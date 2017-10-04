@@ -13,11 +13,13 @@ public class CoarseChangeFilter {
 
     private final EventBus eventBus = new EventBus();
     private String lastFieldChanged;
+    private final BibDatabaseContext context;
 
     public CoarseChangeFilter(BibDatabaseContext bibDatabaseContext) {
         // Listen for change events
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
+        this.context = bibDatabaseContext;
     }
 
     @Subscribe
@@ -38,5 +40,14 @@ public class CoarseChangeFilter {
 
     public void registerListener(Object listener) {
         eventBus.register(listener);
+    }
+
+    public void unregisterListener(Object listener) {
+        eventBus.unregister(listener);
+    }
+
+    public void shutdown() {
+        context.getDatabase().unregisterListener(this);
+        context.getMetaData().unregisterListener(this);
     }
 }

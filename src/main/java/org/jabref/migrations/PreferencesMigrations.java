@@ -1,8 +1,11 @@
 package org.jabref.migrations;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -190,6 +193,55 @@ public class PreferencesMigrations {
         }
     }
 
+    /**
+     * Migrate Import File Name and Directory name Patterns from versions <=4.0 to new BracketedPatterns
+     */
+    private static void migrateFileImportPattern(String oldStylePattern, String newStylePattern,
+            JabRefPreferences prefs, Preferences mainPrefsNode) {
+        String preferenceFileNamePattern = mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null);
+
+        if (preferenceFileNamePattern != null &&
+            oldStylePattern.equals(preferenceFileNamePattern)) {
+            // Upgrade the old-style File Name pattern to new one:
+            mainPrefsNode.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
+            LOGGER.info("migrated old style " + JabRefPreferences.IMPORT_FILENAMEPATTERN +
+                        " value \"" + oldStylePattern + "\" to new value \"" +
+                        newStylePattern + "\" in the preference file");
+
+            if (prefs.hasKey(JabRefPreferences.IMPORT_FILENAMEPATTERN)) {
+                // Update also the key in the current application settings, if necessary:
+                String fileNamePattern = prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN);
+                if (oldStylePattern.equals(fileNamePattern)) {
+                    prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
+                    LOGGER.info("migrated old style " + JabRefPreferences.IMPORT_FILENAMEPATTERN +
+                                " value \"" + oldStylePattern + "\" to new value \"" +
+                                newStylePattern + "\" in the running application");
+                }
+            }
+        }
+    }
+
+    public static void upgradeImportFileAndDirePatterns() {
+        JabRefPreferences prefs = Globals.prefs;
+
+        Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+
+        // Migrate Import patterns
+        // Check for prefs node for Version <= 4.0
+        if (mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null) != null) {
+
+            String[] oldStylePatterns = new String[] {"\\bibtexkey",
+                    "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
+            String[] newStylePatterns = new String[] {"[bibtexkey]",
+                    "[bibtexkey] - [fulltitle]"};
+            for (int i = 0; i < oldStylePatterns.length; i++) {
+                migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
+            }
+        }
+        // Directory preferences are not yet migrated, since it is not quote clear how to parse and reinterpret
+        // the user defined old-style patterns, and the default pattern is "".
+    }
+
     public static void upgradeKeyBindingsToJavaFX() {
         UnaryOperator<String> replaceKeys = (str) -> {
             String result = str.replace("ctrl ", "ctrl+");
@@ -205,6 +257,16 @@ public class PreferencesMigrations {
         keys.replaceAll(replaceKeys);
         prefs.putStringList(JabRefPreferences.BINDINGS, keys);
 
+    }
+
+    public static void addCrossRefRelatedFieldsForAutoComplete() {
+        JabRefPreferences prefs = Globals.prefs;
+        //LinkedHashSet because we want to retain the order and add new fields to the end
+        Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS));
+        keys.add("crossref");
+        keys.add("related");
+        keys.add("entryset");
+        prefs.putStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS, new ArrayList<>(keys));
     }
 
     private static void migrateTypedKeyPrefs(JabRefPreferences prefs, Preferences oldPatternPrefs)

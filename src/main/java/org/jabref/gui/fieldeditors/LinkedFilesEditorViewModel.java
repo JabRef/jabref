@@ -95,6 +95,14 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return new LinkedFile("", relativePath.toString(), suggestedFileType.getName());
     }
 
+    public LinkedFileViewModel fromFile(Path file) {
+        List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+
+        LinkedFile linkedFile = fromFile(file, fileDirectories);
+        return new LinkedFileViewModel(linkedFile, entry, databaseContext);
+
+    }
+
     public boolean isFulltextLookupInProgress() {
         return fulltextLookupInProgress.get();
     }
@@ -273,8 +281,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     private String getSuggestedFileName(String suffix) {
         String plannedName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry,
-                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader));
+                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
 
         if (!suffix.isEmpty()) {
             plannedName += "." + suffix;
@@ -299,9 +306,13 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void deleteFile(LinkedFileViewModel file) {
-        boolean deleteSuccessful = file.delete();
-        if (deleteSuccessful) {
-            files.remove(file);
+        if (file.getFile().isOnlineLink()) {
+            removeFileLink(file);
+        } else {
+            boolean deleteSuccessful = file.delete();
+            if (deleteSuccessful) {
+                files.remove(file);
+            }
         }
     }
 

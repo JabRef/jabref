@@ -12,23 +12,10 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
-
-- We turned the validation feature in the entry editor off by default, because of a bug in the library we have been using [#3145](https://github.com/JabRef/jabref/issues/3145)
-- Added 'Filter All' and 'Filter None' buttons with corresponding functionality to Quality Check tool.
-- We increased the size of the keywords and file text areas in the entry editor
-- When the entry that is currently shown in the entry editor is deleted externally, the editor is now closed automatically [#2946](https://github.com/JabRef/jabref/issues/2946)
+- We added bracketed expresion support for file search patterns, import file name patterns and file directory patters, in addition to bibtexkey patterns.
+- We added support for '[entrytype]' bracketed expression.
 
 ### Fixed
-
-- We re-added the "Normalize to BibTeX name format" context menu item [#3136](https://github.com/JabRef/jabref/issues/3136)
-- We fixed a memory leak in the source tab of the entry editor [#3113](https://github.com/JabRef/jabref/issues/3113)
-- We fixed a [java bug](https://bugs.openjdk.java.net/browse/JDK-8185792) where linux users could not enter accented characters in the entry editor and the search bar [#3028](https://github.com/JabRef/jabref/issues/3028)
-- We fixed a regression introduced in v4.0-beta2: A file can be dropped to the entry preview to attach it to the entry [koppor#245](https://github.com/koppor/jabref/issues/245)
-- We fixed an issue in the "Replace String" dialog (<kbd>Ctrl</kbd>+<kbd>R</kbd> where search and replace did not work for the `bibtexkey` field. [#3132](https://github.com/JabRef/jabref/issues/3132)
-- We fixed an issue in the entry editor where adding a term to a new protected terms list freezed JabRef completely. [#3157](https://github.com/JabRef/jabref/issues/3157)
-- We fixed an issue in the "Manage protected terms" dialog where an 'Open file' dialog instead of a 'Save file' dialog was shown when creating a new list. [#3157](https://github.com/JabRef/jabref/issues/3157)
-- We fixed an issue where unparseable dates of the FileAnnotations caused the FileAnnotationsTab to crash.
-- We fixed an issue where a new protected terms list was not available immediately after its addition. [#3161](https://github.com/JabRef/jabref/issues/3161)
 
 ### Removed
 
@@ -77,9 +64,49 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 
 
+## [4.0] - 2017-10-04
 
+### Changed
 
+- We add a textArea to see versionInfo in the About JabRef Dialog.[#2942](https://github.com/JabRef/jabref/issues/2942)
+- We turned the validation feature in the entry editor off by default, because of a bug in the library we have been using [#3145](https://github.com/JabRef/jabref/issues/3145)
+- Added 'Filter All' and 'Filter None' buttons with corresponding functionality to Quality Check tool.
+- We increased the size of the keywords and file text areas in the entry editor
+- When the entry that is currently shown in the entry editor is deleted externally, the editor is now closed automatically [#2946](https://github.com/JabRef/jabref/issues/2946)
+- We added reordering of file and link entries in the `General`-Tab [3165, comment](https://github.com/JabRef/jabref/issues/3165#issuecomment-326269715)
+- We added autcompletion for the `crossref` field on basis of the BibTeX-key. To accept such an autcompleted key as new entry-link, you have to press <kbd>Enter</kbd> two times, otherwise the field data is not stored in the library file.[koppor#257](https://github.com/koppor/jabref/issues/257)
+- We added drag and drop support for adding files directly in the `General`-Tab. The dragged files are currently only linked from their existing directory. For more advanced features use the `Add files` dialog. [#koppor#244](https://github.com/koppor/jabref/issues/244)
+- We added the file description filed back to the list of files in the `General`-Tab [#2930, comment](https://github.com/JabRef/jabref/issues/2930#issuecomment-328328172)
+- Added an error dialog if the file is open in another process and cannot be renamed. [#3229]
+- On Windows, the `JabRef.exe` executable can now be used to start JabRef from the command line. By default, no output is shown unless the new "-console" option is specified. 
 
+### Fixed
+
+- We re-added the "Normalize to BibTeX name format" context menu item [#3136](https://github.com/JabRef/jabref/issues/3136)
+- We fixed a memory leak in the source tab of the entry editor [#3113](https://github.com/JabRef/jabref/issues/3113)
+- We fixed a [java bug](https://bugs.openjdk.java.net/browse/JDK-8185792) where linux users could not enter accented characters in the entry editor and the search bar [#3028](https://github.com/JabRef/jabref/issues/3028)
+- We fixed a regression introduced in v4.0-beta2: A file can be dropped to the entry preview to attach it to the entry [koppor#245](https://github.com/koppor/jabref/issues/245)
+- We fixed an issue in the "Replace String" dialog (<kbd>Ctrl</kbd>+<kbd>R</kbd> where search and replace did not work for the `bibtexkey` field. [#3132](https://github.com/JabRef/jabref/issues/3132)
+- We fixed an issue in the entry editor where adding a term to a new protected terms list freezed JabRef completely. [#3157](https://github.com/JabRef/jabref/issues/3157)
+- We fixed an issue in the "Manage protected terms" dialog where an 'Open file' dialog instead of a 'Save file' dialog was shown when creating a new list. [#3157](https://github.com/JabRef/jabref/issues/3157)
+- We fixed an issue where unparseable dates of the FileAnnotations caused the FileAnnotationsTab to crash.
+- We fixed an issue where a new protected terms list was not available immediately after its addition. [#3161](https://github.com/JabRef/jabref/issues/3161)
+- We fixed an issue where an online file link could not be removed from an entry [#3165](https://github.com/JabRef/jabref/issues/3165)
+- We fixed an issue where an online file link did not open the browser and created an error [#3165](https://github.com/JabRef/jabref/issues/3165)
+- We fixed an issue where the arrow keys in the search bar did not work as expected [#3081](https://github.com/JabRef/jabref/issues/3081)
+- We fixed wrong hotkey being displayed at "automatically file links" in the entry editor
+- We fixed an issue where metadata syncing with local and shared database were unstable. It will also fix syncing groups and sub-groups in database. [#2284](https://github.com/JabRef/jabref/issues/2284)
+- We fixed an issue where renaming a linked file would fail silently if a file with the same name existed.  Added support for overriding existing file at user discretion. [#3172] (https://github.com/JabRef/jabref/issues/3172)
+- We fixed an issue where the "Remove group and subgroups" operation did not remove group information from entries in the group [#3190](https://github.com/JabRef/jabref/issues/3190)
+- We fixed an issue where it was possible to leave the entry editor with an imbalance of braces. [#3167](https://github.com/JabRef/jabref/issues/3167)
+- Renaming files now truncates the filename to not exceed the limit of 255 chars [#2622](https://github.com/JabRef/jabref/issues/2622)
+- We improved the handling of hyphens in names. [#2775](https://github.com/JabRef/jabref/issues/2775)
+- We fixed an issue where an entered file description was not written to the bib-file [#3208](https://github.com/JabRef/jabref/issues/3208)
+- We improved the auto completion in the search bar. [koppor#253](https://github.com/koppor/jabref/issues/253)
+- We fixed renaming files which are not in the main directory. [#3230](https://github.com/JabRef/jabref/issues/3230)
+
+### Removed
+- We removed support for LatexEditor, as it is not under active development. [#3199](https://github.com/JabRef/jabref/issues/3199)
 
 
 ## [4.0-beta3] – 2017-08-16
@@ -941,7 +968,8 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG) in the [v2.11.1 tag](https://github.com/JabRef/jabref/tree/v2.11.1).
 
-[unreleased]: https://github.com/JabRef/jabref/compare/v4.0-beta3...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v4.0...HEAD
+[4.0]: https://github.com/JabRef/jabref/compare/v4.0-beta3...v4.0
 [4.0-beta3]: https://github.com/JabRef/jabref/compare/v4.0-beta2...v4.0-beta3
 [4.0-beta2]: https://github.com/JabRef/jabref/compare/v4.0-beta...v4.0-beta2
 [4.0-beta]: https://github.com/JabRef/jabref/compare/v3.8.2...v4.0-beta
