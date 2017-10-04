@@ -63,7 +63,7 @@ public class CleanupWorkerTest {
 
         worker = new CleanupWorker(context,
                 //empty fileDirPattern for backwards compatibility
-                new CleanupPreferences("\\bibtexkey",
+                new CleanupPreferences("[bibtexkey]",
                         "",
                         mock(LayoutFormatterPreferences.class),
                         fileDirPrefs));

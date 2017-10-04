@@ -12,6 +12,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- We added bracketed expresion support for file search patterns, import file name patterns and file directory patters, in addition to bibtexkey patterns.
+- We added support for '[entrytype]' bracketed expression.
 
 ### Fixed
 
