@@ -31,8 +31,8 @@ apply from: 'localization.gradle'
 apply from: 'xjc.gradle'
 
 group = "org.jabref"
-version = "4.0-dev"
-project.ext.threeDotVersion = "4.0.2.1"
+version = "4.1-dev"
+project.ext.threeDotVersion = "4.0.3.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -113,9 +113,9 @@ dependencies {
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
     compile 'commons-logging:commons-logging:1.2'
-    compile 'org.apache.logging.log4j:log4j-jcl:2.9.0'
-    compile 'org.apache.logging.log4j:log4j-api:2.9.0'
-    compile 'org.apache.logging.log4j:log4j-core:2.9.0'
+    compile 'org.apache.logging.log4j:log4j-jcl:2.9.1'
+    compile 'org.apache.logging.log4j:log4j-api:2.9.1'
+    compile 'org.apache.logging.log4j:log4j-core:2.9.1'
 
     // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'

@@ -364,7 +364,7 @@ public class GlobalSearchBar extends JPanel {
     public void setAutoCompleter(AutoCompleteSuggestionProvider<Author> searchCompleter) {
         AutoCompletionTextInputBinding.autoComplete(searchField,
                 searchCompleter,
-                new PersonNameStringConverter(true, true, AutoCompleteFirstNameMode.BOTH),
+                new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
                 new AppendPersonNamesStrategy());
 
     }
