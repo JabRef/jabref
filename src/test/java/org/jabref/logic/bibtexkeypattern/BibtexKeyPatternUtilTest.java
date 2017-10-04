@@ -58,13 +58,14 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testCrossrefAndInAuthorNames() throws ParseException {
+    public void testCrossrefAndInAuthorNames() throws Exception {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry();
         entry1.setField(FieldName.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry();
+        entry2.setCiteKey("entry2");
+        entry2.setField(FieldName.AUTHOR, "Simon Holland");
         database.insertEntry(entry1);
-        String bibtexString = "@ARTICLE{entry2, author={Simon Holland}}";
-        BibEntry entry2 = BibtexParser.singleFromString(bibtexString, importFormatPreferences).get();
         database.insertEntry(entry2);
 
         assertEquals("Holland",
@@ -82,13 +83,14 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testCrossrefAndAuthorNames() throws ParseException {
+    public void testCrossrefAndAuthorNames() throws Exception {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry();
         entry1.setField(FieldName.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry();
+        entry2.setCiteKey("entry2");
+        entry2.setField(FieldName.AUTHOR, "Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland");
         database.insertEntry(entry1);
-        String bibtexString = "@ARTICLE{entry2, author={Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland}}";
-        BibEntry entry2 = BibtexParser.singleFromString(bibtexString, importFormatPreferences).get();
         database.insertEntry(entry2);
 
         assertEquals("HerlandHaugeHelgeland",
@@ -311,13 +313,14 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testcrossrefUniversity() throws ParseException {
+    public void testcrossrefUniversity() throws Exception {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry();
         entry1.setField(FieldName.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry();
+        entry2.setCiteKey("entry2");
+        entry2.setField(FieldName.AUTHOR, "{Link{\\\"{o}}ping University}}");
         database.insertEntry(entry1);
-        String bibtexString = "@ARTICLE{entry2, author={{Link{\\\"{o}}ping University}}}";
-        BibEntry entry2 = BibtexParser.singleFromString(bibtexString, importFormatPreferences).get();
         database.insertEntry(entry2);
 
         assertEquals("UniLinkoeping",
@@ -336,13 +339,14 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testcrossrefDepartment() throws ParseException {
+    public void testcrossrefDepartment() throws Exception {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry();
         entry1.setField(FieldName.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry();
+        entry2.setCiteKey("entry2");
+        entry2.setField(FieldName.AUTHOR, "{Link{\\\"{o}}ping University, Department of Electrical Engineering}}");
         database.insertEntry(entry1);
-        String bibtexString = "@ARTICLE{entry2, author={{Link{\\\"{o}}ping University, Department of Electrical Engineering}}}";
-        BibEntry entry2 = BibtexParser.singleFromString(bibtexString, importFormatPreferences).get();
         database.insertEntry(entry2);
 
         assertEquals("UniLinkoepingEE",
@@ -361,13 +365,14 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testcrossrefSchool() throws ParseException {
+    public void testcrossrefSchool() throws Exception {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry();
         entry1.setField(FieldName.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry();
+        entry2.setCiteKey("entry2");
+        entry2.setField(FieldName.AUTHOR, "{Link{\\\"{o}}ping University, School of Computer Engineering}}");
         database.insertEntry(entry1);
-        String bibtexString = "@ARTICLE{entry2, author={{Link{\\\"{o}}ping University, School of Computer Engineering}}}";
-        BibEntry entry2 = BibtexParser.singleFromString(bibtexString, importFormatPreferences).get();
         database.insertEntry(entry2);
 
         assertEquals("UniLinkoepingCE",
@@ -385,13 +390,14 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testcrossrefInstituteOfTechnology() throws ParseException {
+    public void testcrossrefInstituteOfTechnology() throws Exception {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry();
         entry1.setField(FieldName.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry();
+        entry2.setCiteKey("entry2");
+        entry2.setField(FieldName.AUTHOR, "{Massachusetts Institute of Technology}");
         database.insertEntry(entry1);
-        String bibtexString = "@ARTICLE{entry2, author={{Massachusetts Institute of Technology}}}";
-        BibEntry entry2 = BibtexParser.singleFromString(bibtexString, importFormatPreferences).get();
         database.insertEntry(entry2);
 
         assertEquals("MIT",
