@@ -1,5 +1,6 @@
 package org.jabref;
 
+import java.io.IOException;
 import java.net.Authenticator;
 import java.util.Map;
 
