@@ -140,6 +140,7 @@ public class StreamNativeMessagingClient implements NativeMessagingClient {
                 throw new CompletionException(e);
             }
         }, requestExecutor);
+        // TODO: Add timeout: http://iteratrlearning.com/java9/2016/09/13/java9-timeouts-completablefutures.html
     }
 
     @Override
