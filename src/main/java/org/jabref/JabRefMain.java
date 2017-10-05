@@ -54,7 +54,7 @@ public class JabRefMain extends Application {
         launch(arguments);
     }
 
-    private static void start(String[] args) {
+    private static void start(String[] args) throws IOException {
         NativeMessagingClient nativeMessagingClient = new StreamNativeMessagingClient(System.in, System.out);
 
         nativeMessagingClient.send("{\"m\":\"ka\"}");
@@ -183,6 +183,13 @@ public class JabRefMain extends Application {
     @Override
     public void start(Stage mainStage) throws Exception {
         Platform.setImplicitExit(false);
-        SwingUtilities.invokeLater(() -> start(arguments));
+        SwingUtilities.invokeLater(() -> {
+            try {
+                                   start(arguments);
+            } catch(IOException e)
+          {
+               System.out.println(e.getMessage());
+          }}
+                );
     }
 }
