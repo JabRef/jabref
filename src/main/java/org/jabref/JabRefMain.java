@@ -75,6 +75,7 @@ public class JabRefMain extends Application {
         PreferencesMigrations.upgradeSortOrder();
         PreferencesMigrations.upgradeFaultyEncodingStrings();
         PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
+        PreferencesMigrations.upgradeImportFileAndDirePatterns();
         PreferencesMigrations.upgradeStoredCustomEntryTypes();
         PreferencesMigrations.upgradeKeyBindingsToJavaFX();
         PreferencesMigrations.addCrossRefRelatedFieldsForAutoComplete();

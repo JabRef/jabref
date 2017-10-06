@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
+import org.jabref.logic.util.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.OptionalUtil;
@@ -254,7 +255,10 @@ public class FileUtil {
      * @param fileNamePattern the filename pattern
      * @param prefs           the layout preferences
      * @return a suggested fileName
+     *
+     * @Deprecated use String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern ) instead.
      */
+    @Deprecated
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern,
                                                    LayoutFormatterPreferences prefs) {
         String targetName = null;
@@ -275,6 +279,50 @@ public class FileUtil {
         }
         //Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);
+        return targetName;
+    }
+
+    /**
+     * Determines filename provided by an entry in a database
+     *
+     * @param database        the database, where the entry is located
+     * @param entry           the entry to which the file should be linked to
+     * @param fileNamePattern the filename pattern
+     * @return a suggested fileName
+     */
+    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
+        String targetName = null;
+
+        targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
+
+        if ((targetName == null) || targetName.isEmpty()) {
+            targetName = entry.getCiteKeyOptional().orElse("default");
+        }
+
+        //Removes illegal characters from filename
+        targetName = FileNameCleaner.cleanFileName(targetName);
+        return targetName;
+    }
+
+    /**
+     * Determines filename provided by an entry in a database
+     *
+     * @param database        the database, where the entry is located
+     * @param entry           the entry to which the file should be linked to
+     * @param fileNamePattern the filename pattern
+     * @return a suggested fileName
+     */
+    public static String createDirNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
+        String targetName = null;
+
+        targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
+
+        if ((targetName == null) || targetName.isEmpty()) {
+            targetName = entry.getCiteKeyOptional().orElse("default");
+        }
+
+        //Removes illegal characters from filename
+        targetName = FileNameCleaner.cleanDirectoryName(targetName);
         return targetName;
     }
 

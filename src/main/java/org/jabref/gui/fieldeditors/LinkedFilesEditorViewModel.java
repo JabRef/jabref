@@ -281,8 +281,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     private String getSuggestedFileName(String suffix) {
         String plannedName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry,
-                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader));
+                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
 
         if (!suffix.isEmpty()) {
             plannedName += "." + suffix;
