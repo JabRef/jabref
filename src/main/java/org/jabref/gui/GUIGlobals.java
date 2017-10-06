@@ -2,6 +2,7 @@ package org.jabref.gui;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.EmacsKeyBindings;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.preferences.JabRefPreferences;
@@ -155,6 +157,18 @@ public class GUIGlobals {
 
         GUIGlobals.currentFont = new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY),
                 Globals.prefs.getInt(JabRefPreferences.FONT_STYLE), Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
+
+        // Set WM_CLASS using reflection for certain Un*x window managers
+        if (!OS.WINDOWS && !OS.OS_X) {
+            try {
+                Toolkit xToolkit = Toolkit.getDefaultToolkit();
+                java.lang.reflect.Field awtAppClassNameField = xToolkit.getClass().getDeclaredField("awtAppClassName");
+                awtAppClassNameField.setAccessible(true);
+                awtAppClassNameField.set(xToolkit, "org-jabref-JabRefMain");
+            } catch (Exception e) {
+                // ignore any error since this code only works for certain toolkits
+            }
+        }
 
     }
 
