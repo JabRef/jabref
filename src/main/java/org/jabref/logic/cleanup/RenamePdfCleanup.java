@@ -33,18 +33,18 @@ public class RenamePdfCleanup implements CleanupJob {
     private final BibDatabaseContext databaseContext;
     private final boolean onlyRelativePaths;
     private final String fileNamePattern;
-    private final LayoutFormatterPreferences layoutPreferences;
     private final FileDirectoryPreferences fileDirectoryPreferences;
     private int unsuccessfulRenames;
     private LinkedFile singleFieldCleanup;
 
+    // FIXME: (S.G.) remove unused constructor argument 'layoutPreferences' later; for now,
+    // however, the argument is retained in order not to change the class interface:
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
                             LayoutFormatterPreferences layoutPreferences,
                             FileDirectoryPreferences fileDirectoryPreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
         this.fileNamePattern = Objects.requireNonNull(fileNamePattern);
-        this.layoutPreferences = Objects.requireNonNull(layoutPreferences);
         this.fileDirectoryPreferences = fileDirectoryPreferences;
     }
 
@@ -138,7 +138,11 @@ public class RenamePdfCleanup implements CleanupJob {
                 // We use the file directory (if none is set - then bib file) to create relative file links.
                 // The .get() is legal without check because the method will always return a value.
                 Path settingsDir = databaseContext.getFirstExistingFileDir(fileDirectoryPreferences).get();
-                newFileList.add(new LinkedFile(description, settingsDir.relativize(newPath).toString(), type));
+                if (settingsDir.getRoot().equals(newPath.getRoot())) {
+                    newFileList.add(new LinkedFile(description, settingsDir.relativize(newPath).toString(), type));
+                } else {
+                    newFileList.add(new LinkedFile(description, newPath.toString(), type));
+                }
             } else {
                 unsuccessfulRenames++;
             }
@@ -157,7 +161,7 @@ public class RenamePdfCleanup implements CleanupJob {
         String realOldFilename = flEntry.getLink();
 
         String targetFileName = FileUtil.createFileNameFromPattern(
-                databaseContext.getDatabase(), entry, fileNamePattern, layoutPreferences).trim()
+                databaseContext.getDatabase(), entry, fileNamePattern).trim()
                 + '.'
                 + FileHelper.getFileExtension(realOldFilename).orElse("pdf");
 

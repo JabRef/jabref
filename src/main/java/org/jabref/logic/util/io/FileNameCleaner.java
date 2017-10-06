@@ -18,17 +18,15 @@ public class FileNameCleaner {
             10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
             20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
             30, 31, 34,
-            42, 47,
+            42,
             58,
             60, 62, 63,
-            92,
             124
     };
     // @formatter:on
 
     private FileNameCleaner() {
     }
-
 
     /**
      * Replaces illegal characters in given fileName by '_'
@@ -37,6 +35,26 @@ public class FileNameCleaner {
      * @return a clean filename
      */
     public static String cleanFileName(String badFileName) {
+        StringBuilder cleanName = new StringBuilder(badFileName.length());
+        for (int i = 0; i < badFileName.length(); i++) {
+            char c = badFileName.charAt(i);
+            if (FileNameCleaner.isCharLegal(c) && (c != '/') && (c != '\\')) {
+                cleanName.append(c);
+            } else {
+                cleanName.append('_');
+            }
+        }
+        return cleanName.toString().trim();
+    }
+
+    /**
+     * Replaces illegal characters in given directoryName by '_'.
+     * Directory name may contain directory separators, e.g. 'deep/in/a/tree'; these are left untouched.
+     *
+     * @param badFileName the fileName to clean
+     * @return a clean filename
+     */
+    public static String cleanDirectoryName(String badFileName) {
         StringBuilder cleanName = new StringBuilder(badFileName.length());
         for (int i = 0; i < badFileName.length(); i++) {
             char c = badFileName.charAt(i);

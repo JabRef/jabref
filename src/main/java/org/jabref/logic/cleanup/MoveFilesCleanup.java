@@ -31,17 +31,16 @@ public class MoveFilesCleanup implements CleanupJob {
     private final BibDatabaseContext databaseContext;
     private final FileDirectoryPreferences fileDirectoryPreferences;
 
-    private final LayoutFormatterPreferences layoutPrefs;
     private final String fileDirPattern;
 
     private LinkedFile singleFileFieldCleanup;
 
+    // FIXME: remove unused parameter 'layoutPrefs' later S.G.
     public MoveFilesCleanup(BibDatabaseContext databaseContext, String fileDirPattern,
             FileDirectoryPreferences fileDirectoryPreferences, LayoutFormatterPreferences layoutPrefs) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.fileDirPattern = Objects.requireNonNull(fileDirPattern);
         this.fileDirectoryPreferences = Objects.requireNonNull(fileDirectoryPreferences);
-        this.layoutPrefs = Objects.requireNonNull(layoutPrefs);
     }
 
     public MoveFilesCleanup(BibDatabaseContext databaseContext, String fileDirPattern,
@@ -92,8 +91,7 @@ public class MoveFilesCleanup implements CleanupJob {
             }
             String targetDirName = "";
             if (!fileDirPattern.isEmpty()) {
-                targetDirName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, fileDirPattern,
-                        layoutPrefs);
+                targetDirName = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, fileDirPattern);
             }
 
             Path newTargetFile = targetDirectory.get().resolve(targetDirName).resolve(oldFile.get().getFileName());

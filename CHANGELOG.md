@@ -12,6 +12,64 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- We added bracketed expresion support for file search patterns, import file name patterns and file directory patters, in addition to bibtexkey patterns.
+- We added support for '[entrytype]' bracketed expression.
+- Updated French translation
+- We added support for pasting entries in different formats [#3143](https://github.com/JabRef/jabref/issues/3143)
+
+### Fixed
+ - We fixed an issue where JabRef would not terminated after asking to collect anonymous statistics [#2955 comment](https://github.com/JabRef/jabref/issues/2955#issuecomment-334591123)
+
+### Removed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## [4.0] - 2017-10-04
+
+### Changed
 
 - We add a textArea to see versionInfo in the About JabRef Dialog.[#2942](https://github.com/JabRef/jabref/issues/2942)
 - We turned the validation feature in the entry editor off by default, because of a bug in the library we have been using [#3145](https://github.com/JabRef/jabref/issues/3145)
@@ -24,7 +82,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added the file description filed back to the list of files in the `General`-Tab [#2930, comment](https://github.com/JabRef/jabref/issues/2930#issuecomment-328328172)
 - Added an error dialog if the file is open in another process and cannot be renamed. [#3229]
 - On Windows, the `JabRef.exe` executable can now be used to start JabRef from the command line. By default, no output is shown unless the new "-console" option is specified. 
-- We added support for pasting entries in formats other that BibTex [#3143](https://github.com/JabRef/jabref/issues/3143)
 
 ### Fixed
 
@@ -49,57 +106,10 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We improved the handling of hyphens in names. [#2775](https://github.com/JabRef/jabref/issues/2775)
 - We fixed an issue where an entered file description was not written to the bib-file [#3208](https://github.com/JabRef/jabref/issues/3208)
 - We improved the auto completion in the search bar. [koppor#253](https://github.com/koppor/jabref/issues/253)
+- We fixed renaming files which are not in the main directory. [#3230](https://github.com/JabRef/jabref/issues/3230)
 
 ### Removed
 - We removed support for LatexEditor, as it is not under active development. [#3199](https://github.com/JabRef/jabref/issues/3199)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ## [4.0-beta3] – 2017-08-16
@@ -961,7 +971,8 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG) in the [v2.11.1 tag](https://github.com/JabRef/jabref/tree/v2.11.1).
 
-[unreleased]: https://github.com/JabRef/jabref/compare/v4.0-beta3...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v4.0...HEAD
+[4.0]: https://github.com/JabRef/jabref/compare/v4.0-beta3...v4.0
 [4.0-beta3]: https://github.com/JabRef/jabref/compare/v4.0-beta2...v4.0-beta3
 [4.0-beta2]: https://github.com/JabRef/jabref/compare/v4.0-beta...v4.0-beta2
 [4.0-beta]: https://github.com/JabRef/jabref/compare/v3.8.2...v4.0-beta
