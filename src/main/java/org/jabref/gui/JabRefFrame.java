@@ -664,7 +664,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
                 @Override
                 public void run() {
-                    DefaultTaskExecutor.runInJavaFXThread(JabRefFrame.this::showTrackingNotification);
+                    SwingUtilities.invokeLater(() -> {
+                        DefaultTaskExecutor.runInJavaFXThread(JabRefFrame.this::showTrackingNotification);
+                    });
                 }
             }, 60000); // run in one minute
         }
