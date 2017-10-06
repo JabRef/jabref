@@ -2,6 +2,7 @@ package org.jabref.logic.importer;
 
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -28,7 +29,6 @@ public class ImportFormatReaderIntegrationTest {
     public final String format;
     private final Path file;
 
-
     public ImportFormatReaderIntegrationTest(String resource, String format, int count) throws URISyntaxException {
         this.format = format;
         this.count = count;
@@ -53,6 +53,12 @@ public class ImportFormatReaderIntegrationTest {
     @Test
     public void testImportFormatFromFile() throws Exception {
         assertEquals(count, reader.importFromFile(format, file).getDatabase().getEntries().size());
+    }
+
+    @Test
+    public void testImportUnknownFormatFromString() throws Exception {
+        String data = new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
+        assertEquals(count, reader.importUnknownFormat(data).parserResult.getDatabase().getEntries().size());
     }
 
     @Parameterized.Parameters(name = "{index}: {1}")

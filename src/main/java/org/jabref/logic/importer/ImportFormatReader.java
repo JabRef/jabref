@@ -156,11 +156,64 @@ public class ImportFormatReader {
         }
     }
 
+    @FunctionalInterface
+    public static interface CheckedFunction<T, R> {
+
+        R apply(T t) throws IOException;
+    }
+
+    /**
+     * Tries to import entries by iterating through the available import filters,
+     * and keeping the import that seems the most promising
+     *
+     * @param importDatabase the function to import the entries with a formatter
+     * @param isRecognizedFormat the function to check whether the source is in the correct format for an importer
+     * @return an UnknownFormatImport with the imported entries and metadata
+     * @throws ImportException if the import fails (for example, if no suitable importer is found)
+     */
+    private UnknownFormatImport importUnknownFormat(CheckedFunction<Importer, ParserResult> importDatabase, CheckedFunction<Importer, Boolean> isRecognizedFormat) throws ImportException {
+        // stores ref to best result, gets updated at the next loop
+        List<BibEntry> bestResult = null;
+        int bestResultCount = 0;
+        String bestFormatName = null;
+
+        // Cycle through all importers:
+        for (Importer imFo : getImportFormats()) {
+            try {
+                if (!isRecognizedFormat.apply(imFo)) {
+                    continue;
+                }
+
+                ParserResult parserResult = importDatabase.apply(imFo);
+                List<BibEntry> entries = parserResult.getDatabase().getEntries();
+
+                BibDatabases.purgeEmptyEntries(entries);
+                int entryCount = entries.size();
+
+                if (entryCount > bestResultCount) {
+                    bestResult = entries;
+                    bestResultCount = entryCount;
+                    bestFormatName = imFo.getName();
+                }
+            } catch (IOException ex) {
+                // The import did not succeed. Go on.
+            }
+        }
+
+        if (bestResult != null) {
+            // we found something
+            ParserResult parserResult = new ParserResult(bestResult);
+            return new UnknownFormatImport(bestFormatName, parserResult);
+        }
+
+        throw new ImportException(Localization.lang("Could not find a suitable import format."));
+    }
+
     /**
      * Tries to import a file by iterating through the available import filters,
      * and keeping the import that seems most promising.
      * <p/>
-     * If all fails this method attempts to read this file as bibtex.
+     * This method first attempts to read this file as bibtex.
      *
      * @throws ImportException if the import fails (for example, if no suitable importer is found)
      */
@@ -178,41 +231,23 @@ public class ImportFormatReader {
             // Ignored
         }
 
-        // stores ref to best result, gets updated at the next loop
-        List<BibEntry> bestResult = null;
-        int bestResultCount = 0;
-        String bestFormatName = null;
-
-        // Cycle through all importers:
-        for (Importer imFo : getImportFormats()) {
-            try {
-                if (!imFo.isRecognizedFormat(filePath, importFormatPreferences.getEncoding())) {
-                    continue;
-                }
-
-                ParserResult parserResult = imFo.importDatabase(filePath, importFormatPreferences.getEncoding());
-                List<BibEntry> entries = parserResult.getDatabase().getEntries();
-
-                BibDatabases.purgeEmptyEntries(entries);
-                int entryCount = entries.size();
-
-                if (entryCount > bestResultCount) {
-                    bestResult = entries;
-                    bestResultCount = bestResult.size();
-                    bestFormatName = imFo.getName();
-                }
-            } catch (IOException ex) {
-                // The import did not succeed. Go on.
-            }
-        }
-
-        if (bestResult != null) {
-            // we found something
-            ParserResult parserResult = new ParserResult(bestResult);
-            parserResult.setFile(filePath.toFile());
-            return new UnknownFormatImport(bestFormatName, parserResult);
-        }
-
-        throw new ImportException(Localization.lang("Could not find a suitable import format."));
+        UnknownFormatImport unknownFormatImport = importUnknownFormat(importer -> importer.importDatabase(filePath, importFormatPreferences.getEncoding()), importer -> importer.isRecognizedFormat(filePath, importFormatPreferences.getEncoding()));
+        unknownFormatImport.parserResult.setFile(filePath.toFile());
+        return unknownFormatImport;
     }
+
+    /**
+     * Tries to import a String by iterating through the available import filters,
+     * and keeping the import that seems the most promising
+     *
+     * @param data the string to import
+     * @return an UnknownFormatImport with the imported entries and metadata
+     * @throws ImportException if the import fails (for example, if no suitable importer is found)
+     */
+    public UnknownFormatImport importUnknownFormat(String data) throws ImportException {
+        Objects.requireNonNull(data);
+
+        return importUnknownFormat(importer -> importer.importDatabase(data), importer -> importer.isRecognizedFormat(data));
+    }
+
 }

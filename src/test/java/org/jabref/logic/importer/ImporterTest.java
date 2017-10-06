@@ -1,5 +1,6 @@
 package org.jabref.logic.importer;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,17 +40,26 @@ import static org.mockito.Mockito.when;
 @RunWith(Parameterized.class)
 public class ImporterTest {
 
-    @Parameter
-    public Importer format;
+    @Parameter public Importer format;
 
     @Test(expected = NullPointerException.class)
-    public void isRecognizedFormatWithNullThrowsException() throws IOException {
-        format.isRecognizedFormat(null);
+    public void isRecognizedFormatWithNullForBufferedReaderThrowsException() throws IOException {
+        format.isRecognizedFormat((BufferedReader) null);
     }
 
     @Test(expected = NullPointerException.class)
-    public void importDatabaseWithNullThrowsException() throws IOException {
-        format.importDatabase(null);
+    public void isRecognizedFormatWithNullForStringThrowsException() throws IOException {
+        format.isRecognizedFormat((String) null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void importDatabaseWithNullForBufferedReaderThrowsException() throws IOException {
+        format.importDatabase((BufferedReader) null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void importDatabaseWithNullForStringThrowsException() throws IOException {
+        format.importDatabase((String) null);
     }
 
     @Test
