@@ -53,11 +53,9 @@ public class MrDLibImporter extends Importer {
             try (InputStream stream = new ByteArrayInputStream(recommendationsAsString.getBytes())) {
                 saxParser.parse(stream, handler);
             } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
                 return false;
             }
         } catch (ParserConfigurationException | SAXException e) {
-            LOGGER.error(e.getMessage(), e);
             return false;
         }
         return true;
