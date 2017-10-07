@@ -51,6 +51,7 @@ public class JabRefMain extends Application {
     public void start(Stage mainStage) throws Exception {
         Platform.setImplicitExit(false);
         SwingUtilities.invokeLater(() -> start(arguments));
+
     }
 
     private static void start(String[] args) {
