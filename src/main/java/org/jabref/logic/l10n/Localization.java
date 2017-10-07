@@ -11,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class Localization {
+
     public static final String RESOURCE_PREFIX = "l10n/JabRef";
     public static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
     public static final String BIBTEX = "BibTeX";
@@ -98,4 +99,3 @@ public class Localization {
     }
 
 }
-
