@@ -1061,6 +1061,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         file.add(importCurrent);
         file.add(exportAll);
         file.add(exportSelected);
+        file.add(exportLinkedFiles);
         file.addSeparator();
         file.add(connectToSharedDatabaseAction);
         file.add(pullChangesFromSharedDatabase);
@@ -1243,7 +1244,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tools.add(abbreviateMedline);
         tools.add(unabbreviate);
         tools.addSeparator();
-        tools.add(exportLinkedFiles);
         mb.add(tools);
 
         options.add(showPrefs);
