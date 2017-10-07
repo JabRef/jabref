@@ -1,6 +1,10 @@
 package org.jabref.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -22,6 +26,7 @@ import org.jabref.gui.FXDialogService;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -43,11 +48,11 @@ public class ExportLinkedFilesAction extends AbstractAction {
     private final DialogService ds = new FXDialogService();
     private long totalFilesCount;
     private BibDatabaseContext databaseContext;
-    private Optional<Path> exportPath;
+    private Optional<Path> exportPath = Optional.empty();
     private List<BibEntry> entries;
 
     public ExportLinkedFilesAction() {
-        super(Localization.lang("Export linked files"));
+        super(Localization.lang("Copy attached files to folder..."));
     }
 
     @Override
@@ -59,11 +64,14 @@ public class ExportLinkedFilesAction extends AbstractAction {
         entries = JabRefGUI.getMainFrame().getCurrentBasePanel().getSelectedEntries();
         exportPath = DefaultTaskExecutor
                 .runInJavaFXThread(() -> ds.showDirectorySelectionDialog(dirDialogConfiguration));
-        databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabaseContext();
-        totalFilesCount = entries.stream().flatMap(entry -> entry.getFiles().stream()).count();
 
-        Service<Void> exportService = new ExportService();
-        startServiceAndshowProgessDialog(exportService);
+        exportPath.ifPresent(path -> {
+            databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabaseContext();
+            totalFilesCount = entries.stream().flatMap(entry -> entry.getFiles().stream()).count();
+
+            Service<Void> exportService = new ExportService();
+            startServiceAndshowProgessDialog(exportService);
+        });
     }
 
     private <V> void startServiceAndshowProgessDialog(Service<V> service) {
@@ -85,49 +93,72 @@ public class ExportLinkedFilesAction extends AbstractAction {
 
     private class ExportService extends Service<Void> {
 
+        private static final String LOGFILE = "exportLog.log";
+
         @Override
         protected Task<Void> createTask() {
             return new Task<Void>() {
 
                 int totalFilesCounter;
+                int numberSucessful;
+                int numberError;
                 Optional<Path> newPath;
 
                 @Override
                 protected Void call()
-                        throws InterruptedException {
-                    updateMessage(Localization.lang("Exporting files..."));
+                        throws InterruptedException, IOException {
+                    updateMessage(Localization.lang("Copying files..."));
                     updateProgress(0, totalFilesCount);
 
-                    for (int i = 0; i < entries.size(); i++) {
+                    try (BufferedWriter bw = Files.newBufferedWriter(exportPath.get().resolve(LOGFILE), StandardCharsets.UTF_8)) {
 
-                        List<LinkedFile> files = entries.get(i).getFiles();
+                        for (int i = 0; i < entries.size(); i++) {
 
-                        for (int j = 0; j < files.size(); j++) {
-                            updateMessage(Localization.lang("Exporting file %0 of BibEntry %1", Integer.toString(j + 1), Integer.toString(i + 1)));
-                            Thread.sleep(500); //TODO: Adjust/leave/any other idea?
+                            List<LinkedFile> files = entries.get(i).getFiles();
 
-                            String fileName = files.get(j).getLink();
-                            Optional<Path> fileToExport = FileHelper.expandFilenameAsPath(fileName,
-                                    databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()));
+                            for (int j = 0; j < files.size(); j++) {
+                                updateMessage(Localization.lang("Copying file %0 of BibEntry %1", Integer.toString(j + 1), Integer.toString(i + 1)));
+                                Thread.sleep(500); //TODO: Adjust/leave/any other idea?
 
-                            newPath = OptionalUtil.combine(exportPath, fileToExport, resolvePathFilename);
+                                String fileName = files.get(j).getLink();
+                                Optional<Path> fileToExport = FileHelper.expandFilenameAsPath(fileName,
+                                        databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()));
 
-                            newPath.ifPresent(newFile -> {
-                                boolean success = FileUtil.copyFile(fileToExport.get(), newFile, false);
-                                updateProgress(totalFilesCounter++, totalFilesCount);
-                                if (success) {
-                                    updateMessage(Localization.lang("Exported file successfully"));
-                                } else {
-                                    updateMessage(Localization.lang("Could not export file") + " " + Localization.lang("File exists"));
-                                }
-                            });
+                                newPath = OptionalUtil.combine(exportPath, fileToExport, resolvePathFilename);
+
+                                newPath.ifPresent(newFile -> {
+                                    boolean success = FileUtil.copyFile(fileToExport.get(), newFile, false);
+                                    updateProgress(totalFilesCounter++, totalFilesCount);
+                                    if (success) {
+                                        updateMessage(Localization.lang("Copied file successfully"));
+                                        numberSucessful++;
+                                        try {
+                                            bw.write(Localization.lang("Copied file successfully") + ": " + newFile);
+                                            bw.write(OS.NEWLINE);
+                                        } catch (IOException e) {
+                                            LOGGER.error("error writing log file", e);
+                                        }
+                                    } else {
+                                        updateMessage(Localization.lang("Could not copy file") + ": " + Localization.lang("File exists"));
+                                        numberError++;
+                                        try {
+                                            bw.write(Localization.lang("Could not copy file") + ": " + Localization.lang("File exists") + ":" + newFile);
+                                            bw.write(OS.NEWLINE);
+                                        } catch (IOException e) {
+                                            LOGGER.error("error writing log file", e);
+                                        }
+                                    }
+                                });
+                            }
                         }
+                        updateMessage(Localization.lang("Finished copying"));
+                        updateMessage(Localization.lang("Copied %0 files of %1 sucessfully to %2", Integer.toString(numberSucessful), Integer.toString(totalFilesCounter), newPath.map(Path::getParent).map(Path::toString).orElse("")));
+                        bw.write(Localization.lang("Copied %0 files of %1 sucessfully to %2", Integer.toString(numberSucessful), Integer.toString(totalFilesCounter), newPath.map(Path::getParent).map(Path::toString).orElse("")));
+                        return null;
                     }
-                    updateMessage(Localization.lang("Finished exporting"));
-                    updateMessage(Localization.lang("Exported %0 files sucessfully to %1", Integer.toString(totalFilesCounter), newPath.map(Path::toString).orElse("")));
-                    return null;
                 }
             };
         }
     }
+
 }
