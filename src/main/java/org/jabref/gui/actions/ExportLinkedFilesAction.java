@@ -103,7 +103,7 @@ public class ExportLinkedFilesAction extends AbstractAction {
                         List<LinkedFile> files = entries.get(i).getFiles();
 
                         for (int j = 0; j < files.size(); j++) {
-                            updateMessage(Localization.lang("Exporting file %0 of BibEntry %1", Integer.toString(j), Integer.toString(i)));
+                            updateMessage(Localization.lang("Exporting file %0 of BibEntry %1", Integer.toString(j + 1), Integer.toString(i + 1)));
                             Thread.sleep(500); //TODO: Adjust/leave/any other idea?
 
                             String fileName = files.get(j).getLink();
