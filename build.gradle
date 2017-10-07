@@ -31,8 +31,8 @@ apply from: 'localization.gradle'
 apply from: 'xjc.gradle'
 
 group = "org.jabref"
-version = "4.0-dev"
-project.ext.threeDotVersion = "4.0.2.1"
+version = "4.1-dev"
+project.ext.threeDotVersion = "4.0.3.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -72,7 +72,7 @@ dependencies {
     compile 'org.apache.pdfbox:jempbox:1.8.13'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    compile 'org.bouncycastle:bcprov-jdk15on:1.57'
+    compile 'org.bouncycastle:bcprov-jdk15on:1.58'
 
     compile 'commons-cli:commons-cli:1.4'
 
@@ -82,7 +82,7 @@ dependencies {
     compile 'org.openoffice:unoil:4.1.2'
 
     compile 'com.github.bkromhout:java-diff-utils:2.1.1'
-    compile 'info.debatty:java-string-similarity:0.24'
+    compile 'info.debatty:java-string-similarity:1.0.0'
 
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
@@ -91,7 +91,7 @@ dependencies {
     compile 'org.antlr:antlr4-runtime:4.7'
 
     // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
-    compile 'mysql:mysql-connector-java:5.1.42'
+    compile 'mysql:mysql-connector-java:5.1.43'
 
     compile 'com.impossibl.pgjdbc-ng:pgjdbc-ng:0.7.1'
 
@@ -104,7 +104,7 @@ dependencies {
     compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
     compile 'de.saxsys:mvvmfx-validation:1.6.0'
-    compile 'org.controlsfx:controlsfx:8.40.13'
+    compile 'org.controlsfx:controlsfx:8.40.14'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.5.2'
     compile 'org.fxmisc.richtext:richtextfx:0.7-M5'
@@ -113,9 +113,9 @@ dependencies {
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
     compile 'commons-logging:commons-logging:1.2'
-    compile 'org.apache.logging.log4j:log4j-jcl:2.8.2'
-    compile 'org.apache.logging.log4j:log4j-api:2.8.2'
-    compile 'org.apache.logging.log4j:log4j-core:2.8.2'
+    compile 'org.apache.logging.log4j:log4j-jcl:2.9.1'
+    compile 'org.apache.logging.log4j:log4j-api:2.9.1'
+    compile 'org.apache.logging.log4j:log4j-core:2.9.1'
 
     // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
@@ -128,12 +128,12 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.+'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.8.47'
-    testCompile 'com.github.tomakehurst:wiremock:2.7.1'
+    testCompile 'org.mockito:mockito-core:2.10.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.8.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
-    testCompile 'org.xmlunit:xmlunit-core:2.4.0'
-    testCompile 'org.xmlunit:xmlunit-matchers:2.4.0'
+    testCompile 'org.xmlunit:xmlunit-core:2.5.0'
+    testCompile 'org.xmlunit:xmlunit-matchers:2.5.0'
     testCompile 'com.tngtech.archunit:archunit-junit:0.4.0'
     testCompile 'org.slf4j:slf4j-jcl:1.7.25' // required by ArchUnit to enable logging over jcl
 }

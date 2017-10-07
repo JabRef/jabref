@@ -613,4 +613,5 @@ public class BibDatabase {
     public DuplicationChecker getDuplicationChecker() {
         return duplicationChecker;
     }
+
 }

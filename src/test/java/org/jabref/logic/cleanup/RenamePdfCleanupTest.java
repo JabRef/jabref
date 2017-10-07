@@ -52,7 +52,7 @@ public class RenamePdfCleanupTest {
      */
     @Test
     public void cleanupRenamePdfRenamesFileEvenIfOnlyDifferenceIsCase() throws IOException {
-        String fileNamePattern = "\\bibtexkey";
+        String fileNamePattern = "[bibtexkey]";
         File tempFile = testFolder.newFile("toot.tmp");
         LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
@@ -67,7 +67,7 @@ public class RenamePdfCleanupTest {
 
     @Test
     public void cleanupRenamePdfRenamesWithMultipleFiles() throws IOException {
-        String fileNamePattern = "\\bibtexkey - \\title";
+        String fileNamePattern = "[bibtexkey] - [fulltitle]";
         File tempFile = testFolder.newFile("Toot.tmp");
 
         entry.setField("title", "test title");
@@ -85,7 +85,7 @@ public class RenamePdfCleanupTest {
 
     @Test
     public void cleanupRenamePdfRenamesFileStartingWithBibtexKey() throws IOException {
-        String fileNamePattern = "\\bibtexkey - \\title";
+        String fileNamePattern = "[bibtexkey] - [fulltitle]";
 
         File tempFile = testFolder.newFile("Toot.tmp");
         LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
@@ -102,7 +102,7 @@ public class RenamePdfCleanupTest {
 
     @Test
     public void cleanupRenamePdfRenamesFileInSameFolder() throws IOException {
-        String fileNamePattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
+        String fileNamePattern = "[bibtexkey] - [fulltitle]";
         testFolder.newFile("Toot.pdf");
         LinkedFile fileField = new LinkedFile("", "Toot.pdf", "PDF");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
@@ -119,7 +119,7 @@ public class RenamePdfCleanupTest {
 
     @Test
     public void cleanupSingleField() throws IOException {
-        String fileNamePattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
+        String fileNamePattern = "[bibtexkey] - [fulltitle]";
         testFolder.newFile("Toot.pdf");
         LinkedFile fileField = new LinkedFile("", "Toot.pdf", "PDF");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
@@ -137,7 +137,7 @@ public class RenamePdfCleanupTest {
 
     @Test
     public void cleanupGetTargetFilename() throws IOException {
-        String fileNamePattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
+        String fileNamePattern = "[bibtexkey] - [fulltitle]";
         testFolder.newFile("Toot.pdf");
         LinkedFile fileField = new LinkedFile("", "Toot.pdf", "PDF");
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
