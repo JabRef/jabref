@@ -20,6 +20,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Fixed
  - We fixed an issue where JabRef would not terminated after asking to collect anonymous statistics [#2955 comment](https://github.com/JabRef/jabref/issues/2955#issuecomment-334591123)
+ - We fixed an issue where JabRef would not shut down when started with the '-n' (No GUI) option.
 
 ### Removed
 
@@ -82,7 +83,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added drag and drop support for adding files directly in the `General`-Tab. The dragged files are currently only linked from their existing directory. For more advanced features use the `Add files` dialog. [#koppor#244](https://github.com/koppor/jabref/issues/244)
 - We added the file description filed back to the list of files in the `General`-Tab [#2930, comment](https://github.com/JabRef/jabref/issues/2930#issuecomment-328328172)
 - Added an error dialog if the file is open in another process and cannot be renamed. [#3229]
-- On Windows, the `JabRef.exe` executable can now be used to start JabRef from the command line. By default, no output is shown unless the new "-console" option is specified. 
+- On Windows, the `JabRef.exe` executable can now be used to start JabRef from the command line. By default, no output is shown unless the new "-console" option is specified.
 
 ### Fixed
 
