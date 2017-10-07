@@ -94,6 +94,8 @@ public class ExportLinkedFilesAction extends AbstractAction {
     private class ExportService extends Service<Void> {
 
         private static final String LOGFILE = "exportLog.log";
+        private final String localizedSucessMessage = Localization.lang("Copied file successfully");
+        private final String localizedErrorMessage = Localization.lang("Could not copy file") + ": " + Localization.lang("File exists");
 
         @Override
         protected Task<Void> createTask() {
@@ -130,35 +132,38 @@ public class ExportLinkedFilesAction extends AbstractAction {
                                     boolean success = FileUtil.copyFile(fileToExport.get(), newFile, false);
                                     updateProgress(totalFilesCounter++, totalFilesCount);
                                     if (success) {
-                                        updateMessage(Localization.lang("Copied file successfully"));
+                                        updateMessage(localizedSucessMessage);
                                         numberSucessful++;
-                                        try {
-                                            bw.write(Localization.lang("Copied file successfully") + ": " + newFile);
-                                            bw.write(OS.NEWLINE);
-                                        } catch (IOException e) {
-                                            LOGGER.error("error writing log file", e);
-                                        }
+                                        writeLogMessage(newFile, bw, localizedSucessMessage);
+
                                     } else {
-                                        updateMessage(Localization.lang("Could not copy file") + ": " + Localization.lang("File exists"));
+
+                                        updateMessage(localizedErrorMessage);
                                         numberError++;
-                                        try {
-                                            bw.write(Localization.lang("Could not copy file") + ": " + Localization.lang("File exists") + ":" + newFile);
-                                            bw.write(OS.NEWLINE);
-                                        } catch (IOException e) {
-                                            LOGGER.error("error writing log file", e);
-                                        }
+                                        writeLogMessage(newFile, bw, localizedErrorMessage);
                                     }
                                 });
                             }
                         }
                         updateMessage(Localization.lang("Finished copying"));
-                        updateMessage(Localization.lang("Copied %0 files of %1 sucessfully to %2", Integer.toString(numberSucessful), Integer.toString(totalFilesCounter), newPath.map(Path::getParent).map(Path::toString).orElse("")));
-                        bw.write(Localization.lang("Copied %0 files of %1 sucessfully to %2", Integer.toString(numberSucessful), Integer.toString(totalFilesCounter), newPath.map(Path::getParent).map(Path::toString).orElse("")));
+                        String sucessMessage = Localization.lang("Copied %0 files of %1 sucessfully to %2", Integer.toString(numberSucessful), Integer.toString(totalFilesCounter), newPath.map(Path::getParent).map(Path::toString).orElse(""));
+                        updateMessage(sucessMessage);
+                        bw.write(sucessMessage);
                         return null;
                     }
                 }
             };
         }
+
+        private void writeLogMessage(Path newFile, BufferedWriter bw, String logMessage) {
+            try {
+                bw.write(logMessage + ": " + newFile);
+                bw.write(OS.NEWLINE);
+            } catch (IOException e) {
+                LOGGER.error("error writing log file", e);
+            }
+        }
+
     }
 
 }
