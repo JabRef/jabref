@@ -1243,7 +1243,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tools.add(abbreviateIso);
         tools.add(abbreviateMedline);
         tools.add(unabbreviate);
-        tools.addSeparator();
         mb.add(tools);
 
         options.add(showPrefs);
