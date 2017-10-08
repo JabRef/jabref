@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.concurrent.Service;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
@@ -12,6 +13,8 @@ import javafx.stage.FileChooser;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
+
+import org.controlsfx.dialog.ProgressDialog;
 
 /**
  * This interface provides methods to create dialogs and show them to the user.
@@ -122,6 +125,12 @@ public interface DialogService {
     <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog);
 
     /**
+     * Constructs and shows a canceable {@link ProgressDialog}. Clicking cancel will cancel the underlying service and close the dialog
+     * @param service The {@link Service} which executes the work and for which to show the dialog
+     */
+    <V> void showCanceableProgressDialogAndWait(Service<V> service);
+
+    /**
      * Notify the user in an non-blocking way (i.e., update status message instead of showing a dialog).
      * @param message the message to show.
      */
@@ -173,4 +182,5 @@ public interface DialogService {
      * @return A configured instance of the {@link FileChooser}
      */
     FileChooser getConfiguredFileChooser(FileDialogConfiguration fileDialogConfiguration);
+
 }
