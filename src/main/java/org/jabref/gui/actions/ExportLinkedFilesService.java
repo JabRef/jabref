@@ -11,6 +11,8 @@ import java.util.function.BiFunction;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.ListView;
 
 import org.jabref.Globals;
 import org.jabref.logic.l10n.Localization;
@@ -98,6 +100,7 @@ public class ExportLinkedFilesService extends Service<Void> {
                     String sucessMessage = Localization.lang("Copied %0 files of %1 sucessfully to %2", Integer.toString(numberSucessful), Integer.toString(totalFilesCounter), newPath.map(Path::getParent).map(Path::toString).orElse(""));
                     updateMessage(sucessMessage);
                     bw.write(sucessMessage);
+                    showDialog();
                     return null;
                 }
             }
@@ -113,4 +116,10 @@ public class ExportLinkedFilesService extends Service<Void> {
         }
     }
 
+    private void showDialog() {
+        Dialog<String> dlg = new Dialog<>();
+        dlg.setTitle("Results");
+        ListView<String> lv = new ListView<>();
+        dlg.getDialogPane().setContent(lv);
+    }
 }
