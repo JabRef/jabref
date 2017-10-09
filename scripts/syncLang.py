@@ -14,69 +14,39 @@ RES_DIR = "src/main/resources/l10n"
 URL_BASE = "https://github.com/JabRef/jabref/tree/master/src/main/resources/l10n/"
 
 
-def get_current_branch() -> str:
-    """
-    :return: the current git branch
-    """
-    return call_command('git rev-parse --abbrev-ref HEAD')
+class Git:
+    def get_current_branch(self) -> str:
+        """
+        :return: the current git branch
+        """
+        return self.__call_command('git rev-parse --abbrev-ref HEAD')
 
+    def get_current_hash_short(self) -> str:
+        """
+        :return: the current git hash (short)
+        """
+        return self.__call_command('git rev-parse --short HEAD')
 
-def get_current_hash_short() -> str:
-    """
-    :return: the current git hash (short)
-    """
-    return call_command('git rev-parse --short HEAD')
-
-
-def call_command(command: str) -> str:
-    """
-    :param command: a shell command
-    :return: the output of the shell command
-    """
-    return subprocess.check_output(command.split(" ")).decode("utf-8").rstrip()
-
-
-def get_filename(filepath) -> str:
-    """
-    removes the res_dir path
-
-    :param filepath: string
-    :return: string
-    """
-    return filepath.replace("{}\\".format(RES_DIR), "")
-
-
-def read_file(filename, encoding="UTF-8") -> list:
-    """
-    :param filename: string
-    :param encoding: string: the encoding of the file to read (standard: `UTF-8`)
-    :return: list of unicode strings: the lines of the file
-    """
-    with codecs.open(filename, encoding=encoding) as file:
-        return ["{}\r\n".format(line.strip()) for line in file.readlines()]
-
-
-def write_file(filename, content):
-    """
-    writes the lines to the file in `UTF-8`
-    :param filename: string
-    :param content: list of unicode unicode: the lines to write
-    """
-    codecs.open(filename, "w", encoding='utf-8').writelines(content)
+    def __call_command(self, command: str) -> str:
+        """
+        :param command: a shell command
+        :return: the output of the shell command
+        """
+        return subprocess.check_output(command.split(" ")).decode("utf-8").rstrip()
 
 
 class Keys:
     def __init__(self, lines):
         self.lines = lines
 
-    def get_duplicates(self):
+    def duplicates(self) -> list:
         """
         return: list of unicode strings
         """
         duplicates = []
         keys_checked = {}
         for line in self.lines:
-            key, value = self.__get_key_and_value_from_line(line=line)
+            key, value = self.__extract_key_and_value(line=line)
             if key:
                 if key in keys_checked:
                     duplicates.append("{key}={value}".format(key=key, value=value))
@@ -87,18 +57,16 @@ class Keys:
                     keys_checked[key] = value
         return duplicates
 
-    def fix(self):
+    def fix_duplicates(self) -> tuple:
         """
         Fixes all unambiguous duplicates
-
-        :param lines: list of unicode strings
         :return: (list of unicode strings, list of unicode strings): not fixed ambiguous duplicates, fixed unambiguous duplicates
         """
         keys = {}
         fixed = []
         not_fixed = []
         for line in self.lines:
-            key, value = self.__get_key_and_value_from_line(line=line)
+            key, value = self.__extract_key_and_value(line=line)
             if key:
                 if key in keys:
                     if not keys[key]:
@@ -116,22 +84,21 @@ class Keys:
 
         return keys, not_fixed, fixed
 
-    def get_keys_from_lines(self):
+    def keys_from_lines(self) -> list:
         """
         Builds a list of all translation keys in the list of lines.
 
-        :param lines: a list of unicode strings
         :return: list of unicode strings: the sorted keys within the lines
         """
-
-        keys = []
+        keys = list()
         for line in self.lines:
             key = self.key_from_line(line)
             if key:
                 keys.append(key)
         return keys
 
-    def key_from_line(self, line):
+    @staticmethod
+    def key_from_line(line) -> str:
         """
         Tries to extract the key from the line
 
@@ -146,34 +113,32 @@ class Keys:
                 return line[0:index_key_end].strip()
         return None
 
-    def empty_keys(self):
+    def empty_keys(self) -> list:
         """
-        :param lines: list of unicode strings
         :return: list of unicode strings: the keys with empty values
         """
-        not_translated = []
+        not_translated = list()
         keys = self.translations_as_dict()
         for key, value in keys.items():
             if not value:
                 not_translated.append(key)
         return not_translated
 
-    def translations_as_dict(self):
+    def translations_as_dict(self) -> dict:
         """
-        :param lines: list of unicode strings
         :return: dict of unicode strings:
         """
-        translations = {}
+        translations = dict()
         for line in self.lines:
-            key, value = self.__get_key_and_value_from_line(line=line)
+            key, value = self.__extract_key_and_value(line=line)
             if key:
                 translations[key] = value
         return translations
 
-    def __get_key_and_value_from_line(self, line):
+    @staticmethod
+    def __extract_key_and_value(line) -> tuple:
         """
         Tries to extract the key and value from the line
-
         :param line: unicode string
         :return: (unicode string, unicode string) or (None, None): (key, value)
         """
@@ -187,7 +152,7 @@ class Keys:
 
 
 class SyncLang:
-    def __init__(self, extended, out_file='status.md'):
+    def __init__(self, extended: bool, out_file='status.md'):
         """
         :param extended: boolean: if the keys with problems should be printed
 
@@ -227,20 +192,19 @@ class SyncLang:
         self.__update_properties(main_property_file=self.main_jabref_preferences, other_property_files=self.__other_jabref_properties())
 
     def __check_properties(self, main_property_file, property_files):
-        main_lines = read_file(filename=main_property_file)
-        keys2 = Keys(main_lines)
-        main_keys = keys2.get_keys_from_lines()
+        main_lines = self.__read_file_as_lines(filename=main_property_file)
+        main_keys = Keys(main_lines)
 
         # the main property file gets compared to itself, but that is OK
         for file in property_files:
-            filename = get_filename(filepath=file)
-            lines = read_file(file)
+            filename = self.__format_filename(filepath=file)
+            lines = self.__read_file_as_lines(file)
             keys1 = Keys(main_lines)
-            keys = keys1.get_keys_from_lines()
+            keys = keys1.keys_from_lines()
 
-            keys_missing = self.__missing_keys(main_keys, keys)
-            keys_obsolete = self.__missing_keys(keys, main_keys)
-            keys_duplicate = Keys(lines).get_duplicates()
+            keys_missing = self.__missing_keys(main_keys.keys_from_lines(), keys)
+            keys_obsolete = self.__missing_keys(keys, main_keys.keys_from_lines())
+            keys_duplicate = Keys(lines).duplicates()
             keys_not_translated = Keys(lines=lines).empty_keys()
 
             num_keys = len(keys)
@@ -305,25 +269,25 @@ class SyncLang:
         return [os.path.join(RES_DIR, file) for file in jabref_property_files]
 
     def __update_properties(self, main_property_file, other_property_files):
-        main_lines = read_file(filename=main_property_file)
+        main_lines = self.__read_file_as_lines(filename=main_property_file)
         # saved the stripped lines
-        write_file(main_property_file, main_lines)
-        keys_o = Keys(main_lines)
-        main_keys = keys_o.get_keys_from_lines()
+        self.__write_file(main_property_file, main_lines)
+        main_keys = Keys(main_lines)
 
-        main_duplicates = keys_o.get_duplicates()
+        main_duplicates = main_keys.duplicates()
         num_main_duplicates = len(main_duplicates)
         if num_main_duplicates != 0:
             logging.error("There are {num_duplicates} duplicates in {file}, please fix them manually".format(num_duplicates=num_main_duplicates,
-                                                                                                             file=get_filename(filepath=main_property_file)))
+                                                                                                             file=self.__format_filename(
+                                                                                                                 filepath=main_property_file)))
             if self.extended:
                 logging.info("\t{}".format(", ".join(main_duplicates)))
             return
 
         for other_property_file in other_property_files:
-            filename = get_filename(filepath=other_property_file)
-            lines = read_file(filename=other_property_file)
-            keys, not_fixed, fixed = Keys(lines).fix()
+            filename = self.__format_filename(filepath=other_property_file)
+            lines = self.__read_file_as_lines(filename=other_property_file)
+            keys, not_fixed, fixed = Keys(lines).fix_duplicates()
 
             num_keys = len(keys)
             num_not_fixed = len(not_fixed)
@@ -336,8 +300,8 @@ class SyncLang:
                     logging.error("\t{}".format(", ".join(not_fixed)))
                 continue
 
-            keys_missing = self.__missing_keys(main_keys, keys)
-            keys_obsolete = self.__missing_keys(keys, main_keys)
+            keys_missing = self.__missing_keys(main_keys.keys_from_lines(), keys)
+            keys_obsolete = self.__missing_keys(keys, main_keys.keys_from_lines())
 
             num_keys_missing = len(keys_missing)
             num_keys_obsolete = len(keys_obsolete)
@@ -350,7 +314,7 @@ class SyncLang:
 
             other_lines_to_write = []
             for line in main_lines:
-                key = keys_o.key_from_line(line)
+                key = main_keys.key_from_line(line)
                 if key is not None:
                     other_lines_to_write.append("{key}={value}\r\n".format(key=key, value=keys[key]))
                 else:
@@ -362,7 +326,7 @@ class SyncLang:
                     if old_line != new_lines:
                         sorted_lines = True
 
-            write_file(filename=other_property_file, content=other_lines_to_write)
+            self.__write_file(filename=other_property_file, content=other_lines_to_write)
 
             logging.info("Processing file '{file}' with {num_keys} Keys".format(file=filename, num_keys=num_keys))
             if num_fixed != 0:
@@ -383,7 +347,36 @@ class SyncLang:
             if sorted_lines:
                 logging.info("\thas been sorted successfully")
 
-    def __missing_keys(self, first_list, second_list):
+    @staticmethod
+    def __format_filename(filepath) -> str:
+        """
+        removes the res_dir path
+
+        :param filepath: string
+        :return: string
+        """
+        return filepath.replace("{}\\".format(RES_DIR), "")
+
+    @staticmethod
+    def __write_file(filename, content):
+        """
+        writes the lines to the file in `UTF-8`
+        :param filename: string
+        :param content: list of unicode unicode: the lines to write
+        """
+        codecs.open(filename, "w", encoding='utf-8').writelines(content)
+
+    @staticmethod
+    def __read_file_as_lines(filename, encoding="UTF-8") -> list:
+        """
+        :param filename: string
+        :param encoding: string: the encoding of the file to read (standard: `UTF-8`)
+        :return: list of unicode strings: the lines of the file
+        """
+        with codecs.open(filename, encoding=encoding) as file:
+            return ["{}\r\n".format(line.strip()) for line in file.readlines()]
+
+    def __missing_keys(self, first_list: list, second_list: list) -> list:
         """
         Finds all keys in the first list that are not present in the second list
 
@@ -401,13 +394,12 @@ class SyncLang:
         """
         Creates a markdown file of the current status.
         """
-
         def _write_properties(output_file: TextIOWrapper, property_files: list):
             output_file.write("\n| Property file | Keys | Keys translated | Keys not translated | % translated |\n")
             output_file.write("| ------------- | ---- | --------------- | ------------------- | ------------ |\n")
 
             for file in property_files:
-                lines = read_file(file)
+                lines = self.__read_file_as_lines(file)
                 keys = Keys(lines)
                 num_keys = len(keys.translations_as_dict())
                 num_keys_missing_value = len(keys.empty_keys())
@@ -426,7 +418,7 @@ class SyncLang:
 
         with open(self.markdown_output, "w", encoding='utf-8') as status_file:
             status_file.write(f'### Localization files status ({datetime.datetime.now().strftime("%Y-%m-%d %H:%M")} - '
-                              f'Branch `{get_current_branch()}` `{get_current_hash_short()}`)\n\n')
+                              f'Branch `{Git().get_current_branch()}` `{Git().get_current_hash_short()}`)\n\n')
             status_file.write('Note: To get the current status from your local repository, run `python ./scripts/syncLang.py markdown`\n')
 
             _write_properties(status_file, self.__all_menu_properties())
