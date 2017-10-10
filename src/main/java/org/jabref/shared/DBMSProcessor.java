@@ -527,11 +527,17 @@ public abstract class DBMSProcessor {
      * @param data JabRef meta data as map
      */
     public void setSharedMetaData(Map<String, String> data) throws SQLException {
-        connection.createStatement().executeUpdate("TRUNCATE TABLE " + escape("METADATA")); // delete data all data from table
-
-        for (Map.Entry<String, String> metaEntry : data.entrySet()) {
-
-            StringBuilder query = new StringBuilder()
+        StringBuilder updateQuery = new StringBuilder()
+                    .append("UPDATE ")
+                    .append(escape("METADATA"))
+                    .append(" SET ")
+                    .append(escape("VALUE"))
+                    .append(" = ? ")
+                    .append(" WHERE ")
+                    .append(escape("KEY"))
+                    .append(" = ?");
+                
+        StringBuilder insertQuery = new StringBuilder()
                 .append("INSERT INTO ")
                 .append(escape("METADATA"))
                 .append("(")
@@ -539,13 +545,23 @@ public abstract class DBMSProcessor {
                 .append(", ")
                 .append(escape("VALUE"))
                 .append(") VALUES(?, ?)");
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(query.toString())) {
-                preparedStatement.setString(1, metaEntry.getKey());
-                preparedStatement.setString(2, metaEntry.getValue());
-                preparedStatement.executeUpdate();
+        
+        for (Map.Entry<String, String> metaEntry : data.entrySet()) {
+            try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery.toString())) {
+                updateStatement.setString(2, metaEntry.getKey());
+                updateStatement.setString(1, metaEntry.getValue());
+                if (updateStatement.executeUpdate() == 0) {
+                    // No rows updated -> insert data
+                    try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery.toString())) {
+                        insertStatement.setString(1, metaEntry.getKey());
+                        insertStatement.setString(2, metaEntry.getValue());
+                        insertStatement.executeUpdate();
+                    } catch (SQLException e) {
+                            LOGGER.error("SQL Error: ", e);
+                    }                    
+                }
             } catch (SQLException e) {
-                LOGGER.error("SQL Error: ", e);
+                    LOGGER.error("SQL Error: ", e);
             }
         }
     }
