@@ -138,6 +138,7 @@ public class JabRefMain extends Application {
         // See if we should shut down now
         if (argumentProcessor.shouldShutDown()) {
             Globals.shutdownThreadPools();
+            Platform.exit();
             return;
         }
 
