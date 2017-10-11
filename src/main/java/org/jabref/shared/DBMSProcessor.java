@@ -557,7 +557,7 @@ public abstract class DBMSProcessor {
                         insertStatement.setString(2, metaEntry.getValue());
                         insertStatement.executeUpdate();
                     } catch (SQLException e) {
-                            LOGGER.error("SQL Error: ", e);
+                        LOGGER.error("SQL Error: ", e);
                     }                    
                 }
             } catch (SQLException e) {
