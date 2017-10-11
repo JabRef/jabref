@@ -15,6 +15,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added bracketed expresion support for file search patterns, import file name patterns and file directory patters, in addition to bibtexkey patterns.
 - We added support for '[entrytype]' bracketed expression.
 - Updated French translation
+- We improved the handling of abstracts in the "Astrophysics Data System" fetcher. [#2471](https://github.com/JabRef/jabref/issues/2471)
 - We added support for pasting entries in different formats [#3143](https://github.com/JabRef/jabref/issues/3143)
 - Crossreferenced entries are now used when a BibTex key is generated for an entry with empty fields. [#2811](https://github.com/JabRef/jabref/issues/2811)
 - We now set the WM_CLASS of the UI to org-jabref-JabRefMain to allow certain Un*x window managers to properly identify its windows
