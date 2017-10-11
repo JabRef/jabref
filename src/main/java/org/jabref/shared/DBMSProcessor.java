@@ -561,7 +561,7 @@ public abstract class DBMSProcessor {
                     }                    
                 }
             } catch (SQLException e) {
-                    LOGGER.error("SQL Error: ", e);
+                LOGGER.error("SQL Error: ", e);
             }
         }
     }
