@@ -29,7 +29,7 @@ public class OpenOfficePreferences {
     public static final String OSX_EXECUTABLE = "soffice";
 
     public static final String DEFAULT_LINUX_PATH = "/usr/lib/libreoffice";
-    public static final String DEFAULT_LINUX_EXEC_PATH = "/usr/lib/libreoffie/program/soffice";
+    public static final String DEFAULT_LINUX_EXEC_PATH = "/usr/lib/libreoffice/program/soffice";
     public static final String LINUX_EXECUTABLE = "soffice";
 
     public static final List<String> OO_JARS = Arrays.asList("unoil.jar", "jurt.jar", "juh.jar", "ridl.jar");
