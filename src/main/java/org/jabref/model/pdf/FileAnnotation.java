@@ -6,8 +6,6 @@ import java.time.format.DateTimeParseException;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.cos.COSName;
