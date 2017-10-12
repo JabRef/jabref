@@ -24,7 +24,7 @@ public class RemoveNewlinesFormatter implements Formatter {
     public String format(String value) {
         Objects.requireNonNull(value);
 
-        return value.replace("\r\n", " ").replace("\n", " ").trim();
+        return value.replace("\r\n", " ").replace("\n", " ").replace("\r", " ").trim();
     }
 
     @Override
