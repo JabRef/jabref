@@ -109,7 +109,9 @@ public class FileAnnotation {
         }
 
         // remove line breaks
-        return new RemoveNewlinesFormatter().format(content.trim());
+        String processedContent = content.replace("\r\n", " ").replace("\n", " ").replace("\r", " ");
+
+        return processedContent.trim();
     }
 
     /**
