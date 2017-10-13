@@ -103,7 +103,7 @@ dependencies {
     compile 'com.airhacks:afterburner.fx:1.7.0'
     compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
-    compile 'de.saxsys:mvvmfx-validation:1.6.0'
+    compile 'de.saxsys:mvvmfx-validation:1.7.0'
     compile 'org.controlsfx:controlsfx:8.40.14'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.5.2'
