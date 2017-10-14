@@ -234,7 +234,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     @Subscribe
     public synchronized void listen(EntryChangedEvent event) {
-        sourceTab.updateSourcePane();
+        DefaultTaskExecutor.runInJavaFXThread(() -> sourceTab.updateSourcePane());
     }
 
     private void rebuildOtherFieldsTab() {
