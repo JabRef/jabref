@@ -26,6 +26,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue where JabRef would not terminated after asking to collect anonymous statistics [#2955 comment](https://github.com/JabRef/jabref/issues/2955#issuecomment-334591123)
  - We fixed an issue where JabRef would not shut down when started with the '-n' (No GUI) option.
  - We improved the way metadata is updated in remote databases. [#3235](https://github.com/JabRef/jabref/issues/3235)
+ - We improved font rendering of the Entry Editor for Linux based systems [#3295](https://github.com/JabRef/jabref/issues/3295)
 
 ### Removed
 
