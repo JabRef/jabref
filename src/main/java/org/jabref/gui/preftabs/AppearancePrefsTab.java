@@ -115,12 +115,11 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         List<String> lookAndFeels = LookAndFeel.getAvailableLookAndFeels();
         classNamesLAF = new JComboBox<>(lookAndFeels.toArray(new String[lookAndFeels.size()]));
         classNamesLAF.setEditable(true);
-        final JComboBox<String> clName = classNamesLAF;
-        customLAF.addChangeListener(e -> clName.setEnabled(((JCheckBox) e.getSource()).isSelected()));
+        customLAF.addChangeListener(e -> classNamesLAF.setEnabled(((JCheckBox) e.getSource()).isSelected()));
 
         colorPanel = new ColorSetupPanel(colorCodes, resolvedColorCodes, showGrid);
 
-        // only the default L&F shows the the OSX specific first dropdownmenu
+        // only the default L&F shows the OSX specific first drop-down menu
         if (!OS.OS_X) {
             JPanel pan = new JPanel();
             builder.appendSeparator(Localization.lang("Look and feel"));
@@ -251,19 +250,18 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public void storeSettings() {
+        boolean isRestartRequired;
+
         // L&F
         prefs.putBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL, !customLAF.isSelected());
+        prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, classNamesLAF.getSelectedItem().toString());
+        isRestartRequired = (customLAF.isSelected() == useDefaultLAF) ||
+                !currentLAF.equals(classNamesLAF.getSelectedItem().toString());
+
+        // Java FX font rendering tweak
         final boolean oldFxTweakValue = prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK);
         prefs.putBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK, fxFontTweaksLAF.isSelected());
-        prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, classNamesLAF.getSelectedItem().toString());
-        if ((customLAF.isSelected() == useDefaultLAF)
-                || !currentLAF.equals(classNamesLAF.getSelectedItem().toString())
-                || oldFxTweakValue != fxFontTweaksLAF.isSelected()) {
-            JOptionPane.showMessageDialog(null,
-                    Localization.lang("You have changed the look and feel setting.").concat(" ")
-                            .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
-                    Localization.lang("Changed look and feel settings"), JOptionPane.WARNING_MESSAGE);
-        }
+        isRestartRequired |= oldFxTweakValue != fxFontTweaksLAF.isSelected();
 
         prefs.putBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON, colorCodes.isSelected());
         prefs.putBoolean(JabRefPreferences.TABLE_RESOLVED_COLOR_CODES_ON, resolvedColorCodes.isSelected());
@@ -280,33 +278,30 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             int largeIconSize = Integer.parseInt(largeIconsTextField.getText());
             int padding = Integer.parseInt(rowPadding.getText());
             if (overrideFonts.isSelected()) {
-                boolean somethingIsChanged = false;
                 if (size != oldMenuFontSize) {
                     prefs.putInt(JabRefPreferences.MENU_FONT_SIZE, size);
-                    somethingIsChanged = true;
+                    isRestartRequired = true;
                 }
                 if (smallIconSize != oldSmallIconSize) {
                     prefs.putInt(JabRefPreferences.ICON_SIZE_SMALL, smallIconSize);
-                    somethingIsChanged = true;
+                    isRestartRequired = true;
                 }
                 if (largeIconSize != oldLargeIconSize) {
                     prefs.putInt(JabRefPreferences.ICON_SIZE_LARGE, largeIconSize);
-                    somethingIsChanged = true;
-                }
-                if (somethingIsChanged) {
-                    JOptionPane.showMessageDialog(null,
-                            Localization.lang("You have changed the menu and label font size.").concat(" ")
-                                    .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
-                            Localization.lang("Changed font settings"), JOptionPane.WARNING_MESSAGE);
+                    isRestartRequired = true;
                 }
             } else if (overrideFonts.isSelected() != oldOverrideFontSize) {
                 prefs.remove(JabRefPreferences.ICON_SIZE_SMALL);
                 prefs.remove(JabRefPreferences.ICON_SIZE_LARGE);
                 prefs.remove(JabRefPreferences.MENU_FONT_SIZE);
-                JOptionPane.showMessageDialog(null,
-                        Localization.lang("You have changed the menu and label font size.").concat(" ")
-                                .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
-                        Localization.lang("Changed font settings"), JOptionPane.WARNING_MESSAGE);
+                isRestartRequired = true;
+            }
+
+            if (isRestartRequired) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        Localization.lang("Some appearance settings you changed require to restart JabRef to come into effect."),
+                        Localization.lang("Settings"), JOptionPane.WARNING_MESSAGE);
             }
 
             prefs.putInt(JabRefPreferences.TABLE_ROW_PADDING, padding);
