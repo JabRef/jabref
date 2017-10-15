@@ -52,6 +52,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     private String currentLAF = "";
     private boolean useDefaultLAF;
     private final JCheckBox customLAF;
+    private final JCheckBox fxFontTweaksLAF;
 
     static class LookAndFeel {
         private static final List<String> LOOKS = Arrays.asList(
@@ -109,6 +110,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
         customLAF = new JCheckBox(Localization.lang("Use other look and feel"));
+        fxFontTweaksLAF = new JCheckBox(Localization.lang("Tweak font rendering for entry editor on Linux"));
         // Only list L&F which are available
         List<String> lookAndFeels = LookAndFeel.getAvailableLookAndFeels();
         classNamesLAF = new JComboBox<>(lookAndFeels.toArray(new String[lookAndFeels.size()]));
@@ -147,6 +149,9 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             lab = new JLabel(
                     Localization.lang("and the class must be available in your classpath next time you start JabRef."));
             builder.append(lab);
+            builder.nextLine();
+            builder.append(pan);
+            builder.append(fxFontTweaksLAF);
             builder.nextLine();
         }
 
@@ -217,6 +222,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     public void setValues() {
         // L&F
         useDefaultLAF = prefs.getBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL);
+        fxFontTweaksLAF.setSelected(prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK));
         currentLAF = prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
         customLAF.setSelected(!useDefaultLAF);
         classNamesLAF.setSelectedItem(currentLAF);
@@ -247,8 +253,12 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     public void storeSettings() {
         // L&F
         prefs.putBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL, !customLAF.isSelected());
+        final boolean oldFxTweakValue = prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK);
+        prefs.putBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK, fxFontTweaksLAF.isSelected());
         prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, classNamesLAF.getSelectedItem().toString());
-        if ((customLAF.isSelected() == useDefaultLAF) || !currentLAF.equals(classNamesLAF.getSelectedItem().toString())) {
+        if ((customLAF.isSelected() == useDefaultLAF)
+                || !currentLAF.equals(classNamesLAF.getSelectedItem().toString())
+                || oldFxTweakValue != fxFontTweaksLAF.isSelected()) {
             JOptionPane.showMessageDialog(null,
                     Localization.lang("You have changed the look and feel setting.").concat(" ")
                             .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
