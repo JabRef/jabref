@@ -104,10 +104,12 @@ dependencies {
     compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
     compile 'de.saxsys:mvvmfx-validation:1.7.0'
-    compile 'org.controlsfx:controlsfx:8.40.14'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.5.2'
     compile 'org.fxmisc.richtext:richtextfx:0.7-M5'
+
+    // Cannot be updated to 9.*.* until Jabref works with Java 9
+    compile 'org.controlsfx:controlsfx:8.40.14'
 
     compile 'org.jsoup:jsoup:1.10.3'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
