@@ -294,6 +294,7 @@ public class HTMLUnicodeConversionMaps {
             {"982", "piv", "$\\varphi$"}, // greek pi symbol, U+03D6 ISOgrk3
 
             /* General Punctuation */
+            {"8211", "ndash", "$\\textendash$"},
             {"8226", "bull", "$\\bullet$"}, // bullet = black small circle,
             //                                    U+2022 ISOpub
             /* bullet is NOT the same as bullet operator, U+2219 */
