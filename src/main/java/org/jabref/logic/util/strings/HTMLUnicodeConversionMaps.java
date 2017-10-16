@@ -295,6 +295,7 @@ public class HTMLUnicodeConversionMaps {
 
             /* General Punctuation */
             {"8211", "ndash", "$\\textendash$"},
+            {"8212", "mdash", "$\\textemdash$"},
             {"8226", "bull", "$\\bullet$"}, // bullet = black small circle,
             //                                    U+2022 ISOpub
             /* bullet is NOT the same as bullet operator, U+2219 */
