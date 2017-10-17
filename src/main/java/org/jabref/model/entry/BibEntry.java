@@ -20,6 +20,7 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -804,7 +805,8 @@ public class BibEntry implements Cloneable {
             return Optional.empty();
         }
 
-        return this.setField(FieldName.FILE, newValue);
+        //Violates our architecture, but currently only possible way because the LinkedFile is setup using JavaFX properties
+        return DefaultTaskExecutor.runInJavaFXThread(() -> this.setField(FieldName.FILE, newValue));
     }
 
     /**

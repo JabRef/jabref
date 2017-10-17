@@ -23,21 +23,35 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     private static final Log LOGGER = LogFactory.getLog(DefaultTaskExecutor.class);
 
-    private ExecutorService executor = Executors.newFixedThreadPool(5);
+    private final ExecutorService executor = Executors.newFixedThreadPool(5);
 
     public static <V> V runInJavaFXThread(Callable<V> callable) {
-        FutureTask<V> task = new FutureTask<>(callable);
-        Platform.runLater(task);
-        try {
-            return task.get();
-        } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error(e);
-            return null;
+        if (!Platform.isFxApplicationThread()) {
+            FutureTask<V> task = new FutureTask<>(callable);
+            Platform.runLater(task);
+            try {
+                return task.get();
+            } catch (InterruptedException | ExecutionException e) {
+                LOGGER.error(e);
+                return null;
+            }
+        } else {
+            try {
+                //we directly execute the callback
+                return callable.call();
+            } catch (Exception e) {
+                LOGGER.error("Exception on calling callable", e);
+            }
         }
+        return null;
     }
 
     public static void runInJavaFXThread(Runnable runnable) {
-        Platform.runLater(runnable);
+        if (!Platform.isFxApplicationThread()) {
+            Platform.runLater(runnable);
+        } else {
+            LOGGER.debug("Already on FX thread");
+        }
     }
 
     @Override
