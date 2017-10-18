@@ -117,6 +117,11 @@ public class BibtexSingleField {
         properties = pExtras;
     }
 
+    public BibtexSingleField withExtras(Set<FieldProperty> pExtras) {
+        properties = pExtras;
+        return this;
+    }
+
     // fieldExtras contains mappings to tell the EntryEditor to add a specific
     // function to this field, for instance a "browse" button for the "pdf" field.
     public Set<FieldProperty> getFieldProperties() {

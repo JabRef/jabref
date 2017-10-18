@@ -177,7 +177,7 @@ public class InternalBibtexFields {
 
         // additional fields ------------------------------------------------------
         add(new BibtexSingleField(FieldName.LOCATION, false));
-        add(new BibtexSingleField(FieldName.ABSTRACT, false, BibtexSingleField.LARGE_W, 400));
+        add(new BibtexSingleField(FieldName.ABSTRACT, false, BibtexSingleField.LARGE_W, 400).withExtras(EnumSet.of(FieldProperty.MULTILINE_TEXT)));
 
         dummy = new BibtexSingleField(FieldName.URL, false, BibtexSingleField.SMALL_W);
         dummy.setExtras(EnumSet.of(FieldProperty.EXTERNAL, FieldProperty.VERBATIM));

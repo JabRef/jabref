@@ -17,6 +17,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Updated French translation
 - We improved the handling of abstracts in the "Astrophysics Data System" fetcher. [#2471](https://github.com/JabRef/jabref/issues/2471)
 - We added support for pasting entries in different formats [#3143](https://github.com/JabRef/jabref/issues/3143)
+- We increased the relative size of the "abstract" field in the entry editor. [Feature request in the forum](http://discourse.jabref.org/t/entry-preview-in-version-4/827)
 - Crossreferenced entries are now used when a BibTex key is generated for an entry with empty fields. [#2811](https://github.com/JabRef/jabref/issues/2811)
 - We now set the WM_CLASS of the UI to org-jabref-JabRefMain to allow certain Un*x window managers to properly identify its windows
 - We changed the default paths for the OpenOffice/LibreOffice binaries to the default path for LibreOffice
