@@ -24,6 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class LocalizationConsistencyTest {
@@ -180,6 +181,23 @@ public class LocalizationConsistencyTest {
         for (LocalizationEntry e : keys) {
             assertTrue("Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey(),
                     e.getKey().startsWith("\"") || e.getKey().endsWith("\""));
+        }
+    }
+
+    @Test
+    public void localizationTestForInvalidStrings() {
+        for (String bundle : Arrays.asList("JabRef", "Menu")) {
+            for (String lang : Languages.LANGUAGES.values()) {
+                String propertyFilePath = String.format("/l10n/%s_%s.properties", bundle, lang);
+
+                // find any spaces
+                for (Map.Entry<Object, Object> entry : LocalizationParser.getProperties(propertyFilePath).entrySet()) {
+                    assertFalse("Found an invalid character in the '" + lang + "' localization of '" + bundle +
+                            "': The key of " + entry.getKey().toString() + "=" + entry.getValue() + " contains a space!", entry.getKey().toString().contains(" "));
+                    assertFalse("Found an invalid character in the '" + lang + "' localization of '" + bundle +
+                            "': The value of " + entry.getKey().toString() + "=" + entry.getValue() + " contains a space!", entry.getValue().toString().contains(" "));
+                }
+            }
         }
     }
 

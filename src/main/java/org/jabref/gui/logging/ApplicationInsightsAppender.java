@@ -39,6 +39,7 @@ public class ApplicationInsightsAppender extends AbstractAppender {
         Telemetry telemetry;
         if (event.isException()) {
             ExceptionTelemetry exceptionTelemetry = new ExceptionTelemetry(event.getException());
+            exceptionTelemetry.getProperties().put("Message", rawEvent.getMessage().getFormattedMessage());
             exceptionTelemetry.setSeverityLevel(event.getNormalizedSeverityLevel());
             telemetry = exceptionTelemetry;
         } else {

@@ -31,3 +31,7 @@
     -fx-text-fill: text-area-foreground;
     -fx-text-origin: baseline;
 }
+
+.list-cell:odd {
+    -fx-background-color: text-area-background;
+}

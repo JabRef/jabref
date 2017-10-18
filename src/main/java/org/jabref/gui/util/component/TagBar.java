@@ -39,7 +39,11 @@ public class TagBar<T> extends HBox {
         getStylesheets().add(0, TagBar.class.getResource("TagBar.css").toExternalForm());
     }
 
-    public ObservableList getTags() {
+    public TextField getInputTextField() {
+        return inputTextField;
+    }
+
+    public ObservableList<T> getTags() {
         return tags.get();
     }
 
@@ -76,7 +80,7 @@ public class TagBar<T> extends HBox {
         String inputText = inputTextField.getText();
         if (StringUtil.isNotBlank(inputText)) {
             T newTag = stringConverter.fromString(inputText);
-            if (newTag != null && !tags.contains(newTag)) {
+            if ((newTag != null) && !tags.contains(newTag)) {
                 tags.add(newTag);
                 inputTextField.clear();
             }

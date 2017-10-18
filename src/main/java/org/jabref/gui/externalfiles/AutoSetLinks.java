@@ -122,14 +122,13 @@ public class AutoSetLinks {
                         tableModel = singleTableModel;
                     }
                     List<Path> files = entryFilePair.getValue();
-                    for (Path f : files) {
-                        f = FileUtil.shortenFileName(f, dirs);
+                    for (Path file : files) {
+                        file = FileUtil.shortenFileName(file, dirs);
                         boolean alreadyHas = false;
-                        //System.out.println("File: "+f.getPath());
+
                         for (int j = 0; j < tableModel.getRowCount(); j++) {
                             FileListEntry existingEntry = tableModel.getEntry(j);
-                            //System.out.println("Comp: "+existingEntry.getLink());
-                            if (Paths.get(existingEntry.getLink()).equals(f)) {
+                            if (Paths.get(existingEntry.getLink()).equals(file)) {
                                 alreadyHas = true;
                                 foundAny = true;
                                 break;
@@ -137,14 +136,10 @@ public class AutoSetLinks {
                         }
                         if (!alreadyHas) {
                             foundAny = true;
-                            Optional<ExternalFileType> type;
-                            Optional<String> extension = FileHelper.getFileExtension(f);
-                            if (extension.isPresent()) {
-                                type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.get());
-                            } else {
-                                type = Optional.of(new UnknownExternalFileType(""));
-                            }
-                            FileListEntry flEntry = new FileListEntry(f.getFileName().toString(), f.toString(), type);
+                            Optional<ExternalFileType> type = FileHelper.getFileExtension(file)
+                                    .map(extension -> ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension))
+                                    .orElse(Optional.of(new UnknownExternalFileType("")));
+                            FileListEntry flEntry = new FileListEntry("", file.toString(), type);
                             tableModel.addEntry(tableModel.getRowCount(), flEntry);
 
                             String newVal = tableModel.getStringRepresentation();

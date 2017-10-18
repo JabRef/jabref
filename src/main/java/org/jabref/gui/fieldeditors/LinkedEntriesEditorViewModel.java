@@ -1,5 +1,8 @@
 package org.jabref.gui.fieldeditors;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
@@ -9,8 +12,11 @@ import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryLinkList;
 import org.jabref.model.entry.ParsedEntryLink;
+
+import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
 
@@ -29,12 +35,21 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
                 newText -> EntryLinkList.parse(newText, databaseContext.getDatabase()));
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public Collection<ParsedEntryLink> complete(AutoCompletionBinding.ISuggestionRequest request) {
+        //We have to cast the BibEntries from the BibEntrySuggestionProvider to ParsedEntryLink
+        Collection<BibEntry> bibEntries = (Collection<BibEntry>) super.complete(request);
+        return bibEntries.stream().map(ParsedEntryLink::new).collect(Collectors.toList());
+    }
+
     public ListProperty<ParsedEntryLink> linkedEntriesProperty() {
         return linkedEntries;
     }
 
     public StringConverter<ParsedEntryLink> getStringConverter() {
         return new StringConverter<ParsedEntryLink>() {
+
             @Override
             public String toString(ParsedEntryLink linkedEntry) {
                 if (linkedEntry == null) {
@@ -60,4 +75,5 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
         //        e -> frame.getCurrentBasePanel().highlightEntry(e)
         //);
     }
+
 }

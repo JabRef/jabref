@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Stack;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
+import org.jabref.logic.util.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.OptionalUtil;
@@ -30,9 +32,33 @@ import org.apache.commons.logging.LogFactory;
 
 public class FileUtil {
     public static final boolean IS_POSIX_COMPILANT = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
+    public static final int MAXIMUM_FILE_NAME_LENGTH = 255;
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
     private FileUtil() {
+    }
+
+    /**
+     * Returns the extension of a file name or Optional.empty() if the file does not have one (no "." in name).
+     *
+     * @return The extension (without leading dot), trimmed and in lowercase.
+     */
+    public static Optional<String> getFileExtension(String fileName) {
+        int dotPosition = fileName.lastIndexOf('.');
+        if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
+            return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase(Locale.ROOT));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
+     *
+     * @return The extension, trimmed and in lowercase.
+     */
+    public static Optional<String> getFileExtension(File file) {
+        return getFileExtension(file.getName());
     }
 
     /**
@@ -48,8 +74,26 @@ public class FileUtil {
     }
 
     /**
-     * Adds an extension to the given file name. The original extension is not replaced. That means,
-     * "demo.bib", ".sav" gets "demo.bib.sav" and not "demo.sav"
+     * Returns a valid filename for most operating systems.
+     *
+     * Currently, only the length is restricted to 255 chars, see MAXIMUM_FILE_NAME_LENGTH.
+     */
+    public static String getValidFileName(String fileName) {
+        String nameWithoutExtension = getFileName(fileName);
+
+        if (nameWithoutExtension.length() > MAXIMUM_FILE_NAME_LENGTH) {
+            Optional<String> extension = getFileExtension(fileName);
+            String shortName = nameWithoutExtension.substring(0, MAXIMUM_FILE_NAME_LENGTH);
+            LOGGER.info(String.format("Truncated the too long filename '%s' (%d characters) to '%s'.", fileName, fileName.length(), shortName));
+            return extension.map(s -> shortName + "." + s).orElse(shortName);
+        }
+
+        return fileName;
+    }
+
+    /**
+     * Adds an extension to the given file name. The original extension is not replaced. That means, "demo.bib", ".sav"
+     * gets "demo.bib.sav" and not "demo.sav"
      *
      * @param path      the path to add the extension to
      * @param extension the extension to add
@@ -148,24 +192,27 @@ public class FileUtil {
      */
     public static boolean renameFile(Path fromFile, Path toFile, boolean replaceExisting) {
         try {
-            if (replaceExisting) {
-                return Files.move(fromFile, fromFile.resolveSibling(toFile),
-                        StandardCopyOption.REPLACE_EXISTING) != null;
-            } else {
-                return Files.move(fromFile, fromFile.resolveSibling(toFile)) != null;
-            }
+            return renameFileWithException(fromFile, toFile, replaceExisting);
         } catch (IOException e) {
             LOGGER.error("Renaming Files failed", e);
             return false;
         }
     }
 
+    public static boolean renameFileWithException(Path fromFile, Path toFile, boolean replaceExisting) throws IOException {
+        if (replaceExisting) {
+            return Files.move(fromFile, fromFile.resolveSibling(toFile),
+                    StandardCopyOption.REPLACE_EXISTING) != null;
+        } else {
+            return Files.move(fromFile, fromFile.resolveSibling(toFile)) != null;
+        }
+    }
+
     /**
-     * Converts an absolute file to a relative one, if possible.
-     * Returns the parameter file itself if no shortening is possible
+     * Converts an absolute file to a relative one, if possible. Returns the parameter file itself if no shortening is
+     * possible.
      * <p>
-     * This method works correctly only if dirs are sorted decent in their length
-     * i.e. /home/user/literature/important before /home/user/literature
+     * This method works correctly only if dirs are sorted decent in their length i.e. /home/user/literature/important before /home/user/literature.
      *
      * @param file the file to be shortened
      * @param dirs directories to check
@@ -208,7 +255,10 @@ public class FileUtil {
      * @param fileNamePattern the filename pattern
      * @param prefs           the layout preferences
      * @return a suggested fileName
+     *
+     * @Deprecated use String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern ) instead.
      */
+    @Deprecated
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern,
                                                    LayoutFormatterPreferences prefs) {
         String targetName = null;
@@ -233,8 +283,51 @@ public class FileUtil {
     }
 
     /**
-     * Finds a file inside a directory structure.
-     * Will also look for the file inside nested directories.
+     * Determines filename provided by an entry in a database
+     *
+     * @param database        the database, where the entry is located
+     * @param entry           the entry to which the file should be linked to
+     * @param fileNamePattern the filename pattern
+     * @return a suggested fileName
+     */
+    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
+        String targetName = null;
+
+        targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
+
+        if ((targetName == null) || targetName.isEmpty()) {
+            targetName = entry.getCiteKeyOptional().orElse("default");
+        }
+
+        //Removes illegal characters from filename
+        targetName = FileNameCleaner.cleanFileName(targetName);
+        return targetName;
+    }
+
+    /**
+     * Determines filename provided by an entry in a database
+     *
+     * @param database        the database, where the entry is located
+     * @param entry           the entry to which the file should be linked to
+     * @param fileNamePattern the filename pattern
+     * @return a suggested fileName
+     */
+    public static String createDirNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
+        String targetName = null;
+
+        targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
+
+        if ((targetName == null) || targetName.isEmpty()) {
+            targetName = entry.getCiteKeyOptional().orElse("default");
+        }
+
+        //Removes illegal characters from filename
+        targetName = FileNameCleaner.cleanDirectoryName(targetName);
+        return targetName;
+    }
+
+    /**
+     * Finds a file inside a directory structure. Will also look for the file inside nested directories.
      *
      * @param filename      the name of the file that should be found
      * @param rootDirectory the rootDirectory that will be searched
@@ -253,8 +346,7 @@ public class FileUtil {
     }
 
     /**
-     * Finds a file inside a list of directory structures.
-     * Will also look for the file inside nested directories.
+     * Finds a file inside a list of directory structures. Will also look for the file inside nested directories.
      *
      * @param filename    the name of the file that should be found
      * @param directories the directories that will be searched

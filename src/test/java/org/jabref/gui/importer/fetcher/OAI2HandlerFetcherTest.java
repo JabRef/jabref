@@ -72,7 +72,7 @@ public class OAI2HandlerFetcherTest {
 
             Assert.assertEquals(Optional.of("Heavy Particles from Inflation"), be.getField("title"));
             Assert.assertTrue(be.getField("abstract").isPresent());
-            Assert.assertEquals(Optional.of("23 pages"), be.getField("comments"));
+            Assert.assertEquals(Optional.of("23 pages"), be.getField("comment"));
             Assert.assertEquals(Optional.of("CERN-PH-TH/2004-151"), be.getField("reportno"));
         } catch (SAXException e) {
             throw e.getException();

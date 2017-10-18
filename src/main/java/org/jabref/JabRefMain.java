@@ -75,8 +75,10 @@ public class JabRefMain extends Application {
         PreferencesMigrations.upgradeSortOrder();
         PreferencesMigrations.upgradeFaultyEncodingStrings();
         PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
+        PreferencesMigrations.upgradeImportFileAndDirePatterns();
         PreferencesMigrations.upgradeStoredCustomEntryTypes();
         PreferencesMigrations.upgradeKeyBindingsToJavaFX();
+        PreferencesMigrations.addCrossRefRelatedFieldsForAutoComplete();
 
         // Update handling of special fields based on preferences
         InternalBibtexFields
@@ -136,6 +138,7 @@ public class JabRefMain extends Application {
         // See if we should shut down now
         if (argumentProcessor.shouldShutDown()) {
             Globals.shutdownThreadPools();
+            Platform.exit();
             return;
         }
 

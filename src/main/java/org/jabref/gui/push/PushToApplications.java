@@ -16,7 +16,6 @@ public class PushToApplications {
         applications = new ArrayList<>();
 
         applications.add(new PushToEmacs());
-        applications.add(new PushToLatexEditor());
         applications.add(new PushToLyx());
         applications.add(new PushToTexmaker());
         applications.add(new PushToTeXstudio());

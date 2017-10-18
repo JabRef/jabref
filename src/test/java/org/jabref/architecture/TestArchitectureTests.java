@@ -24,6 +24,7 @@ public class TestArchitectureTests {
 
     private static final String CLASS_ORG_JABREF_PREFERENCES = "org.jabref.preferences.JabRefPreferences";
     private static final String CLASS_ORG_JABREF_PREFERENCES_TEST = "JabRefPreferencesTest";
+    private static final String CLASS_ORG_JABREF_PREFERENCES_MIGRATIONS_TEST = "PreferencesMigrationsTest";
 
     private final String forbiddenPackage;
 
@@ -36,6 +37,7 @@ public class TestArchitectureTests {
         // Note that bending the architectural constraints should not be done inconsiderately
         exceptions = new ArrayList<>();
         exceptions.add(CLASS_ORG_JABREF_PREFERENCES_TEST);
+        exceptions.add(CLASS_ORG_JABREF_PREFERENCES_MIGRATIONS_TEST);
     }
 
     @Parameterized.Parameters(name = "tests independent of {0}?")
