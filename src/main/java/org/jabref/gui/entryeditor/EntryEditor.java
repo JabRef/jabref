@@ -158,7 +158,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private final BorderLayout layout;
     private TypeLabel typeLabel;
 
-    public EntryEditor(BasePanel panel, BibEntry entry) {
+    public EntryEditor(BasePanel panel) {
         this.frame = panel.frame();
         this.panel = panel;
 
@@ -170,7 +170,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
         // Create type-label
         typeLabel = new TypeLabel("");
-        setEntry(entry);
         setupToolBar();
         DefaultTaskExecutor.runInJavaFXThread(() ->
                 container.setScene(new Scene(tabbed))

@@ -1490,7 +1490,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             currentEditor.setEntry(entry);
             return currentEditor;
         } else {
-            return new EntryEditor(this, entry);
+            EntryEditor editor = new EntryEditor(this);
+            editor.setEntry(entry);
+            return editor;
         }
     }
 
