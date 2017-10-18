@@ -172,7 +172,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
         typeLabel = new TypeLabel("");
         setEntry(entry);
         setupToolBar();
-        container.setScene(new Scene(tabbed));
+        DefaultTaskExecutor.runInJavaFXThread(() ->
+                container.setScene(new Scene(tabbed))
+        );
         add(container, BorderLayout.CENTER);
 
         DefaultTaskExecutor.runInJavaFXThread(() -> {
