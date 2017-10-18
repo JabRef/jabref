@@ -1,39 +1,6 @@
 package org.jabref.gui.entryeditor;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.undo.UndoableEdit;
-
+import com.google.common.eventbus.Subscribe;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.JFXPanel;
@@ -41,14 +8,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyEvent;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.fxmisc.easybind.EasyBind;
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.EntryContainer;
-import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.OSXCompatibleToolbar;
+import org.jabref.gui.*;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
@@ -86,10 +50,16 @@ import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.fxmisc.easybind.EasyBind;
+import javax.swing.*;
+import javax.swing.undo.UndoableEdit;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -764,7 +734,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                         //TODO: See if we need to update an AutoCompleter instance:
                         /*
-                        AutoCompleter<String> aComp = panel.getSuggestionProviders().get(fieldEditor.getFieldName());
+                        AutoCompleter<String> aComp = panel.getSuggestionProviders().get(fieldEditor.getName());
                         if (aComp != null) {
                             aComp.addBibtexEntry(entry);
                         }

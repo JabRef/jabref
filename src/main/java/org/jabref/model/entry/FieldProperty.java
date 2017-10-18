@@ -17,7 +17,6 @@ public enum FieldProperty {
     EDITOR_TYPE,
     PAGINATION,
     TYPE,
-    CROSSREF,
     ISO_DATE,
     ISBN,
     EPRINT,
