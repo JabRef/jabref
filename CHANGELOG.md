@@ -15,13 +15,20 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added bracketed expresion support for file search patterns, import file name patterns and file directory patters, in addition to bibtexkey patterns.
 - We added support for '[entrytype]' bracketed expression.
 - Updated French translation
+- We improved the handling of abstracts in the "Astrophysics Data System" fetcher. [#2471](https://github.com/JabRef/jabref/issues/2471)
 - We added support for pasting entries in different formats [#3143](https://github.com/JabRef/jabref/issues/3143)
 - Crossreferenced entries are now used when a BibTex key is generated for an entry with empty fields. [#2811](https://github.com/JabRef/jabref/issues/2811)
 - We now set the WM_CLASS of the UI to org-jabref-JabRefMain to allow certain Un*x window managers to properly identify its windows
+- We changed the default paths for the OpenOffice/LibreOffice binaries to the default path for LibreOffice
+- We no longer create a new entry editor when selecting a new entry to increase performance. [#3187](https://github.com/JabRef/jabref/pull/3187)
 
 ### Fixed
+ - We fixed the translation of \textendash in the entry preview [#3307](https://github.com/JabRef/jabref/issues/3307)
  - We fixed an issue where JabRef would not terminated after asking to collect anonymous statistics [#2955 comment](https://github.com/JabRef/jabref/issues/2955#issuecomment-334591123)
- - We fixed an issue where JabRef would not shut down when started with the '-n' (No GUI) option.
+ - We fixed an issue where JabRef would not shut down when started with the '-n' (No GUI) option. [#3247](https://github.com/JabRef/jabref/issues/3247)
+ - We improved the way metadata is updated in remote databases. [#3235](https://github.com/JabRef/jabref/issues/3235)
+ - We improved font rendering of the Entry Editor for Linux based systems [#3295](https://github.com/JabRef/jabref/issues/3295)
+ - We fixed an issue where JabRef would freeze when trying to replace the original entry after a merge with new information from identifiers like DOI/ISBN etc. [3294](https://github.com/JabRef/jabref/issues/3294)
 
 ### Removed
 

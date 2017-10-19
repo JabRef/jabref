@@ -81,6 +81,7 @@ public class ImportFormats {
                 DialogService ds = new FXDialogService();
 
                 FileChooser fs = ds.getConfiguredFileChooser(fileDialogConfiguration);
+                fs.getExtensionFilters().add(0, allImports);
                 fs.setSelectedExtensionFilter(allImports);
                 File f = DefaultTaskExecutor
                         .runInJavaFXThread(() -> fs.showOpenDialog(null));

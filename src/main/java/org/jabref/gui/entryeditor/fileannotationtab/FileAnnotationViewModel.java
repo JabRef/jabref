@@ -26,21 +26,14 @@ public class FileAnnotationViewModel {
 
     private void setupContentProperties(FileAnnotation annotation) {
         if (annotation.hasLinkedAnnotation()) {
-            this.content.set(toNAifEmpty(annotation.getLinkedFileAnnotation().getContent()));
+            this.content.set(annotation.getLinkedFileAnnotation().getContent());
             String annotationContent = annotation.getContent();
             String illegibleTextMessage = Localization.lang("The marked area does not contain any legible text!");
             this.marking.set(annotationContent.isEmpty() ? illegibleTextMessage : annotationContent);
         } else {
-            this.content.set(toNAifEmpty(annotation.getContent()));
-            this.marking.set("N/A");
+            this.content.set(annotation.getContent());
+            this.marking.set("");
         }
-    }
-
-    private static String toNAifEmpty(String content) {
-        if (content.isEmpty()) {
-            return "N/A";
-        }
-        return content;
     }
 
     public String getAuthor() {
