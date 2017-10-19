@@ -1,5 +1,6 @@
 package org.jabref.gui.actions;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.List;
@@ -123,11 +124,42 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
                 });
                 menu.add(menuItem);
             }
+
             JButton menuButton = new JButton(Localization.lang("Filter"));
             menuButton.addActionListener(entry -> menu.show(menuButton, 0, menuButton.getHeight()));
             FormBuilder builder = FormBuilder.create()
                     .layout(new FormLayout("fill:pref:grow", "fill:pref:grow, 2dlu, pref"));
 
+            JButton filterNoneButton = new JButton(Localization.lang("Filter None"));
+            filterNoneButton.addActionListener(event -> {
+                for (Component component : menu.getComponents()) {
+                    if (component instanceof JCheckBoxMenuItem) {
+                        JCheckBoxMenuItem checkBox = (JCheckBoxMenuItem) component;
+                        if (checkBox.isSelected()) {
+                            checkBox.setSelected(false);
+                            showMessage.put(checkBox.getText(), checkBox.isSelected());
+                        }
+                    }
+                    ((AbstractTableModel) table.getModel()).fireTableDataChanged();
+                }
+            });
+
+            JButton filterAllButton = new JButton(Localization.lang("Filter All"));
+            filterAllButton.addActionListener(event -> {
+                for (Component component : menu.getComponents()) {
+                    if (component instanceof JCheckBoxMenuItem) {
+                        JCheckBoxMenuItem checkBox = (JCheckBoxMenuItem) component;
+                        if (!checkBox.isSelected()) {
+                            checkBox.setSelected(true);
+                            showMessage.put(checkBox.getText(), checkBox.isSelected());
+                        }
+                    }
+                    ((AbstractTableModel) table.getModel()).fireTableDataChanged();
+                }
+            });
+
+            builder.add(filterNoneButton).xy(1, 3, "left, b");
+            builder.add(filterAllButton).xy(1, 3, "right, b");
             builder.add(scrollPane).xy(1, 1);
             builder.add(menuButton).xy(1, 3, "c, b");
             dialog.add(builder.getPanel());

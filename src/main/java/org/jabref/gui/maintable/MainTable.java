@@ -116,7 +116,6 @@ public class MainTable extends JTable {
         this.tableFormat = tableFormat;
         this.panel = panel;
 
-
         setModel(GlazedListsSwing
                 .eventTableModelWithThreadProxyList(model.getTableRows(), tableFormat));
 

@@ -16,6 +16,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.util.IdentifierParser;
+import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -31,8 +32,8 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
     private TaskExecutor taskExecutor;
     private DialogService dialogService;
 
-    public IdentifierEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, TaskExecutor taskExecutor, DialogService dialogService) {
-        super(fieldName, suggestionProvider);
+    public IdentifierEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, TaskExecutor taskExecutor, DialogService dialogService, FieldCheckers fieldCheckers) {
+        super(fieldName, suggestionProvider, fieldCheckers);
 
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;

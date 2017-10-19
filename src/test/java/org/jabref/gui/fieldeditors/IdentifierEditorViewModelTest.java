@@ -3,6 +3,7 @@ package org.jabref.gui.fieldeditors;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.WordSuggestionProvider;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
+import org.jabref.logic.integrity.FieldCheckers;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +17,7 @@ public class IdentifierEditorViewModelTest {
 
     @Before
     public void setUp() throws Exception {
-        viewModel = new IdentifierEditorViewModel("DOI", new WordSuggestionProvider("DOI"), new CurrentThreadTaskExecutor(), mock(DialogService.class));
+        viewModel = new IdentifierEditorViewModel("DOI", new WordSuggestionProvider("DOI"), new CurrentThreadTaskExecutor(), mock(DialogService.class), mock(FieldCheckers.class));
     }
 
     @Test

@@ -7,7 +7,7 @@ public abstract class EntryEditorTab extends Tab {
     /**
      * Used for lazy-loading of the tab content.
      */
-    private boolean isInitialized = false;
+    protected boolean isInitialized = false;
 
     public abstract boolean shouldShow();
 

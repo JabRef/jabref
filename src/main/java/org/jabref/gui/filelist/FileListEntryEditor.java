@@ -383,4 +383,5 @@ public class FileListEntryEditor {
     public boolean okPressed() {
         return okPressed;
     }
+
 }

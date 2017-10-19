@@ -166,7 +166,7 @@ public class IconTheme {
 
         return jabrefLogos;
     }
-
+	
     public enum JabRefIcon {
 
         ADD(MaterialDesignIcon.PLUS_BOX),

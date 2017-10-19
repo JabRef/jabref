@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.model.Defaults;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.metadata.FileDirectoryPreferences;
@@ -19,18 +20,20 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.shared.DBMSSynchronizer;
 
 /**
- * Represents everything related to a BIB file.
- * <p>
- * The entries are stored in BibDatabase, the other data in MetaData and the options relevant for this file in Defaults.
+ * Represents everything related to a BIB file. <p> The entries are stored in BibDatabase, the other data in MetaData
+ * and the options relevant for this file in Defaults.
  */
 public class BibDatabaseContext {
 
     private final BibDatabase database;
     private final Defaults defaults;
     private MetaData metaData;
-    /** The file where this database was last saved to. */
+    /**
+     * The file where this database was last saved to.
+     */
     private File file;
     private DBMSSynchronizer dbmsSynchronizer;
+    private CoarseChangeFilter dbmsListener;
     private DatabaseLocation location;
 
     public BibDatabaseContext() {
@@ -61,7 +64,7 @@ public class BibDatabaseContext {
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, File file, Defaults defaults,
-            DatabaseLocation location) {
+                              DatabaseLocation location) {
         this(database, metaData, defaults);
         Objects.requireNonNull(location);
         this.setDatabaseFile(file);
@@ -80,7 +83,7 @@ public class BibDatabaseContext {
     }
 
     public BibDatabaseContext(Defaults defaults, DatabaseLocation location, Character keywordSeparator,
-            GlobalBibtexKeyPattern globalCiteKeyPattern) {
+                              GlobalBibtexKeyPattern globalCiteKeyPattern) {
         this(new BibDatabase(), new MetaData(), defaults);
         if (location == DatabaseLocation.SHARED) {
             convertToSharedDatabase(keywordSeparator, globalCiteKeyPattern);
@@ -165,6 +168,7 @@ public class BibDatabaseContext {
 
     /**
      * Returns the first existing file directory from  {@link #getFileDirectories(FileDirectoryPreferences)}
+     *
      * @param preferences The FileDirectoryPreferences
      * @return Optional of Path
      */
@@ -173,22 +177,21 @@ public class BibDatabaseContext {
     }
 
     /**
-    * Look up the directories set up for the given field type for this database.
-    * If no directory is set up, return that defined in global preferences.
-    * There can be up to three directory definitions for these files:
-    * the database's metadata can specify a general directory and/or a user-specific directory
-    * or the preferences can specify one.
-    * <p>
-    * The settings are prioritized in the following order and the first defined setting is used:
-    * 1. metadata user-specific directory
-    * 2. metadata general directory
-    * 3. preferences directory
-    * 4. BIB file directory
-    *
-    * @param fieldName The field type
+     * Look up the directories set up for the given field type for this database. If no directory is set up, return that
+     * defined in global preferences. There can be up to three directory definitions for these files: the database's
+     * metadata can specify a general directory and/or a user-specific directory or the preferences can specify one. <p>
+     * The settings are prioritized in the following order and the first defined setting is used:
+     * <ol>
+     *     <li>metdata</li>
+     *     <li>user-specific directory</li>
+     *     <li>preferences directory</li>
+     *     <li>BIB file directory</li>
+     * </ol>
+     *
+     * @param fieldName   The field type
      * @param preferences The fileDirectory preferences
      * @return The default directory for this field type.
-    */
+     */
     public List<String> getFileDirectories(String fieldName, FileDirectoryPreferences preferences) {
         List<String> fileDirs = new ArrayList<>();
 
@@ -214,7 +217,7 @@ public class BibDatabaseContext {
             if (parentPath == null) {
                 parentPath = Paths.get(System.getProperty("user.dir"));
             }
-            Objects.requireNonNull(parentPath, "BibTex database parent path is null");
+            Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
             String parentDir = parentPath.toAbsolutePath().toString();
             // Check if we should add it as primary file dir (first in the list) or not:
             if (preferences.isBibLocationAsPrimary()) {
@@ -263,8 +266,8 @@ public class BibDatabaseContext {
 
     public void convertToSharedDatabase(Character keywordSeparator, GlobalBibtexKeyPattern globalCiteKeyPattern) {
         this.dbmsSynchronizer = new DBMSSynchronizer(this, keywordSeparator, globalCiteKeyPattern);
-        this.database.registerListener(dbmsSynchronizer);
-        this.metaData.registerListener(dbmsSynchronizer);
+        this.dbmsListener = new CoarseChangeFilter(this);
+        dbmsListener.registerListener(dbmsSynchronizer);
 
         this.location = DatabaseLocation.SHARED;
     }
@@ -278,9 +281,9 @@ public class BibDatabaseContext {
     }
 
     public void convertToLocalDatabase() {
-        if (Objects.nonNull(dbmsSynchronizer) && (location == DatabaseLocation.SHARED)) {
-            this.database.unregisterListener(dbmsSynchronizer);
-            this.metaData.unregisterListener(dbmsSynchronizer);
+        if (Objects.nonNull(dbmsListener) && (location == DatabaseLocation.SHARED)) {
+            dbmsListener.unregisterListener(dbmsSynchronizer);
+            dbmsListener.shutdown();
         }
 
         this.location = DatabaseLocation.LOCAL;

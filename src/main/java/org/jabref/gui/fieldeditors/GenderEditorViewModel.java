@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 
 import com.google.common.collect.BiMap;
@@ -10,8 +11,8 @@ public class GenderEditorViewModel extends MapBasedEditorViewModel<String> {
 
     private BiMap<String, String> itemMap = HashBiMap.create(7);
 
-    public GenderEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider) {
-        super(fieldName, suggestionProvider);
+    public GenderEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+        super(fieldName, suggestionProvider, fieldCheckers);
 
         itemMap.put("sf", Localization.lang("Female name"));
         itemMap.put("sm", Localization.lang("Male name"));

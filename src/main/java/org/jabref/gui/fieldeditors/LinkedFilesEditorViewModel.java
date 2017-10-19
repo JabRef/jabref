@@ -30,6 +30,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FulltextFetchers;
+import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.OS;
@@ -57,8 +58,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
 
-    public LinkedFilesEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
-        super(fieldName, suggestionProvider);
+    public LinkedFilesEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, FieldCheckers fieldCheckers) {
+        super(fieldName, suggestionProvider, fieldCheckers);
 
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
@@ -92,6 +93,14 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 .getExternalFileTypeByExt(fileExtension).orElse(new UnknownExternalFileType(fileExtension));
         Path relativePath = FileUtil.shortenFileName(file, fileDirectories);
         return new LinkedFile("", relativePath.toString(), suggestedFileType.getName());
+    }
+
+    public LinkedFileViewModel fromFile(Path file) {
+        List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+
+        LinkedFile linkedFile = fromFile(file, fileDirectories);
+        return new LinkedFileViewModel(linkedFile, entry, databaseContext);
+
     }
 
     public boolean isFulltextLookupInProgress() {
@@ -272,8 +281,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     private String getSuggestedFileName(String suffix) {
         String plannedName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry,
-                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader));
+                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
 
         if (!suffix.isEmpty()) {
             plannedName += "." + suffix;
@@ -298,9 +306,13 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void deleteFile(LinkedFileViewModel file) {
-        boolean deleteSuccessful = file.delete();
-        if (deleteSuccessful) {
-            files.remove(file);
+        if (file.getFile().isOnlineLink()) {
+            removeFileLink(file);
+        } else {
+            boolean deleteSuccessful = file.delete();
+            if (deleteSuccessful) {
+                files.remove(file);
+            }
         }
     }
 

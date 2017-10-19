@@ -305,6 +305,7 @@ public class BibDatabaseTest {
         assertEquals(Collections.emptyList(), usedStrings);
     }
 
+    @Test
     public void preambleIsEmptyIfNotSet() {
         assertEquals(Optional.empty(), database.getPreamble());
     }

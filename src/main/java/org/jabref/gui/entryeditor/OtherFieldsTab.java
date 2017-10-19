@@ -34,4 +34,17 @@ public class OtherFieldsTab extends FieldsEditorTab {
         otherFields.removeAll(Globals.prefs.getCustomTabFieldNames());
         return otherFields;
     }
+
+    public static boolean isOtherField(EntryType entryType, String fieldToCheck) {
+        List<String> allKnownFields = entryType.getAllFields().stream().map(String::toLowerCase)
+                .collect(Collectors.toList());
+        if (allKnownFields.contains(fieldToCheck) ||
+                entryType.getDeprecatedFields().contains(fieldToCheck) ||
+                BibEntry.KEY_FIELD.equals(fieldToCheck) ||
+                Globals.prefs.getCustomTabFieldNames().contains(fieldToCheck)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }

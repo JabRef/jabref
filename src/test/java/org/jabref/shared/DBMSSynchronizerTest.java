@@ -181,8 +181,8 @@ public class DBMSSynchronizerTest {
         modifiedBibEntry.setType("article");
 
         dbmsProcessor.updateEntry(modifiedBibEntry);
-
-        dbmsSynchronizer.synchronizeLocalDatabase(); // testing point
+        //testing point
+        dbmsSynchronizer.synchronizeLocalDatabase();
 
         Assert.assertEquals(bibDatabase.getEntries(), dbmsProcessor.getSharedEntries());
     }

@@ -1,18 +1,17 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Optional;
-
 import org.jabref.model.entry.BibEntry;
 import org.jabref.support.DevEnvironment;
 import org.jabref.testutils.category.FetcherTests;
-
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.Optional;
 
 @Category(FetcherTests.class)
 public class DoiResolutionTest {
@@ -45,7 +44,7 @@ public class DoiResolutionTest {
         entry.setField("doi", "10.1051/0004-6361/201527330");
 
         Assert.assertEquals(
-                Optional.of(new URL("http://www.aanda.org/articles/aa/pdf/2016/01/aa27330-15.pdf")),
+                Optional.of(new URL("https://www.aanda.org/articles/aa/pdf/2016/01/aa27330-15.pdf")),
                 finder.findFullText(entry)
         );
     }

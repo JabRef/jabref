@@ -61,9 +61,12 @@ public class SynchronizationTestSimulator {
 
     @Test
     public void simulateEntryInsertionAndManualPull() {
-        clientContextA.getDatabase().insertEntry(getBibEntryExample(1)); // client A inserts an entry
-        clientContextA.getDatabase().insertEntry(getBibEntryExample(2)); // client A inserts another entry
-        clientContextB.getDBMSSynchronizer().pullChanges(); // client B pulls the changes
+        //client A inserts an entry
+        clientContextA.getDatabase().insertEntry(getBibEntryExample(1));
+        //client A inserts another entry
+        clientContextA.getDatabase().insertEntry(getBibEntryExample(2));
+        //client B pulls the changes
+        clientContextB.getDBMSSynchronizer().pullChanges();
 
         Assert.assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
     }
@@ -71,11 +74,14 @@ public class SynchronizationTestSimulator {
     @Test
     public void simulateEntryUpdateAndManualPull() {
         BibEntry bibEntry = getBibEntryExample(1);
-        clientContextA.getDatabase().insertEntry(bibEntry); // client A inserts an entry
-        bibEntry.setField("custom", "custom value"); // client A changes the entry
+        //client A inserts an entry
+        clientContextA.getDatabase().insertEntry(bibEntry);
+        //client A changes the entry
+        bibEntry.setField("custom", "custom value");
+        //client B pulls the changes
         bibEntry.clearField("author");
 
-        clientContextB.getDBMSSynchronizer().pullChanges(); // client B pulls the changes
+        clientContextB.getDBMSSynchronizer().pullChanges();
 
         Assert.assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
     }
@@ -83,15 +89,19 @@ public class SynchronizationTestSimulator {
     @Test
     public void simulateEntryDelitionAndManualPull() {
         BibEntry bibEntry = getBibEntryExample(1);
-        clientContextA.getDatabase().insertEntry(bibEntry); // client A inserts an entry
-        clientContextB.getDBMSSynchronizer().pullChanges(); // client B pulls the entry
+        //client A inserts an entry
+        clientContextA.getDatabase().insertEntry(bibEntry);
+        //client B pulls the entry
+        clientContextB.getDBMSSynchronizer().pullChanges();
 
         Assert.assertFalse(clientContextA.getDatabase().getEntries().isEmpty());
         Assert.assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
         Assert.assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
 
-        clientContextA.getDatabase().removeEntry(bibEntry); // client A removes the entry
-        clientContextB.getDBMSSynchronizer().pullChanges(); // client B pulls the change
+        //client A removes the entry
+        clientContextA.getDatabase().removeEntry(bibEntry);
+        //client B pulls the change
+        clientContextB.getDBMSSynchronizer().pullChanges();
 
         Assert.assertTrue(clientContextA.getDatabase().getEntries().isEmpty());
         Assert.assertTrue(clientContextB.getDatabase().getEntries().isEmpty());
@@ -100,19 +110,22 @@ public class SynchronizationTestSimulator {
     @Test
     public void simulateUpdateOnNoLongerExistingEntry() {
         BibEntry bibEntryOfClientA = getBibEntryExample(1);
-        clientContextA.getDatabase().insertEntry(bibEntryOfClientA); // client A inserts an entry
-        clientContextB.getDBMSSynchronizer().pullChanges(); // client B pulls the entry
+        //client A inserts an entry
+        clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
+        //client B pulls the entry
+        clientContextB.getDBMSSynchronizer().pullChanges();
 
         Assert.assertFalse(clientContextA.getDatabase().getEntries().isEmpty());
         Assert.assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
         Assert.assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
 
-        clientContextA.getDatabase().removeEntry(bibEntryOfClientA); // client A removes the entry
+        //client A removes the entry
+        clientContextA.getDatabase().removeEntry(bibEntryOfClientA);
 
         Assert.assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
         Assert.assertNull(eventListenerB.getSharedEntryNotPresentEvent());
-
-        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().get(0); // client B tries to update the entry
+        //client B tries to update the entry
+        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().get(0);
         bibEntryOfClientB.setField("year", "2009");
 
         // here a new SharedEntryNotPresentEvent has been thrown. In this case the user B would get an pop-up window.
@@ -123,20 +136,23 @@ public class SynchronizationTestSimulator {
     @Test
     public void simulateEntryChangeConflicts() {
         BibEntry bibEntryOfClientA = getBibEntryExample(1);
-        clientContextA.getDatabase().insertEntry(bibEntryOfClientA); // client A inserts an entry
-        clientContextB.getDBMSSynchronizer().pullChanges(); // client B pulls the entry
+        //client A inserts an entry
+        clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
+        //client B pulls the entry
+        clientContextB.getDBMSSynchronizer().pullChanges();
 
-        bibEntryOfClientA.setField("year", "2001"); // A now increases the version number
+        //A now increases the version number
+        bibEntryOfClientA.setField("year", "2001");
 
         // B does nothing here, so there is no event occurrence
-
         // B now tries to update the entry
         Assert.assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
 
         Assert.assertNull(eventListenerB.getUpdateRefusedEvent());
 
         BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().get(0);
-        bibEntryOfClientB.setField("year", "2016"); // B also tries to change something
+        //B also tries to change something
+        bibEntryOfClientB.setField("year", "2016");
 
         // B now cannot update the shared entry, due to optimistic offline lock.
         // In this case an BibEntry merge dialog pops up.

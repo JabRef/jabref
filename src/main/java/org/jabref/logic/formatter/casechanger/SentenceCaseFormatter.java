@@ -16,7 +16,7 @@ public class SentenceCaseFormatter implements Formatter {
     }
 
     /**
-     * Converts the first character of the first word of the given string to upper case (and the remaining characters of the first word to lower case), but does not change anything if word starts with "{"
+     * Converts the first character of the first word of the given string to upper case (and the remaining characters of the first word to lower case) and changes other words to lower case, but does not change anything if word starts with "{"
      */
     @Override
     public String format(String input) {

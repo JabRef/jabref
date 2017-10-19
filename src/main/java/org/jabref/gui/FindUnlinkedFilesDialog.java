@@ -90,6 +90,7 @@ import org.apache.commons.logging.LogFactory;
  * GUI Dialog for the feature "Find unlinked files".
  */
 public class FindUnlinkedFilesDialog extends JabRefDialog {
+
     /**
      * Keys to be used for referencing this Action.
      */

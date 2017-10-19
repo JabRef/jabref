@@ -316,10 +316,14 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                         diag.entryListComplete();
                         diag.setLocationRelativeTo(frame);
                         diag.setVisible(true);
-                        diag.toFront();	 
+                        diag.toFront();
                     } else {
                 		// Regenerate CiteKey of imported BibEntry
                         BibtexKeyPatternUtil.makeAndSetLabel(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern(), frame.getCurrentBasePanel().getDatabase(), bibEntry, Globals.prefs.getBibtexKeyPatternPreferences());
+                        // Update Timestamps
+                        if (Globals.prefs.getTimestampPreferences().includeCreatedTimestamp()) {
+                            bibEntry.setField(Globals.prefs.getTimestampPreferences().getTimestampField(), Globals.prefs.getTimestampPreferences().now());
+                        }
                         frame.getCurrentBasePanel().insertEntry(bibEntry);
                     }
 

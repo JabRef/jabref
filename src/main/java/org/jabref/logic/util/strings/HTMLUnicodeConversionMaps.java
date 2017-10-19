@@ -294,6 +294,8 @@ public class HTMLUnicodeConversionMaps {
             {"982", "piv", "$\\varphi$"}, // greek pi symbol, U+03D6 ISOgrk3
 
             /* General Punctuation */
+            {"8211", "ndash", "$\\textendash$"},
+            {"8212", "mdash", "$\\textemdash$"},
             {"8226", "bull", "$\\bullet$"}, // bullet = black small circle,
             //                                    U+2022 ISOpub
             /* bullet is NOT the same as bullet operator, U+2219 */
@@ -471,7 +473,7 @@ public class HTMLUnicodeConversionMaps {
             /* Manually added */
             {"35", "", "\\#"}, // Hash
             {"36", "dollar", "\\$"}, // Dollar
-            {"37", "percnt", "\\%"}, // Percent
+            {"37", "#37", "\\%"}, // Percent (&percnt; is not displayed correctly in the entry preview)
             {"39", "apos", "'"}, // Apostrophe
             {"40", "lpar", "("}, // Left bracket
             {"41", "rpar", ")"}, // Right bracket

@@ -11,6 +11,7 @@ import logger
 
 RES_DIR = "src/main/resources/l10n"
 STATUS_FILE = "status.md"
+URL_BASE = "https://github.com/JabRef/jabref/tree/master/src/main/resources/l10n/"
 
 
 def get_current_branch():
@@ -413,12 +414,13 @@ def status_create_markdown():
             num_keys_translated = num_keys - num_keys_missing_value
             percent_translated = int((num_keys_translated / float(num_keys)) * 100) if num_keys != 0 else 0
 
-            markdown.append("| {file} | {num_keys} | {num_keys_translated} | {num_keys_missing} | {percent_translated} |\n"
-                .format(file=get_filename(filepath=file), num_keys=num_keys, num_keys_translated=num_keys_translated, num_keys_missing=num_keys_missing_value, percent_translated=percent_translated))
+            markdown.append("| [{file}]({url_base}{file}) | {num_keys} | {num_keys_translated} | {num_keys_missing} | {percent_translated} |\n"
+         .format(url_base=URL_BASE, file=os.path.basename(file), num_keys=num_keys, num_keys_translated=num_keys_translated, num_keys_missing=num_keys_missing_value, percent_translated=percent_translated))
 
     markdown = []
     date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    markdown.append("### Localization files status ({date} - Branch `{branch}` `{hash}`)\n".format(date=date, branch=get_current_branch(), hash=get_current_hash_short()))
+    markdown.append("### Localization files status ({date} - Branch `{branch}` `{hash}`)\n\n".format(date=date, branch=get_current_branch(), hash=get_current_hash_short()))
+    markdown.append("Note: To get the current status from your local repository, run `python ./scripts/syncLang.py markdown`\n")
 
     write_properties(property_files=get_all_jabref_properties())
     write_properties(property_files=get_all_menu_properties())

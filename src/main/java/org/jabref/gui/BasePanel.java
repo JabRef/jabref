@@ -221,6 +221,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         setupActions();
 
         this.getDatabase().registerListener(new SearchListener());
+        this.getDatabase().registerListener(new EntryRemovedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
@@ -1485,11 +1486,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @return A suitable entry editor.
      */
     public EntryEditor getEntryEditor(BibEntry entry) {
-        String lastTabName = "";
         if (currentEditor != null) {
-            lastTabName = currentEditor.getVisibleTabName();
+            currentEditor.setEntry(entry);
+            return currentEditor;
+        } else {
+            EntryEditor editor = new EntryEditor(this);
+            editor.setEntry(entry);
+            return editor;
         }
-        return new EntryEditor(frame, BasePanel.this, entry, lastTabName);
     }
 
     public EntryEditor getCurrentEditor() {
@@ -2093,6 +2097,21 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
                 Globals.stateManager.getSelectedGroup(bibDatabaseContext).forEach(
                         selectedGroup -> selectedGroup.addEntriesToGroup(entries));
+            }
+        }
+    }
+
+    private class EntryRemovedListener {
+
+        @Subscribe
+        public void listen(EntryRemovedEvent entryRemovedEvent) {
+            // if the entry that is displayed in the current entry editor is removed, close the entry editor
+            if (isShowingEditor() && currentEditor.getEntry().equals(entryRemovedEvent.getBibEntry())) {
+                currentEditor.close();
+            }
+
+            if (selectionListener.getPreview().getEntry().equals(entryRemovedEvent.getBibEntry())) {
+                selectionListener.setPreviewActive(false);
             }
         }
     }

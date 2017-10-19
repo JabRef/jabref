@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 
 import com.google.common.collect.BiMap;
@@ -10,8 +11,8 @@ public class PatentTypeEditorViewModel extends MapBasedEditorViewModel<String> {
 
     private BiMap<String, String> itemMap = HashBiMap.create(12);
 
-    public PatentTypeEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider) {
-        super(fieldName, suggestionProvider);
+    public PatentTypeEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+        super(fieldName, suggestionProvider, fieldCheckers);
 
         itemMap.put("patent", Localization.lang("Patent"));
         itemMap.put("patentde", Localization.lang("German patent"));
