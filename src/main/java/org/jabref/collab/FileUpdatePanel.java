@@ -104,7 +104,7 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
     public void scanResultsResolved(boolean resolved) {
         if (resolved) {
             manager.hideComponent(this);
-            panel.setUpdatedExternally(false);
+            panel.markExternalChangesAsResolved();
         }
     }
 }
