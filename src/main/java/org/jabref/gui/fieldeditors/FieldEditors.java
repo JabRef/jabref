@@ -72,6 +72,8 @@ public class FieldEditors {
             return new PersonsEditor(fieldName, suggestionProvider, preferences, fieldCheckers);
         } else if (FieldName.KEYWORDS.equals(fieldName)) {
             return new KeywordsEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
+        } else if (fieldExtras.contains(FieldProperty.MULTILINE_TEXT)) {
+            return new MultilineEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
         }
 
         // default
