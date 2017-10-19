@@ -30,6 +30,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
     private final FileAnnotationCache cache;
     private final BibEntry entry;
     private Map<String, List<FileAnnotation>> fileAnnotations;
+    private String currentFile;
 
     public FileAnnotationTabViewModel(FileAnnotationCache cache, BibEntry entry) {
         this.cache = cache;
@@ -59,6 +60,8 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
     }
 
     public void notifyNewSelectedFile(String newFile) {
+        currentFile = newFile;
+
         Comparator<FileAnnotation> byPage = Comparator.comparingInt(FileAnnotation::getPage);
 
         List<FileAnnotationViewModel> newAnnotations = fileAnnotations.getOrDefault(newFile, new ArrayList<>())
@@ -71,8 +74,12 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
     }
 
     public void reloadAnnotations() {
+        // Remove annotations for the current entry and reinitialize annotation/cache
         cache.remove(entry);
         initialize();
+
+        // Pretend that we just switched to the current file in order to refresh the display
+        notifyNewSelectedFile(currentFile);
     }
 
     /**
