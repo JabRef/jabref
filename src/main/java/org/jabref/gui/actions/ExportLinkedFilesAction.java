@@ -67,11 +67,7 @@ public class ExportLinkedFilesAction extends AbstractAction {
     private void startServiceAndshowProgessDialog(Service<List<CopyFilesResult>> exportService) {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             exportService.setOnSucceeded(value -> {
-                System.out.println(exportService.getValue());
-
-                System.out.println("Service succeeded");
                 DefaultTaskExecutor.runInJavaFXThread(() -> showDialog(exportService.getValue()));
-
             });
             exportService.start();
             DialogService dlgService = new FXDialogService();
@@ -82,7 +78,7 @@ public class ExportLinkedFilesAction extends AbstractAction {
 
     private void showDialog(List<CopyFilesResult> data) {
         Dialog<ButtonType> dlg = new Dialog<>();
-        dlg.setTitle("Results");
+        dlg.setTitle(Localization.lang("Result"));
         ObservableList<CopyFilesResult> tableData = FXCollections.observableArrayList(data);
 
         TableView<CopyFilesResult> tv = createTable();
@@ -95,7 +91,7 @@ public class ExportLinkedFilesAction extends AbstractAction {
         sp.setFitToHeight(true);
         sp.setFitToWidth(true);
 
-        dlg.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
+        dlg.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
         dlg.setResizable(true);
         dlg.showAndWait();
     }
