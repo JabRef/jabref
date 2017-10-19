@@ -5,15 +5,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.ListView;
-
 import org.jabref.Globals;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
@@ -26,7 +24,7 @@ import org.jabref.model.util.OptionalUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ExportLinkedFilesService extends Service<Void> {
+public class ExportLinkedFilesService extends Service<List<CopyFilesResult>> {
 
     private static final Log LOGGER = LogFactory.getLog(ExportLinkedFilesAction.class);
     private static final String LOGFILE = "exportLog.log";
@@ -36,6 +34,7 @@ public class ExportLinkedFilesService extends Service<Void> {
     private final BibDatabaseContext databaseContext;
     private final List<BibEntry> entries;
     private final Path exportPath;
+    private final List<CopyFilesResult> results = new ArrayList<>();
 
     private final BiFunction<Path, Path, Path> resolvePathFilename = (path, file) -> {
         return path.resolve(file.getFileName());
@@ -50,8 +49,8 @@ public class ExportLinkedFilesService extends Service<Void> {
     }
 
     @Override
-    protected Task<Void> createTask() {
-        return new Task<Void>() {
+    protected Task<List<CopyFilesResult>> createTask() {
+        return new Task<List<CopyFilesResult>>() {
 
             int totalFilesCounter;
             int numberSucessful;
@@ -59,7 +58,7 @@ public class ExportLinkedFilesService extends Service<Void> {
             Optional<Path> newPath;
 
             @Override
-            protected Void call()
+            protected List<CopyFilesResult> call()
                     throws InterruptedException, IOException {
                 updateMessage(Localization.lang("Copying files..."));
                 updateProgress(0, totalFilesCount);
@@ -86,12 +85,14 @@ public class ExportLinkedFilesService extends Service<Void> {
                                     updateMessage(localizedSucessMessage);
                                     numberSucessful++;
                                     writeLogMessage(newFile, bw, localizedSucessMessage);
+                                    addResultToList(newFile, success, localizedSucessMessage);
 
                                 } else {
 
                                     updateMessage(localizedErrorMessage);
                                     numberError++;
                                     writeLogMessage(newFile, bw, localizedErrorMessage);
+                                    addResultToList(newFile, success, localizedSucessMessage);
                                 }
                             });
                         }
@@ -100,8 +101,7 @@ public class ExportLinkedFilesService extends Service<Void> {
                     String sucessMessage = Localization.lang("Copied %0 files of %1 sucessfully to %2", Integer.toString(numberSucessful), Integer.toString(totalFilesCounter), newPath.map(Path::getParent).map(Path::toString).orElse(""));
                     updateMessage(sucessMessage);
                     bw.write(sucessMessage);
-                    showDialog();
-                    return null;
+                    return results;
                 }
             }
         };
@@ -116,10 +116,9 @@ public class ExportLinkedFilesService extends Service<Void> {
         }
     }
 
-    private void showDialog() {
-        Dialog<String> dlg = new Dialog<>();
-        dlg.setTitle("Results");
-        ListView<String> lv = new ListView<>();
-        dlg.getDialogPane().setContent(lv);
+    private void addResultToList(Path newFile, boolean success, String logMessage) {
+        CopyFilesResult result = new CopyFilesResult(newFile.toString(), success, logMessage);
+        results.add(result);
     }
+
 }
