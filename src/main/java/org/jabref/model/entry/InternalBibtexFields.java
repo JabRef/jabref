@@ -1,9 +1,19 @@
 package org.jabref.model.entry;
 
-import org.jabref.model.entry.specialfields.SpecialField;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.jabref.model.entry.specialfields.SpecialField;
 
 /**
  * Handling of bibtex fields.
