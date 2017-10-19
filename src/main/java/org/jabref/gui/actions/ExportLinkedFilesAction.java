@@ -14,8 +14,11 @@ import javafx.concurrent.Service;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
@@ -27,6 +30,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
+
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 
 public class ExportLinkedFilesAction extends AbstractAction {
 
@@ -97,17 +103,44 @@ public class ExportLinkedFilesAction extends AbstractAction {
     private static TableView<CopyFilesResult> createTable() {
         TableView<CopyFilesResult> tv = new TableView<>();
 
-        TableColumn<CopyFilesResult, String> colFile = new TableColumn<>("File");
-        TableColumn<CopyFilesResult, Boolean> colSuccess = new TableColumn<>("Success");
-        TableColumn<CopyFilesResult, String> colMessage = new TableColumn<>("Log message");
+        TableColumn<CopyFilesResult, String> colFile = new TableColumn<>(Localization.lang("File"));
+        TableColumn<CopyFilesResult, MaterialDesignIcon> colIcon = new TableColumn<>(Localization.lang("Status"));
+        TableColumn<CopyFilesResult, String> colMessage = new TableColumn<>(Localization.lang("Message"));
 
         colFile.setCellValueFactory(cellData -> cellData.getValue().getFile());
-        colSuccess.setCellValueFactory(cellData -> cellData.getValue().getSucess());
         colMessage.setCellValueFactory(cellData -> cellData.getValue().getMessage());
+        colIcon.setCellValueFactory(cellData -> cellData.getValue().getIcon());
 
-        tv.getColumns().add(colFile);
-        tv.getColumns().add(colSuccess);
+        colIcon.setCellFactory(column -> {
+            return new TableCell<CopyFilesResult, MaterialDesignIcon>() {
+
+                @Override
+                protected void updateItem(MaterialDesignIcon item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if ((item == null) || empty) {
+                        setText(null);
+                        setStyle("");
+                    } else {
+                        Text icon = MaterialDesignIconFactory.get().createIcon(item);
+
+                        //Green checkmark
+                        if (item == MaterialDesignIcon.CHECK) {
+                            icon.setFill(Color.GREEN);
+                        }
+                        //Red Alert symbol
+                        if (item == MaterialDesignIcon.ALERT) {
+                            icon.setFill(Color.RED);
+                        }
+                        setGraphic(icon);
+
+                    }
+                }
+            };
+        });
+        tv.getColumns().add(colIcon);
         tv.getColumns().add(colMessage);
+        tv.getColumns().add(colFile);
 
         return tv;
     }

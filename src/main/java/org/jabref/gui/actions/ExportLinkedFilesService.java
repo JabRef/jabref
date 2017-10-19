@@ -12,6 +12,7 @@ import java.util.function.BiFunction;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+
 import org.jabref.Globals;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
@@ -92,7 +93,7 @@ public class ExportLinkedFilesService extends Service<List<CopyFilesResult>> {
                                     updateMessage(localizedErrorMessage);
                                     numberError++;
                                     writeLogMessage(newFile, bw, localizedErrorMessage);
-                                    addResultToList(newFile, success, localizedSucessMessage);
+                                    addResultToList(newFile, success, localizedErrorMessage);
                                 }
                             });
                         }

@@ -1,21 +1,26 @@
 package org.jabref.gui.actions;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 public class CopyFilesResult {
 
     private final StringProperty file = new SimpleStringProperty("");
-    private final BooleanProperty success = new SimpleBooleanProperty(false);
+    private final ObjectProperty<MaterialDesignIcon> icon = new SimpleObjectProperty<>(MaterialDesignIcon.ALERT);
+
     private final StringProperty message = new SimpleStringProperty("");
 
-    public CopyFilesResult(String file, boolean success, String message)
-    {
+    public CopyFilesResult(String file, boolean success, String message) {
         this.file.setValue(file);
-        this.success.setValue(success);
         this.message.setValue(message);
+        if (success) {
+            this.icon.setValue(MaterialDesignIcon.CHECK);
+        }
+
     }
 
     public StringProperty getFile() {
@@ -26,14 +31,6 @@ public class CopyFilesResult {
         this.file.setValue(file);
     }
 
-    public BooleanProperty getSucess() {
-        return success;
-    }
-
-    public void setSucess(Boolean sucess) {
-        this.success.setValue(sucess);
-    }
-
     public StringProperty getMessage() {
         return message;
     }
@@ -42,8 +39,12 @@ public class CopyFilesResult {
         this.message.setValue(message);
     }
 
+    public ObjectProperty<MaterialDesignIcon> getIcon() {
+        return icon;
+    }
+
     @Override
     public String toString() {
-        return "CopyFilesResult [file=" + file.get() + ", success=" + success.get() + ", message=" + message.get() + "]";
+        return "CopyFilesResult [file=" + file.get() + ", message=" + message.get() + "]";
     }
 }
