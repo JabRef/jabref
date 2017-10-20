@@ -25,7 +25,7 @@ import org.jabref.model.util.OptionalUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ExportLinkedFilesService extends Service<List<CopyFilesResult>> {
+public class ExportLinkedFilesService extends Service<List<CopyFilesResultViewModel>> {
 
     private static final Log LOGGER = LogFactory.getLog(ExportLinkedFilesAction.class);
     private static final String LOGFILE = "exportLog.log";
@@ -35,7 +35,7 @@ public class ExportLinkedFilesService extends Service<List<CopyFilesResult>> {
     private final BibDatabaseContext databaseContext;
     private final List<BibEntry> entries;
     private final Path exportPath;
-    private final List<CopyFilesResult> results = new ArrayList<>();
+    private final List<CopyFilesResultViewModel> results = new ArrayList<>();
 
     private final BiFunction<Path, Path, Path> resolvePathFilename = (path, file) -> {
         return path.resolve(file.getFileName());
@@ -50,8 +50,8 @@ public class ExportLinkedFilesService extends Service<List<CopyFilesResult>> {
     }
 
     @Override
-    protected Task<List<CopyFilesResult>> createTask() {
-        return new Task<List<CopyFilesResult>>() {
+    protected Task<List<CopyFilesResultViewModel>> createTask() {
+        return new Task<List<CopyFilesResultViewModel>>() {
 
             int totalFilesCounter;
             int numberSucessful;
@@ -59,7 +59,7 @@ public class ExportLinkedFilesService extends Service<List<CopyFilesResult>> {
             Optional<Path> newPath;
 
             @Override
-            protected List<CopyFilesResult> call()
+            protected List<CopyFilesResultViewModel> call()
                     throws InterruptedException, IOException {
                 updateMessage(Localization.lang("Copying files..."));
                 updateProgress(0, totalFilesCount);
@@ -118,7 +118,7 @@ public class ExportLinkedFilesService extends Service<List<CopyFilesResult>> {
     }
 
     private void addResultToList(Path newFile, boolean success, String logMessage) {
-        CopyFilesResult result = new CopyFilesResult(newFile.toString(), success, logMessage);
+        CopyFilesResultViewModel result = new CopyFilesResultViewModel(newFile.toString(), success, logMessage);
         results.add(result);
     }
 

@@ -7,14 +7,14 @@ import javafx.beans.property.StringProperty;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
-public class CopyFilesResult {
+public class CopyFilesResultViewModel {
 
     private final StringProperty file = new SimpleStringProperty("");
     private final ObjectProperty<MaterialDesignIcon> icon = new SimpleObjectProperty<>(MaterialDesignIcon.ALERT);
 
     private final StringProperty message = new SimpleStringProperty("");
 
-    public CopyFilesResult(String file, boolean success, String message) {
+    public CopyFilesResultViewModel(String file, boolean success, String message) {
         this.file.setValue(file);
         this.message.setValue(message);
         if (success) {
@@ -45,6 +45,6 @@ public class CopyFilesResult {
 
     @Override
     public String toString() {
-        return "CopyFilesResult [file=" + file.get() + ", message=" + message.get() + "]";
+        return "CopyFilesResultViewModel [file=" + file.get() + ", message=" + message.get() + "]";
     }
 }

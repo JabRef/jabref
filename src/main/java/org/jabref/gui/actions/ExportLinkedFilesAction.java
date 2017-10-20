@@ -36,7 +36,7 @@ import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 
 public class ExportLinkedFilesAction extends AbstractAction {
 
-    private final DialogService ds = new FXDialogService();
+    private final DialogService dialogService = new FXDialogService();
     private BibDatabaseContext databaseContext;
     private List<BibEntry> entries;
 
@@ -53,17 +53,17 @@ public class ExportLinkedFilesAction extends AbstractAction {
         entries = JabRefGUI.getMainFrame().getCurrentBasePanel().getSelectedEntries();
 
         Optional<Path> exportPath = DefaultTaskExecutor
-                .runInJavaFXThread(() -> ds.showDirectorySelectionDialog(dirDialogConfiguration));
+                .runInJavaFXThread(() -> dialogService.showDirectorySelectionDialog(dirDialogConfiguration));
 
         exportPath.ifPresent(path -> {
             databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabaseContext();
 
-            Service<List<CopyFilesResult>> exportService = new ExportLinkedFilesService(databaseContext, entries, path);
+            Service<List<CopyFilesResultViewModel>> exportService = new ExportLinkedFilesService(databaseContext, entries, path);
             startServiceAndshowProgessDialog(exportService);
         });
     }
 
-    private void startServiceAndshowProgessDialog(Service<List<CopyFilesResult>> exportService) {
+    private void startServiceAndshowProgessDialog(Service<List<CopyFilesResultViewModel>> exportService) {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             exportService.setOnSucceeded(value -> {
                 DefaultTaskExecutor.runInJavaFXThread(() -> showDialog(exportService.getValue()));
@@ -75,12 +75,12 @@ public class ExportLinkedFilesAction extends AbstractAction {
         });
     }
 
-    private void showDialog(List<CopyFilesResult> data) {
+    private void showDialog(List<CopyFilesResultViewModel> data) {
         Dialog<ButtonType> dlg = new Dialog<>();
         dlg.setTitle(Localization.lang("Result"));
-        ObservableList<CopyFilesResult> tableData = FXCollections.observableArrayList(data);
+        ObservableList<CopyFilesResultViewModel> tableData = FXCollections.observableArrayList(data);
 
-        TableView<CopyFilesResult> tv = createTable();
+        TableView<CopyFilesResultViewModel> tv = createTable();
         ScrollPane sp = new ScrollPane();
         sp.setContent(tv);
 
@@ -95,19 +95,19 @@ public class ExportLinkedFilesAction extends AbstractAction {
         dlg.showAndWait();
     }
 
-    private static TableView<CopyFilesResult> createTable() {
-        TableView<CopyFilesResult> tv = new TableView<>();
+    private static TableView<CopyFilesResultViewModel> createTable() {
+        TableView<CopyFilesResultViewModel> tableResult = new TableView<>();
 
-        TableColumn<CopyFilesResult, String> colFile = new TableColumn<>(Localization.lang("File"));
-        TableColumn<CopyFilesResult, MaterialDesignIcon> colIcon = new TableColumn<>(Localization.lang("Status"));
-        TableColumn<CopyFilesResult, String> colMessage = new TableColumn<>(Localization.lang("Message"));
+        TableColumn<CopyFilesResultViewModel, String> colFile = new TableColumn<>(Localization.lang("File"));
+        TableColumn<CopyFilesResultViewModel, MaterialDesignIcon> colIcon = new TableColumn<>(Localization.lang("Status"));
+        TableColumn<CopyFilesResultViewModel, String> colMessage = new TableColumn<>(Localization.lang("Message"));
 
         colFile.setCellValueFactory(cellData -> cellData.getValue().getFile());
         colMessage.setCellValueFactory(cellData -> cellData.getValue().getMessage());
         colIcon.setCellValueFactory(cellData -> cellData.getValue().getIcon());
 
         colIcon.setCellFactory(column -> {
-            return new TableCell<CopyFilesResult, MaterialDesignIcon>() {
+            return new TableCell<CopyFilesResultViewModel, MaterialDesignIcon>() {
 
                 @Override
                 protected void updateItem(MaterialDesignIcon item, boolean empty) {
@@ -133,11 +133,11 @@ public class ExportLinkedFilesAction extends AbstractAction {
                 }
             };
         });
-        tv.getColumns().add(colIcon);
-        tv.getColumns().add(colMessage);
-        tv.getColumns().add(colFile);
+        tableResult.getColumns().add(colIcon);
+        tableResult.getColumns().add(colMessage);
+        tableResult.getColumns().add(colFile);
 
-        return tv;
+        return tableResult;
     }
 
 }
