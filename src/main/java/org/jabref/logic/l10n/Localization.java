@@ -5,19 +5,20 @@ import org.apache.commons.logging.LogFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Provides handling for messages and menu entries in the preferred language of the user.
- *
+ * <p>
  * Notes: All messages and menu-entries in JabRef are stored in escaped form like "This_is_a_message". This message
  * serves as key inside the {@link l10n} properties files that hold the translation for many languages.
  * When a message is accessed, it needs to be unescaped and possible parameters that can appear in a message need to
  * be filled with values.
- *
+ * <p>
  * This implementation loads the appropriate language by importing all keys/values from the correct bundle and stores
  * them in unescaped form inside a {@link LocalizationBundle} which provides fast access because it caches the key-value
  * pairs.
- *
+ * <p>
  * The access to this is given by the functions {@link Localization#lang(String, String...)} and
  * {@link Localization#menuTitle(String, String...)} that developers should use whenever they use strings for the e.g.
  * GUI that need to be translatable.
@@ -38,14 +39,15 @@ public class Localization {
 
     /**
      * Public access to all messages that are not menu-entries
-     * @param key The key of the message in unescaped form like "All fields"
+     *
+     * @param key    The key of the message in unescaped form like "All fields"
      * @param params Replacement strings for parameters %0, %1, etc.
      * @return The message with replaced parameters
      */
     public static String lang(String key, String... params) {
         if (localizedMessages == null) {
             // I'm logging this because it should never happen
-            LOGGER.error("Messages are not initialized in " + Localization.class);
+            LOGGER.error("Messages are not initialized.");
             setLanguage("en");
         }
         return lookup(localizedMessages, "message", key, params);
@@ -53,14 +55,15 @@ public class Localization {
 
     /**
      * Public access to menu entry messages
-     * @param key The key of the message in unescaped form like "Save all"
+     *
+     * @param key    The key of the message in unescaped form like "Save all"
      * @param params Replacement strings for parameters %0, %1, etc.
      * @return The message with replaced parameters
      */
     public static String menuTitle(String key, String... params) {
         if (localizedMenuTitles == null) {
             // I'm logging this because it should never happen
-            LOGGER.error("Menu entries are not initialized in " + Localization.class);
+            LOGGER.error("Menu entries are not initialized");
             setLanguage("en");
         }
         return lookup(localizedMenuTitles, "menu item", key, params);
@@ -69,20 +72,23 @@ public class Localization {
     /**
      * Sets the language and loads the appropriate translations. Note, that this function should be called before
      * any other function of this class.
+     *
      * @param language Language identifier like "en", "de", etc.
      */
     public static void setLanguage(String language) {
         Optional<Locale> knownLanguage = Languages.convertToSupportedLocale(language);
+        final Locale defaultLocale = Locale.getDefault();
         if (!knownLanguage.isPresent()) {
-            LOGGER.warn("Language " + language + " is not supported by JabRef (Default:" + Locale.getDefault() + ")");
+            LOGGER.warn("Language " + language + " is not supported by JabRef (Default:" + defaultLocale + ")");
             setLanguage("en");
             return;
         }
         // avoid reinitialization of the language bundles
-        if (locale != null && locale.equals(knownLanguage.get()) && locale.equals(Locale.getDefault())) {
+        final Locale langLocale = knownLanguage.get();
+        if ((locale != null) && locale.equals(langLocale) && locale.equals(defaultLocale)) {
             return;
         }
-        locale = knownLanguage.get();
+        locale = langLocale;
         Locale.setDefault(locale);
         javax.swing.JComponent.setDefaultLocale(locale);
 
@@ -97,6 +103,7 @@ public class Localization {
 
     /**
      * Public access to the messages bundle for classes like AbstractView.
+     *
      * @return The internally cashed bundle.
      */
     public static LocalizationBundle getMessages() {
@@ -111,52 +118,51 @@ public class Localization {
      * Creates and caches the language bundles used in JabRef for a particular language. This function first loads
      * correct version of the "escaped" bundles that are given in {@link l10n}. After that, it stores the unescaped
      * version in a cached {@link LocalizationBundle} for fast access.
+     *
      * @param locale Localization to use.
      */
     private static void createResourceBundles(Locale locale) {
         ResourceBundle messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
         ResourceBundle menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
         // Just for the case something really stupid happened.
-        if (messages == null || menuTitles == null) {
+        if ((messages == null) || (menuTitles == null)) {
             LOGGER.error("Could not load language translation files in " + Localization.class);
             throw new NullPointerException();
         }
-        localizedMessages = new LocalizationBundle(createLookupTable(messages));
-        localizedMenuTitles = new LocalizationBundle(createLookupTable(menuTitles));
+        localizedMessages = new LocalizationBundle(createLookupMap(messages));
+        localizedMenuTitles = new LocalizationBundle(createLookupMap(menuTitles));
     }
 
     /**
-     * Helper function to create a hash-table from the key/value pairs of a bundle.
+     * Helper function to create a HashMap from the key/value pairs of a bundle.
+     *
      * @param baseBundle JabRef language bundle with keys and values for translations.
-     * @return Lookup table for the baseBundle.
+     * @return Lookup map for the baseBundle.
      */
-    private static Hashtable<String, String> createLookupTable(ResourceBundle baseBundle){
+    private static HashMap<String, String> createLookupMap(ResourceBundle baseBundle) {
         final ArrayList<String> baseKeys = Collections.list(baseBundle.getKeys());
-        Hashtable<String, String> lookup = new Hashtable<>(baseKeys.size());
-        baseKeys.forEach(key ->
-            lookup.put(new LocalizationKey(key).getTranslationValue(), new LocalizationKey(baseBundle.getString(key)).getTranslationValue())
-        );
-        return lookup;
+        return new HashMap<>(baseKeys.stream().collect(
+                Collectors.toMap(
+                        key -> new LocalizationKey(key).getTranslationValue(),
+                        key -> new LocalizationKey(baseBundle.getString(key)).getTranslationValue())
+        ));
     }
 
     /**
      * This looks up a key in the bundle and replaces parameters %0, ..., %9 with the respective params given.
      * Note that the keys are the "unescaped" strings from the bundle property files.
      *
-     * @param bundle The {@link LocalizationBundle} which means either {@link Localization#localizedMenuTitles} or {@link Localization#localizedMessages}.
+     * @param bundle            The {@link LocalizationBundle} which means either {@link Localization#localizedMenuTitles} or {@link Localization#localizedMessages}.
      * @param idForErrorMessage Identifier-string when the translation is not found.
-     * @param key The lookup key.
-     * @param params The parameters that should be inserted into the message
+     * @param key               The lookup key.
+     * @param params            The parameters that should be inserted into the message
      * @return The final message with replaced parameters.
      */
     private static String lookup(LocalizationBundle bundle, String idForErrorMessage, String key, String... params) {
-        if (key == null) {
-            LOGGER.error("Error: Key must not be null when retrieving localized messages in " + Localization.class.toString());
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(key);
 
         String translation = bundle.containsKey(key) ? bundle.getString(key) : "";
-        if( translation.isEmpty()) {
+        if (translation.isEmpty()) {
             LOGGER.warn("Warning: could not get " + idForErrorMessage + " translation for \"" + key + "\" for locale "
                     + Locale.getDefault());
             translation = key;
@@ -169,11 +175,10 @@ public class Localization {
      */
     private static class LocalizationBundle extends ResourceBundle {
 
-        // I'm using a Hashtable since it allows to get the keys directly as an Enumeration
-        private Hashtable<String, String> lookup;
+        private final HashMap<String, String> lookup;
 
-        LocalizationBundle(Hashtable<String, String> lookupTable) {
-            this.lookup = lookupTable;
+        LocalizationBundle(HashMap<String, String> lookupMap) {
+            lookup = lookupMap;
         }
 
         public final Object handleGetObject(String key) {
@@ -185,7 +190,7 @@ public class Localization {
 
         @Override
         public Enumeration<String> getKeys() {
-            return lookup.keys();
+            return Collections.enumeration(lookup.keySet());
         }
 
         @Override
@@ -195,7 +200,7 @@ public class Localization {
 
         @Override
         public boolean containsKey(String key) {
-            return key != null && lookup.containsKey(key);
+            return (key != null) && lookup.containsKey(key);
         }
     }
 
