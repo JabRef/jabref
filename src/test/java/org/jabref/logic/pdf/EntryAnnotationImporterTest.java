@@ -1,6 +1,7 @@
 package org.jabref.logic.pdf;
 
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +37,7 @@ public class EntryAnnotationImporterTest {
         EntryAnnotationImporter entryAnnotationImporter = new EntryAnnotationImporter(entry);
 
         //when
-        Map<String, List<FileAnnotation>> annotations = entryAnnotationImporter.importAnnotationsFromFiles(databaseContext);
+        Map<Path, List<FileAnnotation>> annotations = entryAnnotationImporter.importAnnotationsFromFiles(databaseContext);
 
         //then
         int fileCounter = 0;
