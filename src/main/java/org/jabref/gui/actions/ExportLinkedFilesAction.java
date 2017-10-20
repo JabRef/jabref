@@ -37,9 +37,7 @@ import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 public class ExportLinkedFilesAction extends AbstractAction {
 
     private final DialogService ds = new FXDialogService();
-    private long totalFilesCount;
     private BibDatabaseContext databaseContext;
-    private Optional<Path> exportPath = Optional.empty();
     private List<BibEntry> entries;
 
     public ExportLinkedFilesAction() {
@@ -53,7 +51,8 @@ public class ExportLinkedFilesAction extends AbstractAction {
                 .withInitialDirectory(Paths.get(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY)))
                 .build();
         entries = JabRefGUI.getMainFrame().getCurrentBasePanel().getSelectedEntries();
-        exportPath = DefaultTaskExecutor
+
+        Optional<Path> exportPath = DefaultTaskExecutor
                 .runInJavaFXThread(() -> ds.showDirectorySelectionDialog(dirDialogConfiguration));
 
         exportPath.ifPresent(path -> {
