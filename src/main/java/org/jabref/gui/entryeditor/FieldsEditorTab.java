@@ -94,11 +94,11 @@ class FieldsEditorTab extends EntryEditorTab {
             FieldEditor fieldEditor;
             int defaultHeight;
             int wHeight = (int) (50.0 * InternalBibtexFields.getFieldWeight(field));
-            if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
+            if (InternalBibtexFields.getProperties(field).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
                 fieldEditor = new EntryLinkListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent,
                         true);
                 defaultHeight = 0;
-            } else if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
+            } else if (InternalBibtexFields.getProperties(field).contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
                 fieldEditor = new EntryLinkListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent,
                         false);
                 defaultHeight = 0;
@@ -166,7 +166,7 @@ class FieldsEditorTab extends EntryEditorTab {
 
             setRegularRowLayout(gridPane, rows);
         }
-        
+
         if (GUIGlobals.currentFont != null) {
             gridPane.setStyle(
                     "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"

@@ -537,12 +537,7 @@ public class MainTable extends JTable {
     }
 
     private boolean matches(int row, Matcher<BibEntry> m) {
-        Optional<BibEntry> bibEntry = getBibEntry(row);
-
-        if (bibEntry.isPresent()) {
-            return m.matches(bibEntry.get());
-        }
-        return m.matches(null);
+        return getBibEntry(row).map(m::matches).orElse(false);
     }
 
     private boolean isComplete(int row) {
