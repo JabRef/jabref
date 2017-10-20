@@ -447,6 +447,12 @@ public class JabRefPreferences implements PreferencesService {
         // load user preferences
         prefs = Preferences.userNodeForPackage(PREFS_BASE_CLASS);
 
+        // Since some of the preference settings themselves use localized strings, we cannot set the language after
+        // the initialization of the preferences in main
+        // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
+        // like the SearchDisplayMode will never be translated.
+        Localization.setLanguage(prefs.get(LANGUAGE, "en"));
+
         SearchPreferences.putDefaults(defaults);
 
         defaults.put(TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
