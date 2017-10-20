@@ -182,9 +182,7 @@ public class Localization {
         }
 
         public final Object handleGetObject(String key) {
-            if (key == null) {
-                throw new NullPointerException();
-            }
+            Objects.requireNonNull(key);
             return lookup.get(key);
         }
 
