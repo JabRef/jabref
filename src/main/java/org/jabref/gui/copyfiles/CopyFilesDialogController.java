@@ -11,11 +11,8 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 public class CopyFilesDialogController extends AbstractController<CopyFilesDialogViewModel> {
 
     @FXML private TableView<CopyFilesResultItemViewModel> tvResult;
-
     @FXML private TableColumn<CopyFilesResultItemViewModel, MaterialDesignIcon> colStatus;
-
     @FXML private TableColumn<CopyFilesResultItemViewModel, String> colMessage;
-
     @FXML private TableColumn<CopyFilesResultItemViewModel, String> colFile;
 
     @FXML

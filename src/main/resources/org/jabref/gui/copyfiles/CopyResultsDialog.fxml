@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 
 
-<DialogPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="254.0" prefWidth="362.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" controller="CopyFilesDialogController">
+<DialogPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="254.0" prefWidth="362.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.copyfiles.CopyFilesDialogController">
    <content>
       <VBox prefHeight="234.0" prefWidth="383.0">
          <children>
