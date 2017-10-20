@@ -1,4 +1,4 @@
-package org.jabref.gui.actions;
+package org.jabref.gui.copyfiles;
 
 import java.nio.file.Path;
 

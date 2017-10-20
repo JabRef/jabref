@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.VBox?>
+
+
+<DialogPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="254.0" prefWidth="362.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" controller="CopyFilesDialogController">
+   <content>
+      <VBox prefHeight="234.0" prefWidth="383.0">
+         <children>
+            <TableView fx:id="tvResult">
+              <columns>
+                <TableColumn fx:id="colStatus" prefWidth="75.0" text="Status" />
+                <TableColumn fx:id="colMessage" prefWidth="75.0" text="Message" />
+                  <TableColumn fx:id="colFile" prefWidth="75.0" text="File" />
+              </columns>
+            </TableView>
+            <ButtonBar prefHeight="40.0" prefWidth="200.0">
+               <buttons>
+                  <Button defaultButton="true" mnemonicParsing="false" onAction="#close" text="OK" />
+               </buttons>
+            </ButtonBar>
+         </children>
+      </VBox>
+   </content>
+</DialogPane>

@@ -1,4 +1,4 @@
-package org.jabref.gui.actions;
+package org.jabref.gui.copyfiles;
 
 import java.awt.event.ActionEvent;
 import java.nio.file.Path;
@@ -23,6 +23,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
+import org.jabref.gui.actions.ExportLinkedFilesTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.ValueTableCellFactory;

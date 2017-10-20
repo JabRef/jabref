@@ -22,7 +22,7 @@ import org.jabref.gui.EntryMarker;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.Actions;
-import org.jabref.gui.actions.ExportLinkedFilesAction;
+import org.jabref.gui.copyfiles.ExportLinkedFilesAction;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;

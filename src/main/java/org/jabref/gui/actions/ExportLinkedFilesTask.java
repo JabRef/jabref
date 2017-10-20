@@ -13,6 +13,8 @@ import java.util.function.BiFunction;
 import javafx.concurrent.Task;
 
 import org.jabref.Globals;
+import org.jabref.gui.copyfiles.CopyFilesResultItemViewModel;
+import org.jabref.gui.copyfiles.ExportLinkedFilesAction;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
