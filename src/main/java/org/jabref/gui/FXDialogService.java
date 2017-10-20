@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -131,14 +131,14 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
-    public <V> void showCanceableProgressDialogAndWait(Service<V> service) {
-        ProgressDialog progressDialog = new ProgressDialog(service);
-        progressDialog.setOnCloseRequest(evt -> service.cancel());
+    public <V> void showCanceableProgressDialogAndWait(Task<V> task) {
+        ProgressDialog progressDialog = new ProgressDialog(task);
+        progressDialog.setOnCloseRequest(evt -> task.cancel());
         DialogPane dialogPane = progressDialog.getDialogPane();
         dialogPane.getButtonTypes().add(ButtonType.CANCEL);
         Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
         cancelButton.setOnAction(evt -> {
-            service.cancel();
+            task.cancel();
             progressDialog.close();
         });
         progressDialog.showAndWait();

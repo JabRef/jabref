@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
@@ -126,9 +126,9 @@ public interface DialogService {
 
     /**
      * Constructs and shows a canceable {@link ProgressDialog}. Clicking cancel will cancel the underlying service and close the dialog
-     * @param service The {@link Service} which executes the work and for which to show the dialog
+     * @param task The {@link Task} which executes the work and for which to show the dialog
      */
-    <V> void showCanceableProgressDialogAndWait(Service<V> service);
+    <V> void showCanceableProgressDialogAndWait(Task<V> task);
 
     /**
      * Notify the user in an non-blocking way (i.e., update status message instead of showing a dialog).
