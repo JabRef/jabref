@@ -1,32 +1,41 @@
 package org.jabref.logic.l10n;
 
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Provides handling for messages and menu entries in the preferred language of the user.
  * <p>
  * Notes: All messages and menu-entries in JabRef are stored in escaped form like "This_is_a_message". This message
- * serves as key inside the {@link l10n} properties files that hold the translation for many languages.
- * When a message is accessed, it needs to be unescaped and possible parameters that can appear in a message need to
- * be filled with values.
+ * serves as key inside the {@link l10n} properties files that hold the translation for many languages. When a message
+ * is accessed, it needs to be unescaped and possible parameters that can appear in a message need to be filled with
+ * values.
  * <p>
  * This implementation loads the appropriate language by importing all keys/values from the correct bundle and stores
  * them in unescaped form inside a {@link LocalizationBundle} which provides fast access because it caches the key-value
  * pairs.
  * <p>
- * The access to this is given by the functions {@link Localization#lang(String, String...)} and
- * {@link Localization#menuTitle(String, String...)} that developers should use whenever they use strings for the e.g.
- * GUI that need to be translatable.
+ * The access to this is given by the functions {@link Localization#lang(String, String...)} and {@link
+ * Localization#menuTitle(String, String...)} that developers should use whenever they use strings for the e.g. GUI that
+ * need to be translatable.
  */
 public class Localization {
+    public static final String BIBTEX = "BibTeX";
     static final String RESOURCE_PREFIX = "l10n/JabRef";
     static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
-    public static final String BIBTEX = "BibTeX";
 
     private static final Log LOGGER = LogFactory.getLog(Localization.class);
 
@@ -70,8 +79,8 @@ public class Localization {
     }
 
     /**
-     * Sets the language and loads the appropriate translations. Note, that this function should be called before
-     * any other function of this class.
+     * Sets the language and loads the appropriate translations. Note, that this function should be called before any
+     * other function of this class.
      *
      * @param language Language identifier like "en", "de", etc.
      */
@@ -124,11 +133,8 @@ public class Localization {
     private static void createResourceBundles(Locale locale) {
         ResourceBundle messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
         ResourceBundle menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
-        // Just for the case something really stupid happened.
-        if ((messages == null) || (menuTitles == null)) {
-            LOGGER.error("Could not load language translation files in " + Localization.class);
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(messages, "Could not load " + RESOURCE_PREFIX + " resource.");
+        Objects.requireNonNull(menuTitles, "Could not load " + MENU_RESOURCE_PREFIX + " resource.");
         localizedMessages = new LocalizationBundle(createLookupMap(messages));
         localizedMenuTitles = new LocalizationBundle(createLookupMap(menuTitles));
     }
@@ -149,10 +155,11 @@ public class Localization {
     }
 
     /**
-     * This looks up a key in the bundle and replaces parameters %0, ..., %9 with the respective params given.
-     * Note that the keys are the "unescaped" strings from the bundle property files.
+     * This looks up a key in the bundle and replaces parameters %0, ..., %9 with the respective params given. Note that
+     * the keys are the "unescaped" strings from the bundle property files.
      *
-     * @param bundle            The {@link LocalizationBundle} which means either {@link Localization#localizedMenuTitles} or {@link Localization#localizedMessages}.
+     * @param bundle            The {@link LocalizationBundle} which means either {@link Localization#localizedMenuTitles}
+     *                          or {@link Localization#localizedMessages}.
      * @param idForErrorMessage Identifier-string when the translation is not found.
      * @param key               The lookup key.
      * @param params            The parameters that should be inserted into the message
@@ -201,6 +208,5 @@ public class Localization {
             return (key != null) && lookup.containsKey(key);
         }
     }
-
 }
 
