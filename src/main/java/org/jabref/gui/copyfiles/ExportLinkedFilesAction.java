@@ -72,6 +72,7 @@ public class ExportLinkedFilesAction extends AbstractAction {
 
     private void showDialog(List<CopyFilesResultItemViewModel> data) {
 
+        //TODO: Here I am intancicating the object - Mabye that is the problem?
         CopyFilesDialogView dlg = new CopyFilesDialogView(databaseContext, new CopyFilesResultListDependency(data));
         dlg.show();
 
