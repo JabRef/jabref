@@ -13,15 +13,15 @@ import org.jabref.model.entry.identifier.MathSciNetId;
 
 public class MathSciNetTab extends EntryEditorTab {
 
-    private Optional<MathSciNetId> mathSciNetId;
-
-    public MathSciNetTab(BibEntry entry) {
-        this.mathSciNetId = entry.getField(FieldName.MR_NUMBER).flatMap(MathSciNetId::parse);
-
+    public MathSciNetTab() {
         setText(Localization.lang("MathSciNet Review"));
     }
 
-    private StackPane getPane() {
+    private Optional<MathSciNetId> getMathSciNetId(BibEntry entry) {
+        return entry.getField(FieldName.MR_NUMBER).flatMap(MathSciNetId::parse);
+    }
+
+    private StackPane getPane(BibEntry entry) {
         StackPane root = new StackPane();
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(100, 100);
@@ -33,6 +33,7 @@ public class MathSciNetTab extends EntryEditorTab {
 
         root.getChildren().addAll(browser, progress);
 
+        Optional<MathSciNetId> mathSciNetId = getMathSciNetId(entry);
         mathSciNetId.flatMap(MathSciNetId::getExternalURI)
                 .ifPresent(url -> browser.getEngine().load(url.toASCIIString()));
 
@@ -46,12 +47,12 @@ public class MathSciNetTab extends EntryEditorTab {
     }
 
     @Override
-    public boolean shouldShow() {
-        return mathSciNetId.isPresent();
+    public boolean shouldShow(BibEntry entry) {
+        return getMathSciNetId(entry).isPresent();
     }
 
     @Override
-    protected void initialize() {
-        setContent(getPane());
+    protected void bindToEntry(BibEntry entry) {
+        setContent(getPane(entry));
     }
 }
