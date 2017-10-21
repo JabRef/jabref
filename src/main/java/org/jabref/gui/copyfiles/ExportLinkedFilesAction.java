@@ -8,12 +8,7 @@ import java.util.Optional;
 
 import javax.swing.AbstractAction;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.paint.Color;
@@ -76,7 +71,11 @@ public class ExportLinkedFilesAction extends AbstractAction {
     }
 
     private void showDialog(List<CopyFilesResultItemViewModel> data) {
-        Dialog<ButtonType> dlg = new Dialog<>();
+
+        CopyFilesDialogView dlg = new CopyFilesDialogView(databaseContext, new CopyFilesResultListDependency(data));
+        dlg.show();
+
+        /*Dialog<ButtonType> dlg = new Dialog<>();
         dlg.setTitle(Localization.lang("Result"));
         ObservableList<CopyFilesResultItemViewModel> tableData = FXCollections.observableArrayList(data);
 
@@ -93,6 +92,7 @@ public class ExportLinkedFilesAction extends AbstractAction {
         dlg.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
         dlg.setResizable(true);
         dlg.showAndWait();
+        */
     }
 
     private static TableView<CopyFilesResultItemViewModel> createTable() {
