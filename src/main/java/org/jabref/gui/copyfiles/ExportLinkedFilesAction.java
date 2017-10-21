@@ -14,7 +14,6 @@ import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
-import org.jabref.gui.actions.ExportLinkedFilesTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
@@ -46,7 +45,7 @@ public class ExportLinkedFilesAction extends AbstractAction {
         exportPath.ifPresent(path -> {
             databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabaseContext();
 
-            Task<List<CopyFilesResultItemViewModel>> exportTask = new ExportLinkedFilesTask(databaseContext, entries, path);
+            Task<List<CopyFilesResultItemViewModel>> exportTask = new CopyFilesTask(databaseContext, entries, path);
             startServiceAndshowProgessDialog(exportTask);
         });
     }

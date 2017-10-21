@@ -1,4 +1,4 @@
-package org.jabref.gui.actions;
+package org.jabref.gui.copyfiles;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -13,8 +13,6 @@ import java.util.function.BiFunction;
 import javafx.concurrent.Task;
 
 import org.jabref.Globals;
-import org.jabref.gui.copyfiles.CopyFilesResultItemViewModel;
-import org.jabref.gui.copyfiles.ExportLinkedFilesAction;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
@@ -26,23 +24,23 @@ import org.jabref.model.util.OptionalUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ExportLinkedFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
+public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
 
     private static final Log LOGGER = LogFactory.getLog(ExportLinkedFilesAction.class);
     private static final String LOGFILE = "exportLog.log";
+    private final BibDatabaseContext databaseContext;
+    private final Path exportPath;
     private final String localizedSucessMessage = Localization.lang("Copied file successfully");
     private final String localizedErrorMessage = Localization.lang("Could not copy file") + ": " + Localization.lang("File exists");
     private final long totalFilesCount;
-    private final BibDatabaseContext databaseContext;
     private final List<BibEntry> entries;
-    private final Path exportPath;
     private final List<CopyFilesResultItemViewModel> results = new ArrayList<>();
 
     private final BiFunction<Path, Path, Path> resolvePathFilename = (path, file) -> {
         return path.resolve(file.getFileName());
     };
 
-    public ExportLinkedFilesTask(BibDatabaseContext databaseContext, List<BibEntry> entries, Path path) {
+    public CopyFilesTask(BibDatabaseContext databaseContext, List<BibEntry> entries, Path path) {
         this.databaseContext = databaseContext;
         this.entries = entries;
         this.exportPath = path;
@@ -50,10 +48,10 @@ public class ExportLinkedFilesTask extends Task<List<CopyFilesResultItemViewMode
 
     }
 
-    int totalFilesCounter;
-    int numberSucessful;
-    int numberError;
     Optional<Path> newPath;
+    int numberError;
+    int numberSucessful;
+    int totalFilesCounter;
 
     @Override
     protected List<CopyFilesResultItemViewModel> call()
