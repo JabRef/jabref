@@ -1,7 +1,5 @@
 package org.jabref.gui.copyfiles;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import javafx.event.ActionEvent;
@@ -13,7 +11,6 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.AbstractController;
 import org.jabref.gui.util.ValueTableCellFactory;
-import org.jabref.model.database.BibDatabaseContext;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
@@ -25,8 +22,7 @@ public class CopyFilesDialogController extends AbstractController<CopyFilesDialo
     @FXML private TableColumn<CopyFilesResultItemViewModel, String> colMessage;
     @FXML private TableColumn<CopyFilesResultItemViewModel, String> colFile;
 
-    @Inject private CopyFilesResultListDependency results;
-    @Inject private BibDatabaseContext bibdatabasecontext;
+    @Inject private CopyFilesResultListDependency copyfilesresultlistDependency; //This var must have the same name as the key in the View
 
     @FXML
     void close(ActionEvent event) {
@@ -35,7 +31,7 @@ public class CopyFilesDialogController extends AbstractController<CopyFilesDialo
 
     @FXML
     private void initialize() {
-        viewModel = new CopyFilesDialogViewModel(results, bibdatabasecontext);
+        viewModel = new CopyFilesDialogViewModel(copyfilesresultlistDependency);
         setupTable();
     }
 
@@ -44,6 +40,7 @@ public class CopyFilesDialogController extends AbstractController<CopyFilesDialo
         colMessage.setCellValueFactory(cellData -> cellData.getValue().getMessage());
         colStatus.setCellValueFactory(cellData -> cellData.getValue().getIcon());
 
+        colFile.setCellFactory(new ValueTableCellFactory<CopyFilesResultItemViewModel, String>().withText(item -> item).withTooltip(item -> item));
         colStatus.setCellFactory(new ValueTableCellFactory<CopyFilesResultItemViewModel, MaterialDesignIcon>().withGraphic(item -> {
 
             Text icon = MaterialDesignIconFactory.get().createIcon(item);
@@ -55,5 +52,7 @@ public class CopyFilesDialogController extends AbstractController<CopyFilesDialo
             }
             return icon;
         }));
+
+        tvResult.setItems(viewModel.copyFilesResultListProperty());
     }
 }

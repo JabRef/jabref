@@ -13,7 +13,6 @@ public class CopyFilesResultItemViewModel {
 
     private final StringProperty file = new SimpleStringProperty("");
     private final ObjectProperty<MaterialDesignIcon> icon = new SimpleObjectProperty<>(MaterialDesignIcon.ALERT);
-
     private final StringProperty message = new SimpleStringProperty("");
 
     public CopyFilesResultItemViewModel(Path file, boolean success, String message) {

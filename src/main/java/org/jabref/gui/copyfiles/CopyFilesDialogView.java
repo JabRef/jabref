@@ -26,10 +26,11 @@ public class CopyFilesDialogView extends AbstractDialogView {
         copyFilesResultDlg.show();
     }
 
-    private static Function<String, Object> createContext(BibDatabaseContext bibDatabaseContext, CopyFilesResultListDependency results) {
+    private static Function<String, Object> createContext(BibDatabaseContext bibDatabaseContext, CopyFilesResultListDependency copyfilesresultlistDependency) {
         Map<String, Object> context = new HashMap<>();
+        //The "keys" of the HashMap must have the same name as the with @inject annotated field in the controller
         context.put("bibdatabasecontext", bibDatabaseContext);
-        context.put("copyfilesresultltlistdependency", results);
+        context.put("copyfilesresultlistDependency", copyfilesresultlistDependency);
         return context::get;
     }
 }

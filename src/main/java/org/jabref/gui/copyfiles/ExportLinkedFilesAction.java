@@ -9,10 +9,6 @@ import java.util.Optional;
 import javax.swing.AbstractAction;
 
 import javafx.concurrent.Task;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
@@ -21,14 +17,10 @@ import org.jabref.gui.FXDialogService;
 import org.jabref.gui.actions.ExportLinkedFilesTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
-
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 
 public class ExportLinkedFilesAction extends AbstractAction {
 
@@ -71,59 +63,7 @@ public class ExportLinkedFilesAction extends AbstractAction {
     }
 
     private void showDialog(List<CopyFilesResultItemViewModel> data) {
-
-        //TODO: Here I am intancicating the object - Mabye that is the problem?
         CopyFilesDialogView dlg = new CopyFilesDialogView(databaseContext, new CopyFilesResultListDependency(data));
         dlg.show();
-
-        /*Dialog<ButtonType> dlg = new Dialog<>();
-        dlg.setTitle(Localization.lang("Result"));
-        ObservableList<CopyFilesResultItemViewModel> tableData = FXCollections.observableArrayList(data);
-
-        TableView<CopyFilesResultItemViewModel> tv = createTable();
-        ScrollPane sp = new ScrollPane();
-        sp.setContent(tv);
-
-        dlg.getDialogPane().setContent(sp);
-        tv.setItems(tableData);
-
-        sp.setFitToHeight(true);
-        sp.setFitToWidth(true);
-
-        dlg.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
-        dlg.setResizable(true);
-        dlg.showAndWait();
-        */
     }
-
-    private static TableView<CopyFilesResultItemViewModel> createTable() {
-        TableView<CopyFilesResultItemViewModel> tableResult = new TableView<>();
-
-        TableColumn<CopyFilesResultItemViewModel, String> colFile = new TableColumn<>(Localization.lang("File"));
-        TableColumn<CopyFilesResultItemViewModel, MaterialDesignIcon> colIcon = new TableColumn<>(Localization.lang("Status"));
-        TableColumn<CopyFilesResultItemViewModel, String> colMessage = new TableColumn<>(Localization.lang("Message"));
-
-        colFile.setCellValueFactory(cellData -> cellData.getValue().getFile());
-        colMessage.setCellValueFactory(cellData -> cellData.getValue().getMessage());
-        colIcon.setCellValueFactory(cellData -> cellData.getValue().getIcon());
-
-        colIcon.setCellFactory(new ValueTableCellFactory<CopyFilesResultItemViewModel, MaterialDesignIcon>().withGraphic(item -> {
-
-            Text icon = MaterialDesignIconFactory.get().createIcon(item);
-            if (item == MaterialDesignIcon.CHECK) {
-                icon.setFill(Color.GREEN);
-            }
-            if (item == MaterialDesignIcon.ALERT) {
-                icon.setFill(Color.RED);
-            }
-            return icon;
-        }));
-
-        tableResult.getColumns().add(colIcon);
-        tableResult.getColumns().add(colMessage);
-        tableResult.getColumns().add(colFile);
-
-        return tableResult;
-    }
-
 }

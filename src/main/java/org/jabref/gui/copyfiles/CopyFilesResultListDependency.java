@@ -8,7 +8,7 @@ public class CopyFilesResultListDependency {
     private List<CopyFilesResultItemViewModel> results = new ArrayList<>();
 
     public CopyFilesResultListDependency() {
-        //empty
+        //empty, workaround for instanciation
     }
 
     public CopyFilesResultListDependency(List<CopyFilesResultItemViewModel> results) {
@@ -17,6 +17,11 @@ public class CopyFilesResultListDependency {
 
     public List<CopyFilesResultItemViewModel> getResults() {
         return results;
+    }
+
+    @Override
+    public String toString() {
+        return "CopyFilesResultListDependency [results=" + results + "]";
     }
 
 }
