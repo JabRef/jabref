@@ -198,7 +198,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
 
-    DatabaseChangeMonitor changeMonitor;
+    private DatabaseChangeMonitor changeMonitor;
 
     public BasePanel(JabRefFrame frame, BibDatabaseContext bibDatabaseContext) {
         Objects.requireNonNull(frame);
