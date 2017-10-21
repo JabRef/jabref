@@ -103,7 +103,7 @@ class ChangeDisplayDialog extends JabRefDialog implements TreeSelectionListener 
             if (anyDisabled) {
                 panel.markBaseChanged();
             }
-            panel.setUpdatedExternally(false);
+            panel.markExternalChangesAsResolved();
             dispose();
             okPressed = true;
         });

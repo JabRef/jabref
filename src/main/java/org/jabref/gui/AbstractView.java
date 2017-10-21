@@ -32,8 +32,7 @@ public class AbstractView extends FXMLView {
 
         // Notify controller about the stage, where it is displayed
         view.sceneProperty().addListener((observable, oldValue, newValue) -> {
-
-            if (newValue.getWindow() instanceof Stage) {
+            if (newValue != null && newValue.getWindow() instanceof Stage) {
                 Stage stage = (Stage) newValue.getWindow();
                 if (stage != null) {
                     getController().ifPresent(controller -> controller.setStage(stage));
