@@ -25,4 +25,5 @@ public class CopyFilesDialogViewModel extends AbstractViewModel {
     public SimpleListProperty<CopyFilesResultItemViewModel> abbreviationsProperty() {
         return this.copyFilesResultItems;
     }
+
 }

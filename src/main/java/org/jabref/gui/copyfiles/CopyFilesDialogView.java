@@ -1,7 +1,7 @@
 package org.jabref.gui.copyfiles;
 
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.DialogPane;
 
 import org.jabref.gui.AbstractDialogView;
 import org.jabref.gui.FXDialog;

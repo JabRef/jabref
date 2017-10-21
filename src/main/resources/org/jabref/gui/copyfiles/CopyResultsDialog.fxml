@@ -21,7 +21,7 @@
             </TableView>
             <ButtonBar prefHeight="40.0" prefWidth="200.0">
                <buttons>
-                  <Button defaultButton="true" mnemonicParsing="false" onAction="#close" text="OK" />
+                  <Button defaultButton="true" mnemonicParsing="false" onAction="#close" text="OK" ButtonBar.buttonData="OK_DONE"/>
                </buttons>
             </ButtonBar>
          </children>
