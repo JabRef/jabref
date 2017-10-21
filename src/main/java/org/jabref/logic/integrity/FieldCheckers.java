@@ -30,7 +30,7 @@ public class FieldCheckers {
             fieldCheckers.put(field, new AbbreviationChecker());
         }
         for (String field : InternalBibtexFields.getPersonNameFields()) {
-            fieldCheckers.put(field, new PersonNamesChecker());
+            fieldCheckers.put(field, new PersonNamesChecker(databaseContext));
         }
         fieldCheckers.put(FieldName.BOOKTITLE, new BooktitleChecker());
         fieldCheckers.put(FieldName.TITLE, new BracketChecker());

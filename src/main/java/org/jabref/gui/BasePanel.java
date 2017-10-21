@@ -1481,11 +1481,14 @@ public class BasePanel extends JPanel implements ClipboardOwner {
      * @return A suitable entry editor.
      */
     public EntryEditor getEntryEditor(BibEntry entry) {
-        String lastTabName = "";
         if (currentEditor != null) {
-            lastTabName = currentEditor.getVisibleTabName();
+            currentEditor.setEntry(entry);
+            return currentEditor;
+        } else {
+            EntryEditor editor = new EntryEditor(this);
+            editor.setEntry(entry);
+            return editor;
         }
-        return new EntryEditor(frame, BasePanel.this, entry, lastTabName);
     }
 
     public EntryEditor getCurrentEditor() {
