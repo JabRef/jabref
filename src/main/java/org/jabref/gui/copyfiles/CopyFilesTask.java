@@ -35,6 +35,10 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
     private final long totalFilesCount;
     private final List<BibEntry> entries;
     private final List<CopyFilesResultItemViewModel> results = new ArrayList<>();
+    private Optional<Path> newPath;
+    private int numberError;
+    private int numberSucessful;
+    private int totalFilesCounter;
 
     private final BiFunction<Path, Path, Path> resolvePathFilename = (path, file) -> {
         return path.resolve(file.getFileName());
@@ -47,11 +51,6 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
         totalFilesCount = entries.stream().flatMap(entry -> entry.getFiles().stream()).count();
 
     }
-
-    Optional<Path> newPath;
-    int numberError;
-    int numberSucessful;
-    int totalFilesCounter;
 
     @Override
     protected List<CopyFilesResultItemViewModel> call()
