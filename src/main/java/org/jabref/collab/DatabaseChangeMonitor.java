@@ -151,7 +151,6 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         });
     }
 
-
     private void copyToTemp(Path file) {
         FileUtil.copyFile(file, tmpFile, true);
     }
