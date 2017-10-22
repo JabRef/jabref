@@ -9,7 +9,6 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.preferences.PreferencesService;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.injection.PresenterFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,8 +52,8 @@ public class DefaultInjector implements PresenterFactory {
         LOGGER.debug("Instantiate " + clazz.getName());
 
         // Use our own method to construct dependencies
-        Injector.setInstanceSupplier(DefaultInjector::createDependency);
+        BaseInjector.setInstanceSupplier(DefaultInjector::createDependency);
 
-        return Injector.instantiatePresenter(clazz, injectionContext);
+        return BaseInjector.instantiatePresenter(clazz, injectionContext);
     }
 }
