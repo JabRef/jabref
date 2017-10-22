@@ -29,14 +29,6 @@
                     <HBox alignment="BASELINE_LEFT">
                         <Label text="%Filename" prefWidth="70.0" alignment="BASELINE_LEFT"/>
                         <ComboBox fx:id="files" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                        <Button onAction="#reloadAnnotations" styleClass="flatButton" alignment="BASELINE_RIGHT">
-                            <graphic>
-                                <MaterialDesignIconView glyphName="RELOAD"/>
-                            </graphic>
-                            <tooltip>
-                                <Tooltip text="%Reload annotations"/>
-                            </tooltip>
-                        </Button>
                     </HBox>
                 </top>
                 <center>

@@ -49,6 +49,7 @@ public class ChangeScanner implements Runnable {
 
     private static final double MATCH_THRESHOLD = 0.4;
     private final File file;
+    private final Path tempFile;
     private final BibDatabase databaseInMemory;
     private final MetaData metadataInMemory;
 
@@ -67,12 +68,13 @@ public class ChangeScanner implements Runnable {
 
     //  NamedCompound edit = new NamedCompound("Merged external changes")
 
-    public ChangeScanner(JabRefFrame frame, BasePanel bp, File file) {
+    public ChangeScanner(JabRefFrame frame, BasePanel bp, File file, Path tempFile) {
         this.panel = bp;
         this.frame = frame;
         this.databaseInMemory = bp.getDatabase();
         this.metadataInMemory = bp.getBibDatabaseContext().getMetaData();
         this.file = file;
+        this.tempFile = tempFile;
     }
 
     @Override
@@ -80,7 +82,6 @@ public class ChangeScanner implements Runnable {
         try {
 
             // Parse the temporary file.
-            Path tempFile = Globals.getFileUpdateMonitor().getTempFile(panel.fileMonitorHandle());
             ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
             ParserResult result = OpenDatabase.loadDatabase(tempFile.toFile(), importFormatPreferences);
             databaseInTemp = result.getDatabase();
@@ -153,7 +154,7 @@ public class ChangeScanner implements Runnable {
                 Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
                 BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
                 SaveSession ss = databaseWriter.saveDatabase(new BibDatabaseContext(databaseInTemp, metadataInTemp, defaults), prefs);
-                ss.commit(Globals.getFileUpdateMonitor().getTempFile(panel.fileMonitorHandle()));
+                ss.commit(tempFile);
             } catch (SaveException ex) {
                 LOGGER.warn("Problem updating tmp file after accepting external changes", ex);
             }

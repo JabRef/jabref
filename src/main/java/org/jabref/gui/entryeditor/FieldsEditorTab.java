@@ -39,19 +39,21 @@ import org.jabref.model.entry.InternalBibtexFields;
  */
 class FieldsEditorTab extends EntryEditorTab {
 
-    private final Region panel;
     private final List<String> fields;
     private final EntryEditor parent;
     private final Map<String, FieldEditorFX> editors = new LinkedHashMap<>();
     private final JabRefFrame frame;
     private final BasePanel basePanel;
     private final BibEntry entry;
+    private final boolean isCompressed;
+    private Region panel;
     private FieldEditorFX activeField;
+
 
     public FieldsEditorTab(JabRefFrame frame, BasePanel basePanel, List<String> fields, EntryEditor parent, boolean addKeyField, boolean compressed, BibEntry entry) {
         this.entry = Objects.requireNonNull(entry);
         this.fields = new ArrayList<>(Objects.requireNonNull(fields));
-
+        this.isCompressed = compressed;
         // Add the edit field for Bibtex-key.
         if (addKeyField) {
             this.fields.add(BibEntry.KEY_FIELD);
@@ -60,8 +62,6 @@ class FieldsEditorTab extends EntryEditorTab {
         this.parent = parent;
         this.frame = frame;
         this.basePanel = basePanel;
-
-        panel = setupPanel(frame, basePanel, compressed);
 
         // The following line makes sure focus cycles inside tab instead of being lost to other parts of the frame:
         //panel.setFocusCycleRoot(true);
@@ -305,6 +305,7 @@ class FieldsEditorTab extends EntryEditorTab {
 
     @Override
     protected void initialize() {
+        panel = setupPanel(frame, basePanel, isCompressed);
         setContent(panel);
     }
 }
