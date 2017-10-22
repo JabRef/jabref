@@ -162,12 +162,12 @@ public class ChangeScanner implements Runnable {
     }
 
     private void scanMetaData(MetaData inMemory, MetaData onTmp, MetaData onDisk) {
-        if (!onTmp.isEmpty()) {
-            if (!inMemory.equals(onDisk)) {
+        if (onTmp.isEmpty()) {
+            if (!onDisk.isEmpty() || !onTmp.equals(onDisk)) {
                 changes.add(new MetaDataChange(inMemory, onDisk));
             }
         } else {
-            if (!onDisk.isEmpty() || !onTmp.equals(onDisk)) {
+            if (!inMemory.equals(onDisk)) {
                 changes.add(new MetaDataChange(inMemory, onDisk));
             }
         }
@@ -320,12 +320,12 @@ public class ChangeScanner implements Runnable {
         String mem = inMemory.getPreamble().orElse(null);
         Optional<String> tmp = onTmp.getPreamble();
         Optional<String> disk = onDisk.getPreamble();
-        if (!tmp.isPresent()) {
-            disk.ifPresent(diskContent -> changes.add(new PreambleChange(mem, diskContent)));
-        } else {
+        if (tmp.isPresent()) {
             if (!disk.isPresent() || !tmp.equals(disk)) {
                 changes.add(new PreambleChange(mem, disk.orElse(null)));
             }
+        } else {
+            disk.ifPresent(diskContent -> changes.add(new PreambleChange(mem, diskContent)));
         }
     }
 
@@ -455,7 +455,7 @@ public class ChangeScanner implements Runnable {
         if (!groupsTmp.isPresent() && !groupsDisk.isPresent()) {
             return;
         }
-        if ((groupsTmp.isPresent() && !groupsDisk.isPresent()) || !groupsTmp.isPresent()) {
+        if (!groupsTmp.isPresent() || !groupsDisk.isPresent()) {
             changes.add(new GroupChange(groupsDisk.orElse(null), groupsTmp.orElse(null)));
             return;
         }
