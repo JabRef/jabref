@@ -5,13 +5,21 @@
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.BorderPane?>
 
-<DialogPane xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.sharelatex.ShareLatexProjectDialogController">
+<DialogPane prefHeight="494.0" prefWidth="397.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.sharelatex.ShareLatexProjectDialogController">
    <content>
-      <VBox>
-         <children>
-            <TableView fx:id="tblProjects">
+      <BorderPane>
+         <bottom>
+            <ButtonBar minWidth="-Infinity" BorderPane.alignment="CENTER">
+              <buttons>
+                <Button fx:id="btnSync" defaultButton="true" mnemonicParsing="false" onAction="#synchronizeLibrary" text="Synchronize Library" />
+                  <Button fx:id="btnCancel" cancelButton="true" mnemonicParsing="false" onAction="#cancelAndClose" text="Cancel" ButtonBar.buttonData="CANCEL_CLOSE" />
+              </buttons>
+            </ButtonBar>
+         </bottom>
+         <top>
+            <TableView fx:id="tblProjects" BorderPane.alignment="CENTER">
               <columns>
                   <TableColumn fx:id="colActive" prefWidth="75.0" text="Active" />
                 <TableColumn fx:id="colTitle" prefWidth="75.0" text="Title" />
@@ -20,13 +28,7 @@
                   <TableColumn fx:id="colLastModified" prefWidth="75.0" text="Last modified" />
               </columns>
             </TableView>
-            <ButtonBar minWidth="-Infinity">
-              <buttons>
-                <Button fx:id="btnSync" defaultButton="true" mnemonicParsing="false" onAction="#synchronizeLibrary" text="Synchronize Library" />
-                  <Button fx:id="btnCancel" cancelButton="true" mnemonicParsing="false" onAction="#cancelAndClose" text="Cancel" />
-              </buttons>
-            </ButtonBar>
-         </children>
-      </VBox>
+         </top>
+      </BorderPane>
    </content>
 </DialogPane>

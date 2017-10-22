@@ -12,6 +12,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.FXDialogService;
 import org.jabref.logic.sharelatex.ShareLatexManager;
+import org.jabref.logic.sharelatex.SharelatexConnectionProperties;
 
 public class ShareLatexLoginDialogController extends AbstractController<ShareLatexLoginDialogViewModel> {
 
@@ -20,6 +21,7 @@ public class ShareLatexLoginDialogController extends AbstractController<ShareLat
     @FXML private PasswordField pfPassword;
     @Inject private ShareLatexManager manager;
 
+    private SharelatexConnectionProperties props;
     @FXML
     private void initialize() {
         viewModel = new ShareLatexLoginDialogViewModel();
@@ -40,6 +42,8 @@ public class ShareLatexLoginDialogController extends AbstractController<ShareLat
                 dlg.setContentText("Your email or password is incorrect. Please try again");
                 dlg.showAndWait();
             } else {
+                //TODO: Wait until pdf + injection stuff gets merged
+                props = new SharelatexConnectionProperties(tbAddress.getText(), tbUsername.getText(), pfPassword.getText(), "default");
                 ShareLatexProjectDialogView dlgprojects = new ShareLatexProjectDialogView();
                 dlgprojects.show();
                 closeDialog();

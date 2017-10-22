@@ -6,7 +6,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -253,7 +252,7 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
             try {
                 passwordField.setText(
                         new Password(sharedDatabasePassword.get().toCharArray(), sharedDatabaseUser.get()).decrypt());
-            } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+            } catch (GeneralSecurityException e) {
                 LOGGER.error("Could not read the password due to decryption problems.", e);
             }
         }
@@ -401,7 +400,7 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
         if (rememberPassword.isSelected()) {
             try {
                 prefs.setPassword(new Password(passwordField.getPassword(), userField.getText()).encrypt());
-            } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+            } catch (GeneralSecurityException e) {
                 LOGGER.error("Could not store the password due to encryption problems.", e);
             }
         } else {
