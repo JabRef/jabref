@@ -258,8 +258,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Globals.getKeyPrefs().getKey(KeyBinding.OPEN_CONSOLE),
             IconTheme.JabRefIcon.CONSOLE.getIcon());
     private final AbstractAction pullChangesFromSharedDatabase = new GeneralAction(Actions.PULL_CHANGES_FROM_SHARED_DATABASE,
-            Localization.menuTitle("Pull_changes_from_shared_database"),
-            Localization.lang("Pull_changes_from_shared_database"),
+            Localization.menuTitle("Pull changes from shared database"),
+            Localization.lang("Pull changes from shared database"),
             Globals.getKeyPrefs().getKey(KeyBinding.PULL_CHANGES_FROM_SHARED_DATABASE),
             IconTheme.JabRefIcon.PULL.getIcon());
     private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, Localization.menuTitle("Mark entries"),

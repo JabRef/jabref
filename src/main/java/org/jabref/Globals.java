@@ -4,11 +4,11 @@ import java.awt.Toolkit;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.jabref.collab.FileUpdateMonitor;
 import org.jabref.gui.GlobalFocusListener;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileUpdateMonitor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
