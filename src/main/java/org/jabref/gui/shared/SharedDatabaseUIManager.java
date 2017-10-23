@@ -111,7 +111,7 @@ public class SharedDatabaseUIManager {
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
         dbmsSynchronizer.openSharedDatabase(dbmsConnectionProperties);
         dbmsSynchronizer.registerListener(this);
-        frame.output(Localization.lang("Connection_to_%0_server_established.", dbmsConnectionProperties.getType().toString()));
+        frame.output(Localization.lang("Connection to %0 server established.", dbmsConnectionProperties.getType().toString()));
         return frame.addTab(bibDatabaseContext, true);
     }
 
@@ -140,6 +140,6 @@ public class SharedDatabaseUIManager {
         dbmsSynchronizer.openSharedDatabase(dbmsConnectionProperties);
         dbmsSynchronizer.registerListener(this);
         parserResult.setDatabaseContext(bibDatabaseContext);
-        frame.output(Localization.lang("Connection_to_%0_server_established.", dbmsConnectionProperties.getType().toString()));
+        frame.output(Localization.lang("Connection to %0 server established.", dbmsConnectionProperties.getType().toString()));
     }
 }

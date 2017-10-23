@@ -56,7 +56,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         emacsRebindCtrlA = new JCheckBox(Localization.lang("Rebind C-a, too"));
         emacsRebindCtrlF = new JCheckBox(Localization.lang("Rebind C-f, too"));
         autoComplete = new JCheckBox(Localization.lang("Enable word/name autocompletion"));
-        recommendations = new JCheckBox(Localization.lang("Show 'Related_Articles' tab"));
+        recommendations = new JCheckBox(Localization.lang("Show 'Related Articles' tab"));
 
         // allowed name formats
         autoCompFF = new JRadioButton(Localization.lang("Autocomplete names in 'Firstname Lastname' format only"));

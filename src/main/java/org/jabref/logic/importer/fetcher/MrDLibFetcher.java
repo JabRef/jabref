@@ -59,7 +59,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
                     // For displaying An ErrorMessage
                     BibEntry errorBibEntry = new BibEntry();
                     errorBibEntry.setField("html_representation",
-                            Localization.lang("Error_while_fetching_from_%0", "Mr.DLib"));
+                            Localization.lang("Error while fetching from %0", "Mr.DLib"));
                     BibDatabase errorBibDataBase = new BibDatabase();
                     errorBibDataBase.insertEntry(errorBibEntry);
                     parserResult = new ParserResult(errorBibDataBase);

@@ -40,7 +40,7 @@ public class RegexFormatter implements Formatter {
 
     @Override
     public String getName() {
-        return Localization.lang("regular_expression");
+        return Localization.lang("regular expression");
     }
 
     @Override
