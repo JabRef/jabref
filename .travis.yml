@@ -61,3 +61,7 @@ cache:
   directories:
   - $HOME/.gradle/caches/
   - $HOME/.gradle/wrapper/
+
+# disable email notifications about build status
+notifications:
+  email: false
