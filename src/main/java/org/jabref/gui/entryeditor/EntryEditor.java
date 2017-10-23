@@ -108,11 +108,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     /**
-     * The default index number of the other fields tab
-     */
-    private static final int OTHER_FIELDS_DEFAULTPOSITION = 4;
-
-    /**
      * A reference to the entry this object works on.
      */
     private BibEntry entry;
@@ -161,7 +156,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private final BooleanProperty movingToDifferentEntry = new SimpleBooleanProperty();
     private EntryType entryType;
     private SourceTab sourceTab;
-    private final BorderLayout layout;
     private TypeLabel typeLabel;
 
     public EntryEditor(BasePanel panel) {
@@ -170,16 +164,18 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         writeXmp = new WriteXMPEntryEditorAction(panel, this);
 
-        layout = new BorderLayout();
+        BorderLayout layout = new BorderLayout();
         setLayout(layout);
 
         container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
         // Create type-label
         typeLabel = new TypeLabel("");
         setupToolBar();
-        DefaultTaskExecutor.runInJavaFXThread(() ->
-                container.setScene(new Scene(tabbed))
-        );
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            tabbed.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+            tabbed.setStyle("-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
+            container.setScene(new Scene(tabbed));
+        });
         add(container, BorderLayout.CENTER);
 
         DefaultTaskExecutor.runInJavaFXThread(() -> {
@@ -205,27 +201,30 @@ public class EntryEditor extends JPanel implements EntryContainer {
         displayedBibEntryType = entry.getType();
 
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-            recalculateVisibleTabs(this.getVisibleTabName());
+            recalculateVisibleTabs();
+            if (Globals.prefs.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE)) {
+                tabbed.getSelectionModel().select(sourceTab);
+            }
 
-            tabbed.setStyle("-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
-
+            // Notify current tab about new entry
+            EntryEditorTab selectedTab = (EntryEditorTab) tabbed.getSelectionModel().getSelectedItem();
+            selectedTab.notifyAboutFocus(entry);
         });
+
+
         TypedBibEntry typedEntry = new TypedBibEntry(entry, panel.getBibDatabaseContext().getMode());
         typeLabel.setText(typedEntry.getTypeForDisplay());
     }
 
     @Subscribe
     public synchronized void listen(FieldAddedOrRemovedEvent event) {
-        // TODO: Rebuild entry editor based on new information (e.g. hide/add tabs)
+        // Rebuild entry editor based on new information (e.g. hide/add tabs)
+        recalculateVisibleTabs();
     }
 
     @Subscribe
     public synchronized void listen(EntryChangedEvent event) {
         DefaultTaskExecutor.runInJavaFXThread(() -> sourceTab.updateSourcePane(entry));
-    }
-
-    private void selectLastUsedTab(String lastTabName) {
-        tabbed.getTabs().stream().filter(tab -> lastTabName.equals(tab.getText())).findFirst().ifPresent(tab -> tabbed.getSelectionModel().select(tab));
     }
 
     /**
@@ -293,25 +292,31 @@ public class EntryEditor extends JPanel implements EntryContainer {
         closeAction.actionPerformed(null);
     }
 
-    private void recalculateVisibleTabs(String lastTabName) {
-        List<Tab> visibleTabs = new LinkedList<>();
-        for (EntryEditorTab tab : tabs) {
-            if (tab.shouldShow(entry)) {
-                visibleTabs.add(tab);
+    private void recalculateVisibleTabs() {
+        List<Tab> visibleTabs = tabs.stream().filter(tab -> tab.shouldShow(entry)).collect(Collectors.toList());
+
+        // Start of ugly hack:
+        // We need to find out, which tabs will be shown and which not and remove and re-add the appropriate tabs
+        // to the editor. We don't want to simply remove all and re-add the complete list of visible tabs, because
+        // the tabs give an ugly animation the looks like all tabs are shifting in from the right.
+        // This hack is required since tabbed.getTabs().setAll(visibleTabs) changes the order of the tabs in the editor
+
+        // First, remove tabs that we do not want to show
+        List<EntryEditorTab> toBeRemoved = tabs.stream().filter(tab -> !tab.shouldShow(entry)).collect(Collectors.toList());
+        tabbed.getTabs().removeAll(toBeRemoved);
+
+        // Next add all the visible tabs (if not already present) at the right position
+        for (int i = 0; i < visibleTabs.size(); i++) {
+            Tab toBeAdded = visibleTabs.get(i);
+            Tab shown = null;
+            if (i < tabbed.getTabs().size()) {
+                shown = tabbed.getTabs().get(i);
+            }
+
+            if (!toBeAdded.equals(shown)) {
+                tabbed.getTabs().add(i, toBeAdded);
             }
         }
-        tabbed.getTabs().setAll(visibleTabs);
-        tabbed.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-
-        if (Globals.prefs.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE)) {
-            tabbed.getSelectionModel().select(sourceTab);
-        } else {
-            selectLastUsedTab(lastTabName);
-        }
-
-        // Notify current tab about new entry
-        EntryEditorTab selectedTab = (EntryEditorTab) tabbed.getSelectionModel().getSelectedItem();
-        selectedTab.notifyAboutFocus(entry);
     }
 
     private List<EntryEditorTab> createTabs() {
@@ -768,9 +773,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             // Should only be done if this editor is currently showing:
             // don't select the current entry again (eg use BasePanel#highlightEntry} in case another entry was selected)
             if (!movingAway && isShowing()) {
-                SwingUtilities.invokeLater(() -> {
-                    panel.getMainTable().ensureVisible(entry);
-                });
+                SwingUtilities.invokeLater(() -> panel.getMainTable().ensureVisible(entry));
             }
         }
 
