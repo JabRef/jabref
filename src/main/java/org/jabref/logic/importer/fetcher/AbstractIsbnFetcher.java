@@ -25,7 +25,7 @@ public abstract class AbstractIsbnFetcher implements IdBasedParserFetcher {
     protected void ensureThatIsbnIsValid(String identifier) throws FetcherException {
         ISBN isbn = new ISBN(identifier);
         if (!isbn.isValid()) {
-            throw new FetcherException(Localization.lang("Invalid_ISBN:_'%0'.", identifier));
+            throw new FetcherException(Localization.lang("Invalid ISBN: '%0'.", identifier));
         }
     }
 
