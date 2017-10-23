@@ -99,11 +99,13 @@ public class BibDatabase {
     }
 
     /**
-     * Returns an EntrySorter with the sorted entries from this base,
-     * sorted by the given Comparator.
+     * Returns the list of entries sorted by the given comparator.
      */
-    public synchronized EntrySorter getSorter(Comparator<BibEntry> comp) {
-        return new EntrySorter(new ArrayList<>(getEntries()), comp);
+    public synchronized List<BibEntry> getEntriesSorted(Comparator<BibEntry> comparator) {
+        List<BibEntry> entriesSorted = new ArrayList<>(entries);
+        entriesSorted.sort(comparator);
+
+        return entriesSorted;
     }
 
     /**

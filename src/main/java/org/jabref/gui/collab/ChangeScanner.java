@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -32,7 +33,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.EntrySorter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.FieldName;
@@ -77,47 +77,29 @@ public class ChangeScanner implements Runnable {
         this.tempFile = tempFile;
     }
 
-    @Override
-    public void run() {
-        try {
-
-            // Parse the temporary file.
-            ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
-            ParserResult result = OpenDatabase.loadDatabase(tempFile.toFile(), importFormatPreferences);
-            databaseInTemp = result.getDatabase();
-            metadataInTemp = result.getMetaData();
-
-            // Parse the modified file.
-            result = OpenDatabase.loadDatabase(file, importFormatPreferences);
-            BibDatabase databaseOnDisk = result.getDatabase();
-            MetaData metadataOnDisk = result.getMetaData();
-
-            // Sort both databases according to a common sort key.
-            EntryComparator comparator = new EntryComparator(false, true, SORT_BY[2]);
-            comparator = new EntryComparator(false, true, SORT_BY[1], comparator);
-            comparator = new EntryComparator(false, true, SORT_BY[0], comparator);
-            EntrySorter sorterInTemp = databaseInTemp.getSorter(comparator);
-            comparator = new EntryComparator(false, true, SORT_BY[2]);
-            comparator = new EntryComparator(false, true, SORT_BY[1], comparator);
-            comparator = new EntryComparator(false, true, SORT_BY[0], comparator);
-            EntrySorter sorterOnDisk = databaseOnDisk.getSorter(comparator);
-            comparator = new EntryComparator(false, true, SORT_BY[2]);
-            comparator = new EntryComparator(false, true, SORT_BY[1], comparator);
-            comparator = new EntryComparator(false, true, SORT_BY[0], comparator);
-            EntrySorter sorterInMem = databaseInMemory.getSorter(comparator);
-
-            // Start looking at changes.
-            scanMetaData(metadataInMemory, metadataInTemp, metadataOnDisk);
-            scanPreamble(databaseInMemory, databaseInTemp, databaseOnDisk);
-            scanStrings(databaseInMemory, databaseInTemp, databaseOnDisk);
-
-            scanEntries(sorterInMem, sorterInTemp, sorterOnDisk);
-
-            scanGroups(metadataInTemp, metadataOnDisk);
-
-        } catch (IOException ex) {
-            LOGGER.warn("Problem running", ex);
+    /**
+     * Finds the entry in neu best fitting the specified entry in old. If no entries get a score above zero, an entry is
+     * still returned.
+     *
+     * @param oldSorter EntrySorter
+     * @param newSorter EntrySorter
+     * @param index     int
+     * @return BibEntry
+     */
+    private static BibEntry bestFit(List<BibEntry> oldSorter, List<BibEntry> newSorter, int index) {
+        double comp = -1;
+        int found = 0;
+        for (int i = 0; i < newSorter.size(); i++) {
+            double res = DuplicateCheck.compareEntriesStrictly(oldSorter.get(index), newSorter.get(i));
+            if (res > comp) {
+                comp = res;
+                found = i;
+            }
+            if (comp > 1) {
+                break;
+            }
         }
+        return newSorter.get(found);
     }
 
     public boolean changesFound() {
@@ -173,7 +155,49 @@ public class ChangeScanner implements Runnable {
         }
     }
 
-    private void scanEntries(EntrySorter memorySorter, EntrySorter tmpSorter, EntrySorter diskSorter) {
+    @Override
+    public void run() {
+        try {
+
+            // Parse the temporary file.
+            ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
+            ParserResult result = OpenDatabase.loadDatabase(tempFile.toFile(), importFormatPreferences);
+            databaseInTemp = result.getDatabase();
+            metadataInTemp = result.getMetaData();
+
+            // Parse the modified file.
+            result = OpenDatabase.loadDatabase(file, importFormatPreferences);
+            BibDatabase databaseOnDisk = result.getDatabase();
+            MetaData metadataOnDisk = result.getMetaData();
+
+            // Sort both databases according to a common sort key.
+            EntryComparator comparator = new EntryComparator(false, true, SORT_BY[2]);
+            comparator = new EntryComparator(false, true, SORT_BY[1], comparator);
+            comparator = new EntryComparator(false, true, SORT_BY[0], comparator);
+            List<BibEntry> sorterInTemp = databaseInTemp.getEntriesSorted(comparator);
+            comparator = new EntryComparator(false, true, SORT_BY[2]);
+            comparator = new EntryComparator(false, true, SORT_BY[1], comparator);
+            comparator = new EntryComparator(false, true, SORT_BY[0], comparator);
+            List<BibEntry> sorterOnDisk = databaseOnDisk.getEntriesSorted(comparator);
+            comparator = new EntryComparator(false, true, SORT_BY[2]);
+            comparator = new EntryComparator(false, true, SORT_BY[1], comparator);
+            comparator = new EntryComparator(false, true, SORT_BY[0], comparator);
+            List<BibEntry> sorterInMem = databaseInMemory.getEntriesSorted(comparator);
+
+            // Start looking at changes.
+            scanMetaData(metadataInMemory, metadataInTemp, metadataOnDisk);
+            scanPreamble(databaseInMemory, databaseInTemp, databaseOnDisk);
+            scanStrings(databaseInMemory, databaseInTemp, databaseOnDisk);
+
+            scanEntries(sorterInMem, sorterInTemp, sorterOnDisk);
+
+            scanGroups(metadataInTemp, metadataOnDisk);
+        } catch (IOException ex) {
+            LOGGER.warn("Problem running", ex);
+        }
+    }
+
+    private void scanEntries(List<BibEntry> memorySorter, List<BibEntry> tmpSorter, List<BibEntry> diskSorter) {
 
         // Create pointers that are incremented as the entries of each base are used in
         // successive order from the beginning. Entries "further down" in the "disk" base
@@ -183,21 +207,21 @@ public class ChangeScanner implements Runnable {
 
         // Create a HashSet where we can put references to entry numbers in the "disk"
         // database that we have matched. This is to avoid matching them twice.
-        Set<String> used = new HashSet<>(diskSorter.getEntryCount());
-        Set<Integer> notMatched = new HashSet<>(tmpSorter.getEntryCount());
+        Set<String> used = new HashSet<>(diskSorter.size());
+        Set<Integer> notMatched = new HashSet<>(tmpSorter.size());
 
         // Loop through the entries of the "tmp" database, looking for exact matches in the "disk" one.
         // We must finish scanning for exact matches before looking for near matches, to avoid an exact
         // match being "stolen" from another entry.
         mainLoop:
-        for (piv1 = 0; piv1 < tmpSorter.getEntryCount(); piv1++) {
+        for (piv1 = 0; piv1 < tmpSorter.size(); piv1++) {
 
             // First check if the similarly placed entry in the other base matches exactly.
             double comp = -1;
             // (if there are not any entries left in the "disk" database, comp will stay at -1,
             // and this entry will be marked as nonmatched).
-            if (!used.contains(String.valueOf(piv2)) && (piv2 < diskSorter.getEntryCount())) {
-                comp = DuplicateCheck.compareEntriesStrictly(tmpSorter.getEntryAt(piv1), diskSorter.getEntryAt(piv2));
+            if (!used.contains(String.valueOf(piv2)) && (piv2 < diskSorter.size())) {
+                comp = DuplicateCheck.compareEntriesStrictly(tmpSorter.get(piv1), diskSorter.get(piv2));
             }
             if (comp > 1) {
                 used.add(String.valueOf(piv2));
@@ -206,12 +230,12 @@ public class ChangeScanner implements Runnable {
             }
 
             // No? Then check if another entry matches exactly.
-            if (piv2 < (diskSorter.getEntryCount() - 1)) {
-                for (int i = piv2 + 1; i < diskSorter.getEntryCount(); i++) {
+            if (piv2 < (diskSorter.size() - 1)) {
+                for (int i = piv2 + 1; i < diskSorter.size(); i++) {
                     if (used.contains(String.valueOf(i))) {
                         comp = -1;
                     } else {
-                        comp = DuplicateCheck.compareEntriesStrictly(tmpSorter.getEntryAt(piv1), diskSorter.getEntryAt(i));
+                        comp = DuplicateCheck.compareEntriesStrictly(tmpSorter.get(piv1), diskSorter.get(i));
                     }
 
                     if (comp > 1) {
@@ -239,12 +263,12 @@ public class ChangeScanner implements Runnable {
                 double bestMatch = 0;
                 double comp;
 
-                if (piv2 < (diskSorter.getEntryCount() - 1)) {
-                    for (int i = piv2; i < diskSorter.getEntryCount(); i++) {
+                if (piv2 < (diskSorter.size() - 1)) {
+                    for (int i = piv2; i < diskSorter.size(); i++) {
                         if (used.contains(String.valueOf(i))) {
                             comp = -1;
                         } else {
-                            comp = DuplicateCheck.compareEntriesStrictly(tmpSorter.getEntryAt(piv1), diskSorter.getEntryAt(i));
+                            comp = DuplicateCheck.compareEntriesStrictly(tmpSorter.get(piv1), diskSorter.get(i));
                         }
 
                         if (comp > bestMatch) {
@@ -258,11 +282,11 @@ public class ChangeScanner implements Runnable {
                     used.add(String.valueOf(bestMatchI));
                     it.remove();
 
-                    changes.add(new EntryChangeViewModel(bestFit(tmpSorter, memorySorter, piv1), tmpSorter.getEntryAt(piv1),
-                            diskSorter.getEntryAt(bestMatchI)));
+                    changes.add(new EntryChangeViewModel(bestFit(tmpSorter, memorySorter, piv1), tmpSorter.get(piv1),
+                            diskSorter.get(bestMatchI)));
                 } else {
                     changes.add(
-                            new EntryDeleteChangeViewModel(bestFit(tmpSorter, memorySorter, piv1), tmpSorter.getEntryAt(piv1)));
+                            new EntryDeleteChangeViewModel(bestFit(tmpSorter, memorySorter, piv1), tmpSorter.get(piv1)));
                 }
 
             }
@@ -271,49 +295,24 @@ public class ChangeScanner implements Runnable {
 
         // Finally, look if there are still untouched entries in the disk database. These
         // may have been added.
-        if (used.size() < diskSorter.getEntryCount()) {
-            for (int i = 0; i < diskSorter.getEntryCount(); i++) {
+        if (used.size() < diskSorter.size()) {
+            for (int i = 0; i < diskSorter.size(); i++) {
                 if (!used.contains(String.valueOf(i))) {
 
                     // See if there is an identical dupe in the mem database:
                     boolean hasAlready = false;
-                    for (int j = 0; j < memorySorter.getEntryCount(); j++) {
-                        if (DuplicateCheck.compareEntriesStrictly(memorySorter.getEntryAt(j), diskSorter.getEntryAt(i)) >= 1) {
+                    for (int j = 0; j < memorySorter.size(); j++) {
+                        if (DuplicateCheck.compareEntriesStrictly(memorySorter.get(j), diskSorter.get(i)) >= 1) {
                             hasAlready = true;
                             break;
                         }
                     }
                     if (!hasAlready) {
-                        changes.add(new EntryAddChangeViewModel(diskSorter.getEntryAt(i)));
+                        changes.add(new EntryAddChangeViewModel(diskSorter.get(i)));
                     }
                 }
             }
         }
-    }
-
-    /**
-     * Finds the entry in neu best fitting the specified entry in old. If no entries get a score
-     * above zero, an entry is still returned.
-     *
-     * @param oldSorter   EntrySorter
-     * @param newSorter   EntrySorter
-     * @param index int
-     * @return BibEntry
-     */
-    private static BibEntry bestFit(EntrySorter oldSorter, EntrySorter newSorter, int index) {
-        double comp = -1;
-        int found = 0;
-        for (int i = 0; i < newSorter.getEntryCount(); i++) {
-            double res = DuplicateCheck.compareEntriesStrictly(oldSorter.getEntryAt(index), newSorter.getEntryAt(i));
-            if (res > comp) {
-                comp = res;
-                found = i;
-            }
-            if (comp > 1) {
-                break;
-            }
-        }
-        return newSorter.getEntryAt(found);
     }
 
     private void scanPreamble(BibDatabase inMemory, BibDatabase onTmp, BibDatabase onDisk) {
