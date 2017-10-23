@@ -213,7 +213,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
             selectedTab.notifyAboutFocus(entry);
         });
 
-
         TypedBibEntry typedEntry = new TypedBibEntry(entry, panel.getBibDatabaseContext().getMode());
         typeLabel.setText(typedEntry.getTypeForDisplay());
     }
