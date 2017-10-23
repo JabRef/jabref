@@ -40,13 +40,14 @@ import org.jabref.model.entry.InternalBibtexFields;
 abstract class FieldsEditorTab extends EntryEditorTab {
 
     private final Map<String, FieldEditorFX> editors = new LinkedHashMap<>();
-    private final boolean compressed;
+    private final boolean isCompressed;
     private final SuggestionProviders suggestionProviders;
+
     private FieldEditorFX activeField;
     private final BibDatabaseContext databaseContext;
 
     public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders) {
-        this.compressed = compressed;
+        this.isCompressed = compressed;
         this.databaseContext = databaseContext;
         this.suggestionProviders = suggestionProviders;
     }
@@ -215,7 +216,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        Region panel = setupPanel(entry, compressed, suggestionProviders);
+        Region panel = setupPanel(entry, isCompressed, suggestionProviders);
         setContent(panel);
     }
 
