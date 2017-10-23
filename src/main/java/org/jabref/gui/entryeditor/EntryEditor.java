@@ -173,7 +173,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
         setupToolBar();
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             tabbed.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-            tabbed.setStyle("-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
+            tabbed.setStyle(
+                    "-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;" +
+                            "-fx-open-tab-animation: NONE; -fx-close-tab-animation: NONE;");
             container.setScene(new Scene(tabbed));
         });
         add(container, BorderLayout.CENTER);
