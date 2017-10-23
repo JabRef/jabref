@@ -43,8 +43,6 @@ import javafx.application.Platform;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import org.jabref.collab.DatabaseChangeMonitor;
-import org.jabref.collab.FileUpdatePanel;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.actions.CleanupAction;
@@ -54,6 +52,8 @@ import org.jabref.gui.autocompleter.AutoCompleteUpdater;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.bibtexkeypattern.SearchFixDuplicateLabels;
+import org.jabref.gui.collab.DatabaseChangeMonitor;
+import org.jabref.gui.collab.FileUpdatePanel;
 import org.jabref.gui.contentselector.ContentSelectorDialog;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditor;

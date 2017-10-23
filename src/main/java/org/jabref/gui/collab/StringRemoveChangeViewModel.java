@@ -1,4 +1,4 @@
-package org.jabref.collab;
+package org.jabref.gui.collab;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -13,8 +13,8 @@ import org.jabref.model.entry.BibtexString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-class StringRemoveChange extends Change {
-    private static final Log LOGGER = LogFactory.getLog(StringRemoveChange.class);
+class StringRemoveChangeViewModel extends ChangeViewModel {
+    private static final Log LOGGER = LogFactory.getLog(StringRemoveChangeViewModel.class);
     private final BibtexString string;
 
     private final BibtexString inMem;
@@ -24,7 +24,7 @@ class StringRemoveChange extends Change {
     private final BibtexString tmpString;
 
 
-    public StringRemoveChange(BibtexString string, BibtexString tmpString, BibtexString inMem) {
+    public StringRemoveChangeViewModel(BibtexString string, BibtexString tmpString, BibtexString inMem) {
         super(Localization.lang("Removed string") + ": '" + string.getName() + '\'');
         this.tmpString = tmpString;
         this.string = string;

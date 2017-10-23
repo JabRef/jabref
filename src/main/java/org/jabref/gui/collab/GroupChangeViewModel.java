@@ -1,4 +1,4 @@
-package org.jabref.collab;
+package org.jabref.gui.collab;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -12,13 +12,13 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.groups.GroupTreeNode;
 
-class GroupChange extends Change {
+class GroupChangeViewModel extends ChangeViewModel {
 
     private final GroupTreeNode changedGroups;
     private final GroupTreeNode tmpGroupRoot;
 
 
-    public GroupChange(GroupTreeNode changedGroups, GroupTreeNode tmpGroupRoot) {
+    public GroupChangeViewModel(GroupTreeNode changedGroups, GroupTreeNode tmpGroupRoot) {
         super(changedGroups == null ? Localization.lang("Removed all groups") : Localization
                 .lang("Modified groups tree"));
         this.changedGroups = changedGroups;

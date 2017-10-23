@@ -1,4 +1,4 @@
-package org.jabref.collab;
+package org.jabref.gui.collab;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -12,14 +12,14 @@ import org.jabref.model.metadata.MetaData;
 /**
  *
  */
-class MetaDataChange extends Change {
+class MetaDataChangeViewModel extends ChangeViewModel {
 
     private final InfoPane infoPane = new InfoPane();
     private final JScrollPane sp = new JScrollPane(infoPane);
     private final MetaData originalMetaData;
     private final MetaData newMetaData;
 
-    public MetaDataChange(MetaData originalMetaData, MetaData newMetaData) {
+    public MetaDataChangeViewModel(MetaData originalMetaData, MetaData newMetaData) {
         super(Localization.lang("Metadata change"));
         this.originalMetaData = originalMetaData;
         this.newMetaData = newMetaData;

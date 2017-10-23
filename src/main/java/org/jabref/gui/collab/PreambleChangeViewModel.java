@@ -1,4 +1,4 @@
-package org.jabref.collab;
+package org.jabref.gui.collab;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -9,7 +9,7 @@ import org.jabref.gui.undo.UndoablePreambleChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 
-class PreambleChange extends Change {
+class PreambleChangeViewModel extends ChangeViewModel {
 
     private final String mem;
     private final String disk;
@@ -17,7 +17,7 @@ class PreambleChange extends Change {
     private final JScrollPane sp = new JScrollPane(tp);
 
 
-    public PreambleChange(String mem, String disk) {
+    public PreambleChangeViewModel(String mem, String disk) {
         super(Localization.lang("Changed preamble"));
         this.disk = disk;
         this.mem = mem;

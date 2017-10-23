@@ -1,4 +1,4 @@
-package org.jabref.collab;
+package org.jabref.gui.collab;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -12,13 +12,13 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.IdGenerator;
 
-class EntryAddChange extends Change {
+class EntryAddChangeViewModel extends ChangeViewModel {
 
     private final BibEntry diskEntry;
     private final JScrollPane sp;
 
 
-    public EntryAddChange(BibEntry diskEntry) {
+    public EntryAddChangeViewModel(BibEntry diskEntry) {
         super(Localization.lang("Added entry"));
         this.diskEntry = diskEntry;
 

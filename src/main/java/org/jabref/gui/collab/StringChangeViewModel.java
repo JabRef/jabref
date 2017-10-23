@@ -1,4 +1,4 @@
-package org.jabref.collab;
+package org.jabref.gui.collab;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -15,9 +15,9 @@ import org.jabref.model.entry.BibtexString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-class StringChange extends Change {
+class StringChangeViewModel extends ChangeViewModel {
 
-    private static final Log LOGGER = LogFactory.getLog(StringChange.class);
+    private static final Log LOGGER = LogFactory.getLog(StringChangeViewModel.class);
     private final BibtexString string;
     private final String mem;
     private final String disk;
@@ -29,7 +29,7 @@ class StringChange extends Change {
     private final BibtexString tmpString;
 
 
-    public StringChange(BibtexString string, BibtexString tmpString, String label, String mem, String disk) {
+    public StringChangeViewModel(BibtexString string, BibtexString tmpString, String label, String mem, String disk) {
         super(Localization.lang("Modified string") + ": '" + label + '\'');
         this.tmpString = tmpString;
         this.string = string;

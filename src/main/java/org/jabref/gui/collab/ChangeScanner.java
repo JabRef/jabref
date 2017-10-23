@@ -1,4 +1,4 @@
-package org.jabref.collab;
+package org.jabref.gui.collab;
 
 import java.io.File;
 import java.io.IOException;
@@ -164,11 +164,11 @@ public class ChangeScanner implements Runnable {
     private void scanMetaData(MetaData inMemory, MetaData onTmp, MetaData onDisk) {
         if (onTmp.isEmpty()) {
             if (!onDisk.isEmpty() || !onTmp.equals(onDisk)) {
-                changes.add(new MetaDataChange(inMemory, onDisk));
+                changes.add(new MetaDataChangeViewModel(inMemory, onDisk));
             }
         } else {
             if (!inMemory.equals(onDisk)) {
-                changes.add(new MetaDataChange(inMemory, onDisk));
+                changes.add(new MetaDataChangeViewModel(inMemory, onDisk));
             }
         }
     }
@@ -258,11 +258,11 @@ public class ChangeScanner implements Runnable {
                     used.add(String.valueOf(bestMatchI));
                     it.remove();
 
-                    changes.add(new EntryChange(bestFit(tmpSorter, memorySorter, piv1), tmpSorter.getEntryAt(piv1),
+                    changes.add(new EntryChangeViewModel(bestFit(tmpSorter, memorySorter, piv1), tmpSorter.getEntryAt(piv1),
                             diskSorter.getEntryAt(bestMatchI)));
                 } else {
                     changes.add(
-                            new EntryDeleteChange(bestFit(tmpSorter, memorySorter, piv1), tmpSorter.getEntryAt(piv1)));
+                            new EntryDeleteChangeViewModel(bestFit(tmpSorter, memorySorter, piv1), tmpSorter.getEntryAt(piv1)));
                 }
 
             }
@@ -284,7 +284,7 @@ public class ChangeScanner implements Runnable {
                         }
                     }
                     if (!hasAlready) {
-                        changes.add(new EntryAddChange(diskSorter.getEntryAt(i)));
+                        changes.add(new EntryAddChangeViewModel(diskSorter.getEntryAt(i)));
                     }
                 }
             }
@@ -322,10 +322,10 @@ public class ChangeScanner implements Runnable {
         Optional<String> disk = onDisk.getPreamble();
         if (tmp.isPresent()) {
             if (!disk.isPresent() || !tmp.equals(disk)) {
-                changes.add(new PreambleChange(mem, disk.orElse(null)));
+                changes.add(new PreambleChangeViewModel(mem, disk.orElse(null)));
             }
         } else {
-            disk.ifPresent(diskContent -> changes.add(new PreambleChange(mem, diskContent)));
+            disk.ifPresent(diskContent -> changes.add(new PreambleChangeViewModel(mem, diskContent)));
         }
     }
 
@@ -352,10 +352,10 @@ public class ChangeScanner implements Runnable {
                             // But they have nonmatching contents, so we've found a change.
                             Optional<BibtexString> mem = findString(inMem1, tmp.getName(), usedInMem);
                             if (mem.isPresent()) {
-                                changes.add(new StringChange(mem.get(), tmp, tmp.getName(), mem.get().getContent(),
+                                changes.add(new StringChangeViewModel(mem.get(), tmp, tmp.getName(), mem.get().getContent(),
                                         disk.getContent()));
                             } else {
-                                changes.add(new StringChange(null, tmp, tmp.getName(), null, disk.getContent()));
+                                changes.add(new StringChangeViewModel(null, tmp, tmp.getName(), null, disk.getContent()));
                             }
                         }
                         used.add(diskId);
@@ -398,7 +398,7 @@ public class ChangeScanner implements Runnable {
                             }
 
                             if (bsMem != null) {
-                                changes.add(new StringNameChange(bsMem, tmp, bsMem.getName(), tmp.getName(),
+                                changes.add(new StringNameChangeViewModel(bsMem, tmp, bsMem.getName(), tmp.getName(),
                                         disk.getName(), tmp.getContent()));
                                 i.remove();
                                 used.add(diskId);
@@ -416,7 +416,7 @@ public class ChangeScanner implements Runnable {
                 BibtexString tmp = inTmp.getString(notMatchedId);
                 // The removed string is not removed from the mem version.
                 findString(inMem1, tmp.getName(), usedInMem).ifPresent(
-                        x -> changes.add(new StringRemoveChange(tmp, tmp, x)));
+                        x -> changes.add(new StringRemoveChangeViewModel(tmp, tmp, x)));
             }
         }
 
@@ -426,7 +426,7 @@ public class ChangeScanner implements Runnable {
             if (!used.contains(diskId)) {
                 BibtexString disk = onDisk.getString(diskId);
                 used.add(diskId);
-                changes.add(new StringAddChange(disk));
+                changes.add(new StringAddChangeViewModel(disk));
             }
         }
     }
@@ -456,12 +456,12 @@ public class ChangeScanner implements Runnable {
             return;
         }
         if (!groupsTmp.isPresent() || !groupsDisk.isPresent()) {
-            changes.add(new GroupChange(groupsDisk.orElse(null), groupsTmp.orElse(null)));
+            changes.add(new GroupChangeViewModel(groupsDisk.orElse(null), groupsTmp.orElse(null)));
             return;
         }
         // Both present here
         if (!groupsTmp.equals(groupsDisk)) {
-            changes.add(new GroupChange(groupsDisk.get(), groupsTmp.get()));
+            changes.add(new GroupChangeViewModel(groupsDisk.get(), groupsTmp.get()));
         }
     }
 
