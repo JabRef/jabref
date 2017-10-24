@@ -62,14 +62,12 @@ public class ShareLatexProjectDialogController extends AbstractController<ShareL
 
     @FXML
     private void synchronizeLibrary() {
-
         Optional<ShareLatexProjectViewModel> projects = viewModel.projectsProperty().filtered(x -> x.isActive())
                 .stream().findFirst();
 
         if (projects.isPresent() && stateManager.getActiveDatabase().isPresent()) {
             String projectID = projects.get().getProjectId();
             BibDatabaseContext database = stateManager.getActiveDatabase().get();
-
             manager.startWebSocketHandler(projectID, database, preferences.getImportFormatPreferences());
         }
 
