@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
@@ -19,9 +20,11 @@ public class ShareLatexLoginDialogController extends AbstractController<ShareLat
     @FXML private TextField tbAddress;
     @FXML private TextField tbUsername;
     @FXML private PasswordField pfPassword;
+    @FXML private Button btnLogin;
     @Inject private ShareLatexManager manager;
 
     private SharelatexConnectionProperties props;
+
     @FXML
     private void initialize() {
         viewModel = new ShareLatexLoginDialogViewModel();
@@ -34,7 +37,7 @@ public class ShareLatexLoginDialogController extends AbstractController<ShareLat
 
     @FXML
     private void signIn() {
-
+        btnLogin.setText("Logging in....");
         try {
             String result = manager.login(tbAddress.getText(), tbUsername.getText(), pfPassword.getText());
             if (result.contains("incorrect")) {
@@ -48,6 +51,7 @@ public class ShareLatexLoginDialogController extends AbstractController<ShareLat
                 dlgprojects.show();
                 closeDialog();
             }
+
         } catch (Exception e) {
             DialogService dlg = new FXDialogService();
             dlg.showErrorDialogAndWait(e);

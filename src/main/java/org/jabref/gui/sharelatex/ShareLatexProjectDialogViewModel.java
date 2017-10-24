@@ -13,10 +13,10 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.sharelatex.ShareLatexManager;
 import org.jabref.logic.sharelatex.events.ShareLatexEntryMessageEvent;
 import org.jabref.model.sharelatex.ShareLatexProject;
-
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,10 +28,13 @@ public class ShareLatexProjectDialogViewModel extends AbstractViewModel {
     private final StateManager stateManager;
     private final SimpleListProperty<ShareLatexProjectViewModel> projects = new SimpleListProperty<>(
             FXCollections.observableArrayList());
+    private final ImportFormatPreferences prefs;
 
-    public ShareLatexProjectDialogViewModel(StateManager stateManager, ShareLatexManager manager) {
+    public ShareLatexProjectDialogViewModel(StateManager stateManager, ShareLatexManager manager, ImportFormatPreferences prefs) {
         this.stateManager = stateManager;
+        this.prefs = prefs;
         manager.registerListener(this);
+
     }
 
     public void addProjects(List<ShareLatexProject> projectsToAdd) {
@@ -46,9 +49,9 @@ public class ShareLatexProjectDialogViewModel extends AbstractViewModel {
     @Subscribe
     public void listenToSharelatexEntryMessage(ShareLatexEntryMessageEvent event) {
 
-        Path p = stateManager.getActiveDatabase().get().getDatabasePath().get();
+        Path actualDbPath = stateManager.getActiveDatabase().get().getDatabasePath().get();
 
-        try (BufferedWriter writer = Files.newBufferedWriter(p, StandardCharsets.UTF_8)) {
+        try (BufferedWriter writer = Files.newBufferedWriter(actualDbPath, StandardCharsets.UTF_8)) {
             writer.write(event.getNewDatabaseContent());
             writer.close();
 

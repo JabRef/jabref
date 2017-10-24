@@ -35,7 +35,7 @@ public class ShareLatexProjectDialogController extends AbstractController<ShareL
 
     @FXML
     private void initialize() {
-        viewModel = new ShareLatexProjectDialogViewModel(stateManager, manager);
+        viewModel = new ShareLatexProjectDialogViewModel(stateManager, manager, preferences.getImportFormatPreferences());
         try {
             viewModel.addProjects(manager.getProjects());
         } catch (IOException e) {
