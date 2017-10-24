@@ -42,15 +42,13 @@ public class SourceTab extends EntryEditorTab {
 
     private static final Log LOGGER = LogFactory.getLog(SourceTab.class);
     private final BibDatabaseMode mode;
-    private final BibEntry entry;
     private final BasePanel panel;
     private CodeArea codeArea;
     private BooleanProperty movingToDifferentEntry;
     private UndoManager undoManager;
 
-    public SourceTab(BasePanel panel, BibEntry entry, BooleanProperty movingToDifferentEntry) {
+    public SourceTab(BasePanel panel, BooleanProperty movingToDifferentEntry) {
         this.mode = panel.getBibDatabaseContext().getMode();
-        this.entry = entry;
         this.panel = panel;
         this.movingToDifferentEntry = movingToDifferentEntry;
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
@@ -68,7 +66,7 @@ public class SourceTab extends EntryEditorTab {
         return stringWriter.getBuffer().toString();
     }
 
-    public void updateSourcePane() {
+    public void updateSourcePane(BibEntry entry) {
         if (codeArea != null) {
             try {
                 codeArea.clear();
@@ -90,14 +88,14 @@ public class SourceTab extends EntryEditorTab {
         // store source if new tab is selected (if this one is not focused anymore)
         EasyBind.subscribe(codeArea.focusedProperty(), focused -> {
             if (!focused) {
-                storeSource();
+                storeSource(entry);
             }
         });
 
         // store source if new entry is selected in the maintable and the source tab is focused
         EasyBind.subscribe(movingToDifferentEntry, newEntrySelected -> {
             if (newEntrySelected && codeArea.focusedProperty().get()) {
-                DefaultTaskExecutor.runInJavaFXThread(() -> storeSource());
+                DefaultTaskExecutor.runInJavaFXThread(() -> storeSource(entry));
             }
         });
 
@@ -122,16 +120,16 @@ public class SourceTab extends EntryEditorTab {
     }
 
     @Override
-    public boolean shouldShow() {
+    public boolean shouldShow(BibEntry entry) {
         return true;
     }
 
     @Override
-    protected void initialize() {
+    protected void bindToEntry(BibEntry entry) {
         this.setContent(createSourceEditor(entry, mode));
     }
 
-    private void storeSource() {
+    private void storeSource(BibEntry entry) {
         if (codeArea.getText().isEmpty()) {
             return;
         }

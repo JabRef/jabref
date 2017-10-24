@@ -33,7 +33,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We improved the way metadata is updated in remote databases. [#3235](https://github.com/JabRef/jabref/issues/3235)
  - We improved font rendering of the Entry Editor for Linux based systems [#3295](https://github.com/JabRef/jabref/issues/3295)
  - We fixed an issue where JabRef would freeze when trying to replace the original entry after a merge with new information from identifiers like DOI/ISBN etc. [3294](https://github.com/JabRef/jabref/issues/3294)
-
+ - We fixed an issue where JabRef would not show the translated content at some points, although there existed a translation
 ### Removed
 
 
