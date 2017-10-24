@@ -22,14 +22,10 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class IdentifierEditor extends HBox implements FieldEditorFX {
 
-    @FXML
-    private IdentifierEditorViewModel viewModel;
-    @FXML
-    private EditorTextArea textArea;
-    @FXML
-    private Button fetchInformationByIdentifierButton;
-    @FXML
-    private Button lookupIdentifierButton;
+    @FXML private IdentifierEditorViewModel viewModel;
+    @FXML private EditorTextArea textArea;
+    @FXML private Button fetchInformationByIdentifierButton;
+    @FXML private Button lookupIdentifierButton;
     private Optional<BibEntry> entry;
 
     public IdentifierEditor(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, JabRefPreferences preferences) {
