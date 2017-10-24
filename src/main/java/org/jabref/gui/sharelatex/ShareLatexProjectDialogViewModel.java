@@ -14,6 +14,8 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.sharelatex.ShareLatexManager;
 import org.jabref.logic.sharelatex.events.ShareLatexEntryMessageEvent;
 import org.jabref.model.sharelatex.ShareLatexProject;
@@ -50,6 +52,15 @@ public class ShareLatexProjectDialogViewModel extends AbstractViewModel {
     public void listenToSharelatexEntryMessage(ShareLatexEntryMessageEvent event) {
 
         Path actualDbPath = stateManager.getActiveDatabase().get().getDatabasePath().get();
+
+        try {
+            ParserResult result = new BibtexImporter(prefs).importDatabase(event.getNewDatabaseContent());
+
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+
 
         try (BufferedWriter writer = Files.newBufferedWriter(actualDbPath, StandardCharsets.UTF_8)) {
             writer.write(event.getNewDatabaseContent());

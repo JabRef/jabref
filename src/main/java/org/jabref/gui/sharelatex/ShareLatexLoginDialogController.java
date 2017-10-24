@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
+import org.jabref.JabRefGUI;
 import org.jabref.gui.AbstractController;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialog;
@@ -50,8 +51,9 @@ public class ShareLatexLoginDialogController extends AbstractController<ShareLat
                 ShareLatexProjectDialogView dlgprojects = new ShareLatexProjectDialogView();
                 dlgprojects.show();
                 closeDialog();
-            }
+                JabRefGUI.getMainFrame().getSynchronizeWithSharelatexAction().setEnabled(false);
 
+            }
         } catch (Exception e) {
             DialogService dlg = new FXDialogService();
             dlg.showErrorDialogAndWait(e);

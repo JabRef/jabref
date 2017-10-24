@@ -39,7 +39,7 @@
          <bottom>
             <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
               <buttons>
-                <Button id="btnLogin" mnemonicParsing="false" onAction="#signIn" text="Login" ButtonBar.buttonData="OK_DONE" />
+                <Button id="btnLogin" fx:id="btnLogin" mnemonicParsing="false" onAction="#signIn" text="Login" ButtonBar.buttonData="OK_DONE" />
                	<Button id="btnCancel" cancelButton="true" mnemonicParsing="false" onAction="#closeDialog" text="%Cancel" ButtonBar.buttonData="CANCEL_CLOSE" />
               </buttons>
             </ButtonBar>

@@ -73,7 +73,7 @@ public class ShareLatexProjectDialogController extends AbstractController<ShareL
             manager.startWebSocketHandler(projectID, database, preferences.getImportFormatPreferences());
         }
 
-        cancelAndClose();
+        getStage().close();
 
     }
 

@@ -23,6 +23,5 @@ public class SynchronizeWithShareLatexAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         Platform.runLater(() -> new ShareLatexLoginDialogView().show());
-        this.setEnabled(false);
     }
 }

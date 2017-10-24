@@ -1914,6 +1914,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         return back;
     }
 
+    public AbstractAction getSynchronizeWithSharelatexAction() {
+        return synchronizeWithSharelatex;
+    }
+
+    public AbstractAction getDisconnectFromSharelatexAction() {
+        return disconnectFromSharelatex;
+    }
+
     public AbstractAction getNextPreviewStyleAction() {
         return nextPreviewStyle;
     }
