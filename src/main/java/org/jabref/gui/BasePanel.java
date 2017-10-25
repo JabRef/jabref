@@ -894,8 +894,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 
             String sb = String.join(",", keys);
             String citeCommand = Optional.ofNullable(Globals.prefs.get(JabRefPreferences.CITE_COMMAND))
-                    .filter(cite -> !cite.trim().isEmpty())
-                    .filter(cite -> !cite.contains("\\"))
+                    .filter(cite -> cite.contains("\\"))    // must contain \
                     .orElse("\\cite");
             StringSelection ss = new StringSelection(citeCommand + "{" + sb + '}');
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
