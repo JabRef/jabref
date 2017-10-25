@@ -11,28 +11,21 @@ import org.jabref.model.entry.FieldName;
 public class FileAnnotationTab extends EntryEditorTab {
 
     private final FileAnnotationCache fileAnnotationCache;
-    private final BibEntry entry;
 
-    public FileAnnotationTab(FileAnnotationCache cache, BibEntry entry) {
+    public FileAnnotationTab(FileAnnotationCache cache) {
         this.fileAnnotationCache = cache;
-        this.entry = entry;
 
         setText(Localization.lang("File annotations"));
         setTooltip(new Tooltip(Localization.lang("Show file annotations")));
     }
 
     @Override
-    public boolean shouldShow() {
+    public boolean shouldShow(BibEntry entry) {
         return entry.getField(FieldName.FILE).isPresent();
     }
 
     @Override
-    public void notifyAboutFocus() {
-        initialize();
-    }
-
-    @Override
-    protected void initialize() {
+    protected void bindToEntry(BibEntry entry) {
         setContent(new FileAnnotationTabView(entry, fileAnnotationCache).getView());
     }
 }

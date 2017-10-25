@@ -71,7 +71,7 @@ public class FileUpdateMonitor implements Runnable {
      */
     public void addListenerForFile(Path file, FileUpdateListener listener) throws IOException {
         // We can't watch files directly, so monitor their parent directory for updates
-        Path directory = file.getParent();
+        Path directory = file.toAbsolutePath().getParent();
         directory.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
 
         listeners.put(file, listener);
