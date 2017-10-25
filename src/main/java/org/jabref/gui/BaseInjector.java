@@ -45,9 +45,9 @@ import com.airhacks.afterburner.configuration.Configurator;
  */
 public class BaseInjector {
 
-    private static final Map<Class<?>, Object> modelsAndServices = new WeakHashMap<>();
-    private static final Set<Object> presenters = Collections.newSetFromMap(new WeakHashMap<>());
-    private static final Configurator configurator = new Configurator();
+    private static Map<Class<?>, Object> modelsAndServices = new WeakHashMap<>();
+    private static Set<Object> presenters = Collections.newSetFromMap(new WeakHashMap<>());
+    private static Configurator configurator = new Configurator();
     private static Function<Class<?>, Object> instanceSupplier = getDefaultInstanceSupplier();
     private static Consumer<String> LOG = getDefaultLogger();
 
