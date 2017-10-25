@@ -25,7 +25,7 @@ public class CopyFilesDialogController extends AbstractController<CopyFilesDialo
     @Inject private CopyFilesResultListDependency copyfilesresultlistDependency; //This var must have the same name as the key in the View
 
     @FXML
-    void close(ActionEvent event) {
+    private void close(@SuppressWarnings("unused") ActionEvent event) {
         getStage().close();
     }
 

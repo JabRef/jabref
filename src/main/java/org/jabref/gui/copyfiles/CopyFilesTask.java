@@ -36,7 +36,6 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
     private final List<BibEntry> entries;
     private final List<CopyFilesResultItemViewModel> results = new ArrayList<>();
     private Optional<Path> newPath;
-    private int numberError;
     private int numberSucessful;
     private int totalFilesCounter;
 
@@ -85,7 +84,6 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
                         } else {
 
                             updateMessage(localizedErrorMessage);
-                            numberError++;
                             writeLogMessage(newFile, bw, localizedErrorMessage);
                             addResultToList(newFile, success, localizedErrorMessage);
                         }
