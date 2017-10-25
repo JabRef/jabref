@@ -40,6 +40,11 @@ Project: AppleJavaExtensions
 URL:     https://developer.apple.com/legacy/library/samplecode/AppleJavaExtensions/Introduction/Intro.html
 License: Apple License
 
+Id:      com.eclipse.j2v8
+Project: J2V8
+URL:     https://github.com/eclipsesource/J2V8
+Licence: EPL-1.0
+
 Id:      com.github.bkromhout:java-diff-utils
 Project: java-diff-utils
 URL:     https://github.com/bkromhout/java-diff-utils
