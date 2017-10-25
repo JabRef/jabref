@@ -353,18 +353,6 @@ public class BibDatabase {
     }
 
     /**
-     * Copies all Strings from another BibDatabase.
-     *
-     * @param database another BibDatabase
-     */
-    public void copyStrings(BibDatabase database) {
-        for (String key : database.getStringKeySet()) {
-            BibtexString string = database.getString(key);
-            addString(string);
-        }
-    }
-
-    /**
      * Returns true if a string with the given label already exists.
      */
     public synchronized boolean hasStringLabel(String label) {
