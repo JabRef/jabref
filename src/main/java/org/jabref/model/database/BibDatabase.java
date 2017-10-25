@@ -318,6 +318,18 @@ public class BibDatabase {
     }
 
     /**
+     * Returns the string with the given name.
+     */
+    public Optional<BibtexString> getStringByName(String name) {
+        for (BibtexString string : getStringValues()) {
+            if (string.getName().equals(name)) {
+                return Optional.of(string);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
      * Returns the number of strings.
      */
     public int getStringCount() {

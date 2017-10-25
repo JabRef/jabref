@@ -6,8 +6,10 @@ import javax.swing.JScrollPane;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoablePreambleChange;
+import org.jabref.logic.bibtex.comparator.PreambleDiff;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.strings.StringUtil;
 
 class PreambleChangeViewModel extends ChangeViewModel {
 
@@ -17,21 +19,21 @@ class PreambleChangeViewModel extends ChangeViewModel {
     private final JScrollPane sp = new JScrollPane(tp);
 
 
-    public PreambleChangeViewModel(String mem, String disk) {
+    public PreambleChangeViewModel(String mem, PreambleDiff diff) {
         super(Localization.lang("Changed preamble"));
-        this.disk = disk;
+        this.disk = diff.getNewPreamble();
         this.mem = mem;
 
         StringBuilder text = new StringBuilder(34);
         text.append("<FONT SIZE=3><H2>").append(Localization.lang("Changed preamble")).append("</H2>");
 
-        if ((disk != null) && !disk.isEmpty()) {
+        if (StringUtil.isNotBlank(disk)) {
             text.append("<H3>").append(Localization.lang("Value set externally")).append(":</H3>" + "<CODE>").append(disk).append("</CODE>");
         } else {
             text.append("<H3>").append(Localization.lang("Value cleared externally")).append("</H3>");
         }
 
-        if ((mem != null) && !mem.isEmpty()) {
+        if (StringUtil.isNotBlank(mem)) {
             text.append("<H3>").append(Localization.lang("Current value")).append(":</H3>" + "<CODE>").append(mem).append("</CODE>");
         }
 

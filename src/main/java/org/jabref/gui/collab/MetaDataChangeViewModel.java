@@ -5,6 +5,7 @@ import javax.swing.JScrollPane;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.undo.NamedCompound;
+import org.jabref.logic.bibtex.comparator.MetaDataDiff;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.metadata.MetaData;
@@ -19,10 +20,10 @@ class MetaDataChangeViewModel extends ChangeViewModel {
     private final MetaData originalMetaData;
     private final MetaData newMetaData;
 
-    public MetaDataChangeViewModel(MetaData originalMetaData, MetaData newMetaData) {
+    public MetaDataChangeViewModel(MetaData originalMetaData, MetaDataDiff metaDataDiff) {
         super(Localization.lang("Metadata change"));
         this.originalMetaData = originalMetaData;
-        this.newMetaData = newMetaData;
+        this.newMetaData = metaDataDiff.getNewMetaData();
 
         infoPane.setText("<html>" + Localization.lang("Metadata change") + "</html>");
     }

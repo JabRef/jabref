@@ -21,12 +21,8 @@ class StringRemoveChangeViewModel extends ChangeViewModel {
     private final InfoPane tp = new InfoPane();
     private final JScrollPane sp = new JScrollPane(tp);
 
-    private final BibtexString tmpString;
-
-
-    public StringRemoveChangeViewModel(BibtexString string, BibtexString tmpString, BibtexString inMem) {
+    public StringRemoveChangeViewModel(BibtexString string, BibtexString inMem) {
         super(Localization.lang("Removed string") + ": '" + string.getName() + '\'');
-        this.tmpString = tmpString;
         this.string = string;
         this.inMem = inMem; // Holds the version in memory. Check if it has been modified...?
 
@@ -46,7 +42,7 @@ class StringRemoveChangeViewModel extends ChangeViewModel {
         }
 
         // Update tmp database:
-        secondary.removeString(tmpString.getId());
+        secondary.removeString(string.getId());
 
         return true;
     }

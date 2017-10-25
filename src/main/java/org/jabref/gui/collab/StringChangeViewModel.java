@@ -19,7 +19,6 @@ class StringChangeViewModel extends ChangeViewModel {
 
     private static final Log LOGGER = LogFactory.getLog(StringChangeViewModel.class);
     private final BibtexString string;
-    private final String mem;
     private final String disk;
 
     private final String label;
@@ -29,12 +28,11 @@ class StringChangeViewModel extends ChangeViewModel {
     private final BibtexString tmpString;
 
 
-    public StringChangeViewModel(BibtexString string, BibtexString tmpString, String label, String mem, String disk) {
-        super(Localization.lang("Modified string") + ": '" + label + '\'');
+    public StringChangeViewModel(BibtexString string, BibtexString tmpString, String disk) {
+        super(Localization.lang("Modified string") + ": '" + tmpString.getName() + '\'');
         this.tmpString = tmpString;
         this.string = string;
-        this.label = label;
-        this.mem = mem;
+        this.label = tmpString.getName();
         this.disk = disk;
 
         StringBuilder sb = new StringBuilder(46);
@@ -66,6 +64,7 @@ class StringChangeViewModel extends ChangeViewModel {
                 LOGGER.info("Error: could not add string '" + bs.getName() + "': " + ex.getMessage(), ex);
             }
         } else {
+            String mem = string.getContent();
             string.setContent(disk);
             undoEdit.addEdit(new UndoableStringChange(panel, string, false, mem, disk));
         }

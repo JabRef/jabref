@@ -26,12 +26,11 @@ class StringNameChangeViewModel extends ChangeViewModel {
     private final BibtexString tmpString;
 
 
-    public StringNameChangeViewModel(BibtexString string, BibtexString tmpString,
-                                     String mem, String tmp, String disk, String content) {
-        super(Localization.lang("Renamed string") + ": '" + tmp + '\'');
+    public StringNameChangeViewModel(BibtexString string, BibtexString tmpString, String mem, String disk) {
+        super(Localization.lang("Renamed string") + ": '" + tmpString.getName() + '\'');
         this.tmpString = tmpString;
         this.string = string;
-        this.content = content;
+        this.content = tmpString.getContent();
         this.mem = mem;
         this.disk = disk;
 

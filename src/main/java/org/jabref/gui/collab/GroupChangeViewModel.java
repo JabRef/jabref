@@ -7,6 +7,7 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.groups.GroupTreeNodeViewModel;
 import org.jabref.gui.groups.UndoableModifySubtree;
 import org.jabref.gui.undo.NamedCompound;
+import org.jabref.logic.bibtex.comparator.GroupDiff;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
@@ -18,11 +19,11 @@ class GroupChangeViewModel extends ChangeViewModel {
     private final GroupTreeNode tmpGroupRoot;
 
 
-    public GroupChangeViewModel(GroupTreeNode changedGroups, GroupTreeNode tmpGroupRoot) {
-        super(changedGroups == null ? Localization.lang("Removed all groups") : Localization
+    public GroupChangeViewModel(GroupDiff diff) {
+        super(diff.getOriginalGroupRoot() == null ? Localization.lang("Removed all groups") : Localization
                 .lang("Modified groups tree"));
-        this.changedGroups = changedGroups;
-        this.tmpGroupRoot = tmpGroupRoot;
+        this.changedGroups = diff.getOriginalGroupRoot();
+        this.tmpGroupRoot = diff.getNewGroupRoot();
     }
 
     @Override
