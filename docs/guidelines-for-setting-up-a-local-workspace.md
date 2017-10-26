@@ -78,7 +78,8 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 
 ### Set-up your IDE (IntelliJ)
 1. Install the [CheckStyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr=idea), it can be found via plug-in repository (File > Settings > Plugins > Browse repositories).
-2. Go to Settings > Editor > Code Style, choose a code style (or create a new one) 
+2. Go to File > Settings > Editor > Code Style, choose a code style (or create a new one) 
 3. Click on the settings wheel (next to the scheme chooser), then Import scheme and choose "CheckStyle Configuration". Select the CheckStyle configuration file `config\checkstyle\checkstyle.xml`. Click OK and restart IntelliJ.
+4. Go to File > Settings > Checkstyle and import the above CheckStyle configuration file. Activate it.
 
 Got it running? GREAT! You are ready to lurk the code and contribute to JabRef :books: . In the latter case, please read [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md).
