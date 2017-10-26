@@ -54,5 +54,6 @@ public class CopyFilesDialogController extends AbstractController<CopyFilesDialo
         }));
 
         tvResult.setItems(viewModel.copyFilesResultListProperty());
+        tvResult.setColumnResizePolicy((param) -> true);
     }
 }

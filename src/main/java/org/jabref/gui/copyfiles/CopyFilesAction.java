@@ -21,14 +21,14 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-public class ExportLinkedFilesAction extends AbstractAction {
+public class CopyFilesAction extends AbstractAction {
 
     private final DialogService dialogService = new FXDialogService();
     private BibDatabaseContext databaseContext;
     private List<BibEntry> entries;
 
-    public ExportLinkedFilesAction() {
-        super(Localization.lang("Copy attached files to folder..."));
+    public CopyFilesAction() {
+        super(Localization.lang("Copy linked files to folder..."));
     }
 
     @Override
