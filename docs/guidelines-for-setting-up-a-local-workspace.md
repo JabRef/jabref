@@ -76,4 +76,9 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 4. In Eclipse, right click on the project and choose Refresh workspace and then choose Run as --> Java application (Forget about the existing errors)
 5. Choose JabRefMain as the main class to be executed
 
+### Set-up your IDE (IntelliJ)
+1. Install the [CheckStyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr=idea), it can be found via plug-in repository (File > Settings > Plugins > Browse repositories).
+2. Go to Settings > Editor > Code Style, choose a code style (or create a new one) 
+3. Click on the settings wheel (next to the scheme chooser), then Import scheme and choose "CheckStyle Configuration". Select the CheckStyle configuration file `config\checkstyle\checkstyle.xml`. Click OK and restart IntelliJ.
+
 Got it running? GREAT! You are ready to lurk the code and contribute to JabRef :books: . In the latter case, please read [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md).
