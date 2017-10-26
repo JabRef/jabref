@@ -893,7 +893,10 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             }
 
             String sb = String.join(",", keys);
-            StringSelection ss = new StringSelection("\\cite{" + sb + '}');
+            String citeCommand = Optional.ofNullable(Globals.prefs.get(JabRefPreferences.CITE_COMMAND))
+                    .filter(cite -> cite.contains("\\"))    // must contain \
+                    .orElse("\\cite");
+            StringSelection ss = new StringSelection(citeCommand + "{" + sb + '}');
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
 
             if (keys.size() == bes.size()) {
