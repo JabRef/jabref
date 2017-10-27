@@ -23,7 +23,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     private static final Log LOGGER = LogFactory.getLog(DefaultTaskExecutor.class);
 
-    private static final ExecutorService executor = Executors.newFixedThreadPool(5);
+    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(5);
 
     public static <V> V runInJavaFXThread(Callable<V> callable) {
         FutureTask<V> task = new FutureTask<>(callable);
@@ -31,7 +31,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
         if (!Platform.isFxApplicationThread()) {
             Platform.runLater(task);
         } else {
-            executor.submit(task);
+            EXECUTOR.submit(task);
         }
 
         try {
@@ -46,23 +46,23 @@ public class DefaultTaskExecutor implements TaskExecutor {
         if (!Platform.isFxApplicationThread()) {
             Platform.runLater(runnable);
         } else {
-            executor.submit(runnable);
+            EXECUTOR.submit(runnable);
         }
     }
 
     @Override
     public <V> void execute(BackgroundTask<V> task) {
-        executor.submit(getJavaFXTask(task));
+        EXECUTOR.submit(getJavaFXTask(task));
     }
 
     @Override
     public void execute(FileDownloadTask downloadTask) {
-        executor.submit(downloadTask);
+        EXECUTOR.submit(downloadTask);
     }
 
     @Override
     public void shutdown() {
-        executor.shutdownNow();
+        EXECUTOR.shutdownNow();
     }
 
     private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
