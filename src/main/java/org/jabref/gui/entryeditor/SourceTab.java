@@ -8,7 +8,6 @@ import java.util.Objects;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
@@ -20,7 +19,6 @@ import org.jabref.gui.IconTheme;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
@@ -42,17 +40,13 @@ public class SourceTab extends EntryEditorTab {
 
     private static final Log LOGGER = LogFactory.getLog(SourceTab.class);
     private final BibDatabaseMode mode;
-    private final BibEntry entry;
     private final BasePanel panel;
     private CodeArea codeArea;
-    private BooleanProperty movingToDifferentEntry;
     private UndoManager undoManager;
 
-    public SourceTab(BasePanel panel, BibEntry entry, BooleanProperty movingToDifferentEntry) {
+    public SourceTab(BasePanel panel) {
         this.mode = panel.getBibDatabaseContext().getMode();
-        this.entry = entry;
         this.panel = panel;
-        this.movingToDifferentEntry = movingToDifferentEntry;
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
         this.setGraphic(IconTheme.JabRefIcon.SOURCE.getGraphicNode());
@@ -68,7 +62,7 @@ public class SourceTab extends EntryEditorTab {
         return stringWriter.getBuffer().toString();
     }
 
-    public void updateSourcePane() {
+    public void updateSourcePane(BibEntry entry) {
         if (codeArea != null) {
             try {
                 codeArea.clear();
@@ -82,7 +76,7 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    private Node createSourceEditor(BibEntry entry, BibDatabaseMode mode) {
+    private Node createSourceEditor(BibDatabaseMode mode) {
         codeArea = new CodeArea();
         codeArea.setWrapText(true);
         codeArea.lookup(".styled-text-area").setStyle(
@@ -94,15 +88,8 @@ public class SourceTab extends EntryEditorTab {
             }
         });
 
-        // store source if new entry is selected in the maintable and the source tab is focused
-        EasyBind.subscribe(movingToDifferentEntry, newEntrySelected -> {
-            if (newEntrySelected && codeArea.focusedProperty().get()) {
-                DefaultTaskExecutor.runInJavaFXThread(() -> storeSource());
-            }
-        });
-
         try {
-            String srcString = getSourceString(entry, mode);
+            String srcString = getSourceString(this.currentEntry, mode);
             codeArea.appendText(srcString);
         } catch (IOException ex) {
             codeArea.appendText(ex.getMessage() + "\n\n" +
@@ -122,13 +109,13 @@ public class SourceTab extends EntryEditorTab {
     }
 
     @Override
-    public boolean shouldShow() {
+    public boolean shouldShow(BibEntry entry) {
         return true;
     }
 
     @Override
-    protected void initialize() {
-        this.setContent(createSourceEditor(entry, mode));
+    protected void bindToEntry(BibEntry entry) {
+        this.setContent(createSourceEditor(mode));
     }
 
     private void storeSource() {
@@ -159,42 +146,42 @@ public class SourceTab extends EntryEditorTab {
             String newKey = newEntry.getCiteKeyOptional().orElse(null);
 
             if (newKey != null) {
-                entry.setCiteKey(newKey);
+                currentEntry.setCiteKey(newKey);
             } else {
-                entry.clearCiteKey();
+                currentEntry.clearCiteKey();
             }
 
             // First, remove fields that the user has removed.
-            for (Map.Entry<String, String> field : entry.getFieldMap().entrySet()) {
+            for (Map.Entry<String, String> field : currentEntry.getFieldMap().entrySet()) {
                 String fieldName = field.getKey();
                 String fieldValue = field.getValue();
 
                 if (InternalBibtexFields.isDisplayableField(fieldName) && !newEntry.hasField(fieldName)) {
                     compound.addEdit(
-                            new UndoableFieldChange(entry, fieldName, fieldValue, null));
-                    entry.clearField(fieldName);
+                            new UndoableFieldChange(currentEntry, fieldName, fieldValue, null));
+                    currentEntry.clearField(fieldName);
                 }
             }
 
             // Then set all fields that have been set by the user.
             for (Map.Entry<String, String> field : newEntry.getFieldMap().entrySet()) {
                 String fieldName = field.getKey();
-                String oldValue = entry.getField(fieldName).orElse(null);
+                String oldValue = currentEntry.getField(fieldName).orElse(null);
                 String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
                     new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences())
                             .format(newValue, fieldName);
 
-                    compound.addEdit(new UndoableFieldChange(entry, fieldName, oldValue, newValue));
-                    entry.setField(fieldName, newValue);
+                    compound.addEdit(new UndoableFieldChange(currentEntry, fieldName, oldValue, newValue));
+                    currentEntry.setField(fieldName, newValue);
                 }
             }
 
             // See if the user has changed the entry type:
-            if (!Objects.equals(newEntry.getType(), entry.getType())) {
-                compound.addEdit(new UndoableChangeType(entry, entry.getType(), newEntry.getType()));
-                entry.setType(newEntry.getType());
+            if (!Objects.equals(newEntry.getType(), currentEntry.getType())) {
+                compound.addEdit(new UndoableChangeType(currentEntry, currentEntry.getType(), newEntry.getType()));
+                currentEntry.setType(newEntry.getType());
             }
             compound.end();
             undoManager.addEdit(compound);
@@ -216,7 +203,7 @@ public class SourceTab extends EntryEditorTab {
             if (!keepEditing) {
                 // Revert
                 try {
-                    codeArea.replaceText(0, codeArea.getText().length(), getSourceString(entry, mode));
+                    codeArea.replaceText(0, codeArea.getText().length(), getSourceString(this.currentEntry, mode));
                 } catch (IOException e) {
                     LOGGER.debug("Incorrect source", e);
                 }

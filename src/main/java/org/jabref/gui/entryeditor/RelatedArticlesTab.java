@@ -20,12 +20,12 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class RelatedArticlesTab extends EntryEditorTab {
 
-    private final BibEntry entry;
+    private final JabRefPreferences preferences;
 
-    public RelatedArticlesTab(BibEntry entry) {
-        this.entry = entry;
+    public RelatedArticlesTab(JabRefPreferences preferences) {
         setText(Localization.lang("Related articles"));
         setTooltip(new Tooltip(Localization.lang("Related articles")));
+        this.preferences = preferences;
     }
 
     private StackPane getPane(BibEntry entry) {
@@ -73,19 +73,19 @@ public class RelatedArticlesTab extends EntryEditorTab {
         htmlContent.append("<br><div style='margin-left: 5px'>");
         htmlContent.append(
                 "<a href='http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/#' target=\"_blank\">");
-        htmlContent.append(Localization.lang("What_is_Mr._DLib?"));
+        htmlContent.append(Localization.lang("What is Mr. DLib?"));
         htmlContent.append("</a></div>");
         htmlContent.append("</body></html>");
         return htmlContent.toString();
     }
 
     @Override
-    public boolean shouldShow() {
-        return Globals.prefs.getBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS);
+    public boolean shouldShow(BibEntry entry) {
+        return preferences.getBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS);
     }
 
     @Override
-    protected void initialize() {
+    protected void bindToEntry(BibEntry entry) {
         setContent(getPane(entry));
     }
 }

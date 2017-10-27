@@ -59,7 +59,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 fetchedEntry.ifPresent(this::doPostCleanup);
                 return fetchedEntry;
             } else {
-                throw new FetcherException(Localization.lang("Invalid_DOI:_'%0'.", identifier));
+                throw new FetcherException(Localization.lang("Invalid DOI: '%0'.", identifier));
             }
         } catch (IOException e) {
             throw new FetcherException(Localization.lang("Connection error"), e);
