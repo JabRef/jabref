@@ -15,6 +15,7 @@ import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.util.FileHelper;
@@ -33,7 +34,14 @@ public class LinkedFile implements Serializable {
 
     public LinkedFile(String description, String link, String fileType) {
         this.description.setValue(Objects.requireNonNull(description));
-        this.link.setValue(Objects.requireNonNull(link));
+
+        String fileLink = Objects.requireNonNull(link);
+        if (!FileUtil.isOnlineLink(fileLink)) {
+            this.link.setValue(fileLink.replace("\\", "/"));
+        } else {
+            this.link.setValue(fileLink);
+        }
+
         this.fileType.setValue(Objects.requireNonNull(fileType));
     }
 
@@ -62,7 +70,11 @@ public class LinkedFile implements Serializable {
     }
 
     public void setLink(String link) {
-        this.link.setValue(link);
+        if (!FileUtil.isOnlineLink(link)) {
+            this.link.setValue(link.replace("\\", "/"));
+        } else {
+            this.link.setValue(link);
+        }
     }
 
     public Observable[] getObservables() {
@@ -125,7 +137,7 @@ public class LinkedFile implements Serializable {
     }
 
     public boolean isOnlineLink() {
-        return link.get().startsWith("http://") || link.get().startsWith("https://") || link.get().contains("www.");
+        return FileUtil.isOnlineLink(link.get());
     }
 
     public Optional<Path> findIn(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
