@@ -32,6 +32,22 @@ public class SharelatexConnectionProperties {
         this.project = project;
     }
 
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setProject(String project) {
+        this.project = project;
+    }
+
     public String getUser() {
         return user;
     }

@@ -24,7 +24,6 @@ public class DBMSConnectionProperties {
     private String user;
     private String password;
 
-
     public DBMSConnectionProperties() {
         // no data
     }
@@ -94,12 +93,28 @@ public class DBMSConnectionProperties {
     /**
      * Compares all properties except the password.
      */
-    public boolean equals(DBMSConnectionProperties properties) {
-        return this.type.equals(properties.getType())
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        }
+
+        DBMSConnectionProperties properties = (DBMSConnectionProperties) o;
+
+        return Objects.equals(this.type, properties.type)
                 && this.host.equalsIgnoreCase(properties.getHost())
-                && (this.port == properties.getPort())
-                && this.database.equals(properties.getDatabase())
-                && this.user.equals(properties.getUser());
+                && Objects.equals(this.port, properties.port)
+                && Objects.equals(this.database, properties.database)
+                && Objects.equals(this.user, properties.user);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(host, port, database, user);
     }
 
     /**

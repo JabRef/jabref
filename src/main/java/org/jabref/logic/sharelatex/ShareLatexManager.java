@@ -24,6 +24,7 @@ public class ShareLatexManager {
 
     private final SharelatexConnector connector = new SharelatexConnector();
     private final ShareLatexParser parser = new ShareLatexParser();
+    private SharelatexConnectionProperties properties;
 
     public String login(String server, String username, String password) throws IOException {
         return connector.connectToServer(server, username, password);
@@ -72,5 +73,13 @@ public class ShareLatexManager {
 
     public void disconnectAndCloseConnection() {
         connector.disconnectAndCloseConn();
+    }
+
+    public void setConnectionProperties(SharelatexConnectionProperties props) {
+        this.properties = props;
+    }
+
+    public SharelatexConnectionProperties getConnectionProperties() {
+        return this.properties;
     }
 }
