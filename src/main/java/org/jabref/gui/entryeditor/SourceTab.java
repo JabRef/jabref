@@ -19,7 +19,6 @@ import org.jabref.gui.IconTheme;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
