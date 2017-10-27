@@ -116,11 +116,6 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        // store source if new entry is selected in the maintable and the source tab is focused
-        if (codeArea != null && codeArea.focusedProperty().get()) {
-            DefaultTaskExecutor.runInJavaFXThread(() -> storeSource());
-        }
-
         this.setContent(createSourceEditor(mode));
     }
 
