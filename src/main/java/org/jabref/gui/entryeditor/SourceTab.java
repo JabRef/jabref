@@ -44,13 +44,11 @@ public class SourceTab extends EntryEditorTab {
     private final BibDatabaseMode mode;
     private final BasePanel panel;
     private CodeArea codeArea;
-    private BooleanProperty movingToDifferentEntry;
     private UndoManager undoManager;
 
-    public SourceTab(BasePanel panel, BooleanProperty movingToDifferentEntry) {
+    public SourceTab(BasePanel panel) {
         this.mode = panel.getBibDatabaseContext().getMode();
         this.panel = panel;
-        this.movingToDifferentEntry = movingToDifferentEntry;
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
         this.setGraphic(IconTheme.JabRefIcon.SOURCE.getGraphicNode());
@@ -92,13 +90,6 @@ public class SourceTab extends EntryEditorTab {
             }
         });
 
-        // store source if new entry is selected in the maintable and the source tab is focused
-        EasyBind.subscribe(movingToDifferentEntry, newEntrySelected -> {
-            if (newEntrySelected && codeArea.focusedProperty().get()) {
-                DefaultTaskExecutor.runInJavaFXThread(() -> storeSource(entry));
-            }
-        });
-
         try {
             String srcString = getSourceString(entry, mode);
             codeArea.appendText(srcString);
@@ -126,6 +117,11 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
+        // store source if new entry is selected in the maintable and the source tab is focused
+        if (codeArea != null && codeArea.focusedProperty().get()) {
+            DefaultTaskExecutor.runInJavaFXThread(() -> storeSource(this.currentEntry));
+        }
+
         this.setContent(createSourceEditor(entry, mode));
     }
 
