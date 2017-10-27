@@ -78,7 +78,7 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    private Node createSourceEditor(BibEntry entry, BibDatabaseMode mode) {
+    private Node createSourceEditor(BibDatabaseMode mode) {
         codeArea = new CodeArea();
         codeArea.setWrapText(true);
         codeArea.lookup(".styled-text-area").setStyle(
@@ -86,12 +86,12 @@ public class SourceTab extends EntryEditorTab {
         // store source if new tab is selected (if this one is not focused anymore)
         EasyBind.subscribe(codeArea.focusedProperty(), focused -> {
             if (!focused) {
-                storeSource(entry);
+                storeSource();
             }
         });
 
         try {
-            String srcString = getSourceString(entry, mode);
+            String srcString = getSourceString(this.currentEntry, mode);
             codeArea.appendText(srcString);
         } catch (IOException ex) {
             codeArea.appendText(ex.getMessage() + "\n\n" +
@@ -119,13 +119,13 @@ public class SourceTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         // store source if new entry is selected in the maintable and the source tab is focused
         if (codeArea != null && codeArea.focusedProperty().get()) {
-            DefaultTaskExecutor.runInJavaFXThread(() -> storeSource(this.currentEntry));
+            DefaultTaskExecutor.runInJavaFXThread(() -> storeSource());
         }
 
-        this.setContent(createSourceEditor(entry, mode));
+        this.setContent(createSourceEditor(mode));
     }
 
-    private void storeSource(BibEntry entry) {
+    private void storeSource() {
         if (codeArea.getText().isEmpty()) {
             return;
         }
@@ -153,42 +153,42 @@ public class SourceTab extends EntryEditorTab {
             String newKey = newEntry.getCiteKeyOptional().orElse(null);
 
             if (newKey != null) {
-                entry.setCiteKey(newKey);
+                currentEntry.setCiteKey(newKey);
             } else {
-                entry.clearCiteKey();
+                currentEntry.clearCiteKey();
             }
 
             // First, remove fields that the user has removed.
-            for (Map.Entry<String, String> field : entry.getFieldMap().entrySet()) {
+            for (Map.Entry<String, String> field : currentEntry.getFieldMap().entrySet()) {
                 String fieldName = field.getKey();
                 String fieldValue = field.getValue();
 
                 if (InternalBibtexFields.isDisplayableField(fieldName) && !newEntry.hasField(fieldName)) {
                     compound.addEdit(
-                            new UndoableFieldChange(entry, fieldName, fieldValue, null));
-                    entry.clearField(fieldName);
+                            new UndoableFieldChange(currentEntry, fieldName, fieldValue, null));
+                    currentEntry.clearField(fieldName);
                 }
             }
 
             // Then set all fields that have been set by the user.
             for (Map.Entry<String, String> field : newEntry.getFieldMap().entrySet()) {
                 String fieldName = field.getKey();
-                String oldValue = entry.getField(fieldName).orElse(null);
+                String oldValue = currentEntry.getField(fieldName).orElse(null);
                 String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
                     new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences())
                             .format(newValue, fieldName);
 
-                    compound.addEdit(new UndoableFieldChange(entry, fieldName, oldValue, newValue));
-                    entry.setField(fieldName, newValue);
+                    compound.addEdit(new UndoableFieldChange(currentEntry, fieldName, oldValue, newValue));
+                    currentEntry.setField(fieldName, newValue);
                 }
             }
 
             // See if the user has changed the entry type:
-            if (!Objects.equals(newEntry.getType(), entry.getType())) {
-                compound.addEdit(new UndoableChangeType(entry, entry.getType(), newEntry.getType()));
-                entry.setType(newEntry.getType());
+            if (!Objects.equals(newEntry.getType(), currentEntry.getType())) {
+                compound.addEdit(new UndoableChangeType(currentEntry, currentEntry.getType(), newEntry.getType()));
+                currentEntry.setType(newEntry.getType());
             }
             compound.end();
             undoManager.addEdit(compound);
@@ -210,7 +210,7 @@ public class SourceTab extends EntryEditorTab {
             if (!keepEditing) {
                 // Revert
                 try {
-                    codeArea.replaceText(0, codeArea.getText().length(), getSourceString(entry, mode));
+                    codeArea.replaceText(0, codeArea.getText().length(), getSourceString(this.currentEntry, mode));
                 } catch (IOException e) {
                     LOGGER.debug("Incorrect source", e);
                 }
