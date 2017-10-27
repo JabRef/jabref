@@ -8,7 +8,6 @@ import java.util.Objects;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
