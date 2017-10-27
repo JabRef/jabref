@@ -93,15 +93,6 @@ public class FileUtil {
     }
 
     /**
-     * Checks if the given String is an online link
-     * @param toCheck The String to check
-     * @return True if it starts with http://, https:// or contains www; false otherwise
-     */
-    public static boolean isOnlineLink(String toCheck) {
-        return toCheck.startsWith("http://") || toCheck.startsWith("https://") || toCheck.contains("www.");
-    }
-
-    /**
      * Adds an extension to the given file name. The original extension is not replaced. That means, "demo.bib", ".sav"
      * gets "demo.bib.sav" and not "demo.sav"
      *

@@ -15,7 +15,6 @@ import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.util.FileHelper;
@@ -36,7 +35,7 @@ public class LinkedFile implements Serializable {
         this.description.setValue(Objects.requireNonNull(description));
 
         String fileLink = Objects.requireNonNull(link);
-        if (!FileUtil.isOnlineLink(fileLink)) {
+        if (!FileHelper.isOnlineLink(fileLink)) {
             this.link.setValue(fileLink.replace("\\", "/"));
         } else {
             this.link.setValue(fileLink);
@@ -70,7 +69,7 @@ public class LinkedFile implements Serializable {
     }
 
     public void setLink(String link) {
-        if (!FileUtil.isOnlineLink(link)) {
+        if (!FileHelper.isOnlineLink(link)) {
             this.link.setValue(link.replace("\\", "/"));
         } else {
             this.link.setValue(link);
@@ -137,7 +136,7 @@ public class LinkedFile implements Serializable {
     }
 
     public boolean isOnlineLink() {
-        return FileUtil.isOnlineLink(link.get());
+        return FileHelper.isOnlineLink(link.get());
     }
 
     public Optional<Path> findIn(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
