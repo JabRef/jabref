@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -119,20 +118,19 @@ public class AutoSetLinks {
             for (Entry<BibEntry, List<Path>> entryFilePair : result.entrySet()) {
                 Optional<String> oldVal = entryFilePair.getKey().getField(FieldName.FILE);
 
-                List<Path> existingfiles = entryFilePair.getKey().getFiles().stream().map(LinkedFile::getLink).map(Paths::get).collect(Collectors.toList());
-
                 for (Path foundFile : entryFilePair.getValue()) {
-                    Optional<Path> existingSameFile = existingfiles.stream().filter(path -> {
-                        try {
-                            return Files.isSameFile(path, foundFile);
-                        } catch (IOException e) {
-                            LOGGER.error("Error with checking isSameFile", e);
-
-                        }
-                        return false;
-                    }).findFirst();
-
-                    if (!existingSameFile.isPresent()) {
+                    boolean existingSameFile = entryFilePair.getKey().getFiles().stream()
+                            .map(file -> file.findIn(dirs))
+                            .anyMatch(file -> {
+                                try {
+                                    return file.isPresent() && Files.isSameFile(file.get(), foundFile);
+                                } catch (IOException e) {
+                                    // TODO Auto-generated catch block
+                                    e.printStackTrace();
+                                }
+                                return false;
+                            });
+                    if (!existingSameFile) {
 
                         foundAny = true;
                         Optional<ExternalFileType> type = FileHelper.getFileExtension(foundFile)

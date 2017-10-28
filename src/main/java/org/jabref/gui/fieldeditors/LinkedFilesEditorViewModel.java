@@ -168,19 +168,19 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         List<LinkedFileViewModel> result = new ArrayList<>();
         for (Path foundFile : newFiles) {
 
-            List<Path> existingfiles = files.stream().map(LinkedFileViewModel::getLink).map(Paths::get).collect(Collectors.toList());
+            boolean existingSameFile = files.get().stream()
+                    .map(file -> file.findIn(dirs))
+                    .anyMatch(file -> {
+                        try {
+                            return file.isPresent() && Files.isSameFile(file.get(), foundFile);
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        return false;
+                    });
 
-            Optional<Path> existingSameFile = existingfiles.stream().filter(path -> {
-                try {
-                    return Files.isSameFile(path, foundFile);
-                } catch (IOException e) {
-                    LOGGER.error("Error with checking isSameFile", e);
-
-                }
-                return false;
-            }).findFirst();
-
-            if (!existingSameFile.isPresent()) {
+            if (!existingSameFile) {
                 LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(fromFile(foundFile, dirs), entry, databaseContext);
                 newLinkedFile.markAsAutomaticallyFound();
                 result.add(newLinkedFile);
