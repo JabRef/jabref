@@ -12,13 +12,13 @@ import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import org.jabref.collab.ChangeScanner;
-import org.jabref.collab.FileUpdatePanel;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
+import org.jabref.gui.collab.ChangeScanner;
+import org.jabref.gui.collab.FileUpdatePanel;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;

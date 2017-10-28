@@ -1,4 +1,4 @@
-package org.jabref.collab;
+package org.jabref.gui.collab;
 
 import java.io.IOException;
 import java.nio.file.Files;
