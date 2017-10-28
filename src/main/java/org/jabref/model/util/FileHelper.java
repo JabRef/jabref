@@ -15,6 +15,15 @@ import org.jabref.model.metadata.FileDirectoryPreferences;
 public class FileHelper {
 
     /**
+     * Checks if the given String is an online link
+     * @param toCheck The String to check
+     * @return True if it starts with http://, https:// or contains www; false otherwise
+     */
+    public static boolean isOnlineLink(String toCheck) {
+        return toCheck.startsWith("http://") || toCheck.startsWith("https://") || toCheck.contains("www.");
+    }
+
+    /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
      * @param file

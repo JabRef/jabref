@@ -33,7 +33,14 @@ public class LinkedFile implements Serializable {
 
     public LinkedFile(String description, String link, String fileType) {
         this.description.setValue(Objects.requireNonNull(description));
-        this.link.setValue(Objects.requireNonNull(link));
+
+        String fileLink = Objects.requireNonNull(link);
+        if (!FileHelper.isOnlineLink(fileLink)) {
+            this.link.setValue(fileLink.replace("\\", "/"));
+        } else {
+            this.link.setValue(fileLink);
+        }
+
         this.fileType.setValue(Objects.requireNonNull(fileType));
     }
 
@@ -62,7 +69,11 @@ public class LinkedFile implements Serializable {
     }
 
     public void setLink(String link) {
-        this.link.setValue(link);
+        if (!FileHelper.isOnlineLink(link)) {
+            this.link.setValue(link.replace("\\", "/"));
+        } else {
+            this.link.setValue(link);
+        }
     }
 
     public Observable[] getObservables() {
@@ -125,7 +136,7 @@ public class LinkedFile implements Serializable {
     }
 
     public boolean isOnlineLink() {
-        return link.get().startsWith("http://") || link.get().startsWith("https://") || link.get().contains("www.");
+        return FileHelper.isOnlineLink(link.get());
     }
 
     public Optional<Path> findIn(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
