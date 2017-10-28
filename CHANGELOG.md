@@ -36,7 +36,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue where JabRef would freeze when trying to replace the original entry after a merge with new information from identifiers like DOI/ISBN etc. [3294](https://github.com/JabRef/jabref/issues/3294)
  - We fixed an issue where JabRef would not show the translated content at some points, although there existed a translation
  - We fixed an issue where editing in the source tab would override content of other entries [#3352](https://github.com/JabRef/jabref/issues/3352#issue-268580818)
-### Removed
+ - We fixed several issues with the automatic linking of files in the entry editor where files were not found or not correctly saved in the bibtex source [#3346](https://github.com/JabRef/jabref/issues/3346)
+
+ ### Removed
 
 
 
