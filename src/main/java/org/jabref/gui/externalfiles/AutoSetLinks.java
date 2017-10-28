@@ -157,6 +157,7 @@ public class AutoSetLinks {
                         if (changedEntries != null) {
                             changedEntries.add(entryFilePair.getKey());
                         }
+                        break;
                     }
 
                 }
