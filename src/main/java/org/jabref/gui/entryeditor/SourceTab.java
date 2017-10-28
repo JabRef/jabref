@@ -21,6 +21,7 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
@@ -94,15 +95,17 @@ public class SourceTab extends EntryEditorTab {
         // Store source for every change in the source code
         // and update source code for every change of entry field values
         BindingsHelper.bindContentBidirectional(entry.getFieldsObservable(), codeArea.textProperty(), this::storeSource, fields -> {
-            codeArea.clear();
-            try {
-                codeArea.appendText(getSourceString(entry, mode));
-            } catch (IOException ex) {
-                codeArea.setEditable(false);
-                codeArea.appendText(ex.getMessage() + "\n\n" +
-                        Localization.lang("Correct the entry, and reopen editor to display/edit source."));
-                LOGGER.debug("Incorrect entry", ex);
-            }
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                codeArea.clear();
+                try {
+                    codeArea.appendText(getSourceString(entry, mode));
+                } catch (IOException ex) {
+                    codeArea.setEditable(false);
+                    codeArea.appendText(ex.getMessage() + "\n\n" +
+                            Localization.lang("Correct the entry, and reopen editor to display/edit source."));
+                    LOGGER.debug("Incorrect entry", ex);
+                }
+            });
         });
     }
 
