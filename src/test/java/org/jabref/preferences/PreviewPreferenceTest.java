@@ -4,6 +4,8 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static junit.framework.TestCase.assertTrue;
+
 public class PreviewPreferenceTest {
 
     private List<String> previewCycle = null;
@@ -15,27 +17,39 @@ public class PreviewPreferenceTest {
 
     @Test
     public void givenNothingWhenCreatingPreviewPreferenceThenNothingThrown() {
-        new PreviewPreferences(
-                previewCycle,
-                previewCyclePosition,
-                previewPanelHeight,
-                previewPanelEnabled,
-                previewStyle,
-                previewStyleDefault
-        );
+        boolean nothingThrown = true;
+        try {
+            new PreviewPreferences(
+                    previewCycle,
+                    previewCyclePosition,
+                    previewPanelHeight,
+                    previewPanelEnabled,
+                    previewStyle,
+                    previewStyleDefault
+            );
+        } catch (Exception e) {
+            nothingThrown = false;
+        }
+        assertTrue("Simple creation should not throw exceptions.", nothingThrown);
     }
 
     @Test
     public void givenNothingWhenBuildingThenNothingThrown() {
-        PreviewPreferences previewPreferences =
-                new PreviewPreferences(
-                        previewCycle,
-                        previewCyclePosition,
-                        previewPanelHeight,
-                        previewPanelEnabled,
-                        previewStyle,
-                        previewStyleDefault
-        );
-        new PreviewPreferences.Builder(previewPreferences);
+        boolean nothingThrown = true;
+        try {
+            PreviewPreferences previewPreferences =
+                    new PreviewPreferences(
+                            previewCycle,
+                            previewCyclePosition,
+                            previewPanelHeight,
+                            previewPanelEnabled,
+                            previewStyle,
+                            previewStyleDefault
+                    );
+            new PreviewPreferences.Builder(previewPreferences);
+        } catch (Exception e) {
+            nothingThrown = false;
+        }
+        assertTrue("Simple creation should not throw exceptions.", nothingThrown);
     }
 }
