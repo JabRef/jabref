@@ -6,6 +6,9 @@ import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
@@ -18,10 +21,14 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.FileFieldWriter;
+import org.jabref.model.entry.LinkedFile;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -85,21 +92,34 @@ public class AutoSetLinks {
         }
 
         Runnable r = () -> {
-
+            boolean foundAny = false;
             AutoSetFileLinksUtil util = new AutoSetFileLinksUtil();
 
-            FieldChange change = util.findassociatedNotLinkedFiles(entries, databaseContext);
-            if (ce != null) {
-                // store undo information
-                UndoableFieldChange fieldChange = new UndoableFieldChange(change);
-                ce.addEdit(fieldChange);
+            Map<BibEntry, LinkedFile> linkedfiles = util.findassociatedNotLinkedFiles(entries, databaseContext);
+
+            for (Entry<BibEntry, LinkedFile> linkedFile : linkedfiles.entrySet()) {
+                if (ce != null) {
+                    // store undo information
+                    String newVal = FileFieldWriter.getStringRepresentation(linkedFile.getValue());
+
+                    Optional<String> oldVal = entries.stream().filter(entry -> entry.equals(linkedFile.getKey())).findFirst().map(entry -> entry.getField(FieldName.FILE).orElse(null));
+
+                    UndoableFieldChange fieldChange = new UndoableFieldChange(linkedFile.getKey(), FieldName.FILE, oldVal.orElse(null), newVal);
+                    ce.addEdit(fieldChange);
+
+                    DefaultTaskExecutor.runInJavaFXThread(() -> {
+                        linkedFile.getKey().addFile(linkedFile.getValue());
+                    });
+                    foundAny = true;
+                }
+
+                if (changedEntries != null) {
+                    changedEntries.add(linkedFile.getKey());
+                }
+
             }
 
-            if (changedEntries != null) {
-                changedEntries.add(change.getEntry());
-            }
-
-            final int id = change.getNewValue() != null ? 1 : 0;
+            final int id = foundAny ? 1 : 0;
             SwingUtilities.invokeLater(() -> {
 
                 if (diag != null) {

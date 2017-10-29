@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,24 +15,21 @@ import org.jabref.Globals;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
-import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 
 public class AutoSetFileLinksUtil {
 
-    public FieldChange findassociatedNotLinkedFiles(BibEntry entry, BibDatabaseContext databaseContext) {
+    public Map<BibEntry, LinkedFile> findassociatedNotLinkedFiles(BibEntry entry, BibDatabaseContext databaseContext) {
         return findassociatedNotLinkedFiles(Arrays.asList(entry), databaseContext);
     }
 
-    public FieldChange findassociatedNotLinkedFiles(List<BibEntry> entries, BibDatabaseContext databaseContext) {
+    public Map<BibEntry, LinkedFile> findassociatedNotLinkedFiles(List<BibEntry> entries, BibDatabaseContext databaseContext) {
+        Map<BibEntry, LinkedFile> linkedFiles = new HashMap<>();
 
         List<Path> dirs = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
         List<String> extensions = ExternalFileTypes.getInstance().getExternalFileTypeSelection().stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
@@ -42,7 +40,6 @@ public class AutoSetFileLinksUtil {
 
         // Iterate over the entries:
         for (Entry<BibEntry, List<Path>> entryFilePair : result.entrySet()) {
-            Optional<String> oldVal = entryFilePair.getKey().getField(FieldName.FILE);
 
             for (Path foundFile : entryFilePair.getValue()) {
                 boolean existingSameFile = entryFilePair.getKey().getFiles().stream()
@@ -65,17 +62,14 @@ public class AutoSetFileLinksUtil {
                     String strType = type.isPresent() ? type.get().getName() : "";
 
                     LinkedFile linkedFile = new LinkedFile("", foundFile.toString(), strType);
-                    String newVal = FileFieldWriter.getStringRepresentation(linkedFile);
 
-                    DefaultTaskExecutor.runInJavaFXThread(() -> {
-                        entryFilePair.getKey().addFile(linkedFile);
-                    });
 
-                    return new FieldChange(entryFilePair.getKey(), FieldName.FILE, oldVal.orElse(null), newVal);
+                    linkedFiles.put(entryFilePair.getKey(), linkedFile);
+
                 }
             }
 
         }
-        return new FieldChange(null, FieldName.FILE, null, null);
+        return linkedFiles;
     }
 }

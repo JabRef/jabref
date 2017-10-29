@@ -7,7 +7,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
@@ -36,7 +38,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileFieldParser;
@@ -157,19 +158,17 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
      * Find files that are probably associated  to the given entry but not yet linked.
      */
     private List<LinkedFileViewModel> findAssociatedNotLinkedFiles(BibEntry entry) {
+        List<LinkedFileViewModel> result = new ArrayList<>();
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil();
-        FieldChange change = util.findassociatedNotLinkedFiles(entry, databaseContext);
 
-        List<LinkedFileViewModel> result = new ArrayList<>();
-        if ((change.getNewValue() != null) && !(this.files.get().stream().map(LinkedFileViewModel::getFile).map(LinkedFile::toString).anyMatch(p -> p.contains(change.getNewValue())))) {
+        Map<BibEntry, LinkedFile> linkedFiles = util.findassociatedNotLinkedFiles(entry, databaseContext);
 
-            List<LinkedFile> files = FileFieldParser.parse(change.getNewValue());
-            for (LinkedFile file : files) {
-                LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(file, entry, databaseContext);
-                newLinkedFile.markAsAutomaticallyFound();
-                result.add(newLinkedFile);
-            }
+        for (Entry<BibEntry, LinkedFile> linkedFile : linkedFiles.entrySet()) {
+
+            LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(linkedFile.getValue(), entry, databaseContext);
+            newLinkedFile.markAsAutomaticallyFound();
+            result.add(newLinkedFile);
         }
 
         return result;
