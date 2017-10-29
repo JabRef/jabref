@@ -3,9 +3,8 @@ package org.jabref.gui.externalfiles;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -26,25 +25,20 @@ import org.jabref.Globals;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
+import org.jabref.gui.filelist.FileListEntry;
+import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FileFieldWriter;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class AutoSetLinks {
-
-    private static final Log LOGGER = LogFactory.getLog(AutoSetLinks.class);
 
     private AutoSetLinks() {
     }
@@ -56,7 +50,7 @@ public class AutoSetLinks {
      * @param databaseContext the database for which links are set
      */
     public static void autoSetLinks(List<BibEntry> entries, BibDatabaseContext databaseContext) {
-        autoSetLinks(entries, null, null, databaseContext, null, null);
+        autoSetLinks(entries, null, null, null, databaseContext, null, null);
     }
 
     /**
@@ -85,7 +79,7 @@ public class AutoSetLinks {
      * @return the thread performing the automatically setting
      */
     public static Runnable autoSetLinks(final List<BibEntry> entries, final NamedCompound ce,
-            final Set<BibEntry> changedEntries,
+            final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel,
             final BibDatabaseContext databaseContext, final ActionListener callback, final JDialog diag) {
         final Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         if (diag != null) {
@@ -101,87 +95,97 @@ public class AutoSetLinks {
             diag.setLocationRelativeTo(diag.getParent());
         }
 
-        Runnable r = () -> {
+        Runnable r = new Runnable() {
 
-            // determine directories to search in
-            final List<Path> dirs = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+            @Override
+            public void run() {
+                // determine directories to search in
+                final List<Path> dirs = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
 
-            // determine extensions
-            final List<String> extensions = types.stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
+                // determine extensions
+                final List<String> extensions = types.stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
 
-            // Run the search operation:
-            FileFinder fileFinder = FileFinders.constructFromConfiguration(Globals.prefs.getAutoLinkPreferences());
-            Map<BibEntry, List<Path>> result = fileFinder.findAssociatedFiles(entries, dirs, extensions);
+                // Run the search operation:
+                FileFinder fileFinder = FileFinders.constructFromConfiguration(Globals.prefs.getAutoLinkPreferences());
+                Map<BibEntry, List<Path>> result = fileFinder.findAssociatedFiles(entries, dirs, extensions);
 
-            boolean foundAny = false;
-            // Iterate over the entries:
-            for (Entry<BibEntry, List<Path>> entryFilePair : result.entrySet()) {
-                Optional<String> oldVal = entryFilePair.getKey().getField(FieldName.FILE);
-
-                for (Path foundFile : entryFilePair.getValue()) {
-                    boolean existingSameFile = entryFilePair.getKey().getFiles().stream()
-                            .map(file -> file.findIn(dirs))
-                            .anyMatch(file -> {
-                                try {
-                                    return file.isPresent() && Files.isSameFile(file.get(), foundFile);
-                                } catch (IOException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
-                                return false;
-                            });
-                    if (!existingSameFile) {
-
-                        foundAny = true;
-                        Optional<ExternalFileType> type = FileHelper.getFileExtension(foundFile)
-                                .map(extension -> ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension))
-                                .orElse(Optional.of(new UnknownExternalFileType("")));
-
-                        String strType = type.isPresent() ? type.get().getName() : "";
-                        LinkedFile linkedFile = new LinkedFile("", foundFile.toString(), strType);
-
-                        DefaultTaskExecutor.runInJavaFXThread(() -> {
-                            entryFilePair.getKey().addFile(linkedFile);
-                        });
-
-                        String newVal = FileFieldWriter.getStringRepresentation(linkedFile);
-                        if (ce != null) {
-                            // store undo information
-                            UndoableFieldChange change = new UndoableFieldChange(entryFilePair.getKey(),
-                                    FieldName.FILE, oldVal.orElse(null), newVal);
-                            ce.addEdit(change);
-                        }
-
-                        if (changedEntries != null) {
-                            changedEntries.add(entryFilePair.getKey());
-                        }
-                        break;
+                boolean foundAny = false;
+                // Iterate over the entries:
+                for (Entry<BibEntry, List<Path>> entryFilePair : result.entrySet()) {
+                    FileListTableModel tableModel;
+                    Optional<String> oldVal = entryFilePair.getKey().getField(FieldName.FILE);
+                    if (singleTableModel == null) {
+                        tableModel = new FileListTableModel();
+                        oldVal.ifPresent(tableModel::setContent);
+                    } else {
+                        assert entries.size() == 1;
+                        tableModel = singleTableModel;
                     }
+                    List<Path> files = entryFilePair.getValue();
+                    for (Path file : files) {
+                        file = FileUtil.shortenFileName(file, dirs);
+                        boolean alreadyHas = false;
 
+                        for (int j = 0; j < tableModel.getRowCount(); j++) {
+                            FileListEntry existingEntry = tableModel.getEntry(j);
+                            if (Paths.get(existingEntry.getLink()).equals(file)) {
+                                alreadyHas = true;
+                                foundAny = true;
+                                break;
+                            }
+                        }
+                        if (!alreadyHas) {
+                            foundAny = true;
+                            Optional<ExternalFileType> type = FileHelper.getFileExtension(file)
+                                    .map(extension -> ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension))
+                                    .orElse(Optional.of(new UnknownExternalFileType("")));
+                            FileListEntry flEntry = new FileListEntry("", file.toString(), type);
+                            tableModel.addEntry(tableModel.getRowCount(), flEntry);
+
+                            String newVal = tableModel.getStringRepresentation();
+                            if (newVal.isEmpty()) {
+                                newVal = null;
+                            }
+                            if (ce != null) {
+                                // store undo information
+                                UndoableFieldChange change = new UndoableFieldChange(entryFilePair.getKey(),
+                                        FieldName.FILE, oldVal.orElse(null), newVal);
+                                ce.addEdit(change);
+                            }
+                            // hack: if table model is given, do NOT modify entry
+                            if (singleTableModel == null) {
+                                entryFilePair.getKey().setField(FieldName.FILE, newVal);
+                            }
+                            if (changedEntries != null) {
+                                changedEntries.add(entryFilePair.getKey());
+                            }
+                        }
+                    }
                 }
 
+                // handle callbacks and dialog
+                // FIXME: The ID signals if action was successful :/
+                final int id = foundAny ? 1 : 0;
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        if (diag != null) {
+                            diag.dispose();
+                        }
+                        if (callback != null) {
+                            callback.actionPerformed(new ActionEvent(this, id, ""));
+                        }
+                    }
+                });
             }
-            final int id = foundAny ? 1 : 0;
-            SwingUtilities.invokeLater(() -> {
-
-                if (diag != null) {
-                    diag.dispose();
-                }
-                if (callback != null) {
-                    callback.actionPerformed(new ActionEvent(AutoSetLinks.class, id, ""));
-                }
-
-            });
-
         };
-
         SwingUtilities.invokeLater(() -> {
             // show dialog which will be hidden when the task is done
             if (diag != null) {
                 diag.setVisible(true);
             }
         });
-
         return r;
     }
 
@@ -202,9 +206,9 @@ public class AutoSetLinks {
      *                         parameter can be null, which means that no progress update will be shown.
      * @return the runnable able to perform the automatically setting
      */
-    public static Runnable autoSetLinks(final BibEntry entry,
+    public static Runnable autoSetLinks(final BibEntry entry, final FileListTableModel singleTableModel,
             final BibDatabaseContext databaseContext, final ActionListener callback, final JDialog diag) {
-        return autoSetLinks(Collections.singletonList(entry), null, null, databaseContext, callback,
+        return autoSetLinks(Collections.singletonList(entry), null, null, singleTableModel, databaseContext, callback,
                 diag);
     }
 
