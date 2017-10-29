@@ -3,7 +3,6 @@ package org.jabref.gui.fieldeditors;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -21,6 +20,7 @@ import javafx.collections.ObservableList;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -35,9 +35,8 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.OS;
-import org.jabref.logic.util.io.FileFinder;
-import org.jabref.logic.util.io.FileFinders;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileFieldParser;
@@ -158,35 +157,21 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
      * Find files that are probably associated  to the given entry but not yet linked.
      */
     private List<LinkedFileViewModel> findAssociatedNotLinkedFiles(BibEntry entry) {
-        final List<Path> dirs = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
-        final List<String> extensions = ExternalFileTypes.getInstance().getExternalFileTypeSelection().stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
 
-        // Run the search operation:
-        FileFinder fileFinder = FileFinders.constructFromConfiguration(Globals.prefs.getAutoLinkPreferences());
-        List<Path> newFiles = fileFinder.findAssociatedFiles(entry, dirs, extensions);
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil();
+        FieldChange change = util.findassociatedNotLinkedFiles(entry, databaseContext);
 
         List<LinkedFileViewModel> result = new ArrayList<>();
-        for (Path foundFile : newFiles) {
+        if ((change.getNewValue() != null) && !(this.files.get().stream().map(LinkedFileViewModel::getFile).map(LinkedFile::toString).anyMatch(p -> p.contains(change.getNewValue())))) {
 
-            boolean existingSameFile = files.get().stream()
-                    .map(file -> file.findIn(dirs))
-                    .anyMatch(file -> {
-                        try {
-                            return file.isPresent() && Files.isSameFile(file.get(), foundFile);
-                        } catch (IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        return false;
-                    });
-
-            if (!existingSameFile) {
-                LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(fromFile(foundFile, dirs), entry, databaseContext);
+            List<LinkedFile> files = FileFieldParser.parse(change.getNewValue());
+            for (LinkedFile file : files) {
+                LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(file, entry, databaseContext);
                 newLinkedFile.markAsAutomaticallyFound();
                 result.add(newLinkedFile);
-                break; //only add first file, if it exists multiple times
             }
         }
+
         return result;
     }
 

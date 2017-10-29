@@ -3,18 +3,10 @@ package org.jabref.gui.externalfiles;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -22,23 +14,14 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
-import org.jabref.Globals;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileFinder;
-import org.jabref.logic.util.io.FileFinders;
+import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FileFieldWriter;
-import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.util.FileHelper;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -103,65 +86,20 @@ public class AutoSetLinks {
 
         Runnable r = () -> {
 
-            // determine directories to search in
-            final List<Path> dirs = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+            AutoSetFileLinksUtil util = new AutoSetFileLinksUtil();
 
-            // determine extensions
-            final List<String> extensions = types.stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
-
-            // Run the search operation:
-            FileFinder fileFinder = FileFinders.constructFromConfiguration(Globals.prefs.getAutoLinkPreferences());
-            Map<BibEntry, List<Path>> result = fileFinder.findAssociatedFiles(entries, dirs, extensions);
-
-            boolean foundAny = false;
-            // Iterate over the entries:
-            for (Entry<BibEntry, List<Path>> entryFilePair : result.entrySet()) {
-                Optional<String> oldVal = entryFilePair.getKey().getField(FieldName.FILE);
-
-                for (Path foundFile : entryFilePair.getValue()) {
-                    boolean existingSameFile = entryFilePair.getKey().getFiles().stream()
-                            .map(file -> file.findIn(dirs))
-                            .anyMatch(file -> {
-                                try {
-                                    return file.isPresent() && Files.isSameFile(file.get(), foundFile);
-                                } catch (IOException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
-                                return false;
-                            });
-                    if (!existingSameFile) {
-
-                        foundAny = true;
-                        Optional<ExternalFileType> type = FileHelper.getFileExtension(foundFile)
-                                .map(extension -> ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension))
-                                .orElse(Optional.of(new UnknownExternalFileType("")));
-
-                        String strType = type.isPresent() ? type.get().getName() : "";
-                        LinkedFile linkedFile = new LinkedFile("", foundFile.toString(), strType);
-
-                        DefaultTaskExecutor.runInJavaFXThread(() -> {
-                            entryFilePair.getKey().addFile(linkedFile);
-                        });
-
-                        String newVal = FileFieldWriter.getStringRepresentation(linkedFile);
-                        if (ce != null) {
-                            // store undo information
-                            UndoableFieldChange change = new UndoableFieldChange(entryFilePair.getKey(),
-                                    FieldName.FILE, oldVal.orElse(null), newVal);
-                            ce.addEdit(change);
-                        }
-
-                        if (changedEntries != null) {
-                            changedEntries.add(entryFilePair.getKey());
-                        }
-                        break;
-                    }
-
-                }
-
+            FieldChange change = util.findassociatedNotLinkedFiles(entries, databaseContext);
+            if (ce != null) {
+                // store undo information
+                UndoableFieldChange fieldChange = new UndoableFieldChange(change);
+                ce.addEdit(fieldChange);
             }
-            final int id = foundAny ? 1 : 0;
+
+            if (changedEntries != null) {
+                changedEntries.add(change.getEntry());
+            }
+
+            final int id = change.getNewValue() != null ? 1 : 0;
             SwingUtilities.invokeLater(() -> {
 
                 if (diag != null) {
