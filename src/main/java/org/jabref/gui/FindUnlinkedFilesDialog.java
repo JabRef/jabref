@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.AbstractAction;
@@ -973,11 +972,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
         List<FileFilter> fileFilterList = creatorManager.getFileFilterList();
 
-        Vector<FileFilter> vector = new Vector<>();
-        for (FileFilter fileFilter : fileFilterList) {
-            vector.add(fileFilter);
-        }
-        comboBoxFileTypeSelection = new JComboBox<>(vector);
+        comboBoxFileTypeSelection = new JComboBox<>(fileFilterList.toArray(new FileFilter[fileFilterList.size()]));
 
         comboBoxFileTypeSelection.setRenderer(new DefaultListCellRenderer() {
 
@@ -1009,15 +1004,14 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
         Iterator<EntryType> iterator = EntryTypes
                 .getAllValues(frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).iterator();
-        Vector<BibtexEntryTypeWrapper> list = new Vector<>();
+        List<BibtexEntryTypeWrapper> list = new ArrayList<>();
         list.add(
                 new BibtexEntryTypeWrapper(null));
         while (iterator.hasNext()) {
             list.add(new BibtexEntryTypeWrapper(iterator.next()));
         }
-        comboBoxEntryTypeSelection = new JComboBox<>(list);
+        comboBoxEntryTypeSelection = new JComboBox<>(list.toArray(new BibtexEntryTypeWrapper[list.size()]));
     }
-
 
     /**
      * Wrapper for displaying the Type {@link BibtexEntryType} in a Combobox.
@@ -1029,7 +1023,6 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
     private static class BibtexEntryTypeWrapper {
 
         private final EntryType entryType;
-
 
         BibtexEntryTypeWrapper(EntryType bibtexType) {
             this.entryType = bibtexType;
@@ -1052,7 +1045,6 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
         private boolean isSelected;
         private final JCheckBox checkbox;
-
 
         public CheckableTreeNode(Object userObject) {
             super(userObject);
@@ -1133,7 +1125,6 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
         public final File file;
         public final int fileCount;
-
 
         public FileNodeWrapper(File aFile) {
             this(aFile, 0);
