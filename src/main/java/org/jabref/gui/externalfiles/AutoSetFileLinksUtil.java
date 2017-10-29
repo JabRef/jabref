@@ -56,14 +56,12 @@ public class AutoSetFileLinksUtil {
                 if (!existingSameFile) {
 
                     Optional<ExternalFileType> type = FileHelper.getFileExtension(foundFile)
-                            .map(extension -> ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension))
+                            .map(ExternalFileTypes.getInstance()::getExternalFileTypeByExt)
                             .orElse(Optional.of(new UnknownExternalFileType("")));
 
                     String strType = type.isPresent() ? type.get().getName() : "";
 
                     LinkedFile linkedFile = new LinkedFile("", foundFile.toString(), strType);
-
-
                     linkedFiles.put(entryFilePair.getKey(), linkedFile);
 
                 }
