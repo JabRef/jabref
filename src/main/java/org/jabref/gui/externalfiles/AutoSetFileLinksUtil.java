@@ -11,15 +11,16 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.Globals;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
+import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.util.FileHelper;
 
 import org.apache.commons.logging.Log;
@@ -29,18 +30,18 @@ public class AutoSetFileLinksUtil {
 
     private static final Log LOGGER = LogFactory.getLog(AutoSetLinks.class);
 
-    public Map<BibEntry, LinkedFile> findassociatedNotLinkedFiles(BibEntry entry, BibDatabaseContext databaseContext) {
-        return findassociatedNotLinkedFiles(Arrays.asList(entry), databaseContext);
+    public Map<BibEntry, LinkedFile> findassociatedNotLinkedFiles(BibEntry entry, BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirPrefs, AutoLinkPreferences autoLinkPrefs) {
+        return findassociatedNotLinkedFiles(Arrays.asList(entry), databaseContext, fileDirPrefs, autoLinkPrefs);
     }
 
-    public Map<BibEntry, LinkedFile> findassociatedNotLinkedFiles(List<BibEntry> entries, BibDatabaseContext databaseContext) {
+    public Map<BibEntry, LinkedFile> findassociatedNotLinkedFiles(List<BibEntry> entries, BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirPrefs, AutoLinkPreferences autoLinkPrefs) {
         Map<BibEntry, LinkedFile> linkedFiles = new HashMap<>();
 
-        List<Path> dirs = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+        List<Path> dirs = databaseContext.getFileDirectoriesAsPaths(fileDirPrefs);
         List<String> extensions = ExternalFileTypes.getInstance().getExternalFileTypeSelection().stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
 
         // Run the search operation:
-        FileFinder fileFinder = FileFinders.constructFromConfiguration(Globals.prefs.getAutoLinkPreferences());
+        FileFinder fileFinder = FileFinders.constructFromConfiguration(autoLinkPrefs);
         Map<BibEntry, List<Path>> result = fileFinder.findAssociatedFiles(entries, dirs, extensions);
 
         // Iterate over the entries:

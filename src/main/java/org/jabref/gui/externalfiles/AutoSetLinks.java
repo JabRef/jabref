@@ -18,6 +18,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import org.jabref.Globals;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.undo.NamedCompound;
@@ -31,8 +32,6 @@ import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 
 public class AutoSetLinks {
-
-
 
     private AutoSetLinks() {
     }
@@ -88,7 +87,7 @@ public class AutoSetLinks {
             boolean foundAny = false;
             AutoSetFileLinksUtil util = new AutoSetFileLinksUtil();
 
-            Map<BibEntry, LinkedFile> linkedfiles = util.findassociatedNotLinkedFiles(entries, databaseContext);
+            Map<BibEntry, LinkedFile> linkedfiles = util.findassociatedNotLinkedFiles(entries, databaseContext, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getAutoLinkPreferences());
 
             for (Entry<BibEntry, LinkedFile> linkedFile : linkedfiles.entrySet()) {
                 if (ce != null) {

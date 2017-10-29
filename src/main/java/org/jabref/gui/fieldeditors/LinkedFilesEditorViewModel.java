@@ -8,8 +8,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
@@ -162,10 +162,9 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil();
 
-        Map<BibEntry, LinkedFile> linkedFiles = util.findassociatedNotLinkedFiles(entry, databaseContext);
+        Map<BibEntry, LinkedFile> linkedFiles = util.findassociatedNotLinkedFiles(entry, databaseContext, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getAutoLinkPreferences());
 
         for (Entry<BibEntry, LinkedFile> linkedFile : linkedFiles.entrySet()) {
-
             LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(linkedFile.getValue(), entry, databaseContext);
             newLinkedFile.markAsAutomaticallyFound();
             result.add(newLinkedFile);
