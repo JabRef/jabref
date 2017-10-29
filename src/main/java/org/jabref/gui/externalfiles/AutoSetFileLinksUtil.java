@@ -22,7 +22,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class AutoSetFileLinksUtil {
+
+    private static final Log LOGGER = LogFactory.getLog(AutoSetLinks.class);
 
     public Map<BibEntry, LinkedFile> findassociatedNotLinkedFiles(BibEntry entry, BibDatabaseContext databaseContext) {
         return findassociatedNotLinkedFiles(Arrays.asList(entry), databaseContext);
@@ -48,8 +53,7 @@ public class AutoSetFileLinksUtil {
                             try {
                                 return file.isPresent() && Files.isSameFile(file.get(), foundFile);
                             } catch (IOException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
+                                LOGGER.error("Problem with isSameFile", e);
                             }
                             return false;
                         });

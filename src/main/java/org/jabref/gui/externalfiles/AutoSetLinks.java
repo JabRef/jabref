@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -29,12 +30,9 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class AutoSetLinks {
 
-    private static final Log LOGGER = LogFactory.getLog(AutoSetLinks.class);
+
 
     private AutoSetLinks() {
     }
@@ -60,12 +58,7 @@ public class AutoSetLinks {
      * @param entries          A collection of BibEntry objects to find links for.
      * @param ce               A NamedCompound to add UndoEdit elements to.
      * @param changedEntries   MODIFIED, optional. A Set of BibEntry objects to which all modified entries is added.
-     *                         This is used for status output and debugging
-     * @param singleTableModel UGLY HACK. The table model to insert links into. Already existing links are not
-     *                         duplicated or removed. This parameter has to be null if entries.count() != 1. The hack has been
-     *                         introduced as a bibtexentry does not (yet) support the function getListTableModel() and the
-     *                         FileListEntryEditor editor holds an instance of that table model and does not reconstruct it after the
-     *                         search has succeeded.
+
      * @param databaseContext  The database providing the relevant file directory, if any.
      * @param callback         An ActionListener that is notified (on the event dispatch thread) when the search is finished.
      *                         The ActionEvent has id=0 if no new links were added, and id=1 if one or more links were added. This
@@ -148,8 +141,7 @@ public class AutoSetLinks {
      * of external file types. The entry itself is not modified. The entry's bibtex key must have been set.
      *
      * @param entry            The BibEntry to find links for.
-     * @param singleTableModel The table model to insert links into. Already existing links are not duplicated or
-     *                         removed.
+
      * @param databaseContext  The database providing the relevant file directory, if any.
      * @param callback         An ActionListener that is notified (on the event dispatch thread) when the search is finished.
      *                         The ActionEvent has id=0 if no new links were added, and id=1 if one or more links were added. This
