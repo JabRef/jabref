@@ -120,7 +120,7 @@ public class SynchronizeFileField extends AbstractWorker {
             List<BibEntry> entries = new ArrayList<>(sel);
 
             // Start the automatically setting process:
-            Runnable r = AutoSetLinks.autoSetLinks(entries, ce, changedEntries, null, panel.getBibDatabaseContext(), null, null);
+            Runnable r = AutoSetLinks.autoSetLinks(entries, ce, changedEntries, panel.getBibDatabaseContext(), null, null);
             JabRefExecutorService.INSTANCE.executeAndWait(r);
         }
         progress += sel.size() * weightAutoSet;

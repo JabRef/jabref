@@ -3,6 +3,7 @@ package org.jabref.gui.fieldeditors;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -165,14 +166,25 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         List<Path> newFiles = fileFinder.findAssociatedFiles(entry, dirs, extensions);
 
         List<LinkedFileViewModel> result = new ArrayList<>();
-        for (Path newFile : newFiles) {
-            boolean alreadyLinked = files.get().stream()
+        for (Path foundFile : newFiles) {
+
+            boolean existingSameFile = files.get().stream()
                     .map(file -> file.findIn(dirs))
-                    .anyMatch(file -> file.isPresent() && file.get().equals(newFile));
-            if (!alreadyLinked) {
-                LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(fromFile(newFile, dirs), entry, databaseContext);
+                    .anyMatch(file -> {
+                        try {
+                            return file.isPresent() && Files.isSameFile(file.get(), foundFile);
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        return false;
+                    });
+
+            if (!existingSameFile) {
+                LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(fromFile(foundFile, dirs), entry, databaseContext);
                 newLinkedFile.markAsAutomaticallyFound();
                 result.add(newLinkedFile);
+                break; //only add first file, if it exists multiple times
             }
         }
         return result;
