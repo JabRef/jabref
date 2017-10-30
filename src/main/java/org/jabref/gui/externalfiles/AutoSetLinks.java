@@ -6,9 +6,6 @@ import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -87,26 +84,29 @@ public class AutoSetLinks {
             boolean foundAny = false;
             AutoSetFileLinksUtil util = new AutoSetFileLinksUtil();
 
-            Map<BibEntry, LinkedFile> linkedfiles = util.findassociatedNotLinkedFiles(entries, databaseContext, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getAutoLinkPreferences());
+            for (BibEntry entry : entries) {
 
-            for (Entry<BibEntry, LinkedFile> linkedFile : linkedfiles.entrySet()) {
+                List<LinkedFile> linkedFiles = util.findassociatedNotLinkedFiles(entry, databaseContext, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
+
                 if (ce != null) {
-                    // store undo information
-                    String newVal = FileFieldWriter.getStringRepresentation(linkedFile.getValue());
+                    for (LinkedFile linkedFile : linkedFiles) {
+                        // store undo information
+                        String newVal = FileFieldWriter.getStringRepresentation(linkedFile);
 
-                    Optional<String> oldVal = entries.stream().filter(entry -> entry.equals(linkedFile.getKey())).findFirst().map(entry -> entry.getField(FieldName.FILE).orElse(null));
+                        String oldVal = entry.getField(FieldName.FILE).orElse(null);
 
-                    UndoableFieldChange fieldChange = new UndoableFieldChange(linkedFile.getKey(), FieldName.FILE, oldVal.orElse(null), newVal);
-                    ce.addEdit(fieldChange);
+                        UndoableFieldChange fieldChange = new UndoableFieldChange(entry, FieldName.FILE, oldVal, newVal);
+                        ce.addEdit(fieldChange);
 
-                    DefaultTaskExecutor.runInJavaFXThread(() -> {
-                        linkedFile.getKey().addFile(linkedFile.getValue());
-                    });
-                    foundAny = true;
-                }
+                        DefaultTaskExecutor.runInJavaFXThread(() -> {
+                            entry.addFile(linkedFile);
+                        });
+                        foundAny = true;
+                    }
 
-                if (changedEntries != null) {
-                    changedEntries.add(linkedFile.getKey());
+                    if (changedEntries != null) {
+                        changedEntries.add(entry);
+                    }
                 }
 
             }

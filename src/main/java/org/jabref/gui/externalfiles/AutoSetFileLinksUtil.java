@@ -3,11 +3,8 @@ package org.jabref.gui.externalfiles;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -30,49 +27,42 @@ public class AutoSetFileLinksUtil {
 
     private static final Log LOGGER = LogFactory.getLog(AutoSetLinks.class);
 
-    public Map<BibEntry, LinkedFile> findassociatedNotLinkedFiles(BibEntry entry, BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirPrefs, AutoLinkPreferences autoLinkPrefs) {
-        return findassociatedNotLinkedFiles(Arrays.asList(entry), databaseContext, fileDirPrefs, autoLinkPrefs);
-    }
-
-    public Map<BibEntry, LinkedFile> findassociatedNotLinkedFiles(List<BibEntry> entries, BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirPrefs, AutoLinkPreferences autoLinkPrefs) {
-        Map<BibEntry, LinkedFile> linkedFiles = new HashMap<>();
+    public List<LinkedFile> findassociatedNotLinkedFiles(BibEntry entry, BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirPrefs, AutoLinkPreferences autoLinkPrefs, ExternalFileTypes externalFileTypes) {
+        List<LinkedFile> linkedFiles = new ArrayList<>();
 
         List<Path> dirs = databaseContext.getFileDirectoriesAsPaths(fileDirPrefs);
-        List<String> extensions = ExternalFileTypes.getInstance().getExternalFileTypeSelection().stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
+        List<String> extensions = externalFileTypes.getExternalFileTypeSelection().stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
 
         // Run the search operation:
         FileFinder fileFinder = FileFinders.constructFromConfiguration(autoLinkPrefs);
-        Map<BibEntry, List<Path>> result = fileFinder.findAssociatedFiles(entries, dirs, extensions);
+        List<Path> result = fileFinder.findAssociatedFiles(entry, dirs, extensions);
 
         // Iterate over the entries:
-        for (Entry<BibEntry, List<Path>> entryFilePair : result.entrySet()) {
 
-            for (Path foundFile : entryFilePair.getValue()) {
-                boolean existingSameFile = entryFilePair.getKey().getFiles().stream()
-                        .map(file -> file.findIn(dirs))
-                        .anyMatch(file -> {
-                            try {
-                                return file.isPresent() && Files.isSameFile(file.get(), foundFile);
-                            } catch (IOException e) {
-                                LOGGER.error("Problem with isSameFile", e);
-                            }
-                            return false;
-                        });
-                if (!existingSameFile) {
+        for (Path foundFile : result) {
+            boolean existingSameFile = entry.getFiles().stream()
+                    .map(file -> file.findIn(dirs))
+                    .anyMatch(file -> {
+                        try {
+                            return file.isPresent() && Files.isSameFile(file.get(), foundFile);
+                        } catch (IOException e) {
+                            LOGGER.error("Problem with isSameFile", e);
+                        }
+                        return false;
+                    });
+            if (!existingSameFile) {
 
-                    Optional<ExternalFileType> type = FileHelper.getFileExtension(foundFile)
-                            .map(ExternalFileTypes.getInstance()::getExternalFileTypeByExt)
-                            .orElse(Optional.of(new UnknownExternalFileType("")));
+                Optional<ExternalFileType> type = FileHelper.getFileExtension(foundFile)
+                        .map(externalFileTypes::getExternalFileTypeByExt)
+                        .orElse(Optional.of(new UnknownExternalFileType("")));
 
-                    String strType = type.isPresent() ? type.get().getName() : "";
+                String strType = type.isPresent() ? type.get().getName() : "";
 
-                    LinkedFile linkedFile = new LinkedFile("", foundFile.toString(), strType);
-                    linkedFiles.put(entryFilePair.getKey(), linkedFile);
-
-                }
+                LinkedFile linkedFile = new LinkedFile("", foundFile.toString(), strType);
+                linkedFiles.add(linkedFile);
             }
-
         }
+
         return linkedFiles;
     }
 }
