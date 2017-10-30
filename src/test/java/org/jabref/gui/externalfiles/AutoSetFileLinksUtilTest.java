@@ -11,7 +11,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,7 +25,7 @@ import static org.mockito.Mockito.when;
 public class AutoSetFileLinksUtilTest {
 
     private final FileDirectoryPreferences fileDirPrefs = mock(FileDirectoryPreferences.class);
-    private final AutoLinkPreferences autoLinkPrefs = mock(AutoLinkPreferences.class);
+    private final AutoLinkPreferences autoLinkPrefs = new AutoLinkPreferences(false, "", true, ';');
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final ExternalFileTypes externalFileTypes = mock(ExternalFileTypes.class);
     private final BibEntry entry = new BibEntry("article");
@@ -38,9 +37,6 @@ public class AutoSetFileLinksUtilTest {
     public void setUp() throws Exception {
         entry.setCiteKey("CiteKey");
         file = folder.newFile("CiteKey.pdf").toPath();
-
-        JabRefPreferences prefs = mock(JabRefPreferences.class);
-        when(prefs.getAutoLinkPreferences()).thenReturn(new AutoLinkPreferences(false, "", true, ';'));
         when(databaseContext.getFileDirectoriesAsPaths(any())).thenReturn(Collections.singletonList(folder.getRoot().toPath()));
         when(externalFileTypes.getExternalFileTypeSelection()).thenReturn(new TreeSet<>(externalFileTypes.getDefaultExternalFileTypes()));
 
