@@ -6,20 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
-import org.jabref.logic.formatter.bibtexfields.EscapeUnderscoresFormatter;
-import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
-import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
-import org.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
-import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
-import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
-import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
-import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
-import org.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
-import org.jabref.logic.formatter.bibtexfields.RegexFormatter;
-import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
-import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
-import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
+import org.jabref.logic.formatter.bibtexfields.*;
 import org.jabref.logic.formatter.casechanger.CapitalizeFormatter;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
@@ -50,6 +37,7 @@ public class Formatters {
 
     public static final List<Formatter> OTHERS = Arrays.asList(
             new ClearFormatter(),
+            new CleanupURLFormatter(),
             new LatexCleanupFormatter(),
             new MinifyNameListFormatter(),
             new NormalizeDateFormatter(),

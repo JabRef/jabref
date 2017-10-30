@@ -1,21 +1,14 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-
-import javafx.scene.control.CustomMenuItem;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.Tooltip;
-
+import javafx.scene.control.*;
 import org.jabref.gui.actions.CopyDoiUrlAction;
+import org.jabref.logic.formatter.bibtexfields.CleanupURLFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.l10n.Localization;
+
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EditorMenus {
 
@@ -50,6 +43,20 @@ public class EditorMenus {
         List<MenuItem> menuItems = new ArrayList<>();
         menuItems.add(copyDoiUrlMenuItem);
         menuItems.add(new SeparatorMenuItem());
+        return menuItems;
+    }
+
+    public static List<MenuItem> getCleanupURLMenu(TextArea textArea){
+
+        CustomMenuItem cleanupURL = new CustomMenuItem(new Label(Localization.lang("Cleanup URL Link")));
+        //cleanupURL.setDisable(true);
+        cleanupURL.setOnAction(event -> textArea.setText(new CleanupURLFormatter().format(textArea.getText())));
+
+        List<MenuItem> menuItems = new ArrayList<>();
+        menuItems.add(cleanupURL);
+        menuItems.add(new SeparatorMenuItem());
+        menuItems.addAll(getDefaultMenu(textArea));
+
         return menuItems;
     }
 }
