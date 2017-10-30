@@ -23,14 +23,6 @@ public class FileAnnotationCache {
     //the inner list holds the annotations per file, the outer collection maps this to a BibEntry.
     private LoadingCache<BibEntry, Map<Path, List<FileAnnotation>>> annotationCache;
 
-    /**
-     * Creates an empty fil annotation cache. Required to allow the annotation cache to be injected into views without
-     * hitting the bug https://github.com/AdamBien/afterburner.fx/issues/71.
-     */
-    public FileAnnotationCache() {
-
-    }
-
     public FileAnnotationCache(BibDatabaseContext context) {
         annotationCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<BibEntry, Map<Path, List<FileAnnotation>>>() {
             @Override
