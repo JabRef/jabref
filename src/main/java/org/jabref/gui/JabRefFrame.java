@@ -80,7 +80,7 @@ import org.jabref.gui.actions.SearchForUpdateAction;
 import org.jabref.gui.actions.SortTabsAction;
 import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
-import org.jabref.gui.copyfiles.ExportLinkedFilesAction;
+import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.customentrytypes.EntryCustomizationDialog;
 import org.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
@@ -390,7 +390,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Unabbreviate journal names"),
             Localization.lang("Unabbreviate journal names of the selected entries"),
             Globals.getKeyPrefs().getKey(KeyBinding.UNABBREVIATE));
-    private final AbstractAction exportLinkedFiles = new ExportLinkedFilesAction();
+    private final AbstractAction exportLinkedFiles = new CopyFilesAction();
     private final AbstractAction manageJournals = new ManageJournalsAction();
     private final AbstractAction databaseProperties = new DatabasePropertiesAction();
     private final AbstractAction bibtexKeyPattern = new BibtexKeyPatternAction();

@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,8 +28,9 @@ import org.apache.commons.logging.LogFactory;
 
 public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
 
-    private static final Log LOGGER = LogFactory.getLog(ExportLinkedFilesAction.class);
-    private static final String LOGFILE = "exportLog.log";
+    private static final Log LOGGER = LogFactory.getLog(CopyFilesAction.class);
+    private static final String LOGFILE_PREFIX = "copyFileslog_";
+    private static final String LOGFILE_EXT = ".log";
     private final BibDatabaseContext databaseContext;
     private final Path exportPath;
     private final String localizedSucessMessage = Localization.lang("Copied file successfully");
@@ -58,7 +61,10 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
         updateMessage(Localization.lang("Copying files..."));
         updateProgress(0, totalFilesCount);
 
-        try (BufferedWriter bw = Files.newBufferedWriter(exportPath.resolve(LOGFILE), StandardCharsets.UTF_8)) {
+        LocalDateTime currentTime = LocalDateTime.now();
+        String currentDate = currentTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"));
+
+        try (BufferedWriter bw = Files.newBufferedWriter(exportPath.resolve(LOGFILE_PREFIX + currentDate + LOGFILE_EXT), StandardCharsets.UTF_8)) {
 
             for (int i = 0; i < entries.size(); i++) {
 
