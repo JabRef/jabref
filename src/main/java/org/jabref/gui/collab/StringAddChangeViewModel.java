@@ -1,4 +1,4 @@
-package org.jabref.collab;
+package org.jabref.gui.collab;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -14,9 +14,9 @@ import org.jabref.model.entry.BibtexString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-class StringAddChange extends Change {
+class StringAddChangeViewModel extends ChangeViewModel {
 
-    private static final Log LOGGER = LogFactory.getLog(StringAddChange.class);
+    private static final Log LOGGER = LogFactory.getLog(StringAddChangeViewModel.class);
 
     private final BibtexString string;
     private final InfoPane tp = new InfoPane();
@@ -24,7 +24,7 @@ class StringAddChange extends Change {
     private final JScrollPane sp = new JScrollPane(tp);
 
 
-    public StringAddChange(BibtexString string) {
+    public StringAddChangeViewModel(BibtexString string) {
         super(Localization.lang("Added string") + ": '" + string.getName() + '\'');
         this.string = string;
         tp.setText("<HTML><H2>" + Localization.lang("Added string") + "</H2><H3>" +

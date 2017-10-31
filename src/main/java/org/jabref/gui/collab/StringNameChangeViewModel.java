@@ -1,4 +1,4 @@
-package org.jabref.collab;
+package org.jabref.gui.collab;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -15,9 +15,9 @@ import org.jabref.model.entry.BibtexString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-class StringNameChange extends Change {
+class StringNameChangeViewModel extends ChangeViewModel {
 
-    private static final Log LOGGER = LogFactory.getLog(StringNameChange.class);
+    private static final Log LOGGER = LogFactory.getLog(StringNameChangeViewModel.class);
     private final BibtexString string;
     private final String mem;
     private final String disk;
@@ -26,12 +26,11 @@ class StringNameChange extends Change {
     private final BibtexString tmpString;
 
 
-    public StringNameChange(BibtexString string, BibtexString tmpString,
-            String mem, String tmp, String disk, String content) {
-        super(Localization.lang("Renamed string") + ": '" + tmp + '\'');
+    public StringNameChangeViewModel(BibtexString string, BibtexString tmpString, String mem, String disk) {
+        super(Localization.lang("Renamed string") + ": '" + tmpString.getName() + '\'');
         this.tmpString = tmpString;
         this.string = string;
-        this.content = content;
+        this.content = tmpString.getContent();
         this.mem = mem;
         this.disk = disk;
 
