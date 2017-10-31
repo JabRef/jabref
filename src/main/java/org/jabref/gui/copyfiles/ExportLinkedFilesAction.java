@@ -11,6 +11,7 @@ import javax.swing.AbstractAction;
 import javafx.concurrent.Task;
 
 import org.jabref.Globals;
+import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
@@ -54,8 +55,9 @@ public class ExportLinkedFilesAction extends AbstractAction {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             exportService.setOnSucceeded(value -> {
                 DefaultTaskExecutor.runInJavaFXThread(() -> showDialog(exportService.getValue()));
+
             });
-            exportService.run();
+            JabRefExecutorService.INSTANCE.executeInterruptableTask(exportService);
             dialogService.showCanceableProgressDialogAndWait(exportService);
 
         });

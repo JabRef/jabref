@@ -54,6 +54,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
     @Override
     protected List<CopyFilesResultItemViewModel> call()
             throws InterruptedException, IOException {
+
         updateMessage(Localization.lang("Copying files..."));
         updateProgress(0, totalFilesCount);
 
