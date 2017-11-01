@@ -8,7 +8,6 @@ import java.util.Objects;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
@@ -86,8 +85,10 @@ public class SourceTab extends EntryEditorTab {
         NotificationPane notificationPane = new NotificationPane(node);
         notificationPane.setShowFromTop(false);
         sourceValidator.getValidationStatus().getMessages().addListener((ListChangeListener<ValidationMessage>) c -> {
-            while (c.next()) {
-                Platform.runLater(() -> sourceValidator.getValidationStatus().getHighestMessage().ifPresent(validationMessage -> notificationPane.show(validationMessage.getMessage())));
+            if (sourceValidator.getValidationStatus().isValid()) {
+                notificationPane.hide();
+            } else {
+                sourceValidator.getValidationStatus().getHighestMessage().ifPresent(validationMessage -> notificationPane.show(validationMessage.getMessage()));
             }
         });
         this.setContent(notificationPane);
@@ -176,6 +177,8 @@ public class SourceTab extends EntryEditorTab {
             }
             compound.end();
             undoManager.addEdit(compound);
+
+            sourceIsValid.setValue(null);
         } catch (InvalidFieldValueException | IllegalStateException | IOException ex) {
             sourceIsValid.setValue(ValidationMessage.error(Localization.lang("Problem with parsing entry") + ": " + ex.getMessage()));
             LOGGER.debug("Incorrect source", ex);
