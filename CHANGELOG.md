@@ -23,6 +23,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We now set the WM_CLASS of the UI to org-jabref-JabRefMain to allow certain Un*x window managers to properly identify its windows
 - We changed the default paths for the OpenOffice/LibreOffice binaries to the default path for LibreOffice
 - We no longer create a new entry editor when selecting a new entry to increase performance. [#3187](https://github.com/JabRef/jabref/pull/3187)
+- We added the possibility to copy linked files from entries to a single output folder [#2539](https://github.com/JabRef/jabref/pull/2593)
 - We increased performance and decreased the memory footprint of the entry editor drastically. [#3331](https://github.com/JabRef/jabref/pull/3331)
 - Late initialization of the context menus in the entry editor. This improves performance and memory footprint further [#3340](https://github.com/JabRef/jabref/pull/3340)
 - We added a dialog to show that JabRef is working on checking integrity. [#3358](https://github.com/JabRef/jabref/issues/3358)
