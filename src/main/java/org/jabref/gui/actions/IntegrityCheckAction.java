@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -61,7 +62,7 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
         JProgressBar integrityProgressBar = new JProgressBar();
         integrityProgressBar.setIndeterminate(true);
         integrityProgressBar.setStringPainted(true);
-        integrityProgressBar.setString("Checking integrity...");
+        integrityProgressBar.setString(Localization.lang("Checking integrity..."));
         integrityDialog.add(integrityProgressBar);
         integrityDialog.pack();
         SwingWorker<List<IntegrityMessage>, Void> worker = new SwingWorker<List<IntegrityMessage>, Void>() {
