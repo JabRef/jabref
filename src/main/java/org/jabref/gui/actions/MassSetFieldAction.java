@@ -53,9 +53,11 @@ public class MassSetFieldAction extends MnemonicAwareAction {
     private JRadioButton selected;
     private JRadioButton clear;
     private JRadioButton set;
+    private JRadioButton append;
     private JRadioButton rename;
     private JComboBox<String> field;
-    private JTextField text;
+    private JTextField setText;
+    private JTextField appendText;
     private JTextField renameTo;
     private boolean canceled = true;
     private JCheckBox overwrite;
@@ -71,8 +73,10 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
         field = new JComboBox<>();
         field.setEditable(true);
-        text = new JTextField();
-        text.setEnabled(false);
+        setText = new JTextField();
+        setText.setEnabled(false);
+        appendText = new JTextField();
+        appendText.setEnabled(false);
         renameTo = new JTextField();
         renameTo.setEnabled(false);
 
@@ -83,6 +87,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         selected = new JRadioButton(Localization.lang("Selected entries"));
         clear = new JRadioButton(Localization.lang("Clear fields"));
         set = new JRadioButton(Localization.lang("Set fields"));
+        append = new JRadioButton(Localization.lang("Append to fields"));
         rename = new JRadioButton(Localization.lang("Rename field to") + ":");
         rename.setToolTipText(Localization.lang("Move contents of a field into a field with a different name"));
 
@@ -93,15 +98,19 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         }
 
         set.addChangeListener(e ->
-        // Entering a text is only relevant if we are setting, not clearing:
-        text.setEnabled(set.isSelected()));
+        // Entering a setText is only relevant if we are setting, not clearing:
+        setText.setEnabled(set.isSelected()));
+
+        append.addChangeListener(e ->
+        // Text to append is only required if we are appending:
+        appendText.setEnabled(append.isSelected()));
 
         clear.addChangeListener(e ->
         // Overwrite protection makes no sense if we are clearing the field:
         overwrite.setEnabled(!clear.isSelected()));
 
         rename.addChangeListener(e ->
-        // Entering a text is only relevant if we are renaming
+        // Entering a setText is only relevant if we are renaming
         renameTo.setEnabled(rename.isSelected()));
 
         overwrite = new JCheckBox(Localization.lang("Overwrite existing field values"), true);
@@ -111,9 +120,10 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         bg = new ButtonGroup();
         bg.add(clear);
         bg.add(set);
+        bg.add(append);
         bg.add(rename);
         FormBuilder builder = FormBuilder.create().layout(new FormLayout(
-                "left:pref, 4dlu, fill:100dlu:grow", "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref"));
+                "left:pref, 4dlu, fill:100dlu:grow", "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref"));
         builder.addSeparator(Localization.lang("Field name")).xyw(1, 1, 3);
         builder.add(Localization.lang("Field name")).xy(1, 3);
         builder.add(field).xy(3, 3);
@@ -122,11 +132,13 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         builder.add(selected).xyw(1, 9, 3);
         builder.addSeparator(Localization.lang("New field value")).xyw(1, 11, 3);
         builder.add(set).xy(1, 13);
-        builder.add(text).xy(3, 13);
+        builder.add(setText).xy(3, 13);
         builder.add(clear).xyw(1, 15, 3);
-        builder.add(rename).xy(1, 17);
-        builder.add(renameTo).xy(3, 17);
-        builder.add(overwrite).xyw(1, 19, 3);
+        builder.add(append).xy(1, 17);
+        builder.add(appendText).xy(3, 17);
+        builder.add(rename).xy(1, 19);
+        builder.add(renameTo).xy(3, 19);
+        builder.add(overwrite).xyw(1, 21, 3);
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
@@ -219,7 +231,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         } else {
             entryList = entries;
         }
-        String toSet = text.getText();
+        String toSet = setText.getText();
         if (toSet.isEmpty()) {
             toSet = null;
         }
