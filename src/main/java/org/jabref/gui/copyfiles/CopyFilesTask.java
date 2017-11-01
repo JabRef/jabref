@@ -51,7 +51,6 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
         this.entries = entries;
         this.exportPath = path;
         totalFilesCount = entries.stream().flatMap(entry -> entry.getFiles().stream()).count();
-
     }
 
     @Override
@@ -82,6 +81,12 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
                     newPath.ifPresent(newFile -> {
                         boolean success = FileUtil.copyFile(fileToExport.get(), newFile, false);
                         updateProgress(totalFilesCounter++, totalFilesCount);
+                        try {
+                            Thread.sleep(300);
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
                         if (success) {
                             updateMessage(localizedSucessMessage);
                             numberSucessful++;

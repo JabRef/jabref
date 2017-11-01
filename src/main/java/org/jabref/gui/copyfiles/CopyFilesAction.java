@@ -11,7 +11,6 @@ import javax.swing.AbstractAction;
 import javafx.concurrent.Task;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
@@ -52,15 +51,11 @@ public class CopyFilesAction extends AbstractAction {
     }
 
     private void startServiceAndshowProgessDialog(Task<List<CopyFilesResultItemViewModel>> exportService) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            exportService.setOnSucceeded(value -> {
-                DefaultTaskExecutor.runInJavaFXThread(() -> showDialog(exportService.getValue()));
 
-            });
-            JabRefExecutorService.INSTANCE.executeInterruptableTask(exportService);
-            dialogService.showCanceableProgressDialogAndWait(exportService);
+        DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showCanceableProgressDialogAndWait(exportService));
 
-        });
+        exportService.run(); //Run kinda blocks, so we just show the result dialog wgeb run is ready
+        DefaultTaskExecutor.runInJavaFXThread(() -> showDialog(exportService.getValue()));
     }
 
     private void showDialog(List<CopyFilesResultItemViewModel> data) {

@@ -141,8 +141,7 @@ public class FXDialogService implements DialogService {
             task.cancel();
             progressDialog.close();
         });
-        progressDialog.showAndWait();
-
+        progressDialog.show();
     }
 
     @Override
