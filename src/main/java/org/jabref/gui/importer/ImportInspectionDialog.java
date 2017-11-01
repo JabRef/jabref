@@ -1294,7 +1294,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             // links:
             JDialog diag = new JDialog(ImportInspectionDialog.this, true);
             JabRefExecutorService.INSTANCE
-                    .execute(AutoSetLinks.autoSetLinks(entry, localModel, bibDatabaseContext, e -> {
+                    .execute(AutoSetLinks.autoSetLinks(entry, bibDatabaseContext, e -> {
                         if (e.getID() > 0) {
 
                             entries.getReadWriteLock().writeLock().lock();

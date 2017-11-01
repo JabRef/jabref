@@ -33,7 +33,6 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XMPUtil;
 import org.jabref.model.database.BibDatabase;
@@ -351,18 +350,15 @@ public class DroppedFileHandler {
         moveRadioButton.setText(Localization.lang("Move file to file directory"));
         renameCheckBox.setText(Localization.lang("Rename file to").concat(": "));
 
-        LayoutFormatterPreferences layoutPrefs = Globals.prefs
-                .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
-
         // Determine which name to suggest:
         String targetName = FileUtil.createFileNameFromPattern(database, entry,
-                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN), layoutPrefs);
+                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
 
         String fileDirPattern = Globals.prefs.get(JabRefPreferences.IMPORT_FILEDIRPATTERN);
 
         String targetDirName = "";
         if (!fileDirPattern.isEmpty()) {
-            targetDirName = FileUtil.createFileNameFromPattern(database, entry, fileDirPattern, layoutPrefs);
+            targetDirName = FileUtil.createDirNameFromPattern(database, entry, fileDirPattern);
         }
 
         if (targetDirName.isEmpty()) {

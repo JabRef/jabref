@@ -680,11 +680,12 @@ public class BibEntry implements Cloneable {
 
     public KeywordList getKeywords(Character delimiter) {
         Optional<String> keywordsContent = getField(FieldName.KEYWORDS);
-        if (keywordsContent.isPresent()) {
-            return KeywordList.parse(keywordsContent.get(), delimiter);
-        } else {
-            return new KeywordList();
-        }
+        return KeywordList.parse(keywordsContent, delimiter);
+    }
+
+    public KeywordList getResolvedKeywords(Character delimiter, BibDatabase database) {
+        Optional<String> keywordsContent = getResolvedFieldOrAlias(FieldName.KEYWORDS, database);
+        return KeywordList.parse(keywordsContent, delimiter);
     }
 
     public Collection<String> getFieldValues() {
@@ -840,6 +841,10 @@ public class BibEntry implements Cloneable {
         List<LinkedFile> linkedFiles = getFiles();
         linkedFiles.add(file);
         return setFiles(linkedFiles);
+    }
+
+    public ObservableMap<String, String> getFieldsObservable() {
+        return fields;
     }
 
     private interface GetFieldInterface {

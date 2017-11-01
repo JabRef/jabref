@@ -59,7 +59,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testGetLinkedFileNameDefault() {
+    public void testGetLinkedFileNameDefaultWithLayout() {
         // bibkey - title
         String fileNamePattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
         BibEntry entry = new BibEntry();
@@ -71,7 +71,31 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testGetLinkedFileNameBibTeXKey() {
+    public void testGetLinkedFileNameDefaultFullTitle() {
+        // bibkey - title
+        String fileNamePattern = "[bibtexkey] - [fulltitle]";
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("1234");
+        entry.setField("title", "mytitle");
+
+        assertEquals("1234 - mytitle",
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+    }
+
+    @Test
+    public void testGetLinkedFileNameDefaultWithLowercaseTitle() {
+        // bibkey - title
+        String fileNamePattern = "[bibtexkey] - [title:lower]";
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("1234");
+        entry.setField("title", "mytitle");
+
+        assertEquals("1234 - mytitle",
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+    }
+
+    @Test
+    public void testGetLinkedFileNameBibTeXKeyWithLayout() {
         // bibkey
         String fileNamePattern = "\\bibtexkey";
         BibEntry entry = new BibEntry();
@@ -84,13 +108,45 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testGetLinkedFileNameNoPattern() {
+    public void testGetLinkedFileNameBibTeXKey() {
+        // bibkey
+        String fileNamePattern = "[bibtexkey]";
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("1234");
+        entry.setField("title", "mytitle");
+
+        assertEquals("1234",
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+    }
+
+    @Test
+    public void testGetLinkedFileNameNoPatternWithLayout() {
         String fileNamePattern = "";
         BibEntry entry = new BibEntry();
         entry.setCiteKey("1234");
         entry.setField("title", "mytitle");
 
         assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
+                layoutFormatterPreferences));
+    }
+
+    @Test
+    public void testGetLinkedFileNameNoPattern() {
+        String fileNamePattern = "";
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("1234");
+        entry.setField("title", "mytitle");
+
+        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+    }
+
+    @Test
+    public void testGetDefaultFileNameNoPatternNoBibTeXKeyWithLayout() {
+        String fileNamePattern = "";
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "mytitle");
+
+        assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
                 layoutFormatterPreferences));
     }
 
@@ -100,12 +156,11 @@ public class FileUtilTest {
         BibEntry entry = new BibEntry();
         entry.setField("title", "mytitle");
 
-        assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
-                layoutFormatterPreferences));
+        assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
-    public void testGetLinkedFileNameGetKeyIfEmptyField() {
+    public void testGetLinkedFileNameGetKeyIfEmptyFieldWithLayout() {
         // bibkey - title
         String fileNamePattern = "\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
         BibEntry entry = new BibEntry();
@@ -116,13 +171,44 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testGetLinkedFileNameGetDefaultIfEmptyFieldNoKey() {
+    public void testGetLinkedFileNameGetKeyIfEmptyField() {
+        // bibkey - title
+        String fileNamePattern = "[title]";
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("1234");
+
+        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+    }
+
+    @Test
+    public void testGetLinkedFileNameGetDefaultIfEmptyFieldNoKeyWithLayout() {
         // bibkey - title
         String fileNamePattern = "\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
         BibEntry entry = new BibEntry();
 
         assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
                 layoutFormatterPreferences));
+    }
+
+    @Test
+    public void testGetLinkedFileNameGetDefaultIfEmptyFieldNoKey() {
+        // bibkey - title
+        String fileNamePattern = "[title]";
+        BibEntry entry = new BibEntry();
+
+        assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+    }
+
+    @Test
+    public void testGetLinkedFileNameByYearAuthorFirstpage() {
+        // bibkey - title
+        String fileNamePattern = "[year]_[auth]_[firstpage]";
+        BibEntry entry = new BibEntry();
+        entry.setField( "author", "O. Kitsune" );
+        entry.setField( "year", "1868" );
+        entry.setField( "pages", "567-579" );
+
+        assertEquals("1868_Kitsune_567", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
@@ -325,6 +411,20 @@ public class FileUtilTest {
         String longestValidFilename = Stream.generate(() -> String.valueOf('1')).limit(FileUtil.MAXIMUM_FILE_NAME_LENGTH).collect(Collectors.joining());
         String longerFilename = Stream.generate(() -> String.valueOf('1')).limit(260).collect(Collectors.joining());
         assertEquals(longestValidFilename, FileUtil.getValidFileName(longerFilename));
+    }
+
+    @Test
+    public void testGetLinkedDirNameDefaultFullTitle() {
+        // bibkey - title
+        String fileNamePattern = "PDF/[year]/[auth]/[bibtexkey] - [fulltitle]";
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("1234");
+        entry.setField("title", "mytitle");
+        entry.setField("year", "1998");
+        entry.setField("author", "A. Åuthör and Author, Bete");
+
+        assertEquals("PDF/1998/Åuthör/1234 - mytitle",
+                FileUtil.createDirNameFromPattern(null, entry, fileNamePattern));
     }
 
     private Path createTemporaryTestFile(String name) throws IOException {

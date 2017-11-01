@@ -44,7 +44,7 @@ public class DBLPFetcherTest {
         entry.setField(FieldName.YEAR, "2016");
         entry.setField(FieldName.URL,
                 "http://pi.informatik.uni-siegen.de/stt/36_2/./03_Technische_Beitraege/ZEUS2016/beitrag_2.pdf");
-        entry.setField("biburl", "http://dblp.dagstuhl.de/rec/bib/journals/stt/GeigerHL16");
+        entry.setField("biburl", "http://dblp.org/rec/bib/journals/stt/GeigerHL16");
         entry.setField("bibsource", "dblp computer science bibliography, http://dblp.org");
 
     }

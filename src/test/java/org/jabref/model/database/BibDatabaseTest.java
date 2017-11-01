@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -303,6 +304,16 @@ public class BibDatabaseTest {
         database.insertEntry(entry);
         Collection<BibtexString> usedStrings = database.getUsedStrings(Arrays.asList(entry));
         assertEquals(Collections.emptyList(), usedStrings);
+    }
+
+    @Test
+    public void getEntriesSortedWithTwoEntries() {
+        BibEntry entryB = new BibEntry("article");
+        entryB.setId("2");
+        BibEntry entryA = new BibEntry("article");
+        entryB.setId("1");
+        database.insertEntries(entryB, entryA);
+        assertEquals(Arrays.asList(entryA, entryB), database.getEntriesSorted(Comparator.comparing(BibEntry::getId)));
     }
 
     @Test

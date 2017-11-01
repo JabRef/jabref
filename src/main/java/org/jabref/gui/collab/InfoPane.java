@@ -1,4 +1,4 @@
-package org.jabref.collab;
+package org.jabref.gui.collab;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;

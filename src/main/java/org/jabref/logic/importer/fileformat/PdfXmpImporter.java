@@ -44,6 +44,14 @@ public class PdfXmpImporter extends Importer {
     }
 
     @Override
+    public ParserResult importDatabase(String data) throws IOException {
+        Objects.requireNonNull(data);
+        throw new UnsupportedOperationException(
+                "PdfXmpImporter does not support importDatabase(String data)."
+                        + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+    }
+
+    @Override
     public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
         Objects.requireNonNull(filePath);
         try {
@@ -56,9 +64,7 @@ public class PdfXmpImporter extends Importer {
     @Override
     public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
-        throw new UnsupportedOperationException(
-                "PdfXmpImporter does not support isRecognizedFormat(BufferedReader reader)."
-                        + "Instead use isRecognizedFormat(Path filePath, Charset defaultEncoding).");
+        return false;
     }
 
     /**

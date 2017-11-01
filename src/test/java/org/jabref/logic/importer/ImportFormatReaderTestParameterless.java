@@ -3,13 +3,10 @@ package org.jabref.logic.importer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import org.jabref.logic.xmp.XMPPreferences;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
-
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -34,8 +31,14 @@ public class ImportFormatReaderTestParameterless {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNullImportUnknownFormat() throws Exception {
-        reader.importUnknownFormat(null);
+    public void testNullImportUnknownFormatPath() throws Exception {
+        reader.importUnknownFormat((Path) null);
+        fail();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullImportUnknownFormatString() throws Exception {
+        reader.importUnknownFormat((String) null);
         fail();
     }
 
@@ -44,4 +47,5 @@ public class ImportFormatReaderTestParameterless {
         reader.importFromFile("someunknownformat", Paths.get("somepath"));
         fail();
     }
+
 }

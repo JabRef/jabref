@@ -66,7 +66,9 @@ public class JabRefMain extends Application {
 
         Globals.prefs = preferences;
         Globals.startBackgroundTasks();
-        Localization.setLanguage(preferences.get(JabRefPreferences.LANGUAGE));
+
+        // Note that the language was already set during the initialization of the preferences and it is safe to
+        // call the next function.
         Globals.prefs.setLanguageDependentDefaultValues();
 
         // Perform Migrations
@@ -75,6 +77,7 @@ public class JabRefMain extends Application {
         PreferencesMigrations.upgradeSortOrder();
         PreferencesMigrations.upgradeFaultyEncodingStrings();
         PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
+        PreferencesMigrations.upgradeImportFileAndDirePatterns();
         PreferencesMigrations.upgradeStoredCustomEntryTypes();
         PreferencesMigrations.upgradeKeyBindingsToJavaFX();
         PreferencesMigrations.addCrossRefRelatedFieldsForAutoComplete();
@@ -137,6 +140,7 @@ public class JabRefMain extends Application {
         // See if we should shut down now
         if (argumentProcessor.shouldShutDown()) {
             Globals.shutdownThreadPools();
+            Platform.exit();
             return;
         }
 
