@@ -31,6 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class FileUtil {
+
     public static final boolean IS_POSIX_COMPILANT = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
     public static final int MAXIMUM_FILE_NAME_LENGTH = 255;
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
@@ -260,7 +261,7 @@ public class FileUtil {
      */
     @Deprecated
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern,
-                                                   LayoutFormatterPreferences prefs) {
+            LayoutFormatterPreferences prefs) {
         String targetName = null;
 
         StringReader sr = new StringReader(fileNamePattern);
