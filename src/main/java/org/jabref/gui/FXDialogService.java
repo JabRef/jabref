@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.concurrent.Task;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
@@ -22,6 +24,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 
 import org.controlsfx.dialog.ExceptionDialog;
+import org.controlsfx.dialog.ProgressDialog;
 
 /**
  * This class provides methods to create default
@@ -125,6 +128,20 @@ public class FXDialogService implements DialogService {
     @Override
     public <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog) {
         return dialog.showAndWait();
+    }
+
+    @Override
+    public <V> void showCanceableProgressDialogAndWait(Task<V> task) {
+        ProgressDialog progressDialog = new ProgressDialog(task);
+        progressDialog.setOnCloseRequest(evt -> task.cancel());
+        DialogPane dialogPane = progressDialog.getDialogPane();
+        dialogPane.getButtonTypes().add(ButtonType.CANCEL);
+        Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
+        cancelButton.setOnAction(evt -> {
+            task.cancel();
+            progressDialog.close();
+        });
+        progressDialog.show();
     }
 
     @Override

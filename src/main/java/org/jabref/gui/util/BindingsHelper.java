@@ -1,6 +1,7 @@
 package org.jabref.gui.util;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -14,7 +15,9 @@ import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
 
@@ -128,6 +131,25 @@ public class BindingsHelper {
                 updateB);
     }
 
+    public static <A, V, B> void bindContentBidirectional(ObservableMap<A, V> propertyA, ObservableValue<B> propertyB, Consumer<B> updateA, Consumer<Map<A, V>> updateB) {
+        final BidirectionalMapBinding<A, V, B> binding = new BidirectionalMapBinding<>(propertyA, propertyB, updateA, updateB);
+
+        // use list as initial source
+        updateB.accept(propertyA);
+
+        propertyA.addListener(binding);
+        propertyB.addListener(binding);
+    }
+
+    public static <A, V, B> void bindContentBidirectional(ObservableMap<A, V> propertyA, Property<B> propertyB, Consumer<B> updateA, Function<Map<A, V>, B> mapToB) {
+        Consumer<Map<A, V>> updateB = newValueList -> propertyB.setValue(mapToB.apply(newValueList));
+        bindContentBidirectional(
+                propertyA,
+                propertyB,
+                updateA,
+                updateB);
+    }
+
     private static class BidirectionalBinding<A, B> {
 
         private final ObservableValue<A> propertyA;
@@ -202,6 +224,46 @@ public class BindingsHelper {
                 try {
                     updating = true;
                     updateB.accept(listProperty);
+                } finally {
+                    updating = false;
+                }
+            }
+        }
+    }
+
+    private static class BidirectionalMapBinding<A, V, B> implements MapChangeListener<A, V>, ChangeListener<B> {
+
+        private final ObservableMap<A, V> mapProperty;
+        private final ObservableValue<B> property;
+        private final Consumer<B> updateA;
+        private final Consumer<Map<A, V>> updateB;
+        private boolean updating = false;
+
+        public BidirectionalMapBinding(ObservableMap<A, V> mapProperty, ObservableValue<B> property, Consumer<B> updateA, Consumer<Map<A, V>> updateB) {
+            this.mapProperty = mapProperty;
+            this.property = property;
+            this.updateA = updateA;
+            this.updateB = updateB;
+        }
+
+        @Override
+        public void changed(ObservableValue<? extends B> observable, B oldValue, B newValue) {
+            if (!updating) {
+                try {
+                    updating = true;
+                    updateA.accept(newValue);
+                } finally {
+                    updating = false;
+                }
+            }
+        }
+
+        @Override
+        public void onChanged(Change<? extends A, ? extends V> c) {
+            if (!updating) {
+                try {
+                    updating = true;
+                    updateB.accept(mapProperty);
                 } finally {
                     updating = false;
                 }

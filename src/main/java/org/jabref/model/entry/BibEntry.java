@@ -843,6 +843,10 @@ public class BibEntry implements Cloneable {
         return setFiles(linkedFiles);
     }
 
+    public ObservableMap<String, String> getFieldsObservable() {
+        return fields;
+    }
+
     private interface GetFieldInterface {
 
         Optional<String> getValueForField(String fieldName);

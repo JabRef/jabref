@@ -1,4 +1,4 @@
-package org.jabref.collab;
+package org.jabref.gui.collab;
 
 import java.util.Collections;
 import java.util.Enumeration;
@@ -21,11 +21,11 @@ import org.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-class EntryChange extends Change {
+class EntryChangeViewModel extends ChangeViewModel {
 
-    private static final Log LOGGER = LogFactory.getLog(EntryChange.class);
+    private static final Log LOGGER = LogFactory.getLog(EntryChangeViewModel.class);
 
-    public EntryChange(BibEntry memEntry, BibEntry tmpEntry, BibEntry diskEntry) {
+    public EntryChangeViewModel(BibEntry memEntry, BibEntry tmpEntry, BibEntry diskEntry) {
         super();
         Optional<String> key = tmpEntry.getCiteKeyOptional();
         if (key.isPresent()) {
@@ -58,13 +58,13 @@ class EntryChange extends Change {
             if ((tmp.isPresent()) && (disk.isPresent())) {
                 if (!tmp.equals(disk)) {
                     // Modified externally.
-                    add(new FieldChange(field, memEntry, tmpEntry, mem.orElse(null), tmp.get(), disk.get()));
+                    add(new FieldChangeViewModel(field, memEntry, tmpEntry, mem.orElse(null), tmp.get(), disk.get()));
                 }
             } else if (((!tmp.isPresent()) && (disk.isPresent()) && !disk.get().isEmpty())
                     || ((!disk.isPresent()) && (tmp.isPresent()) && !tmp.get().isEmpty()
                             && (mem.isPresent()) && !mem.get().isEmpty())) {
                 // Added externally.
-                add(new FieldChange(field, memEntry, tmpEntry, mem.orElse(null), tmp.orElse(null),
+                add(new FieldChangeViewModel(field, memEntry, tmpEntry, mem.orElse(null), tmp.orElse(null),
                         disk.orElse(null)));
             }
         }
@@ -74,8 +74,8 @@ class EntryChange extends Change {
     public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
         boolean allAccepted = true;
 
-        Enumeration<Change> e = children();
-        for (Change c : Collections.list(e)) {
+        Enumeration<ChangeViewModel> e = children();
+        for (ChangeViewModel c : Collections.list(e)) {
             if (c.isAcceptable() && c.isAccepted()) {
                 c.makeChange(panel, secondary, undoEdit);
             } else {
@@ -97,7 +97,7 @@ class EntryChange extends Change {
         return new JLabel(name);
     }
 
-    static class FieldChange extends Change {
+    static class FieldChangeViewModel extends ChangeViewModel {
 
         private final BibEntry entry;
         private final BibEntry tmpEntry;
@@ -108,7 +108,7 @@ class EntryChange extends Change {
         private final JScrollPane sp = new JScrollPane(tp);
 
 
-        public FieldChange(String field, BibEntry memEntry, BibEntry tmpEntry, String inMem, String onTmp, String onDisk) {
+        public FieldChangeViewModel(String field, BibEntry memEntry, BibEntry tmpEntry, String inMem, String onTmp, String onDisk) {
             super(field);
             entry = memEntry;
             this.tmpEntry = tmpEntry;

@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Supplier;
 
 public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable {
 
@@ -56,14 +57,16 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
     }
 
     /**
-     * Adds the given list of menu items to the context menu.
+     * Adds the given list of menu items to the context menu. The usage of {@link Supplier} prevents that the menus need
+     * to be instantiated at this point. They are populated when the user needs them which prevents many unnecessary
+     * allocations when the main table is just scrolled with the entry editor open.
      */
-    public void addToContextMenu(List<MenuItem> items) {
+    public void addToContextMenu(Supplier<List<MenuItem>> items) {
         TextAreaSkin customContextSkin = new TextAreaSkin(this) {
             @Override
             public void populateContextMenu(ContextMenu contextMenu) {
                 super.populateContextMenu(contextMenu);
-                contextMenu.getItems().addAll(0, items);
+                contextMenu.getItems().addAll(0, items.get());
             }
         };
         setSkin(customContextSkin);

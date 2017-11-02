@@ -1,7 +1,7 @@
 package org.jabref.gui.groups;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import org.jabref.gui.undo.AbstractUndoableJabRefEdit;
 import org.jabref.model.groups.GroupTreeNode;
@@ -14,9 +14,8 @@ public class UndoableModifySubtree extends AbstractUndoableJabRefEdit {
     /** The path to the global groups root node */
     private final List<Integer> m_subtreeRootPath;
     /** This holds the new subtree (the root's modified children) to allow redo. */
-    private final List<GroupTreeNode> m_modifiedSubtree = new Vector<>();
+    private final List<GroupTreeNode> m_modifiedSubtree = new ArrayList<>();
     private final String m_name;
-
 
     /**
      *

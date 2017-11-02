@@ -73,7 +73,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         htmlContent.append("<br><div style='margin-left: 5px'>");
         htmlContent.append(
                 "<a href='http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/#' target=\"_blank\">");
-        htmlContent.append(Localization.lang("What_is_Mr._DLib?"));
+        htmlContent.append(Localization.lang("What is Mr. DLib?"));
         htmlContent.append("</a></div>");
         htmlContent.append("</body></html>");
         return htmlContent.toString();

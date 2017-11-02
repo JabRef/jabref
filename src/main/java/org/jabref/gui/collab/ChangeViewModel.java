@@ -1,4 +1,4 @@
-package org.jabref.collab;
+package org.jabref.gui.collab;
 
 import javax.swing.JComponent;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -7,17 +7,17 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.model.database.BibDatabase;
 
-abstract class Change extends DefaultMutableTreeNode {
+abstract class ChangeViewModel extends DefaultMutableTreeNode {
 
     protected String name;
     private boolean accepted = true;
 
 
-    Change() {
+    ChangeViewModel() {
         name = "";
     }
 
-    Change(String name) {
+    ChangeViewModel(String name) {
         this.name = name;
     }
 
@@ -40,8 +40,8 @@ abstract class Change extends DefaultMutableTreeNode {
      * @return boolean false if the parent overrides by not being accepted.
      */
     public boolean isAcceptable() {
-        if ((getParent() != null) && (getParent() instanceof Change)) {
-            return ((Change) getParent()).isAccepted();
+        if ((getParent() != null) && (getParent() instanceof ChangeViewModel)) {
+            return ((ChangeViewModel) getParent()).isAccepted();
         } else {
             return true;
         }

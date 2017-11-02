@@ -8,18 +8,18 @@ import java.util.Objects;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.scene.Node;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ListChangeListener;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
@@ -32,9 +32,11 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 
+import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.fxmisc.easybind.EasyBind;
+import org.controlsfx.control.NotificationPane;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 
@@ -42,15 +44,12 @@ public class SourceTab extends EntryEditorTab {
 
     private static final Log LOGGER = LogFactory.getLog(SourceTab.class);
     private final BibDatabaseMode mode;
-    private final BasePanel panel;
-    private CodeArea codeArea;
-    private BooleanProperty movingToDifferentEntry;
     private UndoManager undoManager;
+    private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
+    private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator(sourceIsValid);
 
-    public SourceTab(BasePanel panel, BooleanProperty movingToDifferentEntry) {
+    public SourceTab(BasePanel panel) {
         this.mode = panel.getBibDatabaseContext().getMode();
-        this.panel = panel;
-        this.movingToDifferentEntry = movingToDifferentEntry;
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
         this.setGraphic(IconTheme.JabRefIcon.SOURCE.getGraphicNode());
@@ -66,57 +65,12 @@ public class SourceTab extends EntryEditorTab {
         return stringWriter.getBuffer().toString();
     }
 
-    public void updateSourcePane(BibEntry entry) {
-        if (codeArea != null) {
-            try {
-                codeArea.clear();
-                codeArea.appendText(getSourceString(entry, mode));
-            } catch (IOException ex) {
-                codeArea.appendText(ex.getMessage() + "\n\n" +
-                        Localization.lang("Correct the entry, and reopen editor to display/edit source."));
-                codeArea.setEditable(false);
-                LOGGER.debug("Incorrect entry", ex);
-            }
-        }
-    }
-
-    private Node createSourceEditor(BibEntry entry, BibDatabaseMode mode) {
-        codeArea = new CodeArea();
+    private CodeArea createSourceEditor() {
+        CodeArea codeArea = new CodeArea();
         codeArea.setWrapText(true);
         codeArea.lookup(".styled-text-area").setStyle(
                 "-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
-        // store source if new tab is selected (if this one is not focused anymore)
-        EasyBind.subscribe(codeArea.focusedProperty(), focused -> {
-            if (!focused) {
-                storeSource(entry);
-            }
-        });
-
-        // store source if new entry is selected in the maintable and the source tab is focused
-        EasyBind.subscribe(movingToDifferentEntry, newEntrySelected -> {
-            if (newEntrySelected && codeArea.focusedProperty().get()) {
-                DefaultTaskExecutor.runInJavaFXThread(() -> storeSource(entry));
-            }
-        });
-
-        try {
-            String srcString = getSourceString(entry, mode);
-            codeArea.appendText(srcString);
-        } catch (IOException ex) {
-            codeArea.appendText(ex.getMessage() + "\n\n" +
-                    Localization.lang("Correct the entry, and reopen editor to display/edit source."));
-            codeArea.setEditable(false);
-            LOGGER.debug("Incorrect entry", ex);
-        }
-
-        // set the database to dirty when something is changed in the source tab
-        EasyBind.subscribe(codeArea.beingUpdatedProperty(), updated -> {
-            if (updated) {
-                panel.markBaseChanged();
-            }
-        });
-
-        return new VirtualizedScrollPane<>(codeArea);
+        return codeArea;
     }
 
     @Override
@@ -126,17 +80,44 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        this.setContent(createSourceEditor(entry, mode));
+        CodeArea codeArea = createSourceEditor();
+        VirtualizedScrollPane<CodeArea> node = new VirtualizedScrollPane<>(codeArea);
+        NotificationPane notificationPane = new NotificationPane(node);
+        notificationPane.setShowFromTop(false);
+        sourceValidator.getValidationStatus().getMessages().addListener((ListChangeListener<ValidationMessage>) c -> {
+            if (sourceValidator.getValidationStatus().isValid()) {
+                notificationPane.hide();
+            } else {
+                sourceValidator.getValidationStatus().getHighestMessage().ifPresent(validationMessage -> notificationPane.show(validationMessage.getMessage()));
+            }
+        });
+        this.setContent(notificationPane);
+
+        // Store source for every change in the source code
+        // and update source code for every change of entry field values
+        BindingsHelper.bindContentBidirectional(entry.getFieldsObservable(), codeArea.textProperty(), this::storeSource, fields -> {
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                codeArea.clear();
+                try {
+                    codeArea.appendText(getSourceString(entry, mode));
+                } catch (IOException ex) {
+                    codeArea.setEditable(false);
+                    codeArea.appendText(ex.getMessage() + "\n\n" +
+                            Localization.lang("Correct the entry, and reopen editor to display/edit source."));
+                    LOGGER.debug("Incorrect entry", ex);
+                }
+            });
+        });
     }
 
-    private void storeSource(BibEntry entry) {
-        if (codeArea.getText().isEmpty()) {
+    private void storeSource(String text) {
+        if (text.isEmpty()) {
             return;
         }
 
         BibtexParser bibtexParser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
         try {
-            ParserResult parserResult = bibtexParser.parse(new StringReader(codeArea.getText()));
+            ParserResult parserResult = bibtexParser.parse(new StringReader(text));
             BibDatabase database = parserResult.getDatabase();
 
             if (database.getEntryCount() > 1) {
@@ -157,68 +138,50 @@ public class SourceTab extends EntryEditorTab {
             String newKey = newEntry.getCiteKeyOptional().orElse(null);
 
             if (newKey != null) {
-                entry.setCiteKey(newKey);
+                currentEntry.setCiteKey(newKey);
             } else {
-                entry.clearCiteKey();
+                currentEntry.clearCiteKey();
             }
 
             // First, remove fields that the user has removed.
-            for (Map.Entry<String, String> field : entry.getFieldMap().entrySet()) {
+            for (Map.Entry<String, String> field : currentEntry.getFieldMap().entrySet()) {
                 String fieldName = field.getKey();
                 String fieldValue = field.getValue();
 
                 if (InternalBibtexFields.isDisplayableField(fieldName) && !newEntry.hasField(fieldName)) {
                     compound.addEdit(
-                            new UndoableFieldChange(entry, fieldName, fieldValue, null));
-                    entry.clearField(fieldName);
+                            new UndoableFieldChange(currentEntry, fieldName, fieldValue, null));
+                    currentEntry.clearField(fieldName);
                 }
             }
 
             // Then set all fields that have been set by the user.
             for (Map.Entry<String, String> field : newEntry.getFieldMap().entrySet()) {
                 String fieldName = field.getKey();
-                String oldValue = entry.getField(fieldName).orElse(null);
+                String oldValue = currentEntry.getField(fieldName).orElse(null);
                 String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
                     new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences())
                             .format(newValue, fieldName);
 
-                    compound.addEdit(new UndoableFieldChange(entry, fieldName, oldValue, newValue));
-                    entry.setField(fieldName, newValue);
+                    compound.addEdit(new UndoableFieldChange(currentEntry, fieldName, oldValue, newValue));
+                    currentEntry.setField(fieldName, newValue);
                 }
             }
 
             // See if the user has changed the entry type:
-            if (!Objects.equals(newEntry.getType(), entry.getType())) {
-                compound.addEdit(new UndoableChangeType(entry, entry.getType(), newEntry.getType()));
-                entry.setType(newEntry.getType());
+            if (!Objects.equals(newEntry.getType(), currentEntry.getType())) {
+                compound.addEdit(new UndoableChangeType(currentEntry, currentEntry.getType(), newEntry.getType()));
+                currentEntry.setType(newEntry.getType());
             }
             compound.end();
             undoManager.addEdit(compound);
 
-        } catch (InvalidFieldValueException | IOException ex) {
-            // The source couldn't be parsed, so the user is given an
-            // error message, and the choice to keep or revert the contents
-            // of the source text field.
-
+            sourceIsValid.setValue(null);
+        } catch (InvalidFieldValueException | IllegalStateException | IOException ex) {
+            sourceIsValid.setValue(ValidationMessage.error(Localization.lang("Problem with parsing entry") + ": " + ex.getMessage()));
             LOGGER.debug("Incorrect source", ex);
-            DialogService dialogService = new FXDialogService();
-            boolean keepEditing = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("Problem with parsing entry"),
-                    Localization.lang("Error") + ": " + ex.getMessage(),
-                    Localization.lang("Edit"),
-                    Localization.lang("Revert to original source")
-            );
-
-            if (!keepEditing) {
-                // Revert
-                try {
-                    codeArea.replaceText(0, codeArea.getText().length(), getSourceString(entry, mode));
-                } catch (IOException e) {
-                    LOGGER.debug("Incorrect source", e);
-                }
-            }
         }
     }
 }

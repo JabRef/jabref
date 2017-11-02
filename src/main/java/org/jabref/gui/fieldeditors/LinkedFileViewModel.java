@@ -183,6 +183,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
             if (confirm) {
                 Optional<Path> fileConflictCheck = pdfCleanup.findExistingFile(linkedFile, entry);
+
                 performRenameWithConflictCheck(file, pdfCleanup, targetFileName, fileConflictCheck);
             }
         } else {
