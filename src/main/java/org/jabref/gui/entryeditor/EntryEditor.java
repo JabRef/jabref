@@ -89,7 +89,6 @@ import org.jabref.preferences.JabRefPreferences;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.fxmisc.easybind.EasyBind;
 
 
 /**
@@ -180,8 +179,13 @@ public class EntryEditor extends JPanel implements EntryContainer {
         add(container, BorderLayout.CENTER);
 
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-                    EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
-                        EntryEditorTab activeTab = (EntryEditorTab) tab;
+            tabbed.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
+                if (oldTab != null) {
+                    EntryEditorTab oldActiveTab = (EntryEditorTab) oldTab;
+                    oldActiveTab.notifyAboutFocusLost();
+                }
+
+                EntryEditorTab activeTab = (EntryEditorTab) newTab;
                         if (activeTab != null) {
                             activeTab.notifyAboutFocus(entry);
                         }
