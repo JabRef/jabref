@@ -15,6 +15,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public class UrlEditor extends HBox implements FieldEditorFX {
 
@@ -27,9 +28,9 @@ public class UrlEditor extends HBox implements FieldEditorFX {
         ControlHelper.loadFXMLForControl(this);
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
-        List<MenuItem> contextMenu = EditorMenus.getCleanupURLMenu(textArea);
-        textArea.addToContextMenu(contextMenu);
-        MenuItem cleanupURLMenuItem = contextMenu.get(0);
+        Supplier<List<MenuItem>> contextMenuSupplier = EditorMenus.getCleanupURLMenu(textArea);
+        textArea.addToContextMenu(contextMenuSupplier);
+        MenuItem cleanupURLMenuItem = contextMenuSupplier.get().get(0);
         textArea.setOnContextMenuRequested(event ->cleanupURLMenuItem.setDisable("".equals(textArea.getSelectedText())));
 
         // init paste handler for URLEditor to format pasted url link in textArea

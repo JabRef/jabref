@@ -9,6 +9,7 @@ import org.jabref.logic.l10n.Localization;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Provides context menus for the text fields of the entry editor. Note that we use {@link Supplier} to prevent an early
@@ -76,23 +77,26 @@ public class EditorMenus {
             return menuItems;
         };
     }
-     /**
+    /**
      * The default context menu with a specific menu item to cleanup  URL.
      *
      * @param textArea text-area that this menu will be connected to
      * @return menu containing items of the default menu and an item to cleanup a URL
      */
-    public static List<MenuItem> getCleanupURLMenu(TextArea textArea){
+    public static Supplier<List<MenuItem>> getCleanupURLMenu(TextArea textArea){
+        return () -> {
 
-        CustomMenuItem cleanupURL = new CustomMenuItem(new Label(Localization.lang("Cleanup URL Link")));
-        //cleanupURL.setDisable(true);
-        cleanupURL.setOnAction(event -> textArea.setText(new CleanupURLFormatter().format(textArea.getText())));
+            CustomMenuItem cleanupURL = new CustomMenuItem(new Label(Localization.lang("Cleanup URL Link")));
+            //cleanupURL.setDisable(true);
+            cleanupURL.setOnAction(event -> textArea.setText(new CleanupURLFormatter().format(textArea.getText())));
 
-        List<MenuItem> menuItems = new ArrayList<>();
-        menuItems.add(cleanupURL);
-        menuItems.add(new SeparatorMenuItem());
-        menuItems.addAll(getDefaultMenu(textArea));
+            List<MenuItem> menuItems = new ArrayList<>();
+            menuItems.add(cleanupURL);
+            menuItems.add(new SeparatorMenuItem());
+            menuItems.addAll(getDefaultMenu(textArea).get());
 
-        return menuItems;
+            return menuItems;
+        };
     }
 }
+
