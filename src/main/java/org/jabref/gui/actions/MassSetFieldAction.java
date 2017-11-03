@@ -64,12 +64,12 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
 
     public MassSetFieldAction(JabRefFrame frame) {
-        putValue(Action.NAME, Localization.menuTitle("Set/clear/rename fields") + "...");
+        putValue(Action.NAME, Localization.menuTitle("Set/clear/append/rename fields") + "...");
         this.frame = frame;
     }
 
     private void createDialog() {
-        diag = new JDialog(frame, Localization.lang("Set/clear/rename fields"), true);
+        diag = new JDialog(frame, Localization.lang("Set/clear/append/rename fields"), true);
 
         field = new JComboBox<>();
         field.setEditable(true);
@@ -101,13 +101,16 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         // Entering a setText is only relevant if we are setting, not clearing:
         setText.setEnabled(set.isSelected()));
 
-        append.addChangeListener(e ->
-        // Text to append is only required if we are appending:
-        appendText.setEnabled(append.isSelected()));
+        append.addChangeListener(e -> {
+            // Text to append is only required if we are appending:
+            appendText.setEnabled(append.isSelected());
+            // Overwrite protection makes no sense if we are appending to a field:
+            overwrite.setEnabled(!clear.isSelected() && !append.isSelected());
+        });
 
         clear.addChangeListener(e ->
         // Overwrite protection makes no sense if we are clearing the field:
-        overwrite.setEnabled(!clear.isSelected()));
+        overwrite.setEnabled(!clear.isSelected() && !append.isSelected()));
 
         rename.addChangeListener(e ->
         // Entering a setText is only relevant if we are renaming
@@ -231,6 +234,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         } else {
             entryList = entries;
         }
+
         String toSet = setText.getText();
         if (toSet.isEmpty()) {
             toSet = null;
@@ -246,6 +250,10 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             } else {
                 ce.addEdit(MassSetFieldAction.massRenameField(entryList, fields[0], renameTo.getText(),
                         overwrite.isSelected()));
+            }
+        } else if (append.isSelected()) {
+            for (String field1 : fields) {
+                ce.addEdit(MassSetFieldAction.massAppendField(entryList, field1, appendText.getText()));
             }
         } else {
             for (String field1 : fields) {
@@ -286,6 +294,31 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             } else {
                 entry.setField(field, text);
             }
+            ce.addEdit(new UndoableFieldChange(entry, field, oldVal.orElse(null), text));
+        }
+        ce.end();
+        return ce;
+    }
+
+    /**
+     * Append a given value to a given field for all entries in a Collection. This method DOES NOT update any UndoManager,
+     * but returns a relevant CompoundEdit that should be registered by the caller.
+     *
+     * @param entries         The entries to process the operation for.
+     * @param field           The name of the field to append to.
+     * @param text            The value to set. A null in this case will simply preserve the current field state.
+     * @return A CompoundEdit for the entire operation.
+     */
+    private static UndoableEdit massAppendField(Collection<BibEntry> entries, String field, String text) {
+
+        if (text == null) {
+            text = "";
+        }
+
+        NamedCompound ce = new NamedCompound(Localization.lang("Append field"));
+        for (BibEntry entry : entries) {
+            Optional<String> oldVal = entry.getField(field);
+            entry.setField(field, oldVal.orElse("") + text);
             ce.addEdit(new UndoableFieldChange(entry, field, oldVal.orElse(null), text));
         }
         ce.end();
