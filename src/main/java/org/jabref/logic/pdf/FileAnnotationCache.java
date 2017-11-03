@@ -25,7 +25,7 @@ public class FileAnnotationCache {
 
     /**
      * Creates an empty fil annotation cache. Required to allow the annotation cache to be injected into views without
-     * hitting the bug https://github.com/AdamBien/afterburner.fx/issues/71.
+     * hitting the bug https://github.com/AdamBien/afterburner.fx/issues/71 .
      */
     public FileAnnotationCache() {
 
