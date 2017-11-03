@@ -47,6 +47,7 @@ public class SourceTab extends EntryEditorTab {
     private UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator(sourceIsValid);
+    private BindingsHelper.BidirectionalMapBinding<String, String, String> entryBinding;
 
     public SourceTab(BasePanel panel) {
         this.mode = panel.getBibDatabaseContext().getMode();
@@ -95,19 +96,36 @@ public class SourceTab extends EntryEditorTab {
 
         // Store source for every change in the source code
         // and update source code for every change of entry field values
-        BindingsHelper.bindContentBidirectional(entry.getFieldsObservable(), codeArea.textProperty(), this::storeSource, fields -> {
-            DefaultTaskExecutor.runInJavaFXThread(() -> {
-                codeArea.clear();
-                try {
-                    codeArea.appendText(getSourceString(entry, mode));
-                } catch (IOException ex) {
-                    codeArea.setEditable(false);
-                    codeArea.appendText(ex.getMessage() + "\n\n" +
-                            Localization.lang("Correct the entry, and reopen editor to display/edit source."));
-                    LOGGER.debug("Incorrect entry", ex);
-                }
-            });
-        });
+        entryBinding = BindingsHelper.bindContentBidirectional(entry.getFieldsObservable(), codeArea.textProperty(), this::storeSource, fields ->
+                DefaultTaskExecutor.runInJavaFXThread(() -> {
+                    codeArea.clear();
+                    try {
+                        codeArea.appendText(getSourceString(entry, mode));
+                    } catch (IOException ex) {
+                        codeArea.setEditable(false);
+                        codeArea.appendText(ex.getMessage() + "\n\n" +
+                                Localization.lang("Correct the entry, and reopen editor to display/edit source."));
+                        LOGGER.debug("Incorrect entry", ex);
+                    }
+                }));
+    }
+
+    @Override
+    public void notifyAboutFocus(BibEntry entry) {
+        // Because we always clear the tab on focus lost (see notifyAboutFocusLost), we also have to always build it again
+        currentEntry = entry;
+        bindToEntry(entry);
+    }
+
+    @Override
+    public void notifyAboutFocusLost() {
+        if (currentEntry != null) {
+            currentEntry.getFieldsObservable().removeListener(entryBinding);
+        }
+
+        // Due to a bug in the source code editor (https://github.com/FXMisc/RichTextFX/issues/637), a hidden code editor makes troubles
+        // Thus, we just clear the source tab as soon as it losses focus
+        this.setContent(null);
     }
 
     private void storeSource(String text) {

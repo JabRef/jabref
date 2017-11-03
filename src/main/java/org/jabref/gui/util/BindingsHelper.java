@@ -131,7 +131,7 @@ public class BindingsHelper {
                 updateB);
     }
 
-    public static <A, V, B> void bindContentBidirectional(ObservableMap<A, V> propertyA, ObservableValue<B> propertyB, Consumer<B> updateA, Consumer<Map<A, V>> updateB) {
+    public static <A, V, B> BidirectionalMapBinding<A, V, B> bindContentBidirectional(ObservableMap<A, V> propertyA, ObservableValue<B> propertyB, Consumer<B> updateA, Consumer<Map<A, V>> updateB) {
         final BidirectionalMapBinding<A, V, B> binding = new BidirectionalMapBinding<>(propertyA, propertyB, updateA, updateB);
 
         // use list as initial source
@@ -139,6 +139,8 @@ public class BindingsHelper {
 
         propertyA.addListener(binding);
         propertyB.addListener(binding);
+
+        return binding;
     }
 
     public static <A, V, B> void bindContentBidirectional(ObservableMap<A, V> propertyA, Property<B> propertyB, Consumer<B> updateA, Function<Map<A, V>, B> mapToB) {
@@ -231,7 +233,7 @@ public class BindingsHelper {
         }
     }
 
-    private static class BidirectionalMapBinding<A, V, B> implements MapChangeListener<A, V>, ChangeListener<B> {
+    public static class BidirectionalMapBinding<A, V, B> implements MapChangeListener<A, V>, ChangeListener<B> {
 
         private final ObservableMap<A, V> mapProperty;
         private final ObservableValue<B> property;
@@ -239,7 +241,7 @@ public class BindingsHelper {
         private final Consumer<Map<A, V>> updateB;
         private boolean updating = false;
 
-        public BidirectionalMapBinding(ObservableMap<A, V> mapProperty, ObservableValue<B> property, Consumer<B> updateA, Consumer<Map<A, V>> updateB) {
+        private BidirectionalMapBinding(ObservableMap<A, V> mapProperty, ObservableValue<B> property, Consumer<B> updateA, Consumer<Map<A, V>> updateB) {
             this.mapProperty = mapProperty;
             this.property = property;
             this.updateA = updateA;

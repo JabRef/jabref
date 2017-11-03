@@ -36,4 +36,11 @@ public abstract class EntryEditorTab extends Tab {
         }
         handleFocus();
     }
+
+    /**
+     * Notifies the tab that it lost focus and should clear all non-reusable content.
+     */
+    public void notifyAboutFocusLost() {
+
+    }
 }
