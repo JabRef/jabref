@@ -3,9 +3,10 @@ package org.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridBagLayout;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -29,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 class AppearancePrefsTab extends JPanel implements PrefsTab {
+
     private static final Log LOGGER = LogFactory.getLog(AppearancePrefsTab.class);
 
     private final JabRefPreferences prefs;
@@ -55,14 +57,16 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     private final JCheckBox fxFontTweaksLAF;
 
     static class LookAndFeel {
+
         private static final List<String> LOOKS = Arrays.asList(
                 UIManager.getSystemLookAndFeelClassName(),
                 UIManager.getCrossPlatformLookAndFeelClassName(),
                 "com.jgoodies.looks.plastic.Plastic3DLookAndFeel",
                 "com.jgoodies.looks.windows.WindowsLookAndFeel");
 
-        public static List<String> getAvailableLookAndFeels() {
-            List<String> lookAndFeels = new ArrayList<>();
+        public static Set<String> getAvailableLookAndFeels() {
+
+            Set<String> lookAndFeels = new HashSet<>();
 
             for (String l : LOOKS) {
                 try {
@@ -112,7 +116,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         customLAF = new JCheckBox(Localization.lang("Use other look and feel"));
         fxFontTweaksLAF = new JCheckBox(Localization.lang("Tweak font rendering for entry editor on Linux"));
         // Only list L&F which are available
-        List<String> lookAndFeels = LookAndFeel.getAvailableLookAndFeels();
+        Set<String> lookAndFeels = LookAndFeel.getAvailableLookAndFeels();
         classNamesLAF = new JComboBox<>(lookAndFeels.toArray(new String[lookAndFeels.size()]));
         classNamesLAF.setEditable(true);
         customLAF.addChangeListener(e -> classNamesLAF.setEnabled(((JCheckBox) e.getSource()).isSelected()));
