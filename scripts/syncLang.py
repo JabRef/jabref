@@ -1,6 +1,5 @@
 # coding=utf-8
 
-import codecs
 import datetime
 import logging
 import os
@@ -270,8 +269,6 @@ class SyncLang:
 
     def __update_properties(self, main_property_file, other_property_files):
         main_lines = self.__read_file_as_lines(filename=main_property_file)
-        # saved the stripped lines
-        self.__write_file(main_property_file, main_lines)
         main_keys = Keys(main_lines)
 
         main_duplicates = main_keys.duplicates()
@@ -316,7 +313,7 @@ class SyncLang:
             for line in main_lines:
                 key = main_keys.key_from_line(line)
                 if key is not None:
-                    other_lines_to_write.append("{key}={value}\r\n".format(key=key, value=keys[key]))
+                    other_lines_to_write.append("{key}={value}\n".format(key=key, value=keys[key]))
                 else:
                     other_lines_to_write.append(line)
 
@@ -364,7 +361,8 @@ class SyncLang:
         :param filename: string
         :param content: list of unicode unicode: the lines to write
         """
-        codecs.open(filename, "w", encoding='utf-8').writelines(content)
+        with open(filename, 'w', newline='\n', encoding='UTF-8') as f:
+            f.writelines(content)
 
     @staticmethod
     def __read_file_as_lines(filename, encoding="UTF-8") -> list:
@@ -373,8 +371,8 @@ class SyncLang:
         :param encoding: string: the encoding of the file to read (standard: `UTF-8`)
         :return: list of unicode strings: the lines of the file
         """
-        with codecs.open(filename, encoding=encoding) as file:
-            return ["{}\r\n".format(line.strip()) for line in file.readlines()]
+        with open(filename, 'r', newline='', encoding=encoding) as file:
+            return ["{}\n".format(line.strip()) for line in file.readlines()]
 
     def __missing_keys(self, first_list: list, second_list: list) -> list:
         """
@@ -416,7 +414,7 @@ class SyncLang:
                 return 0
             return int(part / whole * 100.0)
 
-        with open(self.markdown_output, "w", encoding='utf-8') as status_file:
+        with open(self.markdown_output, "w", newline="\n", encoding='utf-8') as status_file:
             status_file.write(f'### Localization files status ({datetime.datetime.now().strftime("%Y-%m-%d %H:%M")} - '
                               f'Branch `{Git().get_current_branch()}` `{Git().get_current_hash_short()}`)\n\n')
             status_file.write('Note: To get the current status from your local repository, run `python ./scripts/syncLang.py markdown`\n')
