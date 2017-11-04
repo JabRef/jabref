@@ -56,7 +56,7 @@ public class Localization {
     public static String lang(String key, String... params) {
         if (localizedMessages == null) {
             // I'm logging this because it should never happen
-            LOGGER.error("Messages are not initialized.");
+            LOGGER.error("Messages are not initialized before accessing " + key);
             setLanguage("en");
         }
         return lookup(localizedMessages, "message", key, params);
