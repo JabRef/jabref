@@ -35,7 +35,7 @@ public class LinkedFile implements Serializable {
         this.description.setValue(Objects.requireNonNull(description));
 
         String fileLink = Objects.requireNonNull(link);
-        if (!FileHelper.isOnlineLink(fileLink)) {
+        if (!isOnlineLink(fileLink)) {
             this.link.setValue(fileLink.replace("\\", "/"));
         } else {
             this.link.setValue(fileLink);
@@ -69,7 +69,7 @@ public class LinkedFile implements Serializable {
     }
 
     public void setLink(String link) {
-        if (!FileHelper.isOnlineLink(link)) {
+        if (!isOnlineLink(link)) {
             this.link.setValue(link.replace("\\", "/"));
         } else {
             this.link.setValue(link);
@@ -117,6 +117,15 @@ public class LinkedFile implements Serializable {
         description = new SimpleStringProperty(in.readUTF());
     }
 
+    /**
+     * Checks if the given String is an online link
+     * @param toCheck The String to check
+     * @return True if it starts with http://, https:// or contains www; false otherwise
+     */
+    private boolean isOnlineLink(String toCheck) {
+        return toCheck.startsWith("http://") || toCheck.startsWith("https://") || toCheck.contains("www.");
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(description.get(), link.get(), fileType.get());
@@ -136,7 +145,7 @@ public class LinkedFile implements Serializable {
     }
 
     public boolean isOnlineLink() {
-        return FileHelper.isOnlineLink(link.get());
+        return isOnlineLink(link.get());
     }
 
     public Optional<Path> findIn(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
@@ -152,4 +161,5 @@ public class LinkedFile implements Serializable {
             return FileHelper.expandFilenameAsPath(link.get(), directories);
         }
     }
+
 }
