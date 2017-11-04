@@ -138,6 +138,8 @@ dependencies {
     testCompile 'org.xmlunit:xmlunit-matchers:2.5.0'
     testCompile 'com.tngtech.archunit:archunit-junit:0.4.0'
     testCompile 'org.slf4j:slf4j-jcl:1.7.25' // required by ArchUnit to enable logging over jcl
+    testCompile "org.testfx:testfx-core:4.0.+"
+    testCompile "org.testfx:testfx-junit:4.0.+"
 }
 
 sourceSets {
