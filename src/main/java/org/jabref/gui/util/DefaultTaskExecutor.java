@@ -28,11 +28,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
     public static <V> V runInJavaFXThread(Callable<V> callable) {
         FutureTask<V> task = new FutureTask<>(callable);
 
-        if (!Platform.isFxApplicationThread()) {
-            Platform.runLater(task);
-        } else {
-            EXECUTOR.submit(task);
-        }
+        Platform.runLater(task);
 
         try {
             return task.get();
@@ -43,11 +39,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     public static void runInJavaFXThread(Runnable runnable) {
-        if (!Platform.isFxApplicationThread()) {
-            Platform.runLater(runnable);
-        } else {
-            EXECUTOR.submit(runnable);
-        }
+        Platform.runLater(runnable);
     }
 
     @Override
