@@ -58,20 +58,22 @@ public class CitationStyle {
      * Creates an CitationStyle instance out of the style string
      */
     private static CitationStyle createCitationStyleFromSource(final String source, final String filename) {
-        try {
-            DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            InputSource is = new InputSource();
-            is.setCharacterStream(new StringReader(source));
+        if (source != null && !source.isEmpty() && filename != null && !filename.isEmpty()) {
+            try {
+                DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                InputSource is = new InputSource();
+                is.setCharacterStream(new StringReader(source));
 
-            Document doc = db.parse(is);
-            NodeList nodes = doc.getElementsByTagName("info");
+                Document doc = db.parse(is);
+                NodeList nodes = doc.getElementsByTagName("info");
 
-            NodeList titleNode = ((Element) nodes.item(0)).getElementsByTagName("title");
-            String title = ((CharacterData) titleNode.item(0).getFirstChild()).getData();
+                NodeList titleNode = ((Element) nodes.item(0)).getElementsByTagName("title");
+                String title = ((CharacterData) titleNode.item(0).getFirstChild()).getData();
 
-            return new CitationStyle(filename, title, source);
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            LOGGER.error("Error while parsing source", e);
+                return new CitationStyle(filename, title, source);
+            } catch (ParserConfigurationException | SAXException | IOException e) {
+                LOGGER.error("Error while parsing source", e);
+            }
         }
         return null;
     }
