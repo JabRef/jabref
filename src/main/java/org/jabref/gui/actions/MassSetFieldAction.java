@@ -241,29 +241,29 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         }
 
         String[] fields = getFieldNames(((String) field.getSelectedItem()).trim().toLowerCase(Locale.ROOT));
-        NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
+        NamedCompound compoundEdit = new NamedCompound(Localization.lang("Set field"));
         if (rename.isSelected()) {
             if (fields.length > 1) {
                 JOptionPane.showMessageDialog(diag, Localization.lang("You can only rename one field at a time"), "",
                         JOptionPane.ERROR_MESSAGE);
                 return; // Do not close the dialog.
             } else {
-                ce.addEdit(MassSetFieldAction.massRenameField(entryList, fields[0], renameTo.getText(),
+                compoundEdit.addEdit(MassSetFieldAction.massRenameField(entryList, fields[0], renameTo.getText(),
                         overwrite.isSelected()));
             }
         } else if (append.isSelected()) {
-            for (String field1 : fields) {
-                ce.addEdit(MassSetFieldAction.massAppendField(entryList, field1, appendText.getText()));
+            for (String field : fields) {
+                compoundEdit.addEdit(MassSetFieldAction.massAppendField(entryList, field, appendText.getText()));
             }
         } else {
-            for (String field1 : fields) {
-                ce.addEdit(MassSetFieldAction.massSetField(entryList, field1,
+            for (String field : fields) {
+                compoundEdit.addEdit(MassSetFieldAction.massSetField(entryList, field,
                         set.isSelected() ? toSet : null,
                                 overwrite.isSelected()));
             }
         }
-        ce.end();
-        bp.getUndoManager().addEdit(ce);
+        compoundEdit.end();
+        bp.getUndoManager().addEdit(compoundEdit);
         bp.markBaseChanged();
     }
 
@@ -273,31 +273,31 @@ public class MassSetFieldAction extends MnemonicAwareAction {
      *
      * @param entries         The entries to set the field for.
      * @param field           The name of the field to set.
-     * @param text            The value to set. This value can be null, indicating that the field should be cleared.
+     * @param textToSet            The value to set. This value can be null, indicating that the field should be cleared.
      * @param overwriteValues Indicate whether the value should be set even if an entry already has the field set.
      * @return A CompoundEdit for the entire operation.
      */
-    private static UndoableEdit massSetField(Collection<BibEntry> entries, String field, String text,
+    private static UndoableEdit massSetField(Collection<BibEntry> entries, String field, String textToSet,
             boolean overwriteValues) {
 
-        NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
+        NamedCompound compoundEdit = new NamedCompound(Localization.lang("Set field"));
         for (BibEntry entry : entries) {
-            Optional<String> oldVal = entry.getField(field);
+            Optional<String> oldValue = entry.getField(field);
             // If we are not allowed to overwrite values, check if there is a
             // nonempty
             // value already for this entry:
-            if (!overwriteValues && (oldVal.isPresent()) && !oldVal.get().isEmpty()) {
+            if (!overwriteValues && (oldValue.isPresent()) && !oldValue.get().isEmpty()) {
                 continue;
             }
-            if (text == null) {
+            if (textToSet == null) {
                 entry.clearField(field);
             } else {
-                entry.setField(field, text);
+                entry.setField(field, textToSet);
             }
-            ce.addEdit(new UndoableFieldChange(entry, field, oldVal.orElse(null), text));
+            compoundEdit.addEdit(new UndoableFieldChange(entry, field, oldValue.orElse(null), textToSet));
         }
-        ce.end();
-        return ce;
+        compoundEdit.end();
+        return compoundEdit;
     }
 
     /**
@@ -306,23 +306,23 @@ public class MassSetFieldAction extends MnemonicAwareAction {
      *
      * @param entries         The entries to process the operation for.
      * @param field           The name of the field to append to.
-     * @param text            The value to set. A null in this case will simply preserve the current field state.
+     * @param textToAppend            The value to set. A null in this case will simply preserve the current field state.
      * @return A CompoundEdit for the entire operation.
      */
-    private static UndoableEdit massAppendField(Collection<BibEntry> entries, String field, String text) {
+    private static UndoableEdit massAppendField(Collection<BibEntry> entries, String field, String textToAppend) {
 
-        if (text == null) {
-            text = "";
+        if (textToAppend == null) {
+            textToAppend = "";
         }
 
-        NamedCompound ce = new NamedCompound(Localization.lang("Append field"));
+        NamedCompound compoundEdit = new NamedCompound(Localization.lang("Append field"));
         for (BibEntry entry : entries) {
-            Optional<String> oldVal = entry.getField(field);
-            entry.setField(field, oldVal.orElse("") + text);
-            ce.addEdit(new UndoableFieldChange(entry, field, oldVal.orElse(null), text));
+            Optional<String> oldValue = entry.getField(field);
+            entry.setField(field, oldValue.orElse("") + textToAppend);
+            compoundEdit.addEdit(new UndoableFieldChange(entry, field, oldValue.orElse(null), textToAppend));
         }
-        ce.end();
-        return ce;
+        compoundEdit.end();
+        return compoundEdit;
     }
 
     /**
@@ -337,7 +337,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
      */
     private static UndoableEdit massRenameField(Collection<BibEntry> entries, String field, String newField,
             boolean overwriteValues) {
-        NamedCompound ce = new NamedCompound(Localization.lang("Rename field"));
+        NamedCompound compoundEdit = new NamedCompound(Localization.lang("Rename field"));
         for (BibEntry entry : entries) {
             Optional<String> valToMove = entry.getField(field);
             // If there is no value, do nothing:
@@ -352,12 +352,12 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             }
 
             entry.setField(newField, valToMove.get());
-            ce.addEdit(new UndoableFieldChange(entry, newField, valInNewField.orElse(null), valToMove.get()));
+            compoundEdit.addEdit(new UndoableFieldChange(entry, newField, valInNewField.orElse(null), valToMove.get()));
             entry.clearField(field);
-            ce.addEdit(new UndoableFieldChange(entry, field, valToMove.get(), null));
+            compoundEdit.addEdit(new UndoableFieldChange(entry, field, valToMove.get(), null));
         }
-        ce.end();
-        return ce;
+        compoundEdit.end();
+        return compoundEdit;
     }
 
     private static String[] getFieldNames(String s) {
