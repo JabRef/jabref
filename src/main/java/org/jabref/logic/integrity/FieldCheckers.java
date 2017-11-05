@@ -4,30 +4,30 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-
 public class FieldCheckers {
 
     private Multimap<String, ValueChecker> fieldChecker;
 
-    public FieldCheckers(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
-        fieldChecker = getAllMap(databaseContext, fileDirectoryPreferences);
+    public FieldCheckers(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences, JournalAbbreviationRepository abbreviationRepository) {
+        fieldChecker = getAllMap(databaseContext, fileDirectoryPreferences, abbreviationRepository);
     }
 
-    private static Multimap<String, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
+    private static Multimap<String, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences, JournalAbbreviationRepository abbreviationRepository) {
         ArrayListMultimap<String, ValueChecker> fieldCheckers = ArrayListMultimap.create(50, 10);
 
         for (String field : InternalBibtexFields.getJournalNameFields()) {
-            fieldCheckers.put(field, new AbbreviationChecker());
+            fieldCheckers.put(field, new AbbreviationChecker(abbreviationRepository));
         }
         for (String field : InternalBibtexFields.getBookNameFields()) {
-            fieldCheckers.put(field, new AbbreviationChecker());
+            fieldCheckers.put(field, new AbbreviationChecker(abbreviationRepository));
         }
         for (String field : InternalBibtexFields.getPersonNameFields()) {
             fieldCheckers.put(field, new PersonNamesChecker(databaseContext));
