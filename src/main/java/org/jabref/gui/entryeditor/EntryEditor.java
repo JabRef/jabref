@@ -83,7 +83,6 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -196,7 +195,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     public void setEntry(BibEntry entry) {
         this.entry = Objects.requireNonNull(entry);
-        entry.registerListener(this);
         entryType = EntryTypes.getTypeOrDefault(entry.getType(),
                 this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
 
@@ -221,11 +219,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     public synchronized void listen(FieldAddedOrRemovedEvent event) {
         // Rebuild entry editor based on new information (e.g. hide/add tabs)
         recalculateVisibleTabs();
-    }
-
-    @Subscribe
-    public synchronized void listen(EntryChangedEvent event) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> sourceTab.updateSourcePane(entry));
     }
 
     /**
@@ -346,7 +339,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabs.add(new RelatedArticlesTab(Globals.prefs));
 
         // Source tab
-        sourceTab = new SourceTab(panel, movingToDifferentEntry);
+        sourceTab = new SourceTab(panel.getBibDatabaseContext(), panel.getUndoManager(), Globals.prefs.getLatexFieldFormatterPreferences());
         tabs.add(sourceTab);
         return tabs;
     }
@@ -520,7 +513,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private void unregisterListeners() {
-        this.entry.unregisterListener(this);
         removeSearchListeners();
 
     }
