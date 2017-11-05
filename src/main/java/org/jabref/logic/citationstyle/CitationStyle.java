@@ -80,7 +80,7 @@ public class CitationStyle {
 
     private static String stripInvalidProlog(String source) {
         int startIndex = source.indexOf("<");
-        if(startIndex > 0) {
+        if (startIndex > 0) {
             return source.substring(startIndex, source.length());
         } else {
             return source;
