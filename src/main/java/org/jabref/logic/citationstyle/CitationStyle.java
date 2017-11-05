@@ -71,7 +71,9 @@ public class CitationStyle {
                 String title = ((CharacterData) titleNode.item(0).getFirstChild()).getData();
 
                 return new CitationStyle(filename, title, source);
-            } catch (ParserConfigurationException | SAXException | IOException e) {
+            } catch (SAXException ignore) {
+                // is triggered when a use has not configured CitationStyles -> ignore
+            } catch (ParserConfigurationException | IOException e) {
                 LOGGER.error("Error while parsing source", e);
             }
         }
