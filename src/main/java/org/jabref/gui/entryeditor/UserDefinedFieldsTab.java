@@ -1,5 +1,6 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.jabref.gui.IconTheme;
@@ -20,7 +21,7 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected List<String> determineFieldsToShow(BibEntry entry, EntryType entryType) {
+    protected Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType) {
         return fields;
     }
 }

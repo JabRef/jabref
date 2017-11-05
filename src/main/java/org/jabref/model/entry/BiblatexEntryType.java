@@ -1,9 +1,9 @@
 package org.jabref.model.entry;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -11,23 +11,23 @@ import java.util.stream.Collectors;
  */
 public abstract class BiblatexEntryType implements EntryType {
 
-    private final List<String> requiredFields;
-    private final List<String> optionalFields;
+    private final Set<String> requiredFields;
+    private final Set<String> optionalFields;
 
 
     public BiblatexEntryType() {
-        requiredFields = new ArrayList<>();
-        optionalFields = new ArrayList<>();
+        requiredFields = new LinkedHashSet<>();
+        optionalFields = new LinkedHashSet<>();
     }
 
     @Override
-    public List<String> getOptionalFields() {
-        return Collections.unmodifiableList(optionalFields);
+    public Set<String> getOptionalFields() {
+        return Collections.unmodifiableSet(optionalFields);
     }
 
     @Override
-    public List<String> getRequiredFields() {
-        return Collections.unmodifiableList(requiredFields);
+    public Set<String> getRequiredFields() {
+        return Collections.unmodifiableSet(requiredFields);
     }
 
     void addAllOptional(String... fieldNames) {
@@ -39,28 +39,17 @@ public abstract class BiblatexEntryType implements EntryType {
     }
 
     @Override
-    public List<String> getPrimaryOptionalFields() {
+    public Set<String> getPrimaryOptionalFields() {
         return getOptionalFields();
     }
 
     @Override
-    public List<String> getSecondaryOptionalFields() {
-        List<String> myOptionalFields = getOptionalFields();
-
-        if (myOptionalFields == null) {
-            return Collections.emptyList();
-        }
-
-        return myOptionalFields.stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());
+    public Set<String> getSecondaryOptionalFields() {
+        return getOptionalFields().stream().filter(field -> !isPrimary(field)).collect(Collectors.toSet());
     }
 
     private boolean isPrimary(String field) {
-        List<String> primaryFields = getPrimaryOptionalFields();
-
-        if (primaryFields == null) {
-            return false;
-        }
-        return primaryFields.contains(field);
+        return getPrimaryOptionalFields().contains(field);
     }
 
     @Override

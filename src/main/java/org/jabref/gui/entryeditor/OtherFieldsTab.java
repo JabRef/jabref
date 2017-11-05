@@ -1,5 +1,6 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected List<String> determineFieldsToShow(BibEntry entry, EntryType entryType) {
+    protected Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType) {
         List<String> allKnownFields = entryType.getAllFields().stream().map(String::toLowerCase)
                 .collect(Collectors.toList());
         List<String> otherFields = entry.getFieldNames().stream().map(String::toLowerCase)
