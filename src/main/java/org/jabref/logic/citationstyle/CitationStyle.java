@@ -58,11 +58,11 @@ public class CitationStyle {
      * Creates an CitationStyle instance out of the style string
      */
     private static CitationStyle createCitationStyleFromSource(final String source, final String filename) {
-        if (source != null && !source.isEmpty() && filename != null && !filename.isEmpty()) {
+        if (filename != null && !filename.isEmpty() && source != null && !source.isEmpty()) {
             try {
                 DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                 InputSource is = new InputSource();
-                is.setCharacterStream(new StringReader(source));
+                is.setCharacterStream(new StringReader(stripInvalidProlog(source)));
 
                 Document doc = db.parse(is);
                 NodeList nodes = doc.getElementsByTagName("info");
@@ -76,6 +76,15 @@ public class CitationStyle {
             }
         }
         return null;
+    }
+
+    private static String stripInvalidProlog(String source) {
+        int startIndex = source.indexOf("<");
+        if (startIndex > 0) {
+            return source.substring(startIndex, source.length());
+        } else {
+            return source;
+        }
     }
 
     /**
