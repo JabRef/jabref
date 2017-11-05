@@ -58,7 +58,7 @@ public class CitationStyle {
      * Creates an CitationStyle instance out of the style string
      */
     private static CitationStyle createCitationStyleFromSource(final String source, final String filename) {
-        if (source != null && !source.isEmpty() && filename != null && !filename.isEmpty()) {
+        if (filename != null && !filename.isEmpty() && source != null && !source.isEmpty() && source.startsWith("<")) {
             try {
                 DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                 InputSource is = new InputSource();
@@ -71,9 +71,7 @@ public class CitationStyle {
                 String title = ((CharacterData) titleNode.item(0).getFirstChild()).getData();
 
                 return new CitationStyle(filename, title, source);
-            } catch (SAXException ignore) {
-                // is triggered when a use has not configured CitationStyles -> ignore
-            } catch (ParserConfigurationException | IOException e) {
+            } catch (ParserConfigurationException | SAXException | IOException e) {
                 LOGGER.error("Error while parsing source", e);
             }
         }
