@@ -1,3 +1,4 @@
+
 # Changelog
 All notable changes to this project will be documented in this file.
 This project **does not** adhere to [Semantic Versioning](http://semver.org/).
@@ -26,6 +27,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added the possibility to copy linked files from entries to a single output folder [#2539](https://github.com/JabRef/jabref/pull/2593)
 - We increased performance and decreased the memory footprint of the entry editor drastically. [#3331](https://github.com/JabRef/jabref/pull/3331)
 - Late initialization of the context menus in the entry editor. This improves performance and memory footprint further [#3340](https://github.com/JabRef/jabref/pull/3340)
+- Integrity check "Abbreviation Detection" detects abbreviated names for journals and booktitles based on the internal list instead of only looking for "." signs. Fixes [#3144](https://github.com/JabRef/jabref/issues/3144).
 - We added a dialog to show that JabRef is working on checking integrity. [#3358](https://github.com/JabRef/jabref/issues/3358)
 
 ### Fixed
