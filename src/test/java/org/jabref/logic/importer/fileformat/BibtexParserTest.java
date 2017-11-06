@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1395,8 +1396,8 @@ public class BibtexParserTest {
         assertEquals("Lecturenotes", customEntryTypes.keySet().toArray()[0]);
         EntryType entryType = customEntryTypes.get("Lecturenotes");
         assertEquals("Lecturenotes", entryType.getName());
-        assertEquals(Arrays.asList("author", "title"), entryType.getRequiredFields());
-        assertEquals(Arrays.asList("language", "url"), entryType.getOptionalFields());
+        assertEquals(new HashSet<>(Arrays.asList("author", "title")), entryType.getRequiredFields());
+        assertEquals(new HashSet<>(Arrays.asList("language", "url")), entryType.getOptionalFields());
     }
 
     @Test

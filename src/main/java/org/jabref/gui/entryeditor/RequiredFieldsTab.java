@@ -1,7 +1,8 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javafx.scene.control.Tooltip;
 
@@ -22,8 +23,8 @@ public class RequiredFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected List<String> determineFieldsToShow(BibEntry entry, EntryType entryType) {
-        List<String> fields = new ArrayList<>();
+    protected Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType) {
+        Set<String> fields = new LinkedHashSet<>();
         fields.addAll(entryType.getRequiredFieldsFlat());
 
         // Add the edit field for Bibtex-key.
