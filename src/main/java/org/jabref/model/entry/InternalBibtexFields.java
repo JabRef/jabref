@@ -35,7 +35,7 @@ public class InternalBibtexFields {
      *
      * A user can change them. The change is currently stored in the preferences only and not explicitley exposed as separte preferences object
      */
-    public static final List<String> DEFAULT_GENERAL_FIELDS =  Arrays.asList(FieldName.CROSSREF, FieldName.KEYWORDS, FieldName.FILE, FieldName.DOI, FieldName.URL, FieldName.COMMENT, FieldName.OWNER, FieldName.TIMESTAMP);
+    public static final List<String> DEFAULT_GENERAL_FIELDS = Arrays.asList(FieldName.CROSSREF, FieldName.KEYWORDS, FieldName.FILE, FieldName.DOI, FieldName.URL, FieldName.GROUPS, FieldName.COMMENT, FieldName.OWNER, FieldName.TIMESTAMP);
 
     // Lists of fields with special properties
     private static final List<String> INTEGER_FIELDS = Arrays.asList(FieldName.CTLMAX_NAMES_FORCED_ETAL,
