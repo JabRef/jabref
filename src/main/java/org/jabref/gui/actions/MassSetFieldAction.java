@@ -56,9 +56,9 @@ public class MassSetFieldAction extends MnemonicAwareAction {
     private JRadioButton append;
     private JRadioButton rename;
     private JComboBox<String> field;
-    private JTextField setText;
-    private JTextField appendText;
-    private JTextField renameTo;
+    private JTextField textFieldSet;
+    private JTextField textFieldAppend;
+    private JTextField textFieldRename;
     private boolean canceled = true;
     private JCheckBox overwrite;
 
@@ -73,12 +73,12 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
         field = new JComboBox<>();
         field.setEditable(true);
-        setText = new JTextField();
-        setText.setEnabled(false);
-        appendText = new JTextField();
-        appendText.setEnabled(false);
-        renameTo = new JTextField();
-        renameTo.setEnabled(false);
+        textFieldSet = new JTextField();
+        textFieldSet.setEnabled(false);
+        textFieldAppend = new JTextField();
+        textFieldAppend.setEnabled(false);
+        textFieldRename = new JTextField();
+        textFieldRename.setEnabled(false);
 
         JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
@@ -98,23 +98,23 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         }
 
         set.addChangeListener(e ->
-        // Entering a setText is only relevant if we are setting, not clearing:
-        setText.setEnabled(set.isSelected()));
+                // Entering a setText is only relevant if we are setting, not clearing:
+                textFieldSet.setEnabled(set.isSelected()));
 
         append.addChangeListener(e -> {
             // Text to append is only required if we are appending:
-            appendText.setEnabled(append.isSelected());
+            textFieldAppend.setEnabled(append.isSelected());
             // Overwrite protection makes no sense if we are appending to a field:
             overwrite.setEnabled(!clear.isSelected() && !append.isSelected());
         });
 
         clear.addChangeListener(e ->
-        // Overwrite protection makes no sense if we are clearing the field:
-        overwrite.setEnabled(!clear.isSelected() && !append.isSelected()));
+                // Overwrite protection makes no sense if we are clearing the field:
+                overwrite.setEnabled(!clear.isSelected() && !append.isSelected()));
 
         rename.addChangeListener(e ->
-        // Entering a setText is only relevant if we are renaming
-        renameTo.setEnabled(rename.isSelected()));
+                // Entering a setText is only relevant if we are renaming
+                textFieldRename.setEnabled(rename.isSelected()));
 
         overwrite = new JCheckBox(Localization.lang("Overwrite existing field values"), true);
         ButtonGroup bg = new ButtonGroup();
@@ -135,12 +135,12 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         builder.add(selected).xyw(1, 9, 3);
         builder.addSeparator(Localization.lang("New field value")).xyw(1, 11, 3);
         builder.add(set).xy(1, 13);
-        builder.add(setText).xy(3, 13);
+        builder.add(textFieldSet).xy(3, 13);
         builder.add(clear).xyw(1, 15, 3);
         builder.add(append).xy(1, 17);
-        builder.add(appendText).xy(3, 17);
+        builder.add(textFieldAppend).xy(3, 17);
         builder.add(rename).xy(1, 19);
-        builder.add(renameTo).xy(3, 19);
+        builder.add(textFieldRename).xy(3, 19);
         builder.add(overwrite).xyw(1, 21, 3);
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
@@ -235,7 +235,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             entryList = entries;
         }
 
-        String toSet = setText.getText();
+        String toSet = textFieldSet.getText();
         if (toSet.isEmpty()) {
             toSet = null;
         }
@@ -248,12 +248,12 @@ public class MassSetFieldAction extends MnemonicAwareAction {
                         JOptionPane.ERROR_MESSAGE);
                 return; // Do not close the dialog.
             } else {
-                compoundEdit.addEdit(MassSetFieldAction.massRenameField(entryList, fields[0], renameTo.getText(),
+                compoundEdit.addEdit(MassSetFieldAction.massRenameField(entryList, fields[0], textFieldRename.getText(),
                         overwrite.isSelected()));
             }
         } else if (append.isSelected()) {
             for (String field : fields) {
-                compoundEdit.addEdit(MassSetFieldAction.massAppendField(entryList, field, appendText.getText()));
+                compoundEdit.addEdit(MassSetFieldAction.massAppendField(entryList, field, textFieldAppend.getText()));
             }
         } else {
             for (String field : fields) {
