@@ -131,7 +131,7 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.11.0'
-    testCompile 'com.github.tomakehurst:wiremock:2.8.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.10.1'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.5.0'
