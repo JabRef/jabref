@@ -311,15 +311,17 @@ public class MassSetFieldAction extends MnemonicAwareAction {
      */
     private static UndoableEdit massAppendField(Collection<BibEntry> entries, String field, String textToAppend) {
 
-        if (textToAppend == null) {
-            textToAppend = "";
+        String newValue = "";
+
+        if (textToAppend != null) {
+            newValue = textToAppend;
         }
 
         NamedCompound compoundEdit = new NamedCompound(Localization.lang("Append field"));
         for (BibEntry entry : entries) {
             Optional<String> oldValue = entry.getField(field);
-            entry.setField(field, oldValue.orElse("") + textToAppend);
-            compoundEdit.addEdit(new UndoableFieldChange(entry, field, oldValue.orElse(null), textToAppend));
+            entry.setField(field, oldValue.orElse("") + newValue);
+            compoundEdit.addEdit(new UndoableFieldChange(entry, field, oldValue.orElse(null), newValue));
         }
         compoundEdit.end();
         return compoundEdit;
