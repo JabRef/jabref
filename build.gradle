@@ -129,6 +129,9 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '1.0.9'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.9'
 
+    // required because of LGTM - see https://github.com/TheBoegl/shadow-log4j-transformer/issues/3#issuecomment-342015791
+    classpath 'de.sebastianboegl.gradle.plugins:shadow-log4j-transformer:2.1.1'
+
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.11.0'
     testCompile 'com.github.tomakehurst:wiremock:2.10.1'
