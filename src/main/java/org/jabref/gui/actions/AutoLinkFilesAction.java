@@ -40,7 +40,7 @@ public class AutoLinkFilesAction extends AbstractAction {
         }
         JDialog diag = new JDialog(JabRefGUI.getMainFrame(), true);
         final NamedCompound nc = new NamedCompound(Localization.lang("Automatically set file links"));
-        Runnable runnable = AutoSetLinks.autoSetLinks(entries, nc, null, null,
+        Runnable runnable = AutoSetLinks.autoSetLinks(entries, nc, null,
                 JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext(), e -> {
                     if (e.getID() > 0) {
                         // entry has been updated in Util.autoSetLinks, only treat nc and status message

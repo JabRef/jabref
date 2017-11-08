@@ -101,6 +101,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
     public static final String FONT_FAMILY = "fontFamily";
     public static final String WIN_LOOK_AND_FEEL = "lookAndFeel";
+    public static final String FX_FONT_RENDERING_TWEAK = "fxFontRenderingTweak";
     public static final String LANGUAGE = "language";
     public static final String NAMES_LAST_ONLY = "namesLastOnly";
     public static final String ABBR_AUTHOR_NAMES = "abbrAuthorNames";
@@ -446,6 +447,12 @@ public class JabRefPreferences implements PreferencesService {
         // load user preferences
         prefs = Preferences.userNodeForPackage(PREFS_BASE_CLASS);
 
+        // Since some of the preference settings themselves use localized strings, we cannot set the language after
+        // the initialization of the preferences in main
+        // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
+        // like the SearchDisplayMode will never be translated.
+        Localization.setLanguage(prefs.get(LANGUAGE, "en"));
+
         SearchPreferences.putDefaults(defaults);
 
         defaults.put(TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
@@ -467,6 +474,8 @@ public class JabRefPreferences implements PreferencesService {
             defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
             defaults.put(EMACS_PATH, "emacsclient");
         }
+
+        defaults.put(FX_FONT_RENDERING_TWEAK, OS.LINUX); //we turn this on per default on Linux
         defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
 
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");

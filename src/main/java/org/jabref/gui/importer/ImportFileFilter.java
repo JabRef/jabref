@@ -24,7 +24,9 @@ class ImportFileFilter {
     public static FileChooser.ExtensionFilter convert(String description, Collection<Importer> formats) {
         List<FileExtensions> extensions = formats.stream().map(Importer::getExtensions).collect(Collectors.toList());
         List<String> flatExtensions = extensions.stream().flatMap(extList -> Arrays.stream(extList.getExtensions()))
+                .map(ending -> "*." + ending)
                 .collect(Collectors.toList());
+
         return new FileChooser.ExtensionFilter(description, flatExtensions.toArray(new String[flatExtensions.size()]));
     }
 

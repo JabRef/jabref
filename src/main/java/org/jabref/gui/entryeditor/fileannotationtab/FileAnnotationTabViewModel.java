@@ -1,5 +1,7 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -15,25 +17,36 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileUpdateListener;
+import org.jabref.gui.util.FileUpdateMonitor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.FileAnnotation;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class FileAnnotationTabViewModel extends AbstractViewModel {
+    private static final Log LOGGER = LogFactory.getLog(FileAnnotationTabViewModel.class);
 
     private final ListProperty<FileAnnotationViewModel> annotations = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ListProperty<String> files = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<Path> files = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<FileAnnotationViewModel> currentAnnotation = new SimpleObjectProperty<>();
 
     private final FileAnnotationCache cache;
     private final BibEntry entry;
-    private Map<String, List<FileAnnotation>> fileAnnotations;
+    private Map<Path, List<FileAnnotation>> fileAnnotations;
+    private Path currentFile;
+    private FileUpdateMonitor fileMonitor;
+    private FileUpdateListener fileListener = this::reloadAnnotations;
 
-    public FileAnnotationTabViewModel(FileAnnotationCache cache, BibEntry entry) {
+    public FileAnnotationTabViewModel(FileAnnotationCache cache, BibEntry entry, FileUpdateMonitor fileMonitor) {
         this.cache = cache;
         this.entry = entry;
+        this.fileMonitor = fileMonitor;
         initialize();
     }
 
@@ -50,7 +63,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         return annotations;
     }
 
-    public ListProperty<String> filesProperty() {
+    public ListProperty<Path> filesProperty() {
         return files;
     }
 
@@ -58,21 +71,37 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         currentAnnotation.set(newAnnotation);
     }
 
-    public void notifyNewSelectedFile(String newFile) {
+    public void notifyNewSelectedFile(Path newFile) {
+        fileMonitor.removeListener(currentFile, fileListener);
+        currentFile = newFile;
+
         Comparator<FileAnnotation> byPage = Comparator.comparingInt(FileAnnotation::getPage);
 
-        List<FileAnnotationViewModel> newAnnotations = fileAnnotations.getOrDefault(newFile, new ArrayList<>())
+        List<FileAnnotationViewModel> newAnnotations = fileAnnotations.getOrDefault(currentFile, new ArrayList<>())
                 .stream()
                 .filter(annotation -> (null != annotation.getContent()))
                 .sorted(byPage)
                 .map(FileAnnotationViewModel::new)
                 .collect(Collectors.toList());
         annotations.setAll(newAnnotations);
+
+        try {
+            fileMonitor.addListenerForFile(currentFile, fileListener);
+        } catch (IOException e) {
+            LOGGER.error("Problem while watching file for changes " + currentFile, e);
+        }
     }
 
-    public void reloadAnnotations() {
-        cache.remove(entry);
-        initialize();
+    private void reloadAnnotations() {
+        // Make sure to always run this in the JavaFX thread as the file monitor (and its notifications) live in a different thread
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            // Remove annotations for the current entry and reinitialize annotation/cache
+            cache.remove(entry);
+            initialize();
+
+            // Pretend that we just switched to the current file in order to refresh the display
+            notifyNewSelectedFile(currentFile);
+        });
     }
 
     /**

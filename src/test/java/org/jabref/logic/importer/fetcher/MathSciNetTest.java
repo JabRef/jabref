@@ -63,17 +63,17 @@ public class MathSciNetTest {
 
     @Test
     public void searchByQueryFindsEntry() throws Exception {
-        // CI has no subscription to zbMath and thus gets 401 response
+        // CI has no subscription to MathSciNet and thus gets 401 response
         Assume.assumeFalse(DevEnvironment.isCIServer());
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("Existence and uniqueness theorems Two-Dimensional Ericksen Leslie System");
         assertFalse(fetchedEntries.isEmpty());
-        assertEquals(ratiuEntry, fetchedEntries.get(0));
+        assertEquals(ratiuEntry, fetchedEntries.get(1));
     }
 
     @Test
     public void searchByIdFindsEntry() throws Exception {
-        // CI has no subscription to zbMath and thus gets 401 response
+        // CI has no subscription to MathSciNet and thus gets 401 response
         Assume.assumeFalse(DevEnvironment.isCIServer());
 
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3537908");

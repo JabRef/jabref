@@ -32,7 +32,7 @@ public class FieldEditors {
 
         AutoCompleteSuggestionProvider<?> suggestionProvider = getSuggestionProvider(fieldName, suggestionProviders, databaseContext.getMetaData());
 
-        FieldCheckers fieldCheckers = new FieldCheckers(databaseContext, preferences.getFileDirectoryPreferences());
+        FieldCheckers fieldCheckers = new FieldCheckers(databaseContext, preferences.getFileDirectoryPreferences(), journalAbbreviationLoader.getRepository(journalAbbreviationPreferences));
 
         if (preferences.getTimestampPreferences().getTimestampField().equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
             if (fieldExtras.contains(FieldProperty.ISO_DATE)) {
@@ -72,6 +72,8 @@ public class FieldEditors {
             return new PersonsEditor(fieldName, suggestionProvider, preferences, fieldCheckers);
         } else if (FieldName.KEYWORDS.equals(fieldName)) {
             return new KeywordsEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
+        } else if (fieldExtras.contains(FieldProperty.MULTILINE_TEXT)) {
+            return new MultilineEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
         }
 
         // default

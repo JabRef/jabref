@@ -1,5 +1,7 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
+import java.nio.file.Path;
+
 import javax.inject.Inject;
 
 import javafx.beans.binding.Bindings;
@@ -17,6 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.AbstractController;
+import org.jabref.gui.util.FileUpdateMonitor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
@@ -27,7 +30,7 @@ import org.fxmisc.easybind.EasyBind;
 public class FileAnnotationTabController extends AbstractController<FileAnnotationTabViewModel> {
 
     @FXML
-    public ComboBox<String> files;
+    public ComboBox<Path> files;
     @FXML
     public ListView<FileAnnotationViewModel> annotationList;
     @FXML
@@ -45,10 +48,12 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
     private FileAnnotationCache fileAnnotationCache;
     @Inject
     private BibEntry entry;
+    @Inject
+    private FileUpdateMonitor fileMonitor;
 
     @FXML
     public void initialize() {
-        viewModel = new FileAnnotationTabViewModel(fileAnnotationCache, entry);
+        viewModel = new FileAnnotationTabViewModel(fileAnnotationCache, entry, fileMonitor);
 
         // Set-up files list
         files.getItems().setAll(viewModel.filesProperty().get());
@@ -90,10 +95,6 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
         date.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::dateProperty));
         content.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::contentProperty));
         marking.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::markingProperty));
-    }
-
-    public void reloadAnnotations(ActionEvent event) {
-        viewModel.reloadAnnotations();
     }
 
     public void copy(ActionEvent event) {

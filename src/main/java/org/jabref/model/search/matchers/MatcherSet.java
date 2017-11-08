@@ -1,33 +1,33 @@
 package org.jabref.model.search.matchers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Vector;
 
 import org.jabref.model.search.SearchMatcher;
 
 public abstract class MatcherSet implements SearchMatcher {
 
-    protected final List<SearchMatcher> matchers = new Vector<>();
+    protected final List<SearchMatcher> matchers = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
 
         MatcherSet that = (MatcherSet) o;
 
-        return matchers.equals(that.matchers);
+        return Objects.equals(matchers, that.matchers);
 
     }
 
     @Override
     public int hashCode() {
-        return matchers.hashCode();
+        return Objects.hash(matchers);
     }
 
     public void addRule(SearchMatcher newRule) {

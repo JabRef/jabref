@@ -3,13 +3,13 @@ import org.gradle.internal.os.OperatingSystem
 // to update the gradle wrapper, execute ./gradlew wrapper --gradle-version 4.0
 
 plugins {
-    id 'com.gradle.build-scan' version '1.8'
+    id 'com.gradle.build-scan' version '1.9'
     id 'com.install4j.gradle' version '6.1.5'
     id 'com.github.johnrengelman.shadow' version '2.0.1'
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
     id "com.simonharrer.modernizer" version '1.5.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.3'
-    id 'net.ltgt.errorprone' version '0.0.11'
+    id 'net.ltgt.errorprone' version '0.0.13'
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
@@ -91,23 +91,25 @@ dependencies {
     compile 'org.antlr:antlr4-runtime:4.7'
 
     // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
-    compile 'mysql:mysql-connector-java:5.1.43'
+    compile 'mysql:mysql-connector-java:5.1.44'
 
     compile 'com.impossibl.pgjdbc-ng:pgjdbc-ng:0.7.1'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
-    compile 'com.google.guava:guava:23.0'
+    compile 'com.google.guava:guava:23.3-jre'
 
     // JavaFX stuff
     compile 'com.airhacks:afterburner.fx:1.7.0'
     compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
-    compile 'de.saxsys:mvvmfx-validation:1.6.0'
-    compile 'org.controlsfx:controlsfx:8.40.14'
+    compile 'de.saxsys:mvvmfx-validation:1.7.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
-    compile 'org.fxmisc.flowless:flowless:0.5.2'
-    compile 'org.fxmisc.richtext:richtextfx:0.7-M5'
+    compile 'org.fxmisc.flowless:flowless:0.6'
+    compile 'org.fxmisc.richtext:richtextfx:0.8.1'
+
+    // Cannot be updated to 9.*.* until Jabref works with Java 9
+    compile 'org.controlsfx:controlsfx:8.40.14'
 
     compile 'org.jsoup:jsoup:1.10.3'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
@@ -122,14 +124,14 @@ dependencies {
     compile 'org.citationstyles:locales:1.0.1-SNAPSHOT'
     compile 'de.undercouch:citeproc-java:1.0.1'
 
-    compile 'com.github.tomtung:latex2unicode_2.12:0.2.1'
+    compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
 
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '1.0.+'
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.+'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '1.0.9'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.9'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.10.0'
-    testCompile 'com.github.tomakehurst:wiremock:2.8.0'
+    testCompile 'org.mockito:mockito-core:2.11.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.10.1'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.5.0'
@@ -353,7 +355,7 @@ task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
 checkstyle {
     // do not use other packages for checkstyle, excluding gen(erated) sources
     checkstyleMain.source = "src/main/java"
-    toolVersion = '8.0'
+    toolVersion = '8.3'
 }
 
 checkstyleMain.shouldRunAfter test
