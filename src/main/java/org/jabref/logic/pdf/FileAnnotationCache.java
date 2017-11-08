@@ -1,5 +1,6 @@
 package org.jabref.logic.pdf;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -20,20 +21,20 @@ public class FileAnnotationCache {
     private final static int CACHE_SIZE = 10;
 
     //the inner list holds the annotations per file, the outer collection maps this to a BibEntry.
-    private LoadingCache<BibEntry, Map<String, List<FileAnnotation>>> annotationCache;
+    private LoadingCache<BibEntry, Map<Path, List<FileAnnotation>>> annotationCache;
 
     /**
      * Creates an empty fil annotation cache. Required to allow the annotation cache to be injected into views without
-     * hitting the bug https://github.com/AdamBien/afterburner.fx/issues/71.
+     * hitting the bug https://github.com/AdamBien/afterburner.fx/issues/71 .
      */
     public FileAnnotationCache() {
 
     }
 
     public FileAnnotationCache(BibDatabaseContext context) {
-        annotationCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<BibEntry, Map<String, List<FileAnnotation>>>() {
+        annotationCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<BibEntry, Map<Path, List<FileAnnotation>>>() {
             @Override
-            public Map<String, List<FileAnnotation>> load(BibEntry entry) throws Exception {
+            public Map<Path, List<FileAnnotation>> load(BibEntry entry) throws Exception {
                 return new EntryAnnotationImporter(entry).importAnnotationsFromFiles(context);
             }
         });
@@ -45,7 +46,7 @@ public class FileAnnotationCache {
      * @param entry entry for which to get the annotations
      * @return Map containing a list of annotations in a list for each file
      */
-    public Map<String, List<FileAnnotation>> getFromCache(BibEntry entry) {
+    public Map<Path, List<FileAnnotation>> getFromCache(BibEntry entry) {
         LOGGER.debug(String.format("Loading Bibentry '%s' from cache.", entry.getCiteKeyOptional().orElse(entry.getId())));
         return annotationCache.getUnchecked(entry);
     }

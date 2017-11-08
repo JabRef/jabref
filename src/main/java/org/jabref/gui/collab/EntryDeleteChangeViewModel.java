@@ -1,4 +1,4 @@
-package org.jabref.collab;
+package org.jabref.gui.collab;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -15,16 +15,16 @@ import org.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-class EntryDeleteChange extends Change {
+class EntryDeleteChangeViewModel extends ChangeViewModel {
 
-    private static final Log LOGGER = LogFactory.getLog(EntryDeleteChange.class);
+    private static final Log LOGGER = LogFactory.getLog(EntryDeleteChangeViewModel.class);
     private final BibEntry memEntry;
     private final BibEntry tmpEntry;
 
     private final JScrollPane sp;
 
 
-    public EntryDeleteChange(BibEntry memEntry, BibEntry tmpEntry) {
+    public EntryDeleteChangeViewModel(BibEntry memEntry, BibEntry tmpEntry) {
         super(Localization.lang("Deleted entry"));
         this.memEntry = memEntry;
         this.tmpEntry = tmpEntry;

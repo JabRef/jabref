@@ -66,7 +66,9 @@ public class JabRefMain extends Application {
 
         Globals.prefs = preferences;
         Globals.startBackgroundTasks();
-        Localization.setLanguage(preferences.get(JabRefPreferences.LANGUAGE));
+
+        // Note that the language was already set during the initialization of the preferences and it is safe to
+        // call the next function.
         Globals.prefs.setLanguageDependentDefaultValues();
 
         // Perform Migrations

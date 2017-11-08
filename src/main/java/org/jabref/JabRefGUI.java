@@ -272,6 +272,13 @@ public class JabRefGUI {
                     LOGGER.warn("Unable to find requested look and feel", e);
                 }
             }
+
+            // On Linux, Java FX fonts look blurry per default. This can be improved by using a non-default rendering
+            // setting. See https://github.com/woky/javafx-hates-linux
+            if (Globals.prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK)) {
+                System.setProperty("prism.text", "t2k");
+                System.setProperty("prism.lcdtext", "true");
+            }
         } catch (Exception e) {
             LOGGER.warn("Look and feel could not be set", e);
         }

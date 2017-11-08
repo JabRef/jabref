@@ -1,4 +1,4 @@
-package org.jabref.collab;
+package org.jabref.gui.collab;
 
 import java.awt.BorderLayout;
 import java.awt.Insets;
@@ -31,7 +31,7 @@ class ChangeDisplayDialog extends JabRefDialog implements TreeSelectionListener 
     private final JPanel infoPanel = new JPanel();
     private final JCheckBox cb = new JCheckBox(Localization.lang("Accept change"));
     private final JLabel rootInfo = new JLabel(Localization.lang("Select the tree nodes to view and accept or reject changes") + '.');
-    private Change selected;
+    private ChangeViewModel selected;
     private JComponent infoShown;
     private boolean okPressed;
 
@@ -86,9 +86,9 @@ class ChangeDisplayDialog extends JabRefDialog implements TreeSelectionListener 
             // Perform all accepted changes:
             // Store all edits in an Undoable object:
             NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
-            Enumeration<Change> enumer = root.children();
+            Enumeration<ChangeViewModel> enumer = root.children();
             boolean anyDisabled = false;
-            for (Change c : Collections.list(enumer)) {
+            for (ChangeViewModel c : Collections.list(enumer)) {
                 boolean allAccepted = false;
                 if (c.isAcceptable() && c.isAccepted()) {
                     allAccepted = c.makeChange(panel, localSecondary, ce);
@@ -103,7 +103,7 @@ class ChangeDisplayDialog extends JabRefDialog implements TreeSelectionListener 
             if (anyDisabled) {
                 panel.markBaseChanged();
             }
-            panel.setUpdatedExternally(false);
+            panel.markExternalChangesAsResolved();
             dispose();
             okPressed = true;
         });
@@ -133,8 +133,8 @@ class ChangeDisplayDialog extends JabRefDialog implements TreeSelectionListener 
     @Override
     public void valueChanged(TreeSelectionEvent e) {
         Object o = tree.getLastSelectedPathComponent();
-        if (o instanceof Change) {
-            selected = (Change) o;
+        if (o instanceof ChangeViewModel) {
+            selected = (ChangeViewModel) o;
             setInfo(selected.description());
             cb.setSelected(selected.isAccepted());
             cb.setEnabled(selected.isAcceptable());

@@ -497,7 +497,7 @@ public class BibEntry implements Cloneable {
      *                  argument can be null, meaning that no attempt will be made to follow crossrefs.
      * @return true if all fields are set or could be resolved, false otherwise.
      */
-    public boolean allFieldsPresent(List<String> allFields, BibDatabase database) {
+    public boolean allFieldsPresent(Collection<String> allFields, BibDatabase database) {
 
         for (String field : allFields) {
             String fieldName = toLowerCase(field);
@@ -841,6 +841,10 @@ public class BibEntry implements Cloneable {
         List<LinkedFile> linkedFiles = getFiles();
         linkedFiles.add(file);
         return setFiles(linkedFiles);
+    }
+
+    public ObservableMap<String, String> getFieldsObservable() {
+        return fields;
     }
 
     private interface GetFieldInterface {

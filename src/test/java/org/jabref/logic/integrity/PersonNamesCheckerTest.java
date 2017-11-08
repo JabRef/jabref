@@ -2,6 +2,9 @@ package org.jabref.logic.integrity;
 
 import java.util.Optional;
 
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,11 +12,13 @@ import static org.junit.Assert.assertEquals;
 
 public class PersonNamesCheckerTest {
 
-    PersonNamesChecker checker;
+    private PersonNamesChecker checker;
 
     @Before
     public void setUp() throws Exception {
-        checker = new PersonNamesChecker();
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        databaseContext.setMode(BibDatabaseMode.BIBTEX);
+        checker = new PersonNamesChecker(databaseContext);
     }
 
     @Test
