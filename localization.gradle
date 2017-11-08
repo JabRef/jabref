@@ -8,8 +8,9 @@ task localizationStatusVersion {
             commandLine "python3", "--version"
             standardOutput = os
         }
-        assert os.toString().startsWith("Python 3.")
-        assert Integer.parseInt(String.valueOf(os.toString().charAt(9))) >= 6
+        if(!os.toString().startsWith("Python 3.") || Integer.parseInt(String.valueOf(os.toString().charAt(9))) < 6){
+            throw new Exception ("You need at least Python 3.6 to run syncLang!")
+        }
     }
 }
 
