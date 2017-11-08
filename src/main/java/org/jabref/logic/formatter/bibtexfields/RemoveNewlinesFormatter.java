@@ -1,6 +1,7 @@
 package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
@@ -9,6 +10,8 @@ import org.jabref.model.cleanup.Formatter;
  * Removes all line breaks in the string.
  */
 public class RemoveNewlinesFormatter implements Formatter {
+    private static final Pattern HYPHENATED_WORDS = Pattern.compile("(-\r\n|-\n|-\r)");
+    private static final Pattern LINEBREAKS = Pattern.compile("(\r?\n|\r)");
 
     @Override
     public String getName() {
@@ -24,7 +27,9 @@ public class RemoveNewlinesFormatter implements Formatter {
     public String format(String value) {
         Objects.requireNonNull(value);
 
-        return value.replace("\r\n", " ").replace("\n", " ").replace("\r", " ").trim();
+        value = HYPHENATED_WORDS.matcher(value).replaceAll("");
+        value = LINEBREAKS.matcher(value).replaceAll(" ");
+        return value.trim();
     }
 
     @Override

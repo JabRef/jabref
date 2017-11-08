@@ -27,4 +27,11 @@ public class RemoveNewlinesFormatterTest {
     public void removeLineFeed() {
         assertEquals("n linebreak", formatter.format("n\nlinebreak"));
     }
+
+    @Test
+    public void removeHyphensBeforeNewlines() {
+        assertEquals("water", formatter.format("wa-\nter"));
+        assertEquals("water", formatter.format("wa-\r\nter"));
+        assertEquals("water", formatter.format("wa-\rter"));
+    }
 }
