@@ -7,9 +7,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
 
 /**
- * Removes all line breaks in the string.
+ * Removes all hyphenated line breaks in the string.
  */
-public class RemoveNewlinesFormatter implements Formatter {
+public class RemoveHyphenatedNewlinesFormatter implements Formatter {
+    private static final Pattern HYPHENATED_WORDS = Pattern.compile("(-\r\n|-\n|-\r)");
     private static final Pattern LINEBREAKS = Pattern.compile("(\r?\n|\r)");
 
     @Override
@@ -26,6 +27,7 @@ public class RemoveNewlinesFormatter implements Formatter {
     public String format(String value) {
         Objects.requireNonNull(value);
 
+        value = HYPHENATED_WORDS.matcher(value).replaceAll("");
         value = LINEBREAKS.matcher(value).replaceAll(" ");
         return value.trim();
     }
