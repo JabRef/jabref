@@ -1,5 +1,5 @@
 language: java
-python: "3.6"
+
 # we test at Ubuntu Trusty (Ubuntu 14.04 LTS)
 # see https://docs.travis-ci.com/user/trusty-ci-environment/
 # This environment is continuously updated as described in https://docs.travis-ci.com/user/build-environment-updates/
@@ -31,6 +31,9 @@ before_install:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
+  - pyenv install 3.6.2
+  - pyenv virtualenv 3.6.2 general
+  - pyenv global general
 
 install: true
 
