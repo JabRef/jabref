@@ -15,7 +15,6 @@ import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -53,7 +52,7 @@ public class DBMSSynchronizer {
     private final EventBus eventBus;
     private Connection currentConnection;
     private final Character keywordSeparator;
-    private GlobalBibtexKeyPattern globalCiteKeyPattern;
+    private final GlobalBibtexKeyPattern globalCiteKeyPattern;
 
     public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
             GlobalBibtexKeyPattern globalCiteKeyPattern) {
@@ -262,7 +261,9 @@ public class DBMSSynchronizer {
         }
 
         try {
-            MetaDataParser.parse(metaData, dbmsProcessor.getSharedMetaData(), keywordSeparator, ChangePropagation.DO_NOT_POST_EVENT);
+            metaData.setEventPropagation(false);
+            MetaDataParser.parse(metaData, dbmsProcessor.getSharedMetaData(), keywordSeparator);
+            metaData.setEventPropagation(true);
         } catch (ParseException e) {
             LOGGER.error("Parse error", e);
         }
