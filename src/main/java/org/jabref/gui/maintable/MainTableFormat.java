@@ -113,19 +113,6 @@ public class MainTableFormat implements TableFormat<BibEntry> {
                 tableColumns.add(builder.createFileIconColumn(desiredColumn));
             }
         }
-
-        // Add 'normal' bibtex fields as configured in the preferences
-        // Read table columns from prefs:
-        List<String> colSettings = Globals.prefs.getStringList(JabRefPreferences.COLUMN_NAMES);
-
-        for (String columnName : colSettings) {
-            // stored column name will be used as columnName
-            // There might be more than one field to display, e.g., "author/editor" or "date/year" - so split
-            // at MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR
-            String[] fields = columnName.split(FieldName.FIELD_SEPARATOR);
-            tableColumns.add(new MainTableColumn(columnName, Arrays.asList(fields), database));
-        }
-
         // Add the "special" icon columns (e.g., ranking, file, ...) that are enabled in preferences.
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
@@ -147,6 +134,19 @@ public class MainTableFormat implements TableFormat<BibEntry> {
                 tableColumns.add(builder.buildReadStatusColumn());
             }
         }
+        // Add 'normal' bibtex fields as configured in the preferences
+        // Read table columns from prefs:
+        List<String> colSettings = Globals.prefs.getStringList(JabRefPreferences.COLUMN_NAMES);
+
+        for (String columnName : colSettings) {
+            // stored column name will be used as columnName
+            // There might be more than one field to display, e.g., "author/editor" or "date/year" - so split
+            // at MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR
+            String[] fields = columnName.split(FieldName.FIELD_SEPARATOR);
+            tableColumns.add(new MainTableColumn(columnName, Arrays.asList(fields), database));
+        }
+
+
 
     }
 
