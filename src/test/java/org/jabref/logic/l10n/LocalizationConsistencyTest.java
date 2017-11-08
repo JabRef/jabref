@@ -8,10 +8,10 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -60,9 +60,9 @@ public class LocalizationConsistencyTest {
                 Set<String> nonEnglishKeys = LocalizationParser
                         .getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, lang));
 
-                List<String> missing = new LinkedList<>(englishKeys);
+                List<String> missing = new ArrayList<>(englishKeys);
                 missing.removeAll(nonEnglishKeys);
-                List<String> obsolete = new LinkedList<>(nonEnglishKeys);
+                List<String> obsolete = new ArrayList<>(nonEnglishKeys);
                 obsolete.removeAll(englishKeys);
 
                 assertEquals("Missing keys of " + lang, Collections.emptyList(), missing);
@@ -202,11 +202,9 @@ public class LocalizationConsistencyTest {
     }
 
     private static class DuplicationDetectionProperties extends Properties {
-
         private static final long serialVersionUID = 1L;
 
-        private final List<String> duplicates = new LinkedList<>();
-
+        private final List<String> duplicates = new ArrayList<>();
 
         public DuplicationDetectionProperties() {
             super();
