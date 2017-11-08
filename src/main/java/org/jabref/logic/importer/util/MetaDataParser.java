@@ -13,7 +13,6 @@ import java.util.Optional;
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -39,7 +38,7 @@ public class MetaDataParser {
     /**
      * Parses the data map and changes the given {@link MetaData} instance respectively.
      */
-    public static MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator, ChangePropagation postChange) throws ParseException {
+    public static MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator) throws ParseException {
         List<String> defaultCiteKeyPattern = new ArrayList<>();
         Map<String, List<String>> nonDefaultCiteKeyPatterns = new HashMap<>();
 
@@ -53,40 +52,39 @@ public class MetaDataParser {
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
                 // The user name comes directly after "FILE_DIRECTORY-"
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
-                metaData.setUserFileDirectory(user, getSingleItem(value), postChange);
+                metaData.setUserFileDirectory(user, getSingleItem(value));
                 continue;
             } else if (entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)) {
-                metaData.addContentSelector(ContentSelectors.parse(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length()),
-                        StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)), postChange);
+                metaData.addContentSelector(ContentSelectors.parse(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length()), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
                 continue;
             }
 
             switch (entry.getKey()) {
                 case MetaData.GROUPSTREE:
                 case MetaData.GROUPSTREE_LEGACY:
-                    metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator), postChange);
+                    metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator));
                     break;
                 case MetaData.SAVE_ACTIONS:
-                    metaData.setSaveActions(Cleanups.parse(value), postChange);
+                    metaData.setSaveActions(Cleanups.parse(value));
                     break;
                 case MetaData.DATABASE_TYPE:
-                    metaData.setMode(BibDatabaseMode.parse(getSingleItem(value)), postChange);
+                    metaData.setMode(BibDatabaseMode.parse(getSingleItem(value)));
                     break;
                 case MetaData.KEYPATTERNDEFAULT:
                     defaultCiteKeyPattern = Collections.singletonList(getSingleItem(value));
                     break;
                 case MetaData.PROTECTED_FLAG_META:
                     if (Boolean.parseBoolean(getSingleItem(value))) {
-                        metaData.markAsProtected(postChange);
+                        metaData.markAsProtected();
                     } else {
-                        metaData.markAsNotProtected(postChange);
+                        metaData.markAsNotProtected();
                     }
                     break;
                 case MetaData.FILE_DIRECTORY:
-                    metaData.setDefaultFileDirectory(getSingleItem(value), postChange);
+                    metaData.setDefaultFileDirectory(getSingleItem(value));
                     break;
                 case MetaData.SAVE_ORDER_CONFIG:
-                    metaData.setSaveOrderConfig(SaveOrderConfig.parse(value), postChange);
+                    metaData.setSaveOrderConfig(SaveOrderConfig.parse(value));
                     break;
                 default:
                     // Keep meta data items that we do not know in the file
@@ -94,14 +92,10 @@ public class MetaDataParser {
             }
         }
         if (!defaultCiteKeyPattern.isEmpty() || !nonDefaultCiteKeyPatterns.isEmpty()) {
-            metaData.setCiteKeyPattern(defaultCiteKeyPattern, nonDefaultCiteKeyPatterns, postChange);
+            metaData.setCiteKeyPattern(defaultCiteKeyPattern, nonDefaultCiteKeyPatterns);
         }
 
         return metaData;
-    }
-
-    public static MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator) throws ParseException {
-        return parse(metaData, data, keywordSeparator, ChangePropagation.POST_EVENT);
     }
 
     /**
