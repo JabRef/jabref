@@ -124,17 +124,13 @@ public class BracketedPatternTest {
         BibEntry another_bibentry = null;
         BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
         pattern.expand(another_bibentry, ';', another_database);
-        // The control should not reach this point, exception should be triggered:
-        assert(false);
     }
 
     @Test(expected = NullPointerException.class)
-    public void brachetedExpressionDefaultConstructorTest() {
+    public void bracketedExpressionDefaultConstructorTest() {
         BibDatabase another_database = null;
         BracketedPattern pattern = new BracketedPattern();
         pattern.expand(bibentry, ';', another_database);
-        // The control should not reach this point, exception should be triggered:
-        assert (false);
     }
 
     @Test
