@@ -1,10 +1,11 @@
 language: java
-
+python: 3.6
 # we test at Ubuntu Trusty (Ubuntu 14.04 LTS)
 # see https://docs.travis-ci.com/user/trusty-ci-environment/
 # This environment is continuously updated as described in https://docs.travis-ci.com/user/build-environment-updates/
 dist: trusty
 sudo: required
+
 
 services:
   - postgresql
