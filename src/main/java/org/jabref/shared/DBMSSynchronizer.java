@@ -15,6 +15,7 @@ import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -74,9 +75,9 @@ public class DBMSSynchronizer {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntryEvents may be posted.
         // In this case DBSynchronizer should not try to insert the bibEntry entry again (but it would not harm).
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
-            dbmsProcessor.insertEntry(event.getBibEntry());
             synchronizeLocalMetaData();
             synchronizeLocalDatabase(); // Pull changes for the case that there were some
+            dbmsProcessor.insertEntry(event.getBibEntry());
         }
     }
 
@@ -261,7 +262,7 @@ public class DBMSSynchronizer {
         }
 
         try {
-            MetaDataParser.parse(metaData, dbmsProcessor.getSharedMetaData(), keywordSeparator);
+            MetaDataParser.parse(metaData, dbmsProcessor.getSharedMetaData(), keywordSeparator, ChangePropagation.DO_NOT_POST_EVENT);
         } catch (ParseException e) {
             LOGGER.error("Parse error", e);
         }
