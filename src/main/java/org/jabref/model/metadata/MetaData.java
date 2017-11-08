@@ -64,15 +64,9 @@ public class MetaData {
         return Optional.ofNullable(saveOrderConfig);
     }
 
-    public void setSaveOrderConfig(SaveOrderConfig saveOrderConfig, ChangePropagation postChanges) {
-        this.saveOrderConfig = saveOrderConfig;
-        if (postChanges == ChangePropagation.POST_EVENT) {
-            postChange();
-        }
-    }
-
     public void setSaveOrderConfig(SaveOrderConfig saveOrderConfig) {
-        setSaveOrderConfig(saveOrderConfig, ChangePropagation.POST_EVENT);
+        this.saveOrderConfig = saveOrderConfig;
+        postChange();
     }
 
     public Optional<GroupTreeNode> getGroups() {
@@ -83,17 +77,11 @@ public class MetaData {
      * Sets a new group root node. <b>WARNING </b>: This invalidates everything
      * returned by getGroups() so far!!!
      */
-    public void setGroups(GroupTreeNode root, ChangePropagation postChanges) {
+    public void setGroups(GroupTreeNode root) {
         groupsRoot = Objects.requireNonNull(root);
         groupsRoot.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
         eventBus.post(new GroupUpdatedEvent(this));
-        if (postChanges == ChangePropagation.POST_EVENT) {
-            postChange();
-        }
-    }
-
-    public void setGroups(GroupTreeNode root) {
-        setGroups(root, ChangePropagation.POST_EVENT);
+        postChange();
     }
 
     /**
@@ -124,7 +112,7 @@ public class MetaData {
         setCiteKeyPattern(defaultValue, nonDefaultPatterns);
     }
 
-    public void setCiteKeyPattern(List<String> defaultValue, Map<String, List<String>> nonDefaultPatterns, ChangePropagation postChanges) {
+    public void setCiteKeyPattern(List<String> defaultValue, Map<String, List<String>> nonDefaultPatterns) {
         // Remove all patterns from metadata
         citeKeyPatterns.clear();
 
@@ -140,43 +128,25 @@ public class MetaData {
             defaultCiteKeyPattern = defaultValue.get(0);
         }
 
-        if (postChanges == ChangePropagation.POST_EVENT) {
-            postChange();
-        }
-    }
-
-    public void setCiteKeyPattern(List<String> defaultValue, Map<String, List<String>> nonDefaultPatterns) {
-        setCiteKeyPattern(defaultValue, nonDefaultPatterns, ChangePropagation.POST_EVENT);
+        postChange();
     }
 
     public Optional<FieldFormatterCleanups> getSaveActions() {
         return Optional.ofNullable(saveActions);
     }
 
-    public void setSaveActions(FieldFormatterCleanups saveActions, ChangePropagation postChanges) {
-        this.saveActions = Objects.requireNonNull(saveActions);
-        if (postChanges == ChangePropagation.POST_EVENT) {
-            postChange();
-        }
-    }
-
     public void setSaveActions(FieldFormatterCleanups saveActions) {
-        setSaveActions(saveActions, ChangePropagation.POST_EVENT);
+        this.saveActions = Objects.requireNonNull(saveActions);
+        postChange();
     }
 
     public Optional<BibDatabaseMode> getMode() {
         return Optional.ofNullable(mode);
     }
 
-    public void setMode(BibDatabaseMode mode, ChangePropagation postChanges) {
-        this.mode = Objects.requireNonNull(mode);
-        if (postChanges == ChangePropagation.POST_EVENT) {
-            postChange();
-        }
-    }
-
     public void setMode(BibDatabaseMode mode) {
-        setMode(mode, ChangePropagation.POST_EVENT);
+        this.mode = Objects.requireNonNull(mode);
+        postChange();
     }
 
     public boolean isProtected() {
@@ -191,15 +161,9 @@ public class MetaData {
         return contentSelectors.getContentSelectors();
     }
 
-    public void addContentSelector(ContentSelector contentSelector, ChangePropagation postChanges) {
-        this.contentSelectors.addContentSelector(contentSelector);
-        if (postChanges == ChangePropagation.POST_EVENT) {
-            postChange();
-        }
-    }
-
     public void addContentSelector(ContentSelector contentSelector) {
-        addContentSelector(contentSelector, ChangePropagation.POST_EVENT);
+        this.contentSelectors.addContentSelector(contentSelector);
+        postChange();
     }
 
     public void clearContentSelectors(String fieldName) {
@@ -215,30 +179,18 @@ public class MetaData {
         return Optional.ofNullable(defaultFileDirectory);
     }
 
-    public void setDefaultFileDirectory(String path, ChangePropagation postChanges) {
-        defaultFileDirectory = Objects.requireNonNull(path).trim();
-        if (postChanges == ChangePropagation.POST_EVENT) {
-            postChange();
-        }
-    }
-
     public void setDefaultFileDirectory(String path) {
-        setDefaultFileDirectory(path, ChangePropagation.POST_EVENT);
+        defaultFileDirectory = Objects.requireNonNull(path).trim();
+        postChange();
     }
 
     public Optional<String> getUserFileDirectory(String user) {
         return Optional.ofNullable(userFileDirectory.get(user));
     }
 
-    public void markAsProtected(ChangePropagation postChanges) {
-        isProtected = true;
-        if (postChanges == ChangePropagation.POST_EVENT) {
-            postChange();
-        }
-    }
-
     public void markAsProtected() {
-        markAsProtected(ChangePropagation.POST_EVENT);
+        isProtected = true;
+        postChange();
     }
 
     public void clearDefaultFileDirectory() {
@@ -246,15 +198,9 @@ public class MetaData {
         postChange();
     }
 
-    public void setUserFileDirectory(String user, String path, ChangePropagation postChanges) {
-        userFileDirectory.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
-        if (postChanges == ChangePropagation.POST_EVENT) {
-            postChange();
-        }
-    }
-
     public void setUserFileDirectory(String user, String path) {
-        setUserFileDirectory(user, path, ChangePropagation.POST_EVENT);
+        userFileDirectory.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
+        postChange();
     }
 
     public void clearUserFileDirectory(String user) {
@@ -262,15 +208,9 @@ public class MetaData {
         postChange();
     }
 
-    public void markAsNotProtected(ChangePropagation postChanges) {
-        isProtected = false;
-        if (postChanges == ChangePropagation.POST_EVENT) {
-            postChange();
-        }
-    }
-
     public void markAsNotProtected() {
-        markAsNotProtected(ChangePropagation.POST_EVENT);
+        isProtected = false;
+        postChange();
     }
 
     public void clearSaveActions() {
