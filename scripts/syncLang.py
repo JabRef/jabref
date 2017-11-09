@@ -7,7 +7,6 @@ import logging
 import os
 import subprocess
 import sys
-import io
 
 logging.basicConfig(level=logging.INFO)
 
