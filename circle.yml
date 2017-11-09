@@ -3,6 +3,8 @@ machine:
     TERM: dumb
   java:
     version: oraclejdk8
+  python:
+    version: 3.6.2
 
 dependencies:
   pre:

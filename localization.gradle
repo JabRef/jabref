@@ -2,57 +2,48 @@ repositories {
     jcenter()
 }
 
-configurations {
-    jython
+task localizationStatusVersion {
+    new ByteArrayOutputStream().withStream { os ->
+        def result = exec {
+            commandLine "python3", "--version"
+            standardOutput = os
+        }
+        if(!os.toString().startsWith("Python 3.") || Integer.parseInt(String.valueOf(os.toString().charAt(9))) < 6){
+            throw new Exception("You need at least Python 3.6 to run syncLang, was: " +os.toString())
+        }
+    }
 }
 
-dependencies {
-    jython 'org.python:jython-standalone:2.7.1'
-}
-
-task localizationStatusWithMarkdown(type: JavaExec) {
+task localizationStatusWithMarkdown(dependsOn: localizationStatusVersion, type: Exec) {
     description "Creates an update file in Markdown"
     group = 'Localization'
-    main 'org.python.util.jython'
-    classpath project.configurations.jython.asPath
-    args file("scripts/syncLang.py")
-    args "markdown"
+
+    commandLine "python3", "scripts/syncLang.py", "markdown"
 }
 
-task localizationStatus(type: JavaExec) {
+task localizationStatus(dependsOn: localizationStatusVersion, type: Exec) {
     description "Prints the current status"
     group = 'Localization'
-    main 'org.python.util.jython'
-    classpath project.configurations.jython.asPath
-    args file("scripts/syncLang.py")
-    args "status"
+
+    commandLine "python3", "scripts/syncLang.py", "status"
 }
 
-task localizationStatusExtended(type: JavaExec) {
+task localizationStatusExtended(dependsOn: localizationStatusVersion, type: Exec) {
     description "Prints the current status (extended output)"
     group = 'Localization'
-    main 'org.python.util.jython'
-    classpath project.configurations.jython.asPath
-    args file("scripts/syncLang.py")
-    args "status"
-    args "--extended"
+
+    commandLine "python3", "scripts/syncLang.py", "status", "--extended"
 }
 
-task localizationUpdate(type: JavaExec) {
+task localizationUpdate(dependsOn: localizationStatusVersion, type: Exec) {
     description "Updates the localization files (fixes duplicates, adds missing keys, and sort them"
     group = 'Localization'
-    main 'org.python.util.jython'
-    classpath project.configurations.jython.asPath
-    args file("scripts/syncLang.py")
-    args "update"
+
+    commandLine "python3", "scripts/syncLang.py", "update"
 }
 
-task localizationUpdateExtended(type: JavaExec) {
+task localizationUpdateExtended(dependsOn: localizationStatusVersion, type: Exec) {
     description "Updates the localization files (fixes duplicates, adds missing keys, and sort them (extended output)"
     group = 'Localization'
-    main 'org.python.util.jython'
-    classpath project.configurations.jython.asPath
-    args file("scripts/syncLang.py")
-    args "update"
-    args "--extended"
+    commandLine "python3", "scripts/syncLang.py", "update", "--extended"
 }
