@@ -3,6 +3,8 @@ package org.jabref;
 import java.net.Authenticator;
 import java.util.Map;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import javafx.application.Application;
@@ -24,6 +26,8 @@ import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteListenerClient;
+import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.JavaVersionCheck;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.EntryTypes;
@@ -65,6 +69,25 @@ public class JabRefMain extends Application {
         }
 
         Globals.prefs = preferences;
+
+        // Check if we are running an acceptable version of Java
+        final BuildInfo buildInfo = Globals.BUILD_INFO;
+        if (!buildInfo.isAcceptableJavaVersion()) {
+            StringBuilder versionError = new StringBuilder(
+                    Localization.lang("Your current Java version (%0) is not supported. Please install version %1 or higher.",
+                    JavaVersionCheck.getJavaVersion(),
+                    buildInfo.getMinRequiredJavaVersion()
+                    )
+            );
+            if (!buildInfo.isAllowJava9()) {
+                versionError.append("\n");
+                versionError.append(Localization.lang("Note that currently, JabRef does not run with Java 9."));
+            }
+            final JFrame frame = new JFrame();
+            JOptionPane.showMessageDialog(frame, versionError, Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+            frame.dispose();
+            System.exit(0);
+        }
         Globals.startBackgroundTasks();
 
         // Note that the language was already set during the initialization of the preferences and it is safe to
