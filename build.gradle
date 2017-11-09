@@ -9,7 +9,8 @@ plugins {
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
     id "com.simonharrer.modernizer" version '1.5.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.3'
-    id 'net.ltgt.errorprone' version '0.0.13'
+    id 'com.zyxist.chainsaw' version '0.1.3'
+    //id 'net.ltgt.errorprone' version '0.0.13'
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
@@ -34,9 +35,11 @@ group = "org.jabref"
 version = "4.1-dev"
 project.ext.threeDotVersion = "4.0.3.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.9
+targetCompatibility = 1.9
 mainClassName = "org.jabref.JabRefMain"
+javaModule.name ="org.jabref"
+
 
 install4j {
     installDir = file(project.ext.install4jDir)
