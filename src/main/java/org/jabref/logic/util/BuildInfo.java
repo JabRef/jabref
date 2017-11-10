@@ -78,16 +78,4 @@ public class BuildInfo {
     public boolean isAllowJava9() {
         return allowJava9;
     }
-
-    /**
-     * Tests if we are running an acceptable Java. This test uses the requirements for the Java version as specified in
-     * <code>gradle.build</code>. It is possible to define a minimum version up to the built number and to indicate whether
-     * Java 9 can be use (which it currently can't). It tries to compare this version number to the version of the currently
-     * running JVM. The check is optimistic and will rather return true even if we could not exactly determine the version.
-     *
-     * @return false if we are sure the version is not sufficient; otherwise it returns true
-     */
-    public boolean isAcceptableJavaVersion() {
-        return (!JavaVersionCheck.isJava9() || allowJava9) && JavaVersionCheck.isAtLeast(minRequiredJavaVersion);
-    }
 }
