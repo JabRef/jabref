@@ -5,6 +5,11 @@ language: java
 # This environment is continuously updated as described in https://docs.travis-ci.com/user/build-environment-updates/
 dist: trusty
 sudo: required
+group: edge
+
+jdk:
+ - oraclejdk8
+ - oraclejdk9
 
 services:
   - postgresql
