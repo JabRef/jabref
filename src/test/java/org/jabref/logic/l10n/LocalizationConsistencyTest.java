@@ -117,6 +117,24 @@ public class LocalizationConsistencyTest {
     }
 
     @Test
+    public void languageKeysShouldNotBeQuotedInFiles() throws IOException {
+        final List<LocalizationEntry> quotedEntries = LocalizationParser
+                .findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG)
+                .stream()
+                .filter(key -> key.getKey().contains("_") && key.getKey().equals(new LocalizationKey(key.getKey()).getPropertiesKey()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(
+                "Language keys must not be used quoted in code! Use \"This is a message\" instead of \"This_is_a_message\".\n" +
+                        "Please correct the following entries:\n" +
+                        quotedEntries
+                                .stream()
+                                .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
+                                .collect(Collectors.toList())
+                ,
+                Collections.EMPTY_LIST, quotedEntries);
+    }
+
+    @Test
     public void findMissingLocalizationKeys() throws IOException {
         List<LocalizationEntry> missingKeys = LocalizationParser.find(LocalizationBundleForTest.LANG).stream().sorted()
                 .distinct().collect(Collectors.toList());
@@ -125,7 +143,7 @@ public class LocalizationConsistencyTest {
                         "1. PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n" +
                         "2. EXECUTE: gradlew localizationUpdate\n" +
                         missingKeys.parallelStream()
-                                .map(key -> String.format("%s=%s", key.getKey(), key.getKey()))
+                                .map(key -> String.format("\n%s=%s\n", key.getKey(), key.getKey()))
                                 .collect(Collectors.toList()),
                 Collections.<LocalizationEntry>emptyList(), missingKeys);
     }
