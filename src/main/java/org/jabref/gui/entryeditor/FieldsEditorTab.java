@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -46,11 +48,13 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
     private FieldEditorFX activeField;
     private final BibDatabaseContext databaseContext;
+    private UndoManager undoManager;
 
-    public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders) {
+    public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager) {
         this.isCompressed = compressed;
         this.databaseContext = databaseContext;
         this.suggestionProviders = suggestionProviders;
+        this.undoManager = undoManager;
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -65,7 +69,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }
 
-    private Region setupPanel(BibEntry entry, boolean compressed, SuggestionProviders suggestionProviders) {
+    private Region setupPanel(BibEntry entry, boolean compressed, SuggestionProviders suggestionProviders, UndoManager undoManager) {
         editors.clear();
         List<Label> labels = new ArrayList<>();
 
@@ -75,7 +79,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.TASK_EXECUTOR, new FXDialogService(),
                     Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs,
                     databaseContext, entry.getType(),
-                    suggestionProviders);
+                    suggestionProviders, undoManager);
             fieldEditor.bindToEntry(entry);
 
             editors.put(fieldName, fieldEditor);
@@ -217,7 +221,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        Region panel = setupPanel(entry, isCompressed, suggestionProviders);
+        Region panel = setupPanel(entry, isCompressed, suggestionProviders, undoManager);
         setContent(panel);
     }
 

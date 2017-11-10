@@ -1,6 +1,7 @@
 package org.jabref.gui.undo;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
@@ -15,6 +16,9 @@ public class UndoableKeyChange extends AbstractUndoableJabRefEdit {
     private final String oldValue;
     private final String newValue;
 
+    public UndoableKeyChange(FieldChange change) {
+        this(change.getEntry(), change.getOldValue(), change.getNewValue());
+    }
 
     public UndoableKeyChange(BibEntry entry, String oldValue, String newValue) {
         this.entry = entry;

@@ -65,7 +65,6 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.util.component.CheckBoxMessage;
 import org.jabref.gui.util.component.VerticalLabelUI;
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
@@ -133,11 +132,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
      */
     private final AbstractAction prevEntryAction = new PrevEntryAction();
 
-    /**
-     * The action which generates a BibTeX key for this entry.
-     */
-    private final GenerateKeyAction generateKeyAction = new GenerateKeyAction();
-    private final AutoLinkAction autoLinkAction = new AutoLinkAction();
     private final AbstractAction writeXmp;
     private final TabPane tabbed = new TabPane();
     private final JabRefFrame frame;
@@ -317,20 +311,20 @@ public class EntryEditor extends JPanel implements EntryContainer {
         List<EntryEditorTab> tabs = new LinkedList<>();
 
         // Required fields
-        tabs.add(new RequiredFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders()));
+        tabs.add(new RequiredFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), panel.getUndoManager()));
 
         // Optional fields
-        tabs.add(new OptionalFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders()));
-        tabs.add(new OptionalFields2Tab(panel.getDatabaseContext(), panel.getSuggestionProviders()));
-        tabs.add(new DeprecatedFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders()));
+        tabs.add(new OptionalFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), panel.getUndoManager()));
+        tabs.add(new OptionalFields2Tab(panel.getDatabaseContext(), panel.getSuggestionProviders(), panel.getUndoManager()));
+        tabs.add(new DeprecatedFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), panel.getUndoManager()));
 
         // Other fields
-        tabs.add(new OtherFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders()));
+        tabs.add(new OtherFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), panel.getUndoManager()));
 
         // General fields from preferences
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
         for (int i = 0; i < tabList.getTabCount(); i++) {
-            tabs.add(new UserDefinedFieldsTab(tabList.getTabName(i), tabList.getTabFields(i), panel.getDatabaseContext(), panel.getSuggestionProviders()));
+            tabs.add(new UserDefinedFieldsTab(tabList.getTabName(i), tabList.getTabFields(i), panel.getDatabaseContext(), panel.getSuggestionProviders(), panel.getUndoManager()));
         }
 
         // Special tabs
@@ -377,10 +371,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_ENTRY_EDITOR), "close");
         actionMap.put("close", closeAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.AUTOGENERATE_BIBTEX_KEYS), "generateKey");
-        actionMap.put("generateKey", generateKeyAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.AUTOMATICALLY_LINK_FILES), "autoLink");
-        actionMap.put("autoLink", autoLinkAction);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
         actionMap.put("prev", prevEntryAction);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_ENTRY), "next");
@@ -405,8 +395,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         TypeButton typeButton = new TypeButton();
 
         toolBar.add(typeButton);
-        toolBar.add(generateKeyAction);
-        toolBar.add(autoLinkAction);
 
         toolBar.add(writeXmp);
 
@@ -811,64 +799,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    private class GenerateKeyAction extends AbstractAction {
-
-        private GenerateKeyAction() {
-            super(Localization.lang("Generate BibTeX key"), IconTheme.JabRefIcon.MAKE_KEY.getIcon());
-
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Generate BibTeX key"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            // 1. get BibEntry for selected index (already have)
-            // 2. update label
-
-            // This is a partial clone of org.jabref.gui.BasePanel.setupActions().new AbstractWorker() {...}.run()
-
-            // this updates the table automatically, on close, but not within the tab
-            Optional<String> oldValue = entry.getCiteKeyOptional();
-
-            if (oldValue.isPresent()) {
-                if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
-                    panel.output(Localization.lang(
-                            "Not overwriting existing key. To change this setting, open Options -> Prefererences -> BibTeX key generator"));
-                    return;
-                } else if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
-                    CheckBoxMessage cbm = new CheckBoxMessage(
-                            Localization.lang("The current BibTeX key will be overwritten. Continue?"),
-                            Localization.lang("Disable this confirmation dialog"), false);
-                    int answer = JOptionPane.showConfirmDialog(frame, cbm, Localization.lang("Overwrite key"),
-                            JOptionPane.YES_NO_OPTION);
-                    if (cbm.isSelected()) {
-                        Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, false);
-                    }
-                    if (answer == JOptionPane.NO_OPTION) {
-                        // Ok, break off the operation.
-                        return;
-                    }
-                }
-            }
-
-            BibtexKeyPatternUtil.makeAndSetLabel(panel.getBibDatabaseContext().getMetaData()
-                            .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
-                    panel.getDatabase(), entry,
-                    Globals.prefs.getBibtexKeyPatternPreferences());
-
-            if (entry.hasCiteKey()) {
-                // Store undo information:
-                panel.getUndoManager().addEdit(
-                        new UndoableKeyChange(entry, oldValue.orElse(null),
-                                entry.getCiteKeyOptional().get())); // Cite key always set here
-
-                // here we update the field
-                String bibtexKeyData = entry.getCiteKeyOptional().get();
-                entry.setField(BibEntry.KEY_FIELD, bibtexKeyData);
-                panel.markBaseChanged();
-            }
-        }
-    }
-
     private class UndoAction extends AbstractAction {
 
         private UndoAction() {
@@ -892,22 +822,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         @Override
         public void actionPerformed(ActionEvent e) {
             panel.runCommand(Actions.REDO);
-        }
-    }
-
-    private class AutoLinkAction extends AbstractAction {
-
-        private AutoLinkAction() {
-            putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.AUTO_FILE_LINK.getIcon());
-            putValue(Action.SHORT_DESCRIPTION,
-                    Localization.lang("Automatically set file links for this entry") +
-                            Globals.getKeyPrefs().get(KeyBinding.AUTOMATICALLY_LINK_FILES).map(b -> " (" + b + ")").orElse(""));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            // TODO: Reimplement this
-            //localFileListEditor.autoSetLinks();
         }
     }
 }

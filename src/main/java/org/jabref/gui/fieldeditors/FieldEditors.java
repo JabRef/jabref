@@ -4,6 +4,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.undo.UndoManager;
+
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
@@ -27,7 +29,7 @@ public class FieldEditors {
 
     private static final Log LOGGER = LogFactory.getLog(FieldEditors.class);
 
-    public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, JabRefPreferences preferences, BibDatabaseContext databaseContext, String entryType, SuggestionProviders suggestionProviders) {
+    public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, JabRefPreferences preferences, BibDatabaseContext databaseContext, String entryType, SuggestionProviders suggestionProviders, UndoManager undoManager) {
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 
         AutoCompleteSuggestionProvider<?> suggestionProvider = getSuggestionProvider(fieldName, suggestionProviders, databaseContext.getMetaData());
@@ -74,6 +76,8 @@ public class FieldEditors {
             return new KeywordsEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
         } else if (fieldExtras.contains(FieldProperty.MULTILINE_TEXT)) {
             return new MultilineEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
+        } else if (fieldExtras.contains(FieldProperty.KEY)) {
+            return new BibtexKeyEditor(fieldName, preferences, suggestionProvider, fieldCheckers, preferences.getBibtexKeyPatternPreferences(), databaseContext, undoManager);
         }
 
         // default
