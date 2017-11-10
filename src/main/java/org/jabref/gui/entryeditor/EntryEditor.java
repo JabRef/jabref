@@ -339,7 +339,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabs.add(new RelatedArticlesTab(Globals.prefs));
 
         // Source tab
-        sourceTab = new SourceTab(panel);
+        sourceTab = new SourceTab(panel.getBibDatabaseContext(), panel.getUndoManager(), Globals.prefs.getLatexFieldFormatterPreferences());
         tabs.add(sourceTab);
         return tabs;
     }

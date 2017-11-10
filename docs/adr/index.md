@@ -1,8 +1,13 @@
-# Architectural Decision Records
+# Architectural Decision Log
 
-This lists the architectural decisions for JabRef.
+This log lists the architectural decisions for JabRef.
 
-- [0000-use-architectural-decision-records.md](0000-use-architectural-decision-records) - Use Architectural Decision Records
-- [template.md](template/) - the template
+<!-- adrlog -->
 
-More information on architectural decision records is available at <https://adr.github.io/>.
+- [ADR-0000](0000-use-markdown-architectural-decision-records.md) - Use Markdown Architectural Decision Records
+
+<!-- adrlogstop -->
+
+For new ADRs, please use [template.md](template.md) as basis.
+More information on MADR is available at <https://adr.github.io/madr/>.
+General information about architectural decision records is available at <https://adr.github.io/>.
