@@ -65,7 +65,10 @@ public class JabRefMain extends Application {
      * optimistic and will rather return true even if we could not exactly determine the version.
      * <p>
      * Note: Users with an very old version like 1.6 will not profit from this since class versions are incompatible and
-     * JabRef won't even start.
+     * JabRef won't even start. Currently, JabRef won't start with Java 9 either, but the warning that it cannot be used
+     * with this version is helpful anyway to prevent users to update from an old 1.8 directly to version 9. Additionally,
+     * we soon might have a JabRef that does start with Java 9 but is not perfectly compatible. Therefore, we should leave
+     * the Java 9 check alive.
      */
     private static void ensureCorrectJavaVersion() {
         // Check if we are running an acceptable version of Java
