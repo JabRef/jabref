@@ -216,7 +216,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
         constraints.fill = GridBagConstraints.NONE;
         jPanel.add(generateButton, constraints);
 
-        jPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("ID-based_entry_generator")));
+        jPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("ID-based entry generator")));
 
         SwingUtilities.invokeLater(() -> idTextField.requestFocus());
 
