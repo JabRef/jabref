@@ -1,47 +1,29 @@
 package org.jabref.gui.entryeditor;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
 import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.undo.UndoableEdit;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -49,23 +31,20 @@ import org.jabref.gui.EntryContainer;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.gui.actions.Actions;
-import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.externalfiles.WriteXMPEntryEditorAction;
 import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.EntryFetchAndMergeWorker;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.util.component.VerticalLabelUI;
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
@@ -73,10 +52,8 @@ import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.integrity.BracesCorrector;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQueryHighlightListener;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabase;
@@ -101,7 +78,7 @@ import org.fxmisc.easybind.EasyBind;
  * events whenever a field of the entry changes, enabling the text fields to
  * update themselves if the change is made from somewhere else.
  */
-public class EntryEditor extends JPanel implements EntryContainer {
+public class EntryEditor extends BorderPane implements EntryContainer {
 
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
@@ -114,10 +91,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
      */
     private String displayedBibEntryType;
 
-    /**
-     * The action concerned with closing the window.
-     */
-    private final CloseAction closeAction = new CloseAction();
     /**
      * The action that deletes the current entry, and closes the editor.
      */
@@ -133,45 +106,34 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private final AbstractAction prevEntryAction = new PrevEntryAction();
 
     private final AbstractAction writeXmp;
-    private final TabPane tabbed = new TabPane();
+    @FXML private TabPane tabbed;
     private final JabRefFrame frame;
     private final BasePanel panel;
     private final HelpAction helpAction = new HelpAction(HelpFile.ENTRY_EDITOR, IconTheme.JabRefIcon.HELP.getIcon());
     private final UndoAction undoAction = new UndoAction();
     private final RedoAction redoAction = new RedoAction();
     private final List<SearchQueryHighlightListener> searchListeners = new ArrayList<>();
-    private final JFXPanel container;
     private final List<EntryEditorTab> tabs;
 
     /**
      * Indicates that we are about to go to the next or previous entry
      */
-    private final BooleanProperty movingToDifferentEntry = new SimpleBooleanProperty();
     private EntryType entryType;
     private SourceTab sourceTab;
-    private TypeLabel typeLabel;
+    @FXML private Label typeLabel;
 
     public EntryEditor(BasePanel panel) {
         this.frame = panel.frame();
         this.panel = panel;
 
+        ControlHelper.loadFXMLForControl(this);
+
         writeXmp = new WriteXMPEntryEditorAction(panel, this);
 
-        BorderLayout layout = new BorderLayout();
-        setLayout(layout);
-
-        container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
-        // Create type-label
-        typeLabel = new TypeLabel("");
-        setupToolBar();
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            tabbed.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-            tabbed.setStyle(
-                    "-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;" +
-                            "-fx-open-tab-animation: NONE; -fx-close-tab-animation: NONE;");
-            container.setScene(new Scene(tabbed));
-        });
-        add(container, BorderLayout.CENTER);
+        tabbed.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        tabbed.setStyle(
+                "-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;" +
+                        "-fx-open-tab-animation: NONE; -fx-close-tab-animation: NONE;");
 
         DefaultTaskExecutor.runInJavaFXThread(() -> {
                     EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
@@ -203,10 +165,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
             // Notify current tab about new entry
             EntryEditorTab selectedTab = (EntryEditorTab) tabbed.getSelectionModel().getSelectedItem();
             selectedTab.notifyAboutFocus(entry);
-        });
 
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, panel.getBibDatabaseContext().getMode());
-        typeLabel.setText(typedEntry.getTypeForDisplay());
+            // Update type label
+            TypedBibEntry typedEntry = new TypedBibEntry(entry, panel.getBibDatabaseContext().getMode());
+            typeLabel.setText(typedEntry.getTypeForDisplay());
+        });
     }
 
     @Subscribe
@@ -219,34 +182,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * Set-up key bindings specific for the entry editor.
      */
     private void setupKeyBindings() {
-        container.addKeyListener(new KeyAdapter() {
-
-            @Override
-            public void keyPressed(java.awt.event.KeyEvent e) {
-
-                //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
-                Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
-                if (keyBinding.isPresent()) {
-                    switch (keyBinding.get()) {
-                        case CUT:
-                        case COPY:
-                        case PASTE:
-                        case CLOSE_ENTRY_EDITOR:
-                        case DELETE_ENTRY:
-                        case SELECT_ALL:
-                        case ENTRY_EDITOR_NEXT_PANEL:
-                        case ENTRY_EDITOR_NEXT_PANEL_2:
-                        case ENTRY_EDITOR_PREVIOUS_PANEL:
-                        case ENTRY_EDITOR_PREVIOUS_PANEL_2:
-                            e.consume();
-                            break;
-                        default:
-                            //do nothing
-                    }
-                }
-            }
-        });
-
         tabbed.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
@@ -266,7 +201,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         event.consume();
                         break;
                     case CLOSE_ENTRY_EDITOR:
-                        closeAction.actionPerformed(null);
+                        close();
                         event.consume();
                         break;
                     default:
@@ -277,7 +212,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     public void close() {
-        closeAction.actionPerformed(null);
+        panel.entryEditorClosing(EntryEditor.this);
     }
 
     private void recalculateVisibleTabs() {
@@ -354,50 +289,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         return panel.getDatabase();
     }
 
-    private void setupToolBar() {
-
-        JPanel leftPan = new JPanel();
-        leftPan.setLayout(new BorderLayout());
-        JToolBar toolBar = new OSXCompatibleToolbar(SwingConstants.VERTICAL);
-
-        toolBar.setBorder(null);
-        toolBar.setRollover(true);
-
-        toolBar.setMargin(new Insets(0, 0, 0, 2));
-
-        // The toolbar carries all the key bindings that are valid for the whole window.
-        ActionMap actionMap = toolBar.getActionMap();
-        InputMap inputMap = toolBar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_ENTRY_EDITOR), "close");
-        actionMap.put("close", closeAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
-        actionMap.put("prev", prevEntryAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_ENTRY), "next");
-        actionMap.put("next", nextEntryAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.UNDO), "undo");
-        actionMap.put("undo", undoAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.REDO), "redo");
-        actionMap.put("redo", redoAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
-        actionMap.put("help", helpAction);
-
-        toolBar.setFloatable(false);
-
-        // Add actions (and thus buttons)
-        JButton closeBut = new JButton(closeAction);
-        closeBut.setText(null);
-        closeBut.setBorder(null);
-        closeBut.setMargin(new Insets(8, 0, 8, 0));
-        leftPan.add(closeBut, BorderLayout.NORTH);
-
-        leftPan.add(typeLabel, BorderLayout.CENTER);
-        TypeButton typeButton = new TypeButton();
-
-        toolBar.add(typeButton);
-
-        toolBar.add(writeXmp);
-
+    private ToolBar setupToolBar() {
         JPopupMenu fetcherPopup = new JPopupMenu();
 
         for (EntryBasedFetcher fetcher : WebFetchers
@@ -410,35 +302,20 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
             }));
         }
-        JButton fetcherButton = new JButton(IconTheme.JabRefIcon.REFRESH.getIcon());
-        fetcherButton.setToolTipText(Localization.lang("Update with bibliographic information from the web"));
-        fetcherButton.addMouseListener(new MouseAdapter() {
 
-            @Override
-            public void mousePressed(MouseEvent e) {
-                fetcherPopup.show(e.getComponent(), e.getX(), e.getY());
-            }
-        });
-        toolBar.add(fetcherButton);
+//        fetcherButton.addMouseListener(new MouseAdapter() {
 
-        toolBar.addSeparator();
+        //  @Override
+        //    public void mousePressed(MouseEvent e) {
+        //              fetcherPopup.show(e.getComponent(), e.getX(), e.getY());
+        //        }
+        //  });
 
-        toolBar.add(deleteAction);
-        toolBar.add(prevEntryAction);
-        toolBar.add(nextEntryAction);
+        ToolBar toolBar = new ToolBar(
 
-        toolBar.addSeparator();
+        );
 
-        toolBar.add(helpAction);
-
-        Component[] comps = toolBar.getComponents();
-
-        for (Component comp : comps) {
-            ((JComponent) comp).setOpaque(false);
-        }
-
-        leftPan.add(toolBar, BorderLayout.SOUTH);
-        add(leftPan, BorderLayout.WEST);
+        return toolBar;
     }
 
     void addSearchListener(SearchQueryHighlightListener listener) {
@@ -455,15 +332,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     @Override
     public void requestFocus() {
-        container.requestFocus();
-    }
-
-    /**
-     * Reports the enabled status of the editor, as set by setEnabled()
-     */
-    @Override
-    public boolean isEnabled() {
-        return true;
+        //container.requestFocus();
     }
 
     /**
@@ -496,18 +365,16 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     public void setMovingToDifferentEntry() {
-        movingToDifferentEntry.set(true);
         unregisterListeners();
     }
 
     private void unregisterListeners() {
         removeSearchListeners();
-
     }
 
     private void showChangeEntryTypePopupMenu() {
-        JPopupMenu typeMenu = new ChangeEntryTypeMenu().getChangeentryTypePopupMenu(panel);
-        typeMenu.show(this, 0, 0);
+        //JPopupMenu typeMenu = new ChangeEntryTypeMenu().getChangeentryTypePopupMenu(panel);
+        //typeMenu.show(this, 0, 0);
     }
 
     private void warnDuplicateBibtexkey() {
@@ -523,22 +390,20 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private class TypeButton extends JButton {
 
         private TypeButton() {
-            super(IconTheme.JabRefIcon.EDIT.getIcon());
-            setToolTipText(Localization.lang("Change entry type"));
             addActionListener(e -> showChangeEntryTypePopupMenu());
         }
     }
 
-    private class TypeLabel extends JLabel {
+    private class TypeLabel extends Label {
 
         private TypeLabel(String type) {
             super(type);
-            setUI(new VerticalLabelUI(false));
-            setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
-            setHorizontalAlignment(SwingConstants.RIGHT);
-            setFont(new Font("dialog", Font.ITALIC + Font.BOLD, 18));
+            //setUI(new VerticalLabelUI(false));
+            //setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
+            //setFont(new Font("dialog", Font.ITALIC + Font.BOLD, 18));
 
             // Add a mouse listener so the user can right-click the type label to change the entry type:
+            /*
             addMouseListener(new MouseAdapter() {
 
                 @Override
@@ -559,21 +424,13 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     showChangeEntryTypePopupMenu();
                 }
             });
-        }
-
-        @Override
-        public void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g;
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            super.paintComponent(g2);
+            */
         }
     }
 
     private class DeleteAction extends AbstractAction {
 
         private DeleteAction() {
-            super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete entry"));
         }
 
         @Override
@@ -593,26 +450,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    private class CloseAction extends AbstractAction {
-        private CloseAction() {
-            super(Localization.lang("Close window"), IconTheme.JabRefIcon.CLOSE.getSmallIcon());
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close window"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            Map<String,String> cleanedEntries = entry
-                    .getFieldMap()
-                    .entrySet()
-                    .stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, f -> BracesCorrector.apply(f.getValue())));
-            if (!cleanedEntries.equals(entry.getFieldMap())) {
-                frame.output(Localization.lang("Added missing braces."));
-            }
-            entry.setField(cleanedEntries);
-            panel.entryEditorClosing(EntryEditor.this);
-        }
-    }
 
     public class StoreFieldAction extends AbstractAction {
 
@@ -623,8 +460,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            boolean movingAway = movingToDifferentEntry.get();
-            movingToDifferentEntry.set(false);
 
             if (event.getSource() instanceof TextField) {
                 // Storage from bibtex key field.
@@ -753,7 +588,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             // Make sure we scroll to the entry if it moved in the table.
             // Should only be done if this editor is currently showing:
             // don't select the current entry again (eg use BasePanel#highlightEntry} in case another entry was selected)
-            if (!movingAway && isShowing()) {
+            if (isVisible()) {
                 SwingUtilities.invokeLater(() -> panel.getMainTable().ensureVisible(entry));
             }
         }
@@ -774,9 +609,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private class NextEntryAction extends AbstractAction {
 
         private NextEntryAction() {
-            super(Localization.lang("Next entry"), IconTheme.JabRefIcon.DOWN.getIcon());
 
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Next entry"));
         }
 
         @Override
@@ -788,9 +621,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private class PrevEntryAction extends AbstractAction {
 
         private PrevEntryAction() {
-            super(Localization.lang("Previous entry"), IconTheme.JabRefIcon.UP.getIcon());
 
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Previous entry"));
         }
 
         @Override
