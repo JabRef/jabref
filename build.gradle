@@ -254,19 +254,12 @@ javadoc {
 }
 
 junitPlatform {
+    filters {
+        tags {
+            exclude 'DatabaseTests', 'FetcherTests', 'GUITests'
+        }
+    }
     logManager 'org.apache.logging.log4j.jul.LogManager'
-}
-
-test {
-    useJUnit {
-        excludeCategories 'org.jabref.testutils.category.DatabaseTests'
-        excludeCategories 'org.jabref.testutils.category.FetcherTests'
-        excludeCategories 'org.jabref.testutils.category.GUITests'
-    }
-    testLogging {
-        events "failed"
-        exceptionFormat "full"
-    }
 }
 
 task databaseTest(type: Test) {
