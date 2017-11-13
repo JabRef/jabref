@@ -251,6 +251,10 @@ javadoc {
     }
 }
 
+junitPlatform {
+    logManager 'org.apache.logging.log4j.jul.LogManager'
+}
+
 test {
     useJUnit {
         excludeCategories 'org.jabref.testutils.category.DatabaseTests'
