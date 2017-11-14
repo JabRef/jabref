@@ -6,9 +6,11 @@ import org.jabref.testutils.category.DatabaseTests;
 
 import com.google.common.eventbus.Subscribe;
 import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
 
 @Category(DatabaseTests.class)
 @DatabaseTests
+@Tag("DatabaseTests")
 public class SynchronizationTestEventListener {
 
     private SharedEntryNotPresentEvent sharedEntryNotPresentEvent;

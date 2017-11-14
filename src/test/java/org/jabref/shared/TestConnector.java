@@ -6,9 +6,11 @@ import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.testutils.category.DatabaseTests;
 
 import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
 
 @Category(DatabaseTests.class)
 @DatabaseTests
+@Tag("DatabaseTests")
 public class TestConnector {
 
     public static DBMSType currentConnectionType;
