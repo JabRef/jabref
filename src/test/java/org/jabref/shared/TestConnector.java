@@ -8,6 +8,7 @@ import org.jabref.testutils.category.DatabaseTests;
 import org.junit.experimental.categories.Category;
 
 @Category(DatabaseTests.class)
+@DatabaseTests
 public class TestConnector {
 
     public static DBMSType currentConnectionType;

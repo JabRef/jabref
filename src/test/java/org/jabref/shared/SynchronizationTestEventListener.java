@@ -8,6 +8,7 @@ import com.google.common.eventbus.Subscribe;
 import org.junit.experimental.categories.Category;
 
 @Category(DatabaseTests.class)
+@DatabaseTests
 public class SynchronizationTestEventListener {
 
     private SharedEntryNotPresentEvent sharedEntryNotPresentEvent;

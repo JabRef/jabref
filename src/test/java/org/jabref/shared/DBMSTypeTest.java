@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(DatabaseTests.class)
+@DatabaseTests
 public class DBMSTypeTest {
 
     @Test

@@ -25,6 +25,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 @Category(DatabaseTests.class)
+@DatabaseTests
 public class SynchronizationTestSimulator {
 
     private BibDatabaseContext clientContextA;
