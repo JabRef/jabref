@@ -237,6 +237,8 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                 this.baseChanged = true;
             }
         }
+
+        this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
     }
 
     public static void runWorker(AbstractWorker worker) throws Exception {
@@ -2097,6 +2099,25 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         public void listen(EntryRemovedEvent removedEntryEvent) {
             // IMO only used to update the status (found X entries)
             frame.getGlobalSearchBar().performSearch();
+        }
+    }
+
+    /**
+     * Updates the timestamp of changed entries if the feature is enabled
+     */
+    public static class UpdateTimestampListener {
+        private final JabRefPreferences jabRefPreferences;
+
+        public UpdateTimestampListener(JabRefPreferences jabRefPreferences) {
+            this.jabRefPreferences = jabRefPreferences;
+        }
+
+        @Subscribe
+        public void listen(EntryChangedEvent event) {
+            if (jabRefPreferences.getTimestampPreferences().includeTimestamps()) {
+                event.getBibEntry().setField(jabRefPreferences.getTimestampPreferences().getTimestampField(),
+                        jabRefPreferences.getTimestampPreferences().now());
+            }
         }
     }
 
