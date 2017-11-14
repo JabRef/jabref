@@ -7,7 +7,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.1'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.2'
     }
 }
 
@@ -255,10 +255,14 @@ javadoc {
 
 junitPlatform {
     filters {
+        engines {
+            exclude 'junit-vintage'
+        }
         tags {
             exclude 'DatabaseTests', 'FetcherTests', 'GUITests'
         }
     }
+
     logManager 'org.apache.logging.log4j.jul.LogManager'
 }
 

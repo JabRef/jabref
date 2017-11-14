@@ -6,7 +6,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +16,8 @@ import org.mockito.Answers;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
-@Category(FetcherTests.class)
+@Category(FetcherTest.class)
+@FetcherTest
 public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
 
     @Before

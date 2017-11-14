@@ -8,7 +8,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.FieldName;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +18,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-@Category(FetcherTests.class)
+@Category(FetcherTest.class)
+@FetcherTest
 public class MedlineFetcherTest {
 
     private MedlineFetcher fetcher;

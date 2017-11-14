@@ -22,23 +22,19 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.shared.exception.DatabaseNotSupportedException;
 import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.shared.exception.OfflineLockException;
-import org.jabref.testutils.category.DatabaseTests;
+import org.jabref.testutils.category.DatabaseTest;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.jupiter.api.Tag;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(Parameterized.class)
-@Category(DatabaseTests.class)
-@DatabaseTests
-@Tag("DatabaseTests")
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@DatabaseTest
+
 public class DBMSSynchronizerTest {
 
     private DBMSSynchronizer dbmsSynchronizer;
@@ -50,7 +46,7 @@ public class DBMSSynchronizerTest {
     @Parameter
     public DBMSType dbmsType;
 
-    @Before
+    @BeforeEach
     public void setUp() throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
 
         dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
@@ -85,8 +81,8 @@ public class DBMSSynchronizerTest {
 
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
 
-        Assert.assertEquals(1, actualEntries.size());
-        Assert.assertEquals(expectedEntry, actualEntries.get(0));
+        assertEquals(1, actualEntries.size());
+        assertEquals(expectedEntry, actualEntries.get(0));
     }
 
     @Test
@@ -99,9 +95,9 @@ public class DBMSSynchronizerTest {
         expectedEntry.setField("title", "The micro multiplexer", EntryEventSource.SHARED);
 
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
-        Assert.assertEquals(1, actualEntries.size());
-        Assert.assertEquals(expectedEntry.getField("author"), actualEntries.get(0).getField("author"));
-        Assert.assertEquals("The nano processor1", actualEntries.get(0).getField("title").get());
+        assertEquals(1, actualEntries.size());
+        assertEquals(expectedEntry.getField("author"), actualEntries.get(0).getField("author"));
+        assertEquals("The nano processor1", actualEntries.get(0).getField("title").get());
 
     }
 
@@ -111,20 +107,20 @@ public class DBMSSynchronizerTest {
         bibDatabase.insertEntry(bibEntry);
 
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
-        Assert.assertEquals(1, actualEntries.size());
-        Assert.assertEquals(bibEntry, actualEntries.get(0));
+        assertEquals(1, actualEntries.size());
+        assertEquals(bibEntry, actualEntries.get(0));
 
         bibDatabase.removeEntry(bibEntry);
         actualEntries = dbmsProcessor.getSharedEntries();
 
-        Assert.assertEquals(0, actualEntries.size());
+        assertEquals(0, actualEntries.size());
 
         bibDatabase.insertEntry(bibEntry);
         bibDatabase.removeEntry(bibEntry, EntryEventSource.SHARED);
 
         actualEntries = dbmsProcessor.getSharedEntries();
-        Assert.assertEquals(1, actualEntries.size());
-        Assert.assertEquals(bibEntry, actualEntries.get(0));
+        assertEquals(1, actualEntries.size());
+        assertEquals(bibEntry, actualEntries.get(0));
     }
 
     @Test
@@ -137,16 +133,16 @@ public class DBMSSynchronizerTest {
         Map<String, String> expectedMap = MetaDataSerializer.getSerializedStringMap(testMetaData, pattern);
         Map<String, String> actualMap = dbmsProcessor.getSharedMetaData();
 
-        Assert.assertEquals(expectedMap, actualMap);
+        assertEquals(expectedMap, actualMap);
     }
 
     @Test
     public void testInitializeDatabases() throws SQLException, DatabaseNotSupportedException {
         clear();
         dbmsSynchronizer.initializeDatabases();
-        Assert.assertTrue(dbmsProcessor.checkBaseIntegrity());
+        assertTrue(dbmsProcessor.checkBaseIntegrity());
         dbmsSynchronizer.initializeDatabases();
-        Assert.assertTrue(dbmsProcessor.checkBaseIntegrity());
+        assertTrue(dbmsProcessor.checkBaseIntegrity());
     }
 
     @Test
@@ -156,11 +152,11 @@ public class DBMSSynchronizerTest {
         dbmsProcessor.insertEntry(expectedBibEntries.get(0));
         dbmsProcessor.insertEntry(expectedBibEntries.get(1));
 
-        Assert.assertTrue(bibDatabase.getEntries().isEmpty());
+        assertTrue(bibDatabase.getEntries().isEmpty());
 
         dbmsSynchronizer.synchronizeLocalDatabase();
 
-        Assert.assertEquals(expectedBibEntries, bibDatabase.getEntries());
+        assertEquals(expectedBibEntries, bibDatabase.getEntries());
 
         dbmsProcessor.removeEntry(expectedBibEntries.get(0));
         dbmsProcessor.removeEntry(expectedBibEntries.get(1));
@@ -169,14 +165,14 @@ public class DBMSSynchronizerTest {
 
         dbmsSynchronizer.synchronizeLocalDatabase();
 
-        Assert.assertEquals(expectedBibEntries, bibDatabase.getEntries());
+        assertEquals(expectedBibEntries, bibDatabase.getEntries());
     }
 
     @Test
     public void testSynchronizeLocalDatabaseWithEntryUpdate() throws OfflineLockException, SQLException {
         BibEntry bibEntry = getBibEntryExample(1);
         bibDatabase.insertEntry(bibEntry);
-        Assert.assertEquals(1, bibDatabase.getEntries().size());
+        assertEquals(1, bibDatabase.getEntries().size());
 
         BibEntry modifiedBibEntry = getBibEntryExample(1);
         modifiedBibEntry.setField("custom", "custom value");
@@ -187,7 +183,7 @@ public class DBMSSynchronizerTest {
         //testing point
         dbmsSynchronizer.synchronizeLocalDatabase();
 
-        Assert.assertEquals(bibDatabase.getEntries(), dbmsProcessor.getSharedEntries());
+        assertEquals(bibDatabase.getEntries(), dbmsProcessor.getSharedEntries());
     }
 
     @Test
@@ -202,7 +198,7 @@ public class DBMSSynchronizerTest {
 
         dbmsSynchronizer.applyMetaData();
 
-        Assert.assertEquals("wirthlin, michael j1", bibEntry.getField("author").get());
+        assertEquals("wirthlin, michael j1", bibEntry.getField("author").get());
 
     }
 
@@ -215,7 +211,7 @@ public class DBMSSynchronizerTest {
         return bibEntry;
     }
 
-    @After
+    @AfterEach
     public void clear() throws SQLException {
         TestManager.clearTables(dbmsConnection);
     }

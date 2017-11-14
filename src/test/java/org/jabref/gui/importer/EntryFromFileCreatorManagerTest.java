@@ -15,17 +15,16 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITest;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 import static org.mockito.Mockito.mock;
 
-@Category(GUITests.class)
+@GUITest
 public class EntryFromFileCreatorManagerTest {
 
     // Needed to initialize ExternalFileTypes

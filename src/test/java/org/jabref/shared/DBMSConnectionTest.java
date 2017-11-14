@@ -1,43 +1,31 @@
 package org.jabref.shared;
 
 import java.sql.SQLException;
-import java.util.Collection;
 
 import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.testutils.category.DatabaseTests;
+import org.jabref.testutils.category.DatabaseTest;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.jupiter.api.Tag;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
-@RunWith(Parameterized.class)
-@Category(DatabaseTests.class)
-@DatabaseTests
-@Tag("DatabaseTests")
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+@DatabaseTest
+
 public class DBMSConnectionTest {
 
-    @Parameter
-    public DBMSType dbmsType;
-
-
-    @Parameters(name = "Test with {0} database system")
-    public static Collection<DBMSType> getTestingDatabaseSystems() {
-        return TestManager.getDBMSTypeTestParameter();
+    @ParameterizedTest
+    @EnumSource(DBMSType.class)
+    public void testGetConnection(DBMSType dbmsType) throws SQLException, InvalidDBMSConnectionPropertiesException {
+        DBMSConnectionProperties properties = TestConnector.getTestConnectionProperties(dbmsType);
+        assertNotNull(new DBMSConnection(properties).getConnection());
     }
 
     @Test
-    public void testGetConnection() throws SQLException, InvalidDBMSConnectionPropertiesException {
-        DBMSConnectionProperties properties = TestConnector.getTestConnectionProperties(dbmsType);
-        Assert.assertNotNull(new DBMSConnection(properties).getConnection());
-    }
-
-    @Test(expected = SQLException.class)
-    public void testGetConnectionFail() throws SQLException, InvalidDBMSConnectionPropertiesException {
-        new DBMSConnection(new DBMSConnectionProperties(dbmsType, "XXXX", 0, "XXXX", "XXXX", "XXXX")).getConnection();
+    public void testGetConnectionFail(DBMSType dbmsType) throws SQLException, InvalidDBMSConnectionPropertiesException {
+        assertThrows(SQLException.class,
+                () -> new DBMSConnection(new DBMSConnectionProperties(dbmsType, "XXXX", 0, "XXXX", "XXXX", "XXXX")).getConnection());
     }
 }

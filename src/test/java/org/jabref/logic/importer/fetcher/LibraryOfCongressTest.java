@@ -3,14 +3,15 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 
-@Category(FetcherTests.class)
+@Category(FetcherTest.class)
+@FetcherTest
 public class LibraryOfCongressTest {
 
     private LibraryOfCongress fetcher = new LibraryOfCongress();

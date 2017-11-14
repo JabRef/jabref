@@ -4,7 +4,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +12,8 @@ import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 
-@Category(FetcherTests.class)
+@Category(FetcherTest.class)
+@FetcherTest
 public class CrossRefTest {
 
     private CrossRef fetcher;

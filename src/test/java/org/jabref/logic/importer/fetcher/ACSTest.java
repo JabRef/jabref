@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.support.DevEnvironment;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -14,7 +14,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-@Category(FetcherTests.class)
+@Category(FetcherTest.class)
+@FetcherTest
 public class ACSTest {
 
     private ACS finder;

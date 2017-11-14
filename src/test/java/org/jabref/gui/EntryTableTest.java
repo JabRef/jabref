@@ -3,13 +3,12 @@ package org.jabref.gui;
 import java.awt.event.KeyEvent;
 import java.util.regex.Pattern;
 
-import org.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITest;
 
 import org.assertj.swing.fixture.JTableCellFixture;
 import org.assertj.swing.fixture.JTableFixture;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 /**
  * Specific Use-Case:
@@ -17,7 +16,8 @@ import org.junit.experimental.categories.Category;
  * Then I click on the first entry again, and scroll through all of the lists entries, without having to click
  * on the table again.
  */
-@Category(GUITests.class)
+
+@GUITest
 public class EntryTableTest extends AbstractUITest{
 
     private final static int SCROLL_ACTION_EXECUTION = 5;

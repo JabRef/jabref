@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 import org.jabref.gui.BasePanel;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.testutils.TestUtils;
-import org.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITest;
 
 import org.assertj.swing.core.ComponentFinder;
 import org.assertj.swing.edt.FailOnThreadViolationRepaintManager;
@@ -19,9 +19,8 @@ import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
-@Category(GUITests.class)
+@GUITest
 public class SearchResultsTest extends AssertJSwingJUnitTestCase {
 
     private FrameFixture frameFixture;

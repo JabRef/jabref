@@ -11,23 +11,22 @@ import org.jabref.model.database.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.shared.exception.DatabaseNotSupportedException;
 import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.testutils.category.DatabaseTests;
+import org.jabref.testutils.category.DatabaseTest;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.jupiter.api.Tag;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(Parameterized.class)
-@Category(DatabaseTests.class)
-@DatabaseTests
-@Tag("DatabaseTests")
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@DatabaseTest
+
 public class SynchronizationTestSimulator {
 
     private BibDatabaseContext clientContextA;
@@ -40,8 +39,7 @@ public class SynchronizationTestSimulator {
     @Parameter
     public DBMSType dbmsType;
 
-
-    @Before
+    @BeforeEach
     public void setUp() throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
         this.dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
 
@@ -71,7 +69,7 @@ public class SynchronizationTestSimulator {
         //client B pulls the changes
         clientContextB.getDBMSSynchronizer().pullChanges();
 
-        Assert.assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
+        assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
     }
 
     @Test
@@ -86,7 +84,7 @@ public class SynchronizationTestSimulator {
 
         clientContextB.getDBMSSynchronizer().pullChanges();
 
-        Assert.assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
+        assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
     }
 
     @Test
@@ -97,17 +95,17 @@ public class SynchronizationTestSimulator {
         //client B pulls the entry
         clientContextB.getDBMSSynchronizer().pullChanges();
 
-        Assert.assertFalse(clientContextA.getDatabase().getEntries().isEmpty());
-        Assert.assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
-        Assert.assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
+        assertFalse(clientContextA.getDatabase().getEntries().isEmpty());
+        assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
+        assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
 
         //client A removes the entry
         clientContextA.getDatabase().removeEntry(bibEntry);
         //client B pulls the change
         clientContextB.getDBMSSynchronizer().pullChanges();
 
-        Assert.assertTrue(clientContextA.getDatabase().getEntries().isEmpty());
-        Assert.assertTrue(clientContextB.getDatabase().getEntries().isEmpty());
+        assertTrue(clientContextA.getDatabase().getEntries().isEmpty());
+        assertTrue(clientContextB.getDatabase().getEntries().isEmpty());
     }
 
     @Test
@@ -118,22 +116,22 @@ public class SynchronizationTestSimulator {
         //client B pulls the entry
         clientContextB.getDBMSSynchronizer().pullChanges();
 
-        Assert.assertFalse(clientContextA.getDatabase().getEntries().isEmpty());
-        Assert.assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
-        Assert.assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
+        assertFalse(clientContextA.getDatabase().getEntries().isEmpty());
+        assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
+        assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
 
         //client A removes the entry
         clientContextA.getDatabase().removeEntry(bibEntryOfClientA);
 
-        Assert.assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
-        Assert.assertNull(eventListenerB.getSharedEntryNotPresentEvent());
+        assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
+        assertNull(eventListenerB.getSharedEntryNotPresentEvent());
         //client B tries to update the entry
         BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().get(0);
         bibEntryOfClientB.setField("year", "2009");
 
         // here a new SharedEntryNotPresentEvent has been thrown. In this case the user B would get an pop-up window.
-        Assert.assertNotNull(eventListenerB.getSharedEntryNotPresentEvent());
-        Assert.assertEquals(bibEntryOfClientB, eventListenerB.getSharedEntryNotPresentEvent().getBibEntry());
+        assertNotNull(eventListenerB.getSharedEntryNotPresentEvent());
+        assertEquals(bibEntryOfClientB, eventListenerB.getSharedEntryNotPresentEvent().getBibEntry());
     }
 
     @Test
@@ -149,9 +147,9 @@ public class SynchronizationTestSimulator {
 
         // B does nothing here, so there is no event occurrence
         // B now tries to update the entry
-        Assert.assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
+        assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
 
-        Assert.assertNull(eventListenerB.getUpdateRefusedEvent());
+        assertNull(eventListenerB.getUpdateRefusedEvent());
 
         BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().get(0);
         //B also tries to change something
@@ -159,7 +157,7 @@ public class SynchronizationTestSimulator {
 
         // B now cannot update the shared entry, due to optimistic offline lock.
         // In this case an BibEntry merge dialog pops up.
-        Assert.assertNotNull(eventListenerB.getUpdateRefusedEvent());
+        assertNotNull(eventListenerB.getUpdateRefusedEvent());
     }
 
     private BibEntry getBibEntryExample(int index) {
@@ -173,7 +171,7 @@ public class SynchronizationTestSimulator {
         return bibEntry;
     }
 
-    @After
+    @AfterEach
     public void clear() throws SQLException {
         TestManager.clearTables(dbmsConnection);
     }

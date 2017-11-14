@@ -11,7 +11,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,7 +24,8 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Category(FetcherTests.class)
+@Category(FetcherTest.class)
+@FetcherTest
 public class ArXivTest {
 
     @Rule public ExpectedException expectedException = ExpectedException.none();

@@ -9,14 +9,13 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.text.JTextComponent;
 
-import org.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITest;
 
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
 import org.assertj.swing.fixture.JTableFixture;
 import org.assertj.swing.timing.Condition;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -24,7 +23,8 @@ import static org.assertj.swing.finder.WindowFinder.findDialog;
 import static org.assertj.swing.timing.Pause.pause;
 
 @RunWith(Parameterized.class)
-@Category(GUITests.class)
+
+@GUITest
 public class IdFetcherDialogTest extends AbstractUITest {
 
     private final String databaseMode, fetcherType, fetchID;
