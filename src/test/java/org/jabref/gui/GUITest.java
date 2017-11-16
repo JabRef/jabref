@@ -11,10 +11,11 @@ import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
 import org.assertj.swing.fixture.DialogFixture;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.assertj.swing.finder.WindowFinder.findDialog;
 
-@org.jabref.testutils.category.GUITest
+@Category(org.jabref.testutils.category.GUITest.class)
 public class GUITest extends AbstractUITest {
 
     @Test
