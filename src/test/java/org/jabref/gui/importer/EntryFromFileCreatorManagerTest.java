@@ -21,10 +21,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.mockito.Mockito.mock;
 
-@GUITest
+@Category(GUITest.class)
 public class EntryFromFileCreatorManagerTest {
 
     // Needed to initialize ExternalFileTypes

@@ -19,8 +19,9 @@ import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
-@GUITest
+@Category(GUITest.class)
 public class SearchResultsTest extends AssertJSwingJUnitTestCase {
 
     private FrameFixture frameFixture;

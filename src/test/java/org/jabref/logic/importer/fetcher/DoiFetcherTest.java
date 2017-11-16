@@ -18,7 +18,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 @Category(FetcherTest.class)
-@FetcherTest
 public class DoiFetcherTest {
 
     private DoiFetcher fetcher;

@@ -13,7 +13,6 @@ import org.junit.experimental.categories.Category;
 import static org.junit.Assert.assertEquals;
 
 @Category(FetcherTest.class)
-@FetcherTest
 public class CrossRefTest {
 
     private CrossRef fetcher;

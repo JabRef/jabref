@@ -18,7 +18,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 @Category(FetcherTest.class)
-@FetcherTest
 public class DiVATest {
 
     private DiVA fetcher;

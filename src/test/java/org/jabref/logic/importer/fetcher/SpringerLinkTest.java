@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(FetcherTest.class)
-@FetcherTest
 public class SpringerLinkTest {
 
     private SpringerLink finder;

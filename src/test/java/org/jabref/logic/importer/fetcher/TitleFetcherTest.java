@@ -17,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 @Category(FetcherTest.class)
-@FetcherTest
 public class TitleFetcherTest {
 
     private TitleFetcher fetcher;

@@ -19,7 +19,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category(FetcherTest.class)
-@FetcherTest
 public class GvkFetcherTest {
 
     private GvkFetcher fetcher;

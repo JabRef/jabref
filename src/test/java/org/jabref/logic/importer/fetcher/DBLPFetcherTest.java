@@ -20,7 +20,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Category(FetcherTest.class)
-@FetcherTest
 public class DBLPFetcherTest {
 
     private DBLPFetcher dblpFetcher;

@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DatabaseTest
-
 public class DBMSConnectionTest {
 
     @ParameterizedTest

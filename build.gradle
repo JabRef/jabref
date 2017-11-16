@@ -255,11 +255,8 @@ javadoc {
 
 junitPlatform {
     filters {
-        engines {
-            exclude 'junit-vintage'
-        }
         tags {
-            exclude 'DatabaseTests', 'FetcherTests', 'GUITests'
+            exclude 'DatabaseTest', 'org.jabref.testutils.category.FetcherTest', 'org.jabref.testutils.category.GUITest'
         }
     }
 
@@ -268,19 +265,19 @@ junitPlatform {
 
 task databaseTest(type: Test) {
     useJUnit {
-        includeCategories 'org.jabref.testutils.category.DatabaseTests'
+        includeCategories 'org.jabref.testutils.category.DatabaseTest'
     }
 }
 
 task fetcherTest(type: Test) {
     useJUnit {
-        includeCategories 'org.jabref.testutils.category.FetcherTests'
+        includeCategories 'org.jabref.testutils.category.FetcherTest'
     }
 }
 
 task guiTest(type: Test) {
     useJUnit {
-        includeCategories 'org.jabref.testutils.category.GUITests'
+        includeCategories 'org.jabref.testutils.category.GUITest'
     }
 }
 

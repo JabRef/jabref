@@ -18,7 +18,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.mock;
 
 @Category(FetcherTest.class)
-@FetcherTest
 public class IsbnViaChimboriFetcherTest extends AbstractIsbnFetcherTest {
 
     @Before

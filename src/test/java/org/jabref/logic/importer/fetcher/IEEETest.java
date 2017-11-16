@@ -15,7 +15,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(FetcherTest.class)
-@FetcherTest
 public class IEEETest {
     private IEEE finder;
     private BibEntry entry;

@@ -6,7 +6,6 @@ import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.testutils.category.DatabaseTest;
 
 @DatabaseTest
-
 public class TestConnector {
 
     public static DBMSConnection getTestDBMSConnection(DBMSType dbmsType) throws SQLException, InvalidDBMSConnectionPropertiesException {

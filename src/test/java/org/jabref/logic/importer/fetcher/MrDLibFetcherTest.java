@@ -15,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 @Category(FetcherTest.class)
-@FetcherTest
 public class MrDLibFetcherTest {
 
     private MrDLibFetcher fetcher;

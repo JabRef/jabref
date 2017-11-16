@@ -19,7 +19,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Category(FetcherTest.class)
-@FetcherTest
 public class MedlineFetcherTest {
 
     private MedlineFetcher fetcher;

@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DatabaseTest
-
 public class SynchronizationTestSimulator {
 
     private BibDatabaseContext clientContextA;

@@ -15,6 +15,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.xml.sax.SAXException;
 
 /**
@@ -25,7 +26,7 @@ import org.xml.sax.SAXException;
  * @author Christopher Oezbek
  */
 
-@GUITest
+@Category(GUITest.class)
 public class OAI2HandlerFetcherTest {
 
     protected OAI2Handler handler;

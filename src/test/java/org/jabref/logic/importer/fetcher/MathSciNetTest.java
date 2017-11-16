@@ -21,7 +21,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Category(FetcherTest.class)
-@FetcherTest
 public class MathSciNetTest {
 
     MathSciNet fetcher;
