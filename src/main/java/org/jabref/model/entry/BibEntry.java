@@ -105,16 +105,6 @@ public class BibEntry implements Cloneable {
         return setField(FieldName.MONTH, parsedMonth.getJabRefFormat());
     }
 
-    public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Optional<Keyword> newValue,
-            Character keywordDelimiter) {
-        KeywordList keywordList = getKeywords(keywordDelimiter);
-        if (newValue.isPresent()) {
-            keywordList.replaceAll(keywordsToReplace, newValue.get());
-        }
-
-        return putKeywords(keywordList, keywordDelimiter);
-    }
-
     /**
      * Returns the text stored in the given field of the given bibtex entry
      * which belongs to the given database.
@@ -686,6 +676,16 @@ public class BibEntry implements Cloneable {
     public KeywordList getResolvedKeywords(Character delimiter, BibDatabase database) {
         Optional<String> keywordsContent = getResolvedFieldOrAlias(FieldName.KEYWORDS, database);
         return KeywordList.parse(keywordsContent, delimiter);
+    }
+
+    public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Optional<Keyword> newValue,
+                                                 Character keywordDelimiter) {
+        KeywordList keywordList = getKeywords(keywordDelimiter);
+        if (newValue.isPresent()) {
+            keywordList.replaceAll(keywordsToReplace, newValue.get());
+        }
+
+        return putKeywords(keywordList, keywordDelimiter);
     }
 
     public Collection<String> getFieldValues() {
