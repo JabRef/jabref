@@ -8,11 +8,14 @@ import java.util.Optional;
 
 import org.jabref.model.FieldChange;
 
+import org.jabref.model.entry.specialfields.SpecialField;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class BibEntryTests {
 
@@ -367,6 +370,36 @@ public class BibEntryTests {
         BibEntry entry = new BibEntry();
         entry.setField(FieldName.KEYWORDS, "w1, w2a w2b, w3");
         assertEquals(new KeywordList("w1", "w2a w2b", "w3"), entry.getKeywords(','));
+    }
+
+    @Test
+    public void removeKeywordsOnEntryWithoutKeywordsDoesNothing() {
+        BibEntry entry = new BibEntry();
+        Optional<FieldChange> change = entry.removeKeywords(SpecialField.RANKING.getKeyWords(), ',');
+        assertEquals(Optional.empty(), change);
+    }
+
+    @Test
+    public void removeKeywordsWithEmptyListDoesNothing() {
+        keywordEntry.putKeywords(Arrays.asList("kw1", "kw2"), ',');
+        Optional<FieldChange> change = keywordEntry.removeKeywords(new KeywordList(), ',');
+        assertEquals(Optional.empty(), change);
+    }
+
+    @Test
+    public void removeKeywordsWithNonExistingKeywordsDoesNothing() {
+        keywordEntry.putKeywords(Arrays.asList("kw1", "kw2"), ',');
+        Optional<FieldChange> change = keywordEntry.removeKeywords(KeywordList.parse("kw3, kw4", ','), ',');
+        assertEquals(Optional.empty(), change);
+        assertEquals(2, keywordEntry.getKeywords(',').size());
+    }
+
+    @Test
+    public void removeKeywordsWithExistingKeywordsRemovesThem() {
+        keywordEntry.putKeywords(Arrays.asList("kw1", "kw2", "kw3"), ',');
+        Optional<FieldChange> change = keywordEntry.removeKeywords(KeywordList.parse("kw1, kw2", ','), ',');
+        assertTrue(change.isPresent());
+        assertEquals(KeywordList.parse("kw3", ','), keywordEntry.getKeywords(','));
     }
 
     @Test

@@ -46,9 +46,12 @@ public class SpecialFieldsUtils {
 
         Optional<Keyword> newValue = entry.getField(specialField.getFieldName()).map(Keyword::new);
         KeywordList keyWords = specialField.getKeyWords();
-
-        Optional<FieldChange> change = entry.replaceKeywords(keyWords, newValue, keywordDelimiter);
-        change.ifPresent(changeValue -> fieldChanges.add(changeValue));
+        if(newValue.isPresent()) {
+            Optional<FieldChange> change = entry.replaceKeywords(keyWords, newValue, keywordDelimiter);
+            change.ifPresent(changeValue -> fieldChanges.add(changeValue));
+        } else {
+            entry.removeKeywords(keyWords, keywordDelimiter).ifPresent(changeValue -> fieldChanges.add(changeValue));
+        }
 
         return fieldChanges;
     }
