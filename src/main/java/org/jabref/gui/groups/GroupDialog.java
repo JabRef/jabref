@@ -28,6 +28,7 @@ import javax.swing.SwingConstants;
 import javax.swing.event.CaretListener;
 
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
@@ -566,7 +567,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
             s1 = searchGroupSearchExpression.getText().trim();
             okEnabled = okEnabled & !s1.isEmpty();
             if (okEnabled) {
-                setDescription(new SearchQuery(s1, isCaseSensitive(), isRegex()).getDescription());
+                setDescription(fromTextFlowToHTMLString(new SearchQuery(s1, isCaseSensitive(), isRegex()).getDescription()));
 
                 if (isRegex()) {
                     try {
@@ -589,6 +590,11 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
             setNameFontItalic(false);
         }
         okButton.setEnabled(okEnabled);
+    }
+
+    //TODO right placement?
+    private String fromTextFlowToHTMLString(TextFlow textFlow) {
+        return "";
     }
 
     private boolean isRegex() {

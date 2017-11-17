@@ -4,8 +4,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import javafx.scene.text.TextFlow;
+
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.rules.describer.SearchDescribers;
+import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
 import org.jabref.model.search.rules.ContainBasedSearchRule;
@@ -20,7 +22,8 @@ public class SearchQuery implements SearchMatcher {
     private final boolean caseSensitive;
     private final boolean regularExpression;
     private final SearchRule rule;
-    private final String description;
+    // TODO is it ok to have a gui dependency in the logic package?
+    private final TextFlow description;
 
     public SearchQuery(String query, boolean caseSensitive, boolean regularExpression) {
         this.query = Objects.requireNonNull(query);
@@ -103,7 +106,7 @@ public class SearchQuery implements SearchMatcher {
         return regularExpression;
     }
 
-    public String getDescription() {
+    public TextFlow getDescription() {
         return description;
     }
 
