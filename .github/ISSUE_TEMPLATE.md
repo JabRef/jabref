@@ -2,7 +2,7 @@
 Feature requests,  questions and general feedback is now handled at http://discourse.jabref.org 
 Thanks! --> 
 
-[ ] I have tested the latest master version from http://builds.jabref.org/master/ and the problem persists
+- [ ] I have tested the latest master version from http://builds.jabref.org/master/ and the problem persists
 
 
 JabRef version <!-- version as shown in the about box --> on <!-- Windows 10|Ubuntu 14.04|Mac OS X 10.8|... -->
