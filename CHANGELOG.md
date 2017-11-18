@@ -43,10 +43,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We no longer allow to add a field multiple times in customized entry types and thereby fix an issue in the entry editor that resulted from having a field multiple times. [#3046](https://github.com/JabRef/jabref/issues/3046)
  - We fixed an issue where JabRef would not show the translated content at some points, although there existed a translation
  - We fixed an issue where editing in the source tab would override content of other entries [#3352](https://github.com/JabRef/jabref/issues/3352#issue-268580818)
+ - We fixed an issue where file links created under windows could not be opened on Linux/OSX [#3311](https://github.com/JabRef/jabref/issues/3311)
  - We fixed several issues with the automatic linking of files in the entry editor where files were not found or not correctly saved in the bibtex source [#3346](https://github.com/JabRef/jabref/issues/3346)
  - We fixed an issue where fetching entries from crossref that had no titles caused an error [#3376](https://github.com/JabRef/jabref/issues/3376)
  - We fixed an issue where the same Java Look and Feel would be listed more than once in the Preferences. [#3391](https://github.com/JabRef/jabref/issues/3391)
  - We fixed an issue where errors in citation styles triggered an exception when opening the preferences dialog [#3389](https://github.com/JabRef/jabref/issues/3389)
+
 
  ### Removed
 
