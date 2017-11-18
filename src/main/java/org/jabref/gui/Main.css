@@ -66,6 +66,12 @@
     -fx-effect:none;
 }
 
+.search-tooltip {
+    -fx-border-color: #2C4987;
+    -fx-padding: 0;
+    -fx-background-color: #ACD2F8;
+}
+
 .flatButton {
     -fx-shadow-highlight-color: transparent;
     -fx-outer-border: transparent;
