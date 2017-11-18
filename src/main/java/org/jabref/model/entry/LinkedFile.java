@@ -33,15 +33,8 @@ public class LinkedFile implements Serializable {
 
     public LinkedFile(String description, String link, String fileType) {
         this.description.setValue(Objects.requireNonNull(description));
-
-        String fileLink = Objects.requireNonNull(link);
-        if (!isOnlineLink(fileLink)) {
-            this.link.setValue(fileLink.replace("\\", "/"));
-        } else {
-            this.link.setValue(fileLink);
-        }
-
         this.fileType.setValue(Objects.requireNonNull(fileType));
+        setLink(Objects.requireNonNull(link));
     }
 
     public LinkedFile(String description, URL link, String fileType) {
