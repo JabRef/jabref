@@ -3,7 +3,7 @@ import org.gradle.internal.os.OperatingSystem
 // to update the gradle wrapper, execute ./gradlew wrapper --gradle-version 4.0
 
 plugins {
-    id 'com.gradle.build-scan' version '1.8'
+    id 'com.gradle.build-scan' version '1.9'
     id 'com.install4j.gradle' version '6.1.5'
     id 'com.github.johnrengelman.shadow' version '2.0.1'
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
@@ -37,6 +37,10 @@ project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jD
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 mainClassName = "org.jabref.JabRefMain"
+
+// These are the Java version requirements we will check on each start of JabRef
+ext.minRequiredJavaVersion = "1.8.0_144"
+ext.allowJava9 = false
 
 install4j {
     installDir = file(project.ext.install4jDir)
@@ -97,7 +101,7 @@ dependencies {
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
-    compile 'com.google.guava:guava:23.2-jre'
+    compile 'com.google.guava:guava:23.3-jre'
 
     // JavaFX stuff
     compile 'com.airhacks:afterburner.fx:1.7.0'
@@ -131,7 +135,7 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.11.0'
-    testCompile 'com.github.tomakehurst:wiremock:2.8.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.10.1'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.5.0'
@@ -160,7 +164,11 @@ processResources {
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
-                "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'))
+                "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'),
+                "minRequiredJavaVersion": minRequiredJavaVersion,
+                "allowJava9": allowJava9
+
+        )
         filteringCharset = 'UTF-8'
     }
 

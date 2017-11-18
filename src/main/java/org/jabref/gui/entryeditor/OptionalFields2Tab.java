@@ -1,6 +1,6 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.List;
+import java.util.Collection;
 
 import javafx.scene.control.Tooltip;
 
@@ -21,7 +21,7 @@ public class OptionalFields2Tab extends FieldsEditorTab {
     }
 
     @Override
-    protected List<String> determineFieldsToShow(BibEntry entry, EntryType entryType) {
+    protected Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType) {
         return entryType.getSecondaryOptionalNotDeprecatedFields();
     }
 }
