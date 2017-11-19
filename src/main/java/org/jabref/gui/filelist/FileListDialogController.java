@@ -2,12 +2,15 @@ package org.jabref.gui.filelist;
 
 import java.io.IOException;
 import java.util.Optional;
+
 import javax.inject.Inject;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+
 import org.jabref.gui.AbstractController;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -52,20 +55,19 @@ public class FileListDialogController extends AbstractController<FileListDialogV
     }
 
     @FXML
-    void browseFileDialog(ActionEvent event) {
-
+    private void browseFileDialog(ActionEvent event) {
         viewModel.browseFileDialog();
         tfLink.requestFocus();
 
     }
 
     @FXML
-    void cancel(ActionEvent event) {
+    private void cancel(ActionEvent event) {
         getStage().close();
     }
 
     @FXML
-    void ok_clicked(ActionEvent event) {
+    private void ok_clicked(ActionEvent event) {
 
     }
 
