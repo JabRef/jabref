@@ -2102,25 +2102,6 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         }
     }
 
-    /**
-     * Updates the timestamp of changed entries if the feature is enabled
-     */
-    public static class UpdateTimestampListener {
-        private final JabRefPreferences jabRefPreferences;
-
-        public UpdateTimestampListener(JabRefPreferences jabRefPreferences) {
-            this.jabRefPreferences = jabRefPreferences;
-        }
-
-        @Subscribe
-        public void listen(EntryChangedEvent event) {
-            if (jabRefPreferences.getTimestampPreferences().includeTimestamps()) {
-                event.getBibEntry().setField(jabRefPreferences.getTimestampPreferences().getTimestampField(),
-                        jabRefPreferences.getTimestampPreferences().now());
-            }
-        }
-    }
-
     private class UndoAction implements BaseAction {
 
         @Override

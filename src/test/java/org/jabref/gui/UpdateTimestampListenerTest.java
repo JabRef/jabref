@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -53,7 +52,7 @@ public class UpdateTimestampListenerTest {
         assertEquals("Initial timestamp not set correctly",
                 BASE_DATE, bibEntry.getField(TIMESTAMP_FIELD).get());
 
-        database.registerListener(new BasePanel.UpdateTimestampListener(preferencesMock));
+        database.registerListener(new UpdateTimestampListener(preferencesMock));
 
         bibEntry.setField("test", "some value");
 
@@ -88,7 +87,7 @@ public class UpdateTimestampListenerTest {
         assertEquals("Initial timestamp not set correctly",
                 BASE_DATE, bibEntry.getField(TIMESTAMP_FIELD).get());
 
-        database.registerListener(new BasePanel.UpdateTimestampListener(preferencesMock));
+        database.registerListener(new UpdateTimestampListener(preferencesMock));
 
         bibEntry.setField("test", "some value");
 
