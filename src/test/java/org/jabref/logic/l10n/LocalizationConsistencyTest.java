@@ -8,10 +8,10 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -60,9 +60,9 @@ public class LocalizationConsistencyTest {
                 Set<String> nonEnglishKeys = LocalizationParser
                         .getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, lang));
 
-                List<String> missing = new LinkedList<>(englishKeys);
+                List<String> missing = new ArrayList<>(englishKeys);
                 missing.removeAll(nonEnglishKeys);
-                List<String> obsolete = new LinkedList<>(nonEnglishKeys);
+                List<String> obsolete = new ArrayList<>(nonEnglishKeys);
                 obsolete.removeAll(englishKeys);
 
                 assertEquals("Missing keys of " + lang, Collections.emptyList(), missing);
@@ -117,6 +117,24 @@ public class LocalizationConsistencyTest {
     }
 
     @Test
+    public void languageKeysShouldNotBeQuotedInFiles() throws IOException {
+        final List<LocalizationEntry> quotedEntries = LocalizationParser
+                .findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG)
+                .stream()
+                .filter(key -> key.getKey().contains("_") && key.getKey().equals(new LocalizationKey(key.getKey()).getPropertiesKey()))
+                .collect(Collectors.toList());
+        Assert.assertEquals(
+                "Language keys must not be used quoted in code! Use \"This is a message\" instead of \"This_is_a_message\".\n" +
+                        "Please correct the following entries:\n" +
+                        quotedEntries
+                                .stream()
+                                .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
+                                .collect(Collectors.toList())
+                ,
+                Collections.EMPTY_LIST, quotedEntries);
+    }
+
+    @Test
     public void findMissingLocalizationKeys() throws IOException {
         List<LocalizationEntry> missingKeys = LocalizationParser.find(LocalizationBundleForTest.LANG).stream().sorted()
                 .distinct().collect(Collectors.toList());
@@ -125,7 +143,7 @@ public class LocalizationConsistencyTest {
                         "1. PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n" +
                         "2. EXECUTE: gradlew localizationUpdate\n" +
                         missingKeys.parallelStream()
-                                .map(key -> String.format("%s=%s", key.getKey(), key.getKey()))
+                                .map(key -> String.format("\n%s=%s\n", key.getKey(), key.getKey()))
                                 .collect(Collectors.toList()),
                 Collections.<LocalizationEntry>emptyList(), missingKeys);
     }
@@ -202,11 +220,9 @@ public class LocalizationConsistencyTest {
     }
 
     private static class DuplicationDetectionProperties extends Properties {
-
         private static final long serialVersionUID = 1L;
 
-        private final List<String> duplicates = new LinkedList<>();
-
+        private final List<String> duplicates = new ArrayList<>();
 
         public DuplicationDetectionProperties() {
             super();

@@ -7,9 +7,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -41,7 +41,7 @@ public class LocalizationParser {
         } else {
             englishKeys = getKeysInPropertiesFile("/l10n/Menu_en.properties");
         }
-        List<String> missingKeys = new LinkedList<>(keysInJavaFiles);
+        List<String> missingKeys = new ArrayList<>(keysInJavaFiles);
         missingKeys.removeAll(englishKeys);
 
         return entries.stream().filter(e -> missingKeys.contains(e.getKey())).collect(
@@ -130,7 +130,7 @@ public class LocalizationParser {
     }
 
     private static List<LocalizationEntry> getLanguageKeysInJavaFile(Path path, LocalizationBundleForTest type) {
-        List<LocalizationEntry> result = new LinkedList<>();
+        List<LocalizationEntry> result = new ArrayList<>();
 
         try {
             List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
@@ -150,7 +150,7 @@ public class LocalizationParser {
     }
 
     private static List<LocalizationEntry> getLocalizationParametersInJavaFile(Path path, LocalizationBundleForTest type) {
-        List<LocalizationEntry> result = new LinkedList<>();
+        List<LocalizationEntry> result = new ArrayList<>();
 
         try {
             List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
@@ -173,7 +173,7 @@ public class LocalizationParser {
      * Loads the fxml file and returns all used language resources.
      */
     private static List<LocalizationEntry> getLanguageKeysInFxmlFile(Path path, LocalizationBundleForTest type) {
-        List<String> result = new LinkedList<>();
+        List<String> result = new ArrayList<>();
 
         // Record which keys are requested; we pretend that we have all keys
         ResourceBundle registerUsageResourceBundle = new ResourceBundle() {
@@ -227,7 +227,7 @@ public class LocalizationParser {
         public static List<String> getLanguageKeysInString(String content, LocalizationBundleForTest type) {
             List<String> parameters = getLocalizationParameter(content, type);
 
-            List<String> result = new LinkedList<>();
+            List<String> result = new ArrayList<>();
 
             for (String param : parameters) {
 
@@ -275,7 +275,7 @@ public class LocalizationParser {
         }
 
         public static List<String> getLocalizationParameter(String content, LocalizationBundleForTest type) {
-            List<String> result = new LinkedList<>();
+            List<String> result = new ArrayList<>();
 
             Matcher matcher;
             if (type == LocalizationBundleForTest.LANG) {

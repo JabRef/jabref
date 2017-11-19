@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +70,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         List<Label> labels = new ArrayList<>();
 
         EntryType entryType = EntryTypes.getTypeOrDefault(entry.getType(), databaseContext.getMode());
-        List<String> fields = determineFieldsToShow(entry, entryType);
+        Collection<String> fields = determineFieldsToShow(entry, entryType);
         for (String fieldName : fields) {
             FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.TASK_EXECUTOR, new FXDialogService(),
                     Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs,
@@ -138,7 +139,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         return scrollPane;
     }
 
-    private void setRegularRowLayout(GridPane gridPane, List<String> fields, int rows) {
+    private void setRegularRowLayout(GridPane gridPane, Collection<String> fields, int rows) {
         List<RowConstraints> constraints = new ArrayList<>(rows);
         for (String field : fields) {
             RowConstraints rowExpand = new RowConstraints();
@@ -220,5 +221,5 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         setContent(panel);
     }
 
-    protected abstract List<String> determineFieldsToShow(BibEntry entry, EntryType entryType);
+    protected abstract Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType);
 }
