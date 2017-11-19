@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import com.google.common.collect.Sets;
 import org.jabref.model.FieldChange;
 
 import org.jabref.model.entry.specialfields.SpecialField;
@@ -391,7 +392,7 @@ public class BibEntryTests {
         keywordEntry.putKeywords(Arrays.asList("kw1", "kw2"), ',');
         Optional<FieldChange> change = keywordEntry.removeKeywords(KeywordList.parse("kw3, kw4", ','), ',');
         assertEquals(Optional.empty(), change);
-        assertEquals(2, keywordEntry.getKeywords(',').size());
+        assertEquals(Sets.newHashSet("kw1", "kw2"), keywordEntry.getKeywords(',').toStringList());
     }
 
     @Test

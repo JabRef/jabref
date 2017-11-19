@@ -1,11 +1,13 @@
 package org.jabref.logic.specialfields;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 
+import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.specialfields.SpecialField;
@@ -82,7 +84,8 @@ public class SpecialFieldsUtilsTest {
         SpecialFieldsUtils.updateField(specialField, specialFieldKeyword.get(), entry, true, true, ',');
         // Remove it
         List<FieldChange> changes = SpecialFieldsUtils.updateField(specialField, specialFieldKeyword.get(), entry, true, true, ',');
-        assertTrue(changes.size() > 0);
+        assertEquals(Arrays.asList(new FieldChange(entry, specialField.getFieldName(), specialFieldKeyword.get(), null),
+                new FieldChange(entry, FieldName.KEYWORDS, specialFieldKeyword.get(), null)), changes);
         KeywordList remainingKeywords = entry.getKeywords(',');
         assertFalse(remainingKeywords.contains(specialFieldKeyword));
     }
