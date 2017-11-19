@@ -17,6 +17,7 @@ import org.jabref.model.groups.GroupTreeNodeTest;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 
 import org.junit.Before;
@@ -106,6 +107,13 @@ public class GroupSerializerTest {
         AutomaticPersonsGroup group = new AutomaticPersonsGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, "authors");
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(Collections.singletonList("0 AutomaticPersonsGroup:myAutomaticGroup;0;authors;1;;;;"), serialization);
+    }
+
+    @Test
+    public void serializeSingleTexGroup() {
+        TexGroup group = new TexGroup("myTexGroup", GroupHierarchyType.INDEPENDENT, "pathToFile");
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
+        assertEquals(Collections.singletonList("0 TexGroup:myTexGroup;0;pathToFile;1;;;;"), serialization);
     }
 
     @Test

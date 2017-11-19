@@ -53,6 +53,10 @@ public class AuxParser {
         masterDatabase = database;
     }
 
+    public AuxParser(Path auxFile, BibDatabase database) {
+        this(auxFile.toAbsolutePath().toString(), database);
+    }
+
     /**
      * Executes the parsing logic and returns a result containing all information and the generated BibDatabase.
      *

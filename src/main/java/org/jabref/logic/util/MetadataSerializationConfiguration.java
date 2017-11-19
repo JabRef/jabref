@@ -6,6 +6,7 @@ import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 
 /**
@@ -57,6 +58,11 @@ public class MetadataSerializationConfiguration {
      * Identifier for {@link AutomaticKeywordGroup}.
      */
     public static final String AUTOMATIC_KEYWORD_GROUP_ID = "AutomaticKeywordGroup:";
+
+    /**
+     * Identifier for {@link TexGroup}.
+     */
+    public static final String TEX_GROUP_ID = "TexGroup:";
 
     private MetadataSerializationConfiguration() {
     }

@@ -13,6 +13,7 @@ import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.TexGroup;
 
 import org.junit.Test;
 
@@ -85,6 +86,13 @@ public class GroupsParserTest {
     public void fromStringParsesAutomaticPersonGroup() throws Exception {
         AutomaticPersonsGroup expected = new AutomaticPersonsGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, "authors");
         AbstractGroup parsed = GroupsParser.fromString("AutomaticPersonsGroup:myAutomaticGroup;0;authors;1;;;;", ',');
+        assertEquals(expected, parsed);
+    }
+
+    @Test
+    public void fromStringParsesTexGroup() throws Exception {
+        TexGroup expected = new TexGroup("myTexGroup", GroupHierarchyType.INDEPENDENT, "pathToFile");
+        AbstractGroup parsed = GroupsParser.fromString("TexGroup:myTexGroup;0;pathToFile;1;;;;", ',');
         assertEquals(expected, parsed);
     }
 

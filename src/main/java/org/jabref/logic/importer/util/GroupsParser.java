@@ -16,6 +16,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.strings.StringUtil;
 
@@ -78,28 +79,43 @@ public class GroupsParser {
     public static AbstractGroup fromString(String s, Character keywordSeparator)
             throws ParseException {
         if (s.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)) {
-            return GroupsParser.keywordGroupFromString(s, keywordSeparator);
+            return keywordGroupFromString(s, keywordSeparator);
         }
         if (s.startsWith(MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID)) {
-            return GroupsParser.allEntriesGroupFromString(s);
+            return allEntriesGroupFromString(s);
         }
         if (s.startsWith(MetadataSerializationConfiguration.SEARCH_GROUP_ID)) {
-            return GroupsParser.searchGroupFromString(s);
+            return searchGroupFromString(s);
         }
         if (s.startsWith(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID)) {
-            return GroupsParser.explicitGroupFromString(s, keywordSeparator);
+            return explicitGroupFromString(s, keywordSeparator);
         }
         if (s.startsWith(MetadataSerializationConfiguration.LEGACY_EXPLICIT_GROUP_ID)) {
-            return GroupsParser.legacyExplicitGroupFromString(s, keywordSeparator);
+            return legacyExplicitGroupFromString(s, keywordSeparator);
         }
         if (s.startsWith(MetadataSerializationConfiguration.AUTOMATIC_PERSONS_GROUP_ID)) {
-            return GroupsParser.automaticPersonsGroupFromString(s);
+            return automaticPersonsGroupFromString(s);
         }
         if (s.startsWith(MetadataSerializationConfiguration.AUTOMATIC_KEYWORD_GROUP_ID)) {
-            return GroupsParser.automaticKeywordGroupFromString(s);
+            return automaticKeywordGroupFromString(s);
+        }
+        if (s.startsWith(MetadataSerializationConfiguration.TEX_GROUP_ID)) {
+            return texGroupFromString(s);
         }
 
         throw new ParseException("Unknown group: " + s);
+    }
+
+    private static AbstractGroup texGroupFromString(String string) {
+        QuotedStringTokenizer tok = new QuotedStringTokenizer(string.substring(MetadataSerializationConfiguration.TEX_GROUP_ID
+                .length()), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+
+        String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+        GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
+        String path = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+        TexGroup newGroup = new TexGroup(name, context, path);
+        addGroupDetails(tok, newGroup);
+        return newGroup;
     }
 
     private static AbstractGroup automaticPersonsGroupFromString(String string) {
