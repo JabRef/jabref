@@ -33,6 +33,7 @@ public class UpdateTimestampListenerTest {
         final String TIMESTAMP_FIELD = "timestamp";
         final String BASE_DATE = "2000-1-1";
         final String NEW_DATE = "2000-1-2";
+
         final boolean INCLUDE_TIMESTAMP = true;
 
         JabRefPreferences preferencesMock = mock(JabRefPreferences.class);
@@ -65,6 +66,7 @@ public class UpdateTimestampListenerTest {
         final String TIMESTAMP_FIELD = "timestamp";
         final String BASE_DATE = "2000-1-1";
         final String NEW_DATE = "2000-1-2";
+
         final boolean INCLUDE_TIMESTAMP = false;
 
         JabRefPreferences preferencesMock = mock(JabRefPreferences.class);
