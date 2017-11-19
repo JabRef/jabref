@@ -1,4 +1,4 @@
-package org.jabref.model.database.event;
+package org.jabref.gui;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.logic.preferences.TimestampPreferences;
