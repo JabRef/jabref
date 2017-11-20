@@ -4,10 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import javafx.scene.text.TextFlow;
-
 import org.jabref.logic.l10n.Localization;
-import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
 import org.jabref.model.search.rules.ContainBasedSearchRule;
@@ -22,15 +19,12 @@ public class SearchQuery implements SearchMatcher {
     private final boolean caseSensitive;
     private final boolean regularExpression;
     private final SearchRule rule;
-    // TODO is it ok to have a gui dependency in the logic package?
-    private final TextFlow description;
 
     public SearchQuery(String query, boolean caseSensitive, boolean regularExpression) {
         this.query = Objects.requireNonNull(query);
         this.caseSensitive = caseSensitive;
         this.regularExpression = regularExpression;
         this.rule = SearchRules.getSearchRuleByQuery(query, caseSensitive, regularExpression);
-        this.description = SearchDescribers.getSearchDescriberFor(rule, query).getDescription();
     }
 
     @Override
@@ -106,10 +100,6 @@ public class SearchQuery implements SearchMatcher {
         return regularExpression;
     }
 
-    public TextFlow getDescription() {
-        return description;
-    }
-
     /**
      * Returns a list of words this query searches for.
      * The returned strings can be a regular expression.
@@ -122,5 +112,9 @@ public class SearchQuery implements SearchMatcher {
             // For example, "The great Vikinger" will give ["The","great","Vikinger"]
             return (new SentenceAnalyzer(getQuery())).getWords();
         }
+    }
+
+    public SearchRule getRule() {
+        return rule;
     }
 }

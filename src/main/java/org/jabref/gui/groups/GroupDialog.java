@@ -37,6 +37,7 @@ import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.entry.FieldName;
@@ -567,7 +568,9 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
             s1 = searchGroupSearchExpression.getText().trim();
             okEnabled = okEnabled & !s1.isEmpty();
             if (okEnabled) {
-                setDescription(fromTextFlowToHTMLString(new SearchQuery(s1, isCaseSensitive(), isRegex()).getDescription()));
+                SearchQuery searchQuery = new SearchQuery(s1, isCaseSensitive(), isRegex());
+                setDescription(fromTextFlowToHTMLString(SearchDescribers.getSearchDescriberFor(searchQuery.getRule(),
+                        searchQuery.getQuery()).getDescription()));
 
                 if (isRegex()) {
                     try {
