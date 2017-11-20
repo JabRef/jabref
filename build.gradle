@@ -38,6 +38,10 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 mainClassName = "org.jabref.JabRefMain"
 
+// These are the Java version requirements we will check on each start of JabRef
+ext.minRequiredJavaVersion = "1.8.0_144"
+ext.allowJava9 = false
+
 install4j {
     installDir = file(project.ext.install4jDir)
 }
@@ -160,7 +164,11 @@ processResources {
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
-                "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'))
+                "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'),
+                "minRequiredJavaVersion": minRequiredJavaVersion,
+                "allowJava9": allowJava9
+
+        )
         filteringCharset = 'UTF-8'
     }
 

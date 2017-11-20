@@ -3,6 +3,8 @@ package org.jabref.gui.entryeditor.fileannotationtab;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.logic.formatter.bibtexfields.RemoveHyphenatedNewlinesFormatter;
+import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
@@ -31,7 +33,11 @@ public class FileAnnotationViewModel {
             String illegibleTextMessage = Localization.lang("The marked area does not contain any legible text!");
             this.marking.set(annotationContent.isEmpty() ? illegibleTextMessage : annotationContent);
         } else {
-            this.content.set(annotation.getContent());
+            String content = annotation.getContent();
+            // remove newlines && hyphens before linebreaks
+            content = new RemoveHyphenatedNewlinesFormatter().format(content);
+            content = new RemoveNewlinesFormatter().format(content);
+            this.content.set(content);
             this.marking.set("");
         }
     }

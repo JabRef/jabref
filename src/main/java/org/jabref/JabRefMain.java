@@ -3,6 +3,8 @@ package org.jabref;
 import java.net.Authenticator;
 import java.util.Map;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import javafx.application.Application;
@@ -24,6 +26,8 @@ import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteListenerClient;
+import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.JavaVersion;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.EntryTypes;
@@ -53,10 +57,54 @@ public class JabRefMain extends Application {
         SwingUtilities.invokeLater(() -> start(arguments));
     }
 
+    /**
+     * Tests if we are running an acceptable Java and terminates JabRef when we are sure the version is not supported.
+     * This test uses the requirements for the Java version as specified in <code>gradle.build</code>. It is possible to
+     * define a minimum version including the built number and to indicate whether Java 9 can be use (which it currently
+     * can't). It tries to compare this version number to the version of the currently running JVM. The check is
+     * optimistic and will rather return true even if we could not exactly determine the version.
+     * <p>
+     * Note: Users with an very old version like 1.6 will not profit from this since class versions are incompatible and
+     * JabRef won't even start. Currently, JabRef won't start with Java 9 either, but the warning that it cannot be used
+     * with this version is helpful anyway to prevent users to update from an old 1.8 directly to version 9. Additionally,
+     * we soon might have a JabRef that does start with Java 9 but is not perfectly compatible. Therefore, we should leave
+     * the Java 9 check alive.
+     */
+    private static void ensureCorrectJavaVersion() {
+        // Check if we are running an acceptable version of Java
+        final BuildInfo buildInfo = Globals.BUILD_INFO;
+        JavaVersion checker = new JavaVersion();
+        final boolean java9Fail = !buildInfo.isAllowJava9() && checker.isJava9();
+        final boolean versionFail = !checker.isAtLeast(buildInfo.getMinRequiredJavaVersion());
+
+        if (java9Fail || versionFail) {
+            StringBuilder versionError = new StringBuilder(
+                    Localization.lang("Your current Java version (%0) is not supported. Please install version %1 or higher.",
+                            checker.getJavaVersion(),
+                            buildInfo.getMinRequiredJavaVersion()
+                    )
+            );
+            if (!buildInfo.isAllowJava9()) {
+                versionError.append("\n");
+                versionError.append(Localization.lang("Note that currently, JabRef does not run with Java 9."));
+            }
+            final JFrame frame = new JFrame();
+            JOptionPane.showMessageDialog(frame, versionError, Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+            frame.dispose();
+
+            // We exit on Java 9 error since this will definitely not work
+            if (java9Fail) {
+                System.exit(0);
+            }
+        }
+    }
+
     private static void start(String[] args) {
         FallbackExceptionHandler.installExceptionHandler();
 
         JabRefPreferences preferences = JabRefPreferences.getInstance();
+
+        ensureCorrectJavaVersion();
 
         ProxyPreferences proxyPreferences = preferences.getProxyPreferences();
         ProxyRegisterer.register(proxyPreferences);
