@@ -22,10 +22,22 @@ public class UpdateTimestampListenerTest {
     public ExpectedException thrown = ExpectedException.none();
 
     private BibDatabase database;
+    private BibEntry bibEntry;
+
+    private JabRefPreferences preferencesMock;
+    private TimestampPreferences timestampPreferencesMock;
 
     @Before
     public void setUp(){
         database = new BibDatabase();
+        bibEntry = new BibEntry();
+
+        database.insertEntries(bibEntry);
+
+        preferencesMock = mock(JabRefPreferences.class);
+        timestampPreferencesMock = mock(TimestampPreferences.class);
+
+        when(preferencesMock.getTimestampPreferences()).thenReturn(timestampPreferencesMock);
     }
 
     @Test
@@ -36,19 +48,11 @@ public class UpdateTimestampListenerTest {
 
         final boolean INCLUDE_TIMESTAMP = true;
 
-        JabRefPreferences preferencesMock = mock(JabRefPreferences.class);
-        TimestampPreferences timestampPreferencesMock = mock(TimestampPreferences.class);
-
-        when(preferencesMock.getTimestampPreferences()).thenReturn(timestampPreferencesMock);
-
         when(timestampPreferencesMock.getTimestampField()).thenReturn(TIMESTAMP_FIELD);
         when(timestampPreferencesMock.now()).thenReturn(NEW_DATE);
         when(timestampPreferencesMock.includeTimestamps()).thenReturn(INCLUDE_TIMESTAMP);
 
-        BibEntry bibEntry = new BibEntry();
         bibEntry.setField(TIMESTAMP_FIELD, BASE_DATE);
-
-        database.insertEntries(bibEntry);
 
         assertEquals("Initial timestamp not set correctly",
                 Optional.of(BASE_DATE), bibEntry.getField(TIMESTAMP_FIELD));
@@ -69,20 +73,12 @@ public class UpdateTimestampListenerTest {
 
         final boolean INCLUDE_TIMESTAMP = false;
 
-        JabRefPreferences preferencesMock = mock(JabRefPreferences.class);
-        TimestampPreferences timestampPreferencesMock = mock(TimestampPreferences.class);
-
-        when(preferencesMock.getTimestampPreferences()).thenReturn(timestampPreferencesMock);
-
         when(timestampPreferencesMock.getTimestampField()).thenReturn(TIMESTAMP_FIELD);
         when(timestampPreferencesMock.now()).thenReturn(NEW_DATE);
         when(timestampPreferencesMock.includeTimestamps()).thenReturn(INCLUDE_TIMESTAMP);
 
-        BibEntry bibEntry = new BibEntry();
-
         bibEntry.setField(TIMESTAMP_FIELD, BASE_DATE);
 
-        database.insertEntries(bibEntry);
         assertEquals("Initial timestamp not set correctly",
                 Optional.of(BASE_DATE), bibEntry.getField(TIMESTAMP_FIELD));
 
