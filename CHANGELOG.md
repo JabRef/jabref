@@ -23,6 +23,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Crossreferenced entries are now used when a BibTex key is generated for an entry with empty fields. [#2811](https://github.com/JabRef/jabref/issues/2811)
 - We now set the WM_CLASS of the UI to org-jabref-JabRefMain to allow certain Un*x window managers to properly identify its windows
 - We changed the default paths for the OpenOffice/LibreOffice binaries to the default path for LibreOffice
+- File annotation tab now removes newlines and hyphens before newlines from content and displays an empty String instead of N/A if no contents are found. [#3280](https://github.com/JabRef/jabref/issues/3280)
 - We moved the groups field from the "Other fields" tab to "General" (you may have to reset your editor preferences under Options > Set up general fields)
 - We no longer create a new entry editor when selecting a new entry to increase performance. [#3187](https://github.com/JabRef/jabref/pull/3187)
 - We added the possibility to copy linked files from entries to a single output folder [#2539](https://github.com/JabRef/jabref/pull/2593)
