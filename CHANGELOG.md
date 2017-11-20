@@ -31,6 +31,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Late initialization of the context menus in the entry editor. This improves performance and memory footprint further [#3340](https://github.com/JabRef/jabref/pull/3340)
 - Integrity check "Abbreviation Detection" detects abbreviated names for journals and booktitles based on the internal list instead of only looking for "." signs. Fixes [#3144](https://github.com/JabRef/jabref/issues/3144).
 - We added a dialog to show that JabRef is working on checking integrity. [#3358](https://github.com/JabRef/jabref/issues/3358)
+- We added an option to mass append to fields via the Quality -> set/clear/append/rename fields dialog. [#2721](https://github.com/JabRef/jabref/issues/2721)
+- We added a check on startup to ensure JabRef is run with an adequate Java version. [3310](https://github.com/JabRef/jabref/issues/3310)
 
 ### Fixed
  - We fixed the translation of \textendash in the entry preview [#3307](https://github.com/JabRef/jabref/issues/3307)
@@ -42,10 +44,13 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We no longer allow to add a field multiple times in customized entry types and thereby fix an issue in the entry editor that resulted from having a field multiple times. [#3046](https://github.com/JabRef/jabref/issues/3046)
  - We fixed an issue where JabRef would not show the translated content at some points, although there existed a translation
  - We fixed an issue where editing in the source tab would override content of other entries [#3352](https://github.com/JabRef/jabref/issues/3352#issue-268580818)
+ - We fixed an issue where file links created under windows could not be opened on Linux/OSX [#3311](https://github.com/JabRef/jabref/issues/3311)
  - We fixed several issues with the automatic linking of files in the entry editor where files were not found or not correctly saved in the bibtex source [#3346](https://github.com/JabRef/jabref/issues/3346)
  - We fixed an issue where fetching entries from crossref that had no titles caused an error [#3376](https://github.com/JabRef/jabref/issues/3376)
  - We fixed an issue where the same Java Look and Feel would be listed more than once in the Preferences. [#3391](https://github.com/JabRef/jabref/issues/3391)
  - We fixed an issue where errors in citation styles triggered an exception when opening the preferences dialog [#3389](https://github.com/JabRef/jabref/issues/3389)
+ - We fixed an issue where special fields (such as `printed`) could not be cleared when syncing special fields via the keywords [#3432](https://github.com/JabRef/jabref/issues/3432)
+
 
  ### Removed
 
