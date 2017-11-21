@@ -30,7 +30,23 @@ public class TextUtil {
 
     public static Text createTextMonospaced(String textString, double size) {
         Text text = new Text(textString);
-        text.setFont(Font.font("Monospaced Regular", size));
+        text.setFont(Font.font("Monospaced", size));
         return text;
+    }
+
+    public static String textToHTMLString(Text text) {
+        String textString = text.getText();
+        textString = textString.replace("\n", "<br>");
+        if (text.getFont().getFamily().equals("Monospaced")) {
+            textString = String.format("<kbd>%s</kbd>",textString);
+        }
+        switch (text.getFont().getStyle()) {
+            case "Bold":
+                return String.format("<b>%s</b>",textString);
+            case "Italic":
+                return String.format("<i>%s</i>",textString);
+            default:
+                return textString;
+        }
     }
 }
