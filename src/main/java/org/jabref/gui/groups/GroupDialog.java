@@ -330,7 +330,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
         builderAll.getPanel().getActionMap().put("close", cancelAction);
 
         okButton.addActionListener(e -> {
-                isOkPressed = true;
+            isOkPressed = true;
             try {
                 String groupName = nameField.getText().trim();
                 if (explicitRadioButton.isSelected()) {
@@ -602,7 +602,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
         StringBuilder htmlStringBuilder = new StringBuilder();
         for (Node node : textFlow.getChildren()) {
             if (node instanceof Text)
-                htmlStringBuilder.append(TextUtil.textToHTMLString((Text)node));
+                htmlStringBuilder.append(TextUtil.textToHTMLString((Text) node));
         }
         return htmlStringBuilder.toString();
     }

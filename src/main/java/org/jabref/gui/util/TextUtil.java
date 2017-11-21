@@ -38,13 +38,13 @@ public class TextUtil {
         String textString = text.getText();
         textString = textString.replace("\n", "<br>");
         if (text.getFont().getFamily().equals("Monospaced")) {
-            textString = String.format("<kbd>%s</kbd>",textString);
+            textString = String.format("<kbd>%s</kbd>", textString);
         }
         switch (text.getFont().getStyle()) {
             case "Bold":
-                return String.format("<b>%s</b>",textString);
+                return String.format("<b>%s</b>", textString);
             case "Italic":
-                return String.format("<i>%s</i>",textString);
+                return String.format("<i>%s</i>", textString);
             default:
                 return textString;
         }
