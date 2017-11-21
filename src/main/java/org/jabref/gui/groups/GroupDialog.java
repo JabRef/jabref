@@ -27,7 +27,9 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.event.CaretListener;
 
+import javafx.scene.Node;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
@@ -38,6 +40,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
+import org.jabref.gui.util.TextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.entry.FieldName;
@@ -595,9 +598,13 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
         okButton.setEnabled(okEnabled);
     }
 
-    //TODO right placement?
     private String fromTextFlowToHTMLString(TextFlow textFlow) {
-        return "";
+        StringBuilder htmlStringBuilder = new StringBuilder();
+        for (Node node : textFlow.getChildren()) {
+            if (node instanceof Text)
+                htmlStringBuilder.append(TextUtil.textToHTMLString((Text)node));
+        }
+        return htmlStringBuilder.toString();
     }
 
     private boolean isRegex() {
