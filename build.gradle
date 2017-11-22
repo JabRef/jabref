@@ -2,6 +2,15 @@ import org.gradle.internal.os.OperatingSystem
 
 // to update the gradle wrapper, execute ./gradlew wrapper --gradle-version 4.0
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.2'
+    }
+}
+
 plugins {
     id 'com.gradle.build-scan' version '1.9'
     id 'com.install4j.gradle' version '6.1.5'
@@ -25,6 +34,7 @@ apply plugin: 'jacoco'
 apply plugin: 'install4j'
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'checkstyle'
+apply plugin: 'org.junit.platform.gradle.plugin'
 
 apply from: 'eclipse.gradle'
 apply from: 'localization.gradle'
@@ -134,6 +144,12 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.9'
 
     testCompile 'junit:junit:4.12'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.0'
+    testCompile 'org.junit.jupiter:junit-jupiter-params:5.0.0'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.0'
+    testRuntime 'org.junit.vintage:junit-vintage-engine:4.12.0'
+    testRuntime 'org.apache.logging.log4j:log4j-core:2.9.1'
+    testRuntime 'org.apache.logging.log4j:log4j-jul:2.9.1'
     testCompile 'org.mockito:mockito-core:2.12.0'
     testCompile 'com.github.tomakehurst:wiremock:2.11.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
@@ -245,33 +261,31 @@ javadoc {
     }
 }
 
-test {
-    useJUnit {
-        excludeCategories 'org.jabref.testutils.category.DatabaseTests'
-        excludeCategories 'org.jabref.testutils.category.FetcherTests'
-        excludeCategories 'org.jabref.testutils.category.GUITests'
+junitPlatform {
+    filters {
+        tags {
+            exclude 'DatabaseTest', 'org.jabref.testutils.category.FetcherTest', 'org.jabref.testutils.category.GUITest'
+        }
     }
-    testLogging {
-        events "failed"
-        exceptionFormat "full"
-    }
+
+    logManager 'org.apache.logging.log4j.jul.LogManager'
 }
 
 task databaseTest(type: Test) {
     useJUnit {
-        includeCategories 'org.jabref.testutils.category.DatabaseTests'
+        includeCategories 'org.jabref.testutils.category.DatabaseTest'
     }
 }
 
 task fetcherTest(type: Test) {
     useJUnit {
-        includeCategories 'org.jabref.testutils.category.FetcherTests'
+        includeCategories 'org.jabref.testutils.category.FetcherTest'
     }
 }
 
 task guiTest(type: Test) {
     useJUnit {
-        includeCategories 'org.jabref.testutils.category.GUITests'
+        includeCategories 'org.jabref.testutils.category.GUITest'
     }
 }
 

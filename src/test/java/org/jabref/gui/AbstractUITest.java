@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.jabref.JabRefMain;
-import org.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITest;
 
 import org.assertj.swing.fixture.AbstractWindowFixture;
 import org.assertj.swing.fixture.FrameFixture;
@@ -23,7 +23,7 @@ import org.junit.experimental.categories.Category;
 import static org.assertj.swing.finder.WindowFinder.findFrame;
 import static org.assertj.swing.launcher.ApplicationLauncher.application;
 
-@Category(GUITests.class)
+@Category(GUITest.class)
 public abstract class AbstractUITest extends AssertJSwingJUnitTestCase {
 
     protected final static int SPEED_NORMAL = 50;
