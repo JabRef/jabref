@@ -423,3 +423,18 @@ modernizer {
     // See https://github.com/andrewgaul/modernizer-maven-plugin for more information on modernizer
     failOnViolations = false
 }
+
+
+// enable the use of java.xml.bind
+// source: https://discuss.gradle.org/t/gradle-does-not-honor-add-modules-jvm-argument-in-jdk9/20403/2
+// via: https://stackoverflow.com/a/43574427/873282
+tasks.withType(AbstractCompile) {
+    if (org.gradle.api.JavaVersion.current().isJava9Compatible()) {
+        options.compilerArgs += ["--add-modules", "java.xml.bind"]
+    }
+}
+tasks.withType(Test) {
+    if (org.gradle.api.JavaVersion.current().isJava9Compatible()) {
+        jvmArgs += ["--add-modules", "java.xml.bind"]
+    }
+}
