@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +17,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-@Category(FetcherTests.class)
+@Category(FetcherTest.class)
 public class DiVATest {
 
     private DiVA fetcher;

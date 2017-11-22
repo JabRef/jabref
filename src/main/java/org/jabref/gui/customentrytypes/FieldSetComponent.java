@@ -11,6 +11,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -220,7 +221,7 @@ class FieldSetComponent extends JPanel {
      * Return the current list.
      */
     public Set<String> getFields() {
-        Set<String> res = new HashSet<>(listModel.getSize());
+        Set<String> res = new LinkedHashSet<>(listModel.getSize());
         Enumeration<String> elements = listModel.elements();
         while (elements.hasMoreElements()) {
             res.add(elements.nextElement());
