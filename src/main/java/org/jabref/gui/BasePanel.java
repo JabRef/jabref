@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -70,6 +71,8 @@ import org.jabref.gui.filelist.AttachFileAction;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.groups.GroupAddRemoveDialog;
+import org.jabref.gui.groups.GroupTreeNodeViewModel;
+import org.jabref.gui.groups.UndoableChangeEntriesOfGroup;
 import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.journals.UnabbreviateAction;
@@ -136,6 +139,7 @@ import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 import org.jabref.shared.DBMSSynchronizer;
@@ -764,12 +768,71 @@ public class BasePanel extends JPanel implements ClipboardOwner {
      *            "deleted". If true the action will be localized as "cut"
      */
     private void delete(boolean cut) {
-        List<BibEntry> entries = mainTable.getSelectedEntries();
+    	boolean bRemoveFromGroup = false;
+    	boolean bDelete = false;
+    	List<FieldChange> changesRemove = new ArrayList<>();
+    	
+    	List<BibEntry> entries = mainTable.getSelectedEntries();
+
         if (entries.isEmpty()) {
             return;
         }
-        if (!cut && !showDeleteConfirmationDialog(entries.size())) {
-            return;
+    	
+    	String selectedGroup = "";
+    	if (Globals.stateManager.getSelectedGroup(bibDatabaseContext).size() > 0) {
+    		selectedGroup = Globals.stateManager.getSelectedGroup(bibDatabaseContext).get(0).getName();
+    	}
+
+        //get list of all groups
+        Optional<GroupTreeNode> groups = bibDatabaseContext.getMetaData().getGroups();
+
+        if (groups.get().getName().contentEquals(groups.get().getName())) { //checks if is selected any group
+        	//TODO define dialog not to offer "remove from group"
+        }
+
+		Object[] options = {Localization.lang("Delete_from_database"),
+			Localization.lang("Remove_from_group") + " \"" + selectedGroup + "\"",
+			Localization.lang("Cancel")};
+		int n = JOptionPane.showOptionDialog(frame,
+				Localization.lang("The_entry_is_the_member_of_groups") + entries.get(0).getField("groups"),
+				Localization.lang("Delete_remove_entry"),
+				JOptionPane.YES_NO_CANCEL_OPTION,
+				JOptionPane.QUESTION_MESSAGE,
+				null,
+				options,
+				options[2]);
+
+		if (n == 0) { // Delete
+			bDelete = true;
+		} else if (n == 1) { //Remove from group(s) 
+			bRemoveFromGroup = true;
+		} else if (n == 2) { //Cancel
+			return;
+		}
+
+		// removes from the first selected group
+		if (bRemoveFromGroup) {
+			if (Globals.stateManager.getSelectedGroup(bibDatabaseContext).size() < 1) {
+				return;
+			}
+			
+			GroupTreeNode node = Globals.stateManager.getSelectedGroup(bibDatabaseContext).get(0);
+			changesRemove = node.removeEntriesFromGroup(entries);
+
+			// Remember undo information
+			if (!changesRemove.isEmpty()) {
+				AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node), changesRemove);
+				undoManager.addEdit(undoRemove);
+			}
+
+			markBaseChanged();
+			mainTable.requestFocus();
+			return;
+		}
+
+        //if (!cut && !bRemoveFromGroup && !showDeleteConfirmationDialog(entries.size())) {
+        if (!cut && !bDelete) {
+             return;
         }
 
         // select the next entry to stay at the same place as before (or the previous if we're already at the end)
