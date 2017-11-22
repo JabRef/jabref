@@ -1,16 +1,17 @@
 package org.jabref.model.entry;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class FileFieldParser {
+
     public static List<LinkedFile> parse(String value) {
+        List<LinkedFile> files = new ArrayList<>();
+
         if ((value == null) || value.trim().isEmpty()) {
-            return Collections.emptyList();
+            return files;
         }
 
-        List<LinkedFile> files = new ArrayList<>();
         List<String> entry = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         boolean inXmlChar = false;

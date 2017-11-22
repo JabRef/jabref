@@ -196,6 +196,14 @@ public class PdfContentImporter extends Importer {
     }
 
     @Override
+    public ParserResult importDatabase(String data) throws IOException {
+        Objects.requireNonNull(data);
+        throw new UnsupportedOperationException(
+                "PdfContentImporter does not support importDatabase(String data)."
+                        + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+    }
+
+    @Override
     public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
         final ArrayList<BibEntry> result = new ArrayList<>(1);
         try (FileInputStream fileStream = new FileInputStream(filePath.toFile());

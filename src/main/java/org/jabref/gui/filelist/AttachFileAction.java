@@ -15,7 +15,6 @@ public class AttachFileAction implements BaseAction {
 
     private final BasePanel panel;
 
-
     public AttachFileAction(BasePanel panel) {
         this.panel = panel;
     }

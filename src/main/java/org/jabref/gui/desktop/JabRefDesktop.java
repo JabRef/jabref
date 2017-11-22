@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,6 +50,7 @@ import org.apache.commons.logging.LogFactory;
  * http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
  */
 public class JabRefDesktop {
+
     private static final Log LOGGER = LogFactory.getLog(JabRefDesktop.class);
 
     private static final NativeDesktop NATIVE_DESKTOP = getNativeDesktop();
@@ -139,7 +139,7 @@ public class JabRefDesktop {
         }
 
         // For other platforms we'll try to find the file type:
-        Path file = Paths.get(link);
+        Path file = null;
         if (!httpLink) {
             Optional<Path> tmp = FileHelper.expandFilename(databaseContext, link,
                     Globals.prefs.getFileDirectoryPreferences());
@@ -149,7 +149,7 @@ public class JabRefDesktop {
         }
 
         // Check if we have arrived at a file type, and either an http link or an existing file:
-        if (httpLink || Files.exists(file) && (type.isPresent())) {
+        if (httpLink || ((file != null) && Files.exists(file) && (type.isPresent()))) {
             // Open the file:
             String filePath = httpLink ? link : file.toString();
             openExternalFilePlatformIndependent(type, filePath);
@@ -160,8 +160,7 @@ public class JabRefDesktop {
         }
     }
 
-    public static boolean openExternalFileAnyFormat(Path file, final BibDatabaseContext databaseContext,
-                                                    final Optional<ExternalFileType> type) throws IOException {
+    public static boolean openExternalFileAnyFormat(Path file, final BibDatabaseContext databaseContext, final Optional<ExternalFileType> type) throws IOException {
         return openExternalFileAnyFormat(databaseContext, file.toString(), type);
     }
 
@@ -291,7 +290,7 @@ public class JabRefDesktop {
             LOGGER.error("Could not open browser", exception);
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);
-            String copiedToClipboard = Localization.lang("The_link_has_been_copied_to_the_clipboard.");
+            String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
             JabRefGUI.getMainFrame().output(couldNotOpenBrowser);
             JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(), couldNotOpenBrowser + "\n" + openManually + "\n" +
                     copiedToClipboard, couldNotOpenBrowser, JOptionPane.ERROR_MESSAGE);

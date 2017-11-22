@@ -1,36 +1,42 @@
-# <Short Title of the Issue>
+# *[short title of solved problem and solution]*
 
-**UserStory:** <TICKET/ISSUE-NUMBER>
+**User Story:** *[ticket/issue-number]* <!-- optional -->
 
-<WRITE ONE SENTENCE DESCRIBING THE PROBLEM. (Optional)>
+*[context and problem statement]*
+*[decision drivers | forces]* <!-- optional -->
 
 ## Considered Alternatives
 
-* <ALTERNATIVE 1>
-* <ALTERNATIVE 2>
-* <ALTERNATIVE 3>
+* *[alternative 1]*
+* *[alternative 2]*
+* *[alternative 3]*
+* *[...]* <!-- numbers of alternatives can vary -->
 
-## Conclusion
+## Decision Outcome
 
-* *Chosen Alternative: <ALTERNATIVE 1>*
-* <FURTHER RATIONALE (Optional)>
+* Chosen Alternative: *[alternative 1]*
+* *[justification. e.g., only alternative, which meets k.o. criterion decision driver | which resolves force force | ... | comes out best (see below)]*
+* *[consequences. e.g., negative impact on quality attribute, follow-up decisions required, ...]* <!-- optional -->
 
-## Comparison (Optional)
+## Pros and Cons of the Alternatives <!-- optional -->
 
-### <ALTERNATIVE 1>
+### *[alternative 1]*
 
-* + <ARGUMENT 1 PRO>
-* + <ARGUMENT 2 PRO>
-* - <ARGUMENT 1 CONTRA>
+* `+` *[argument 1 pro]*
+* `+` *[argument 2 pro]*
+* `-` *[argument 1 con]*
+* *[...]* <!-- numbers of pros and cons can vary -->
 
-### <ALTERNATIVE 2>
+### *[alternative 2]*
 
-* + <ARGUMENT 1 PRO>
-* + <ARGUMENT 2 PRO>
-* - <ARGUMENT 1 CONTRA>
+* `+` *[argument 1 pro]*
+* `+` *[argument 2 pro]*
+* `-` *[argument 1 con]*
+* *[...]* <!-- numbers of pros and cons can vary -->
 
-### <ALTERNATIVE 3>
+### *[alternative 3]*
 
-* + <ARGUMENT 1 PRO>
-* + <ARGUMENT 2 PRO>
-* - <ARGUMENT 1 CONTRA>
+* `+` *[argument 1 pro]*
+* `+` *[argument 2 pro]*
+* `-` *[argument 1 con]*
+* *[...]* <!-- numbers of pros and cons can vary -->

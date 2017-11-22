@@ -17,7 +17,8 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
-public final class ExternalFileTypes {
+//Do not make this class final, as it otherwise can't be mocked for tests
+public class ExternalFileTypes {
 
     // This String is used in the encoded list in prefs of external file type
     // modifications, in order to indicate a removed default file type:
@@ -115,10 +116,9 @@ public final class ExternalFileTypes {
      * @return The ExternalFileType registered, or null if none.
      */
     public Optional<ExternalFileType> getExternalFileTypeByName(String name) {
-        for (ExternalFileType type : externalFileTypes) {
-            if (type.getName().equals(name)) {
-                return Optional.of(type);
-            }
+        Optional<ExternalFileType> externalFileType = externalFileTypes.stream().filter(type -> type.getExtension().equals(name)).findFirst();
+        if (externalFileType.isPresent()) {
+            return externalFileType;
         }
         // Return an instance that signifies an unknown file type:
         return Optional.of(new UnknownExternalFileType(name));
@@ -131,12 +131,7 @@ public final class ExternalFileTypes {
      * @return The ExternalFileType registered, or null if none.
      */
     public Optional<ExternalFileType> getExternalFileTypeByExt(String extension) {
-        for (ExternalFileType type : externalFileTypes) {
-            if (type.getExtension().equalsIgnoreCase(extension)) {
-                return Optional.of(type);
-            }
-        }
-        return Optional.empty();
+        return externalFileTypes.stream().filter(type -> type.getExtension().equalsIgnoreCase(extension)).findFirst();
     }
 
     /**
@@ -146,27 +141,7 @@ public final class ExternalFileTypes {
      * @return true if an ExternalFileType with the extension exists, false otherwise
      */
     public boolean isExternalFileTypeByExt(String extension) {
-        for (ExternalFileType type : externalFileTypes) {
-            if (type.getExtension().equalsIgnoreCase(extension)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Look up the external file type name registered for this extension, if any.
-     *
-     * @param extension The file extension.
-     * @return The name of the ExternalFileType registered, or null if none.
-     */
-    public String getExternalFileTypeNameByExt(String extension) {
-        for (ExternalFileType type : externalFileTypes) {
-            if (type.getExtension().equalsIgnoreCase(extension)) {
-                return type.getName();
-            }
-        }
-        return "";
+        return externalFileTypes.stream().anyMatch(type -> type.getExtension().equalsIgnoreCase(extension));
     }
 
     /**

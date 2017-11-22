@@ -15,12 +15,12 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -232,7 +232,8 @@ public class XMPUtilTest {
         pdfFile = tempFolder.newFile("JabRef.pdf");
 
         try (PDDocument pdf = new PDDocument()) {
-            pdf.addPage(new PDPage()); // Need page to open in Acrobat
+            //Need page to open in Acrobat
+            pdf.addPage(new PDPage());
             pdf.save(pdfFile.getAbsolutePath());
         }
 
@@ -855,7 +856,7 @@ public class XMPUtilTest {
      */
     @Test
     public void testWriteMultiple() throws IOException, TransformerException {
-        List<BibEntry> l = new LinkedList<>();
+        List<BibEntry> l = new ArrayList<>();
         l.add(t2BibtexEntry());
         l.add(t3BibtexEntry());
 
@@ -907,7 +908,7 @@ public class XMPUtilTest {
 
     @Test
     public void testReadWriteDC() throws IOException, TransformerException {
-        List<BibEntry> l = new LinkedList<>();
+        List<BibEntry> l = new ArrayList<>();
         l.add(t3BibtexEntry());
 
         XMPUtil.writeXMP(pdfFile, l, null, true, xmpPreferences);
@@ -973,7 +974,7 @@ public class XMPUtilTest {
 
     @Test
     public void testWriteSingleUpdatesDCAndInfo() throws IOException, TransformerException {
-        List<BibEntry> l = new LinkedList<>();
+        List<BibEntry> l = new ArrayList<>();
         l.add(t3BibtexEntry());
 
         XMPUtil.writeXMP(pdfFile, l, null, true, xmpPreferences);

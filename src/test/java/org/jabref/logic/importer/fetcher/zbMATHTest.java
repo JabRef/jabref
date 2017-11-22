@@ -8,7 +8,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.support.DevEnvironment;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.Assume;
 import org.junit.Before;
@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Category(FetcherTests.class)
+@Category(FetcherTest.class)
 public class zbMATHTest {
     private zbMATH fetcher;
     private BibEntry donaldsonEntry;

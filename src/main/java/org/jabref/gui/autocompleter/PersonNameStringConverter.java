@@ -59,7 +59,7 @@ public class PersonNameStringConverter extends StringConverter<Author> {
                     break;
             }
         }
-        return author.getLastFirst(false);
+        return author.getLastOnly();
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.jabref.gui.help;
 import javax.inject.Inject;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -20,6 +21,8 @@ public class AboutDialogController extends AbstractController<AboutDialogViewMod
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private BuildInfo buildInfo;
 
+    @FXML private TextArea textAreaVersions;
+
     @FXML
     private void initialize() {
         viewModel = new AboutDialogViewModel(dialogService, clipBoardManager, buildInfo);
@@ -27,6 +30,8 @@ public class AboutDialogController extends AbstractController<AboutDialogViewMod
         SvgImageLoaderFactory.install();
         Image icon = new Image(this.getClass().getResourceAsStream("/icons/jabref.svg"));
         iconImage.setImage(icon);
+        textAreaVersions.setText(viewModel.getVersionInfo());
+
     }
 
     @FXML
@@ -68,4 +73,5 @@ public class AboutDialogController extends AbstractController<AboutDialogViewMod
     public void openDonation() {
         viewModel.openDonation();
     }
+
 }

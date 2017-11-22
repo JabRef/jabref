@@ -20,16 +20,16 @@ import org.jabref.preferences.JabRefPreferences;
  */
 public class OpenOfficePreferences {
 
-    public static final String DEFAULT_WINDOWS_PATH = "C:\\Program Files\\OpenOffice.org 4";
-    public static final String DEFAULT_WIN_EXEC_PATH = "C:\\Program Files\\OpenOffice.org 4\\program\\soffice.exe";
+    public static final String DEFAULT_WINDOWS_PATH = "C:\\Program Files\\LibreOffice 5";
+    public static final String DEFAULT_WIN_EXEC_PATH = "C:\\Program Files\\LibreOffice 5\\program";
     public static final String WINDOWS_EXECUTABLE = "soffice.exe";
 
     public static final String DEFAULT_OSX_PATH = "/Applications/OpenOffice.org.app";
     public static final String DEFAULT_OSX_EXEC_PATH = "/Applications/OpenOffice.org.app/Contents/MacOS/soffice";
     public static final String OSX_EXECUTABLE = "soffice";
 
-    public static final String DEFAULT_LINUX_PATH = "/opt/openoffice4";
-    public static final String DEFAULT_LINUX_EXEC_PATH = "/opt/openoffice4/program/soffice";
+    public static final String DEFAULT_LINUX_PATH = "/usr/lib/libreoffice";
+    public static final String DEFAULT_LINUX_EXEC_PATH = "/usr/lib/libreoffice/program/soffice";
     public static final String LINUX_EXECUTABLE = "soffice";
 
     public static final List<String> OO_JARS = Arrays.asList("unoil.jar", "jurt.jar", "juh.jar", "ridl.jar");

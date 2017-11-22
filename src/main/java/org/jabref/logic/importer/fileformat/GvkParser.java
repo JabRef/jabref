@@ -450,6 +450,9 @@ public class GvkParser implements Parser {
     }
 
     private Element getChild(String name, Element e) {
+        if (e == null) {
+            return null;
+        }
         NodeList children = e.getChildNodes();
 
         int j = children.getLength();

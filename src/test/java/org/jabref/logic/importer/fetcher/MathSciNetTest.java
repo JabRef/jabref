@@ -8,7 +8,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.support.DevEnvironment;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.Assume;
 import org.junit.Before;
@@ -20,7 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Category(FetcherTests.class)
+@Category(FetcherTest.class)
 public class MathSciNetTest {
 
     MathSciNet fetcher;
@@ -63,17 +63,17 @@ public class MathSciNetTest {
 
     @Test
     public void searchByQueryFindsEntry() throws Exception {
-        // CI has no subscription to zbMath and thus gets 401 response
+        // CI has no subscription to MathSciNet and thus gets 401 response
         Assume.assumeFalse(DevEnvironment.isCIServer());
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("Existence and uniqueness theorems Two-Dimensional Ericksen Leslie System");
         assertFalse(fetchedEntries.isEmpty());
-        assertEquals(ratiuEntry, fetchedEntries.get(0));
+        assertEquals(ratiuEntry, fetchedEntries.get(1));
     }
 
     @Test
     public void searchByIdFindsEntry() throws Exception {
-        // CI has no subscription to zbMath and thus gets 401 response
+        // CI has no subscription to MathSciNet and thus gets 401 response
         Assume.assumeFalse(DevEnvironment.isCIServer());
 
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3537908");

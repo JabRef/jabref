@@ -45,6 +45,7 @@ import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.WordKeywordGroup;
@@ -326,18 +327,45 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
         okButton.addActionListener(e -> {
                 isOkPressed = true;
             try {
+                String groupName = nameField.getText().trim();
                 if (explicitRadioButton.isSelected()) {
-                    resultingGroup = new ExplicitGroup(nameField.getText().trim(), getContext(),
-                            Globals.prefs.getKeywordDelimiter());
+                    Character keywordDelimiter = Globals.prefs.getKeywordDelimiter();
+                    if (groupName.contains(Character.toString(keywordDelimiter))) {
+                        jabrefFrame.showMessage(
+                                Localization.lang("The group name contains the keyword separator \"%0\" and thus probably does not work as expected.", Character.toString(keywordDelimiter)));
+                    }
+
+                    Optional<GroupTreeNode> rootGroup = jabrefFrame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getGroups();
+                    if (rootGroup.isPresent()) {
+                        int groupsWithSameName = rootGroup.get().findChildrenSatisfying(group -> group.getName().equals(groupName)).size();
+                        boolean warnAboutSameName = false;
+                        if (editedGroup == null && groupsWithSameName > 0) {
+                            // New group but there is already one group with the same name
+                            warnAboutSameName = true;
+                        }
+                        if (editedGroup != null && !editedGroup.getName().equals(groupName) && groupsWithSameName > 0) {
+                            // Edit group, changed name to something that is already present
+                            warnAboutSameName = true;
+                        }
+
+                        if (warnAboutSameName) {
+                            jabrefFrame.showMessage(
+                                    Localization.lang("There exists already a group with the same name.", Character.toString(keywordDelimiter)));
+                            return;
+                        }
+                    }
+
+                    resultingGroup = new ExplicitGroup(groupName, getContext(),
+                            keywordDelimiter);
                 } else if (keywordsRadioButton.isSelected()) {
                     // regex is correct, otherwise OK would have been disabled
                     // therefore I don't catch anything here
                     if (keywordGroupRegExp.isSelected()) {
-                        resultingGroup = new RegexKeywordGroup(nameField.getText().trim(), getContext(),
+                        resultingGroup = new RegexKeywordGroup(groupName, getContext(),
                                 keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
                                 keywordGroupCaseSensitive.isSelected());
                     } else {
-                        resultingGroup = new WordKeywordGroup(nameField.getText().trim(), getContext(),
+                        resultingGroup = new WordKeywordGroup(groupName, getContext(),
                                 keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
                                 keywordGroupCaseSensitive.isSelected(), Globals.prefs.getKeywordDelimiter(), false);
                     }
@@ -346,7 +374,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
                         // regex is correct, otherwise OK would have been
                         // disabled
                         // therefore I don't catch anything here
-                        resultingGroup = new SearchGroup(nameField.getText().trim(), getContext(), searchGroupSearchExpression.getText().trim(),
+                        resultingGroup = new SearchGroup(groupName, getContext(), searchGroupSearchExpression.getText().trim(),
                                 isCaseSensitive(), isRegex());
                     } catch (Exception e1) {
                         // should never happen
@@ -354,12 +382,12 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
                 } else if (autoRadioButton.isSelected()) {
                     if (autoGroupKeywordsOption.isSelected()) {
                         resultingGroup = new AutomaticKeywordGroup(
-                                nameField.getText().trim(), getContext(),
+                                groupName, getContext(),
                                 autoGroupKeywordsField.getText().trim(),
                                 autoGroupKeywordsDeliminator.getText().charAt(0),
                                 autoGroupKeywordsHierarchicalDeliminator.getText().charAt(0));
                     } else {
-                        resultingGroup = new AutomaticPersonsGroup(nameField.getText().trim(), getContext(),
+                        resultingGroup = new AutomaticPersonsGroup(groupName, getContext(),
                                 autoGroupPersonsField.getText().trim());
                     }
                 }

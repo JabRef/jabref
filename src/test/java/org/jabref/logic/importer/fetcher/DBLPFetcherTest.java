@@ -9,7 +9,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,7 +19,7 @@ import org.junit.experimental.categories.Category;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Category(FetcherTests.class)
+@Category(FetcherTest.class)
 public class DBLPFetcherTest {
 
     private DBLPFetcher dblpFetcher;
@@ -44,7 +44,7 @@ public class DBLPFetcherTest {
         entry.setField(FieldName.YEAR, "2016");
         entry.setField(FieldName.URL,
                 "http://pi.informatik.uni-siegen.de/stt/36_2/./03_Technische_Beitraege/ZEUS2016/beitrag_2.pdf");
-        entry.setField("biburl", "http://dblp.dagstuhl.de/rec/bib/journals/stt/GeigerHL16");
+        entry.setField("biburl", "http://dblp.org/rec/bib/journals/stt/GeigerHL16");
         entry.setField("bibsource", "dblp computer science bibliography, http://dblp.org");
 
     }

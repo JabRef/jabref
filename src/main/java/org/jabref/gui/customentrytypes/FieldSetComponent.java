@@ -9,9 +9,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -217,16 +217,16 @@ class FieldSetComponent extends JPanel {
         remove.setEnabled(en);
     }
 
-    public void setFields(List<String> fields) {
-        DefaultListModel<String> newListModel = new DefaultListModel<>();
-        for (String field : fields) {
-            newListModel.addElement(field);
+    /**
+     * Return the current list.
+     */
+    public Set<String> getFields() {
+        Set<String> res = new LinkedHashSet<>(listModel.getSize());
+        Enumeration<String> elements = listModel.elements();
+        while (elements.hasMoreElements()) {
+            res.add(elements.nextElement());
         }
-        this.listModel = newListModel;
-        for (ListDataListener modelListener : modelListeners) {
-            newListModel.addListDataListener(modelListener);
-        }
-        list.setModel(newListModel);
+        return res;
     }
 
     /**
@@ -279,16 +279,16 @@ class FieldSetComponent extends JPanel {
 
     }
 
-    /**
-     * Return the current list.
-     */
-    public List<String> getFields() {
-        List<String> res = new ArrayList<>(listModel.getSize());
-        Enumeration<String> elements = listModel.elements();
-        while (elements.hasMoreElements()) {
-            res.add(elements.nextElement());
+    public void setFields(Set<String> fields) {
+        DefaultListModel<String> newListModel = new DefaultListModel<>();
+        for (String field : fields) {
+            newListModel.addElement(field);
         }
-        return res;
+        this.listModel = newListModel;
+        for (ListDataListener modelListener : modelListeners) {
+            newListModel.addListDataListener(modelListener);
+        }
+        list.setModel(newListModel);
     }
 
     /**

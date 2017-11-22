@@ -1,8 +1,8 @@
 package org.jabref.logic.bibtex;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -80,7 +80,7 @@ public class DuplicateCheck {
 
         EntryType type = EntryTypes.getTypeOrDefault(one.getType(), bibDatabaseMode);
         // The check if they have the same required fields:
-        List<String> var = type.getRequiredFieldsFlat();
+        Collection<String> var = type.getRequiredFieldsFlat();
         double[] req;
         if (var == null) {
             req = new double[]{0., 0.};
@@ -93,7 +93,7 @@ public class DuplicateCheck {
             return req[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
         }
         // Close to the threshold value, so we take a look at the optional fields, if any:
-        List<String> optionalFields = type.getOptionalFields();
+        Collection<String> optionalFields = type.getOptionalFields();
         if (optionalFields != null) {
             double[] opt = DuplicateCheck.compareFieldSet(optionalFields, one, two);
             double totValue = ((DuplicateCheck.REQUIRED_WEIGHT * req[0] * req[1]) + (opt[0] * opt[1])) / ((req[1] * DuplicateCheck.REQUIRED_WEIGHT) + opt[1]);
@@ -120,7 +120,7 @@ public class DuplicateCheck {
         return false;
     }
 
-    private static double[] compareFieldSet(List<String> fields, BibEntry one, BibEntry two) {
+    private static double[] compareFieldSet(Collection<String> fields, BibEntry one, BibEntry two) {
         double res = 0;
         double totWeights = 0.;
         for (String field : fields) {
