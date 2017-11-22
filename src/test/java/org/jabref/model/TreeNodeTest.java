@@ -610,6 +610,16 @@ public class TreeNodeTest {
         verify(subscriber).accept(node);
     }
 
+    @Test
+    public void findChildrenWithSameName() throws Exception {
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock("A");
+        TreeNodeTestData.TreeNodeMock childB = root.addChild(new TreeNodeTestData.TreeNodeMock("B"));
+        TreeNodeTestData.TreeNodeMock node = childB.addChild(new TreeNodeTestData.TreeNodeMock("A"));
+        TreeNodeTestData.TreeNodeMock childA = root.addChild(new TreeNodeTestData.TreeNodeMock("A"));
+
+        assertEquals(Arrays.asList(root, node, childA), root.findChildrenSatisfying(treeNode -> treeNode.getName().equals("A")));
+    }
+
     private static class WrongTreeNodeImplementation extends TreeNode<TreeNodeTestData.TreeNodeMock> {
         // This class is a wrong derived class of TreeNode<T>
         // since it does not extends TreeNode<WrongTreeNodeImplementation>

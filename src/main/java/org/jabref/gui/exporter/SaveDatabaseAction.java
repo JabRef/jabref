@@ -1,7 +1,6 @@
 package org.jabref.gui.exporter;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
@@ -13,13 +12,13 @@ import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import org.jabref.collab.ChangeScanner;
-import org.jabref.collab.FileUpdatePanel;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
+import org.jabref.gui.collab.ChangeScanner;
+import org.jabref.gui.collab.FileUpdatePanel;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;
@@ -145,7 +144,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                         panel.getBibDatabaseContext().getMetaData().getEncoding()
                                 .orElse(Globals.prefs.getDefaultEncoding()));
 
-                Globals.getFileUpdateMonitor().updateTimeStamp(panel.getFileMonitorHandle());
+                panel.updateTimeStamp();
             } else {
                 success = false;
                 fileLockedError = true;
@@ -161,7 +160,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 // since last save:
                 panel.setNonUndoableChange(false);
                 panel.setBaseChanged(false);
-                panel.setUpdatedExternally(false);
+                panel.markExternalChangesAsResolved();
             }
         } catch (SaveException ex) {
             if (ex == SaveException.FILE_LOCKED) {
@@ -346,14 +345,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             LOGGER.info("Old file not found, just creating a new file");
         }
         context.setDatabaseFile(file);
-
-        // Register so we get notifications about outside changes to the file.
-        try {
-            panel.setFileMonitorHandle(Globals.getFileUpdateMonitor().addUpdateListener(panel,
-                    context.getDatabaseFile().orElse(null)));
-        } catch (IOException ex) {
-            LOGGER.error("Problem registering file change notifications", ex);
-        }
+        panel.resetChangeMonitor();
 
         if (readyForAutosave(context)) {
             AutosaveManager autosaver = AutosaveManager.start(context);
@@ -408,8 +400,7 @@ public class SaveDatabaseAction extends AbstractWorker {
      */
     private boolean checkExternalModification() {
         // Check for external modifications:
-        if (panel.isUpdatedExternally()
-                || Globals.getFileUpdateMonitor().hasBeenModified(panel.getFileMonitorHandle())) {
+        if (panel.isUpdatedExternally()) {
             String[] opts = new String[] {Localization.lang("Review changes"), Localization.lang("Save"),
                     Localization.lang("Cancel")};
             int answer = JOptionPane.showOptionDialog(panel.frame(),
@@ -432,12 +423,12 @@ public class SaveDatabaseAction extends AbstractWorker {
                     }
 
                     ChangeScanner scanner = new ChangeScanner(panel.frame(), panel,
-                            panel.getBibDatabaseContext().getDatabaseFile().get());
+                            panel.getBibDatabaseContext().getDatabaseFile().get(), panel.getTempFile());
                     JabRefExecutorService.INSTANCE.executeInterruptableTaskAndWait(scanner);
                     if (scanner.changesFound()) {
                         scanner.displayResult(resolved -> {
                             if (resolved) {
-                                panel.setUpdatedExternally(false);
+                                panel.markExternalChangesAsResolved();
                                 SwingUtilities
                                         .invokeLater(() -> panel.getSidePaneManager().hide(FileUpdatePanel.class));
                             } else {
@@ -456,7 +447,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                             Localization.lang("Protected library"), JOptionPane.ERROR_MESSAGE);
                     canceled = true;
                 } else {
-                    panel.setUpdatedExternally(false);
+                    panel.markExternalChangesAsResolved();
                     panel.getSidePaneManager().hide(FileUpdatePanel.class);
                 }
             }

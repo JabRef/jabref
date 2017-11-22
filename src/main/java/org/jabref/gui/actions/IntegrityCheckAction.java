@@ -1,5 +1,6 @@
 package org.jabref.gui.actions;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.List;
@@ -11,10 +12,12 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
+import javax.swing.SwingWorker;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -29,9 +32,12 @@ import org.jabref.logic.l10n.Localization;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class IntegrityCheckAction extends MnemonicAwareAction {
 
+    private static final Log LOGGER = LogFactory.getLog(IntegrityCheckAction.class);
     private static final String ELLIPSES = "...";
 
     private final JabRefFrame frame;
@@ -49,7 +55,36 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
                 Globals.prefs.getBibtexKeyPatternPreferences(),
                 Globals.journalAbbreviationLoader
                         .getRepository(Globals.prefs.getJournalAbbreviationPreferences()));
-        List<IntegrityMessage> messages = check.checkBibtexDatabase();
+
+        final JDialog integrityDialog = new JDialog(frame, true);
+        integrityDialog.setUndecorated(true);
+        integrityDialog.setLocationRelativeTo(frame);
+        JProgressBar integrityProgressBar = new JProgressBar();
+        integrityProgressBar.setIndeterminate(true);
+        integrityProgressBar.setStringPainted(true);
+        integrityProgressBar.setString(Localization.lang("Checking integrity..."));
+        integrityDialog.add(integrityProgressBar);
+        integrityDialog.pack();
+        SwingWorker<List<IntegrityMessage>, Void> worker = new SwingWorker<List<IntegrityMessage>, Void>() {
+            @Override
+            protected List<IntegrityMessage> doInBackground() {
+                List<IntegrityMessage> messages = check.checkBibtexDatabase();
+                return messages;
+            }
+
+            @Override
+            protected void done() {
+                integrityDialog.dispose();
+            }
+        };
+        worker.execute();
+        integrityDialog.setVisible(true);
+        List<IntegrityMessage> messages = null;
+        try {
+            messages = worker.get();
+        } catch (Exception ex) {
+            LOGGER.error("Integrity check failed.", ex);
+        }
 
         if (messages.isEmpty()) {
             JOptionPane.showMessageDialog(frame.getCurrentBasePanel(), Localization.lang("No problems found."));
@@ -123,11 +158,42 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
                 });
                 menu.add(menuItem);
             }
+
             JButton menuButton = new JButton(Localization.lang("Filter"));
             menuButton.addActionListener(entry -> menu.show(menuButton, 0, menuButton.getHeight()));
             FormBuilder builder = FormBuilder.create()
                     .layout(new FormLayout("fill:pref:grow", "fill:pref:grow, 2dlu, pref"));
 
+            JButton filterNoneButton = new JButton(Localization.lang("Filter None"));
+            filterNoneButton.addActionListener(event -> {
+                for (Component component : menu.getComponents()) {
+                    if (component instanceof JCheckBoxMenuItem) {
+                        JCheckBoxMenuItem checkBox = (JCheckBoxMenuItem) component;
+                        if (checkBox.isSelected()) {
+                            checkBox.setSelected(false);
+                            showMessage.put(checkBox.getText(), checkBox.isSelected());
+                        }
+                    }
+                    ((AbstractTableModel) table.getModel()).fireTableDataChanged();
+                }
+            });
+
+            JButton filterAllButton = new JButton(Localization.lang("Filter All"));
+            filterAllButton.addActionListener(event -> {
+                for (Component component : menu.getComponents()) {
+                    if (component instanceof JCheckBoxMenuItem) {
+                        JCheckBoxMenuItem checkBox = (JCheckBoxMenuItem) component;
+                        if (!checkBox.isSelected()) {
+                            checkBox.setSelected(true);
+                            showMessage.put(checkBox.getText(), checkBox.isSelected());
+                        }
+                    }
+                    ((AbstractTableModel) table.getModel()).fireTableDataChanged();
+                }
+            });
+
+            builder.add(filterNoneButton).xy(1, 3, "left, b");
+            builder.add(filterAllButton).xy(1, 3, "right, b");
             builder.add(scrollPane).xy(1, 1);
             builder.add(menuButton).xy(1, 3, "c, b");
             dialog.add(builder.getPanel());

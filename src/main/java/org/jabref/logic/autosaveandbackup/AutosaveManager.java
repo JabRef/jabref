@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.AutosaveEvent;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
+import org.jabref.model.database.event.CoarseChangeFilter;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -32,13 +33,15 @@ public class AutosaveManager {
     private final BlockingQueue<Runnable> workerQueue;
     private final ExecutorService executor;
     private final EventBus eventBus;
-
+    private final CoarseChangeFilter changeFilter;
 
     private AutosaveManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.workerQueue = new ArrayBlockingQueue<>(1);
         this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, workerQueue);
         this.eventBus = new EventBus();
+        this.changeFilter = new CoarseChangeFilter(bibDatabaseContext);
+        changeFilter.registerListener(this);
     }
 
     @Subscribe
@@ -53,8 +56,8 @@ public class AutosaveManager {
     }
 
     private void shutdown() {
-        bibDatabaseContext.getDatabase().unregisterListener(this);
-        bibDatabaseContext.getMetaData().unregisterListener(this);
+        changeFilter.unregisterListener(this);
+        changeFilter.shutdown();
         executor.shutdown();
     }
 
@@ -65,8 +68,6 @@ public class AutosaveManager {
      */
     public static AutosaveManager start(BibDatabaseContext bibDatabaseContext) {
         AutosaveManager autosaver = new AutosaveManager(bibDatabaseContext);
-        bibDatabaseContext.getDatabase().registerListener(autosaver);
-        bibDatabaseContext.getMetaData().registerListener(autosaver);
         runningInstances.add(autosaver);
         return autosaver;
     }

@@ -69,7 +69,7 @@ public class AppendDatabaseAction implements BaseAction {
 
         if (importEntries) { // Add entries
             boolean overwriteOwner = Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER);
-            boolean overwriteTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP);
+            boolean overwriteTimeStamp = Globals.prefs.getTimestampPreferences().overwriteTimestamp();
 
             for (BibEntry originalEntry : fromDatabase.getEntries()) {
                 BibEntry entry = (BibEntry) originalEntry.clone();

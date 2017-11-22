@@ -2,28 +2,38 @@ package org.jabref.gui.entryeditor;
 
 import javafx.scene.control.Tab;
 
+import org.jabref.model.entry.BibEntry;
+
 public abstract class EntryEditorTab extends Tab {
 
+    protected BibEntry currentEntry;
+
     /**
-     * Used for lazy-loading of the tab content.
+     * Decide whether to show this tab for the given entry.
      */
-    private boolean isInitialized = false;
+    public abstract boolean shouldShow(BibEntry entry);
 
-    public abstract boolean shouldShow();
+    /**
+     * Updates the view with the contents of the given entry.
+     */
+    protected abstract void bindToEntry(BibEntry entry);
 
-    public void requestFocus() {
-
+    /**
+     * The tab just got the focus. Override this method if you want to perform a special action on focus (like selecting
+     * the first field in the editor)
+     */
+    protected void handleFocus() {
+        // Do nothing by default
     }
 
     /**
-     * This method is called when the user focuses this tab.
+     * Notifies the tab that it got focus and should display the given entry.
      */
-    public void notifyAboutFocus() {
-        if (!isInitialized) {
-            initialize();
-            isInitialized = true;
+    public void notifyAboutFocus(BibEntry entry) {
+        if (!entry.equals(currentEntry)) {
+            currentEntry = entry;
+            bindToEntry(entry);
         }
+        handleFocus();
     }
-
-    protected abstract void initialize();
 }

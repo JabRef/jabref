@@ -12,20 +12,21 @@ import java.util.Optional;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.shared.exception.OfflineLockException;
-import org.jabref.testutils.category.DatabaseTests;
+import org.jabref.testutils.category.DatabaseTest;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(Parameterized.class)
-@Category(DatabaseTests.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+@DatabaseTest
 public class DBMSProcessorTest {
 
     private DBMSConnection dbmsConnection;
@@ -34,8 +35,7 @@ public class DBMSProcessorTest {
     @Parameter
     public DBMSType dbmsType;
 
-
-    @Before
+    @BeforeEach
     public void setUp() throws SQLException, InvalidDBMSConnectionPropertiesException {
         dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
         dbmsProcessor = DBMSProcessor.getProcessorInstance(dbmsConnection);
@@ -49,16 +49,16 @@ public class DBMSProcessorTest {
 
     @Test
     public void testCheckBaseIntegrity() throws SQLException {
-        Assert.assertTrue(dbmsProcessor.checkBaseIntegrity());
+        assertTrue(dbmsProcessor.checkBaseIntegrity());
         clear();
-        Assert.assertFalse(dbmsProcessor.checkBaseIntegrity());
+        assertFalse(dbmsProcessor.checkBaseIntegrity());
     }
 
     @Test
     public void testSetUpSharedDatabase() throws SQLException {
         clear();
         dbmsProcessor.setupSharedDatabase();
-        Assert.assertTrue(dbmsProcessor.checkBaseIntegrity());
+        assertTrue(dbmsProcessor.checkBaseIntegrity());
     }
 
     @Test
@@ -74,11 +74,11 @@ public class DBMSProcessorTest {
         Map<String, String> actualFieldMap = new HashMap<>();
 
         try (ResultSet entryResultSet = selectFrom("ENTRY")) {
-            Assert.assertTrue(entryResultSet.next());
-            Assert.assertEquals(1, entryResultSet.getInt("SHARED_ID"));
-            Assert.assertEquals("inproceedings", entryResultSet.getString("TYPE"));
-            Assert.assertEquals(1, entryResultSet.getInt("VERSION"));
-            Assert.assertFalse(entryResultSet.next());
+            assertTrue(entryResultSet.next());
+            assertEquals(1, entryResultSet.getInt("SHARED_ID"));
+            assertEquals("inproceedings", entryResultSet.getString("TYPE"));
+            assertEquals(1, entryResultSet.getInt("VERSION"));
+            assertFalse(entryResultSet.next());
 
             try (ResultSet fieldResultSet = selectFrom("FIELD")) {
                 while (fieldResultSet.next()) {
@@ -89,7 +89,7 @@ public class DBMSProcessorTest {
 
         Map<String, String> expectedFieldMap = expectedEntry.getFieldMap();
 
-        Assert.assertEquals(expectedFieldMap, actualFieldMap);
+        assertEquals(expectedFieldMap, actualFieldMap);
     }
 
     @Test
@@ -108,23 +108,20 @@ public class DBMSProcessorTest {
         Optional<BibEntry> actualEntryOptional = dbmsProcessor
                 .getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedID());
 
-        if (actualEntryOptional.isPresent()) {
-            Assert.assertEquals(expectedEntry, actualEntryOptional.get());
-        } else {
-            Assert.fail();
-        }
+        assertEquals(expectedEntry, actualEntryOptional.get());
     }
 
-    @Test(expected = OfflineLockException.class)
+    @Test
     public void testUpdateNewerEntry() throws OfflineLockException, SQLException {
         BibEntry bibEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(bibEntry);
 
-        bibEntry.getSharedBibEntryData().setVersion(0); // simulate older version
+        //simulate older version
+        bibEntry.getSharedBibEntryData().setVersion(0);
         bibEntry.setField("year", "1993");
 
-        dbmsProcessor.updateEntry(bibEntry);
+        assertThrows(OfflineLockException.class, () -> dbmsProcessor.updateEntry(bibEntry));
     }
 
     @Test
@@ -132,19 +129,14 @@ public class DBMSProcessorTest {
         BibEntry expectedBibEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(expectedBibEntry);
-
-        expectedBibEntry.getSharedBibEntryData().setVersion(0); // simulate older version
-
+        //simulate older version
+        expectedBibEntry.getSharedBibEntryData().setVersion(0);
         dbmsProcessor.updateEntry(expectedBibEntry);
 
         Optional<BibEntry> actualBibEntryOptional = dbmsProcessor
                 .getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedID());
 
-        if (actualBibEntryOptional.isPresent()) {
-            Assert.assertEquals(expectedBibEntry, actualBibEntryOptional.get());
-        } else {
-            Assert.fail();
-        }
+        assertEquals(expectedBibEntry, actualBibEntryOptional.get());
     }
 
     @Test
@@ -154,7 +146,7 @@ public class DBMSProcessorTest {
         dbmsProcessor.removeEntry(bibEntry);
 
         try (ResultSet resultSet = selectFrom("ENTRY")) {
-            Assert.assertFalse(resultSet.next());
+            assertFalse(resultSet.next());
         }
     }
 
@@ -167,7 +159,7 @@ public class DBMSProcessorTest {
         List<BibEntry> expectedEntries = Arrays.asList(bibEntry);
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
 
-        Assert.assertEquals(expectedEntries, actualEntries);
+        assertEquals(expectedEntries, actualEntries);
     }
 
     @Test
@@ -179,17 +171,13 @@ public class DBMSProcessorTest {
         Optional<BibEntry> actualBibEntryOptional = dbmsProcessor
                 .getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedID());
 
-        if (actualBibEntryOptional.isPresent()) {
-            Assert.assertEquals(expectedBibEntry, actualBibEntryOptional.get());
-        } else {
-            Assert.fail();
-        }
+        assertEquals(expectedBibEntry, actualBibEntryOptional.get());
     }
 
     @Test
     public void testGetNotExistingSharedEntry() {
         Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(1);
-        Assert.assertFalse(actualBibEntryOptional.isPresent());
+        assertFalse(actualBibEntryOptional.isPresent());
     }
 
     @Test
@@ -207,8 +195,7 @@ public class DBMSProcessorTest {
 
         Map<Integer, Integer> actualIDVersionMap = dbmsProcessor.getSharedIDVersionMapping();
 
-        Assert.assertEquals(expectedIDVersionMap, actualIDVersionMap);
-
+        assertEquals(expectedIDVersionMap, actualIDVersionMap);
     }
 
     @Test
@@ -221,8 +208,7 @@ public class DBMSProcessorTest {
         Map<String, String> expectedMetaData = getMetaDataExample();
         Map<String, String> actualMetaData = dbmsProcessor.getSharedMetaData();
 
-        Assert.assertEquals(expectedMetaData, actualMetaData);
-
+        assertEquals(expectedMetaData, actualMetaData);
     }
 
     @Test
@@ -232,7 +218,7 @@ public class DBMSProcessorTest {
 
         Map<String, String> actualMetaData = dbmsProcessor.getSharedMetaData();
 
-        Assert.assertEquals(expectedMetaData, actualMetaData);
+        assertEquals(expectedMetaData, actualMetaData);
     }
 
     private Map<String, String> getMetaDataExample() {
@@ -270,7 +256,7 @@ public class DBMSProcessorTest {
         try {
             return dbmsConnection.getConnection().createStatement().executeQuery("SELECT * FROM " + escape(table));
         } catch (SQLException e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
             return null;
         }
     }
@@ -283,7 +269,7 @@ public class DBMSProcessorTest {
                     + escape("KEY") + ", " + escape("VALUE") + ") VALUES("
                     + escapeValue(key) + ", " + escapeValue(value) + ")");
         } catch (SQLException e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 
@@ -295,7 +281,7 @@ public class DBMSProcessorTest {
         return "'" + value + "'";
     }
 
-    @After
+    @AfterEach
     public void clear() throws SQLException {
         TestManager.clearTables(dbmsConnection);
     }

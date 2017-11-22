@@ -1,8 +1,10 @@
 package org.jabref.logic.integrity;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.InternalBibtexFields;
@@ -13,27 +15,23 @@ import com.google.common.collect.Multimap;
 
 public class FieldCheckers {
 
-    private FieldCheckers() {
+    private Multimap<String, ValueChecker> fieldChecker;
+
+    public FieldCheckers(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences, JournalAbbreviationRepository abbreviationRepository) {
+        fieldChecker = getAllMap(databaseContext, fileDirectoryPreferences, abbreviationRepository);
     }
 
-    static List<FieldChecker> getAll(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
-        return getAllMap(databaseContext, fileDirectoryPreferences)
-                .entries().stream()
-                .map(pair -> new FieldChecker(pair.getKey(), pair.getValue()))
-                .collect(Collectors.toList());
-    }
-
-    private static Multimap<String, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
+    private static Multimap<String, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences, JournalAbbreviationRepository abbreviationRepository) {
         ArrayListMultimap<String, ValueChecker> fieldCheckers = ArrayListMultimap.create(50, 10);
 
         for (String field : InternalBibtexFields.getJournalNameFields()) {
-            fieldCheckers.put(field, new AbbreviationChecker());
+            fieldCheckers.put(field, new AbbreviationChecker(abbreviationRepository));
         }
         for (String field : InternalBibtexFields.getBookNameFields()) {
-            fieldCheckers.put(field, new AbbreviationChecker());
+            fieldCheckers.put(field, new AbbreviationChecker(abbreviationRepository));
         }
         for (String field : InternalBibtexFields.getPersonNameFields()) {
-            fieldCheckers.put(field, new PersonNamesChecker());
+            fieldCheckers.put(field, new PersonNamesChecker(databaseContext));
         }
         fieldCheckers.put(FieldName.BOOKTITLE, new BooktitleChecker());
         fieldCheckers.put(FieldName.TITLE, new BracketChecker());
@@ -51,5 +49,18 @@ public class FieldCheckers {
         fieldCheckers.put(FieldName.YEAR, new YearChecker());
 
         return fieldCheckers;
+    }
+
+    public List<FieldChecker> getAll() {
+        return fieldChecker
+                .entries()
+                .stream()
+                .map(pair -> new FieldChecker(pair.getKey(), pair.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    public Collection<ValueChecker> getForField(String field) {
+        return fieldChecker
+                .get(field);
     }
 }

@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.strings.StringUtil;
 
 public class MonthChecker implements ValueChecker {
 
@@ -33,6 +34,10 @@ public class MonthChecker implements ValueChecker {
      */
     @Override
     public Optional<String> checkValue(String value) {
+        if (StringUtil.isBlank(value)) {
+            return Optional.empty();
+        }
+
         //biblatex
         if (bibDatabaseContextMonth.isBiblatexMode()
                 && !(ONLY_AN_INTEGER.test(value.trim()) || MONTH_NORMALIZED.test(value.trim()))) {

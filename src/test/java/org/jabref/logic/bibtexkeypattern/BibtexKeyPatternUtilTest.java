@@ -7,6 +7,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -57,12 +58,44 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
+    public void testCrossrefAndInAuthorNames() throws Exception {
+        BibDatabase database = new BibDatabase();
+        BibEntry entry1 = new BibEntry();
+        entry1.setField(FieldName.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry();
+        entry2.setCiteKey("entry2");
+        entry2.setField(FieldName.AUTHOR, "Simon Holland");
+        database.insertEntry(entry1);
+        database.insertEntry(entry2);
+
+        assertEquals("Holland",
+                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry1, "auth",
+                        ',', database), true));
+    }
+
+    @Test
     public void testAndAuthorNames() throws ParseException {
         String bibtexString = "@ARTICLE{whatevery, author={Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland}}";
         Optional<BibEntry> entry = BibtexParser.singleFromString(bibtexString, importFormatPreferences);
         assertEquals("HerlandHaugeHelgeland",
                 BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry.get(), "authors3",
                         ',', new BibDatabase()), true));
+    }
+
+    @Test
+    public void testCrossrefAndAuthorNames() throws Exception {
+        BibDatabase database = new BibDatabase();
+        BibEntry entry1 = new BibEntry();
+        entry1.setField(FieldName.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry();
+        entry2.setCiteKey("entry2");
+        entry2.setField(FieldName.AUTHOR, "Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland");
+        database.insertEntry(entry1);
+        database.insertEntry(entry2);
+
+        assertEquals("HerlandHaugeHelgeland",
+                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry1, "authors3",
+                        ',', database), true));
     }
 
     @Test
@@ -280,6 +313,22 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
+    public void testcrossrefUniversity() throws Exception {
+        BibDatabase database = new BibDatabase();
+        BibEntry entry1 = new BibEntry();
+        entry1.setField(FieldName.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry();
+        entry2.setCiteKey("entry2");
+        entry2.setField(FieldName.AUTHOR, "{Link{\\\"{o}}ping University}}");
+        database.insertEntry(entry1);
+        database.insertEntry(entry2);
+
+        assertEquals("UniLinkoeping",
+                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry1, "auth",
+                        ',', database), true));
+    }
+
+    @Test
     public void testDepartment() throws ParseException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, Department of Electrical Engineering}}}",
@@ -287,6 +336,22 @@ public class BibtexKeyPatternUtilTest {
         assertEquals("UniLinkoepingEE",
                 BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry.get(), "auth",
                         ',', new BibDatabase()), true));
+    }
+
+    @Test
+    public void testcrossrefDepartment() throws Exception {
+        BibDatabase database = new BibDatabase();
+        BibEntry entry1 = new BibEntry();
+        entry1.setField(FieldName.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry();
+        entry2.setCiteKey("entry2");
+        entry2.setField(FieldName.AUTHOR, "{Link{\\\"{o}}ping University, Department of Electrical Engineering}}");
+        database.insertEntry(entry1);
+        database.insertEntry(entry2);
+
+        assertEquals("UniLinkoepingEE",
+                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry1, "auth",
+                        ',', database), true));
     }
 
     @Test
@@ -300,12 +365,44 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
+    public void testcrossrefSchool() throws Exception {
+        BibDatabase database = new BibDatabase();
+        BibEntry entry1 = new BibEntry();
+        entry1.setField(FieldName.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry();
+        entry2.setCiteKey("entry2");
+        entry2.setField(FieldName.AUTHOR, "{Link{\\\"{o}}ping University, School of Computer Engineering}}");
+        database.insertEntry(entry1);
+        database.insertEntry(entry2);
+
+        assertEquals("UniLinkoepingCE",
+                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry1, "auth",
+                        ',', database), true));
+    }
+
+    @Test
     public void testInstituteOfTechnology() throws ParseException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Massachusetts Institute of Technology}}}", importFormatPreferences);
         assertEquals("MIT",
                 BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry.get(), "auth",
                         ',', new BibDatabase()), true));
+    }
+
+    @Test
+    public void testcrossrefInstituteOfTechnology() throws Exception {
+        BibDatabase database = new BibDatabase();
+        BibEntry entry1 = new BibEntry();
+        entry1.setField(FieldName.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry();
+        entry2.setCiteKey("entry2");
+        entry2.setField(FieldName.AUTHOR, "{Massachusetts Institute of Technology}");
+        database.insertEntry(entry1);
+        database.insertEntry(entry2);
+
+        assertEquals("MIT",
+                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry1, "auth",
+                        ',', database), true));
     }
 
     @Test
@@ -595,16 +692,17 @@ public class BibtexKeyPatternUtilTest {
         BibtexKeyPatternUtil.firstPage(null);
     }
 
+    @Test
     public void testPagePrefix() {
         assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L7--27"));
-        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L--27"));
+        assertEquals("L--", BibtexKeyPatternUtil.pagePrefix("L--27"));
         assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L"));
         assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L42--111"));
         assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L7,L41,L73--97"));
         assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L41,L7,L73--97"));
         assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L43+"));
         assertEquals("", BibtexKeyPatternUtil.pagePrefix("7--27"));
-        assertEquals("", BibtexKeyPatternUtil.pagePrefix("--27"));
+        assertEquals("--", BibtexKeyPatternUtil.pagePrefix("--27"));
         assertEquals("", BibtexKeyPatternUtil.pagePrefix(""));
         assertEquals("", BibtexKeyPatternUtil.pagePrefix("42--111"));
         assertEquals("", BibtexKeyPatternUtil.pagePrefix("7,41,73--97"));
@@ -674,20 +772,20 @@ public class BibtexKeyPatternUtilTest {
     public void shortTitle() {
         // shortTitle is getTitleWords with "3" as count
         int count = 3;
-        assertEquals("applicationmigrationeffort",
+        assertEquals("application migration effort",
                 BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
-        assertEquals("BPELconformancein", BibtexKeyPatternUtil.getTitleWords(count,
+        assertEquals("BPEL conformance in", BibtexKeyPatternUtil.getTitleWords(count,
                 TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
-        assertEquals("ProcessViewingPatterns", BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED));
-        assertEquals("BPMNConformancein",
+        assertEquals("Process Viewing Patterns", BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED));
+        assertEquals("BPMN Conformance in",
                 BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
-        assertEquals("TheDifferenceBetween", BibtexKeyPatternUtil.getTitleWords(count,
+        assertEquals("The Difference Between", BibtexKeyPatternUtil.getTitleWords(count,
                 TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING));
-        assertEquals("CloudComputingThe",
+        assertEquals("Cloud Computing: The",
                 BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
-        assertEquals("TowardsChoreographybased",
+        assertEquals("Towards Choreography based",
                 BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
-        assertEquals("OntheMeasurement",
+        assertEquals("On the Measurement",
                 BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
     }
 
@@ -766,6 +864,22 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
+    public void crossrefkeywordNKeywordsSeparatedBySpace() {
+        BibDatabase database = new BibDatabase();
+        BibEntry entry1 = new BibEntry();
+        BibEntry entry2 = new BibEntry();
+        entry1.setField(FieldName.CROSSREF, "entry2");
+        entry2.setCiteKey("entry2");
+        database.insertEntry(entry2);
+        database.insertEntry(entry1);
+        entry2.setField("keywords", "w1, w2a w2b, w3");
+
+        String result = BibtexKeyPatternUtil.makeLabel(entry1, "keyword1", ',', database);
+
+        assertEquals("w1", result);
+    }
+
+    @Test
     public void keywordsNKeywordsSeparatedBySpace() {
         BibEntry entry = new BibEntry();
         entry.setField("keywords", "w1, w2a w2b, w3");
@@ -780,6 +894,22 @@ public class BibtexKeyPatternUtilTest {
 
         // check out of range
         result = BibtexKeyPatternUtil.makeLabel(entry, "keywords55", ',', new BibDatabase());
+        assertEquals("w1w2aw2bw3", result);
+    }
+
+    @Test
+    public void crossrefkeywordsNKeywordsSeparatedBySpace() {
+        BibDatabase database = new BibDatabase();
+        BibEntry entry1 = new BibEntry();
+        BibEntry entry2 = new BibEntry();
+        entry1.setField(FieldName.CROSSREF, "entry2");
+        entry2.setCiteKey("entry2");
+        database.insertEntry(entry2);
+        database.insertEntry(entry1);
+        entry2.setField("keywords", "w1, w2a w2b, w3");
+
+        String result = BibtexKeyPatternUtil.makeLabel(entry1, "keywords", ',', database);
+
         assertEquals("w1w2aw2bw3", result);
     }
 
@@ -808,8 +938,37 @@ public class BibtexKeyPatternUtilTest {
         BibEntry entry = new BibEntry();
         entry.setField("title", "Green Scheduling of Whatever");
         assertEquals("GSo", BibtexKeyPatternUtil.makeLabel(entry, "shorttitleINI", ',', new BibDatabase()));
-        assertEquals("GreenSchedulingof", BibtexKeyPatternUtil.makeLabel(entry, "shorttitle",
+        assertEquals("Green Scheduling of", BibtexKeyPatternUtil.makeLabel(entry, "shorttitle",
                 ',', new BibDatabase()));
+    }
+
+    @Test
+    public void testcrossrefShorttitle() {
+        BibDatabase database = new BibDatabase();
+        BibEntry entry1 = new BibEntry();
+        BibEntry entry2 = new BibEntry();
+        entry1.setField(FieldName.CROSSREF, "entry2");
+        entry2.setCiteKey("entry2");
+        database.insertEntry(entry2);
+        database.insertEntry(entry1);
+        entry2.setField("title", "Green Scheduling of Whatever");
+
+        assertEquals("Green Scheduling of", BibtexKeyPatternUtil.makeLabel(entry1, "shorttitle",
+                ',', database));
+    }
+
+    @Test
+    public void testcrossrefShorttitleInitials() {
+        BibDatabase database = new BibDatabase();
+        BibEntry entry1 = new BibEntry();
+        BibEntry entry2 = new BibEntry();
+        entry1.setField(FieldName.CROSSREF, "entry2");
+        entry2.setCiteKey("entry2");
+        database.insertEntry(entry2);
+        database.insertEntry(entry1);
+        entry2.setField("title", "Green Scheduling of Whatever");
+
+        assertEquals("GSo", BibtexKeyPatternUtil.makeLabel(entry1, "shorttitleINI", ',', database));
     }
 
 }

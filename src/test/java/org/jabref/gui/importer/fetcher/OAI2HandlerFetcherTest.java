@@ -9,7 +9,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.jabref.logic.importer.util.OAI2Handler;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITest;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,7 +25,8 @@ import org.xml.sax.SAXException;
  * @author Christian Kopf
  * @author Christopher Oezbek
  */
-@Category(GUITests.class)
+
+@Category(GUITest.class)
 public class OAI2HandlerFetcherTest {
 
     protected OAI2Handler handler;
@@ -72,7 +73,7 @@ public class OAI2HandlerFetcherTest {
 
             Assert.assertEquals(Optional.of("Heavy Particles from Inflation"), be.getField("title"));
             Assert.assertTrue(be.getField("abstract").isPresent());
-            Assert.assertEquals(Optional.of("23 pages"), be.getField("comments"));
+            Assert.assertEquals(Optional.of("23 pages"), be.getField("comment"));
             Assert.assertEquals(Optional.of("CERN-PH-TH/2004-151"), be.getField("reportno"));
         } catch (SAXException e) {
             throw e.getException();

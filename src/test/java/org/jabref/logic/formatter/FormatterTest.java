@@ -13,6 +13,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
+import org.jabref.logic.formatter.bibtexfields.RegexFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
@@ -123,6 +124,7 @@ public class FormatterTest {
                 new Object[]{new NormalizePagesFormatter()},
                 new Object[]{new OrdinalsToSuperscriptFormatter()},
                 new Object[]{new ProtectTermsFormatter()},
+                new Object[]{new RegexFormatter()},
                 new Object[]{new RemoveBracesFormatter()},
                 new Object[]{new SentenceCaseFormatter()},
                 new Object[]{new TitleCaseFormatter()},

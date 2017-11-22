@@ -186,19 +186,13 @@ class ReplaceStringDialog extends JabRefDialog {
     public int replace(BibEntry be, NamedCompound ce) {
         int counter = 0;
         if (allFields()) {
-
             for (String s : be.getFieldNames()) {
-                if (!s.equals(BibEntry.KEY_FIELD)) {
-                    counter += replaceField(be, s, ce);
-                }
+                counter += replaceField(be, s, ce);
             }
         } else {
             for (String fld : fieldStrings) {
-                if (!fld.equals(BibEntry.KEY_FIELD)) {
                     counter += replaceField(be, fld, ce);
-                }
             }
-
         }
         return counter;
     }
