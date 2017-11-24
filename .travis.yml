@@ -46,7 +46,7 @@ script:
 
 after_success:
   # enable codecov report
-  - ./gradlew jacocoTestReport
+  - ./gradlew jacocoJunit5TestReport
   - bash <(curl -s https://codecov.io/bash)
 
 after_failure:
