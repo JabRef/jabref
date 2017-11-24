@@ -304,7 +304,7 @@ tasks.withType(Test) {
 }
 
 task jacocoMerge(type: JacocoMerge) {
-    executionData junitPlatformTest, databaseTest, fetcherTest
+    executionData file("$buildDir/jacoco/databaseTest.exec"), file("$buildDir/jacoco/fetcherTest.exec"), file("$buildDir/jacoco/junitPlatformTest.exec")
 }
 
 jacocoTestReport {
