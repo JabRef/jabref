@@ -304,7 +304,7 @@ tasks.withType(Test) {
 }
 
 task jacocoMerge(type: JacocoMerge) {
-    executionData test, databaseTest
+    executionData junitPlatformTest, databaseTest, fetcherTest
 }
 
 jacocoTestReport {
@@ -325,7 +325,8 @@ afterEvaluate {
     }
 
     task jacocoJunit5TestReport(type: JacocoReport) {
-        executionData junitPlatformTest
+        executionData jacocoMerge.destinationFile
+        dependsOn jacocoMerge
         sourceSets sourceSets.main
         sourceDirectories = files(sourceSets.main.allSource.srcDirs)
         classDirectories = files(sourceSets.main.output)
