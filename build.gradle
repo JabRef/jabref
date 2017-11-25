@@ -304,7 +304,8 @@ tasks.withType(Test) {
 }
 
 task jacocoMerge(type: JacocoMerge) {
-    executionData test, databaseTest
+    executionData file("$buildDir/jacoco/junitPlatformTest.exec"), file("$buildDir/jacoco/databaseTest.exec"), file("$buildDir/jacoco/fetcherTest.exec")
+    dependsOn junitPlatformTest, databaseTest, fetcherTest
 }
 
 jacocoTestReport {
@@ -314,6 +315,27 @@ jacocoTestReport {
     reports {
         xml.enabled = true // coveralls plugin depends on xml format report
         html.enabled = true
+    }
+}
+
+afterEvaluate {
+    def junitPlatformTest = tasks.junitPlatformTest
+
+    jacoco {
+        applyTo(junitPlatformTest)
+    }
+
+    task jacocoJunit5TestReport(type: JacocoReport) {
+        executionData jacocoMerge.destinationFile
+        dependsOn jacocoMerge
+        sourceSets sourceSets.main
+        sourceDirectories = files(sourceSets.main.allSource.srcDirs)
+        classDirectories = files(sourceSets.main.output)
+
+        reports {
+            xml.enabled true
+            html.enabled true
+        }
     }
 }
 

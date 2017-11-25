@@ -19,11 +19,13 @@ env:
     - TEST_SUITE=databaseTest
     - TEST_SUITE=guiTest
     - TEST_SUITE=checkstyle
+    - TEST_SUITE=codecov
 
 matrix:
     fast_finish: true
     allow_failures:
       - env: TEST_SUITE=fetcherTest
+      - env: TEST_SUITE=codecov
 
 # JavaFX localization tests need a running X environment
 before_install:
@@ -40,14 +42,10 @@ before_script:
 script:
   # --scan enables the Gradle build scan, which can be used to investigate the time each action consumes
   # For more information see https://gradle.com/scans/get-started
-  - if [ "$TEST_SUITE" != "guiTest" ] && [ "$TEST_SUITE" != "checkstyle" ]; then ./gradlew $TEST_SUITE $OPTIONS --scan; fi
+  - if [ "$TEST_SUITE" != "guiTest" ] && [ "$TEST_SUITE" != "checkstyle" ] && [ "$TEST_SUITE" != "codecov" ]; then ./gradlew $TEST_SUITE $OPTIONS --scan; fi
   - if [ "$TEST_SUITE" == "checkstyle" ]; then ./gradlew checkstyleMain checkstyleTest checkstyleJmh; fi
   - if [ "$TEST_SUITE" == "guiTest" ]; then ./buildres/gui-tests.sh; fi
-
-after_success:
-  # enable codecov report
-  - ./gradlew jacocoTestReport
-  - bash <(curl -s https://codecov.io/bash)
+  - if [ "$TEST_SUITE" == "codecov" ]; then ./gradlew jacocoJunit5TestReport; bash <(curl -s https://codecov.io/bash); fi
 
 after_failure:
   # show test results if build fails
