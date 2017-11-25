@@ -29,10 +29,6 @@ public class FulltextFetchers {
 
     private final List<FulltextFetcher> finders = new ArrayList<>();
 
-    public List<FulltextFetcher> getFetchers() {
-        return finders;
-    }
-
     public FulltextFetchers(ImportFormatPreferences importFormatPreferences) {
         // Ordering is important, authorities first!
         // Publisher
@@ -48,6 +44,10 @@ public class FulltextFetchers {
 
     public FulltextFetchers(List<FulltextFetcher> fetcher) {
         finders.addAll(fetcher);
+    }
+
+    public List<FulltextFetcher> getFetchers() {
+        return finders;
     }
 
     public Optional<URL> findFullTextPDF(BibEntry entry) {

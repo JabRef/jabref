@@ -19,13 +19,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-public class MathSciNetTest {
+class MathSciNetTest {
 
     MathSciNet fetcher;
     private BibEntry ratiuEntry;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(
                 mock(FieldContentParserPreferences.class));
@@ -48,7 +48,7 @@ public class MathSciNetTest {
     }
 
     @Test
-    public void searchByEntryFindsEntry() throws Exception {
+    void searchByEntryFindsEntry() throws Exception {
         BibEntry searchEntry = new BibEntry();
         searchEntry.setField("title", "existence");
         searchEntry.setField("author", "Ratiu");
@@ -61,7 +61,7 @@ public class MathSciNetTest {
 
     @Test
     @DisabledOnCIServer("CI server has no subscription to MathSciNet and thus gets 401 response")
-    public void searchByQueryFindsEntry() throws Exception {
+    void searchByQueryFindsEntry() throws Exception {
         List<BibEntry> fetchedEntries = fetcher.performSearch("Existence and uniqueness theorems Two-Dimensional Ericksen Leslie System");
         assertFalse(fetchedEntries.isEmpty());
         assertEquals(ratiuEntry, fetchedEntries.get(1));
@@ -69,7 +69,7 @@ public class MathSciNetTest {
 
     @Test
     @DisabledOnCIServer("CI server has no subscription to MathSciNet and thus gets 401 response")
-    public void searchByIdFindsEntry() throws Exception {
+    void searchByIdFindsEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3537908");
         assertEquals(Optional.of(ratiuEntry), fetchedEntry);
     }

@@ -18,12 +18,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-public class zbMATHTest {
+class zbMATHTest {
     private zbMATH fetcher;
     private BibEntry donaldsonEntry;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(
                 mock(FieldContentParserPreferences.class));
@@ -47,7 +47,7 @@ public class zbMATHTest {
 
     @Test
     @DisabledOnCIServer("CI server has no subscription to zbMath and thus gets 401 response")
-    public void searchByQueryFindsEntry() throws Exception {
+    void searchByQueryFindsEntry() throws Exception {
         List<BibEntry> fetchedEntries = fetcher.performSearch("an:0507.57010");
         assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
     }

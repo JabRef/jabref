@@ -14,20 +14,20 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @FetcherTest
-public class ScienceDirectTest {
+class ScienceDirectTest {
 
     private ScienceDirect finder;
     private BibEntry entry;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         finder = new ScienceDirect();
         entry = new BibEntry();
     }
 
     @Test
     @DisabledOnCIServer("CI server is blocked")
-    public void findByDOIOldPage() throws IOException {
+    void findByDOIOldPage() throws IOException {
         entry.setField("doi", "10.1016/j.jrmge.2015.08.004");
 
         assertEquals(
@@ -38,7 +38,7 @@ public class ScienceDirectTest {
 
     @Test
     @DisabledOnCIServer("CI server is blocked")
-    public void findByDOINewPage() throws IOException {
+    void findByDOINewPage() throws IOException {
         entry.setField("doi", "10.1016/j.aasri.2014.09.002");
 
         assertEquals(
@@ -49,7 +49,7 @@ public class ScienceDirectTest {
 
     @Test
     @DisabledOnCIServer("CI server is blocked")
-    public void notFoundByDOI() throws IOException {
+    void notFoundByDOI() throws IOException {
         entry.setField("doi", "10.1016/j.aasri.2014.0559.002");
 
         assertEquals(Optional.empty(), finder.findFullText(entry));
