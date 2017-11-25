@@ -60,8 +60,6 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         public static Set<String> getAvailableLookAndFeels() {
 
             Set<String> lookAndFeels = new HashSet<>();
-            lookAndFeels.add("com.jgoodies.looks.plastic.Plastic3DLookAndFeel");
-            lookAndFeels.add("com.jgoodies.looks.windows.WindowsLookAndFeel");
 
             for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 lookAndFeels.add(info.getClassName());

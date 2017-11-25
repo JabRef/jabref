@@ -12,6 +12,7 @@ import java.util.prefs.Preferences;
 
 import org.jabref.Globals;
 import org.jabref.JabRefMain;
+import org.jabref.logic.util.OS;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
@@ -279,6 +280,18 @@ public class PreferencesMigrations {
             keyPattern.addBibtexKeyPattern(key, oldPatternPrefs.get(key, null));
         }
         prefs.putKeyPattern(keyPattern);
+    }
+
+    public static void upgradeObsoleteLookAndFeels() {
+        JabRefPreferences prefs = Globals.prefs;
+        if (prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL).equals("com.jgoodies.looks.windows.WindowsLookAndFeel") ||
+                prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL).equals("com.jgoodies.plaf.plastic.Plastic3DLookAndFeel") ) {
+            if (OS.WINDOWS) {
+                prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            } else {
+                prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, "javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            }
+        }
     }
 
 }
