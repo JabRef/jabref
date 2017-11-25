@@ -7,24 +7,22 @@ import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.support.DevEnvironment;
+import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Category(FetcherTest.class)
+@FetcherTest
 public class zbMATHTest {
     private zbMATH fetcher;
     private BibEntry donaldsonEntry;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(
@@ -48,10 +46,8 @@ public class zbMATHTest {
     }
 
     @Test
+    @DisabledOnCIServer("CI server has no subscription to zbMath and thus gets 401 response")
     public void searchByQueryFindsEntry() throws Exception {
-        // CI has no subscription to zbMath and thus gets 401 response
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
         List<BibEntry> fetchedEntries = fetcher.performSearch("an:0507.57010");
         assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
     }

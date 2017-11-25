@@ -29,6 +29,10 @@ public class FulltextFetchers {
 
     private final List<FulltextFetcher> finders = new ArrayList<>();
 
+    public List<FulltextFetcher> getFetchers() {
+        return finders;
+    }
+
     public FulltextFetchers(ImportFormatPreferences importFormatPreferences) {
         // Ordering is important, authorities first!
         // Publisher
