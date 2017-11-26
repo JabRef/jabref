@@ -35,6 +35,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
     private final ListProperty<FileAnnotationViewModel> annotations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Path> files = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<FileAnnotationViewModel> currentAnnotation = new SimpleObjectProperty<>();
+    private final ObjectProperty<Boolean> annotaionEmpty = new SimpleObjectProperty<Boolean>(null);
 
     private final FileAnnotationCache cache;
     private final BibEntry entry;
@@ -57,6 +58,10 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
 
     public ObjectProperty<FileAnnotationViewModel> currentAnnotationProperty() {
         return currentAnnotation;
+    }
+
+    public boolean isAnnotationsEmpty() {
+        return annotations.isEmpty();
     }
 
     public ListProperty<FileAnnotationViewModel> annotationsProperty() {
