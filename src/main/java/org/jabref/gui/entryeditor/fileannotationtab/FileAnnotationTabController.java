@@ -14,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -43,6 +44,8 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
     public TextArea content;
     @FXML
     public TextArea marking;
+    @FXML
+    public GridPane grid;
 
     @Inject
     private FileAnnotationCache fileAnnotationCache;
@@ -54,7 +57,7 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
     @FXML
     public void initialize() {
         viewModel = new FileAnnotationTabViewModel(fileAnnotationCache, entry, fileMonitor);
-
+        
         // Set-up files list
         files.getItems().setAll(viewModel.filesProperty().get());
         files.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.notifyNewSelectedFile(newValue));
@@ -63,6 +66,7 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
         // Set-up annotation list
         annotationList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         annotationList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.notifyNewSelectedAnnotation(newValue));
+        annotationList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> grid.setDisable(newValue == null));
         ViewModelListCellFactory<FileAnnotationViewModel> cellFactory = new ViewModelListCellFactory<FileAnnotationViewModel>()
                 .withTooltip(FileAnnotationViewModel::getDescription)
                 .withGraphic(annotation -> {
@@ -95,6 +99,8 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
         date.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::dateProperty));
         content.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::contentProperty));
         marking.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::markingProperty));
+        grid.setDisable(true);
+        //grid.disableProperty().bind(Bindings.and(viewModel.isAnnotationsEmpty(), false));
     }
 
     public void copy(ActionEvent event) {
