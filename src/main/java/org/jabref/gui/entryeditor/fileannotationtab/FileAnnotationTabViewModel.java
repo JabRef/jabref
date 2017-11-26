@@ -60,8 +60,8 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         return currentAnnotation;
     }
 
-    public boolean isAnnotationsEmpty() {
-        return annotations.isEmpty();
+    public ObjectProperty<Boolean> isAnnotationsEmpty() {
+        return annotaionEmpty;
     }
 
     public ListProperty<FileAnnotationViewModel> annotationsProperty() {
@@ -89,7 +89,10 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
                 .map(FileAnnotationViewModel::new)
                 .collect(Collectors.toList());
         annotations.setAll(newAnnotations);
-
+        if (annotations.isEmpty())
+            annotaionEmpty.setValue(true);
+        else
+            annotaionEmpty.setValue(false);
         try {
             fileMonitor.addListenerForFile(currentFile, fileListener);
         } catch (IOException e) {

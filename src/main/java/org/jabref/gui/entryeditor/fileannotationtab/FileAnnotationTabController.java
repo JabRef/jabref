@@ -57,7 +57,7 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
     @FXML
     public void initialize() {
         viewModel = new FileAnnotationTabViewModel(fileAnnotationCache, entry, fileMonitor);
-        
+
         // Set-up files list
         files.getItems().setAll(viewModel.filesProperty().get());
         files.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.notifyNewSelectedFile(newValue));
@@ -66,7 +66,7 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
         // Set-up annotation list
         annotationList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         annotationList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.notifyNewSelectedAnnotation(newValue));
-        annotationList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> grid.setDisable(newValue == null));
+        //annotationList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> grid.setDisable(newValue == null));
         ViewModelListCellFactory<FileAnnotationViewModel> cellFactory = new ViewModelListCellFactory<FileAnnotationViewModel>()
                 .withTooltip(FileAnnotationViewModel::getDescription)
                 .withGraphic(annotation -> {
@@ -100,7 +100,7 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
         content.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::contentProperty));
         marking.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::markingProperty));
         grid.setDisable(true);
-        //grid.disableProperty().bind(Bindings.and(viewModel.isAnnotationsEmpty(), false));
+        grid.disableProperty().bind(viewModel.isAnnotationsEmpty());
     }
 
     public void copy(ActionEvent event) {
