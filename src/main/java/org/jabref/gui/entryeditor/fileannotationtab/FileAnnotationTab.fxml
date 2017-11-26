@@ -37,7 +37,7 @@
             </BorderPane>
         </masterNode>
         <detailNode>
-            <GridPane>
+            <GridPane fx:id="grid">
                 <padding>
                     <Insets top="5" right="5" bottom="5" left="10"/>
                 </padding>
