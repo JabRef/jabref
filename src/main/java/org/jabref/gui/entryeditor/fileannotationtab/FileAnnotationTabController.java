@@ -66,7 +66,6 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
         // Set-up annotation list
         annotationList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         annotationList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.notifyNewSelectedAnnotation(newValue));
-        //annotationList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> grid.setDisable(newValue == null));
         ViewModelListCellFactory<FileAnnotationViewModel> cellFactory = new ViewModelListCellFactory<FileAnnotationViewModel>()
                 .withTooltip(FileAnnotationViewModel::getDescription)
                 .withGraphic(annotation -> {
@@ -99,7 +98,6 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
         date.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::dateProperty));
         content.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::contentProperty));
         marking.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::markingProperty));
-        grid.setDisable(true);
         grid.disableProperty().bind(viewModel.isAnnotationsEmpty());
     }
 
