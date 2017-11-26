@@ -35,8 +35,8 @@ public class ContainsAndRegexBasedSearchRuleDescriberTest {
         double textSize = 13;
         String query = "a b";
         List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which any field contains the term ", textSize),
-                TextUtil.createTextBold("a", textSize), TextUtil.createText(" and ", textSize), TextUtil.createTextBold("b", textSize), TextUtil.createText(" (case insensitive). ", textSize),
-                TextUtil.createText("\n\nHint: To search specific fields only, enter for example:\n", textSize), TextUtil.createTextMonospaced("author=smith and title=electrical", textSize));
+                TextUtil.createText("a", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" and ", textSize), TextUtil.createText("b", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" (case insensitive). ", textSize),
+                TextUtil.createText("\n\nHint: To search specific fields only, enter for example:\n", textSize), TextUtil.createText("author=smith and title=electrical", textSize, TextUtil.TextType.MONOSPACED));
         TextFlow description = new ContainsAndRegexBasedSearchRuleDescriber(false, false, query).getDescription();
 
         assertTrue(checkIfDescriptionEqualsExpectedTexts(description, expectedTexts));
@@ -47,8 +47,8 @@ public class ContainsAndRegexBasedSearchRuleDescriberTest {
         double textSize = 13;
         String query = "a b";
         List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which any field contains the regular expression ", textSize),
-                TextUtil.createTextBold("a", textSize), TextUtil.createText(" and ", textSize), TextUtil.createTextBold("b", textSize), TextUtil.createText(" (case insensitive). ", textSize),
-                TextUtil.createText("\n\nHint: To search specific fields only, enter for example:\n", textSize), TextUtil.createTextMonospaced("author=smith and title=electrical", textSize));
+                TextUtil.createText("a", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" and ", textSize), TextUtil.createText("b", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" (case insensitive). ", textSize),
+                TextUtil.createText("\n\nHint: To search specific fields only, enter for example:\n", textSize), TextUtil.createText("author=smith and title=electrical", textSize, TextUtil.TextType.MONOSPACED));
         TextFlow description = new ContainsAndRegexBasedSearchRuleDescriber(false, true, query).getDescription();
 
         assertTrue(checkIfDescriptionEqualsExpectedTexts(description, expectedTexts));
@@ -59,8 +59,8 @@ public class ContainsAndRegexBasedSearchRuleDescriberTest {
         double textSize = 13;
         String query = "a b";
         List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which any field contains the regular expression ", textSize),
-                TextUtil.createTextBold("a", textSize), TextUtil.createText(" and ", textSize), TextUtil.createTextBold("b", textSize), TextUtil.createText(" (case sensitive). ", textSize),
-                TextUtil.createText("\n\nHint: To search specific fields only, enter for example:\n", textSize), TextUtil.createTextMonospaced("author=smith and title=electrical", textSize));
+                TextUtil.createText("a", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" and ", textSize), TextUtil.createText("b", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" (case sensitive). ", textSize),
+                TextUtil.createText("\n\nHint: To search specific fields only, enter for example:\n", textSize), TextUtil.createText("author=smith and title=electrical", textSize, TextUtil.TextType.MONOSPACED));
         TextFlow description = new ContainsAndRegexBasedSearchRuleDescriber(true, true, query).getDescription();
 
         assertTrue(checkIfDescriptionEqualsExpectedTexts(description, expectedTexts));
@@ -71,8 +71,8 @@ public class ContainsAndRegexBasedSearchRuleDescriberTest {
         double textSize = 13;
         String query = "a b";
         List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which any field contains the term ", textSize),
-                TextUtil.createTextBold("a", textSize), TextUtil.createText(" and ", textSize), TextUtil.createTextBold("b", textSize), TextUtil.createText(" (case sensitive). ", textSize),
-                TextUtil.createText("\n\nHint: To search specific fields only, enter for example:\n", textSize), TextUtil.createTextMonospaced("author=smith and title=electrical", textSize));
+                TextUtil.createText("a", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" and ", textSize), TextUtil.createText("b", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" (case sensitive). ", textSize),
+                TextUtil.createText("\n\nHint: To search specific fields only, enter for example:\n", textSize), TextUtil.createText("author=smith and title=electrical", textSize, TextUtil.TextType.MONOSPACED));
         TextFlow description = new ContainsAndRegexBasedSearchRuleDescriber(true, false, query).getDescription();
 
         assertTrue(checkIfDescriptionEqualsExpectedTexts(description, expectedTexts));

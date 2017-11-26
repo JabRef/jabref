@@ -42,8 +42,8 @@ public class GrammarBasedSearchRuleDescriberTest {
     public void testSimpleQueryCaseSensitiveRegex() {
         double textSize = 13;
         String query = "a=b";
-        List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createTextBold("a", textSize),
-                TextUtil.createText(" contains the regular expression ", textSize), TextUtil.createTextBold("b", textSize), TextUtil.createText(". ", textSize),
+        List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createText("a", textSize, TextUtil.TextType.BOLD),
+                TextUtil.createText(" contains the regular expression ", textSize), TextUtil.createText("b", textSize, TextUtil.TextType.BOLD), TextUtil.createText(". ", textSize),
                 TextUtil.createText("The search is case sensitive.", textSize));
         TextFlow description = createDescription(query, true, true);
 
@@ -54,8 +54,8 @@ public class GrammarBasedSearchRuleDescriberTest {
     public void testSimpleQueryCaseSensitive() {
         double textSize = 13;
         String query = "a=b";
-        List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createTextBold("a", textSize),
-                TextUtil.createText(" contains the term ", textSize), TextUtil.createTextBold("b", textSize), TextUtil.createText(". ", textSize),
+        List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createText("a", textSize, TextUtil.TextType.BOLD),
+                TextUtil.createText(" contains the term ", textSize), TextUtil.createText("b", textSize, TextUtil.TextType.BOLD), TextUtil.createText(". ", textSize),
                 TextUtil.createText("The search is case sensitive.", textSize));
         TextFlow description = createDescription(query, true, false);
 
@@ -66,8 +66,8 @@ public class GrammarBasedSearchRuleDescriberTest {
     public void testSimpleQuery() {
         double textSize = 13;
         String query = "a=b";
-        List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createTextBold("a", textSize),
-                TextUtil.createText(" contains the term ", textSize), TextUtil.createTextBold("b", textSize), TextUtil.createText(". ", textSize),
+        List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createText("a", textSize, TextUtil.TextType.BOLD),
+                TextUtil.createText(" contains the term ", textSize), TextUtil.createText("b", textSize, TextUtil.TextType.BOLD), TextUtil.createText(". ", textSize),
                 TextUtil.createText("The search is case insensitive.", textSize));
         TextFlow description = createDescription(query, false, false);
 
@@ -78,8 +78,8 @@ public class GrammarBasedSearchRuleDescriberTest {
     public void testSimpleQueryRegex() {
         double textSize = 13;
         String query = "a=b";
-        List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createTextBold("a", textSize),
-                TextUtil.createText(" contains the regular expression ", textSize), TextUtil.createTextBold("b", textSize), TextUtil.createText(". ", textSize),
+        List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createText("a", textSize, TextUtil.TextType.BOLD),
+                TextUtil.createText(" contains the regular expression ", textSize), TextUtil.createText("b", textSize, TextUtil.TextType.BOLD), TextUtil.createText(". ", textSize),
                 TextUtil.createText("The search is case insensitive.", textSize));
         TextFlow description = createDescription(query, false, true);
 
@@ -90,10 +90,10 @@ public class GrammarBasedSearchRuleDescriberTest {
     public void testComplexQueryCaseSensitiveRegex() {
         double textSize = 13;
         String query = "not a=b and c=e or e=\"x\"";
-        List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which ", textSize), TextUtil.createText("not ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createTextBold("a", textSize),
-                TextUtil.createText(" contains the regular expression ", textSize), TextUtil.createTextBold("b", textSize), TextUtil.createText(" and ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createTextBold("c", textSize), TextUtil.createText(" contains the regular expression ", textSize),
-                TextUtil.createTextBold("e", textSize), TextUtil.createText(" or ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createTextBold("e", textSize), TextUtil.createText(" contains the regular expression ", textSize),
-                TextUtil.createTextBold("x", textSize), TextUtil.createText(". ", textSize), TextUtil.createText("The search is case sensitive.", textSize));
+        List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which ", textSize), TextUtil.createText("not ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createText("a", textSize, TextUtil.TextType.BOLD),
+                TextUtil.createText(" contains the regular expression ", textSize), TextUtil.createText("b", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" and ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createText("c", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" contains the regular expression ", textSize),
+                TextUtil.createText("e", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" or ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createText("e", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" contains the regular expression ", textSize),
+                TextUtil.createText("x", textSize, TextUtil.TextType.BOLD), TextUtil.createText(". ", textSize), TextUtil.createText("The search is case sensitive.", textSize));
         TextFlow description = createDescription(query, true, true);
 
         assertTrue(checkIfDescriptionEqualsExpectedTexts(description, expectedTexts));
@@ -103,10 +103,10 @@ public class GrammarBasedSearchRuleDescriberTest {
     public void testComplexQueryRegex() {
         double textSize = 13;
         String query = "not a=b and c=e or e=\"x\"";
-        List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which ", textSize), TextUtil.createText("not ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createTextBold("a", textSize),
-                TextUtil.createText(" contains the regular expression ", textSize), TextUtil.createTextBold("b", textSize), TextUtil.createText(" and ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createTextBold("c", textSize), TextUtil.createText(" contains the regular expression ", textSize),
-                TextUtil.createTextBold("e", textSize), TextUtil.createText(" or ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createTextBold("e", textSize), TextUtil.createText(" contains the regular expression ", textSize),
-                TextUtil.createTextBold("x", textSize), TextUtil.createText(". ", textSize), TextUtil.createText("The search is case insensitive.", textSize));
+        List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which ", textSize), TextUtil.createText("not ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createText("a", textSize, TextUtil.TextType.BOLD),
+                TextUtil.createText(" contains the regular expression ", textSize), TextUtil.createText("b", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" and ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createText("c", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" contains the regular expression ", textSize),
+                TextUtil.createText("e", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" or ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createText("e", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" contains the regular expression ", textSize),
+                TextUtil.createText("x", textSize, TextUtil.TextType.BOLD), TextUtil.createText(". ", textSize), TextUtil.createText("The search is case insensitive.", textSize));
         TextFlow description = createDescription(query, false, true);
 
         assertTrue(checkIfDescriptionEqualsExpectedTexts(description, expectedTexts));
@@ -116,9 +116,9 @@ public class GrammarBasedSearchRuleDescriberTest {
     public void testComplexQueryCaseSensitive() {
         double textSize = 13;
         String query = "not a=b and c=e or e=\"x\"";
-        List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which ", textSize), TextUtil.createText("not ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createTextBold("a", textSize),
-                TextUtil.createText(" contains the term ", textSize), TextUtil.createTextBold("b", textSize), TextUtil.createText(" and ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createTextBold("c", textSize), TextUtil.createText(" contains the term ", textSize), TextUtil.createTextBold("e", textSize),
-                TextUtil.createText(" or ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createTextBold("e", textSize), TextUtil.createText(" contains the term ", textSize), TextUtil.createTextBold("x", textSize), TextUtil.createText(". ", textSize), TextUtil.createText("The search is case sensitive.", textSize));
+        List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which ", textSize), TextUtil.createText("not ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createText("a", textSize, TextUtil.TextType.BOLD),
+                TextUtil.createText(" contains the term ", textSize), TextUtil.createText("b", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" and ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createText("c", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" contains the term ", textSize), TextUtil.createText("e", textSize, TextUtil.TextType.BOLD),
+                TextUtil.createText(" or ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createText("e", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" contains the term ", textSize), TextUtil.createText("x", textSize, TextUtil.TextType.BOLD), TextUtil.createText(". ", textSize), TextUtil.createText("The search is case sensitive.", textSize));
         TextFlow description = createDescription(query, true, false);
 
         assertTrue(checkIfDescriptionEqualsExpectedTexts(description, expectedTexts));
@@ -128,9 +128,9 @@ public class GrammarBasedSearchRuleDescriberTest {
     public void testComplexQuery() {
         double textSize = 13;
         String query = "not a=b and c=e or e=\"x\"";
-        List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which ", textSize), TextUtil.createText("not ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createTextBold("a", textSize),
-                TextUtil.createText(" contains the term ", textSize), TextUtil.createTextBold("b", textSize), TextUtil.createText(" and ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createTextBold("c", textSize), TextUtil.createText(" contains the term ", textSize), TextUtil.createTextBold("e", textSize),
-                TextUtil.createText(" or ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createTextBold("e", textSize), TextUtil.createText(" contains the term ", textSize), TextUtil.createTextBold("x", textSize), TextUtil.createText(". ", textSize), TextUtil.createText("The search is case insensitive.", textSize));
+        List<Text> expectedTexts = Arrays.asList(TextUtil.createText("This search contains entries in which ", textSize), TextUtil.createText("not ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createText("a", textSize, TextUtil.TextType.BOLD),
+                TextUtil.createText(" contains the term ", textSize), TextUtil.createText("b", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" and ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createText("c", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" contains the term ", textSize), TextUtil.createText("e", textSize, TextUtil.TextType.BOLD),
+                TextUtil.createText(" or ", textSize), TextUtil.createText("the field ", textSize), TextUtil.createText("e", textSize, TextUtil.TextType.BOLD), TextUtil.createText(" contains the term ", textSize), TextUtil.createText("x", textSize, TextUtil.TextType.BOLD), TextUtil.createText(". ", textSize), TextUtil.createText("The search is case insensitive.", textSize));
         TextFlow description = createDescription(query, false, false);
 
         assertTrue(checkIfDescriptionEqualsExpectedTexts(description, expectedTexts));
