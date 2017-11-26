@@ -27,33 +27,35 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
         List<String> words = new SentenceAnalyzer(query).getWords();
         String firstWord = words.isEmpty() ? "" : words.get(0);
 
-        TextFlow searchDescription = new TextFlow();
-        searchDescription.getChildren().add(TextUtil.createText(regExp ? Localization.lang(
-                "This search contains entries in which any field contains the regular expression ")
-                : Localization.lang("This search contains entries in which any field contains the term "), textSize));
-        searchDescription.getChildren().add(TextUtil.createTextBold(firstWord, textSize));
+        String temp = regExp ? Localization.lang(
+                "This search contains entries in which any field contains the regular expression <b>%0</b>")
+                : Localization.lang("This search contains entries in which any field contains the term <b>%0</b>");
+        List<Text> textList = TextUtil.formatToTexts(temp, textSize, new TextUtil.TextReplacement("<b>%0</b>", firstWord, TextUtil.TextType.BOLD));
 
         if (words.size() > 1) {
             List<String> unprocessedWords = words.subList(1, words.size());
             for (String word : unprocessedWords) {
-                searchDescription.getChildren().add(TextUtil.createText(String.format(" %s ", Localization.lang("and")), textSize));
-                searchDescription.getChildren().add(TextUtil.createTextBold(word, textSize));
+                textList.add(TextUtil.createText(String.format(" %s ", Localization.lang("and")), textSize, TextUtil.TextType.NORMAL));
+                textList.add(TextUtil.createText(word, textSize, TextUtil.TextType.BOLD));
             }
         }
 
-        Text genericDescription = TextUtil.createText("\n\n" + Localization.lang("Hint: To search specific fields only, enter for example:\n"), textSize);
-        Text genericDescription2 = TextUtil.createTextMonospaced("author=smith and title=electrical", textSize);
-        searchDescription.getChildren().add(getCaseSensitiveDescription());
-        searchDescription.getChildren().add(genericDescription);
-        searchDescription.getChildren().add(genericDescription2);
+        String genericDescription = "\n\n" + Localization.lang("Hint: To search specific fields only, enter for example:<p><tt>author=smith and title=electrical</tt>");
+        genericDescription = genericDescription.replace("<p>", "\n");
+        List<Text> genericDescriptionTexts = TextUtil.formatToTexts(genericDescription, textSize, new TextUtil.TextReplacement("<tt>author=smith and title=electrical</tt>", "author=smith and title=electrical", TextUtil.TextType.MONOSPACED));
+        textList.add(getCaseSensitiveDescription());
+        textList.addAll(genericDescriptionTexts);
+
+        TextFlow searchDescription = new TextFlow();
+        searchDescription.getChildren().setAll(textList);
         return searchDescription;
     }
 
     private Text getCaseSensitiveDescription() {
         if (caseSensitive) {
-            return TextUtil.createText(String.format(" (%s). ", Localization.lang("case sensitive")), textSize);
+            return TextUtil.createText(String.format(" (%s). ", Localization.lang("case sensitive")), textSize, TextUtil.TextType.NORMAL);
         } else {
-            return TextUtil.createText(String.format(" (%s). ", Localization.lang("case insensitive")), textSize);
+            return TextUtil.createText(String.format(" (%s). ", Localization.lang("case insensitive")), textSize, TextUtil.TextType.NORMAL);
         }
     }
 }

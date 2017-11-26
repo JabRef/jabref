@@ -37,12 +37,12 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
         DescriptionSearchBaseVisitor descriptionSearchBaseVisitor = new DescriptionSearchBaseVisitor();
 
         // describe advanced search expression
-        textFlow.getChildren().add(TextUtil.createText(Localization.lang("This search contains entries in which "), textSize));
+        textFlow.getChildren().add(TextUtil.createText(String.format("%s ", Localization.lang("This search contains entries in which")), textSize, TextUtil.TextType.NORMAL));
         textFlow.getChildren().addAll(descriptionSearchBaseVisitor.visit(parseTree));
-        textFlow.getChildren().add(TextUtil.createText(". ", textSize));
+        textFlow.getChildren().add(TextUtil.createText(". ", textSize, TextUtil.TextType.NORMAL));
         textFlow.getChildren().add(TextUtil.createText(caseSensitive ? Localization
                 .lang("The search is case sensitive.") :
-                Localization.lang("The search is case insensitive."), textSize));
+                Localization.lang("The search is case insensitive."), textSize, TextUtil.TextType.NORMAL));
         return textFlow;
     }
 
@@ -56,14 +56,14 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
         @Override
         public List<Text> visitUnaryExpression(SearchParser.UnaryExpressionContext context) {
             List<Text> textList = visit(context.expression());
-            textList.add(0, TextUtil.createText(Localization.lang("not "), textSize));
+            textList.add(0, TextUtil.createText(Localization.lang("not").concat(" "), textSize, TextUtil.TextType.NORMAL));
             return textList;
         }
 
         @Override
         public List<Text> visitParenExpression(SearchParser.ParenExpressionContext context) {
             ArrayList<Text> textList = new ArrayList<>();
-            textList.add(TextUtil.createText(String.format("%s", context.expression()), textSize));
+            textList.add(TextUtil.createText(String.format("%s", context.expression()), textSize, TextUtil.TextType.NORMAL));
             return textList;
         }
 
@@ -71,9 +71,9 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
         public List<Text> visitBinaryExpression(SearchParser.BinaryExpressionContext context) {
             List<Text> textList = visit(context.left);
             if ("AND".equalsIgnoreCase(context.operator.getText())) {
-                textList.add(TextUtil.createText(Localization.lang(" and "), textSize));
+                textList.add(TextUtil.createText(String.format(" %s ", Localization.lang("and")), textSize, TextUtil.TextType.NORMAL));
             } else {
-                textList.add(TextUtil.createText(Localization.lang(" or "), textSize));
+                textList.add(TextUtil.createText(String.format(" %s ", Localization.lang("or")), textSize, TextUtil.TextType.NORMAL));
             }
             textList.addAll(visit(context.right));
             return textList;
@@ -94,42 +94,37 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
             final GrammarBasedSearchRule.ComparisonOperator operator = GrammarBasedSearchRule.ComparisonOperator.build(context.operator.getText());
 
             final boolean regExpFieldSpec = !Pattern.matches("\\w+", field);
-            textList.add(TextUtil.createText(regExpFieldSpec ? Localization.lang(
-                    "any field that matches the regular expression ") : Localization.lang("the field "), textSize));
-            textList.add(TextUtil.createTextBold(field, textSize));
+            String temp = regExpFieldSpec ? Localization.lang(
+                    "any field that matches the regular expression <b>%0</b>") : Localization.lang("the field <b>%0</b>");
 
             if (operator == GrammarBasedSearchRule.ComparisonOperator.CONTAINS) {
                 if (regExp) {
-                    textList.add(TextUtil.createText(Localization.lang(" contains the regular expression "), textSize));
-                    textList.add(TextUtil.createTextBold(value, textSize));
-                    return textList;
+                    temp = Localization.lang("%0 contains the regular expression <b>%1</b>", temp);
+                } else {
+                    temp = Localization.lang("%0 contains the term <b>%1</b>", temp);
                 }
-                textList.add(TextUtil.createText(Localization.lang(" contains the term "), textSize));
-                textList.add(TextUtil.createTextBold(value, textSize));
-                return textList;
             } else if (operator == GrammarBasedSearchRule.ComparisonOperator.EXACT) {
                 if (regExp) {
-                    textList.add(TextUtil.createText(Localization.lang(" matches the regular expression "), textSize));
-                    textList.add(TextUtil.createTextBold(value, textSize));
-                    return textList;
+                    temp = Localization.lang("%0 matches the regular expression <b>%1</b>", temp);
+                } else {
+                    temp = Localization.lang("%0 matches the term <b>%1</b>", temp);
                 }
-                textList.add(TextUtil.createText(Localization.lang(" matches the term "), textSize));
-                textList.add(TextUtil.createTextBold(value, textSize));
-                return textList;
             } else if (operator == GrammarBasedSearchRule.ComparisonOperator.DOES_NOT_CONTAIN) {
                 if (regExp) {
-                    textList.add(TextUtil.createText(Localization.lang(" doesn't contain the regular expression "), textSize));
-                    textList.add(TextUtil.createTextBold(value, textSize));
-                    return textList;
+                    temp = Localization.lang("%0 doesn't contain the regular expression <b>%1</b>", temp);
+                } else {
+                    temp = Localization.lang("%0 doesn't contain the term <b>%1</b>", temp);
                 }
-                textList.add(TextUtil.createText(Localization.lang(" doesn't contain the term "), textSize));
-                textList.add(TextUtil.createTextBold(value, textSize));
-                return textList;
             } else {
                 throw new IllegalStateException("CANNOT HAPPEN!");
             }
+
+            List<Text> formattedTexts = TextUtil.formatToTexts(temp, textSize,
+                    new TextUtil.TextReplacement("<b>%0</b>", field, TextUtil.TextType.BOLD),
+                    new TextUtil.TextReplacement("<b>%1</b>", value, TextUtil.TextType.BOLD));
+            textList.addAll(formattedTexts);
+            return textList;
         }
 
     }
-
 }
