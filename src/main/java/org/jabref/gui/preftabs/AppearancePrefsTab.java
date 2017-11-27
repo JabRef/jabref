@@ -3,8 +3,10 @@ package org.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridBagLayout;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -58,14 +60,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     static class LookAndFeel {
 
         public static Set<String> getAvailableLookAndFeels() {
-
-            Set<String> lookAndFeels = new HashSet<>();
-
-            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                lookAndFeels.add(info.getClassName());
-            }
-
-            return lookAndFeels;
+            return Arrays.stream(UIManager.getInstalledLookAndFeels()).map(LookAndFeelInfo::getClassName).collect(Collectors.toSet());
         }
     }
 
