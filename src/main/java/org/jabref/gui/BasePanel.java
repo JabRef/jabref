@@ -237,6 +237,8 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                 this.baseChanged = true;
             }
         }
+
+        this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
     }
 
     public static void runWorker(AbstractWorker worker) throws Exception {
