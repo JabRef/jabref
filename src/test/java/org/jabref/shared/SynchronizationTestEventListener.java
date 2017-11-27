@@ -2,12 +2,11 @@ package org.jabref.shared;
 
 import org.jabref.shared.event.SharedEntryNotPresentEvent;
 import org.jabref.shared.event.UpdateRefusedEvent;
-import org.jabref.testutils.category.DatabaseTests;
+import org.jabref.testutils.category.DatabaseTest;
 
 import com.google.common.eventbus.Subscribe;
-import org.junit.experimental.categories.Category;
 
-@Category(DatabaseTests.class)
+@DatabaseTest
 public class SynchronizationTestEventListener {
 
     private SharedEntryNotPresentEvent sharedEntryNotPresentEvent;
