@@ -14,7 +14,6 @@ import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.FontUIResource;
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
