@@ -249,7 +249,7 @@ public class JabRefGUI {
             if (UIManager.getCrossPlatformLookAndFeelClassName().equals(lookFeel)
                     && !System.getProperty("java.runtime.name").contains("OpenJDK")) {
                 // try to avoid ending up with the ugly Metal L&F
-                UIManager.setLookAndFeel(new NimbusLookAndFeel());
+                UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
             } else {
                 try {
                     UIManager.setLookAndFeel(lookFeel);
