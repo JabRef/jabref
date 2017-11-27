@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -44,6 +45,7 @@ import javafx.application.Platform;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.gui.DeleteDialog.DeleteResult;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.actions.CleanupAction;
@@ -143,7 +145,6 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 import org.jabref.shared.DBMSSynchronizer;
-
 import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -769,7 +770,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
      */
     private void delete(boolean cut) {
     	boolean bRemoveFromGroup = false;
-    	boolean bDelete = false;
+    	boolean delete = false;
     	List<FieldChange> changesRemove = new ArrayList<>();
     	
     	List<BibEntry> entries = mainTable.getSelectedEntries();
@@ -778,35 +779,53 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             return;
         }
     	
-    	String selectedGroup = "";
-    	if (Globals.stateManager.getSelectedGroup(bibDatabaseContext).size() > 0) {
-    		selectedGroup = Globals.stateManager.getSelectedGroup(bibDatabaseContext).get(0).getName();
-    	}
-
-        //get list of all groups
+        
+        //create list of all groups of selected entries
+        Set<String> allEnriesGroups = new HashSet<String>(); {
+		};
+		for(BibEntry entrie : entries){
+			if(entrie.getField("groups").isPresent()){
+				System.out.println(entrie.getField("groups"));
+				String[] groups = entrie.getField("groups").get().split(",");
+				for(String group : groups){
+					allEnriesGroups.add(group);
+				}
+			}
+		}
+        System.out.println(allEnriesGroups);
+        
+        
+    	//get list of all groups
         Optional<GroupTreeNode> groups = bibDatabaseContext.getMetaData().getGroups();
 
         if (groups.get().getName().contentEquals(groups.get().getName())) { //checks if is selected any group
         	//TODO define dialog not to offer "remove from group"
         }
 
-		Object[] options = {Localization.lang("Delete_from_database"),
-			Localization.lang("Remove_from_group") + " \"" + selectedGroup + "\"",
-			Localization.lang("Cancel")};
-		int n = JOptionPane.showOptionDialog(frame,
-				Localization.lang("The_entry_is_the_member_of_groups") + entries.get(0).getField("groups"),
-				Localization.lang("Delete_remove_entry"),
-				JOptionPane.YES_NO_CANCEL_OPTION,
-				JOptionPane.QUESTION_MESSAGE,
-				null,
-				options,
-				options[2]);
+        
+        DeleteDialog diag = new DeleteDialog(Globals.stateManager.getSelectedGroup(bibDatabaseContext), allEnriesGroups);
+        diag.setVisible(true);
 
-		if (n == 0) { // Delete
-			bDelete = true;
-		} else if (n == 1) { //Remove from group(s) 
+        DeleteResult resultDialog = diag.getResult();
+        System.out.println(resultDialog);
+        
+//		Object[] options = {Localization.lang("Delete_from_database"),
+//			Localization.lang("Remove_from_group") + " \"" + selectedGroup + "\"",
+//			Localization.lang("Cancel")};
+//		int n = JOptionPane.showOptionDialog(frame,
+//				Localization.lang("The_entry_is_the_member_of_groups") + entries.get(0).getField("groups"),
+//				Localization.lang("Delete_remove_entry"),
+//				JOptionPane.YES_NO_CANCEL_OPTION,
+//				JOptionPane.QUESTION_MESSAGE,
+//				null,
+//				options,
+//				options[2]);
+
+		if (resultDialog == DeleteResult.DELETE_FROM_DATABASE) { // Delete
+			delete = true;
+		} else if (resultDialog == DeleteResult.REMOVE_FROM_GROUPS) { //Remove from group(s) 
 			bRemoveFromGroup = true;
-		} else if (n == 2) { //Cancel
+		} else if (resultDialog == DeleteResult.CANCEL) { //Cancel
 			return;
 		}
 
@@ -831,7 +850,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 		}
 
         //if (!cut && !bRemoveFromGroup && !showDeleteConfirmationDialog(entries.size())) {
-        if (!cut && !bDelete) {
+        if (!cut && !delete) {
              return;
         }
 
