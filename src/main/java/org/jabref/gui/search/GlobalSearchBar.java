@@ -24,8 +24,10 @@ import javax.swing.SwingUtilities;
 import javafx.css.PseudoClass;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -191,6 +193,7 @@ public class GlobalSearchBar extends JPanel {
         container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             container.setScene(new Scene(searchField));
+            container.getScene().getStylesheets().add(GlobalSearchBar.class.getResource("../Main.css").toExternalForm());
             container.addKeyListener(new SearchKeyAdapter());
 
         });
@@ -385,7 +388,7 @@ public class GlobalSearchBar extends JPanel {
         return searchQuery;
     }
 
-    public void updateResults(int matched, String description, boolean grammarBasedSearch) {
+    public void updateResults(int matched, TextFlow description, boolean grammarBasedSearch) {
         if (matched == 0) {
             currentResults.setText(Localization.lang("No results found."));
             searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
@@ -393,7 +396,11 @@ public class GlobalSearchBar extends JPanel {
             currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
             searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
         }
-        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setTooltip(new Tooltip(description)));
+        Tooltip tooltip = new Tooltip();
+        tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        tooltip.setGraphic(description);
+        tooltip.setMaxHeight(10);
+        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setTooltip(tooltip));
         openCurrentResultsInDialog.setEnabled(true);
     }
 
