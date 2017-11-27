@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-import org.jabref.gui.util.TextUtil;
+import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.search.rules.GrammarBasedSearchRule;
 import org.jabref.model.strings.StringUtil;
@@ -23,7 +23,6 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
     private final boolean caseSensitive;
     private final boolean regExp;
     private final ParseTree parseTree;
-    private final double textSize = 13;
 
     public GrammarBasedSearchRuleDescriber(boolean caseSensitive, boolean regExp, ParseTree parseTree) {
         this.caseSensitive = caseSensitive;
@@ -37,12 +36,12 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
         DescriptionSearchBaseVisitor descriptionSearchBaseVisitor = new DescriptionSearchBaseVisitor();
 
         // describe advanced search expression
-        textFlow.getChildren().add(TextUtil.createText(String.format("%s ", Localization.lang("This search contains entries in which")), textSize, TextUtil.TextType.NORMAL));
+        textFlow.getChildren().add(TooltipTextUtil.createText(String.format("%s ", Localization.lang("This search contains entries in which")), TooltipTextUtil.TextType.NORMAL));
         textFlow.getChildren().addAll(descriptionSearchBaseVisitor.visit(parseTree));
-        textFlow.getChildren().add(TextUtil.createText(". ", textSize, TextUtil.TextType.NORMAL));
-        textFlow.getChildren().add(TextUtil.createText(caseSensitive ? Localization
+        textFlow.getChildren().add(TooltipTextUtil.createText(". ", TooltipTextUtil.TextType.NORMAL));
+        textFlow.getChildren().add(TooltipTextUtil.createText(caseSensitive ? Localization
                 .lang("The search is case sensitive.") :
-                Localization.lang("The search is case insensitive."), textSize, TextUtil.TextType.NORMAL));
+                Localization.lang("The search is case insensitive."), TooltipTextUtil.TextType.NORMAL));
         return textFlow;
     }
 
@@ -56,14 +55,14 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
         @Override
         public List<Text> visitUnaryExpression(SearchParser.UnaryExpressionContext context) {
             List<Text> textList = visit(context.expression());
-            textList.add(0, TextUtil.createText(Localization.lang("not").concat(" "), textSize, TextUtil.TextType.NORMAL));
+            textList.add(0, TooltipTextUtil.createText(Localization.lang("not").concat(" "), TooltipTextUtil.TextType.NORMAL));
             return textList;
         }
 
         @Override
         public List<Text> visitParenExpression(SearchParser.ParenExpressionContext context) {
             ArrayList<Text> textList = new ArrayList<>();
-            textList.add(TextUtil.createText(String.format("%s", context.expression()), textSize, TextUtil.TextType.NORMAL));
+            textList.add(TooltipTextUtil.createText(String.format("%s", context.expression()), TooltipTextUtil.TextType.NORMAL));
             return textList;
         }
 
@@ -71,9 +70,9 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
         public List<Text> visitBinaryExpression(SearchParser.BinaryExpressionContext context) {
             List<Text> textList = visit(context.left);
             if ("AND".equalsIgnoreCase(context.operator.getText())) {
-                textList.add(TextUtil.createText(String.format(" %s ", Localization.lang("and")), textSize, TextUtil.TextType.NORMAL));
+                textList.add(TooltipTextUtil.createText(String.format(" %s ", Localization.lang("and")), TooltipTextUtil.TextType.NORMAL));
             } else {
-                textList.add(TextUtil.createText(String.format(" %s ", Localization.lang("or")), textSize, TextUtil.TextType.NORMAL));
+                textList.add(TooltipTextUtil.createText(String.format(" %s ", Localization.lang("or")), TooltipTextUtil.TextType.NORMAL));
             }
             textList.addAll(visit(context.right));
             return textList;
@@ -119,9 +118,9 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
                 throw new IllegalStateException("CANNOT HAPPEN!");
             }
 
-            List<Text> formattedTexts = TextUtil.formatToTexts(temp, textSize,
-                    new TextUtil.TextReplacement("<b>%0</b>", field, TextUtil.TextType.BOLD),
-                    new TextUtil.TextReplacement("<b>%1</b>", value, TextUtil.TextType.BOLD));
+            List<Text> formattedTexts = TooltipTextUtil.formatToTexts(temp,
+                    new TooltipTextUtil.TextReplacement("<b>%0</b>", field, TooltipTextUtil.TextType.BOLD),
+                    new TooltipTextUtil.TextReplacement("<b>%1</b>", value, TooltipTextUtil.TextType.BOLD));
             textList.addAll(formattedTexts);
             return textList;
         }

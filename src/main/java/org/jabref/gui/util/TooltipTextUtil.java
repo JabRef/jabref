@@ -4,76 +4,69 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 /**
  * Utility class with static methods for javafx {@link Text} objects
  */
-public class TextUtil {
+public class TooltipTextUtil {
 
     public enum TextType {
         NORMAL, BOLD, ITALIC, MONOSPACED
     }
 
-    public static Text createText(String textString, double size, TextType textType) {
+    public static Text createText(String textString, TextType textType) {
         Text text = new Text(textString);
-        Font font;
         switch (textType) {
             case BOLD:
-                font = Font.font("System Regular", FontWeight.BOLD, size);
+                text.getStyleClass().setAll("tooltip-text-bold");
                 break;
             case ITALIC:
-                font = Font.font("System Regular", FontPosture.ITALIC, size);
+                text.getStyleClass().setAll("tooltip-text-italic");
                 break;
             case MONOSPACED:
-                font = Font.font("Monospaced", size);
+                text.getStyleClass().setAll("tooltip-text-monospaced");
                 break;
             default:
-                font = Font.font("System Regular", size);
                 break;
         }
-        text.setFont(font);
         return text;
     }
 
-    public static Text createText(String textString, double size) {
-        return createText(textString, size, TextType.NORMAL);
+    public static Text createText(String textString) {
+        return createText(textString, TextType.NORMAL);
     }
 
     public static String textToHTMLString(Text text) {
         String textString = text.getText();
         textString = textString.replace("\n", "<br>");
-        if (text.getFont().getFamily().equals("Monospaced")) {
+        if (text.getStyleClass().toString().contains("tooltip-text-monospaced")) {
             textString = String.format("<kbd>%s</kbd>", textString);
         }
-        switch (text.getFont().getStyle()) {
-            case "Bold":
-                return String.format("<b>%s</b>", textString);
-            case "Italic":
-                return String.format("<i>%s</i>", textString);
-            default:
-                return textString;
+        if (text.getStyleClass().toString().contains("tooltip-text-bold")) {
+            textString = String.format("<b>%s</b>", textString);
         }
+        if (text.getStyleClass().toString().contains("tooltip-text-italic")) {
+            textString = String.format("<i>%s</i>", textString);
+        }
+        return textString;
     }
 
 
     /**
      * Formats a String to multiple Texts by replacing some parts and adding font characteristics.
      */
-    public static List<Text> formatToTexts(String original, double textSize, TextReplacement... replacements) {
+    public static List<Text> formatToTexts(String original, TextReplacement... replacements) {
         List<Text> textList = new ArrayList<>();
         textList.add(new Text(original));
         for (TextReplacement replacement : replacements) {
-            splitReplace(textList, textSize, replacement);
+            splitReplace(textList, replacement);
         }
 
         return textList;
     }
 
-    private static void splitReplace(List<Text> textList, double textSize, TextReplacement replacement) {
+    private static void splitReplace(List<Text> textList, TextReplacement replacement) {
         Optional<Text> textContainingReplacement = textList.stream().filter(it -> it.getText().contains(replacement.toReplace)).findFirst();
         if (textContainingReplacement.isPresent()) {
             int index = textList.indexOf(textContainingReplacement.get());
@@ -82,16 +75,16 @@ public class TextUtil {
             String[] textParts = original.split(replacement.toReplace);
             if (textParts.length == 2) {
                 if (textParts[0].equals("")) {
-                    textList.add(index, TextUtil.createText(replacement.replacement, textSize, replacement.textType));
-                    textList.add(index + 1, TextUtil.createText(textParts[1], textSize, TextUtil.TextType.NORMAL));
+                    textList.add(index, TooltipTextUtil.createText(replacement.replacement, replacement.textType));
+                    textList.add(index + 1, TooltipTextUtil.createText(textParts[1], TooltipTextUtil.TextType.NORMAL));
                 } else {
-                    textList.add(index, TextUtil.createText(textParts[0], textSize, TextUtil.TextType.NORMAL));
-                    textList.add(index + 1, TextUtil.createText(replacement.replacement, textSize, replacement.textType));
-                    textList.add(index + 2, TextUtil.createText(textParts[1], textSize, TextUtil.TextType.NORMAL));
+                    textList.add(index, TooltipTextUtil.createText(textParts[0], TooltipTextUtil.TextType.NORMAL));
+                    textList.add(index + 1, TooltipTextUtil.createText(replacement.replacement, replacement.textType));
+                    textList.add(index + 2, TooltipTextUtil.createText(textParts[1], TooltipTextUtil.TextType.NORMAL));
                 }
             } else if (textParts.length == 1) {
-                textList.add(index, TextUtil.createText(textParts[0], textSize, TextUtil.TextType.NORMAL));
-                textList.add(index + 1, TextUtil.createText(replacement.replacement, textSize, replacement.textType));
+                textList.add(index, TooltipTextUtil.createText(textParts[0], TooltipTextUtil.TextType.NORMAL));
+                textList.add(index + 1, TooltipTextUtil.createText(replacement.replacement, replacement.textType));
             } else {
                 throw new IllegalStateException("It is not allowed that the toReplace string: '" + replacement.toReplace
                         + "' exists multiple times in the original string");
@@ -105,9 +98,9 @@ public class TextUtil {
     public static class TextReplacement {
         private final String toReplace;
         private final String replacement;
-        private final TextUtil.TextType textType;
+        private final TooltipTextUtil.TextType textType;
 
-        public TextReplacement(String toReplace, String replacement, TextUtil.TextType textType) {
+        public TextReplacement(String toReplace, String replacement, TooltipTextUtil.TextType textType) {
             this.toReplace = toReplace;
             this.replacement = replacement;
             this.textType = textType;

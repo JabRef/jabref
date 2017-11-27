@@ -40,7 +40,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
-import org.jabref.gui.util.TextUtil;
+import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.entry.FieldName;
@@ -601,7 +601,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
         StringBuilder htmlStringBuilder = new StringBuilder();
         for (Node node : textFlow.getChildren()) {
             if (node instanceof Text)
-                htmlStringBuilder.append(TextUtil.textToHTMLString((Text) node));
+                htmlStringBuilder.append(TooltipTextUtil.textToHTMLString((Text) node));
         }
         return htmlStringBuilder.toString();
     }

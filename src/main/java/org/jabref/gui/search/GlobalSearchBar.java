@@ -400,7 +400,6 @@ public class GlobalSearchBar extends JPanel {
         tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         tooltip.setGraphic(description);
         tooltip.setMaxHeight(10);
-        tooltip.getStyleClass().setAll("search-tooltip");
         DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setTooltip(tooltip));
         openCurrentResultsInDialog.setEnabled(true);
     }
