@@ -571,9 +571,8 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
             s1 = searchGroupSearchExpression.getText().trim();
             okEnabled = okEnabled & !s1.isEmpty();
             if (okEnabled) {
-                SearchQuery searchQuery = new SearchQuery(s1, isCaseSensitive(), isRegex());
-                setDescription(fromTextFlowToHTMLString(SearchDescribers.getSearchDescriberFor(searchQuery.getRule(),
-                        searchQuery.getQuery()).getDescription()));
+                setDescription(fromTextFlowToHTMLString(SearchDescribers.getSearchDescriberFor(
+                        new SearchQuery(s1, isCaseSensitive(), isRegex())).getDescription()));
 
                 if (isRegex()) {
                     try {

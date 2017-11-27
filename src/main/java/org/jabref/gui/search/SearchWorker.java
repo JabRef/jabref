@@ -109,8 +109,9 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
             }
         }
 
-        globalSearchBar.updateResults(matchedEntries.size(), SearchDescribers.getSearchDescriberFor(searchQuery.getRule(),
-                searchQuery.getQuery()).getDescription(), searchQuery.isGrammarBasedSearch());
+        globalSearchBar.updateResults(matchedEntries.size(),
+                SearchDescribers.getSearchDescriberFor(searchQuery).getDescription(),
+                searchQuery.isGrammarBasedSearch());
         globalSearchBar.getSearchQueryHighlightObservable().fireSearchlistenerEvent(searchQuery);
     }
 
