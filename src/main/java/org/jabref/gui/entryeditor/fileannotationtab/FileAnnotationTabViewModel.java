@@ -35,7 +35,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
     private final ListProperty<FileAnnotationViewModel> annotations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Path> files = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<FileAnnotationViewModel> currentAnnotation = new SimpleObjectProperty<>();
-    private final ObjectProperty<Boolean> annotaionEmpty = new SimpleObjectProperty<>(null);
+    private final ObjectProperty<Boolean> annotationEmpty = new SimpleObjectProperty<>(null);
 
     private final FileAnnotationCache cache;
     private final BibEntry entry;
@@ -61,7 +61,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
     }
 
     public ObjectProperty<Boolean> isAnnotationsEmpty() {
-        return annotaionEmpty;
+        return annotationEmpty;
     }
 
     public ListProperty<FileAnnotationViewModel> annotationsProperty() {
@@ -90,9 +90,9 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
                 .collect(Collectors.toList());
         annotations.setAll(newAnnotations);
         if (annotations.isEmpty()) {
-            annotaionEmpty.setValue(true);
+            annotationEmpty.setValue(true);
         } else {
-            annotaionEmpty.setValue(false);
+            annotationEmpty.setValue(false);
         }
         try {
             fileMonitor.addListenerForFile(currentFile, fileListener);
