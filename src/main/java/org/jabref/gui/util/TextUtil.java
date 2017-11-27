@@ -20,11 +20,8 @@ public class TextUtil {
 
     public static Text createText(String textString, double size, TextType textType) {
         Text text = new Text(textString);
-        Font font = null;
+        Font font;
         switch (textType) {
-            case NORMAL:
-                font = Font.font("System Regular", size);
-                break;
             case BOLD:
                 font = Font.font("System Regular", FontWeight.BOLD, size);
                 break;
@@ -33,6 +30,9 @@ public class TextUtil {
                 break;
             case MONOSPACED:
                 font = Font.font("Monospaced", size);
+                break;
+            default:
+                font = Font.font("System Regular", size);
                 break;
         }
         text.setFont(font);
@@ -103,9 +103,9 @@ public class TextUtil {
     }
 
     public static class TextReplacement {
-        String toReplace;
-        String replacement;
-        TextUtil.TextType textType;
+        private final String toReplace;
+        private final String replacement;
+        private final TextUtil.TextType textType;
 
         public TextReplacement(String toReplace, String replacement, TextUtil.TextType textType) {
             this.toReplace = toReplace;
