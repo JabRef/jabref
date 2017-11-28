@@ -35,7 +35,7 @@ public class EditorMenus {
      */
     public static Supplier<List<MenuItem>> getDefaultMenu(TextArea textArea) {
         return () -> {
-            List<MenuItem> menuItems = new ArrayList<>(5);
+            List<MenuItem> menuItems = new ArrayList<>(6);
             menuItems.add(new CaseChangeMenu(textArea.textProperty()));
             menuItems.add(new ConversionMenu(textArea.textProperty()));
             menuItems.add(new SeparatorMenuItem());
@@ -56,11 +56,9 @@ public class EditorMenus {
         return () -> {
             CustomMenuItem normalizeNames = new CustomMenuItem(new Label(Localization.lang("Normalize to BibTeX name format")));
             normalizeNames.setOnAction(event -> textArea.setText(new NormalizeNamesFormatter().format(textArea.getText())));
-
             Tooltip toolTip = new Tooltip(Localization.lang("If possible, normalize this list of names to conform to standard BibTeX name formatting"));
             Tooltip.install(normalizeNames.getContent(), toolTip);
-
-            List<MenuItem> menuItems = new ArrayList<>(7);
+            List<MenuItem> menuItems = new ArrayList<>(6);
             menuItems.add(normalizeNames);
             menuItems.addAll(getDefaultMenu(textArea).get());
             return menuItems;
