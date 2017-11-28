@@ -3,15 +3,18 @@ package org.jabref.gui;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 import org.jabref.model.groups.GroupTreeNode;
-
 import javafx.collections.ObservableList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.Iterator;
 import java.util.Set;
 import java.awt.event.ActionEvent;
@@ -35,7 +38,6 @@ public class DeleteDialog extends JDialog {
 	public DeleteDialog(ObservableList<GroupTreeNode> selectedGroups, Set<String> allEnriesGroups) {
 		setTitle("Delete");
 		setModal(true);
-		setBounds(100, 100, 423, 231);
 		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
 		JPanel panel = new JPanel();
@@ -47,7 +49,7 @@ public class DeleteDialog extends JDialog {
 			for(int i = 0; i < selectedGroups.size(); i++){
 				message += "<li>"+selectedGroups.get(i).getName() + "</li>"; 
 			}
-			message += "</ul>If you would like to remove selected entities from selected groups <br/>press button \"Remove from groups\" <br>";
+			message += "</ul>If you would like to remove selected entities from selected groups <br/>press button \"Remove from groups\" <br/><br/>";
 		}
 		
 		if (!allEnriesGroups.isEmpty()) {
@@ -56,12 +58,11 @@ public class DeleteDialog extends JDialog {
 			while(iterator.hasNext()){
 				message += "<li>"+iterator.next()+ "</li>"; 
 			}
-			message += "</ul>If you delete articles it will be removed from all groups <br>";
+			message += "</ul>If you delete articles it will be removed from all listed groups <br>";
 		}
 
 		JLabel lblThisEntitiesAre = new JLabel("<html> "+ message + " </html>");
 		panel.add(lblThisEntitiesAre);
-
 
 		JPanel buttonPane = new JPanel();
 		getContentPane().add(buttonPane);
@@ -105,6 +106,18 @@ public class DeleteDialog extends JDialog {
 			JCheckBox chckbxRememberChoice = new JCheckBox("Remember choice");
 			panel2.add(chckbxRememberChoice);
 		}
+		
+		
+		// set size
+		pack();
+		
+		// center of screen
+		this.setLocationRelativeTo(null);
+		
+		// dispose on ESC
+		getRootPane().registerKeyboardAction(e -> {
+		    this.dispose();
+		}, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
 
 	DeleteResult getResult(){
