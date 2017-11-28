@@ -769,12 +769,10 @@ public class BasePanel extends JPanel implements ClipboardOwner {
      *            "deleted". If true the action will be localized as "cut"
      */
     private void delete(boolean cut) {
-    	boolean bRemoveFromGroup = false;
     	boolean delete = false;
     	List<FieldChange> changesRemove = new ArrayList<>();
     	
     	List<BibEntry> entries = mainTable.getSelectedEntries();
-
         if (entries.isEmpty()) {
             return;
         }
@@ -803,56 +801,48 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         }
 
         
-        DeleteDialog diag = new DeleteDialog(Globals.stateManager.getSelectedGroup(bibDatabaseContext), allEnriesGroups);
-        diag.setVisible(true);
+        if(!cut) { // dialog only for delete
+        	DeleteDialog diag = new DeleteDialog(Globals.stateManager.getSelectedGroup(bibDatabaseContext), allEnriesGroups);
+        	diag.setVisible(true);
 
-        DeleteResult resultDialog = diag.getResult();
-        System.out.println(resultDialog);
-        
-//		Object[] options = {Localization.lang("Delete_from_database"),
-//			Localization.lang("Remove_from_group") + " \"" + selectedGroup + "\"",
-//			Localization.lang("Cancel")};
-//		int n = JOptionPane.showOptionDialog(frame,
-//				Localization.lang("The_entry_is_the_member_of_groups") + entries.get(0).getField("groups"),
-//				Localization.lang("Delete_remove_entry"),
-//				JOptionPane.YES_NO_CANCEL_OPTION,
-//				JOptionPane.QUESTION_MESSAGE,
-//				null,
-//				options,
-//				options[2]);
+        	DeleteResult resultDialog = diag.getResult();
+        	System.out.println(resultDialog);
 
-		if (resultDialog == DeleteResult.DELETE_FROM_DATABASE) { // Delete
-			delete = true;
-		} else if (resultDialog == DeleteResult.REMOVE_FROM_GROUPS) { //Remove from group(s) 
-			bRemoveFromGroup = true;
-		} else if (resultDialog == DeleteResult.CANCEL) { //Cancel
-			return;
-		}
+        	//		Object[] options = {Localization.lang("Delete_from_database"),
+        	//			Localization.lang("Remove_from_group") + " \"" + selectedGroup + "\"",
+        	//			Localization.lang("Cancel")};
+        	//		int n = JOptionPane.showOptionDialog(frame,
+        	//				Localization.lang("The_entry_is_the_member_of_groups") + entries.get(0).getField("groups"),
+        	//				Localization.lang("Delete_remove_entry"),
+        	//				JOptionPane.YES_NO_CANCEL_OPTION,
+        	//				JOptionPane.QUESTION_MESSAGE,
+        	//				null,
+        	//				options,
+        	//				options[2]);
 
-		// removes from the first selected group
-		if (bRemoveFromGroup) {
-			if (Globals.stateManager.getSelectedGroup(bibDatabaseContext).size() < 1) {
-				return;
-			}
-			
-			GroupTreeNode node = Globals.stateManager.getSelectedGroup(bibDatabaseContext).get(0);
-			changesRemove = node.removeEntriesFromGroup(entries);
+        	if (resultDialog == DeleteResult.DELETE_FROM_DATABASE) { // Delete
+        		delete = true;
+        	} else if (resultDialog == DeleteResult.REMOVE_FROM_GROUPS) { //Remove from selected groups 
+        		for(GroupTreeNode node: Globals.stateManager.getSelectedGroup(bibDatabaseContext)){
+        			//GroupTreeNode node = Globals.stateManager.getSelectedGroup(bibDatabaseContext).get(0);
+        			//changesRemove = node.removeEntriesFromGroup(entries);
+        			changesRemove = node.removeEntriesFromGroup(entries);
 
-			// Remember undo information
-			if (!changesRemove.isEmpty()) {
-				AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node), changesRemove);
-				undoManager.addEdit(undoRemove);
-			}
+        			// Remember undo information
+        			if (!changesRemove.isEmpty()) {
+        				AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node), changesRemove);
+        				undoManager.addEdit(undoRemove);
+        			}
+        		}
 
-			markBaseChanged();
-			mainTable.requestFocus();
-			return;
-		}
-
-        //if (!cut && !bRemoveFromGroup && !showDeleteConfirmationDialog(entries.size())) {
-        if (!cut && !delete) {
-             return;
+        		markBaseChanged();
+        		mainTable.requestFocus();
+        		return;
+        	} else if (resultDialog == DeleteResult.CANCEL) { //Cancel
+        		return;
+        	}
         }
+
 
         // select the next entry to stay at the same place as before (or the previous if we're already at the end)
         if (mainTable.getSelectedRow() != (mainTable.getRowCount() - 1)) {
