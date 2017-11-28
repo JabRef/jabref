@@ -26,9 +26,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We increased performance and decreased the memory footprint of the entry editor drastically. [#3331](https://github.com/JabRef/jabref/pull/3331)
 - Late initialization of the context menus in the entry editor. This improves performance and memory footprint further [#3340](https://github.com/JabRef/jabref/pull/3340)
 - We added the clear text button into the right-click menu of the text field. When adding a new entry into a library, the text boxes are now clearable by clicking this button. Issue 198 in "Beginner" section of "koppor"'s repository. ( https://github.com/jabref/issues/198 )
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> 76be5e61035ac28b072212dc8c13f21cab3d4bc4
 ### Fixed
  - We fixed the translation of \textendash in the entry preview [#3307](https://github.com/JabRef/jabref/issues/3307)
  - We fixed an issue where JabRef would not terminated after asking to collect anonymous statistics [#2955 comment](https://github.com/JabRef/jabref/issues/2955#issuecomment-334591123)
