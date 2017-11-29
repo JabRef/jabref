@@ -54,6 +54,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue where special fields (such as `printed`) could not be cleared when syncing special fields via the keywords [#3432](https://github.com/JabRef/jabref/issues/3432)
  - We fixed an issue where the tooltip of the global search bar showed html tags instead of formatting the text [#3381](https://github.com/JabRef/jabref/issues/3381)
  - We fixed an issue where timestamps were not updated for changed entries [#2810](https://github.com/JabRef/jabref/issues/2810)
+ - We fixed an issue where trying to fetch data from Medline/PubMed resulted in an error [#3463](https://github.com/JabRef/jabref/issues/3463)
 
  ### Removed
 
