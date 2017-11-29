@@ -1,0 +1,5 @@
+files:
+  - source: /src/main/resources/l10n/Menu_en.properties
+    translation: /src/main/resources/l10n/Menu_%two_letters_code%.properties
+  - source: /src/main/resources/l10n/JabRef_en.properties
+    translation: /src/main/resources/l10n/JabRef_%two_letters_code%.properties
