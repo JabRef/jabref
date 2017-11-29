@@ -795,37 +795,17 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         
     	//get list of all groups
         Optional<GroupTreeNode> groups = bibDatabaseContext.getMetaData().getGroups();
-
-        if (groups.get().getName().contentEquals(groups.get().getName())) { //checks if is selected any group
-        	//TODO define dialog not to offer "remove from group"
-        }
-
         
         if(!cut) { // dialog only for delete
         	DeleteDialog diag = new DeleteDialog(Globals.stateManager.getSelectedGroup(bibDatabaseContext), allEnriesGroups);
         	diag.setVisible(true);
 
         	DeleteResult resultDialog = diag.getResult();
-        	System.out.println(resultDialog);
-
-        	//		Object[] options = {Localization.lang("Delete_from_database"),
-        	//			Localization.lang("Remove_from_group") + " \"" + selectedGroup + "\"",
-        	//			Localization.lang("Cancel")};
-        	//		int n = JOptionPane.showOptionDialog(frame,
-        	//				Localization.lang("The_entry_is_the_member_of_groups") + entries.get(0).getField("groups"),
-        	//				Localization.lang("Delete_remove_entry"),
-        	//				JOptionPane.YES_NO_CANCEL_OPTION,
-        	//				JOptionPane.QUESTION_MESSAGE,
-        	//				null,
-        	//				options,
-        	//				options[2]);
 
         	if (resultDialog == DeleteResult.DELETE_FROM_DATABASE) { // Delete
         		delete = true;
         	} else if (resultDialog == DeleteResult.REMOVE_FROM_GROUPS) { //Remove from selected groups 
         		for(GroupTreeNode node: Globals.stateManager.getSelectedGroup(bibDatabaseContext)){
-        			//GroupTreeNode node = Globals.stateManager.getSelectedGroup(bibDatabaseContext).get(0);
-        			//changesRemove = node.removeEntriesFromGroup(entries);
         			changesRemove = node.removeEntriesFromGroup(entries);
 
         			// Remember undo information
