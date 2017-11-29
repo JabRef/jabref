@@ -1,5 +1,6 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,21 +24,8 @@ public class OtherFieldsTab extends FieldsEditorTab {
         setGraphic(IconTheme.JabRefIcon.OPTIONAL.getGraphicNode());
     }
 
-    public static boolean isOtherField(EntryType entryType, String fieldToCheck) {
-        List<String> allKnownFields = entryType.getAllFields().stream().map(String::toLowerCase)
-                .collect(Collectors.toList());
-        if (allKnownFields.contains(fieldToCheck) ||
-                entryType.getDeprecatedFields().contains(fieldToCheck) ||
-                BibEntry.KEY_FIELD.equals(fieldToCheck) ||
-                Globals.prefs.getCustomTabFieldNames().contains(fieldToCheck)) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
     @Override
-    protected List<String> determineFieldsToShow(BibEntry entry, EntryType entryType) {
+    protected Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType) {
         List<String> allKnownFields = entryType.getAllFields().stream().map(String::toLowerCase)
                 .collect(Collectors.toList());
         List<String> otherFields = entry.getFieldNames().stream().map(String::toLowerCase)

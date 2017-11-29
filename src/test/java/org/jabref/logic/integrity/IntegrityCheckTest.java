@@ -195,8 +195,9 @@ public class IntegrityCheckTest {
     @Test
     public void testAbbreviationChecks() {
         for (String field : Arrays.asList("booktitle", "journal")) {
-            assertCorrect(createContext(field, "IEEE SW"));
-            assertWrong(createContext(field, "Proc. of the"));
+            assertCorrect(createContext(field, "IEEE Software"));
+            assertCorrect(createContext(field, ""));
+            assertWrong(createContext(field, "IEEE SW"));
         }
     }
 

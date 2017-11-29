@@ -340,8 +340,10 @@ public class MedlineImporter extends Importer implements Parser {
 
             fields.put("status", medlineCitation.getStatus());
             DateCreated dateCreated = medlineCitation.getDateCreated();
-            fields.put("created",
-                    convertToDateFormat(dateCreated.getYear(), dateCreated.getMonth(), dateCreated.getDay()));
+            if (medlineCitation.getDateCreated() != null) {
+                fields.put("created",
+                        convertToDateFormat(dateCreated.getYear(), dateCreated.getMonth(), dateCreated.getDay()));
+            }
             fields.put("pubmodel", medlineCitation.getArticle().getPubModel());
 
             if (medlineCitation.getDateCompleted() != null) {

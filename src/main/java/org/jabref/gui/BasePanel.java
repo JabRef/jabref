@@ -198,7 +198,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
 
-    private DatabaseChangeMonitor changeMonitor;
+    private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
 
     public BasePanel(JabRefFrame frame, BibDatabaseContext bibDatabaseContext) {
         Objects.requireNonNull(frame);
@@ -228,7 +228,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         Optional<File> file = bibDatabaseContext.getDatabaseFile();
         if (file.isPresent()) {
             // Register so we get notifications about outside changes to the file.
-            changeMonitor = new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), this);
+            changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), this));
         } else {
             if (bibDatabaseContext.getDatabase().hasEntries()) {
                 // if the database is not empty and no file is assigned,
@@ -237,6 +237,8 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                 this.baseChanged = true;
             }
         }
+
+        this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
     }
 
     public static void runWorker(AbstractWorker worker) throws Exception {
@@ -1796,7 +1798,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
      * Perform necessary cleanup when this BasePanel is closed.
      */
     public void cleanUp() {
-        changeMonitor.unregister();
+        changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
 
         // Check if there is a FileUpdatePanel for this BasePanel being shown. If so,
         // remove it:
@@ -1823,11 +1825,11 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     public boolean isUpdatedExternally() {
-        return changeMonitor.hasBeenModifiedExternally();
+        return changeMonitor.map(DatabaseChangeMonitor::hasBeenModifiedExternally).orElse(false);
     }
 
     public void markExternalChangesAsResolved() {
-        changeMonitor.markExternalChangesAsResolved();
+        changeMonitor.ifPresent(DatabaseChangeMonitor::markExternalChangesAsResolved);
     }
 
     public SidePaneManager getSidePaneManager() {
@@ -1975,16 +1977,16 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     public void resetChangeMonitor() {
-        changeMonitor.unregister();
-        changeMonitor = new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), this);
+        changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
+        changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), this));
     }
 
     public void updateTimeStamp() {
-        changeMonitor.markAsSaved();
+        changeMonitor.ifPresent(DatabaseChangeMonitor::markAsSaved);
     }
 
     public Path getTempFile() {
-        return changeMonitor.getTempFile();
+        return changeMonitor.map(DatabaseChangeMonitor::getTempFile).orElse(null);
     }
 
     private static class SearchAndOpenFile {

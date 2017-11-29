@@ -7,27 +7,25 @@ import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.support.DevEnvironment;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.support.DisabledOnCIServer;
+import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Category(FetcherTests.class)
-public class MathSciNetTest {
+@FetcherTest
+class MathSciNetTest {
 
     MathSciNet fetcher;
     private BibEntry ratiuEntry;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(
                 mock(FieldContentParserPreferences.class));
@@ -50,7 +48,7 @@ public class MathSciNetTest {
     }
 
     @Test
-    public void searchByEntryFindsEntry() throws Exception {
+    void searchByEntryFindsEntry() throws Exception {
         BibEntry searchEntry = new BibEntry();
         searchEntry.setField("title", "existence");
         searchEntry.setField("author", "Ratiu");
@@ -62,20 +60,16 @@ public class MathSciNetTest {
     }
 
     @Test
-    public void searchByQueryFindsEntry() throws Exception {
-        // CI has no subscription to zbMath and thus gets 401 response
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
+    @DisabledOnCIServer("CI server has no subscription to MathSciNet and thus gets 401 response")
+    void searchByQueryFindsEntry() throws Exception {
         List<BibEntry> fetchedEntries = fetcher.performSearch("Existence and uniqueness theorems Two-Dimensional Ericksen Leslie System");
         assertFalse(fetchedEntries.isEmpty());
-        assertEquals(ratiuEntry, fetchedEntries.get(0));
+        assertEquals(ratiuEntry, fetchedEntries.get(1));
     }
 
     @Test
-    public void searchByIdFindsEntry() throws Exception {
-        // CI has no subscription to zbMath and thus gets 401 response
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
+    @DisabledOnCIServer("CI server has no subscription to MathSciNet and thus gets 401 response")
+    void searchByIdFindsEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3537908");
         assertEquals(Optional.of(ratiuEntry), fetchedEntry);
     }

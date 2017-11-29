@@ -8,104 +8,71 @@ import java.util.Objects;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.scene.Node;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ListChangeListener;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
+import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 
+import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.fxmisc.easybind.EasyBind;
+import org.controlsfx.control.NotificationPane;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 
 public class SourceTab extends EntryEditorTab {
 
     private static final Log LOGGER = LogFactory.getLog(SourceTab.class);
+    private final LatexFieldFormatterPreferences fieldFormatterPreferences;
     private final BibDatabaseMode mode;
-    private final BasePanel panel;
-    private CodeArea codeArea;
     private UndoManager undoManager;
+    private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
+    private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator(sourceIsValid);
 
-    public SourceTab(BasePanel panel) {
-        this.mode = panel.getBibDatabaseContext().getMode();
-        this.panel = panel;
+    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences) {
+        this.mode = bibDatabaseContext.getMode();
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
         this.setGraphic(IconTheme.JabRefIcon.SOURCE.getGraphicNode());
-        this.undoManager = panel.getUndoManager();
+        this.undoManager = undoManager;
+        this.fieldFormatterPreferences = fieldFormatterPreferences;
     }
 
-    private static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
+    private static String getSourceString(BibEntry entry, BibDatabaseMode type, LatexFieldFormatterPreferences fieldFormatterPreferences) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
-        LatexFieldFormatter formatter = LatexFieldFormatter
-                .buildIgnoreHashes(Globals.prefs.getLatexFieldFormatterPreferences());
+        LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes(fieldFormatterPreferences);
         new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter, type);
 
         return stringWriter.getBuffer().toString();
     }
 
-    public void updateSourcePane(BibEntry entry) {
-        if (codeArea != null) {
-            try {
-                codeArea.clear();
-                codeArea.appendText(getSourceString(entry, mode));
-            } catch (IOException ex) {
-                codeArea.appendText(ex.getMessage() + "\n\n" +
-                        Localization.lang("Correct the entry, and reopen editor to display/edit source."));
-                codeArea.setEditable(false);
-                LOGGER.debug("Incorrect entry", ex);
-            }
-        }
-    }
-
-    private Node createSourceEditor(BibDatabaseMode mode) {
-        codeArea = new CodeArea();
+    private CodeArea createSourceEditor() {
+        CodeArea codeArea = new CodeArea();
         codeArea.setWrapText(true);
-        codeArea.lookup(".styled-text-area").setStyle(
-                "-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
-        // store source if new tab is selected (if this one is not focused anymore)
-        EasyBind.subscribe(codeArea.focusedProperty(), focused -> {
-            if (!focused) {
-                storeSource();
-            }
-        });
-
-        try {
-            String srcString = getSourceString(this.currentEntry, mode);
-            codeArea.appendText(srcString);
-        } catch (IOException ex) {
-            codeArea.appendText(ex.getMessage() + "\n\n" +
-                    Localization.lang("Correct the entry, and reopen editor to display/edit source."));
-            codeArea.setEditable(false);
-            LOGGER.debug("Incorrect entry", ex);
-        }
-
-        // set the database to dirty when something is changed in the source tab
-        EasyBind.subscribe(codeArea.beingUpdatedProperty(), updated -> {
-            if (updated) {
-                panel.markBaseChanged();
-            }
-        });
-
-        return new VirtualizedScrollPane<>(codeArea);
+        codeArea.lookup(".styled-text-area").setStyle("-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
+        return codeArea;
     }
 
     @Override
@@ -115,17 +82,44 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        this.setContent(createSourceEditor(mode));
+        CodeArea codeArea = createSourceEditor();
+        VirtualizedScrollPane<CodeArea> node = new VirtualizedScrollPane<>(codeArea);
+        NotificationPane notificationPane = new NotificationPane(node);
+        notificationPane.setShowFromTop(false);
+        sourceValidator.getValidationStatus().getMessages().addListener((ListChangeListener<ValidationMessage>) c -> {
+            if (sourceValidator.getValidationStatus().isValid()) {
+                notificationPane.hide();
+            } else {
+                sourceValidator.getValidationStatus().getHighestMessage().ifPresent(validationMessage -> notificationPane.show(validationMessage.getMessage()));
+            }
+        });
+        this.setContent(codeArea);
+
+        // Store source for every change in the source code
+        // and update source code for every change of entry field values
+        BindingsHelper.bindContentBidirectional(entry.getFieldsObservable(), codeArea.textProperty(), this::storeSource, fields -> {
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                codeArea.clear();
+                try {
+                    codeArea.appendText(getSourceString(entry, mode, fieldFormatterPreferences));
+                } catch (IOException ex) {
+                    codeArea.setEditable(false);
+                    codeArea.appendText(ex.getMessage() + "\n\n" +
+                            Localization.lang("Correct the entry, and reopen editor to display/edit source."));
+                    LOGGER.debug("Incorrect entry", ex);
+                }
+            });
+        });
     }
 
-    private void storeSource() {
-        if (codeArea.getText().isEmpty()) {
+    private void storeSource(String text) {
+        if (text.isEmpty()) {
             return;
         }
 
         BibtexParser bibtexParser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
         try {
-            ParserResult parserResult = bibtexParser.parse(new StringReader(codeArea.getText()));
+            ParserResult parserResult = bibtexParser.parse(new StringReader(text));
             BibDatabase database = parserResult.getDatabase();
 
             if (database.getEntryCount() > 1) {
@@ -186,28 +180,10 @@ public class SourceTab extends EntryEditorTab {
             compound.end();
             undoManager.addEdit(compound);
 
-        } catch (InvalidFieldValueException | IOException ex) {
-            // The source couldn't be parsed, so the user is given an
-            // error message, and the choice to keep or revert the contents
-            // of the source text field.
-
+            sourceIsValid.setValue(null);
+        } catch (InvalidFieldValueException | IllegalStateException | IOException ex) {
+            sourceIsValid.setValue(ValidationMessage.error(Localization.lang("Problem with parsing entry") + ": " + ex.getMessage()));
             LOGGER.debug("Incorrect source", ex);
-            DialogService dialogService = new FXDialogService();
-            boolean keepEditing = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("Problem with parsing entry"),
-                    Localization.lang("Error") + ": " + ex.getMessage(),
-                    Localization.lang("Edit"),
-                    Localization.lang("Revert to original source")
-            );
-
-            if (!keepEditing) {
-                // Revert
-                try {
-                    codeArea.replaceText(0, codeArea.getText().length(), getSourceString(this.currentEntry, mode));
-                } catch (IOException e) {
-                    LOGGER.debug("Incorrect source", e);
-                }
-            }
         }
     }
 }
