@@ -1,23 +1,18 @@
 package org.jabref.logic.importer.fetcher;
 
+import org.jabref.testutils.category.FetcherTest;
+
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.*;
 
-
+@Category(FetcherTest.class)
 public class IacrEprintFetcherTest {
 
     @Test
     public void testPerformSearchById() {
         fail("Not yet implemented");
-    }
-
-    @Test
-    public void testGetDate() {
-        String input = "received 9 Nov 2017, last revised 10 Nov 2017";
-        assertEquals("2017-11-10", IacrEprintFetcher.getDate(input));
-        input = "received 9 Nov 2017";
-        assertEquals("2017-11-09", IacrEprintFetcher.getDate(input));
     }
 
 }

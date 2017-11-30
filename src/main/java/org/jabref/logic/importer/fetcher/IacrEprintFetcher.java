@@ -22,13 +22,22 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class IacrEprintFetcher implements IdBasedFetcher {
 
-    private final ImportFormatPreferences prefs;
+    private static final Log LOGGER = LogFactory.getLog(IacrEprintFetcher.class);
+    private static final Pattern DATE_FROM_WEBSITE_PATTERN = Pattern.compile("[a-z ]+(\\d{1,2} [A-Za-z][a-z]{2} \\d{4})");
     private static final DateFormat DATE_FORMAT_WEBSITE = new SimpleDateFormat("dd MMM yyyy");
     private static final DateFormat DATE_FORMAT_BIBTEX = new SimpleDateFormat("yyyy-MM-dd");
     private static final Predicate<String> IDENTIFIER_PREDICATE = Pattern.compile("\\d{4}/\\d{3,5}").asPredicate();
     private static final String CITATION_URL_PREFIX = "https://eprint.iacr.org/eprint-bin/cite.pl?entry=";
+    private static final String DESCRIPTION_URL_PREFIX = "https://eprint.iacr.org/";
+    private static final String IACR_NAME = "IACR eprints";
+
+    private final ImportFormatPreferences prefs;
 
     public IacrEprintFetcher(ImportFormatPreferences prefs) {
         this.prefs = prefs;
@@ -64,13 +73,8 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         return entry;
     }
 
-    @Override
-    public String getName() {
-        return "IACR eprint";
-    }
-
     private void setAdditionalFields(BibEntry entry, String identifier) throws FetcherException {
-        String url = "https://eprint.iacr.org/" + identifier;
+        String url = DESCRIPTION_URL_PREFIX + identifier;
         entry.setField(FieldName.URL, url);
 
         String content = getHtml(url);
@@ -85,28 +89,38 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         entry.setField(FieldName.VERSION, version);
 
         String dateStringAsInHtml = getValueBetween("<b>Date: </b>", "<p />", content);
-        entry.setField(FieldName.DATE, getDate(dateStringAsInHtml));
+        entry.setField(FieldName.DATE, getLatestDate(dateStringAsInHtml));
     }
 
-    public static String getDate(String dateContent) {
-        String[] rawDates = dateContent.split(",");
+    private String getLatestDate(String dateStringAsInHtml) throws FetcherException {
+        String[] rawDates = dateStringAsInHtml.split(",");
         List<String> formattedDates = new ArrayList<>();
-
         for (String rawDate : rawDates) {
-            try {
-                rawDate = rawDate.trim();
-                Matcher dateMatcher = Pattern.compile("[a-z ]+(\\d{1,2} [A-Za-z][a-z]{2} \\d{4})").matcher(rawDate);
-                if (dateMatcher.find()) {
-                    Date date = DATE_FORMAT_WEBSITE.parse(dateMatcher.group(1));
-                    formattedDates.add(DATE_FORMAT_BIBTEX.format(date));
-                }
-            } catch (Exception e) {
-                // Just skip
+            Date date = parseDateFromWebsite(rawDate);
+            if (date != null) {
+                formattedDates.add(DATE_FORMAT_BIBTEX.format(date));
             }
+        }
+
+        if (formattedDates.isEmpty()) {
+            throw new FetcherException(Localization.lang("Entry from IACR could not be parsed."));
         }
 
         Collections.sort(formattedDates, Collections.reverseOrder());
         return formattedDates.get(0);
+    }
+
+    private Date parseDateFromWebsite(String dateStringFromWebsite) {
+        Date date = null;
+        Matcher dateMatcher = DATE_FROM_WEBSITE_PATTERN.matcher(dateStringFromWebsite.trim());
+        if (dateMatcher.find()) {
+            try {
+                date = DATE_FORMAT_WEBSITE.parse(dateMatcher.group(1));
+            } catch (java.text.ParseException e) {
+                LOGGER.warn("Date from IACR could not be parsed", e);
+            }
+        }
+        return date;
     }
 
     private String getHtml(String url) throws FetcherException {
@@ -118,13 +132,17 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         }
     }
 
-    private static String getValueBetween(String from, String to, String haystack) throws FetcherException {
-        try {
-            int begin = haystack.indexOf(from) + from.length();
-            int end = haystack.indexOf(to, begin);
-            return haystack.substring(begin, end);
-        } catch (IndexOutOfBoundsException e) {
+    private String getValueBetween(String from, String to, String haystack) throws FetcherException {
+        String value = StringUtils.substringBetween(haystack, from, to);
+        if (value == null) {
             throw new FetcherException(Localization.lang("Could not extract required data from IACR HTML."));
+        } else {
+            return value;
         }
+    }
+
+    @Override
+    public String getName() {
+        return IACR_NAME;
     }
 }
