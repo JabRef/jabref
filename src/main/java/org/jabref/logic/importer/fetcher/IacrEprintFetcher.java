@@ -74,22 +74,28 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     }
 
     private void setAdditionalFields(BibEntry entry, String identifier) throws FetcherException {
-        String url = DESCRIPTION_URL_PREFIX + identifier;
-        entry.setField(FieldName.URL, url);
+        String descriptiveHtml = getHtml(DESCRIPTION_URL_PREFIX + identifier);
+        String version = getVersion(identifier, descriptiveHtml);
 
-        String content = getHtml(url);
+        entry.setField(FieldName.VERSION, version);
+        entry.setField(FieldName.URL, DESCRIPTION_URL_PREFIX + identifier + "/" + version);
+        entry.setField(FieldName.ABSTRACT, getAbstract(descriptiveHtml));
 
-        String abstractText = getValueBetween("<b>Abstract: </b>", "<p />", content);
+        String dateStringAsInHtml = getValueBetween("<b>Date: </b>", "<p />", descriptiveHtml);
+        entry.setField(FieldName.DATE, getLatestDate(dateStringAsInHtml));
+    }
+
+    private String getVersion(String identifier, String descriptiveHtml) throws FetcherException {
+        String startOfVersionString = "<b>Version: </b><a href=\"/" + identifier + "/";
+        String version = getValueBetween(startOfVersionString, "\"", descriptiveHtml);
+        return version;
+    }
+
+    private String getAbstract(String descriptiveHtml) throws FetcherException {
+        String abstractText = getValueBetween("<b>Abstract: </b>", "<p />", descriptiveHtml);
         // for some reason, all spaces are doubled...
         abstractText = abstractText.replaceAll("\\s(\\s)", "$1");
-        entry.setField(FieldName.ABSTRACT, abstractText);
-
-        String startOfVersionString = "<b>Version: </b><a href=\"/" + identifier + "/";
-        String version = getValueBetween(startOfVersionString, "\"", content);
-        entry.setField(FieldName.VERSION, version);
-
-        String dateStringAsInHtml = getValueBetween("<b>Date: </b>", "<p />", content);
-        entry.setField(FieldName.DATE, getLatestDate(dateStringAsInHtml));
+        return abstractText;
     }
 
     private String getLatestDate(String dateStringAsInHtml) throws FetcherException {
