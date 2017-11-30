@@ -17,6 +17,7 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -34,11 +35,11 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     }
 
     @Override
-    public Optional<BibEntry> performSearchById(final String identifier) throws FetcherException {
+    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         String identifierWithoutLettersAndSpaces = identifier.replaceAll("[^0-9/]", " ").trim();
 
         if (!IDENTIFIER_PREDICATE.test(identifierWithoutLettersAndSpaces)) {
-            throw new FetcherException("Invalid IACR identifier: " + identifier);
+            throw new FetcherException(Localization.lang("Invalid IACR identifier: '%0'.", identifier));
         }
 
         Optional<BibEntry> entry = createEntryFromIacrCitation(identifierWithoutLettersAndSpaces);
@@ -58,7 +59,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         try {
             entry = BibtexParser.singleFromString(actualEntry, prefs);
         } catch (ParseException e) {
-            throw new FetcherException("Entry from IACR could not be parsed.", e);
+            throw new FetcherException(Localization.lang("Entry from IACR could not be parsed."), e);
         }
         return entry;
     }
@@ -108,12 +109,12 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         return formattedDates.get(0);
     }
 
-    private String getHtml(final String url) throws FetcherException {
+    private String getHtml(String url) throws FetcherException {
         try {
             URLDownload download = new URLDownload(url);
             return download.asString(prefs.getEncoding());
         } catch (IOException e) {
-            throw new FetcherException("Could not retrieve entry data from IACR.", e);
+            throw new FetcherException(Localization.lang("Could not retrieve entry data from IACR at '%0'.", url), e);
         }
     }
 
@@ -123,7 +124,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
             int end = haystack.indexOf(to, begin);
             return haystack.substring(begin, end);
         } catch (IndexOutOfBoundsException e) {
-            throw new FetcherException("Could not extract required data from IACR HTML.");
+            throw new FetcherException(Localization.lang("Could not extract required data from IACR HTML."));
         }
     }
 }
