@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,7 +26,8 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     private final ImportFormatPreferences prefs;
     private static final DateFormat DATE_FORMAT_WEBSITE = new SimpleDateFormat("dd MMM yyyy");
     private static final DateFormat DATE_FORMAT_BIBTEX = new SimpleDateFormat("yyyy-MM-dd");
-    private static final Predicate<String> IDENTIFIER_REGEX = Pattern.compile("\\d{4}/\\d{1,4}").asPredicate();
+    private static final Predicate<String> IDENTIFIER_PREDICATE = Pattern.compile("\\d{4}/\\d{3,5}").asPredicate();
+    private static final String CITATION_URL_PREFIX = "https://eprint.iacr.org/eprint-bin/cite.pl?entry=";
 
     public IacrEprintFetcher(ImportFormatPreferences prefs) {
         this.prefs = prefs;
@@ -35,30 +35,32 @@ public class IacrEprintFetcher implements IdBasedFetcher {
 
     @Override
     public Optional<BibEntry> performSearchById(final String identifier) throws FetcherException {
-        if (!IDENTIFIER_REGEX.test(identifier)) {
-            throw new FetcherException("Wrong identifier format");
-        }
-        String downloaded;
-        try {
-            URL url = new URL("https://eprint.iacr.org/eprint-bin/cite.pl?entry=" + identifier);
-            URLDownload download = new URLDownload(url);
-            downloaded = download.asString();
-        } catch (IOException e) {
-            FetcherException ex = new FetcherException(e.getMessage());
-            ex.addSuppressed(e);
-            throw ex;
+        String identifierWithoutLettersAndSpaces = identifier.replaceAll("[^0-9/]", " ").trim();
+
+        if (!IDENTIFIER_PREDICATE.test(identifierWithoutLettersAndSpaces)) {
+            throw new FetcherException("Invalid IACR identifier: " + identifier);
         }
 
-        String entryString = downloaded.substring(downloaded.indexOf("<PRE>") + 5, downloaded.indexOf("</PRE>")).trim();
-        try {
-            Optional<BibEntry> entry = BibtexParser.singleFromString(entryString, prefs);
-            if (entry.isPresent()) {
-                setAdditionalFields(entry.get(), identifier);
-            }
-            return entry;
-        } catch (IOException | ParseException e) {
-            throw new FetcherException(e.toString());
+        Optional<BibEntry> entry = createEntryFromIacrCitation(identifierWithoutLettersAndSpaces);
+
+        if (entry.isPresent()) {
+            setAdditionalFields(entry.get(), identifierWithoutLettersAndSpaces);
         }
+
+        return entry;
+    }
+
+    private Optional<BibEntry> createEntryFromIacrCitation(String validIdentifier) throws FetcherException {
+        String bibtexCitationHtml = getHtml(CITATION_URL_PREFIX + validIdentifier);
+        String actualEntry = getValueBetween("<PRE>", "</PRE>", bibtexCitationHtml);
+
+        Optional<BibEntry> entry;
+        try {
+            entry = BibtexParser.singleFromString(actualEntry, prefs);
+        } catch (ParseException e) {
+            throw new FetcherException("Entry from IACR could not be parsed.", e);
+        }
+        return entry;
     }
 
     @Override
@@ -66,12 +68,11 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         return "IACR eprint";
     }
 
-    private void setAdditionalFields(BibEntry entry, String identifier) throws IOException {
+    private void setAdditionalFields(BibEntry entry, String identifier) throws FetcherException {
         String url = "https://eprint.iacr.org/" + identifier;
         entry.setField(FieldName.URL, url);
 
-        URLDownload download = new URLDownload(url);
-        String content = download.asString();
+        String content = getHtml(url);
 
         String abstractText = getValueBetween("<b>Abstract: </b>", "<p />", content);
         // for some reason, all spaces are doubled...
@@ -82,14 +83,13 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         String version = getValueBetween(startOfVersionString, "\"", content);
         entry.setField(FieldName.VERSION, version);
 
-        String dates = getValueBetween("<b>Date: </b>", "<p />", content);
-        entry.setField(FieldName.DATE, getDate(dates));
+        String dateStringAsInHtml = getValueBetween("<b>Date: </b>", "<p />", content);
+        entry.setField(FieldName.DATE, getDate(dateStringAsInHtml));
     }
 
     public static String getDate(String dateContent) {
         String[] rawDates = dateContent.split(",");
         List<String> formattedDates = new ArrayList<>();
-
 
         for (String rawDate : rawDates) {
             try {
@@ -108,9 +108,22 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         return formattedDates.get(0);
     }
 
-    private static String getValueBetween(String from, String to, String haystack) {
-        int begin = haystack.indexOf(from) + from.length();
-        int end = haystack.indexOf(to, begin);
-        return haystack.substring(begin, end);
+    private String getHtml(final String url) throws FetcherException {
+        try {
+            URLDownload download = new URLDownload(url);
+            return download.asString(prefs.getEncoding());
+        } catch (IOException e) {
+            throw new FetcherException("Could not retrieve entry data from IACR.", e);
+        }
+    }
+
+    private static String getValueBetween(String from, String to, String haystack) throws FetcherException {
+        try {
+            int begin = haystack.indexOf(from) + from.length();
+            int end = haystack.indexOf(to, begin);
+            return haystack.substring(begin, end);
+        } catch (IndexOutOfBoundsException e) {
+            throw new FetcherException("Could not extract required data from IACR HTML.");
+        }
     }
 }
