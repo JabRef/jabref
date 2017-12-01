@@ -25,6 +25,7 @@ public class IacrEprintFetcherTest {
     private IacrEprintFetcher fetcher;
     private BibEntry abram2017;
     private BibEntry beierle2016;
+    private BibEntry delgado2017;
 
     @Before
     public void setUp() {
@@ -55,6 +56,19 @@ public class IacrEprintFetcherTest {
         beierle2016.setField(FieldName.URL, "https://eprint.iacr.org/2016/119/20170217:150415");
         beierle2016.setField(FieldName.VERSION, "20170217:150415");
         beierle2016.setField(FieldName.YEAR, "2016");
+
+        delgado2017 = new BibEntry();
+        delgado2017.setType(BiblatexEntryTypes.MISC);
+        delgado2017.setField("bibtexkey", "cryptoeprint:2017:1095");
+        delgado2017.setField(FieldName.ABSTRACT, "Bitcoin relies on the Unspent Transaction Outputs (UTXO) set to efficiently verify new generated transactions. Every unspent out- put, no matter its type, age, value or length is stored in every full node. In this paper we introduce a tool to study  and analyze the UTXO set, along with a detailed description of the set format  and functionality. Our analysis includes a general view of the set  and quantifies the difference between the two existing formats up to the date. We also provide an ac- curate analysis of the volume of dust  and unprofitable outputs included in the set, the distribution of the block height in which the outputs where included,  and the use of non-standard outputs.\n");
+        delgado2017.setField(FieldName.AUTHOR, "Sergi Delgado-Segura and Cristina Pérez-Solà and Guillermo Navarro-Arribas and Jordi Herrera-Joancomartí");
+        delgado2017.setField(FieldName.DATE, "2017-11-10");
+        delgado2017.setField(FieldName.HOWPUBLISHED, "Cryptology ePrint Archive, Report 2017/1095");
+        delgado2017.setField(FieldName.NOTE, "\\url{https://eprint.iacr.org/2017/1095}");
+        delgado2017.setField(FieldName.TITLE, "Analysis of the Bitcoin UTXO set");
+        delgado2017.setField(FieldName.URL, "https://eprint.iacr.org/2017/1095/20171110:183926");
+        delgado2017.setField(FieldName.VERSION, "20171110:183926");
+        delgado2017.setField(FieldName.YEAR, "2017");
     }
 
     @Test(timeout = TIMEOUT_FOR_TESTS)
@@ -67,6 +81,12 @@ public class IacrEprintFetcherTest {
     public void searchByIdWithValidId2() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("iacr ePrint 2016/119");
         assertEquals(Optional.of(beierle2016), fetchedEntry);
+    }
+
+    @Test(timeout = TIMEOUT_FOR_TESTS)
+    public void searchByIdWithValidIdAndNonAsciiChars() throws FetcherException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("some random 2017/1095 stuff around the id");
+        assertEquals(Optional.of(delgado2017), fetchedEntry);
     }
 
     @Test(timeout = TIMEOUT_FOR_TESTS, expected = FetcherException.class)

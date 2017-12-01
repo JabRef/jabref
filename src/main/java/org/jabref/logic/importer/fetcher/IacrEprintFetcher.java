@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     private static final Predicate<String> IDENTIFIER_PREDICATE = Pattern.compile("\\d{4}/\\d{3,5}").asPredicate();
     private static final String CITATION_URL_PREFIX = "https://eprint.iacr.org/eprint-bin/cite.pl?entry=";
     private static final String DESCRIPTION_URL_PREFIX = "https://eprint.iacr.org/";
+    private static final Charset WEBSITE_CHARSET = Charset.forName("iso-8859-1");
 
     private final ImportFormatPreferences prefs;
 
@@ -133,7 +135,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     private String getHtml(String url) throws FetcherException {
         try {
             URLDownload download = new URLDownload(url);
-            return download.asString();
+            return download.asString(WEBSITE_CHARSET);
         } catch (IOException e) {
             throw new FetcherException(Localization.lang("Could not retrieve entry data from IACR at '%0'.", url), e);
         }
