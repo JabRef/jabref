@@ -132,7 +132,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     private String getHtml(String url) throws FetcherException {
         try {
             URLDownload download = new URLDownload(url);
-            return download.asString(prefs.getEncoding());
+            return download.asString();
         } catch (IOException e) {
             throw new FetcherException(Localization.lang("Could not retrieve entry data from IACR at '%0'.", url), e);
         }
