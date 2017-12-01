@@ -34,6 +34,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added an option to mass append to fields via the Quality -> set/clear/append/rename fields dialog. [#2721](https://github.com/JabRef/jabref/issues/2721)
 - We added a check on startup to ensure JabRef is run with an adequate Java version. [3310](https://github.com/JabRef/jabref/issues/3310)
 - In the preference, all installed java Look and Feels are now listed and selectable
+- We added the clear text button into the right-click menu of the text field. When adding a new entry into a library, the text boxes are now clearable by clicking this button. Issue 198 in "Beginner" section of "koppor"'s repository. ( https://github.com/jabref/issues/198 )
+
 
 ### Fixed
  - We fixed the translation of \textendash in the entry preview [#3307](https://github.com/JabRef/jabref/issues/3307)
