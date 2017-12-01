@@ -9,25 +9,23 @@ import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.FieldName;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-@Category(FetcherTest.class)
+@FetcherTest
 public class IacrEprintFetcherTest {
-
-    private final static int TIMEOUT_FOR_TESTS = 5000;
 
     private IacrEprintFetcher fetcher;
     private BibEntry abram2017;
     private BibEntry beierle2016;
     private BibEntry delgado2017;
 
-    @Before
+    @BeforeAll
     public void setUp() {
         fetcher = new IacrEprintFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
@@ -71,47 +69,47 @@ public class IacrEprintFetcherTest {
         delgado2017.setField(FieldName.YEAR, "2017");
     }
 
-    @Test(timeout = TIMEOUT_FOR_TESTS)
+    @Test
     public void searchByIdWithValidId1() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("Report 2017/1118 ");
         assertEquals(Optional.of(abram2017), fetchedEntry);
     }
 
-    @Test(timeout = TIMEOUT_FOR_TESTS)
+    @Test
     public void searchByIdWithValidId2() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("iacr ePrint 2016/119");
         assertEquals(Optional.of(beierle2016), fetchedEntry);
     }
 
-    @Test(timeout = TIMEOUT_FOR_TESTS)
+    @Test
     public void searchByIdWithValidIdAndNonAsciiChars() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("some random 2017/1095 stuff around the id");
         assertEquals(Optional.of(delgado2017), fetchedEntry);
     }
 
-    @Test(timeout = TIMEOUT_FOR_TESTS, expected = FetcherException.class)
-    public void searchByIdWithEmptyIdFails() throws FetcherException {
-        fetcher.performSearchById("");
+    @Test
+    public void searchByIdWithEmptyIdFails() {
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById(""));
     }
 
-    @Test(timeout = TIMEOUT_FOR_TESTS, expected = FetcherException.class)
-    public void searchByIdWithInvalidReportNumberFails() throws FetcherException {
-        fetcher.performSearchById("2016/1");
+    @Test
+    public void searchByIdWithInvalidReportNumberFails() {
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("2016/1"));
     }
 
-    @Test(timeout = TIMEOUT_FOR_TESTS, expected = FetcherException.class)
-    public void searchByIdWithInvalidYearFails() throws FetcherException {
-        fetcher.performSearchById("16/115");
+    @Test
+    public void searchByIdWithInvalidYearFails() {
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("16/115"));
     }
 
-    @Test(timeout = TIMEOUT_FOR_TESTS, expected = FetcherException.class)
-    public void searchByIdWithInvalidIdFails() throws FetcherException {
-        fetcher.performSearchById("asdf");
+    @Test
+    public void searchByIdWithInvalidIdFails() {
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("asdf"));
     }
 
-    @Test(timeout = TIMEOUT_FOR_TESTS, expected = FetcherException.class)
-    public void searchForNonexistentIdFails() throws FetcherException {
-        fetcher.performSearchById("2016/6425");
+    @Test
+    public void searchForNonexistentIdFails() {
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("2016/6425"));
     }
 
     @Test
