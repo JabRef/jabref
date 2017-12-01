@@ -21,11 +21,14 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class IacrEprintFetcher implements IdBasedFetcher {
+
+    public static final String NAME = "IACR eprints";
 
     private static final Log LOGGER = LogFactory.getLog(IacrEprintFetcher.class);
     private static final Pattern DATE_FROM_WEBSITE_PATTERN = Pattern.compile("[a-z ]+(\\d{1,2} [A-Za-z][a-z]{2} \\d{4})");
@@ -34,7 +37,6 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     private static final Predicate<String> IDENTIFIER_PREDICATE = Pattern.compile("\\d{4}/\\d{3,5}").asPredicate();
     private static final String CITATION_URL_PREFIX = "https://eprint.iacr.org/eprint-bin/cite.pl?entry=";
     private static final String DESCRIPTION_URL_PREFIX = "https://eprint.iacr.org/";
-    public static final String NAME = "IACR eprints";
 
     private final ImportFormatPreferences prefs;
 
