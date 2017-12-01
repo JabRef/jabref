@@ -21,7 +21,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,7 +34,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     private static final Predicate<String> IDENTIFIER_PREDICATE = Pattern.compile("\\d{4}/\\d{3,5}").asPredicate();
     private static final String CITATION_URL_PREFIX = "https://eprint.iacr.org/eprint-bin/cite.pl?entry=";
     private static final String DESCRIPTION_URL_PREFIX = "https://eprint.iacr.org/";
-    private static final String IACR_NAME = "IACR eprints";
+    public static final String NAME = "IACR eprints";
 
     private final ImportFormatPreferences prefs;
 
@@ -149,6 +148,6 @@ public class IacrEprintFetcher implements IdBasedFetcher {
 
     @Override
     public String getName() {
-        return IACR_NAME;
+        return NAME;
     }
 }
