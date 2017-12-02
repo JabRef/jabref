@@ -49,6 +49,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private FieldEditorFX activeField;
     private final BibDatabaseContext databaseContext;
     private UndoManager undoManager;
+    private Collection<String> fields;
 
     public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager) {
         this.isCompressed = compressed;
@@ -71,10 +72,11 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
     private Region setupPanel(BibEntry entry, boolean compressed, SuggestionProviders suggestionProviders, UndoManager undoManager) {
         editors.clear();
-        List<Label> labels = new ArrayList<>();
 
         EntryType entryType = EntryTypes.getTypeOrDefault(entry.getType(), databaseContext.getMode());
-        Collection<String> fields = determineFieldsToShow(entry, entryType);
+        fields = determineFieldsToShow(entry, entryType);
+
+        List<Label> labels = new ArrayList<>();
         for (String fieldName : fields) {
             FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.TASK_EXECUTOR, new FXDialogService(),
                     Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs,
@@ -122,7 +124,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
             gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);
 
-            setRegularRowLayout(gridPane, fields, rows);
+            setRegularRowLayout(gridPane, rows);
         }
 
         if (GUIGlobals.currentFont != null) {
@@ -131,7 +133,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                             + "text-area-foreground: " + convertToHex(GUIGlobals.editorTextColor) + ";"
                             + "text-area-highlight: " + convertToHex(GUIGlobals.activeBackgroundColor) + ";");
         }
-        gridPane.getStylesheets().add("org/jabref/gui/entryeditor/EntryEditor.css");
 
         // Warp everything in a scroll-pane
         ScrollPane scrollPane = new ScrollPane();
@@ -143,7 +144,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         return scrollPane;
     }
 
-    private void setRegularRowLayout(GridPane gridPane, Collection<String> fields, int rows) {
+    private void setRegularRowLayout(GridPane gridPane, int rows) {
         List<RowConstraints> constraints = new ArrayList<>(rows);
         for (String field : fields) {
             RowConstraints rowExpand = new RowConstraints();
@@ -226,4 +227,8 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     }
 
     protected abstract Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType);
+
+    public Collection<String> getShownFields() {
+        return fields;
+    }
 }

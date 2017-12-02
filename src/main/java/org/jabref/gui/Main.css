@@ -34,6 +34,11 @@
     -fx-dark-background: #757575;
 
     /*
+     * A strong white as background
+     */
+    -fx-light-background: #ffffff;
+
+    /*
      * A strong blue for backgrounds of active items (toggle button, selected list item)
      */
     -fx-active-background: #6A9FCD;
@@ -66,6 +71,8 @@
     -fx-effect:none;
 }
 
+.flatButtonNoSpaceBottom,
+.flatButtonNoSpaceTop,
 .flatButton {
     -fx-shadow-highlight-color: transparent;
     -fx-outer-border: transparent;
@@ -81,4 +88,12 @@
     -fx-background-color: -fx-active-background;
     -fx-text-fill: white;
     -fx-fill: white;
+}
+
+.flatButtonNoSpaceBottom {
+    -fx-padding: 0.5em 0.5em -0.1em 0.5em;
+}
+
+.flatButtonNoSpaceTop {
+    -fx-padding: -0.1em 0.5em 0.5em 0.5em;
 }

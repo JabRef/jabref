@@ -802,7 +802,16 @@ public class BasePanel extends JPanel implements ClipboardOwner {
      *            "deleted". If true the action will be localized as "cut"
      */
     private void delete(boolean cut) {
-        List<BibEntry> entries = mainTable.getSelectedEntries();
+        delete(cut, mainTable.getSelectedEntries());
+    }
+
+    /**
+     * Removes the selected entries from the database
+     *
+     * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as
+     *            "deleted". If true the action will be localized as "cut"
+     */
+    private void delete(boolean cut, List<BibEntry> entries) {
         if (entries.isEmpty()) {
             return;
         }
@@ -839,6 +848,10 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 
         // prevent the main table from loosing focus
         mainTable.requestFocus();
+    }
+
+    public void delete(BibEntry entry) {
+        delete(false, Collections.singletonList(entry));
     }
 
     private void paste() {

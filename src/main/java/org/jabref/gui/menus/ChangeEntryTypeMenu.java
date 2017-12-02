@@ -1,22 +1,30 @@
 package org.jabref.gui.menus;
 
 import java.awt.Font;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
+import javax.swing.undo.UndoManager;
+
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
+import javafx.scene.control.SeparatorMenuItem;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.actions.ChangeTypeAction;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.IEEETranEntryTypes;
@@ -41,15 +49,55 @@ public class ChangeEntryTypeMenu {
         return menu;
     }
 
-    public JPopupMenu getChangeentryTypePopupMenu(BasePanel panel) {
-        JMenu menu = getChangeEntryTypeMenu(panel);
-        return menu.getPopupMenu();
+    public ContextMenu getChangeEntryTypePopupMenu(BibEntry entry, BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager) {
+        ContextMenu menu = new ContextMenu();
+
+        if (bibDatabaseContext.isBiblatexMode()) {
+            // Default BibLaTeX
+            populate(menu, EntryTypes.getAllValues(BibDatabaseMode.BIBLATEX), entry, undoManager);
+
+            // Custom types
+            populateSubMenu(menu, Localization.lang("Custom"), EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBLATEX), entry, undoManager);
+        } else {
+            // Default BibTeX
+            populateSubMenu(menu, Localization.lang("BibTeX"), BibtexEntryTypes.ALL, entry, undoManager);
+            menu.getItems().remove(0); // Remove separator
+
+            // IEEETran
+            populateSubMenu(menu, Localization.lang("IEEETran"), IEEETranEntryTypes.ALL, entry, undoManager);
+
+            // Custom types
+            populateSubMenu(menu, Localization.lang("Custom"), EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBTEX), entry, undoManager);
+        }
+
+        return menu;
     }
+
+    private void populateSubMenu(ContextMenu menu, String text, List<EntryType> entryTypes, BibEntry entry, CountingUndoManager undoManager) {
+        if (!entryTypes.isEmpty()) {
+            menu.getItems().add(new SeparatorMenuItem());
+            Menu custom = new Menu(text);
+            populate(custom, entryTypes, entry, undoManager);
+            menu.getItems().add(custom);
+        }
+    }
+
+    private void populate(ContextMenu menu, Collection<EntryType> types, BibEntry entry, UndoManager undoManager) {
+        for (EntryType type : types) {
+            menu.getItems().add(ChangeTypeAction.as(type, entry, undoManager));
+        }
+    }
+
+    private void populate(Menu menu, Collection<EntryType> types, BibEntry entry, UndoManager undoManager) {
+        for (EntryType type : types) {
+            menu.getItems().add(ChangeTypeAction.as(type, entry, undoManager));
+        }
+    }
+
     /**
      * Remove all types from the menu. Then cycle through all available
      * types, and add them.
      */
-
     private void populateChangeEntryTypeMenu(JMenu menu, BasePanel panel) {
         menu.removeAll();
 

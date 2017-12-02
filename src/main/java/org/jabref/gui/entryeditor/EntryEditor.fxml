@@ -13,9 +13,8 @@
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.112">
     <left>
-
         <ToolBar orientation="VERTICAL">
-            <Button styleClass="flatButton">
+            <Button styleClass="flatButton,narrow" onAction="#close">
                 <graphic>
                     <MaterialDesignIconView glyphName="CLOSE"/>
                 </graphic>
@@ -25,10 +24,14 @@
             </Button>
             <Pane prefHeight="10" VBox.vgrow="ALWAYS"/>
             <Group>
-                <Label fx:id="typeLabel" rotate="270"/>
+                <Label fx:id="typeLabel" rotate="270">
+                    <tooltip>
+                        <Tooltip text="%Change entry type"/>
+                    </tooltip>
+                </Label>
             </Group>
             <Pane prefHeight="10" VBox.vgrow="ALWAYS"/>
-            <Button styleClass="flatButton">
+            <Button fx:id="typeChangeButton" styleClass="flatButton,narrow">
                 <graphic>
                     <MaterialDesignIconView glyphName="PENCIL"/>
                 </graphic>
@@ -36,7 +39,7 @@
                     <Tooltip text="%Change entry type"/>
                 </tooltip>
             </Button>
-            <Button styleClass="flatButton">
+            <Button fx:id="fetcherButton" styleClass="flatButton,narrow">
                 <graphic>
                     <MaterialDesignIconView glyphName="REFRESH"/>
                 </graphic>
@@ -44,8 +47,7 @@
                     <Tooltip text="%Update with bibliographic information from the web"/>
                 </tooltip>
             </Button>
-            <Separator/>
-            <Button styleClass="flatButton">
+            <Button styleClass="flatButton,narrow" onAction="#deleteEntry">
                 <graphic>
                     <MaterialDesignIconView glyphName="DELETE"/>
                 </graphic>
@@ -53,7 +55,8 @@
                     <Tooltip text="%Delete entry"/>
                 </tooltip>
             </Button>
-            <Button styleClass="flatButton">
+            <Separator/>
+            <Button styleClass="flatButtonNoSpaceBottom,narrow" onAction="#navigateToPreviousEntry">
                 <graphic>
                     <MaterialDesignIconView glyphName="CHEVRON_UP"/>
                 </graphic>
@@ -61,7 +64,7 @@
                     <Tooltip text="%Previous entry"/>
                 </tooltip>
             </Button>
-            <Button styleClass="flatButton">
+            <Button styleClass="flatButtonNoSpaceTop,narrow" onAction="#navigateToNextEntry">
                 <graphic>
                     <MaterialDesignIconView glyphName="CHEVRON_DOWN"/>
                 </graphic>
@@ -69,18 +72,9 @@
                     <Tooltip text="%Next entry"/>
                 </tooltip>
             </Button>
-            <Separator/>
-            <Button styleClass="flatButton">
-                <graphic>
-                    <MaterialDesignIconView glyphName="HELP_CIRCLE"/>
-                </graphic>
-                <tooltip>
-                    <Tooltip text="%Help"/>
-                </tooltip>
-            </Button>
         </ToolBar>
     </left>
     <center>
-        <TabPane fx:id="tabbed"/>
+        <TabPane fx:id="tabbed" tabClosingPolicy="UNAVAILABLE"/>
     </center>
 </fx:root>

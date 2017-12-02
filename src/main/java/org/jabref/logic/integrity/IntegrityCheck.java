@@ -67,6 +67,7 @@ public class IntegrityCheck {
         result.addAll(new HTMLCharacterChecker().check(entry));
         result.addAll(new EntryLinkChecker(bibDatabaseContext.getDatabase()).check(entry));
         result.addAll(new BibtexkeyDeviationChecker(bibDatabaseContext, bibtexKeyPatternPreferences).check(entry));
+        result.addAll(new BibtexKeyDuplicationChecker(bibDatabaseContext.getDatabase()).check(entry));
 
         return result;
     }

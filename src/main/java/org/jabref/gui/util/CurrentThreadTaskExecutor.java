@@ -2,8 +2,6 @@ package org.jabref.gui.util;
 
 import java.util.function.Consumer;
 
-import org.jabref.gui.externalfiles.FileDownloadTask;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -41,11 +39,6 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
                 LOGGER.error("Unhandled exception", exception);
             }
         }
-    }
-
-    @Override
-    public void execute(FileDownloadTask downloadTask) {
-        downloadTask.run();
     }
 
     @Override

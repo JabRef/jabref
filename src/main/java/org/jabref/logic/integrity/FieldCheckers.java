@@ -47,6 +47,7 @@ public class FieldCheckers {
         fieldCheckers.put(FieldName.PAGES, new PagesChecker(databaseContext));
         fieldCheckers.put(FieldName.URL, new UrlChecker());
         fieldCheckers.put(FieldName.YEAR, new YearChecker());
+        fieldCheckers.put(FieldName.KEY, new ValidBibtexKeyChecker());
 
         return fieldCheckers;
     }
