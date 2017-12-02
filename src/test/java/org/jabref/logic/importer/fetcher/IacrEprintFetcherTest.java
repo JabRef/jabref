@@ -20,13 +20,13 @@ import static org.mockito.Mockito.mock;
 @FetcherTest
 public class IacrEprintFetcherTest {
 
-    private IacrEprintFetcher fetcher;
-    private BibEntry abram2017;
-    private BibEntry beierle2016;
-    private BibEntry delgado2017;
+    private static IacrEprintFetcher fetcher;
+    private static BibEntry abram2017;
+    private static BibEntry beierle2016;
+    private static BibEntry delgado2017;
 
     @BeforeAll
-    public void setUp() {
+    public static void setUp() {
         fetcher = new IacrEprintFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         abram2017 = new BibEntry();
