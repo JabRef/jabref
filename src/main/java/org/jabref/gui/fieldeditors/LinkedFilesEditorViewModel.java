@@ -212,14 +212,15 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         LinkedFileViewModel temporaryDownloadFile = new LinkedFileViewModel(
                 new LinkedFile("", url, suggestedTypeName), entry, databaseContext, taskExecutor);
         files.add(temporaryDownloadFile);
-        FileDownloadTask downloadTask = new FileDownloadTask(url, destination);
-        temporaryDownloadFile.downloadProgressProperty().bind(downloadTask.progressProperty());
-        downloadTask.setOnSucceeded(event -> {
-            files.remove(temporaryDownloadFile);
-            LinkedFile newLinkedFile = fromFile(destination, fileDirectories);
-            files.add(new LinkedFileViewModel(newLinkedFile, entry, databaseContext, taskExecutor));
-        });
-        downloadTask.setOnFailed(event -> dialogService.showErrorDialogAndWait("", downloadTask.getException()));
+        BackgroundTask<Void> downloadTask = new FileDownloadTask(url, destination)
+                .onSuccess(event -> {
+                    files.remove(temporaryDownloadFile);
+                    LinkedFile newLinkedFile = fromFile(destination, fileDirectories);
+                    files.add(new LinkedFileViewModel(newLinkedFile, entry, databaseContext, taskExecutor));
+                })
+                .onFailure(ex -> dialogService.showErrorDialogAndWait("", ex));
+
+        temporaryDownloadFile.downloadProgressProperty().bind(downloadTask.workDoneProperty());
         taskExecutor.execute(downloadTask);
     }
 

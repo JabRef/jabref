@@ -10,10 +10,9 @@ import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
-import org.jabref.gui.externalfiles.FileDownloadTask;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.fxmisc.easybind.EasyBind;
 
 /**
  * A very simple implementation of the {@link TaskExecutor} interface.
@@ -54,6 +53,10 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
         Task<V> javaTask = new Task<V>() {
+
+            {
+                EasyBind.subscribe(task.progressProperty(), progress -> updateProgress(progress.getWorkDone(), progress.getMax()));
+            }
 
             @Override
             public V call() throws Exception {
