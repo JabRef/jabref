@@ -53,6 +53,15 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final DoubleProperty downloadProgress = new SimpleDoubleProperty(-1);
     private final BooleanProperty downloadOngoing = new SimpleBooleanProperty(false);
     private final BooleanProperty isAutomaticallyFound = new SimpleBooleanProperty(false);
+
+    public boolean isCanWriteXMPMetadata() {
+        return canWriteXMPMetadata.get();
+    }
+
+    public BooleanProperty canWriteXMPMetadataProperty() {
+        return canWriteXMPMetadata;
+    }
+
     private final BooleanProperty canWriteXMPMetadata = new SimpleBooleanProperty(false);
 
     private final DialogService dialogService = new FXDialogService();
@@ -315,6 +324,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void writeXMPMetadata() {
+        // Localization.lang("Writing XMP-metadata...")
         BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {
                 Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
                 if (!file.isPresent()) {
@@ -330,6 +340,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 }
                 return null;
             });
+
+        // Localization.lang("Finished writing XMP-metadata.")
 
         // TODO: Show progress
         taskExecutor.execute(writeTask);
