@@ -98,7 +98,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
 
         LinkedFile linkedFile = fromFile(file, fileDirectories);
-        return new LinkedFileViewModel(linkedFile, entry, databaseContext);
+        return new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor);
 
     }
 
@@ -112,7 +112,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     private List<LinkedFileViewModel> parseToFileViewModel(String stringValue) {
         return FileFieldParser.parse(stringValue).stream()
-                .map(linkedFile -> new LinkedFileViewModel(linkedFile, entry, databaseContext))
+                .map(linkedFile -> new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor))
                 .collect(Collectors.toList());
     }
 
@@ -136,7 +136,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(
                 newFile -> {
                     LinkedFile newLinkedFile = fromFile(newFile, fileDirectories);
-                    files.add(new LinkedFileViewModel(newLinkedFile, entry, databaseContext));
+                    files.add(new LinkedFileViewModel(newLinkedFile, entry, databaseContext, taskExecutor));
                 });
     }
 
@@ -162,7 +162,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         List<LinkedFile> linkedFiles = util.findassociatedNotLinkedFiles(entry, databaseContext, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
 
         for (LinkedFile linkedFile : linkedFiles) {
-            LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(linkedFile, entry, databaseContext);
+            LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor);
             newLinkedFile.markAsAutomaticallyFound();
             result.add(newLinkedFile);
         }
@@ -210,14 +210,14 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         Path destination = constructSuggestedPath(suggestedType, fileDirectories);
 
         LinkedFileViewModel temporaryDownloadFile = new LinkedFileViewModel(
-                new LinkedFile("", url, suggestedTypeName), entry, databaseContext);
+                new LinkedFile("", url, suggestedTypeName), entry, databaseContext, taskExecutor);
         files.add(temporaryDownloadFile);
         FileDownloadTask downloadTask = new FileDownloadTask(url, destination);
         temporaryDownloadFile.downloadProgressProperty().bind(downloadTask.progressProperty());
         downloadTask.setOnSucceeded(event -> {
             files.remove(temporaryDownloadFile);
             LinkedFile newLinkedFile = fromFile(destination, fileDirectories);
-            files.add(new LinkedFileViewModel(newLinkedFile, entry, databaseContext));
+            files.add(new LinkedFileViewModel(newLinkedFile, entry, databaseContext, taskExecutor));
         });
         downloadTask.setOnFailed(event -> dialogService.showErrorDialogAndWait("", downloadTask.getException()));
         taskExecutor.execute(downloadTask);

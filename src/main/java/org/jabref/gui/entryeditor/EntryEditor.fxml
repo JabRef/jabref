@@ -36,15 +36,6 @@
                     <Tooltip text="%Change entry type"/>
                 </tooltip>
             </Button>
-
-            <Button styleClass="flatButton">
-                <graphic>
-                    <MaterialDesignIconView glyphName="IMPORT"/>
-                </graphic>
-                <tooltip>
-                    <Tooltip text="%Write BibTeXEntry as XMP-metadata to PDF."/>
-                </tooltip>
-            </Button>
             <Button styleClass="flatButton">
                 <graphic>
                     <MaterialDesignIconView glyphName="REFRESH"/>

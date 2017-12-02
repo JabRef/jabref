@@ -48,11 +48,6 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     @Override
-    public void execute(FileDownloadTask downloadTask) {
-        EXECUTOR.submit(downloadTask);
-    }
-
-    @Override
     public void shutdown() {
         EXECUTOR.shutdownNow();
     }

@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 import javax.swing.AbstractAction;
 import javax.xml.transform.TransformerException;
 
+import javafx.concurrent.Task;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.entryeditor.EntryEditor;
@@ -52,7 +54,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
 
         // We want to offload the actual work to a background thread, so we have a worker
         // thread:
-        AbstractWorker worker = new WriteXMPWorker(files, entry);
+        AbstractWorker worker = new WriteXMPTask(files, entry);
         // Using Spin, we get a thread that gets synchronously offloaded to a new thread,
         // blocking the execution of this method:
         worker.getWorker().run();
@@ -63,13 +65,13 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
         setEnabled(true);
     }
 
-    class WriteXMPWorker extends AbstractWorker {
+    class WriteXMPTask extends Task<Void> {
 
-        private final List<Path> files;
+        private final Path files;
         private final BibEntry entry;
 
 
-        public WriteXMPWorker(List<Path> files, BibEntry entry) {
+        public WriteXMPTask(List<Path> files, BibEntry entry) {
 
             this.files = files;
             this.entry = entry;
@@ -83,27 +85,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
                 int written = 0;
                 int error = 0;
                 for (Path file : files) {
-                    if (!Files.exists(file)) {
-                        if (files.size() == 1) {
-                            message = Localization.lang("PDF does not exist");
-                        }
-                        error++;
 
-                    } else {
-                        try {
-                            XMPUtil.writeXMP(file.toFile(), entry, panel.getDatabase(), Globals.prefs.getXMPPreferences());
-                            if (files.size() == 1) {
-                                message = Localization.lang("Wrote XMP-metadata");
-                            }
-                            written++;
-                        } catch (IOException | TransformerException e) {
-                            if (files.size() == 1) {
-                                message = Localization.lang("Error while writing") + " '" + file.toString() + "'";
-                            }
-                            error++;
-
-                        }
-                    }
                 }
                 if (files.size() > 1) {
                     StringBuilder sb = new StringBuilder();

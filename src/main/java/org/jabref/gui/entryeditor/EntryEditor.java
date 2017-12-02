@@ -105,7 +105,6 @@ public class EntryEditor extends BorderPane implements EntryContainer {
      */
     private final AbstractAction prevEntryAction = new PrevEntryAction();
 
-    private final AbstractAction writeXmp;
     @FXML private TabPane tabbed;
     private final JabRefFrame frame;
     private final BasePanel panel;
@@ -127,8 +126,6 @@ public class EntryEditor extends BorderPane implements EntryContainer {
         this.panel = panel;
 
         ControlHelper.loadFXMLForControl(this);
-
-        writeXmp = new WriteXMPEntryEditorAction(panel, this);
 
         tabbed.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         tabbed.setStyle(
@@ -449,7 +446,6 @@ public class EntryEditor extends BorderPane implements EntryContainer {
             panel.output(Localization.lang("Deleted entry"));
         }
     }
-
 
     public class StoreFieldAction extends AbstractAction {
 
