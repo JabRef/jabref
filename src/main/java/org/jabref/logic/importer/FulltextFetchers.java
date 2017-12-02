@@ -46,6 +46,10 @@ public class FulltextFetchers {
         finders.addAll(fetcher);
     }
 
+    public List<FulltextFetcher> getFetchers() {
+        return finders;
+    }
+
     public Optional<URL> findFullTextPDF(BibEntry entry) {
         // for accuracy, fetch DOI first but do not modify entry
         BibEntry clonedEntry = (BibEntry) entry.clone();

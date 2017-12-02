@@ -2,6 +2,19 @@ import org.gradle.internal.os.OperatingSystem
 
 // to update the gradle wrapper, execute ./gradlew wrapper --gradle-version 4.0
 
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+        maven {
+            url 'https://oss.sonatype.org/content/groups/public'
+        }
+    }
+    dependencies {
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.2'
+    }
+}
+
 plugins {
     id 'com.gradle.build-scan' version '1.9'
     id 'com.install4j.gradle' version '6.1.5'
@@ -25,6 +38,7 @@ apply plugin: 'jacoco'
 apply plugin: 'install4j'
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'checkstyle'
+apply plugin: 'org.junit.platform.gradle.plugin'
 
 apply from: 'eclipse.gradle'
 apply from: 'localization.gradle'
@@ -37,6 +51,10 @@ project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jD
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 mainClassName = "org.jabref.JabRefMain"
+
+// These are the Java version requirements we will check on each start of JabRef
+ext.minRequiredJavaVersion = "1.8.0_144"
+ext.allowJava9 = false
 
 install4j {
     installDir = file(project.ext.install4jDir)
@@ -61,10 +79,6 @@ dependencies {
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
     compile 'com.jgoodies:jgoodies-looks:2.7.0'
-
-    // Later versions cannot be used. Tested until 1.6.5-1.
-    // See https://github.com/JabRef/jabref/issues/271 for details.
-    compile 'org.swinglabs.swingx:swingx-core:1.6.4'
 
     // update to 2.0.x is not possible - see https://github.com/JabRef/jabref/pull/1096#issuecomment-208857517
     compile 'org.apache.pdfbox:pdfbox:1.8.13'
@@ -97,7 +111,7 @@ dependencies {
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
-    compile 'com.google.guava:guava:23.3-jre'
+    compile 'com.google.guava:guava:23.4-jre'
 
     // JavaFX stuff
     compile 'com.airhacks:afterburner.fx:1.7.0'
@@ -130,8 +144,14 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.9'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.11.0'
-    testCompile 'com.github.tomakehurst:wiremock:2.10.1'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.2'
+    testCompile 'org.junit.jupiter:junit-jupiter-params:5.0.2'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.2'
+    testRuntime 'org.junit.vintage:junit-vintage-engine:4.12.1'
+    testRuntime 'org.apache.logging.log4j:log4j-core:2.9.1'
+    testRuntime 'org.apache.logging.log4j:log4j-jul:2.9.1'
+    testCompile 'org.mockito:mockito-core:2.12.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.11.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.5.0'
@@ -160,7 +180,11 @@ processResources {
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
-                "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'))
+                "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'),
+                "minRequiredJavaVersion": minRequiredJavaVersion,
+                "allowJava9": allowJava9
+
+        )
         filteringCharset = 'UTF-8'
     }
 
@@ -237,33 +261,31 @@ javadoc {
     }
 }
 
-test {
-    useJUnit {
-        excludeCategories 'org.jabref.testutils.category.DatabaseTests'
-        excludeCategories 'org.jabref.testutils.category.FetcherTests'
-        excludeCategories 'org.jabref.testutils.category.GUITests'
+junitPlatform {
+    filters {
+        tags {
+            exclude 'DatabaseTest', 'org.jabref.testutils.category.FetcherTest', 'org.jabref.testutils.category.GUITest'
+        }
     }
-    testLogging {
-        events "failed"
-        exceptionFormat "full"
-    }
+
+    logManager 'org.apache.logging.log4j.jul.LogManager'
 }
 
 task databaseTest(type: Test) {
     useJUnit {
-        includeCategories 'org.jabref.testutils.category.DatabaseTests'
+        includeCategories 'org.jabref.testutils.category.DatabaseTest'
     }
 }
 
 task fetcherTest(type: Test) {
     useJUnit {
-        includeCategories 'org.jabref.testutils.category.FetcherTests'
+        includeCategories 'org.jabref.testutils.category.FetcherTest'
     }
 }
 
 task guiTest(type: Test) {
     useJUnit {
-        includeCategories 'org.jabref.testutils.category.GUITests'
+        includeCategories 'org.jabref.testutils.category.GUITest'
     }
 }
 
@@ -282,7 +304,8 @@ tasks.withType(Test) {
 }
 
 task jacocoMerge(type: JacocoMerge) {
-    executionData test, databaseTest
+    executionData file("$buildDir/jacoco/junitPlatformTest.exec"), file("$buildDir/jacoco/databaseTest.exec"), file("$buildDir/jacoco/fetcherTest.exec")
+    dependsOn junitPlatformTest, databaseTest, fetcherTest
 }
 
 jacocoTestReport {
@@ -292,6 +315,27 @@ jacocoTestReport {
     reports {
         xml.enabled = true // coveralls plugin depends on xml format report
         html.enabled = true
+    }
+}
+
+afterEvaluate {
+    def junitPlatformTest = tasks.junitPlatformTest
+
+    jacoco {
+        applyTo(junitPlatformTest)
+    }
+
+    task jacocoJunit5TestReport(type: JacocoReport) {
+        executionData jacocoMerge.destinationFile
+        dependsOn jacocoMerge
+        sourceSets sourceSets.main
+        sourceDirectories = files(sourceSets.main.allSource.srcDirs)
+        classDirectories = files(sourceSets.main.output)
+
+        reports {
+            xml.enabled true
+            html.enabled true
+        }
     }
 }
 

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.rules.describer.SearchDescribers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
 import org.jabref.model.search.rules.ContainBasedSearchRule;
@@ -20,14 +19,12 @@ public class SearchQuery implements SearchMatcher {
     private final boolean caseSensitive;
     private final boolean regularExpression;
     private final SearchRule rule;
-    private final String description;
 
     public SearchQuery(String query, boolean caseSensitive, boolean regularExpression) {
         this.query = Objects.requireNonNull(query);
         this.caseSensitive = caseSensitive;
         this.regularExpression = regularExpression;
         this.rule = SearchRules.getSearchRuleByQuery(query, caseSensitive, regularExpression);
-        this.description = SearchDescribers.getSearchDescriberFor(rule, query).getDescription();
     }
 
     @Override
@@ -103,10 +100,6 @@ public class SearchQuery implements SearchMatcher {
         return regularExpression;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
     /**
      * Returns a list of words this query searches for.
      * The returned strings can be a regular expression.
@@ -119,5 +112,9 @@ public class SearchQuery implements SearchMatcher {
             // For example, "The great Vikinger" will give ["The","great","Vikinger"]
             return (new SentenceAnalyzer(getQuery())).getWords();
         }
+    }
+
+    public SearchRule getRule() {
+        return rule;
     }
 }

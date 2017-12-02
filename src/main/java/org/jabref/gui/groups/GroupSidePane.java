@@ -62,8 +62,6 @@ public class GroupSidePane extends SidePaneComponent {
 
         this.frame = frame;
 
-        this.setTitle(Localization.lang("Groups"));
-
         JFXPanel groupsPane = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
 
         add(groupsPane);

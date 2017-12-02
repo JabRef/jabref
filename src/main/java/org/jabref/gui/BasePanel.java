@@ -243,6 +243,8 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             }
         }
 
+        this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
+
         entryEditor = new EntryEditor(this);
         entryEditorContainer = setupEntryEditor(entryEditor);
     }

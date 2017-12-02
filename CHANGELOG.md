@@ -23,6 +23,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Crossreferenced entries are now used when a BibTex key is generated for an entry with empty fields. [#2811](https://github.com/JabRef/jabref/issues/2811)
 - We now set the WM_CLASS of the UI to org-jabref-JabRefMain to allow certain Un*x window managers to properly identify its windows
 - We changed the default paths for the OpenOffice/LibreOffice binaries to the default path for LibreOffice
+- File annotation tab now removes newlines and hyphens before newlines from content and displays an empty String instead of N/A if no contents are found. [#3280](https://github.com/JabRef/jabref/issues/3280)
 - We moved the groups field from the "Other fields" tab to "General" (you may have to reset your editor preferences under Options > Set up general fields)
 - We no longer create a new entry editor when selecting a new entry to increase performance. [#3187](https://github.com/JabRef/jabref/pull/3187)
 - We added the possibility to copy linked files from entries to a single output folder [#2539](https://github.com/JabRef/jabref/pull/2593)
@@ -31,6 +32,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Integrity check "Abbreviation Detection" detects abbreviated names for journals and booktitles based on the internal list instead of only looking for "." signs. Fixes [#3144](https://github.com/JabRef/jabref/issues/3144).
 - We added a dialog to show that JabRef is working on checking integrity. [#3358](https://github.com/JabRef/jabref/issues/3358)
 - We added an option to mass append to fields via the Quality -> set/clear/append/rename fields dialog. [#2721](https://github.com/JabRef/jabref/issues/2721)
+- We added a check on startup to ensure JabRef is run with an adequate Java version. [3310](https://github.com/JabRef/jabref/issues/3310)
+- In the preference, all installed java Look and Feels are now listed and selectable
 
 ### Fixed
  - We fixed the translation of \textendash in the entry preview [#3307](https://github.com/JabRef/jabref/issues/3307)
@@ -42,10 +45,16 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We no longer allow to add a field multiple times in customized entry types and thereby fix an issue in the entry editor that resulted from having a field multiple times. [#3046](https://github.com/JabRef/jabref/issues/3046)
  - We fixed an issue where JabRef would not show the translated content at some points, although there existed a translation
  - We fixed an issue where editing in the source tab would override content of other entries [#3352](https://github.com/JabRef/jabref/issues/3352#issue-268580818)
+ - We fixed an issue where file links created under windows could not be opened on Linux/OSX [#3311](https://github.com/JabRef/jabref/issues/3311)
  - We fixed several issues with the automatic linking of files in the entry editor where files were not found or not correctly saved in the bibtex source [#3346](https://github.com/JabRef/jabref/issues/3346)
  - We fixed an issue where fetching entries from crossref that had no titles caused an error [#3376](https://github.com/JabRef/jabref/issues/3376)
  - We fixed an issue where the same Java Look and Feel would be listed more than once in the Preferences. [#3391](https://github.com/JabRef/jabref/issues/3391)
  - We fixed an issue where errors in citation styles triggered an exception when opening the preferences dialog [#3389](https://github.com/JabRef/jabref/issues/3389)
+ - We fixed an issue where entries were displayed twice after insertion into a shared database. [#3164](https://github.com/JabRef/jabref/issues/3164)
+ - We fixed an issue where special fields (such as `printed`) could not be cleared when syncing special fields via the keywords [#3432](https://github.com/JabRef/jabref/issues/3432)
+ - We fixed an issue where the tooltip of the global search bar showed html tags instead of formatting the text [#3381](https://github.com/JabRef/jabref/issues/3381)
+ - We fixed an issue where timestamps were not updated for changed entries [#2810](https://github.com/JabRef/jabref/issues/2810)
+ - We fixed an issue where trying to fetch data from Medline/PubMed resulted in an error [#3463](https://github.com/JabRef/jabref/issues/3463)
 
  ### Removed
 
