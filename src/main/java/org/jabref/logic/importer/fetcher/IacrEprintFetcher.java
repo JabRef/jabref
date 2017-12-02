@@ -3,11 +3,11 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -34,8 +34,8 @@ public class IacrEprintFetcher implements IdBasedFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(IacrEprintFetcher.class);
     private static final Pattern DATE_FROM_WEBSITE_PATTERN = Pattern.compile("[a-z ]+(\\d{1,2} [A-Za-z][a-z]{2} \\d{4})");
-    private static final DateFormat DATE_FORMAT_WEBSITE = new SimpleDateFormat("dd MMM yyyy");
-    private static final DateFormat DATE_FORMAT_BIBTEX = new SimpleDateFormat("yyyy-MM-dd");
+    private static final DateTimeFormatter DATE_FORMAT_WEBSITE = DateTimeFormatter.ofPattern("d MMM yyyy");
+    private static final DateTimeFormatter DATE_FORMAT_BIBTEX = DateTimeFormatter.ISO_LOCAL_DATE;
     private static final Predicate<String> IDENTIFIER_PREDICATE = Pattern.compile("\\d{4}/\\d{3,5}").asPredicate();
     private static final String CITATION_URL_PREFIX = "https://eprint.iacr.org/eprint-bin/cite.pl?entry=";
     private static final String DESCRIPTION_URL_PREFIX = "https://eprint.iacr.org/";
@@ -68,13 +68,11 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         String bibtexCitationHtml = getHtml(CITATION_URL_PREFIX + validIdentifier);
         String actualEntry = getValueBetween("<PRE>", "</PRE>", bibtexCitationHtml);
 
-        Optional<BibEntry> entry;
         try {
-            entry = BibtexParser.singleFromString(actualEntry, prefs);
+            return BibtexParser.singleFromString(actualEntry, prefs);
         } catch (ParseException e) {
             throw new FetcherException(Localization.lang("Entry from IACR could not be parsed."), e);
         }
-        return entry;
     }
 
     private void setAdditionalFields(BibEntry entry, String identifier) throws FetcherException {
@@ -106,7 +104,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         String[] rawDates = dateStringAsInHtml.split(",");
         List<String> formattedDates = new ArrayList<>();
         for (String rawDate : rawDates) {
-            Date date = parseDateFromWebsite(rawDate);
+            TemporalAccessor date = parseDateFromWebsite(rawDate);
             if (date != null) {
                 formattedDates.add(DATE_FORMAT_BIBTEX.format(date));
             }
@@ -120,13 +118,13 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         return formattedDates.get(0);
     }
 
-    private Date parseDateFromWebsite(String dateStringFromWebsite) {
-        Date date = null;
+    private TemporalAccessor parseDateFromWebsite(String dateStringFromWebsite) {
+        TemporalAccessor date = null;
         Matcher dateMatcher = DATE_FROM_WEBSITE_PATTERN.matcher(dateStringFromWebsite.trim());
         if (dateMatcher.find()) {
             try {
                 date = DATE_FORMAT_WEBSITE.parse(dateMatcher.group(1));
-            } catch (java.text.ParseException e) {
+            } catch (DateTimeParseException e) {
                 LOGGER.warn("Date from IACR could not be parsed", e);
             }
         }
