@@ -23,6 +23,7 @@ plugins {
     id "com.simonharrer.modernizer" version '1.5.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.3'
     id 'net.ltgt.errorprone' version '0.0.13'
+    id 'com.github.ben-manes.versions' version '0.17.0'
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
