@@ -1,39 +1,6 @@
 package org.jabref.gui.customentrytypes;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
-
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefDialog;
@@ -48,7 +15,18 @@ import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.strings.StringUtil;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class EntryCustomizationDialog extends JabRefDialog implements ListSelectionListener {
 
@@ -75,7 +53,7 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
      * Creates a new instance of EntryCustomizationDialog
      */
     public EntryCustomizationDialog(JabRefFrame frame) {
-        super(frame, Localization.lang("Customize entry types"), false, EntryCustomizationDialog.class);
+        super((JFrame) null, Localization.lang("Customize entry types"), false, EntryCustomizationDialog.class);
 
         this.frame = frame;
         initGui();
@@ -325,7 +303,7 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
         if (type.isPresent() && (type.get() instanceof CustomEntryType)) {
             if (!EntryTypes.getStandardType(name, bibDatabaseMode).isPresent()) {
                 int reply = JOptionPane.showConfirmDialog
-                        (frame, Localization.lang("All entries of this "
+                        (null, Localization.lang("All entries of this "
                                         + "type will be declared "
                                         + "typeless. Continue?"),
                                 Localization.lang("Delete custom format") +

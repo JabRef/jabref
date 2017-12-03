@@ -1,26 +1,8 @@
 package org.jabref.gui.exporter;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.table.TableColumnModel;
-
+import ca.odell.glazedlists.gui.TableFormat;
+import ca.odell.glazedlists.swing.DefaultEventTableModel;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.jabref.Globals;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -31,9 +13,13 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 
-import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.swing.DefaultEventTableModel;
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import javax.swing.*;
+import javax.swing.table.TableColumnModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * <p>Title: </p>
@@ -53,7 +39,7 @@ public class ExportCustomizationDialog extends JabRefDialog {
 
     public ExportCustomizationDialog(final JabRefFrame frame) {
 
-        super(frame, Localization.lang("Manage custom exports"), false, ExportCustomizationDialog.class);
+        super((JFrame) null, Localization.lang("Manage custom exports"), false, ExportCustomizationDialog.class);
         DefaultEventTableModel<List<String>> tableModel = new DefaultEventTableModel<>(
                 Globals.prefs.customExports.getSortedList(), new ExportTableFormat());
         JTable table = new JTable(tableModel);
@@ -156,7 +142,6 @@ public class ExportCustomizationDialog extends JabRefDialog {
         getContentPane().add(main, BorderLayout.CENTER);
         getContentPane().add(buttons, BorderLayout.SOUTH);
         pack();
-        setLocationRelativeTo(frame);
         table.requestFocus();
     }
 

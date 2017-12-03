@@ -1,14 +1,7 @@
 package org.jabref.gui.push;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
-import javax.swing.Icon;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
@@ -19,8 +12,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.swing.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 public class PushToVim extends AbstractPushToApplication implements PushToApplication {
 
@@ -113,7 +108,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
     public void operationCompleted(BasePanel panel) {
         if (couldNotConnect) {
             JOptionPane.showMessageDialog(
-                    panel.frame(),
+                    null,
                     "<HTML>" +
                             Localization.lang("Could not connect to Vim server. Make sure that "
                                     + "Vim is running<BR>with correct server name.")
@@ -121,7 +116,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         } else if (couldNotCall) {
             JOptionPane.showMessageDialog(
-                    panel.frame(),
+                    null,
                     Localization.lang("Could not run the 'vim' program."),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         } else {

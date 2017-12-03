@@ -1,15 +1,10 @@
 package org.jabref.gui.mergeentries;
 
-import java.awt.event.ActionEvent;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JSeparator;
-
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.undo.NamedCompound;
@@ -21,11 +16,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.RowSpec;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Dialog for merging Bibtex entry with fetched data
@@ -43,7 +38,7 @@ public class MergeFetchedEntryDialog extends JabRefDialog {
 
 
     public MergeFetchedEntryDialog(BasePanel panel, BibEntry originalEntry, BibEntry fetchedEntry, String type) {
-        super(panel.frame(), Localization.lang("Merge entry with %0 information", type), true, MergeFetchedEntryDialog.class);
+        super((JFrame) null, Localization.lang("Merge entry with %0 information", type), true, MergeFetchedEntryDialog.class);
 
         this.panel = panel;
         this.originalEntry = originalEntry;

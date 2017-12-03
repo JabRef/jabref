@@ -1,16 +1,7 @@
 package org.jabref.pdfimport;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelMode;
@@ -37,8 +28,10 @@ import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.swing.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 public class PdfImporter {
 
@@ -112,7 +105,6 @@ public class PdfImporter {
                 if (!XMPUtil.hasMetadata(Paths.get(fileName), Globals.prefs.getXMPPreferences())) {
                     importDialog.disableXMPChoice();
                 }
-                importDialog.setLocationRelativeTo(frame);
                 importDialog.showDialog();
                 doNotShowAgain = importDialog.isDoNotShowAgain();
             }
@@ -233,8 +225,6 @@ public class PdfImporter {
     private Optional<BibEntry> createNewEntry() {
         // Find out what type is desired
         EntryTypeDialog etd = new EntryTypeDialog(frame);
-        // We want to center the dialog, to make it look nicer.
-        etd.setLocationRelativeTo(frame);
         etd.setVisible(true);
         EntryType type = etd.getChoice();
 

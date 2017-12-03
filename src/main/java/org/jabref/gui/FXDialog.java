@@ -1,9 +1,5 @@
 package org.jabref.gui;
 
-import java.awt.Window;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
@@ -12,11 +8,13 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
 import org.jabref.Globals;
-import org.jabref.JabRefGUI;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * This class provides a super class for all dialogs implemented in JavaFX.
@@ -134,6 +132,7 @@ public class FXDialog extends Alert {
     }
 
     private void setLocationRelativeToMainWindow() {
+        /*
         double mainWindowX = JabRefGUI.getMainFrame().getLocationOnScreen().getX();
         double mainWindowY = JabRefGUI.getMainFrame().getLocationOnScreen().getY();
         double mainWindowWidth = JabRefGUI.getMainFrame().getSize().getWidth();
@@ -141,6 +140,7 @@ public class FXDialog extends Alert {
 
         setX((mainWindowX + (mainWindowWidth / 2)) - (getWidth() / 2));
         setY((mainWindowY + (mainWindowHeight / 2)) - (getHeight() / 2));
+        */
     }
 
 }

@@ -1,30 +1,10 @@
 package org.jabref.gui.importer.actions;
 
-import java.awt.event.ActionEvent;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.FileTime;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.swing.Action;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.*;
 import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.gui.autosaveandbackup.BackupUIManager;
 import org.jabref.gui.importer.ParserResultWarningDialog;
@@ -46,8 +26,15 @@ import org.jabref.shared.exception.DatabaseNotSupportedException;
 import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.shared.exception.NotASharedDatabaseException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 // The action concerned with opening an existing database.
 
@@ -228,7 +215,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             }
 
             if (BackupManager.checkForBackupFile(fileToLoad)) {
-                BackupUIManager.showRestoreBackupDialog(frame, fileToLoad);
+                BackupUIManager.showRestoreBackupDialog(null, fileToLoad);
             }
 
             ParserResult result;
@@ -243,7 +230,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     result.getDatabaseContext().clearDatabaseFile(); // do not open the original file
                     result.getDatabase().clearSharedDatabaseID();
                     LOGGER.error("Connection error", e);
-                    JOptionPane.showMessageDialog(frame,
+                    JOptionPane.showMessageDialog(null,
                             e.getMessage() + "\n\n" + Localization.lang("A local copy will be opened."),
                             Localization.lang("Connection error"), JOptionPane.WARNING_MESSAGE);
                 }

@@ -1,10 +1,5 @@
 package org.jabref.gui.actions;
 
-import java.util.List;
-import java.util.Objects;
-
-import javax.swing.JOptionPane;
-
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
@@ -20,6 +15,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
+
+import javax.swing.*;
+import java.util.List;
+import java.util.Objects;
 
 public class CleanupAction extends AbstractWorker {
 
@@ -46,7 +45,7 @@ public class CleanupAction extends AbstractWorker {
         canceled = false;
         modifiedEntriesCount = 0;
         if (panel.getSelectedEntries().isEmpty()) { // None selected. Inform the user to select entries first.
-            JOptionPane.showMessageDialog(frame, Localization.lang("First select entries to clean up."),
+            JOptionPane.showMessageDialog(null, Localization.lang("First select entries to clean up."),
                     Localization.lang("Cleanup entry"), JOptionPane.INFORMATION_MESSAGE);
             canceled = true;
             return;
@@ -75,7 +74,7 @@ public class CleanupAction extends AbstractWorker {
             CheckBoxMessage cbm = new CheckBoxMessage(
                     Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
                     Localization.lang("Disable this confirmation dialog"), false);
-            int answer = JOptionPane.showConfirmDialog(frame, cbm, Localization.lang("Autogenerate PDF Names"),
+            int answer = JOptionPane.showConfirmDialog(null, cbm, Localization.lang("Autogenerate PDF Names"),
                     JOptionPane.YES_NO_OPTION);
             if (cbm.isSelected()) {
                 Globals.prefs.putBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN, false);
@@ -107,7 +106,7 @@ public class CleanupAction extends AbstractWorker {
             return;
         }
         if (unsuccessfulRenames > 0) { //Rename failed for at least one entry
-            JOptionPane.showMessageDialog(frame,
+            JOptionPane.showMessageDialog(null,
                     Localization.lang("File rename failed for %0 entries.", Integer.toString(unsuccessfulRenames)),
                     Localization.lang("Autogenerate PDF Names"), JOptionPane.INFORMATION_MESSAGE);
         }
@@ -134,7 +133,7 @@ public class CleanupAction extends AbstractWorker {
     private int showDialog(CleanupPresetPanel presetPanel) {
         String dialogTitle = Localization.lang("Cleanup entries");
         Object[] messages = {Localization.lang("What would you like to clean up?"), presetPanel.getScrollPane()};
-        return JOptionPane.showConfirmDialog(frame, messages, dialogTitle, JOptionPane.OK_CANCEL_OPTION,
+        return JOptionPane.showConfirmDialog(null, messages, dialogTitle, JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
     }
 

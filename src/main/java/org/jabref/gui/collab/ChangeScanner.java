@@ -1,16 +1,7 @@
 package org.jabref.gui.collab;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-import javax.swing.tree.DefaultMutableTreeNode;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
@@ -19,12 +10,7 @@ import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
 import org.jabref.logic.bibtex.comparator.BibStringDiff;
-import org.jabref.logic.exporter.BibDatabaseWriter;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.FileSaveSession;
-import org.jabref.logic.exporter.SaveException;
-import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.exporter.SaveSession;
+import org.jabref.logic.exporter.*;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
@@ -34,8 +20,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.metadata.MetaData;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 public class ChangeScanner implements Runnable {
     private static final Log LOGGER = LogFactory.getLog(ChangeScanner.class);
@@ -84,8 +76,7 @@ public class ChangeScanner implements Runnable {
     public void displayResult(final DisplayResultCallback fup) {
         if (changes.getChildCount() > 0) {
             SwingUtilities.invokeLater(() -> {
-                ChangeDisplayDialog changeDialog = new ChangeDisplayDialog(frame, panel, databaseInTemp.getDatabase(), changes);
-                changeDialog.setLocationRelativeTo(frame);
+                ChangeDisplayDialog changeDialog = new ChangeDisplayDialog(null, panel, databaseInTemp.getDatabase(), changes);
                 changeDialog.setVisible(true);
                 fup.scanResultsResolved(changeDialog.isOkPressed());
                 if (changeDialog.isOkPressed()) {
@@ -95,7 +86,7 @@ public class ChangeScanner implements Runnable {
             });
 
         } else {
-            JOptionPane.showMessageDialog(frame, Localization.lang("No actual changes found."),
+            JOptionPane.showMessageDialog(null, Localization.lang("No actual changes found."),
                     Localization.lang("External changes"), JOptionPane.INFORMATION_MESSAGE);
             fup.scanResultsResolved(true);
         }

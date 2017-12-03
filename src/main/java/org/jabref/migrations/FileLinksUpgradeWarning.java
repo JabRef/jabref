@@ -1,14 +1,7 @@
 package org.jabref.migrations;
 
-import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
@@ -29,8 +22,8 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import java.util.List;
 
 /**
  * This class defines the warning that can be offered when opening a pre-2.3
@@ -172,7 +165,7 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
 
         message.add(formBuilder.build());
 
-        int answer = JOptionPane.showConfirmDialog(panel.frame(),
+        int answer = JOptionPane.showConfirmDialog(null,
                 message, Localization.lang("Upgrade file"), JOptionPane.YES_NO_OPTION);
         if (doNotShowDialog.isSelected()) {
             Globals.prefs.putBoolean(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING, false);

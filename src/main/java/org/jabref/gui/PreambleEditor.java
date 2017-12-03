@@ -1,23 +1,5 @@
 package org.jabref.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JPanel;
-import javax.swing.LayoutFocusTraversalPolicy;
-import javax.swing.text.JTextComponent;
-
 import org.jabref.Globals;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.fieldeditors.FieldEditor;
@@ -28,6 +10,11 @@ import org.jabref.gui.util.WindowLocation;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.preferences.JabRefPreferences;
+
+import javax.swing.*;
+import javax.swing.text.JTextComponent;
+import java.awt.*;
+import java.awt.event.*;
 
 class PreambleEditor extends JabRefDialog {
     // A reference to the entry this object works on.
@@ -43,7 +30,7 @@ class PreambleEditor extends JabRefDialog {
     private final CloseAction closeAction = new CloseAction();
 
     public PreambleEditor(JabRefFrame baseFrame, BasePanel panel, BibDatabase database) {
-        super(baseFrame, PreambleEditor.class);
+        super(null, PreambleEditor.class);
         this.panel = panel;
         this.database = database;
 

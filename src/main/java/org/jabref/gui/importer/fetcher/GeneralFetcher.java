@@ -1,24 +1,5 @@
 package org.jabref.gui.importer.fetcher;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.IconTheme;
@@ -32,6 +13,14 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
 
@@ -186,13 +175,11 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                     frame.setProgressBarVisible(false);
                     frame.output("");
                     if (result) {
-                        dialog.setLocationRelativeTo(frame);
                         dialog.setVisible(true);
                         if (dialog.isOkPressed()) {
                             final ImportInspectionDialog d2 = new ImportInspectionDialog(frame,
                                     frame.getCurrentBasePanel(), activeFetcher.getTitle(), false);
                             d2.addCallBack(activeFetcher);
-                            d2.setLocationRelativeTo(frame);
                             d2.setVisible(true);
                             JabRefExecutorService.INSTANCE.execute(() -> {
                                 pFetcher.getEntries(dialog.getSelection(), d2);
@@ -209,7 +196,6 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
                     activeFetcher.getTitle(), false);
             dialog.addCallBack(activeFetcher);
-            dialog.setLocationRelativeTo(frame);
             dialog.setVisible(true);
 
             JabRefExecutorService.INSTANCE.execute(() -> {

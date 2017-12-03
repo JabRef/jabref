@@ -1,12 +1,6 @@
 package org.jabref.gui.shared;
 
-import java.sql.SQLException;
-import java.util.Objects;
-import java.util.Optional;
-
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
+import com.google.common.eventbus.Subscribe;
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
@@ -29,7 +23,10 @@ import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.shared.exception.NotASharedDatabaseException;
 import org.jabref.shared.prefs.SharedDatabasePreferences;
 
-import com.google.common.eventbus.Subscribe;
+import javax.swing.*;
+import java.sql.SQLException;
+import java.util.Objects;
+import java.util.Optional;
 
 public class SharedDatabaseUIManager {
 
@@ -48,7 +45,7 @@ public class SharedDatabaseUIManager {
         String[] options = {Localization.lang("Reconnect"), Localization.lang("Work offline"),
                 Localization.lang("Close library")};
 
-        int answer = JOptionPane.showOptionDialog(jabRefFrame,
+        int answer = JOptionPane.showOptionDialog(null,
                 Localization.lang("The connection to the server has been terminated.") + "\n\n",
                 Localization.lang("Connection lost"), JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,
                 null, options, options[0]);
@@ -85,7 +82,7 @@ public class SharedDatabaseUIManager {
         panel.getUndoManager().addEdit(new UndoableRemoveEntry(panel.getDatabase(), event.getBibEntry(), panel));
 
         if (Objects.nonNull(entryEditor) && (entryEditor.getEntry() == event.getBibEntry())) {
-            JOptionPane.showMessageDialog(jabRefFrame,
+            JOptionPane.showMessageDialog(null,
                     Localization.lang("The BibEntry you currently work on has been deleted on the shared side.")
                             + "\n" + Localization.lang("You can restore the entry using the \"Undo\" operation."),
                     Localization.lang("Shared entry is no longer present"), JOptionPane.INFORMATION_MESSAGE);

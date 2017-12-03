@@ -1,29 +1,8 @@
 package org.jabref.gui.actions;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
-import javax.swing.undo.UndoableEdit;
-
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
@@ -33,9 +12,12 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import javax.swing.undo.UndoableEdit;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.*;
+import java.util.List;
 
 /**
  * An Action for launching mass field.
@@ -69,7 +51,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
     }
 
     private void createDialog() {
-        diag = new JDialog(frame, Localization.lang("Set/clear/append/rename fields"), true);
+        diag = new JDialog((JFrame) null, Localization.lang("Set/clear/append/rename fields"), true);
 
         field = new JComboBox<>();
         field.setEditable(true);
@@ -220,7 +202,6 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         canceled = true;
         prepareDialog(!entries.isEmpty());
         if (diag != null) {
-            diag.setLocationRelativeTo(frame);
             diag.setVisible(true);
         }
         if (canceled) {

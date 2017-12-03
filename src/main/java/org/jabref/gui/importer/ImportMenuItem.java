@@ -1,24 +1,7 @@
 package org.jabref.gui.importer;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.EntryMarker;
-import org.jabref.gui.FXDialogService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.*;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -34,6 +17,17 @@ import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.preferences.JabRefPreferences;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /*
  * TODO: could separate the "menu item" functionality from the importing functionality
@@ -163,12 +157,12 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 } else {
                     // Import in a specific format was specified. Check if we have stored error information:
                     if (importError == null) {
-                        JOptionPane.showMessageDialog(frame,
+                        JOptionPane.showMessageDialog(null,
                                 Localization
                                         .lang("No entries found. Please make sure you are using the correct import filter."),
                                 Localization.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
                     } else {
-                        JOptionPane.showMessageDialog(frame, importError.getMessage(),
+                        JOptionPane.showMessageDialog(null, importError.getMessage(),
                                 Localization.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
@@ -184,7 +178,6 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                             openInNew);
                     diag.addEntries(bibtexResult.getDatabase().getEntries());
                     diag.entryListComplete();
-                    diag.setLocationRelativeTo(frame);
                     diag.setVisible(true);
                     diag.toFront();
                 }

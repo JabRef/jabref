@@ -1,20 +1,17 @@
 package org.jabref.gui.menus;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.preferences.JabRefPreferences;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class FileHistoryMenu extends JMenu implements ActionListener {
 
@@ -87,7 +84,7 @@ public class FileHistoryMenu extends JMenu implements ActionListener {
 
         // the existence check has to be done here (and not in open.openIt) as we have to call "removeItem" if the file does not exist
         if (!Files.exists(fileToOpen)) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("File not found") + ": " + fileToOpen.getFileName(),
+            JOptionPane.showMessageDialog(null, Localization.lang("File not found") + ": " + fileToOpen.getFileName(),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
             history.removeItem(name);
             setItems();

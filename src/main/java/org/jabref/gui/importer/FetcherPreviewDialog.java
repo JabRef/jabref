@@ -1,34 +1,5 @@
 package org.jabref.gui.importer;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableModel;
-
-import org.jabref.Globals;
-import org.jabref.gui.JabRefDialog;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.logic.importer.OutputPrinter;
-import org.jabref.logic.l10n.Localization;
-
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.gui.TableFormat;
@@ -37,6 +8,20 @@ import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
+import org.jabref.Globals;
+import org.jabref.gui.JabRefDialog;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.logic.importer.OutputPrinter;
+import org.jabref.logic.l10n.Localization;
+
+import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  *
@@ -51,7 +36,7 @@ public class FetcherPreviewDialog extends JabRefDialog implements OutputPrinter 
 
 
     public FetcherPreviewDialog(JabRefFrame frame, int warningLimit, int tableRowHeight) {
-        super(frame, Localization.lang("Title"), true, FetcherPreviewDialog.class);
+        super((JFrame) null, Localization.lang("Title"), true, FetcherPreviewDialog.class);
         this.frame = frame;
         this.warningLimit = warningLimit;
 

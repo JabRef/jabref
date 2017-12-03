@@ -1,14 +1,7 @@
 package org.jabref.gui.externalfiletype;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.util.Optional;
-
-import javax.swing.Icon;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.l10n.Localization;
@@ -16,8 +9,11 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.Optional;
 
 /**
  * The menu item used in the popup menu for opening external resources associated
@@ -92,7 +88,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
             if ((fileType.isPresent()) && (!fileType.get().getOpenWithApplication().isEmpty())
                     && ex.getMessage().contains(fileType.get().getOpenWithApplication())) {
 
-                JOptionPane.showMessageDialog(frame, Localization.lang("Unable to open link. "
+                JOptionPane.showMessageDialog(null, Localization.lang("Unable to open link. "
                                         + "The application '%0' associated with the file type '%1' could not be called.",
                         fileType.get().getOpenWithApplication(), fileType.get().getName()),
                         Localization.lang("Could not open link"), JOptionPane.ERROR_MESSAGE);

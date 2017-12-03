@@ -1,21 +1,19 @@
 package org.jabref;
 
-import java.awt.Frame;
-import java.io.File;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.swing.JOptionPane;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.plaf.FontUIResource;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-
+import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
+import com.jgoodies.looks.plastic.theme.SkyBluer;
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef;
+import com.sun.jna.platform.win32.WinUser;
+import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
@@ -35,10 +33,14 @@ import org.jabref.shared.exception.DatabaseNotSupportedException;
 import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.shared.exception.NotASharedDatabaseException;
 
-import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
-import com.jgoodies.looks.plastic.theme.SkyBluer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import java.io.File;
+import java.sql.SQLException;
+import java.util.*;
+
+import static com.sun.jna.platform.win32.WinUser.GWL_STYLE;
 
 public class JabRefGUI {
     private static final Log LOGGER = LogFactory.getLog(JabRefGUI.class);
@@ -52,7 +54,7 @@ public class JabRefGUI {
 
     private String focusedFile;
 
-    public JabRefGUI(List<ParserResult> argsDatabases, boolean isBlank) {
+    public JabRefGUI(Stage mainStage, List<ParserResult> argsDatabases, boolean isBlank) {
         this.bibDatabases = argsDatabases;
         this.isBlank = isBlank;
 
@@ -60,7 +62,7 @@ public class JabRefGUI {
         focusedFile = argsDatabases.stream().findFirst().flatMap(ParserResult::getFile).map(File::getAbsolutePath)
                 .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
 
-        openWindow();
+        openWindow(mainStage);
         JabRefGUI.checkForNewVersion(false);
     }
 
@@ -70,7 +72,7 @@ public class JabRefGUI {
         new VersionWorker(JabRefGUI.getMainFrame(), manualExecution, currentVersion, toBeIgnored).execute();
     }
 
-    private void openWindow() {
+    private void openWindow(Stage mainStage) {
 
         // This property is set to make the Mac OSX Java VM move the menu bar to the top of the screen
         if (OS.OS_X) {
@@ -121,7 +123,7 @@ public class JabRefGUI {
                         pr.getDatabase().clearSharedDatabaseID();
 
                         LOGGER.error("Connection error", e);
-                        JOptionPane.showMessageDialog(mainFrame,
+                        JOptionPane.showMessageDialog(null,
                                 e.getMessage() + "\n\n" + Localization.lang("A local copy will be opened."),
                                 Localization.lang("Connection error"), JOptionPane.WARNING_MESSAGE);
                     }
@@ -147,17 +149,54 @@ public class JabRefGUI {
         // state. This needs to be set after the window has been made visible, so we
         // do it here:
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-            JabRefGUI.getMainFrame().setExtendedState(Frame.MAXIMIZED_BOTH);
+            //JabRefGUI.getMainFrame().setExtendedState(Frame.MAXIMIZED_BOTH);
         }
 
-        JabRefGUI.getMainFrame().setVisible(true);
+        mainStage.setTitle(JabRefFrame.FRAME_TITLE);
+
+        TextArea ta = new TextArea("output\n");
+        VBox root = new VBox(5, ta);
+        Scene scene = new Scene(root, 800, 200);
+        mainStage.setTitle("Find this window");
+        mainStage.setScene(scene);
+        mainStage.show();
+
+        //gets this window (stage)
+        long lhwnd = com.sun.glass.ui.Window.getWindows().get(0).getNativeWindow();
+        Pointer lpVoid = new Pointer(lhwnd);
+        //gets the foreground (focused) window
+        final User32 user32 = User32.INSTANCE;
+        char[] windowText = new char[512];
+        WinDef.HWND hwnd = user32.GetForegroundWindow();
+        //see what the title is
+        user32.GetWindowText(hwnd, windowText, 512);
+        //user32.GetWindowText(new HWND(lpVoid), windowText, 512);//to use the hwnd from stage
+        String text = (Native.toString(windowText));
+        //see if it's the same pointer
+        ta.appendText("HWND java:" + lpVoid + " HWND user32:" + hwnd + " text:" + text + "\n");
+        //change the window style if it's the right title
+        if (text.equals(mainStage.getTitle())) {
+            //the style to change
+            int WS_DLGFRAME = 0x00400000;//s/b long I think
+            //not the same constant here??
+            ta.appendText("windows api:" + WS_DLGFRAME + " JNA: " + WinUser.SM_CXDLGFRAME);
+            int oldStyle = user32.GetWindowLong(hwnd, GWL_STYLE);
+            int newStyle = oldStyle & ~0x00400000; //bitwise not WS_DLGFRAME means remove the style
+            newStyle = newStyle & ~0x00040000;//WS_THICKFRAME
+            user32.SetWindowLong(hwnd, GWL_STYLE, newStyle);
+        }
+
+        mainStage.setOnCloseRequest(event -> {
+            mainFrame.quit();
+            Platform.exit();
+        });
 
         for (ParserResult pr : failed) {
             String message = "<html>" + Localization.lang("Error opening file '%0'.", pr.getFile().get().getName())
                     + "<p>"
                     + pr.getErrorMessage() + "</html>";
 
-            JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(), message, Localization.lang("Error opening file"),
+            JOptionPane.showMessageDialog(null, message, Localization.lang("Error opening file"),
                     JOptionPane.ERROR_MESSAGE);
         }
 
@@ -204,7 +243,7 @@ public class JabRefGUI {
             }
 
             if (BackupManager.checkForBackupFile(dbFile.toPath())) {
-                BackupUIManager.showRestoreBackupDialog(mainFrame, dbFile.toPath());
+                BackupUIManager.showRestoreBackupDialog(null, dbFile.toPath());
             }
 
             ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,
@@ -265,7 +304,7 @@ public class JabRefGUI {
                     // also set system l&f as default
                     Globals.prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, systemLookFeel);
                     // notify the user
-                    JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(),
+                    JOptionPane.showMessageDialog(null,
                             Localization
                                     .lang("Unable to find the requested look and feel and thus the default one is used."),
                             Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);

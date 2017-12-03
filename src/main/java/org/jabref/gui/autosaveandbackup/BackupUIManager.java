@@ -1,12 +1,10 @@
 package org.jabref.gui.autosaveandbackup;
 
-import java.nio.file.Path;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.l10n.Localization;
+
+import javax.swing.*;
+import java.nio.file.Path;
 
 /**
  * Stores all user dialogs related to {@link BackupManager}.
@@ -17,7 +15,7 @@ public class BackupUIManager {
     }
 
     public static void showRestoreBackupDialog(JFrame frame, Path originalPath) {
-        int answer = JOptionPane.showConfirmDialog(frame,
+        int answer = JOptionPane.showConfirmDialog(null,
                 new StringBuilder()
                     .append(Localization.lang("A backup file for '%0' was found.", originalPath.getFileName().toString()))
                     .append("\n")

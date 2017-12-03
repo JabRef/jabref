@@ -1,83 +1,19 @@
 package org.jabref.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.GraphicsEnvironment;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.MouseAdapter;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.TimerTask;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JProgressBar;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JToggleButton;
-import javax.swing.KeyStroke;
-import javax.swing.MenuElement;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
-
+import com.google.common.eventbus.Subscribe;
+import com.jgoodies.looks.HeaderStyle;
+import com.jgoodies.looks.Options;
 import javafx.application.Platform;
-
+import javafx.embed.swing.SwingNode;
+import javafx.scene.control.Button;
+import javafx.scene.control.SplitPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import org.jabref.gui.actions.Actions;
-import org.jabref.gui.actions.AutoLinkFilesAction;
-import org.jabref.gui.actions.ConnectToSharedDatabaseAction;
-import org.jabref.gui.actions.ErrorConsoleAction;
-import org.jabref.gui.actions.IntegrityCheckAction;
-import org.jabref.gui.actions.LookupIdentifierAction;
-import org.jabref.gui.actions.ManageKeywordsAction;
-import org.jabref.gui.actions.MassSetFieldAction;
-import org.jabref.gui.actions.MnemonicAwareAction;
-import org.jabref.gui.actions.NewDatabaseAction;
-import org.jabref.gui.actions.NewEntryAction;
-import org.jabref.gui.actions.NewSubDatabaseAction;
-import org.jabref.gui.actions.OpenBrowserAction;
-import org.jabref.gui.actions.SearchForUpdateAction;
-import org.jabref.gui.actions.SortTabsAction;
+import org.jabref.gui.actions.*;
 import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
 import org.jabref.gui.copyfiles.CopyFilesAction;
@@ -114,7 +50,6 @@ import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.specialfields.SpecialFieldDropDown;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.util.WindowLocation;
 import org.jabref.gui.worker.MarkEntriesAction;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
@@ -141,26 +76,32 @@ import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.LastFocusedTabPreferences;
 import org.jabref.preferences.SearchPreferences;
-
-import com.google.common.eventbus.Subscribe;
-import com.jgoodies.looks.HeaderStyle;
-import com.jgoodies.looks.Options;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.MouseAdapter;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.List;
 
 /**
  * The main window of the application.
  */
-public class JabRefFrame extends JFrame implements OutputPrinter {
+public class JabRefFrame extends BorderPane implements OutputPrinter {
     private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
 
     // Frame titles.
-    private static final String FRAME_TITLE = "JabRef";
+    public static final String FRAME_TITLE = "JabRef";
     private static final String ELLIPSES = "...";
     public final AbstractAction nextTab = new ChangeTabAction(true);
     public final AbstractAction prevTab = new ChangeTabAction(false);
-    private final JSplitPane splitPane = new JSplitPane();
+    private final SplitPane splitPane = new SplitPane();
     private final JabRefPreferences prefs = Globals.prefs;
     private final Insets marg = new Insets(1, 0, 2, 0);
     private final IntegrityCheckAction checkIntegrity = new IntegrityCheckAction(this);
@@ -562,25 +503,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         tabbedPane = new DragDropPopupPane(tabPopupMenu());
 
-        MyGlassPane glassPane = new MyGlassPane();
-        setGlassPane(glassPane);
-
-        setTitle(FRAME_TITLE);
-        setIconImages(IconTheme.getLogoSet());
-        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-
-            @Override
-            public void windowClosing(WindowEvent e) {
-
-                if (OS.OS_X) {
-                    JabRefFrame.this.setVisible(false);
-                } else {
-                    new CloseAction().actionPerformed(null);
-                }
-            }
-        });
-
         initSidePane();
 
         initLayout();
@@ -590,10 +512,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // Show the toolbar if it was visible at last shutdown:
         tlb.setVisible(Globals.prefs.getBoolean(JabRefPreferences.TOOLBAR_VISIBLE));
 
-        setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
-        WindowLocation pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
-                JabRefPreferences.SIZE_Y);
-        pw.displayWindowAtStoredLocation();
+        //setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
+        //WindowLocation pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
+        //        JabRefPreferences.SIZE_Y);
+        //pw.displayWindowAtStoredLocation();
 
         tabbedPane.setBorder(null);
         tabbedPane.setForeground(GUIGlobals.INACTIVE_TABBED_COLOR);
@@ -703,7 +625,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         // no database open
         if (panel == null) {
-            setTitle(FRAME_TITLE);
+            //setTitle(FRAME_TITLE);
             return;
         }
 
@@ -715,10 +637,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             String changeFlag = panel.isModified() && !isAutosaveEnabled ? "*" : "";
             String databaseFile = panel.getBibDatabaseContext().getDatabaseFile().map(File::getPath)
                     .orElse(GUIGlobals.UNTITLED_TITLE);
-                setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
+            //setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
         } else if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
-            setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBMSSynchronizer().getDBName() + " ["
-                    + Localization.lang("shared") + "]" + modeInfo);
+            //setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBMSSynchronizer().getDBName() + " ["
+            //        + Localization.lang("shared") + "]" + modeInfo);
         }
     }
 
@@ -755,7 +677,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         output(Localization.lang("Opening preferences..."));
         if (prefsDialog == null) {
             prefsDialog = new PreferencesDialog(JabRefFrame.this);
-            prefsDialog.setLocationRelativeTo(JabRefFrame.this);
+            //prefsDialog.setLocationRelativeTo(JabRefFrame.this);
         } else {
             prefsDialog.setValues();
         }
@@ -779,15 +701,15 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         Globals.stopBackgroundTasks();
         Globals.shutdownThreadPools();
 
-        dispose();
+        //dispose();
 
-        prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
+        //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
 
         prefs.putBoolean(JabRefPreferences.TOOLBAR_VISIBLE, tlb.isVisible());
         // Store divider location for side pane:
-        int width = splitPane.getDividerLocation();
+        double width = splitPane.getDividerPositions()[0];
         if (width > 0) {
-            prefs.putInt(JabRefPreferences.SIDE_PANE_WIDTH, width);
+            prefs.putDouble(JabRefPreferences.SIDE_PANE_WIDTH, width);
         }
         if (prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
             // Here we store the names of all current files. If
@@ -903,19 +825,33 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         pushExternalButton = new PushToApplicationButton(this, pushApplications.getApplications());
         fillMenu();
         createToolBar();
-        setJMenuBar(mb);
-        getContentPane().setLayout(new BorderLayout());
+        //setJMenuBar(mb);
+        //getContentPane().setLayout(new BorderLayout());
 
         JPanel toolbarPanel = new JPanel(new WrapLayout(FlowLayout.LEFT));
         toolbarPanel.add(tlb);
         toolbarPanel.add(globalSearchBar);
-        getContentPane().add(toolbarPanel, BorderLayout.PAGE_START);
+        //getContentPane().add(toolbarPanel, BorderLayout.PAGE_START);
 
-        splitPane.setDividerSize(2);
-        splitPane.setBorder(null);
-        splitPane.setRightComponent(tabbedPane);
-        splitPane.setLeftComponent(sidePaneManager.getPanel());
-        getContentPane().add(splitPane, BorderLayout.CENTER);
+        //splitPane.setDividerSize(2);
+        //splitPane.setBorder(null);
+        setCenter(splitPane);
+
+        StackPane header = new StackPane();
+        header.setId("header");
+        header.setPrefHeight(50);
+        header.setStyle("-fx-background-color: #4d4674; -fx-text-fill: white;");
+        setTop(header);
+
+        SwingNode swingTabbedPane = new SwingNode();
+        SwingNode swingSidePane = new SwingNode();
+        SwingUtilities.invokeLater(() -> {
+            swingTabbedPane.setContent(tabbedPane);
+            swingSidePane.setContent(sidePaneManager.getPanel());
+        });
+        StackPane centerPane = new StackPane();
+        centerPane.getChildren().addAll(swingTabbedPane, new Button("test"));
+        splitPane.getItems().addAll(swingSidePane, swingTabbedPane);
 
         UIManager.put("TabbedPane.contentBorderInsets", new Insets(0, 0, 0, 0));
         sidePaneManager.updateView();
@@ -943,7 +879,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         gbl.setConstraints(progressBar, con);
         status.add(progressBar);
         statusLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR.darker());
-        getContentPane().add(status, BorderLayout.PAGE_END);
+        //getContentPane().add(status, BorderLayout.PAGE_END);
 
         // Drag and drop for tabbedPane:
         TransferHandler xfer = new EntryTableTransferHandler(null, this, null);
@@ -1657,7 +1593,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     Localization.lang("Import"), openInNew);
             diag.addEntries(entries);
             diag.entryListComplete();
-            diag.setLocationRelativeTo(JabRefFrame.this);
+            //diag.setLocationRelativeTo(JabRefFrame.this);
             diag.setVisible(true);
             diag.toFront();
         });
@@ -1688,6 +1624,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * @param blocked true if input should be blocked
      */
     private void changeBlocking(boolean blocked) {
+        /*
         if (SwingUtilities.isEventDispatchThread()) {
             getGlassPane().setVisible(blocked);
         } else {
@@ -1697,6 +1634,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 LOGGER.error("Problem " + (blocked ? "" : "un") + "blocking UI", e);
             }
         }
+        */
     }
 
     /**
@@ -1791,7 +1729,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     @Override
     public void showMessage(String message, String title, int msgType) {
-        JOptionPane.showMessageDialog(this, message, title, msgType);
+        JOptionPane.showMessageDialog(null, message, title, msgType);
     }
 
     @Override
@@ -1801,7 +1739,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     @Override
     public void showMessage(String message) {
-        JOptionPane.showMessageDialog(this, message);
+        JOptionPane.showMessageDialog(null, message);
     }
 
     private int showSaveDialog(String filename) {
@@ -1809,7 +1747,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 Localization.lang("Discard changes"),
                 Localization.lang("Return to JabRef")};
 
-        return JOptionPane.showOptionDialog(JabRefFrame.this,
+        return JOptionPane.showOptionDialog(null,
                 Localization.lang("Library '%0' has changed.", filename),
                 Localization.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.WARNING_MESSAGE, null, options, options[2]);
@@ -1915,7 +1853,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         return previousPreviewStyle;
     }
 
-    public JSplitPane getSplitPane() {
+    public SplitPane getSplitPane() {
         return splitPane;
     }
 
@@ -2180,7 +2118,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         @Override
         public void actionPerformed(ActionEvent e) {
             JDialog dl = new EntryCustomizationDialog(JabRefFrame.this);
-            dl.setLocationRelativeTo(JabRefFrame.this);
             dl.setVisible(true);
         }
     }
@@ -2194,7 +2131,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         @Override
         public void actionPerformed(ActionEvent e) {
             GenFieldsCustomizer gf = new GenFieldsCustomizer(JabRefFrame.this);
-            gf.setLocationRelativeTo(JabRefFrame.this);
             gf.setVisible(true);
 
         }
@@ -2225,11 +2161,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (propertiesDialog == null) {
-                propertiesDialog = new DatabasePropertiesDialog(JabRefFrame.this);
+                propertiesDialog = new DatabasePropertiesDialog(null);
             }
             propertiesDialog.setPanel(getCurrentBasePanel());
             propertiesDialog.updateEnableStatus();
-            propertiesDialog.setLocationRelativeTo(JabRefFrame.this);
+            propertiesDialog.setLocationRelativeTo(null);
             propertiesDialog.setVisible(true);
         }
 
@@ -2253,7 +2189,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 // BibtexKeyPatternDialog allows for updating content based on currently selected panel
                 bibtexKeyPatternDialog.setPanel(getCurrentBasePanel());
             }
-            bibtexKeyPatternDialog.setLocationRelativeTo(JabRefFrame.this);
+            bibtexKeyPatternDialog.setLocationRelativeTo(null);
             bibtexKeyPatternDialog.setVisible(true);
         }
 

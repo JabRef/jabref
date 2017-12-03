@@ -1,27 +1,6 @@
 package org.jabref.gui.groups;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.util.List;
-import java.util.Optional;
-
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
-import javax.swing.SwingUtilities;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
-
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.actions.BaseAction;
@@ -30,7 +9,15 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import javax.swing.*;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.List;
+import java.util.Optional;
 
 public class GroupAddRemoveDialog implements BaseAction {
 
@@ -55,7 +42,7 @@ public class GroupAddRemoveDialog implements BaseAction {
 
         selection = panel.getSelectedEntries();
 
-        final JDialog diag = new JDialog(panel.frame(),
+        final JDialog diag = new JDialog((JFrame) null,
                 (add ? (move ? Localization.lang("Move to group") : Localization.lang("Add to group")) : Localization
                         .lang("Remove from group")),
                 true);
@@ -121,7 +108,6 @@ public class GroupAddRemoveDialog implements BaseAction {
 
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
-        diag.setLocationRelativeTo(panel.frame());
         diag.setVisible(true);
 
     }

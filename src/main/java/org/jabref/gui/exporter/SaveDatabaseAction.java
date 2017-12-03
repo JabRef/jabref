@@ -1,15 +1,9 @@
 package org.jabref.gui.exporter;
 
-import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
-import java.nio.file.Path;
-import java.util.Optional;
-
-import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
@@ -24,11 +18,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.FileSaveSession;
-import org.jabref.logic.exporter.SaveException;
-import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.exporter.SaveSession;
+import org.jabref.logic.exporter.*;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileExtensions;
@@ -41,10 +31,12 @@ import org.jabref.preferences.JabRefPreferences;
 import org.jabref.shared.DBMSConnectionProperties;
 import org.jabref.shared.prefs.SharedDatabasePreferences;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.swing.*;
+import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for
@@ -192,7 +184,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             panel.registerUndoableChanges(session);
 
         } catch (UnsupportedCharsetException ex) {
-            JOptionPane.showMessageDialog(frame,
+            JOptionPane.showMessageDialog(null,
                     Localization.lang("Could not save file.")
                             + Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()),
                     Localization.lang("Save library"), JOptionPane.ERROR_MESSAGE);
@@ -210,7 +202,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 LOGGER.error("A problem occured when trying to save the file", ex);
             }
 
-            JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + ".\n" + ex.getMessage(),
+            JOptionPane.showMessageDialog(null, Localization.lang("Could not save file.") + ".\n" + ex.getMessage(),
                     Localization.lang("Save library"), JOptionPane.ERROR_MESSAGE);
             // FIXME: rethrow anti-pattern
             throw new SaveException("rt");
@@ -231,13 +223,13 @@ public class SaveDatabaseAction extends AbstractWorker {
             builder.add(ta).xy(3, 1);
             builder.add(Localization.lang("What do you want to do?")).xy(1, 3);
             String tryDiff = Localization.lang("Try different encoding");
-            int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Localization.lang("Save library"),
+            int answer = JOptionPane.showOptionDialog(null, builder.getPanel(), Localization.lang("Save library"),
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
                     new String[] {Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
-                Object choice = JOptionPane.showInputDialog(frame, Localization.lang("Select encoding"),
+                Object choice = JOptionPane.showInputDialog(null, Localization.lang("Select encoding"),
                         Localization.lang("Save library"), JOptionPane.QUESTION_MESSAGE, null,
                         Encodings.ENCODINGS_DISPLAYNAMES, encoding);
                 if (choice == null) {
@@ -403,7 +395,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         if (panel.isUpdatedExternally()) {
             String[] opts = new String[] {Localization.lang("Review changes"), Localization.lang("Save"),
                     Localization.lang("Cancel")};
-            int answer = JOptionPane.showOptionDialog(panel.frame(),
+            int answer = JOptionPane.showOptionDialog(null,
                     Localization.lang("File has been updated externally. " + "What do you want to do?"),
                     Localization.lang("File updated externally"), JOptionPane.YES_NO_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE, null, opts, opts[0]);
@@ -441,7 +433,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 return true;
             } else { // User indicated to store anyway.
                 if (panel.getBibDatabaseContext().getMetaData().isProtected()) {
-                    JOptionPane.showMessageDialog(frame,
+                    JOptionPane.showMessageDialog(null,
                             Localization
                                     .lang("Library is protected. Cannot save until external changes have been reviewed."),
                             Localization.lang("Protected library"), JOptionPane.ERROR_MESSAGE);

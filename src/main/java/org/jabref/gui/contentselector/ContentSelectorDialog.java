@@ -1,33 +1,8 @@
 package org.jabref.gui.contentselector;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -40,9 +15,14 @@ import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.util.*;
+import java.util.List;
 
 public class ContentSelectorDialog extends JabRefDialog {
 
@@ -197,7 +177,7 @@ public class ContentSelectorDialog extends JabRefDialog {
                 dispose();
             } catch (Exception ex) {
                 LOGGER.info("Could not apply changes in \"Manage content selectors\"", ex);
-                JOptionPane.showMessageDialog(frame, Localization.lang("Could not apply changes."));
+                JOptionPane.showMessageDialog(null, Localization.lang("Could not apply changes."));
             }
         });
 
@@ -210,7 +190,7 @@ public class ContentSelectorDialog extends JabRefDialog {
                 applyChanges();
             } catch (Exception ex) {
                 LOGGER.info("Could not apply changes in \"Manage content selectors\"", ex);
-                JOptionPane.showMessageDialog(frame, Localization.lang("Could not apply changes."));
+                JOptionPane.showMessageDialog(null, Localization.lang("Could not apply changes."));
             }
         });
 

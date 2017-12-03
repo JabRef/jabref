@@ -1,28 +1,9 @@
 package org.jabref.gui.actions;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.RowFilter;
-import javax.swing.SwingWorker;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
-
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -30,10 +11,16 @@ import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class IntegrityCheckAction extends MnemonicAwareAction {
 
@@ -56,9 +43,8 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
                 Globals.journalAbbreviationLoader
                         .getRepository(Globals.prefs.getJournalAbbreviationPreferences()));
 
-        final JDialog integrityDialog = new JDialog(frame, true);
+        final JDialog integrityDialog = new JDialog((JFrame) null, true);
         integrityDialog.setUndecorated(true);
-        integrityDialog.setLocationRelativeTo(frame);
         JProgressBar integrityProgressBar = new JProgressBar();
         integrityProgressBar.setIndeterminate(true);
         integrityProgressBar.setStringPainted(true);
@@ -87,7 +73,7 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
         }
 
         if (messages.isEmpty()) {
-            JOptionPane.showMessageDialog(frame.getCurrentBasePanel(), Localization.lang("No problems found."));
+            JOptionPane.showMessageDialog(null, Localization.lang("No problems found."));
         } else {
             Map<String, Boolean> showMessage = new HashMap<>();
             // prepare data model
@@ -147,7 +133,7 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
             table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
             JScrollPane scrollPane = new JScrollPane(table);
             String title = Localization.lang("%0 problem(s) found", String.valueOf(messages.size()));
-            JDialog dialog = new JDialog(frame, title, false);
+            JDialog dialog = new JDialog((JFrame) null, title, false);
 
             JPopupMenu menu = new JPopupMenu();
             for (String messageString : showMessage.keySet()) {

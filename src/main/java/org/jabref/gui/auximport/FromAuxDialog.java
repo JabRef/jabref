@@ -1,31 +1,10 @@
 package org.jabref.gui.auximport;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.nio.file.Path;
-import java.util.Optional;
-
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
-import org.jabref.gui.JabRefDialog;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.*;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -36,9 +15,11 @@ import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * A wizard dialog for generating a new sub database from existing TeX AUX file
@@ -67,7 +48,7 @@ public class FromAuxDialog extends JabRefDialog {
     private final JabRefFrame parentFrame;
 
     public FromAuxDialog(JabRefFrame frame, String title, boolean modal, JTabbedPane viewedDBs) {
-        super(frame, title, modal, FromAuxDialog.class);
+        super((JFrame) null, title, modal, FromAuxDialog.class);
 
         parentTabbedPane = viewedDBs;
         parentFrame = frame;

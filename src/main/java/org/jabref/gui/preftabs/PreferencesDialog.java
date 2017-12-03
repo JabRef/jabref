@@ -1,33 +1,11 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Component;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.prefs.BackingStoreException;
-
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.JabRefException;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
-import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.JabRefDialog;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.*;
 import org.jabref.gui.keyboard.KeyBinder;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -42,9 +20,15 @@ import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.JabRefPreferencesFilter;
 import org.jabref.shared.prefs.SharedDatabasePreferences;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.prefs.BackingStoreException;
 
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined in
@@ -69,7 +53,7 @@ public class PreferencesDialog extends JabRefDialog {
     private final JButton resetPreferences = new JButton(Localization.lang("Reset preferences"));
 
     public PreferencesDialog(JabRefFrame parent) {
-        super(parent, Localization.lang("JabRef preferences"), false, PreferencesDialog.class);
+        super((JFrame) null, Localization.lang("JabRef preferences"), false, PreferencesDialog.class);
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         frame = parent;
 
@@ -188,7 +172,7 @@ public class PreferencesDialog extends JabRefDialog {
         });
 
         showPreferences.addActionListener(
-                e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs), frame).setVisible(true));
+                e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs), null).setVisible(true));
         resetPreferences.addActionListener(e -> {
             if (JOptionPane.showConfirmDialog(PreferencesDialog.this,
                     Localization.lang("Are you sure you want to reset all settings to default values?"),

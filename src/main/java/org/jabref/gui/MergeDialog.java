@@ -1,23 +1,12 @@
 package org.jabref.gui;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
 import org.jabref.Globals;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 
 /**
  * <p>Title: MergeDialog</p>
@@ -44,7 +33,7 @@ public class MergeDialog extends JabRefDialog {
     private boolean okPressed;
 
     public MergeDialog(JabRefFrame frame, String title, boolean modal) {
-        super(frame, title, modal, MergeDialog.class);
+        super((JFrame) null, title, modal, MergeDialog.class);
         jbInit();
         pack();
     }

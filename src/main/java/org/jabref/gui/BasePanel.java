@@ -1,46 +1,11 @@
 package org.jabref.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
+import com.google.common.eventbus.Subscribe;
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import javafx.application.Platform;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.Actions;
@@ -84,29 +49,15 @@ import org.jabref.gui.plaintextimport.TextInputDialog;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
-import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableChangeType;
-import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.undo.UndoableInsertEntry;
-import org.jabref.gui.undo.UndoableKeyChange;
-import org.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.gui.undo.*;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.component.CheckBoxMessage;
-import org.jabref.gui.worker.AbstractWorker;
-import org.jabref.gui.worker.CallBack;
-import org.jabref.gui.worker.CitationStyleToClipboardWorker;
-import org.jabref.gui.worker.MarkEntriesAction;
-import org.jabref.gui.worker.SendAsEMailAction;
+import org.jabref.gui.worker.*;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.FileSaveSession;
-import org.jabref.logic.exporter.SaveException;
-import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.exporter.SaveSession;
+import org.jabref.logic.exporter.*;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
@@ -140,11 +91,27 @@ import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 import org.jabref.shared.DBMSSynchronizer;
 
-import com.google.common.eventbus.Subscribe;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.swing.*;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class BasePanel extends JPanel implements ClipboardOwner {
 
@@ -373,7 +340,6 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         actions.put(Actions.EDIT_PREAMBLE, (BaseAction) () -> {
             if (preambleEditor == null) {
                 PreambleEditor form = new PreambleEditor(frame, BasePanel.this, bibDatabaseContext.getDatabase());
-                form.setLocationRelativeTo(frame);
                 form.setVisible(true);
                 preambleEditor = form;
             } else {
@@ -393,8 +359,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         });
 
         actions.put(FindUnlinkedFilesDialog.ACTION_COMMAND, (BaseAction) () -> {
-            final FindUnlinkedFilesDialog dialog = new FindUnlinkedFilesDialog(frame, frame, BasePanel.this);
-            dialog.setLocationRelativeTo(frame);
+            final FindUnlinkedFilesDialog dialog = new FindUnlinkedFilesDialog(null, frame, BasePanel.this);
             dialog.setVisible(true);
         });
 
@@ -412,7 +377,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                 numSelected = entries.size();
 
                 if (entries.isEmpty()) { // None selected. Inform the user to select entries first.
-                    JOptionPane.showMessageDialog(frame,
+                    JOptionPane.showMessageDialog(null,
                             Localization.lang("First select the entries you want keys to be generated for."),
                             Localization.lang("Autogenerate BibTeX keys"), JOptionPane.INFORMATION_MESSAGE);
                     return;
@@ -434,7 +399,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                         CheckBoxMessage cbm = new CheckBoxMessage(
                                 Localization.lang("One or more keys will be overwritten. Continue?"),
                                 Localization.lang("Disable this confirmation dialog"), false);
-                        final int answer = JOptionPane.showConfirmDialog(frame, cbm,
+                        final int answer = JOptionPane.showConfirmDialog(null, cbm,
                                 Localization.lang("Overwrite keys"), JOptionPane.YES_NO_OPTION);
                         Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !cbm.isSelected());
 
@@ -691,8 +656,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         actions.put(Actions.PREVIOUS_PREVIEW_STYLE, (BaseAction) selectionListener::previousPreviewStyle);
 
         actions.put(Actions.MANAGE_SELECTORS, (BaseAction) () -> {
-            ContentSelectorDialog csd = new ContentSelectorDialog(frame, frame, BasePanel.this, false, null);
-            csd.setLocationRelativeTo(frame);
+            ContentSelectorDialog csd = new ContentSelectorDialog(null, frame, BasePanel.this, false, null);
             csd.setVisible(true);
         });
 
@@ -1058,7 +1022,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         }
         // FIXME: not sure if this is really thrown anywhere
         catch (UnsupportedCharsetException ex) {
-            JOptionPane.showMessageDialog(frame,
+            JOptionPane.showMessageDialog(null,
                     Localization.lang("Could not save file.") + ' '
                             + Localization.lang("Character encoding '%0' is not supported.", enc.displayName()),
                     SAVE_DATABASE, JOptionPane.ERROR_MESSAGE);
@@ -1072,7 +1036,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                 LOGGER.warn("Could not save", ex);
             }
 
-            JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + "\n" + ex.getMessage(),
+            JOptionPane.showMessageDialog(null, Localization.lang("Could not save file.") + "\n" + ex.getMessage(),
                     SAVE_DATABASE, JOptionPane.ERROR_MESSAGE);
             throw new SaveException("rt");
         } finally {
@@ -1090,13 +1054,13 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             builder.add(ta).xy(3, 1);
             builder.add(Localization.lang("What do you want to do?")).xy(1, 3);
             String tryDiff = Localization.lang("Try different encoding");
-            int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), SAVE_DATABASE,
+            int answer = JOptionPane.showOptionDialog(null, builder.getPanel(), SAVE_DATABASE,
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
                     new String[]{Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
-                Object choice = JOptionPane.showInputDialog(frame, Localization.lang("Select encoding"), SAVE_DATABASE,
+                Object choice = JOptionPane.showInputDialog(null, Localization.lang("Select encoding"), SAVE_DATABASE,
                         JOptionPane.QUESTION_MESSAGE, null, Encodings.ENCODINGS_DISPLAYNAMES, enc);
                 if (choice == null) {
                     commit = false;
@@ -1143,7 +1107,6 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             // Find out what type is wanted.
             final EntryTypeDialog etd = new EntryTypeDialog(frame);
             // We want to center the dialog, to make it look nicer.
-            etd.setLocationRelativeTo(frame);
             etd.setVisible(true);
             actualType = etd.getChoice();
         }
@@ -1715,7 +1678,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 
             CheckBoxMessage cb = new CheckBoxMessage(msg, Localization.lang("Disable this confirmation dialog"), false);
 
-            int answer = JOptionPane.showConfirmDialog(frame, cb, title, JOptionPane.YES_NO_OPTION,
+            int answer = JOptionPane.showConfirmDialog(null, cb, title, JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
             if (cb.isSelected()) {
                 Globals.prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, false);

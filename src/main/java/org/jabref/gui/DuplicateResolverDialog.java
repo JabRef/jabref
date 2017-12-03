@@ -1,13 +1,5 @@
 package org.jabref.gui;
 
-import java.awt.BorderLayout;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.mergeentries.MergeEntries;
@@ -16,6 +8,11 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class DuplicateResolverDialog extends JabRefDialog {
 
@@ -45,7 +42,7 @@ public class DuplicateResolverDialog extends JabRefDialog {
     private MergeEntries me;
 
     public DuplicateResolverDialog(JabRefFrame frame, BibEntry one, BibEntry two, DuplicateResolverType type) {
-        super(frame, Localization.lang("Possible duplicate entries"), true, DuplicateResolverDialog.class);
+        super((JFrame) null, Localization.lang("Possible duplicate entries"), true, DuplicateResolverDialog.class);
         this.frame = frame;
         init(one, two, type);
     }

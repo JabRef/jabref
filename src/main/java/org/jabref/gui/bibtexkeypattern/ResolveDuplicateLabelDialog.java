@@ -1,22 +1,8 @@
 package org.jabref.gui.bibtexkeypattern;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.PreviewPanel;
@@ -24,9 +10,11 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Dialog box for resolving duplicate bibte keys
@@ -40,7 +28,7 @@ class ResolveDuplicateLabelDialog {
 
 
     public ResolveDuplicateLabelDialog(BasePanel panel, String key, List<BibEntry> entries) {
-        diag = new JDialog(panel.frame(), Localization.lang("Duplicate BibTeX key"), true);
+        diag = new JDialog((JFrame) null, Localization.lang("Duplicate BibTeX key"), true);
 
         FormBuilder b = FormBuilder.create().layout(new FormLayout(
                 "left:pref, 4dlu, fill:pref", "p"));

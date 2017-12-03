@@ -1,17 +1,7 @@
 package org.jabref.gui.externalfiles;
 
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.swing.JOptionPane;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -23,8 +13,16 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.swing.*;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
@@ -56,7 +54,7 @@ public class FindFullTextAction extends AbstractWorker {
         if (basePanel.getSelectedEntries().size() >= WARNING_LIMIT) {
             String[] options = new String[] {Localization.lang("Look up full text documents"),
                     Localization.lang("Cancel")};
-            int answer = JOptionPane.showOptionDialog(basePanel.frame(),
+            int answer = JOptionPane.showOptionDialog(null,
                     Localization.lang(
                             "You are about to look up full text documents for %0 entries.",
                             String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
@@ -86,7 +84,7 @@ public class FindFullTextAction extends AbstractWorker {
                 Optional<Path> dir = basePanel.getBibDatabaseContext().getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences());
 
                 if (!dir.isPresent()) {
-                    JOptionPane.showMessageDialog(basePanel.frame(),
+                    JOptionPane.showMessageDialog(null,
                             Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
                                     + " -> " + Localization.lang("File"),
                             Localization.lang("Directory not found"), JOptionPane.ERROR_MESSAGE);
@@ -118,7 +116,7 @@ public class FindFullTextAction extends AbstractWorker {
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined")));
 
                 basePanel.output(message);
-                JOptionPane.showMessageDialog(basePanel.frame(), message, title, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
             }
             remove.add(result);
         }

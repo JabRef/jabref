@@ -1,32 +1,8 @@
 package org.jabref.gui.externalfiles;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
@@ -49,9 +25,13 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.List;
 
 /**
  * This action goes through all selected entries in the BasePanel, and attempts to autoset the
@@ -84,9 +64,8 @@ public class SynchronizeFileField extends AbstractWorker {
 
         // Ask about rules for the operation:
         if (optDiag == null) {
-            optDiag = new SynchronizeFileField.OptionsDialog(panel.frame(), panel.getBibDatabaseContext());
+            optDiag = new SynchronizeFileField.OptionsDialog(null, panel.getBibDatabaseContext());
         }
-        optDiag.setLocationRelativeTo(panel.frame());
         optDiag.setVisible(true);
         if (optDiag.canceled()) {
             goOn = false;
@@ -156,7 +135,7 @@ public class SynchronizeFileField extends AbstractWorker {
                             if (removeAllBroken) {
                                 answer = 2; // We should delete this link.
                             } else {
-                                answer = JOptionPane.showOptionDialog(panel.frame(),
+                                answer = JOptionPane.showOptionDialog(null,
                                         Localization.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
                                                 flEntry.getLink(),
                                                 aSel.getCiteKeyOptional().orElse(Localization.lang("undefined"))),
@@ -198,7 +177,7 @@ public class SynchronizeFileField extends AbstractWorker {
                                     Localization.lang("Change file type"),
                                     Localization.lang("Cancel")};
                             String defOption = options[0];
-                            int answer = JOptionPane.showOptionDialog(panel.frame(), Localization.lang("One or more file links are of the type '%0', which is undefined. What do you want to do?",
+                            int answer = JOptionPane.showOptionDialog(null, Localization.lang("One or more file links are of the type '%0', which is undefined. What do you want to do?",
                                     flEntry.getType().get().getName()),
                                     Localization.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
                                     JOptionPane.QUESTION_MESSAGE, null, options, defOption
@@ -209,7 +188,7 @@ public class SynchronizeFileField extends AbstractWorker {
                                 // User wants to define the new file type. Show the dialog:
                                 ExternalFileType newType = new ExternalFileType(flEntry.getType().get().getName(), "", "",
                                         "", "new", IconTheme.JabRefIcon.FILE.getSmallIcon());
-                                ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(panel.frame(), newType);
+                                ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor((JFrame) null, newType);
                                 editor.setVisible(true);
                                 if (editor.okPressed()) {
                                     // Get the old list of types, add this one, and update the list in prefs:

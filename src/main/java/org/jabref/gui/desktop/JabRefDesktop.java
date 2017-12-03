@@ -1,29 +1,13 @@
 package org.jabref.gui.desktop;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.regex.Pattern;
-
-import javax.swing.JOptionPane;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.desktop.os.DefaultDesktop;
-import org.jabref.gui.desktop.os.Linux;
-import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.desktop.os.OSX;
-import org.jabref.gui.desktop.os.Windows;
+import org.jabref.gui.desktop.os.*;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypeEntryEditor;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -42,8 +26,14 @@ import org.jabref.model.entry.identifier.Eprint;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * TODO: Replace by http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html
@@ -184,7 +174,7 @@ public class JabRefDesktop {
         String[] options = new String[] {Localization.lang("Define '%0'", fileType.getName()),
                 Localization.lang("Change file type"), Localization.lang("Cancel")};
         String defOption = options[0];
-        int answer = JOptionPane.showOptionDialog(frame,
+        int answer = JOptionPane.showOptionDialog(null,
                 Localization.lang("This external link is of the type '%0', which is undefined. What do you want to do?",
                         fileType.getName()),
                 Localization.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
@@ -196,7 +186,7 @@ public class JabRefDesktop {
             // User wants to define the new file type. Show the dialog:
             ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "", "new",
                     IconTheme.JabRefIcon.FILE.getSmallIcon());
-            ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(frame, newType);
+            ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor((JFrame) null, newType);
             editor.setVisible(true);
             if (editor.okPressed()) {
                 // Get the old list of types, add this one, and update the list in prefs:
@@ -292,7 +282,7 @@ public class JabRefDesktop {
             String openManually = Localization.lang("Please open %0 manually.", url);
             String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
             JabRefGUI.getMainFrame().output(couldNotOpenBrowser);
-            JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(), couldNotOpenBrowser + "\n" + openManually + "\n" +
+            JOptionPane.showMessageDialog(null, couldNotOpenBrowser + "\n" + openManually + "\n" +
                     copiedToClipboard, couldNotOpenBrowser, JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -334,7 +324,7 @@ public class JabRefDesktop {
                 } catch (IOException exception) {
                     LOGGER.error("Open console", exception);
 
-                    JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(),
+                    JOptionPane.showMessageDialog(null,
                             Localization.lang("Error_occured_while_executing_the_command_\"%0\".", commandLoggingText),
                             Localization.lang("Open console") + " - " + Localization.lang("Error"),
                             JOptionPane.ERROR_MESSAGE);

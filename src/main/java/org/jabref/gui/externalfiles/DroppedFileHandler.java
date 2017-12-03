@@ -1,26 +1,9 @@
 package org.jabref.gui.externalfiles;
 
-import java.awt.BorderLayout;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
@@ -42,10 +25,17 @@ import org.jabref.model.entry.IdGenerator;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * This class holds the functionality of autolinking to a file that's dropped
@@ -251,7 +241,7 @@ public class DroppedFileHandler {
         contentPanel.add(confirmationMessage, BorderLayout.NORTH);
         contentPanel.add(entriesPanel, BorderLayout.CENTER);
 
-        int reply = JOptionPane.showConfirmDialog(frame, contentPanel,
+        int reply = JOptionPane.showConfirmDialog(null, contentPanel,
                 Localization.lang("XMP-metadata found in PDF: %0", fileName), JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 
@@ -377,7 +367,7 @@ public class DroppedFileHandler {
 
         try {
             Object[] messages = {Localization.lang("How would you like to link to '%0'?", linkFileName), optionsPanel};
-            int reply = JOptionPane.showConfirmDialog(frame, messages, dialogTitle, JOptionPane.OK_CANCEL_OPTION,
+            int reply = JOptionPane.showConfirmDialog(null, messages, dialogTitle, JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
             if (reply == JOptionPane.OK_OPTION) {
                 // store user's choice
@@ -475,7 +465,7 @@ public class DroppedFileHandler {
             Path destFile = dir.get().resolve(destFilename);
 
             if (Files.exists(destFile)) {
-                int answer = JOptionPane.showConfirmDialog(frame,
+                int answer = JOptionPane.showConfirmDialog(null,
                         Localization.lang("'%0' exists. Overwrite file?", destFile.toString()),
                         Localization.lang("Overwrite file?"), JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.NO_OPTION) {
@@ -494,7 +484,7 @@ public class DroppedFileHandler {
             if (FileUtil.renameFile(fromFile, destFile, true)) {
                 return true;
             } else {
-                JOptionPane.showMessageDialog(frame,
+                JOptionPane.showMessageDialog(null,
                         Localization.lang("Could not move file '%0'.", destFile.toString())
                                 + Localization.lang("Please move the file manually and link in place."),
                         Localization.lang("Move file failed"), JOptionPane.ERROR_MESSAGE);
@@ -539,7 +529,7 @@ public class DroppedFileHandler {
         }
 
         if (Files.exists(destFile)) {
-            int answer = JOptionPane.showConfirmDialog(frame,
+            int answer = JOptionPane.showConfirmDialog(null,
                     Localization.lang("'%0' exists. Overwrite file?", destFile.toString()),
                     Localization.lang("File exists"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (answer == JOptionPane.NO_OPTION) {

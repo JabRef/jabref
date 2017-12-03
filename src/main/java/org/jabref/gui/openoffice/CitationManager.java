@@ -1,30 +1,5 @@
 package org.jabref.gui.openoffice;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.List;
-import java.util.Optional;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-
-import org.jabref.Globals;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.openoffice.CitationEntry;
-
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.gui.TableFormat;
@@ -42,6 +17,19 @@ import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jabref.Globals;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.openoffice.CitationEntry;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Dialog for modifying existing citations.
@@ -59,7 +47,7 @@ class CitationManager {
 
     public CitationManager(final JabRefFrame frame, OOBibBase ooBase)
             throws NoSuchElementException, WrappedTargetException, UnknownPropertyException {
-        diag = new JDialog(frame, Localization.lang("Manage citations"), true);
+        diag = new JDialog((JFrame) null, Localization.lang("Manage citations"), true);
         this.ooBase = ooBase;
 
         list = new BasicEventList<>();
@@ -94,7 +82,7 @@ class CitationManager {
             } catch (UnknownPropertyException | NotRemoveableException | PropertyExistException | IllegalTypeException |
                     IllegalArgumentException ex) {
                 LOGGER.warn("Problem modifying citation", ex);
-                JOptionPane.showMessageDialog(frame, Localization.lang("Problem modifying citation"));
+                JOptionPane.showMessageDialog(null, Localization.lang("Problem modifying citation"));
             }
             diag.dispose();
         });
