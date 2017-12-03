@@ -16,8 +16,8 @@ buildscript {
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '1.9'
-    id 'com.install4j.gradle' version '6.1.5'
+    id 'com.gradle.build-scan' version '1.10.3'
+    id 'com.install4j.gradle' version '7.0.3'
     id 'com.github.johnrengelman.shadow' version '2.0.1'
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
     id "com.simonharrer.modernizer" version '1.5.0-1'
@@ -96,7 +96,7 @@ dependencies {
     compile 'org.openoffice:unoil:4.1.2'
 
     compile 'com.github.bkromhout:java-diff-utils:2.1.1'
-    compile 'info.debatty:java-string-similarity:1.0.0'
+    compile 'info.debatty:java-string-similarity:1.0.1'
 
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
@@ -111,7 +111,7 @@ dependencies {
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
-    compile 'com.google.guava:guava:23.4-jre'
+    compile 'com.google.guava:guava:23.5-jre'
 
     // JavaFX stuff
     compile 'com.airhacks:afterburner.fx:1.7.0'
@@ -125,13 +125,13 @@ dependencies {
     // Cannot be updated to 9.*.* until Jabref works with Java 9
     compile 'org.controlsfx:controlsfx:8.40.14'
 
-    compile 'org.jsoup:jsoup:1.10.3'
+    compile 'org.jsoup:jsoup:1.11.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
     compile 'commons-logging:commons-logging:1.2'
-    compile 'org.apache.logging.log4j:log4j-jcl:2.9.1'
-    compile 'org.apache.logging.log4j:log4j-api:2.9.1'
-    compile 'org.apache.logging.log4j:log4j-core:2.9.1'
+    compile 'org.apache.logging.log4j:log4j-jcl:2.10.0'
+    compile 'org.apache.logging.log4j:log4j-api:2.10.0'
+    compile 'org.apache.logging.log4j:log4j-core:2.10.0'
 
     // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
@@ -151,12 +151,12 @@ dependencies {
     testRuntime 'org.apache.logging.log4j:log4j-core:2.9.1'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.9.1'
     testCompile 'org.mockito:mockito-core:2.12.0'
-    testCompile 'com.github.tomakehurst:wiremock:2.11.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.12.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
-    testCompile 'org.xmlunit:xmlunit-core:2.5.0'
-    testCompile 'org.xmlunit:xmlunit-matchers:2.5.0'
-    testCompile 'com.tngtech.archunit:archunit-junit:0.4.0'
+    testCompile 'org.xmlunit:xmlunit-core:2.5.1'
+    testCompile 'org.xmlunit:xmlunit-matchers:2.5.1'
+    testCompile 'com.tngtech.archunit:archunit-junit:0.5.0'
     testCompile 'org.slf4j:slf4j-jcl:1.7.25' // required by ArchUnit to enable logging over jcl
 }
 
