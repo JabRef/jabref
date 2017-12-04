@@ -13,6 +13,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Reorganised annotation information on the right side of the "File annotations" tab. [#3109](https://github.com/JabRef/jabref/issues/3109)
+- Changed list item format in list of annotations for the "File annotations" tab. [#3109](https://github.com/JabRef/jabref/issues/3109)
+- Added gui solution for "no annotations in linked file" for the "File annotations" tab. [#3109](https://github.com/JabRef/jabref/issues/3109)
 - We added bracketed expresion support for file search patterns, import file name patterns and file directory patters, in addition to bibtexkey patterns.
 - We added support for '[entrytype]' bracketed expression.
 - Updated French translation
