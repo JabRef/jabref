@@ -55,6 +55,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue where the tooltip of the global search bar showed html tags instead of formatting the text [#3381](https://github.com/JabRef/jabref/issues/3381)
  - We fixed an issue where timestamps were not updated for changed entries [#2810](https://github.com/JabRef/jabref/issues/2810)
  - We fixed an issue where trying to fetch data from Medline/PubMed resulted in an error [#3463](https://github.com/JabRef/jabref/issues/3463)
+ - We fixed an issue where double clicking on an entry in the integrity check dialog resulted in an exception [#3485](https://github.com/JabRef/jabref/issues/3485)
+ - We fixed an issue where the entry type could sometimes not be changed when the entry editor was open [#3435](https://github.com/JabRef/jabref/issues/3435)
 
  ### Removed
 
