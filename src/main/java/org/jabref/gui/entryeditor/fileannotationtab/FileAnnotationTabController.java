@@ -19,6 +19,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Font;
+
 import javafx.scene.text.TextAlignment;
 import org.jabref.gui.AbstractController;
 import org.jabref.gui.util.FileUpdateMonitor;
@@ -94,8 +95,8 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
                     Label date = new Label(annotation.getDate());
                     Label page = new Label(Localization.lang("Page") + ": " + annotation.getPage());
 
-                    marking.setFont(new Font("System Bold", 14));
-                    marking.setPrefWidth(100);
+                    marking.setFont(new Font("System Bold", 15));
+                    marking.setPrefWidth(250);
                     author.setFont(new Font("System", 14));
 
                     marking.setPrefHeight(10);
