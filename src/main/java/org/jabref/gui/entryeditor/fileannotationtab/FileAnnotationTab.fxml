@@ -37,21 +37,27 @@
                     <Insets bottom="5" left="10" right="5" top="5" />
                 </padding>
                 <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" prefWidth="70.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="10.0" />
                     <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="20.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="10.0" />
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     <RowConstraints minHeight="10.0" prefHeight="100.0" vgrow="ALWAYS" />
-                    <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="ALWAYS" />
+                    <RowConstraints maxHeight="-Infinity" minHeight="20.0" prefHeight="40.0" vgrow="ALWAYS" />
                <RowConstraints />
+               <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="10.0" />
                 </rowConstraints>
-                <Label text="%Marking" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                <TextArea fx:id="marking" editable="false" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                <Label text="%Content" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                <TextArea fx:id="content" editable="false" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                <Label text="%Marking" GridPane.columnIndex="1" GridPane.valignment="BOTTOM">
+               <padding>
+                  <Insets bottom="3.0" />
+               </padding></Label>
+                <TextArea fx:id="marking" editable="false" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label text="%Content" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
+               <padding>
+                  <Insets bottom="5.0" />
+               </padding></Label>
+                <TextArea fx:id="content" editable="false" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             </GridPane>
         </detailNode>
     </MasterDetailPane>

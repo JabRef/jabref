@@ -11,14 +11,15 @@ import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.*;
+//import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 
 import javafx.scene.text.TextAlignment;
 import org.jabref.gui.AbstractController;
@@ -94,8 +95,6 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
                     Label author = new Label(annotation.getAuthor());
                     Label date = new Label(annotation.getDate());
                     Label page = new Label(Localization.lang("Page") + ": " + annotation.getPage());
-                    //marking.getStyleClass().setAll("marking");
-
 
                     marking.setFont(new Font("System Bold", 14));
                     marking.setPrefWidth(100);
@@ -106,15 +105,13 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
                     date.setPrefHeight(10);
                     page.setPrefHeight(30);
 
+                    // add alignment for text in the list
                     marking.setTextAlignment(TextAlignment.LEFT);
                     marking.setAlignment(Pos.TOP_LEFT);
-
                     author.setTextAlignment(TextAlignment.LEFT);
                     author.setAlignment(Pos.TOP_LEFT);
-
                     date.setTextAlignment(TextAlignment.RIGHT);
                     date.setAlignment(Pos.TOP_RIGHT);
-
                     page.setTextAlignment(TextAlignment.RIGHT);
                     page.setAlignment(Pos.TOP_RIGHT);
 
@@ -123,21 +120,6 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
                     node.add(date, 1, 0);
                     node.add(page, 1, 1);
 
-                    /*
-                    VBox node = new VBox();
-
-                    Text text = new Text();
-                    text.setText(annotation.getContent());
-                    text.getStyleClass().setAll("text");
-
-                    HBox details = new HBox();
-                    details.getStyleClass().setAll("details");
-                    Text page = new Text();
-                    page.setText(Localization.lang("Page") + ": " + annotation.getPage());
-                    details.getChildren().addAll(page);
-
-                    node.getChildren().addAll(text, details);
-                    node.setMaxWidth(Control.USE_PREF_SIZE);*/
                     return node;
                 });
         annotationList.setCellFactory(cellFactory);
@@ -148,9 +130,6 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
                 (ListChangeListener<? super FileAnnotationViewModel>) c -> annotationList.getSelectionModel().selectFirst());
 
         // Set-up details pane
-        //author.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::authorProperty));
-        //page.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::pageProperty));
-        //date.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::dateProperty));
         content.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::contentProperty));
         marking.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::markingProperty));
         grid.disableProperty().bind(viewModel.isAnnotationsEmpty());
