@@ -91,7 +91,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fxmisc.easybind.EasyBind;
 
-
 /**
  * GUI component that allows editing of the fields of a BibEntry (i.e. the
  * one that shows up, when you double click on an entry in the table)
@@ -155,7 +154,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private final BooleanProperty movingToDifferentEntry = new SimpleBooleanProperty();
     private EntryType entryType;
     private SourceTab sourceTab;
-    private TypeLabel typeLabel;
+    private final TypeLabel typeLabel;
 
     public EntryEditor(BasePanel panel) {
         this.frame = panel.frame();
@@ -180,13 +179,13 @@ public class EntryEditor extends JPanel implements EntryContainer {
         add(container, BorderLayout.CENTER);
 
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-                    EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
-                        EntryEditorTab activeTab = (EntryEditorTab) tab;
-                        if (activeTab != null) {
-                            activeTab.notifyAboutFocus(entry);
-                        }
-                    });
-                });
+            EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
+                EntryEditorTab activeTab = (EntryEditorTab) tab;
+                if (activeTab != null) {
+                    activeTab.notifyAboutFocus(entry);
+                }
+            });
+        });
 
         setupKeyBindings();
 
@@ -498,13 +497,17 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     public void setFocusToField(String fieldName) {
-        for (Tab tab : tabbed.getTabs()) {
-            if ((tab instanceof FieldsEditorTab) && ((FieldsEditorTab) tab).determineFieldsToShow(entry, entryType).contains(fieldName)) {
-                FieldsEditorTab fieldsEditorTab = (FieldsEditorTab) tab;
-                tabbed.getSelectionModel().select(tab);
-                fieldsEditorTab.requestFocus(fieldName);
+
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+
+            for (Tab tab : tabbed.getTabs()) {
+                if ((tab instanceof FieldsEditorTab) && ((FieldsEditorTab) tab).determineFieldsToShow(entry, entryType).contains(fieldName)) {
+                    FieldsEditorTab fieldsEditorTab = (FieldsEditorTab) tab;
+                    tabbed.getSelectionModel().select(tab);
+                    fieldsEditorTab.requestFocus(fieldName);
+                }
             }
-        }
+        });
     }
 
     public void setMovingToDifferentEntry() {
@@ -606,6 +609,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private class CloseAction extends AbstractAction {
+
         private CloseAction() {
             super(Localization.lang("Close window"), IconTheme.JabRefIcon.CLOSE.getSmallIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close window"));
@@ -613,7 +617,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Map<String,String> cleanedEntries = entry
+            Map<String, String> cleanedEntries = entry
                     .getFieldMap()
                     .entrySet()
                     .stream()
@@ -851,7 +855,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
 
             BibtexKeyPatternUtil.makeAndSetLabel(panel.getBibDatabaseContext().getMetaData()
-                            .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                    .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
                     panel.getDatabase(), entry,
                     Globals.prefs.getBibtexKeyPatternPreferences());
 
