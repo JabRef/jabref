@@ -474,8 +474,7 @@ public class HTMLUnicodeConversionMaps {
             {"35", "", "\\#"}, // Hash
             {"36", "dollar", "\\$"}, // Dollar
             {"37", "#37", "\\%"}, // Percent (&percnt; is not displayed correctly in the entry preview)
-            {"39", "apos", "'"}, // Apostrophe
-            {"39", "apos", "{\\textquotesingle}"}, // Apostrophe                                                          
+            {"39", "apos", "'"}, // Apostrophe                        
             {"40", "lpar", "("}, // Left bracket
             {"41", "rpar", ")"}, // Right bracket
             {"42", "", "*"}, // Asterisk
@@ -896,7 +895,10 @@ public class HTMLUnicodeConversionMaps {
         // Support relax to the extent that it is simply removed
         LATEX_HTML_CONVERSION_MAP.put("relax", "");
         LATEX_UNICODE_CONVERSION_MAP.put("relax", "");
-
+        // Support a special version of apostrophe
+        LATEX_HTML_CONVERSION_MAP.put("{\\textquotesingle}", "&apos;");
+        LATEX_UNICODE_CONVERSION_MAP.put("{\\textquotesingle}", "'"); // apostrophe, U+00027
+        
     }
 
     private HTMLUnicodeConversionMaps() {
