@@ -497,17 +497,15 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     public void setFocusToField(String fieldName) {
-
-        for (Tab tab : tabbed.getTabs()) {
-            if ((tab instanceof FieldsEditorTab) && ((FieldsEditorTab) tab).determineFieldsToShow(entry, entryType).contains(fieldName)) {
-                FieldsEditorTab fieldsEditorTab = (FieldsEditorTab) tab;
-                DefaultTaskExecutor.runInJavaFXThread(() -> {
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            for (Tab tab : tabbed.getTabs()) {
+                if ((tab instanceof FieldsEditorTab) && ((FieldsEditorTab) tab).determineFieldsToShow(entry, entryType).contains(fieldName)) {
+                    FieldsEditorTab fieldsEditorTab = (FieldsEditorTab) tab;
                     tabbed.getSelectionModel().select(tab);
                     fieldsEditorTab.requestFocus(fieldName);
-                });
+                }
             }
-        }
-
+        });
     }
 
     public void setMovingToDifferentEntry() {
