@@ -11,4 +11,5 @@ class ClearField extends MenuItem {
         super(Localization.lang("Clear text"));
         setOnAction(event -> opener.setText(""));
     }
+
 }
