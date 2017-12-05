@@ -11,7 +11,6 @@ import javafx.collections.ObservableList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 
 import java.awt.event.ActionListener;
@@ -49,16 +48,19 @@ public class DeleteDialog extends JDialog {
 			for(int i = 0; i < selectedGroups.size(); i++){
 				message += "<li>"+selectedGroups.get(i).getName() + "</li>"; 
 			}
-			message += "</ul>" + Localization.lang("If_you_would_like_to_remove_selected_entities_from_selected_groups_<br/>press_button_")+"\""+Localization.lang("Remove_from_groups")+"\"<br/><br/>";
+			message += "</ul>" + Localization.lang("If_you_would_like_to_remove_selected_entities_from_selected_groups_<br/>press_button") 
+			+ "\" " 
+			+ Localization.lang("Remove_from_groups") 
+			+ "\"<br/><br/>";
 		}
 		
 		if (!allEnriesGroups.isEmpty()) {
-			message += Localization.lang("Selected_entries_belongs_to_group(s)")+": <br/><ul>";
+			message += Localization.lang("Selected_entries_belongs_to_group(s)") + ": <br/><ul>";
 			Iterator<String> iterator = allEnriesGroups.iterator();
-			while(iterator.hasNext()){
-				message += "<li>"+iterator.next()+ "</li>"; 
+			while (iterator.hasNext()) {
+				message += "<li>" + iterator.next() + "</li>"; 
 			}
-			message += "</ul>"+ Localization.lang("If_you_delete_articles_it_will_be_removed_from_all_listed_groups") +"<br>";
+			message += "</ul>" + Localization.lang("If_you_delete_articles_it_will_be_removed_from_all_listed_groups") + "<br>";
 		}
 
 		JLabel lblThisEntitiesAre = new JLabel("<html> "+ message + " </html>");

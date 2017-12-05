@@ -769,7 +769,6 @@ public class BasePanel extends JPanel implements ClipboardOwner {
      *            "deleted". If true the action will be localized as "cut"
      */
     private void delete(boolean cut) {
-    	boolean delete = false;
     	List<FieldChange> changesRemove = new ArrayList<>();
     	
     	List<BibEntry> entries = mainTable.getSelectedEntries();
@@ -777,35 +776,32 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             return;
         }
     	
-        
         //create list of all groups of selected entries
-        Set<String> allEnriesGroups = new HashSet<String>(); {
-		};
-		for(BibEntry entrie : entries){
-			if(entrie.getField("groups").isPresent()){
-				System.out.println(entrie.getField("groups"));
-				String[] groups = entrie.getField("groups").get().split(",");
-				for(String group : groups){
-					allEnriesGroups.add(group);
-				}
-			}
-		}
+        Set<String> allEnriesGroups = new HashSet<String>(); 
+
+        for (BibEntry entrie : entries) {
+        	if (entrie.getField("groups").isPresent()) {
+        		System.out.println(entrie.getField("groups"));
+        		String[] groups = entrie.getField("groups").get().split(",");
+        		for(String group : groups){
+        			allEnriesGroups.add(group);
+        		}
+        	}
+        }
         System.out.println(allEnriesGroups);
         
         
     	//get list of all groups
-        Optional<GroupTreeNode> groups = bibDatabaseContext.getMetaData().getGroups();
+        //Optional<GroupTreeNode> groups = bibDatabaseContext.getMetaData().getGroups();
         
-        if(!cut) { // dialog only for delete
+        if (!cut) { // dialog only for delete
         	DeleteDialog diag = new DeleteDialog(Globals.stateManager.getSelectedGroup(bibDatabaseContext), allEnriesGroups);
         	diag.setVisible(true);
 
         	DeleteResult resultDialog = diag.getResult();
 
-        	if (resultDialog == DeleteResult.DELETE_FROM_DATABASE) { // Delete
-        		delete = true;
-        	} else if (resultDialog == DeleteResult.REMOVE_FROM_GROUPS) { //Remove from selected groups 
-        		for(GroupTreeNode node: Globals.stateManager.getSelectedGroup(bibDatabaseContext)){
+        	if (resultDialog == DeleteResult.REMOVE_FROM_GROUPS) { //Remove from selected groups 
+        		for (GroupTreeNode node: Globals.stateManager.getSelectedGroup(bibDatabaseContext)) {
         			changesRemove = node.removeEntriesFromGroup(entries);
 
         			// Remember undo information
@@ -820,7 +816,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         		return;
         	} else if (resultDialog == DeleteResult.CANCEL) { //Cancel
         		return;
-        	}
+        	} 
         }
 
 
