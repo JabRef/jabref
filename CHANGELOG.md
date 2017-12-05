@@ -36,7 +36,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - In the preference, all installed java Look and Feels are now listed and selectable
 
 ### Fixed
- - We fixed the translation of \textendash in the entry preview [#3307](https://github.com/JabRef/jabref/issues/3307)
+ - We fixed the translation of \textendash and \textquotesingle in the entry preview [#3307](https://github.com/JabRef/jabref/issues/3307)
  - We fixed an issue where JabRef would not terminated after asking to collect anonymous statistics [#2955 comment](https://github.com/JabRef/jabref/issues/2955#issuecomment-334591123)
  - We fixed an issue where JabRef would not shut down when started with the '-n' (No GUI) option. [#3247](https://github.com/JabRef/jabref/issues/3247)
  - We improved the way metadata is updated in remote databases. [#3235](https://github.com/JabRef/jabref/issues/3235)
@@ -55,6 +55,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue where the tooltip of the global search bar showed html tags instead of formatting the text [#3381](https://github.com/JabRef/jabref/issues/3381)
  - We fixed an issue where timestamps were not updated for changed entries [#2810](https://github.com/JabRef/jabref/issues/2810)
  - We fixed an issue where trying to fetch data from Medline/PubMed resulted in an error [#3463](https://github.com/JabRef/jabref/issues/3463)
+ - We fixed an issue where double clicking on an entry in the integrity check dialog resulted in an exception [#3485](https://github.com/JabRef/jabref/issues/3485)
+ - We fixed an issue where the entry type could sometimes not be changed when the entry editor was open [#3435](https://github.com/JabRef/jabref/issues/3435)
 
  ### Removed
 

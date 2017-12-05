@@ -39,7 +39,6 @@ import org.jabref.preferences.JabRefPreferences;
 
 import org.fxmisc.easybind.EasyBind;
 
-
 /**
  * GUI component that allows editing of the fields of a BibEntry (i.e. the
  * one that shows up, when you double click on an entry in the table)
@@ -256,12 +255,14 @@ public class EntryEditor extends BorderPane {
     }
 
     public void setFocusToField(String fieldName) {
-        for (Tab tab : tabbed.getTabs()) {
-            if ((tab instanceof FieldsEditorTab) && ((FieldsEditorTab) tab).getShownFields().contains(fieldName)) {
-                FieldsEditorTab fieldsEditorTab = (FieldsEditorTab) tab;
-                tabbed.getSelectionModel().select(tab);
-                fieldsEditorTab.requestFocus(fieldName);
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            for (Tab tab : tabbed.getTabs()) {
+                if ((tab instanceof FieldsEditorTab) && ((FieldsEditorTab) tab).getShownFields().contains(fieldName)) {
+                    FieldsEditorTab fieldsEditorTab = (FieldsEditorTab) tab;
+                    tabbed.getSelectionModel().select(tab);
+                    fieldsEditorTab.requestFocus(fieldName);
+                }
             }
-        }
+        });
     }
 }
