@@ -15,7 +15,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.actions.CopyDoiUrlAction;
-import org.jabref.gui.fieldeditors.EditorTextArea;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.l10n.Localization;
 
@@ -23,7 +22,7 @@ import org.jabref.logic.l10n.Localization;
  * Provides context menus for the text fields of the entry editor. Note that we use {@link Supplier} to prevent an early
  * instantiation of the menus. Therefore, they are attached to each text field but instantiation happens on the first
  * right-click of the user in that field. The late instantiation is done by {@link
- * EditorTextArea#addToContextMenu(java.util.function.Supplier)}.
+ * org.jabref.gui.fieldeditors.EditorTextArea#addToContextMenu(java.util.function.Supplier)}.
  */
 public class EditorMenus {
 
