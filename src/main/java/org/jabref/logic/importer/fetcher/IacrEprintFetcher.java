@@ -3,12 +3,14 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.time.DateTimeException;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -33,8 +35,11 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     public static final String NAME = "IACR eprints";
 
     private static final Log LOGGER = LogFactory.getLog(IacrEprintFetcher.class);
-    private static final Pattern DATE_FROM_WEBSITE_PATTERN = Pattern.compile("[a-z ]+(\\d{1,2} [A-Za-z][a-z]{2} \\d{4})");
-    private static final DateTimeFormatter DATE_FORMAT_WEBSITE = DateTimeFormatter.ofPattern("d MMM yyyy");
+    private static final Pattern DATE_FROM_WEBSITE_AFTER_2000_PATTERN = Pattern.compile("[a-z ]+(\\d{1,2} [A-Za-z][a-z]{2} \\d{4})");
+    private static final DateTimeFormatter DATE_FORMAT_WEBSITE_AFTER_2000 = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.US);
+    private static final Pattern DATE_FROM_WEBSITE_BEFORE_2000_PATTERN = Pattern.compile("[A-Za-z ]+? ([A-Za-z][a-z]{2,10} \\d{1,2}(th|st|nd|rd)?, \\d{4})\\.?");
+    private static final DateTimeFormatter DATE_FORMAT_WEBSITE_BEFORE_2000_LONG_MONTHS = DateTimeFormatter.ofPattern("MMMM d['th']['st']['nd']['rd'] yyyy", Locale.US);
+    private static final DateTimeFormatter DATE_FORMAT_WEBSITE_BEFORE_2000_SHORT_MONTHS = DateTimeFormatter.ofPattern("MMM d['th']['st']['nd']['rd'] yyyy", Locale.US);
     private static final DateTimeFormatter DATE_FORMAT_BIBTEX = DateTimeFormatter.ISO_LOCAL_DATE;
     private static final Predicate<String> IDENTIFIER_PREDICATE = Pattern.compile("\\d{4}/\\d{3,5}").asPredicate();
     private static final String CITATION_URL_PREFIX = "https://eprint.iacr.org/eprint-bin/cite.pl?entry=";
@@ -66,7 +71,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
 
     private Optional<BibEntry> createEntryFromIacrCitation(String validIdentifier) throws FetcherException {
         String bibtexCitationHtml = getHtml(CITATION_URL_PREFIX + validIdentifier);
-        String actualEntry = getValueBetween("<PRE>", "</PRE>", bibtexCitationHtml);
+        String actualEntry = getRequiredValueBetween("<PRE>", "</PRE>", bibtexCitationHtml);
 
         try {
             return BibtexParser.singleFromString(actualEntry, prefs);
@@ -76,35 +81,43 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     }
 
     private void setAdditionalFields(BibEntry entry, String identifier) throws FetcherException {
-        String descriptiveHtml = getHtml(DESCRIPTION_URL_PREFIX + identifier);
-        String version = getVersion(identifier, descriptiveHtml);
-
-        entry.setField(FieldName.VERSION, version);
-        entry.setField(FieldName.URL, DESCRIPTION_URL_PREFIX + identifier + "/" + version);
+        String entryUrl = DESCRIPTION_URL_PREFIX + identifier;
+        String descriptiveHtml = getHtml(entryUrl);
         entry.setField(FieldName.ABSTRACT, getAbstract(descriptiveHtml));
-
-        String dateStringAsInHtml = getValueBetween("<b>Date: </b>", "<p />", descriptiveHtml);
+        String dateStringAsInHtml = getRequiredValueBetween("<b>Date: </b>", "<p />", descriptiveHtml);
         entry.setField(FieldName.DATE, getLatestDate(dateStringAsInHtml));
+
+        if (isFromOrAfterYear2000(entry)) {
+            String version = getVersion(identifier, descriptiveHtml);
+            entry.setField(FieldName.VERSION, version);
+            entry.setField(FieldName.URL, entryUrl + "/" + version);
+        } else {
+            // No version information for entries before year 2000
+            entry.setField(FieldName.URL, entryUrl);
+        }
     }
 
     private String getVersion(String identifier, String descriptiveHtml) throws FetcherException {
         String startOfVersionString = "<b>Version: </b><a href=\"/" + identifier + "/";
-        String version = getValueBetween(startOfVersionString, "\"", descriptiveHtml);
+        String version = getRequiredValueBetween(startOfVersionString, "\"", descriptiveHtml);
         return version;
     }
 
     private String getAbstract(String descriptiveHtml) throws FetcherException {
-        String abstractText = getValueBetween("<b>Abstract: </b>", "<p />", descriptiveHtml);
+        String abstractText = getRequiredValueBetween("<b>Abstract: </b>", "<p />", descriptiveHtml);
         // for some reason, all spaces are doubled...
         abstractText = abstractText.replaceAll("\\s(\\s)", "$1");
         return abstractText;
     }
 
     private String getLatestDate(String dateStringAsInHtml) throws FetcherException {
-        String[] rawDates = dateStringAsInHtml.split(",");
+        if (dateStringAsInHtml.contains("withdrawn")) {
+            throw new FetcherException(Localization.lang("This paper has been withdrawn."));
+        }
+        String[] rawDates = dateStringAsInHtml.split(", \\D");
         List<String> formattedDates = new ArrayList<>();
         for (String rawDate : rawDates) {
-            TemporalAccessor date = parseDateFromWebsite(rawDate);
+            TemporalAccessor date = parseSingleDateFromWebsite(rawDate);
             if (date != null) {
                 formattedDates.add(DATE_FORMAT_BIBTEX.format(date));
             }
@@ -118,16 +131,37 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         return formattedDates.get(0);
     }
 
-    private TemporalAccessor parseDateFromWebsite(String dateStringFromWebsite) {
+    private TemporalAccessor parseSingleDateFromWebsite(String dateStringFromWebsite) {
         TemporalAccessor date = null;
-        Matcher dateMatcher = DATE_FROM_WEBSITE_PATTERN.matcher(dateStringFromWebsite.trim());
-        if (dateMatcher.find()) {
+        // Some entries contain double spaces in the date string (which would break our regexs below)
+        dateStringFromWebsite = dateStringFromWebsite.replaceAll("\\s\\s+", " ");
+
+        Matcher dateMatcherAfter2000 = DATE_FROM_WEBSITE_AFTER_2000_PATTERN.matcher(dateStringFromWebsite.trim());
+        if (dateMatcherAfter2000.find()) {
             try {
-                date = DATE_FORMAT_WEBSITE.parse(dateMatcher.group(1));
+                date = DATE_FORMAT_WEBSITE_AFTER_2000.parse(dateMatcherAfter2000.group(1));
             } catch (DateTimeParseException e) {
                 LOGGER.warn("Date from IACR could not be parsed", e);
             }
         }
+
+        // Entries before year 2000 use a variety of date formats - fortunately, we can match them with only two different
+        // date formats (each of which differ from the unified format of post-2000 entries).
+        Matcher dateMatcherBefore2000 = DATE_FROM_WEBSITE_BEFORE_2000_PATTERN.matcher(dateStringFromWebsite.trim());
+        if (dateMatcherBefore2000.find()) {
+            String dateWithoutComma = dateMatcherBefore2000.group(1).replace(",", "");
+            try {
+                date = DATE_FORMAT_WEBSITE_BEFORE_2000_LONG_MONTHS.parse(dateWithoutComma);
+            } catch (DateTimeParseException e) {
+                try {
+                    date = DATE_FORMAT_WEBSITE_BEFORE_2000_SHORT_MONTHS.parse(dateWithoutComma);
+                } catch (DateTimeException e1) {
+                    LOGGER.warn("Date from IACR could not be parsed", e);
+                    LOGGER.warn("Date from IACR could not be parsed", e1);
+                }
+            }
+        }
+
         return date;
     }
 
@@ -140,13 +174,21 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         }
     }
 
-    private String getValueBetween(String from, String to, String haystack) throws FetcherException {
+    private String getRequiredValueBetween(String from, String to, String haystack) throws FetcherException {
         String value = StringUtils.substringBetween(haystack, from, to);
         if (value == null) {
             throw new FetcherException(Localization.lang("Could not extract required data from IACR HTML."));
         } else {
             return value;
         }
+    }
+
+    private boolean isFromOrAfterYear2000(BibEntry entry) throws FetcherException {
+        Optional<String> yearField = entry.getField(FieldName.YEAR);
+        if (yearField.isPresent()) {
+            return Integer.parseInt(yearField.get()) > 2000;
+        }
+        throw new FetcherException(Localization.lang("Entry from IACR could not be parsed."));
     }
 
     @Override

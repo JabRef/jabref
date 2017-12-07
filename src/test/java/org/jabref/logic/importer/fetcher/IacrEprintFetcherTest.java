@@ -1,6 +1,11 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -10,12 +15,16 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
@@ -122,5 +131,54 @@ public class IacrEprintFetcherTest {
     @Test
     public void testGetName() {
         assertEquals(IacrEprintFetcher.NAME, fetcher.getName());
+    }
+
+    @Test
+    public void searchByIdForWithdrawnPaperFails() {
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("1998/016"));
+    }
+
+    @Test
+    public void searchByIdWithOldHtmlFormatAndCheckDate() throws FetcherException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("1997/006");
+        assertEquals(Optional.of("1997-05-04"), fetchedEntry.get().getField(FieldName.DATE));
+    }
+
+    @DisplayName("Get all entries with old HTML format (except withdrawn ones)")
+    @ParameterizedTest(name = "Fetch for id: {0}")
+    @MethodSource("allNonWithdrawnIdsWithOldHtmlFormat")
+    public void searchByIdWithOldHtmlFormatWithoutDateCheck(String id) throws FetcherException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(id);
+        assertTrue(fetchedEntry.isPresent(), "Expected to get an entry for id " + id);
+        assertNotEquals(Optional.empty(), fetchedEntry.get().getField(FieldName.DATE), "Expected non empty date field, entry is\n" + fetchedEntry.toString());
+        assertTrue(fetchedEntry.get().getField(FieldName.DATE).get().length() == 10, "Expected yyyy-MM-dd date format, entry is\n" + fetchedEntry.toString());
+        assertNotEquals(Optional.empty(), fetchedEntry.get().getField(FieldName.ABSTRACT), "Expected non empty abstract field, entry is\n" + fetchedEntry.toString());
+    }
+
+    /**
+     * Helper method for allNonWithdrawnIdsWithOldHtmlFormat.
+     *
+     * @param year The year of the generated IDs (e.g. 1996)
+     * @param maxId The maximum ID to generate in the given year (e.g. 112)
+     * @return A list of IDs in the from yyyy/iii (e.g. [1996/001, 1996/002, ..., 1996/112]
+     */
+    private static List<String> getIdsFor(int year, int maxId) {
+        List<String> result = new ArrayList<>();
+        for (int i = 1; i <= maxId; i++) {
+            result.add(String.format("%04d/%03d", year, i));
+        }
+        return result;
+    }
+
+    // Parameter provider
+    static Stream<String> allNonWithdrawnIdsWithOldHtmlFormat() {
+        Collection<String> withdrawnIds = Arrays.asList("1998/016", "1999/006");
+        List<String> ids = new ArrayList<>();
+        ids.addAll(getIdsFor(1996, 16));
+        ids.addAll(getIdsFor(1997, 15));
+        ids.addAll(getIdsFor(1998, 26));
+        ids.addAll(getIdsFor(1999, 24));
+        ids.removeAll(withdrawnIds);
+        return ids.stream();
     }
 }
