@@ -57,7 +57,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         String identifierWithoutLettersAndSpaces = identifier.replaceAll("[^0-9/]", " ").trim();
 
         if (!IDENTIFIER_PREDICATE.test(identifierWithoutLettersAndSpaces)) {
-            throw new FetcherException(Localization.lang("Invalid IACR identifier: '%0'.", identifier));
+            throw new FetcherException(Localization.lang("Invalid identifier: '%0'.", identifier));
         }
 
         Optional<BibEntry> entry = createEntryFromIacrCitation(identifierWithoutLettersAndSpaces);
@@ -71,12 +71,15 @@ public class IacrEprintFetcher implements IdBasedFetcher {
 
     private Optional<BibEntry> createEntryFromIacrCitation(String validIdentifier) throws FetcherException {
         String bibtexCitationHtml = getHtml(CITATION_URL_PREFIX + validIdentifier);
+        if (bibtexCitationHtml.contains("No such report found")) {
+            throw new FetcherException(Localization.lang("No results found."));
+        }
         String actualEntry = getRequiredValueBetween("<PRE>", "</PRE>", bibtexCitationHtml);
 
         try {
             return BibtexParser.singleFromString(actualEntry, prefs);
         } catch (ParseException e) {
-            throw new FetcherException(Localization.lang("Entry from IACR could not be parsed."), e);
+            throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"), e);
         }
     }
 
@@ -124,7 +127,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         }
 
         if (formattedDates.isEmpty()) {
-            throw new FetcherException(Localization.lang("Entry from IACR could not be parsed."));
+            throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"));
         }
 
         Collections.sort(formattedDates, Collections.reverseOrder());
@@ -170,14 +173,14 @@ public class IacrEprintFetcher implements IdBasedFetcher {
             URLDownload download = new URLDownload(url);
             return download.asString(WEBSITE_CHARSET);
         } catch (IOException e) {
-            throw new FetcherException(Localization.lang("Could not retrieve entry data from IACR at '%0'.", url), e);
+            throw new FetcherException(Localization.lang("Could not retrieve entry data from '%0'.", url), e);
         }
     }
 
     private String getRequiredValueBetween(String from, String to, String haystack) throws FetcherException {
         String value = StringUtils.substringBetween(haystack, from, to);
         if (value == null) {
-            throw new FetcherException(Localization.lang("Could not extract required data from IACR HTML."));
+            throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"));
         } else {
             return value;
         }
@@ -188,7 +191,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         if (yearField.isPresent()) {
             return Integer.parseInt(yearField.get()) > 2000;
         }
-        throw new FetcherException(Localization.lang("Entry from IACR could not be parsed."));
+        throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"));
     }
 
     @Override
