@@ -15,6 +15,7 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -147,6 +148,7 @@ public class IacrEprintFetcherTest {
     @DisplayName("Get all entries with old HTML format (except withdrawn ones)")
     @ParameterizedTest(name = "Fetch for id: {0}")
     @MethodSource("allNonWithdrawnIdsWithOldHtmlFormat")
+    @Disabled("Takes a lot of time - should only be called manually")
     public void searchByIdWithOldHtmlFormatWithoutDateCheck(String id) throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById(id);
         assertTrue(fetchedEntry.isPresent(), "Expected to get an entry for id " + id);
