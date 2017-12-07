@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.groups;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -44,9 +44,9 @@ public class DeleteDialog extends JDialog {
 
 		String message = "";
 		if (selectedGroups.size() > 0) {
-			message += Localization.lang("Currently_there_are_selected_group(s)")+": <br/><ul>";
-			for(int i = 0; i < selectedGroups.size(); i++){
-				message += "<li>"+selectedGroups.get(i).getName() + "</li>"; 
+			message += Localization.lang("There_are_group(s)_selected") + ": <br/><ul>";
+			for (int i = 0; i < selectedGroups.size(); i++) {
+				message += "<li>" + selectedGroups.get(i).getName() + "</li>"; 
 			}
 			message += "</ul>" + Localization.lang("If_you_would_like_to_remove_selected_entities_from_selected_groups_<br/>press_button") 
 			+ "\" " 
@@ -55,29 +55,29 @@ public class DeleteDialog extends JDialog {
 		}
 		
 		if (!allEnriesGroups.isEmpty()) {
-			message += Localization.lang("Selected_entries_belongs_to_group(s)") + ": <br/><ul>";
+			message += Localization.lang("Selected_entries_belong_to_group(s)") + ": <br/><ul>";
 			Iterator<String> iterator = allEnriesGroups.iterator();
 			while (iterator.hasNext()) {
 				message += "<li>" + iterator.next() + "</li>"; 
 			}
-			message += "</ul>" + Localization.lang("If_you_delete_articles_it_will_be_removed_from_all_listed_groups") + "<br>";
+			message += "</ul>" + Localization.lang("If_you_delete_the_entries_they_will_be_removed_from_all_listed_groups") + "<br>";
 		}
 
-		JLabel lblThisEntitiesAre = new JLabel("<html> "+ message + " </html>");
-		panel.add(lblThisEntitiesAre);
+		JLabel centralLabel = new JLabel("<html> " + message + " </html>");
+		panel.add(centralLabel);
 
 		JPanel buttonPane = new JPanel();
 		getContentPane().add(buttonPane);
 		buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.X_AXIS));
 
-		JButton btnDeleteFromDatabase = new JButton(Localization.lang("Delete_from_database"));
-		btnDeleteFromDatabase.addActionListener(new ActionListener() {
+		JButton deleteFromDatabase = new JButton(Localization.lang("Delete_from_database"));
+		deleteFromDatabase.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				result = DeleteResult.DELETE_FROM_DATABASE;
 				dispose();
 			}
 		});
-		buttonPane.add(btnDeleteFromDatabase);
+		buttonPane.add(deleteFromDatabase);
 
 		if (selectedGroups.size() > 0) {
 			JButton btnRemoveFromAll = new JButton(Localization.lang("Remove_from_group(s)"));
@@ -110,19 +110,15 @@ public class DeleteDialog extends JDialog {
 //		}
 		
 		
-		// set size
 		pack();
-		
-		// center of screen
 		this.setLocationRelativeTo(null);
 		
-		// dispose on ESC
 		getRootPane().registerKeyboardAction(e -> {
 		    this.dispose();
 		}, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
 
-	DeleteResult getResult(){
+	public DeleteResult getResult() {
 		return result;
 	}
 

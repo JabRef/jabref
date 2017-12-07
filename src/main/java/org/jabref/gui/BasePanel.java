@@ -45,7 +45,6 @@ import javafx.application.Platform;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import org.jabref.gui.DeleteDialog.DeleteResult;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.actions.CleanupAction;
@@ -72,6 +71,8 @@ import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.filelist.AttachFileAction;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
+import org.jabref.gui.groups.DeleteDialog;
+import org.jabref.gui.groups.DeleteDialog.DeleteResult;
 import org.jabref.gui.groups.GroupAddRemoveDialog;
 import org.jabref.gui.groups.GroupTreeNodeViewModel;
 import org.jabref.gui.groups.UndoableChangeEntriesOfGroup;
@@ -763,7 +764,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     /**
-     * Removes the selected entries from the database
+     * Removes the selected entries from the database or selected groups
      *
      * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as
      *            "deleted". If true the action will be localized as "cut"
@@ -776,35 +777,29 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             return;
         }
     	
-        //create list of all groups of selected entries
         Set<String> allEnriesGroups = new HashSet<String>(); 
 
-        for (BibEntry entrie : entries) {
-        	if (entrie.getField("groups").isPresent()) {
-        		System.out.println(entrie.getField("groups"));
-        		String[] groups = entrie.getField("groups").get().split(",");
-        		for(String group : groups){
+        for (BibEntry entry : entries) {
+        	if (entry.getField("groups").isPresent()) {
+        		System.out.println(entry.getField("groups"));
+        		String[] groups = entry.getField("groups").get().split(",");
+        		for (String group : groups){
         			allEnriesGroups.add(group);
         		}
         	}
         }
         System.out.println(allEnriesGroups);
-        
-        
-    	//get list of all groups
-        //Optional<GroupTreeNode> groups = bibDatabaseContext.getMetaData().getGroups();
-        
-        if (!cut) { // dialog only for delete
+               
+        if (!cut) { 
         	DeleteDialog diag = new DeleteDialog(Globals.stateManager.getSelectedGroup(bibDatabaseContext), allEnriesGroups);
         	diag.setVisible(true);
 
         	DeleteResult resultDialog = diag.getResult();
 
-        	if (resultDialog == DeleteResult.REMOVE_FROM_GROUPS) { //Remove from selected groups 
+        	if (resultDialog == DeleteResult.REMOVE_FROM_GROUPS) { 
         		for (GroupTreeNode node: Globals.stateManager.getSelectedGroup(bibDatabaseContext)) {
         			changesRemove = node.removeEntriesFromGroup(entries);
 
-        			// Remember undo information
         			if (!changesRemove.isEmpty()) {
         				AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node), changesRemove);
         				undoManager.addEdit(undoRemove);
@@ -814,7 +809,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         		markBaseChanged();
         		mainTable.requestFocus();
         		return;
-        	} else if (resultDialog == DeleteResult.CANCEL) { //Cancel
+        	} else if (resultDialog == DeleteResult.CANCEL) { 
         		return;
         	} 
         }
