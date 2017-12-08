@@ -172,8 +172,9 @@ public class IacrEprintFetcherTest {
         return result;
     }
 
-    // Parameter provider
-    static Stream<String> allNonWithdrawnIdsWithOldHtmlFormat() {
+    // Parameter provider (method name is passed as a string)
+    @SuppressWarnings("unused")
+    private static Stream<String> allNonWithdrawnIdsWithOldHtmlFormat() {
         Collection<String> withdrawnIds = Arrays.asList("1998/016", "1999/006");
         List<String> ids = new ArrayList<>();
         ids.addAll(getIdsFor(1996, 16));

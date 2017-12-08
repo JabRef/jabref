@@ -137,9 +137,9 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     private TemporalAccessor parseSingleDateFromWebsite(String dateStringFromWebsite) {
         TemporalAccessor date = null;
         // Some entries contain double spaces in the date string (which would break our regexs below)
-        dateStringFromWebsite = dateStringFromWebsite.replaceAll("\\s\\s+", " ");
+        String dateStringWithoutDoubleSpaces = dateStringFromWebsite.replaceAll("\\s\\s+", " ");
 
-        Matcher dateMatcherAfter2000 = DATE_FROM_WEBSITE_AFTER_2000_PATTERN.matcher(dateStringFromWebsite.trim());
+        Matcher dateMatcherAfter2000 = DATE_FROM_WEBSITE_AFTER_2000_PATTERN.matcher(dateStringWithoutDoubleSpaces.trim());
         if (dateMatcherAfter2000.find()) {
             try {
                 date = DATE_FORMAT_WEBSITE_AFTER_2000.parse(dateMatcherAfter2000.group(1));
@@ -150,7 +150,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
 
         // Entries before year 2000 use a variety of date formats - fortunately, we can match them with only two different
         // date formats (each of which differ from the unified format of post-2000 entries).
-        Matcher dateMatcherBefore2000 = DATE_FROM_WEBSITE_BEFORE_2000_PATTERN.matcher(dateStringFromWebsite.trim());
+        Matcher dateMatcherBefore2000 = DATE_FROM_WEBSITE_BEFORE_2000_PATTERN.matcher(dateStringWithoutDoubleSpaces.trim());
         if (dateMatcherBefore2000.find()) {
             String dateWithoutComma = dateMatcherBefore2000.group(1).replace(",", "");
             try {
