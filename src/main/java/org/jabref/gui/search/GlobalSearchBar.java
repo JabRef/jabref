@@ -1,26 +1,5 @@
 package org.jabref.gui.search;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.io.File;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.swing.AbstractAction;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
-
 import javafx.css.PseudoClass;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
@@ -28,18 +7,10 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.text.TextFlow;
-
+import org.fxmisc.easybind.EasyBind;
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.OSXCompatibleToolbar;
-import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
-import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
-import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
-import org.jabref.gui.autocompleter.PersonNameStringConverter;
+import org.jabref.gui.*;
+import org.jabref.gui.autocompleter.*;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -55,7 +26,15 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.SearchPreferences;
 
-import org.fxmisc.easybind.EasyBind;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.io.File;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class GlobalSearchBar extends JPanel {
 
@@ -192,8 +171,9 @@ public class GlobalSearchBar extends JPanel {
 
         container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-            container.setScene(new Scene(searchField));
-            container.getScene().getStylesheets().add(GlobalSearchBar.class.getResource("../Main.css").toExternalForm());
+            Scene scene = new Scene(searchField);
+            scene.getStylesheets().add(GlobalSearchBar.class.getResource("../Main.css").toExternalForm());
+            container.setScene(scene);
             container.addKeyListener(new SearchKeyAdapter());
 
         });
