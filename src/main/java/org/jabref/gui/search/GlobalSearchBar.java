@@ -1,5 +1,25 @@
 package org.jabref.gui.search;
 
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.io.File;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
+
 import javafx.css.PseudoClass;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
@@ -7,10 +27,18 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.text.TextFlow;
-import org.fxmisc.easybind.EasyBind;
+
 import org.jabref.Globals;
-import org.jabref.gui.*;
-import org.jabref.gui.autocompleter.*;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.OSXCompatibleToolbar;
+import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
+import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
+import org.jabref.gui.autocompleter.PersonNameStringConverter;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -26,22 +54,9 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.SearchPreferences;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.io.File;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import org.fxmisc.easybind.EasyBind;
 
 public class GlobalSearchBar extends JPanel {
-
-    private static final Color NEUTRAL_COLOR = Color.WHITE;
-    private static final Color NO_RESULTS_COLOR = new Color(232, 202, 202);
-    private static final Color RESULTS_FOUND_COLOR = new Color(217, 232, 202);
-    private static final Color ADVANCED_SEARCH_COLOR = new Color(102, 255, 255);
 
     private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
     private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
@@ -175,7 +190,6 @@ public class GlobalSearchBar extends JPanel {
             scene.getStylesheets().add(GlobalSearchBar.class.getResource("../Main.css").toExternalForm());
             container.setScene(scene);
             container.addKeyListener(new SearchKeyAdapter());
-
         });
 
         setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -227,7 +241,7 @@ public class GlobalSearchBar extends JPanel {
 
         SearchResultFrame searchDialog = new SearchResultFrame(currentBasePanel.frame(),
                 Localization.lang("Search results in library %0 for %1", currentBasePanel.getBibDatabaseContext()
-                        .getDatabaseFile().map(File::getName).orElse(GUIGlobals.UNTITLED_TITLE),
+                                .getDatabaseFile().map(File::getName).orElse(GUIGlobals.UNTITLED_TITLE),
                         this.getSearchQuery().localize()),
                 getSearchQuery(), false);
         List<BibEntry> entries = currentBasePanel.getDatabase().getEntries().stream()
@@ -349,7 +363,6 @@ public class GlobalSearchBar extends JPanel {
                 searchCompleter,
                 new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
                 new AppendPersonNamesStrategy());
-
     }
 
     public SearchQueryHighlightObservable getSearchQueryHighlightObservable() {
@@ -395,7 +408,6 @@ public class GlobalSearchBar extends JPanel {
 
         setDontSelectSearchBar();
         DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchTerm));
-
     }
 
     public void setDontSelectSearchBar() {
