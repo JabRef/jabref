@@ -32,8 +32,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
+
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -42,6 +44,7 @@ import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.TransferableBibtexEntry;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.filelist.FileListEntry;
@@ -49,11 +52,13 @@ import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.MainTableNameFormatter;
 import org.jabref.gui.renderer.GeneralRenderer;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.comparator.IconComparator;
 import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
@@ -149,7 +154,10 @@ public class SearchResultFrame {
         entryTable.addMouseListener(new TableClickListener());
 
         contentPane.setTopComponent(sp);
-        contentPane.setBottomComponent(preview);
+
+        JFXPanel container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+        DefaultTaskExecutor.runInJavaFXThread(() -> container.setScene(new Scene(preview)));
+        contentPane.setBottomComponent(container);
 
         // Key bindings:
         AbstractAction closeAction = new AbstractAction() {
@@ -547,7 +555,6 @@ public class SearchResultFrame {
                 preview.setBasePanel(entryHome.get(entry));
                 preview.setDatabaseContext(entryHome.get(entry).getBibDatabaseContext());
                 contentPane.setDividerLocation(0.5f);
-                SwingUtilities.invokeLater(() -> preview.scrollRectToVisible(toRect));
             }
         }
     }

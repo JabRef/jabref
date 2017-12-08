@@ -1,13 +1,18 @@
 package org.jabref.gui.collab;
 
 import javax.swing.JComponent;
-import javax.swing.JScrollPane;
+
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.PreviewPanel;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.IdGenerator;
@@ -15,15 +20,17 @@ import org.jabref.model.entry.IdGenerator;
 class EntryAddChangeViewModel extends ChangeViewModel {
 
     private final BibEntry diskEntry;
-    private final JScrollPane sp;
+    private final JFXPanel container;
 
 
     public EntryAddChangeViewModel(BibEntry diskEntry) {
         super(Localization.lang("Added entry"));
         this.diskEntry = diskEntry;
 
-        PreviewPanel pp = new PreviewPanel(null, diskEntry, null);
-        sp = new JScrollPane(pp);
+        PreviewPanel previewPanel = new PreviewPanel(null, null);
+        previewPanel.setEntry(diskEntry);
+        container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+        DefaultTaskExecutor.runInJavaFXThread(() -> container.setScene(new Scene(previewPanel)));
     }
 
     @Override
@@ -37,6 +44,6 @@ class EntryAddChangeViewModel extends ChangeViewModel {
 
     @Override
     public JComponent description() {
-        return sp;
+        return container;
     }
 }

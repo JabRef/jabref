@@ -27,13 +27,19 @@ import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+
 import org.jabref.Globals;
 import org.jabref.gui.PreviewPanel;
+import org.jabref.gui.customjfx.CustomJFXPanel;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.component.DiffHighlightingTextPane;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.strings.DiffHighlighting;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -179,8 +185,11 @@ public class MergeEntries {
         // Setup a PreviewPanel and a Bibtex source box for the merged entry
         mainPanel.add(boldFontLabel(Localization.lang("Merged entry")), CELL_CONSTRAINTS.xyw(1, 6, 6));
 
-        entryPreview = new PreviewPanel(null, mergedEntry, null);
-        mainPanel.add(entryPreview, CELL_CONSTRAINTS.xyw(1, 8, 6));
+        entryPreview = new PreviewPanel(null, null);
+        entryPreview.setEntry(mergedEntry);
+        JFXPanel container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+        DefaultTaskExecutor.runInJavaFXThread(() -> container.setScene(new Scene(entryPreview)));
+        mainPanel.add(container, CELL_CONSTRAINTS.xyw(1, 8, 6));
 
         mainPanel.add(boldFontLabel(Localization.lang("Merged BibTeX source code")), CELL_CONSTRAINTS.xyw(8, 6, 4));
 

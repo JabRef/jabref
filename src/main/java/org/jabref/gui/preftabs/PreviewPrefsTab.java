@@ -18,12 +18,18 @@ import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
 
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.PreviewPanel;
+import org.jabref.gui.customjfx.CustomJFXPanel;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.preferences.PreviewPreferences;
 
@@ -116,10 +122,13 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
         btnTest.addActionListener(event -> {
             try {
-                PreviewPanel testPane = new PreviewPanel(null, TestEntry.getTestEntry(), null)
-                        .setFixedLayout(layout.getText());
-                testPane.setPreferredSize(new Dimension(800, 350));
-                JOptionPane.showMessageDialog(PreviewPrefsTab.this, new JScrollPane(testPane), Localization.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
+                PreviewPanel testPane = new PreviewPanel(null, null);
+                testPane.setFixedLayout(layout.getText());
+                testPane.setEntry(TestEntry.getTestEntry());
+                JFXPanel container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+                container.setPreferredSize(new Dimension(800, 350));
+                DefaultTaskExecutor.runInJavaFXThread(() -> container.setScene(new Scene(testPane)));
+                JOptionPane.showMessageDialog(PreviewPrefsTab.this, container, Localization.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
             } catch (StringIndexOutOfBoundsException exception) {
                 LOGGER.warn("Parsing error.", exception);
                 JOptionPane.showMessageDialog(null,
