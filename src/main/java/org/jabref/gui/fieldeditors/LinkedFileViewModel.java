@@ -293,7 +293,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         } else {
             Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.ERROR, Localization.lang("File not found"),
-                    Localization.lang("Could not find file '%0'.", linkedFile.getLink() + OS.NEWLINE + Localization.lang("Pressing remove will remove the file from the entry")),
+                    (Localization.lang("Could not find file '%0'.", linkedFile.getLink()) + OS.NEWLINE + Localization.lang("Pressing 'remove' will remove the file from the entry")),
                     removeFromEntry, ButtonType.CANCEL);
 
             if (buttonType.isPresent()) {
