@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -229,7 +229,7 @@ public class EndnoteImporter extends Importer {
                         type = "mastersthesis";
                     }
                 } else if ("F".equals(prefix)) {
-                    hm.put(BibEntry.KEY_FIELD, BibtexKeyPatternUtil.checkLegalKey(val,
+                    hm.put(BibEntry.KEY_FIELD, BibtexKeyGenerator.cleanKey(val,
                             preferences.getBibtexKeyPatternPreferences().isEnforceLegalKey()));
                 }
             }

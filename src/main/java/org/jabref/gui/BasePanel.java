@@ -99,7 +99,7 @@ import org.jabref.gui.worker.CallBack;
 import org.jabref.gui.worker.CitationStyleToClipboardWorker;
 import org.jabref.gui.worker.MarkEntriesAction;
 import org.jabref.gui.worker.SendAsEMailAction;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -119,7 +119,6 @@ import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
-import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.DatabaseLocation;
@@ -136,6 +135,7 @@ import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 import org.jabref.shared.DBMSSynchronizer;
@@ -448,16 +448,10 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 
                 // generate the new cite keys for each entry
                 final NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
-                AbstractBibtexKeyPattern citeKeyPattern = bibDatabaseContext.getMetaData()
-                        .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern());
+                BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(bibDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences());
                 for (BibEntry entry : entries) {
-                    String oldCiteKey = entry.getCiteKeyOptional().orElse("");
-                    BibtexKeyPatternUtil.makeAndSetLabel(citeKeyPattern, bibDatabaseContext.getDatabase(),
-                            entry, Globals.prefs.getBibtexKeyPatternPreferences());
-                    String newCiteKey = entry.getCiteKeyOptional().orElse("");
-                    if (!oldCiteKey.equals(newCiteKey)) {
-                        ce.addEdit(new UndoableKeyChange(entry, oldCiteKey, newCiteKey));
-                    }
+                    Optional<FieldChange> change = keyGenerator.generateAndSetKey(entry);
+                    change.ifPresent(fieldChange -> ce.addEdit(new UndoableKeyChange(fieldChange)));
                 }
                 ce.end();
 
@@ -1735,15 +1729,12 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         if (Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING)) {
             NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
 
+            BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(bibDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences());
             for (BibEntry bes : bibDatabaseContext.getDatabase().getEntries()) {
                 Optional<String> oldKey = bes.getCiteKeyOptional();
-                if (!(oldKey.isPresent()) || oldKey.get().isEmpty()) {
-                    BibtexKeyPatternUtil.makeAndSetLabel(bibDatabaseContext.getMetaData()
-                            .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
-                            bibDatabaseContext.getDatabase(),
-                            bes, Globals.prefs.getBibtexKeyPatternPreferences());
-                    bes.getCiteKeyOptional().ifPresent(
-                            newKey -> ce.addEdit(new UndoableKeyChange(bes, oldKey.orElse(""), newKey)));
+                if (StringUtil.isBlank(oldKey)) {
+                    Optional<FieldChange> change = keyGenerator.generateAndSetKey(bes);
+                    change.ifPresent(fieldChange -> ce.addEdit(new UndoableKeyChange(fieldChange)));
                 }
             }
 

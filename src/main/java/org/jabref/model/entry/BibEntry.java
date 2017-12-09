@@ -184,8 +184,8 @@ public class BibEntry implements Cloneable {
      *
      * @param newCiteKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
      */
-    public void setCiteKey(String newCiteKey) {
-        setField(KEY_FIELD, newCiteKey);
+    public Optional<FieldChange> setCiteKey(String newCiteKey) {
+        return setField(KEY_FIELD, newCiteKey);
     }
 
     public Optional<String> getCiteKeyOptional() {

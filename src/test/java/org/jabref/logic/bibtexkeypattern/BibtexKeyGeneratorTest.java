@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 
-public class BibtexKeyPatternUtilTest {
+public class BibtexKeyGeneratorTest {
 
     private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1 = "Isaac Newton";
     private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2 = "Isaac Newton and James Maxwell";
@@ -53,7 +53,7 @@ public class BibtexKeyPatternUtilTest {
         Optional<BibEntry> entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}}",
                 importFormatPreferences);
         assertEquals("Holland",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth",
                         ',', new BibDatabase()), true));
     }
 
@@ -69,7 +69,7 @@ public class BibtexKeyPatternUtilTest {
         database.insertEntry(entry2);
 
         assertEquals("Holland",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry1, "auth",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry1, "auth",
                         ',', database), true));
     }
 
@@ -78,7 +78,7 @@ public class BibtexKeyPatternUtilTest {
         String bibtexString = "@ARTICLE{whatevery, author={Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland}}";
         Optional<BibEntry> entry = BibtexParser.singleFromString(bibtexString, importFormatPreferences);
         assertEquals("HerlandHaugeHelgeland",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry.get(), "authors3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry.get(), "authors3",
                         ',', new BibDatabase()), true));
     }
 
@@ -94,7 +94,7 @@ public class BibtexKeyPatternUtilTest {
         database.insertEntry(entry2);
 
         assertEquals("HerlandHaugeHelgeland",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry1, "authors3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry1, "authors3",
                         ',', database), true));
     }
 
@@ -103,7 +103,7 @@ public class BibtexKeyPatternUtilTest {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={Simon Popovi\\v{c}ov\\'{a}}}", importFormatPreferences);
         assertEquals("Popovicova",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry.get(), "auth",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry.get(), "auth",
                         ',', new BibDatabase()), true));
     }
 
@@ -117,73 +117,73 @@ public class BibtexKeyPatternUtilTest {
         Optional<BibEntry> entry0 = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={Andreas Köning}, year={2000}}", importFormatPreferences);
         assertEquals("Koen",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         ',', new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Áöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Aoen",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         ',', new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Éöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Eoen",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         ',', new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Íöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Ioen",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         ',', new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ĺöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Loen",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         ',', new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ńöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Noen",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         ',', new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Óöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Ooen",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         ',', new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ŕöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Roen",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         ',', new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Śöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Soen",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         ',', new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Úöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Uoen",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         ',', new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ýöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Yoen",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         ',', new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Źöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Zoen",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         ',', new BibDatabase()), true));
     }
 
@@ -195,31 +195,31 @@ public class BibtexKeyPatternUtilTest {
         Optional<BibEntry> entry0 = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}", importFormatPreferences);
         assertEquals("Aoen",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         ',', new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Èöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Eoen",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         ',', new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ìöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Ioen",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         ',', new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Òöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Ooen",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         ',', new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ùöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Uoen",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0.get(), "auth3",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
                         ',', new BibDatabase()), true));
     }
 
@@ -227,7 +227,7 @@ public class BibtexKeyPatternUtilTest {
      * Tests if checkLegalKey replaces Non-ASCII chars.
      * There are quite a few chars that should be replaced. Perhaps there is a better method than the current.
      *
-     * @see BibtexKeyPatternUtil#checkLegalKey(String)
+     * @see BibtexKeyGenerator#checkLegalKey(String)
      */
     @Test
     public void testCheckLegalKey() {
@@ -238,43 +238,43 @@ public class BibtexKeyPatternUtilTest {
         //"Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə
         String accents = "ÀàÈèÌìÒòÙù Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ";
         String expectedResult = "AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYy";
-        assertEquals(expectedResult, BibtexKeyPatternUtil.checkLegalKey(accents, true));
+        assertEquals(expectedResult, BibtexKeyGenerator.cleanKey(accents, true));
 
         accents = "ÄäËëÏïÖöÜüŸÿ";
         expectedResult = "AeaeEeIiOeoeUeueYy";
-        assertEquals(expectedResult, BibtexKeyPatternUtil.checkLegalKey(accents, true));
+        assertEquals(expectedResult, BibtexKeyGenerator.cleanKey(accents, true));
 
         accents = "Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ";
         expectedResult = "CcGgKkLlNnRrSsTt";
-        assertEquals(expectedResult, BibtexKeyPatternUtil.checkLegalKey(accents, true));
+        assertEquals(expectedResult, BibtexKeyGenerator.cleanKey(accents, true));
 
         accents = "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ";
         expectedResult = "AaEeGgIiOoUu";
-        assertEquals(expectedResult, BibtexKeyPatternUtil.checkLegalKey(accents, true));
+        assertEquals(expectedResult, BibtexKeyGenerator.cleanKey(accents, true));
 
         accents = "Ċ ċ Ė ė Ġ ġ İ ı Ż ż";
         expectedResult = "CcEeGgIiZz";
-        assertEquals(expectedResult, BibtexKeyPatternUtil.checkLegalKey(accents, true));
+        assertEquals(expectedResult, BibtexKeyGenerator.cleanKey(accents, true));
 
         accents = "Ą ą Ę ę Į į Ǫ ǫ Ų ų";
         expectedResult = "AaEeIiOoUu"; // O or Q? o or q?
-        assertEquals(expectedResult, BibtexKeyPatternUtil.checkLegalKey(accents, true));
+        assertEquals(expectedResult, BibtexKeyGenerator.cleanKey(accents, true));
 
         accents = "Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ";
         expectedResult = "AaEeIiOoUuYy";
-        assertEquals(expectedResult, BibtexKeyPatternUtil.checkLegalKey(accents, true));
+        assertEquals(expectedResult, BibtexKeyGenerator.cleanKey(accents, true));
 
         accents = "Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž";
         expectedResult = "AaCcDdEeIiLlNnOoRrSsTtUuZz";
-        assertEquals(expectedResult, BibtexKeyPatternUtil.checkLegalKey(accents, true));
+        assertEquals(expectedResult, BibtexKeyGenerator.cleanKey(accents, true));
 
         expectedResult = "AaEeIiNnOoUuYy";
         accents = "ÃãẼẽĨĩÑñÕõŨũỸỹ";
-        assertEquals(expectedResult, BibtexKeyPatternUtil.checkLegalKey(accents, true));
+        assertEquals(expectedResult, BibtexKeyGenerator.cleanKey(accents, true));
 
         accents = "Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ";
         expectedResult = "DdHhLlLlMmNnRrRrSsTt";
-        assertEquals(expectedResult, BibtexKeyPatternUtil.checkLegalKey(accents, true));
+        assertEquals(expectedResult, BibtexKeyGenerator.cleanKey(accents, true));
 
         String totest = "À à È è Ì ì Ò ò Ù ù   Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ  Ä ä Ë ë Ï ï Ö ö Ü ü Ÿ ÿ    "
                 + "Ã ã Ẽ ẽ Ĩ ĩ Ñ ñ Õ õ Ũ ũ Ỹ ỹ   Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ"
@@ -284,23 +284,23 @@ public class BibtexKeyPatternUtilTest {
         String expectedResults = "AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYyAeaeEeIiOeoeUeueYy"
                 + "AaEeIiNnOoUuYyCcGgKkLlNnRrSsTt" + "AaCcDdEeIiLlNnOoRrSsTtUuZz" + "AaEeIiOoUuYy" + "AaEeGgIiOoUu"
                 + "CcEeGgIiZzAaEeIiOoUu" + "DdHhLlLlMmNnRrRrSsTt";
-        assertEquals(expectedResults, BibtexKeyPatternUtil.checkLegalKey(totest, true));
+        assertEquals(expectedResults, BibtexKeyGenerator.cleanKey(totest, true));
     }
 
     @Test
     public void testFirstAuthor() {
-        assertEquals("Newton", BibtexKeyPatternUtil.firstAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5));
-        assertEquals("Newton", BibtexKeyPatternUtil.firstAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
+        assertEquals("Newton", BibtexKeyGenerator.firstAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5));
+        assertEquals("Newton", BibtexKeyGenerator.firstAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
 
         // https://sourceforge.net/forum/message.php?msg_id=4498555
-        assertEquals("K{\\\"o}ning", BibtexKeyPatternUtil.firstAuthor("K{\\\"o}ning"));
+        assertEquals("K{\\\"o}ning", BibtexKeyGenerator.firstAuthor("K{\\\"o}ning"));
 
-        assertEquals("", BibtexKeyPatternUtil.firstAuthor(""));
+        assertEquals("", BibtexKeyGenerator.firstAuthor(""));
     }
 
     @Test(expected = NullPointerException.class)
     public void testFirstAuthorNull() {
-        BibtexKeyPatternUtil.firstAuthor(null);
+        BibtexKeyGenerator.firstAuthor(null);
     }
 
     @Test
@@ -308,7 +308,7 @@ public class BibtexKeyPatternUtilTest {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University}}}", importFormatPreferences);
         assertEquals("UniLinkoeping",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry.get(), "auth",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry.get(), "auth",
                         ',', new BibDatabase()), true));
     }
 
@@ -324,7 +324,7 @@ public class BibtexKeyPatternUtilTest {
         database.insertEntry(entry2);
 
         assertEquals("UniLinkoeping",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry1, "auth",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry1, "auth",
                         ',', database), true));
     }
 
@@ -334,7 +334,7 @@ public class BibtexKeyPatternUtilTest {
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, Department of Electrical Engineering}}}",
                 importFormatPreferences);
         assertEquals("UniLinkoepingEE",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry.get(), "auth",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry.get(), "auth",
                         ',', new BibDatabase()), true));
     }
 
@@ -350,7 +350,7 @@ public class BibtexKeyPatternUtilTest {
         database.insertEntry(entry2);
 
         assertEquals("UniLinkoepingEE",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry1, "auth",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry1, "auth",
                         ',', database), true));
     }
 
@@ -360,7 +360,7 @@ public class BibtexKeyPatternUtilTest {
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, School of Computer Engineering}}}",
                 importFormatPreferences);
         assertEquals("UniLinkoepingCE",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry.get(), "auth",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry.get(), "auth",
                         ',', new BibDatabase()), true));
     }
 
@@ -376,7 +376,7 @@ public class BibtexKeyPatternUtilTest {
         database.insertEntry(entry2);
 
         assertEquals("UniLinkoepingCE",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry1, "auth",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry1, "auth",
                         ',', database), true));
     }
 
@@ -385,7 +385,7 @@ public class BibtexKeyPatternUtilTest {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Massachusetts Institute of Technology}}}", importFormatPreferences);
         assertEquals("MIT",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry.get(), "auth",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry.get(), "auth",
                         ',', new BibDatabase()), true));
     }
 
@@ -401,35 +401,35 @@ public class BibtexKeyPatternUtilTest {
         database.insertEntry(entry2);
 
         assertEquals("MIT",
-                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry1, "auth",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry1, "auth",
                         ',', database), true));
     }
 
     @Test
     public void testAuthIniN() {
-        assertEquals("NMEB", BibtexKeyPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, 4));
-        assertEquals("NMEB", BibtexKeyPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 4));
-        assertEquals("NeME", BibtexKeyPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 4));
-        assertEquals("NeMa", BibtexKeyPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 4));
-        assertEquals("Newt", BibtexKeyPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 4));
+        assertEquals("NMEB", BibtexKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, 4));
+        assertEquals("NMEB", BibtexKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 4));
+        assertEquals("NeME", BibtexKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 4));
+        assertEquals("NeMa", BibtexKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 4));
+        assertEquals("Newt", BibtexKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 4));
         assertEquals("", "");
 
-        assertEquals("N", BibtexKeyPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1));
-        assertEquals("", BibtexKeyPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 0));
-        assertEquals("", BibtexKeyPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, -1));
+        assertEquals("N", BibtexKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1));
+        assertEquals("", BibtexKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 0));
+        assertEquals("", BibtexKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, -1));
 
-        assertEquals("Newton", BibtexKeyPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 6));
-        assertEquals("Newton", BibtexKeyPatternUtil.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 7));
+        assertEquals("Newton", BibtexKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 6));
+        assertEquals("Newton", BibtexKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 7));
     }
 
     @Test(expected = NullPointerException.class)
     public void testAuthIniNNull() {
-        BibtexKeyPatternUtil.authIniN(null, 3);
+        BibtexKeyGenerator.authIniN(null, 3);
     }
 
     @Test
     public void testAuthIniNEmptyReturnsEmpty() {
-        assertEquals("", BibtexKeyPatternUtil.authIniN("", 1));
+        assertEquals("", BibtexKeyGenerator.authIniN("", 1));
     }
 
     /**
@@ -437,16 +437,16 @@ public class BibtexKeyPatternUtilTest {
      */
     @Test
     public void authAuthEa() {
-        assertEquals("Newton", BibtexKeyPatternUtil.authAuthEa(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1));
+        assertEquals("Newton", BibtexKeyGenerator.authAuthEa(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1));
         assertEquals("Newton.Maxwell",
-                BibtexKeyPatternUtil.authAuthEa(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2));
+                BibtexKeyGenerator.authAuthEa(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2));
         assertEquals("Newton.Maxwell.ea",
-                BibtexKeyPatternUtil.authAuthEa(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3));
+                BibtexKeyGenerator.authAuthEa(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3));
     }
 
     @Test
     public void testAuthEaEmptyReturnsEmpty() {
-        assertEquals("", BibtexKeyPatternUtil.authAuthEa(""));
+        assertEquals("", BibtexKeyGenerator.authAuthEa(""));
     }
 
     /**
@@ -460,17 +460,17 @@ public class BibtexKeyPatternUtilTest {
         String delim = ".";
         String append = ".etal";
         assertEquals("Newton.etal",
-                BibtexKeyPatternUtil.authEtal(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, delim, append));
+                BibtexKeyGenerator.authEtal(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, delim, append));
         assertEquals("Newton.Maxwell",
-                BibtexKeyPatternUtil.authEtal(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, delim, append));
+                BibtexKeyGenerator.authEtal(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, delim, append));
 
         // [authEtAl]
         delim = "";
         append = "EtAl";
         assertEquals("NewtonEtAl",
-                BibtexKeyPatternUtil.authEtal(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, delim, append));
+                BibtexKeyGenerator.authEtal(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, delim, append));
         assertEquals("NewtonMaxwell",
-                BibtexKeyPatternUtil.authEtal(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, delim, append));
+                BibtexKeyGenerator.authEtal(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, delim, append));
     }
 
     /**
@@ -479,15 +479,15 @@ public class BibtexKeyPatternUtilTest {
     @Test
     public void testAuthShort() {
         // tests taken from the comments
-        assertEquals("NME+", BibtexKeyPatternUtil.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4));
-        assertEquals("NME", BibtexKeyPatternUtil.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
-        assertEquals("NM", BibtexKeyPatternUtil.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
-        assertEquals("Newton", BibtexKeyPatternUtil.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
+        assertEquals("NME+", BibtexKeyGenerator.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4));
+        assertEquals("NME", BibtexKeyGenerator.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
+        assertEquals("NM", BibtexKeyGenerator.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
+        assertEquals("Newton", BibtexKeyGenerator.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
     }
 
     @Test
     public void testAuthShortEmptyReturnsEmpty() {
-        assertEquals("", BibtexKeyPatternUtil.authshort(""));
+        assertEquals("", BibtexKeyGenerator.authshort(""));
     }
 
     /**
@@ -495,27 +495,27 @@ public class BibtexKeyPatternUtilTest {
      */
     @Test
     public void authNM() {
-        assertEquals("N", BibtexKeyPatternUtil.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1, 1));
+        assertEquals("N", BibtexKeyGenerator.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1, 1));
         assertEquals("Max",
-                BibtexKeyPatternUtil.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 3, 2));
+                BibtexKeyGenerator.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 3, 2));
         assertEquals("New",
-                BibtexKeyPatternUtil.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 3, 1));
+                BibtexKeyGenerator.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 3, 1));
         assertEquals("Bo",
-                BibtexKeyPatternUtil.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 2, 4));
+                BibtexKeyGenerator.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 2, 4));
         assertEquals("Bohr",
-                BibtexKeyPatternUtil.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, 6, 4));
+                BibtexKeyGenerator.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, 6, 4));
 
         assertEquals("Aal",
-                BibtexKeyPatternUtil.authNofMth(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, 3, 1));
+                BibtexKeyGenerator.authNofMth(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, 3, 1));
         assertEquals("Less",
-                BibtexKeyPatternUtil.authNofMth(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, 4, 2));
+                BibtexKeyGenerator.authNofMth(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, 4, 2));
 
-        assertEquals("", BibtexKeyPatternUtil.authNofMth("", 2, 4));
+        assertEquals("", BibtexKeyGenerator.authNofMth("", 2, 4));
     }
 
     @Test(expected = NullPointerException.class)
     public void authNMThrowsNPE() {
-        BibtexKeyPatternUtil.authNofMth(null, 2, 4);
+        BibtexKeyGenerator.authNofMth(null, 2, 4);
     }
 
     /**
@@ -523,14 +523,14 @@ public class BibtexKeyPatternUtilTest {
      */
     @Test
     public void firstAuthorForenameInitials() {
-        assertEquals("I", BibtexKeyPatternUtil
+        assertEquals("I", BibtexKeyGenerator
                 .firstAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
-        assertEquals("I", BibtexKeyPatternUtil
+        assertEquals("I", BibtexKeyGenerator
                 .firstAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
         assertEquals("I",
-                BibtexKeyPatternUtil.firstAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1));
+                BibtexKeyGenerator.firstAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1));
         assertEquals("I",
-                BibtexKeyPatternUtil.firstAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2));
+                BibtexKeyGenerator.firstAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2));
     }
 
     /**
@@ -538,18 +538,18 @@ public class BibtexKeyPatternUtilTest {
      */
     @Test
     public void firstAuthorVonAndLast() {
-        assertEquals("vanderAalst", BibtexKeyPatternUtil
+        assertEquals("vanderAalst", BibtexKeyGenerator
                 .firstAuthorVonAndLast(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1));
-        assertEquals("vanderAalst", BibtexKeyPatternUtil
+        assertEquals("vanderAalst", BibtexKeyGenerator
                 .firstAuthorVonAndLast(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2));
     }
 
     @Test
     public void firstAuthorVonAndLastNoVonInName() {
         assertEquals("Newton",
-                BibtexKeyPatternUtil.firstAuthorVonAndLast(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1));
+                BibtexKeyGenerator.firstAuthorVonAndLast(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1));
         assertEquals("Newton",
-                BibtexKeyPatternUtil.firstAuthorVonAndLast(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2));
+                BibtexKeyGenerator.firstAuthorVonAndLast(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2));
     }
 
     /**
@@ -557,11 +557,11 @@ public class BibtexKeyPatternUtilTest {
      */
     @Test
     public void testAllAuthors() {
-        assertEquals("Newton", BibtexKeyPatternUtil.allAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
+        assertEquals("Newton", BibtexKeyGenerator.allAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
         assertEquals("NewtonMaxwell",
-                BibtexKeyPatternUtil.allAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
+                BibtexKeyGenerator.allAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
         assertEquals("NewtonMaxwellEinstein",
-                BibtexKeyPatternUtil.allAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
+                BibtexKeyGenerator.allAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
     }
 
     /**
@@ -569,16 +569,16 @@ public class BibtexKeyPatternUtilTest {
      */
     @Test
     public void authorsAlpha() {
-        assertEquals("New", BibtexKeyPatternUtil.authorsAlpha(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
-        assertEquals("NM", BibtexKeyPatternUtil.authorsAlpha(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
-        assertEquals("NME", BibtexKeyPatternUtil.authorsAlpha(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
-        assertEquals("NMEB", BibtexKeyPatternUtil.authorsAlpha(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4));
-        assertEquals("NME+", BibtexKeyPatternUtil.authorsAlpha(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5));
+        assertEquals("New", BibtexKeyGenerator.authorsAlpha(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
+        assertEquals("NM", BibtexKeyGenerator.authorsAlpha(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
+        assertEquals("NME", BibtexKeyGenerator.authorsAlpha(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
+        assertEquals("NMEB", BibtexKeyGenerator.authorsAlpha(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4));
+        assertEquals("NME+", BibtexKeyGenerator.authorsAlpha(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5));
 
         assertEquals("vdAal",
-                BibtexKeyPatternUtil.authorsAlpha(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1));
+                BibtexKeyGenerator.authorsAlpha(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1));
         assertEquals("vdAvL",
-                BibtexKeyPatternUtil.authorsAlpha(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2));
+                BibtexKeyGenerator.authorsAlpha(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2));
     }
 
     /**
@@ -586,17 +586,17 @@ public class BibtexKeyPatternUtilTest {
      */
     @Test
     public void lastAuthor() {
-        assertEquals("Newton", BibtexKeyPatternUtil.lastAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
-        assertEquals("Maxwell", BibtexKeyPatternUtil.lastAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
+        assertEquals("Newton", BibtexKeyGenerator.lastAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
+        assertEquals("Maxwell", BibtexKeyGenerator.lastAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
         assertEquals("Einstein",
-                BibtexKeyPatternUtil.lastAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
-        assertEquals("Bohr", BibtexKeyPatternUtil.lastAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4));
-        assertEquals("Unknown", BibtexKeyPatternUtil.lastAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5));
+                BibtexKeyGenerator.lastAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
+        assertEquals("Bohr", BibtexKeyGenerator.lastAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4));
+        assertEquals("Unknown", BibtexKeyGenerator.lastAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5));
 
         assertEquals("Aalst",
-                BibtexKeyPatternUtil.lastAuthor(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1));
+                BibtexKeyGenerator.lastAuthor(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1));
         assertEquals("Lessen",
-                BibtexKeyPatternUtil.lastAuthor(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2));
+                BibtexKeyGenerator.lastAuthor(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2));
     }
 
     /**
@@ -605,19 +605,19 @@ public class BibtexKeyPatternUtilTest {
     @Test
     public void lastAuthorForenameInitials() {
         assertEquals("I",
-                BibtexKeyPatternUtil.lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
+                BibtexKeyGenerator.lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
         assertEquals("J",
-                BibtexKeyPatternUtil.lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
+                BibtexKeyGenerator.lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
         assertEquals("A",
-                BibtexKeyPatternUtil.lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
+                BibtexKeyGenerator.lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
         assertEquals("N",
-                BibtexKeyPatternUtil.lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4));
+                BibtexKeyGenerator.lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4));
         assertEquals("H",
-                BibtexKeyPatternUtil.lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5));
+                BibtexKeyGenerator.lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5));
 
-        assertEquals("W", BibtexKeyPatternUtil
+        assertEquals("W", BibtexKeyGenerator
                 .lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1));
-        assertEquals("T", BibtexKeyPatternUtil
+        assertEquals("T", BibtexKeyGenerator
                 .lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2));
     }
 
@@ -627,20 +627,20 @@ public class BibtexKeyPatternUtilTest {
     @Test
     public void oneAuthorPlusIni() {
         assertEquals("Newto",
-                BibtexKeyPatternUtil.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
+                BibtexKeyGenerator.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
         assertEquals("NewtoM",
-                BibtexKeyPatternUtil.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
+                BibtexKeyGenerator.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
         assertEquals("NewtoME",
-                BibtexKeyPatternUtil.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
+                BibtexKeyGenerator.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
         assertEquals("NewtoMEB",
-                BibtexKeyPatternUtil.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4));
+                BibtexKeyGenerator.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4));
         assertEquals("NewtoMEBU",
-                BibtexKeyPatternUtil.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5));
+                BibtexKeyGenerator.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5));
 
         assertEquals("Aalst",
-                BibtexKeyPatternUtil.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1));
+                BibtexKeyGenerator.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1));
         assertEquals("AalstL",
-                BibtexKeyPatternUtil.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2));
+                BibtexKeyGenerator.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2));
     }
 
     /**
@@ -648,18 +648,18 @@ public class BibtexKeyPatternUtilTest {
      */
     @Test
     public void testNAuthors1() {
-        assertEquals("Newton", BibtexKeyPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1));
+        assertEquals("Newton", BibtexKeyGenerator.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1));
         assertEquals("NewtonEtAl",
-                BibtexKeyPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 1));
+                BibtexKeyGenerator.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 1));
         assertEquals("NewtonEtAl",
-                BibtexKeyPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 1));
+                BibtexKeyGenerator.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 1));
         assertEquals("NewtonEtAl",
-                BibtexKeyPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 1));
+                BibtexKeyGenerator.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 1));
     }
 
     @Test
     public void testNAuthors1EmptyReturnEmpty() {
-        assertEquals("", BibtexKeyPatternUtil.nAuthors("", 1));
+        assertEquals("", BibtexKeyGenerator.nAuthors("", 1));
     }
 
     /**
@@ -667,69 +667,69 @@ public class BibtexKeyPatternUtilTest {
      */
     @Test
     public void testNAuthors3() {
-        assertEquals("Newton", BibtexKeyPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 3));
+        assertEquals("Newton", BibtexKeyGenerator.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 3));
         assertEquals("NewtonMaxwell",
-                BibtexKeyPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 3));
+                BibtexKeyGenerator.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 3));
         assertEquals("NewtonMaxwellEinstein",
-                BibtexKeyPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 3));
+                BibtexKeyGenerator.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 3));
         assertEquals("NewtonMaxwellEinsteinEtAl",
-                BibtexKeyPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 3));
+                BibtexKeyGenerator.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 3));
     }
 
     @Test
     public void testFirstPage() {
-        assertEquals("7", BibtexKeyPatternUtil.firstPage("7--27"));
-        assertEquals("27", BibtexKeyPatternUtil.firstPage("--27"));
-        assertEquals("", BibtexKeyPatternUtil.firstPage(""));
-        assertEquals("42", BibtexKeyPatternUtil.firstPage("42--111"));
-        assertEquals("7", BibtexKeyPatternUtil.firstPage("7,41,73--97"));
-        assertEquals("7", BibtexKeyPatternUtil.firstPage("41,7,73--97"));
-        assertEquals("43", BibtexKeyPatternUtil.firstPage("43+"));
+        assertEquals("7", BibtexKeyGenerator.firstPage("7--27"));
+        assertEquals("27", BibtexKeyGenerator.firstPage("--27"));
+        assertEquals("", BibtexKeyGenerator.firstPage(""));
+        assertEquals("42", BibtexKeyGenerator.firstPage("42--111"));
+        assertEquals("7", BibtexKeyGenerator.firstPage("7,41,73--97"));
+        assertEquals("7", BibtexKeyGenerator.firstPage("41,7,73--97"));
+        assertEquals("43", BibtexKeyGenerator.firstPage("43+"));
     }
 
     @Test(expected = NullPointerException.class)
     public void testFirstPageNull() {
-        BibtexKeyPatternUtil.firstPage(null);
+        BibtexKeyGenerator.firstPage(null);
     }
 
     @Test
     public void testPagePrefix() {
-        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L7--27"));
-        assertEquals("L--", BibtexKeyPatternUtil.pagePrefix("L--27"));
-        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L"));
-        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L42--111"));
-        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L7,L41,L73--97"));
-        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L41,L7,L73--97"));
-        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L43+"));
-        assertEquals("", BibtexKeyPatternUtil.pagePrefix("7--27"));
-        assertEquals("--", BibtexKeyPatternUtil.pagePrefix("--27"));
-        assertEquals("", BibtexKeyPatternUtil.pagePrefix(""));
-        assertEquals("", BibtexKeyPatternUtil.pagePrefix("42--111"));
-        assertEquals("", BibtexKeyPatternUtil.pagePrefix("7,41,73--97"));
-        assertEquals("", BibtexKeyPatternUtil.pagePrefix("41,7,73--97"));
-        assertEquals("", BibtexKeyPatternUtil.pagePrefix("43+"));
+        assertEquals("L", BibtexKeyGenerator.pagePrefix("L7--27"));
+        assertEquals("L--", BibtexKeyGenerator.pagePrefix("L--27"));
+        assertEquals("L", BibtexKeyGenerator.pagePrefix("L"));
+        assertEquals("L", BibtexKeyGenerator.pagePrefix("L42--111"));
+        assertEquals("L", BibtexKeyGenerator.pagePrefix("L7,L41,L73--97"));
+        assertEquals("L", BibtexKeyGenerator.pagePrefix("L41,L7,L73--97"));
+        assertEquals("L", BibtexKeyGenerator.pagePrefix("L43+"));
+        assertEquals("", BibtexKeyGenerator.pagePrefix("7--27"));
+        assertEquals("--", BibtexKeyGenerator.pagePrefix("--27"));
+        assertEquals("", BibtexKeyGenerator.pagePrefix(""));
+        assertEquals("", BibtexKeyGenerator.pagePrefix("42--111"));
+        assertEquals("", BibtexKeyGenerator.pagePrefix("7,41,73--97"));
+        assertEquals("", BibtexKeyGenerator.pagePrefix("41,7,73--97"));
+        assertEquals("", BibtexKeyGenerator.pagePrefix("43+"));
     }
 
     @Test(expected = NullPointerException.class)
     public void testPagePrefixNull() {
-        BibtexKeyPatternUtil.pagePrefix(null);
+        BibtexKeyGenerator.pagePrefix(null);
     }
 
     @Test
     public void testLastPage() {
 
-        assertEquals("27", BibtexKeyPatternUtil.lastPage("7--27"));
-        assertEquals("27", BibtexKeyPatternUtil.lastPage("--27"));
-        assertEquals("", BibtexKeyPatternUtil.lastPage(""));
-        assertEquals("111", BibtexKeyPatternUtil.lastPage("42--111"));
-        assertEquals("97", BibtexKeyPatternUtil.lastPage("7,41,73--97"));
-        assertEquals("97", BibtexKeyPatternUtil.lastPage("7,41,97--73"));
-        assertEquals("43", BibtexKeyPatternUtil.lastPage("43+"));
+        assertEquals("27", BibtexKeyGenerator.lastPage("7--27"));
+        assertEquals("27", BibtexKeyGenerator.lastPage("--27"));
+        assertEquals("", BibtexKeyGenerator.lastPage(""));
+        assertEquals("111", BibtexKeyGenerator.lastPage("42--111"));
+        assertEquals("97", BibtexKeyGenerator.lastPage("7,41,73--97"));
+        assertEquals("97", BibtexKeyGenerator.lastPage("7,41,97--73"));
+        assertEquals("43", BibtexKeyGenerator.lastPage("43+"));
     }
 
     @Test(expected = NullPointerException.class)
     public void testLastPageNull() {
-        BibtexKeyPatternUtil.lastPage(null);
+        BibtexKeyGenerator.lastPage(null);
     }
 
     /**
@@ -740,28 +740,28 @@ public class BibtexKeyPatternUtilTest {
         // veryShortTitle is getTitleWords with "1" as count
         int count = 1;
         assertEquals("application",
-                BibtexKeyPatternUtil.getTitleWords(count,
-                        BibtexKeyPatternUtil.removeSmallWords(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH)));
-        assertEquals("BPEL", BibtexKeyPatternUtil.getTitleWords(count,
-                BibtexKeyPatternUtil.removeSmallWords(
+                BibtexKeyGenerator.getTitleWords(count,
+                        BibtexKeyGenerator.removeSmallWords(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH)));
+        assertEquals("BPEL", BibtexKeyGenerator.getTitleWords(count,
+                BibtexKeyGenerator.removeSmallWords(
                         TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON)));
-        assertEquals("Process", BibtexKeyPatternUtil.getTitleWords(count,
-                BibtexKeyPatternUtil.removeSmallWords(TITLE_STRING_CASED)));
+        assertEquals("Process", BibtexKeyGenerator.getTitleWords(count,
+                BibtexKeyGenerator.removeSmallWords(TITLE_STRING_CASED)));
         assertEquals("BPMN",
-                BibtexKeyPatternUtil.getTitleWords(count,
-                        BibtexKeyPatternUtil.removeSmallWords(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD)));
-        assertEquals("Difference", BibtexKeyPatternUtil.getTitleWords(count,
-                BibtexKeyPatternUtil.removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING)));
+                BibtexKeyGenerator.getTitleWords(count,
+                        BibtexKeyGenerator.removeSmallWords(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD)));
+        assertEquals("Difference", BibtexKeyGenerator.getTitleWords(count,
+                BibtexKeyGenerator.removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING)));
         assertEquals("Cloud",
-                BibtexKeyPatternUtil.getTitleWords(count,
-                        BibtexKeyPatternUtil
+                BibtexKeyGenerator.getTitleWords(count,
+                        BibtexKeyGenerator
                                 .removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON)));
         assertEquals("Towards",
-                BibtexKeyPatternUtil.getTitleWords(count,
-                        BibtexKeyPatternUtil.removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD)));
+                BibtexKeyGenerator.getTitleWords(count,
+                        BibtexKeyGenerator.removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD)));
         assertEquals("Measurement",
-                BibtexKeyPatternUtil.getTitleWords(count,
-                        BibtexKeyPatternUtil
+                BibtexKeyGenerator.getTitleWords(count,
+                        BibtexKeyGenerator
                                 .removeSmallWords(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS)));
     }
 
@@ -773,20 +773,20 @@ public class BibtexKeyPatternUtilTest {
         // shortTitle is getTitleWords with "3" as count
         int count = 3;
         assertEquals("application migration effort",
-                BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
-        assertEquals("BPEL conformance in", BibtexKeyPatternUtil.getTitleWords(count,
+                BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
+        assertEquals("BPEL conformance in", BibtexKeyGenerator.getTitleWords(count,
                 TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
-        assertEquals("Process Viewing Patterns", BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED));
+        assertEquals("Process Viewing Patterns", BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_CASED));
         assertEquals("BPMN Conformance in",
-                BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
-        assertEquals("The Difference Between", BibtexKeyPatternUtil.getTitleWords(count,
+                BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
+        assertEquals("The Difference Between", BibtexKeyGenerator.getTitleWords(count,
                 TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING));
         assertEquals("Cloud Computing: The",
-                BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
+                BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
         assertEquals("Towards Choreography based",
-                BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
+                BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
         assertEquals("On the Measurement",
-                BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
+                BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
     }
 
     /**
@@ -796,22 +796,22 @@ public class BibtexKeyPatternUtilTest {
     public void camel() {
         // camel capitalises and concatenates all the words of the title
         assertEquals("ApplicationMigrationEffortInTheCloudTheCaseOfCloudPlatforms",
-                BibtexKeyPatternUtil.getCamelizedTitle(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
+                BibtexKeyGenerator.getCamelizedTitle(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
         assertEquals("BPELConformanceInOpenSourceEnginesTheCaseOfStaticAnalysis",
-                BibtexKeyPatternUtil.getCamelizedTitle(
+                BibtexKeyGenerator.getCamelizedTitle(
                         TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
-        assertEquals("ProcessViewingPatterns", BibtexKeyPatternUtil.getCamelizedTitle(TITLE_STRING_CASED));
+        assertEquals("ProcessViewingPatterns", BibtexKeyGenerator.getCamelizedTitle(TITLE_STRING_CASED));
         assertEquals("BPMNConformanceInOpenSourceEngines",
-                BibtexKeyPatternUtil.getCamelizedTitle(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
+                BibtexKeyGenerator.getCamelizedTitle(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
         assertEquals("TheDifferenceBetweenGraphBasedAndBlockStructuredBusinessProcessModellingLanguages",
-                BibtexKeyPatternUtil.getCamelizedTitle(
+                BibtexKeyGenerator.getCamelizedTitle(
                         TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING));
         assertEquals("CloudComputingTheNextRevolutionInIT",
-                BibtexKeyPatternUtil.getCamelizedTitle(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
+                BibtexKeyGenerator.getCamelizedTitle(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
         assertEquals("TowardsChoreographyBasedProcessDistributionInTheCloud",
-                BibtexKeyPatternUtil.getCamelizedTitle(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
+                BibtexKeyGenerator.getCamelizedTitle(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
         assertEquals("OnTheMeasurementOfDesignTimeAdaptabilityForProcessBasedSystems",
-                BibtexKeyPatternUtil.getCamelizedTitle(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
+                BibtexKeyGenerator.getCamelizedTitle(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
     }
 
     /**
@@ -822,27 +822,27 @@ public class BibtexKeyPatternUtilTest {
         // title capitalises the significant words of the title
         // for the title case the concatenation happens at formatting, which is tested in MakeLabelWithDatabaseTest.java
         assertEquals("Application Migration Effort in the Cloud the Case of Cloud Platforms",
-                BibtexKeyPatternUtil
+                BibtexKeyGenerator
                         .camelizeSignificantWordsInTitle(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
         assertEquals("BPEL Conformance in Open Source Engines: the Case of Static Analysis",
-                BibtexKeyPatternUtil.camelizeSignificantWordsInTitle(
+                BibtexKeyGenerator.camelizeSignificantWordsInTitle(
                         TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
         assertEquals("Process Viewing Patterns",
-                BibtexKeyPatternUtil.camelizeSignificantWordsInTitle(TITLE_STRING_CASED));
+                BibtexKeyGenerator.camelizeSignificantWordsInTitle(TITLE_STRING_CASED));
         assertEquals("BPMN Conformance in Open Source Engines",
-                BibtexKeyPatternUtil
+                BibtexKeyGenerator
                         .camelizeSignificantWordsInTitle(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
         assertEquals("The Difference between Graph Based and Block Structured Business Process Modelling Languages",
-                BibtexKeyPatternUtil.camelizeSignificantWordsInTitle(
+                BibtexKeyGenerator.camelizeSignificantWordsInTitle(
                         TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING));
         assertEquals("Cloud Computing: the Next Revolution in IT",
-                BibtexKeyPatternUtil.camelizeSignificantWordsInTitle(
+                BibtexKeyGenerator.camelizeSignificantWordsInTitle(
                         TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
         assertEquals("Towards Choreography Based Process Distribution in the Cloud",
-                BibtexKeyPatternUtil
+                BibtexKeyGenerator
                         .camelizeSignificantWordsInTitle(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
         assertEquals("On the Measurement of Design Time Adaptability for Process Based Systems",
-                BibtexKeyPatternUtil.camelizeSignificantWordsInTitle(
+                BibtexKeyGenerator.camelizeSignificantWordsInTitle(
                         TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
     }
 
@@ -851,15 +851,15 @@ public class BibtexKeyPatternUtilTest {
         BibEntry entry = new BibEntry();
         entry.setField("keywords", "w1, w2a w2b, w3");
 
-        String result = BibtexKeyPatternUtil.makeLabel(entry, "keyword1", ',', new BibDatabase());
+        String result = BibtexKeyGenerator.generateKey(entry, "keyword1", ',', new BibDatabase());
         assertEquals("w1", result);
 
         // check keywords with space
-        result = BibtexKeyPatternUtil.makeLabel(entry, "keyword2", ',', new BibDatabase());
+        result = BibtexKeyGenerator.generateKey(entry, "keyword2", ',', new BibDatabase());
         assertEquals("w2a w2b", result);
 
         // check out of range
-        result = BibtexKeyPatternUtil.makeLabel(entry, "keyword4", ',', new BibDatabase());
+        result = BibtexKeyGenerator.generateKey(entry, "keyword4", ',', new BibDatabase());
         assertEquals("", result);
     }
 
@@ -874,7 +874,7 @@ public class BibtexKeyPatternUtilTest {
         database.insertEntry(entry1);
         entry2.setField("keywords", "w1, w2a w2b, w3");
 
-        String result = BibtexKeyPatternUtil.makeLabel(entry1, "keyword1", ',', database);
+        String result = BibtexKeyGenerator.generateKey(entry1, "keyword1", ',', database);
 
         assertEquals("w1", result);
     }
@@ -885,15 +885,15 @@ public class BibtexKeyPatternUtilTest {
         entry.setField("keywords", "w1, w2a w2b, w3");
 
         // all keywords
-        String result = BibtexKeyPatternUtil.makeLabel(entry, "keywords", ',', new BibDatabase());
+        String result = BibtexKeyGenerator.generateKey(entry, "keywords", ',', new BibDatabase());
         assertEquals("w1w2aw2bw3", result);
 
         // check keywords with space
-        result = BibtexKeyPatternUtil.makeLabel(entry, "keywords2", ',', new BibDatabase());
+        result = BibtexKeyGenerator.generateKey(entry, "keywords2", ',', new BibDatabase());
         assertEquals("w1w2aw2b", result);
 
         // check out of range
-        result = BibtexKeyPatternUtil.makeLabel(entry, "keywords55", ',', new BibDatabase());
+        result = BibtexKeyGenerator.generateKey(entry, "keywords55", ',', new BibDatabase());
         assertEquals("w1w2aw2bw3", result);
     }
 
@@ -908,37 +908,37 @@ public class BibtexKeyPatternUtilTest {
         database.insertEntry(entry1);
         entry2.setField("keywords", "w1, w2a w2b, w3");
 
-        String result = BibtexKeyPatternUtil.makeLabel(entry1, "keywords", ',', database);
+        String result = BibtexKeyGenerator.generateKey(entry1, "keywords", ',', database);
 
         assertEquals("w1w2aw2bw3", result);
     }
 
     @Test
     public void testCheckLegalKeyEnforceLegal() {
-        assertEquals("AAAA", BibtexKeyPatternUtil.checkLegalKey("AA AA", true));
-        assertEquals("SPECIALCHARS", BibtexKeyPatternUtil.checkLegalKey("SPECIAL CHARS#{\\\"}~,^", true));
-        assertEquals("", BibtexKeyPatternUtil.checkLegalKey("\n\t\r", true));
+        assertEquals("AAAA", BibtexKeyGenerator.cleanKey("AA AA", true));
+        assertEquals("SPECIALCHARS", BibtexKeyGenerator.cleanKey("SPECIAL CHARS#{\\\"}~,^", true));
+        assertEquals("", BibtexKeyGenerator.cleanKey("\n\t\r", true));
     }
 
     @Test
     public void testCheckLegalKeyDoNotEnforceLegal() {
-        assertEquals("AAAA", BibtexKeyPatternUtil.checkLegalKey("AA AA", false));
-        assertEquals("SPECIALCHARS#~^", BibtexKeyPatternUtil.checkLegalKey("SPECIAL CHARS#{\\\"}~,^", false));
-        assertEquals("", BibtexKeyPatternUtil.checkLegalKey("\n\t\r", false));
+        assertEquals("AAAA", BibtexKeyGenerator.cleanKey("AA AA", false));
+        assertEquals("SPECIALCHARS#~^", BibtexKeyGenerator.cleanKey("SPECIAL CHARS#{\\\"}~,^", false));
+        assertEquals("", BibtexKeyGenerator.cleanKey("\n\t\r", false));
     }
 
     @Test
     public void testCheckLegalNullInNullOut() {
-        assertNull(BibtexKeyPatternUtil.checkLegalKey(null, true));
-        assertNull(BibtexKeyPatternUtil.checkLegalKey(null, false));
+        assertNull(BibtexKeyGenerator.cleanKey(null, true));
+        assertNull(BibtexKeyGenerator.cleanKey(null, false));
     }
 
     @Test
     public void testApplyModifiers() {
         BibEntry entry = new BibEntry();
         entry.setField("title", "Green Scheduling of Whatever");
-        assertEquals("GSo", BibtexKeyPatternUtil.makeLabel(entry, "shorttitleINI", ',', new BibDatabase()));
-        assertEquals("Green Scheduling of", BibtexKeyPatternUtil.makeLabel(entry, "shorttitle",
+        assertEquals("GSo", BibtexKeyGenerator.generateKey(entry, "shorttitleINI", ',', new BibDatabase()));
+        assertEquals("Green Scheduling of", BibtexKeyGenerator.generateKey(entry, "shorttitle",
                 ',', new BibDatabase()));
     }
 
@@ -953,7 +953,7 @@ public class BibtexKeyPatternUtilTest {
         database.insertEntry(entry1);
         entry2.setField("title", "Green Scheduling of Whatever");
 
-        assertEquals("Green Scheduling of", BibtexKeyPatternUtil.makeLabel(entry1, "shorttitle",
+        assertEquals("Green Scheduling of", BibtexKeyGenerator.generateKey(entry1, "shorttitle",
                 ',', database));
     }
 
@@ -968,7 +968,7 @@ public class BibtexKeyPatternUtilTest {
         database.insertEntry(entry1);
         entry2.setField("title", "Green Scheduling of Whatever");
 
-        assertEquals("GSo", BibtexKeyPatternUtil.makeLabel(entry1, "shorttitleINI", ',', database));
+        assertEquals("GSo", BibtexKeyGenerator.generateKey(entry1, "shorttitleINI", ',', database));
     }
 
 }

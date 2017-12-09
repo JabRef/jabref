@@ -70,7 +70,7 @@ import org.jabref.gui.util.component.VerticalLabelUI;
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -80,6 +80,7 @@ import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.EntryTypes;
+import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
@@ -655,7 +656,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
 
                 // Make sure the key is legal:
-                String cleaned = BibtexKeyPatternUtil.checkLegalKey(newValue,
+                String cleaned = BibtexKeyGenerator.cleanKey(newValue,
                         Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
                 if ((cleaned == null) || cleaned.equals(newValue)) {
                     textField.setValidBackgroundColor();
@@ -852,22 +853,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
             }
 
-            BibtexKeyPatternUtil.makeAndSetLabel(panel.getBibDatabaseContext().getMetaData()
-                    .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
-                    panel.getDatabase(), entry,
-                    Globals.prefs.getBibtexKeyPatternPreferences());
-
-            if (entry.hasCiteKey()) {
-                // Store undo information:
-                panel.getUndoManager().addEdit(
-                        new UndoableKeyChange(entry, oldValue.orElse(null),
-                                entry.getCiteKeyOptional().get())); // Cite key always set here
-
-                // here we update the field
-                String bibtexKeyData = entry.getCiteKeyOptional().get();
-                entry.setField(BibEntry.KEY_FIELD, bibtexKeyData);
-                panel.markBaseChanged();
-            }
+            Optional<FieldChange> change = new BibtexKeyGenerator(panel.getBibDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences())
+                    .generateAndSetKey(entry);
+            change.ifPresent(fieldChange -> panel.getUndoManager().addEdit(new UndoableKeyChange(fieldChange)));
         }
     }
 

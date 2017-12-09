@@ -22,7 +22,7 @@ public class MakeLabelWithoutDatabaseTest {
     @Test
     public void makeLabelForFileSearch() {
         String label =
-            BibtexKeyPatternUtil.makeLabel(entry, "auth", ',', null);
+                BibtexKeyGenerator.generateKey(entry, "auth", ',', null);
         assertEquals("Doe", label);
     }
 
@@ -34,7 +34,7 @@ public class MakeLabelWithoutDatabaseTest {
         localEntry.setField("title", "An awesome paper on JabRef");
 
         String label =
-            BibtexKeyPatternUtil.makeLabel(localEntry, "auth", ',', null);
+                BibtexKeyGenerator.generateKey(localEntry, "auth", ',', null);
         assertEquals("Doe", label);
     }
 

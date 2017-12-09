@@ -1208,7 +1208,7 @@ public class JabRefPreferences implements PreferencesService {
             if (!pattern.isDefaultValue(key)) {
                 // no default value
                 // the first entry in the array is the full pattern
-                // see org.jabref.logic.labelPattern.BibtexKeyPatternUtil.split(String)
+                // see org.jabref.logic.labelPattern.BibtexKeyGenerator.split(String)
                 pre.put(key, pattern.getValue(key).get(0));
             }
         }
