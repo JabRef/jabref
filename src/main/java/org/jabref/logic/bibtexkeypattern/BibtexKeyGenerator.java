@@ -1,6 +1,7 @@
 package org.jabref.logic.bibtexkeypattern;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -8,6 +9,7 @@ import java.util.Optional;
 import org.jabref.logic.util.BracketedPattern;
 import org.jabref.model.FieldChange;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -43,8 +45,15 @@ public class BibtexKeyGenerator extends BracketedPattern {
         this.bibtexKeyPatternPreferences = bibtexKeyPatternPreferences;
     }
 
-    static String generateKey(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database) {
-        return expandBrackets("[" + value + "]", keywordDelimiter, entry, database);
+    static String generateKey(BibEntry entry, String value) {
+        return generateKey(entry, value, new BibDatabase());
+    }
+
+    static String generateKey(BibEntry entry, String value, BibDatabase database) {
+        GlobalBibtexKeyPattern keyPattern = new GlobalBibtexKeyPattern(Collections.emptyList());
+        keyPattern.setDefaultValue("[" + value + "]");
+        return new BibtexKeyGenerator(keyPattern, database, new BibtexKeyPatternPreferences("", "", false, true, true, keyPattern, ','))
+                .generateKey(entry);
     }
 
     /**
@@ -91,7 +100,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
         StringBuilder newKey = new StringBuilder();
         for (int i = 0; i < key.length(); i++) {
             char c = key.charAt(i);
-            if (!Character.isWhitespace(c) && ("{}(),\\\"#~^'".indexOf(c) == -1)) {
+            if (!Character.isWhitespace(c) && ("{}(),\\\"#~^':`".indexOf(c) == -1)) {
                 newKey.append(c);
             }
         }

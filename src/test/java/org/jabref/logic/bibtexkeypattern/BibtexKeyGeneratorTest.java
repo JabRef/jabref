@@ -54,7 +54,7 @@ public class BibtexKeyGeneratorTest {
                 importFormatPreferences);
         assertEquals("Holland",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class BibtexKeyGeneratorTest {
 
         assertEquals("Holland",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry1, "auth",
-                        ',', database), true));
+                        database), true));
     }
 
     @Test
@@ -79,7 +79,7 @@ public class BibtexKeyGeneratorTest {
         Optional<BibEntry> entry = BibtexParser.singleFromString(bibtexString, importFormatPreferences);
         assertEquals("HerlandHaugeHelgeland",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry.get(), "authors3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class BibtexKeyGeneratorTest {
 
         assertEquals("HerlandHaugeHelgeland",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry1, "authors3",
-                        ',', database), true));
+                        database), true));
     }
 
     @Test
@@ -104,7 +104,7 @@ public class BibtexKeyGeneratorTest {
                 "@ARTICLE{kohn, author={Simon Popovi\\v{c}ov\\'{a}}}", importFormatPreferences);
         assertEquals("Popovicova",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry.get(), "auth",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
     }
 
     /**
@@ -118,73 +118,73 @@ public class BibtexKeyGeneratorTest {
                 "@ARTICLE{kohn, author={Andreas Köning}, year={2000}}", importFormatPreferences);
         assertEquals("Koen",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Áöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Aoen",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Éöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Eoen",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Íöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Ioen",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ĺöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Loen",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ńöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Noen",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Óöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Ooen",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ŕöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Roen",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Śöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Soen",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Úöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Uoen",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ýöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Yoen",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Źöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Zoen",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
     }
 
     /**
@@ -196,31 +196,31 @@ public class BibtexKeyGeneratorTest {
                 "@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}", importFormatPreferences);
         assertEquals("Aoen",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Èöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Eoen",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ìöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Ioen",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Òöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Ooen",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ùöning}, year={2000}}",
                 importFormatPreferences);
         assertEquals("Uoen",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry0.get(), "auth3",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
     }
 
     /**
@@ -309,7 +309,7 @@ public class BibtexKeyGeneratorTest {
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University}}}", importFormatPreferences);
         assertEquals("UniLinkoeping",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry.get(), "auth",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
     }
 
     @Test
@@ -325,7 +325,7 @@ public class BibtexKeyGeneratorTest {
 
         assertEquals("UniLinkoeping",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry1, "auth",
-                        ',', database), true));
+                        database), true));
     }
 
     @Test
@@ -335,7 +335,7 @@ public class BibtexKeyGeneratorTest {
                 importFormatPreferences);
         assertEquals("UniLinkoepingEE",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry.get(), "auth",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
     }
 
     @Test
@@ -351,7 +351,7 @@ public class BibtexKeyGeneratorTest {
 
         assertEquals("UniLinkoepingEE",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry1, "auth",
-                        ',', database), true));
+                        database), true));
     }
 
     @Test
@@ -361,7 +361,7 @@ public class BibtexKeyGeneratorTest {
                 importFormatPreferences);
         assertEquals("UniLinkoepingCE",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry.get(), "auth",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
     }
 
     @Test
@@ -377,7 +377,7 @@ public class BibtexKeyGeneratorTest {
 
         assertEquals("UniLinkoepingCE",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry1, "auth",
-                        ',', database), true));
+                        database), true));
     }
 
     @Test
@@ -386,7 +386,7 @@ public class BibtexKeyGeneratorTest {
                 "@ARTICLE{kohn, author={{Massachusetts Institute of Technology}}}", importFormatPreferences);
         assertEquals("MIT",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry.get(), "auth",
-                        ',', new BibDatabase()), true));
+                        new BibDatabase()), true));
     }
 
     @Test
@@ -402,7 +402,7 @@ public class BibtexKeyGeneratorTest {
 
         assertEquals("MIT",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry1, "auth",
-                        ',', database), true));
+                        database), true));
     }
 
     @Test
@@ -851,15 +851,15 @@ public class BibtexKeyGeneratorTest {
         BibEntry entry = new BibEntry();
         entry.setField("keywords", "w1, w2a w2b, w3");
 
-        String result = BibtexKeyGenerator.generateKey(entry, "keyword1", ',', new BibDatabase());
+        String result = BibtexKeyGenerator.generateKey(entry, "keyword1");
         assertEquals("w1", result);
 
         // check keywords with space
-        result = BibtexKeyGenerator.generateKey(entry, "keyword2", ',', new BibDatabase());
-        assertEquals("w2a w2b", result);
+        result = BibtexKeyGenerator.generateKey(entry, "keyword2");
+        assertEquals("w2aw2b", result);
 
         // check out of range
-        result = BibtexKeyGenerator.generateKey(entry, "keyword4", ',', new BibDatabase());
+        result = BibtexKeyGenerator.generateKey(entry, "keyword4");
         assertEquals("", result);
     }
 
@@ -874,7 +874,7 @@ public class BibtexKeyGeneratorTest {
         database.insertEntry(entry1);
         entry2.setField("keywords", "w1, w2a w2b, w3");
 
-        String result = BibtexKeyGenerator.generateKey(entry1, "keyword1", ',', database);
+        String result = BibtexKeyGenerator.generateKey(entry1, "keyword1", database);
 
         assertEquals("w1", result);
     }
@@ -885,15 +885,15 @@ public class BibtexKeyGeneratorTest {
         entry.setField("keywords", "w1, w2a w2b, w3");
 
         // all keywords
-        String result = BibtexKeyGenerator.generateKey(entry, "keywords", ',', new BibDatabase());
+        String result = BibtexKeyGenerator.generateKey(entry, "keywords");
         assertEquals("w1w2aw2bw3", result);
 
         // check keywords with space
-        result = BibtexKeyGenerator.generateKey(entry, "keywords2", ',', new BibDatabase());
+        result = BibtexKeyGenerator.generateKey(entry, "keywords2");
         assertEquals("w1w2aw2b", result);
 
         // check out of range
-        result = BibtexKeyGenerator.generateKey(entry, "keywords55", ',', new BibDatabase());
+        result = BibtexKeyGenerator.generateKey(entry, "keywords55");
         assertEquals("w1w2aw2bw3", result);
     }
 
@@ -908,7 +908,7 @@ public class BibtexKeyGeneratorTest {
         database.insertEntry(entry1);
         entry2.setField("keywords", "w1, w2a w2b, w3");
 
-        String result = BibtexKeyGenerator.generateKey(entry1, "keywords", ',', database);
+        String result = BibtexKeyGenerator.generateKey(entry1, "keywords", database);
 
         assertEquals("w1w2aw2bw3", result);
     }
@@ -927,7 +927,7 @@ public class BibtexKeyGeneratorTest {
         assertEquals("", BibtexKeyGenerator.cleanKey("\n\t\r", false));
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testCheckLegalNullInNullOut() {
         assertNull(BibtexKeyGenerator.cleanKey(null, true));
         assertNull(BibtexKeyGenerator.cleanKey(null, false));
@@ -937,9 +937,9 @@ public class BibtexKeyGeneratorTest {
     public void testApplyModifiers() {
         BibEntry entry = new BibEntry();
         entry.setField("title", "Green Scheduling of Whatever");
-        assertEquals("GSo", BibtexKeyGenerator.generateKey(entry, "shorttitleINI", ',', new BibDatabase()));
-        assertEquals("Green Scheduling of", BibtexKeyGenerator.generateKey(entry, "shorttitle",
-                ',', new BibDatabase()));
+        assertEquals("GSo", BibtexKeyGenerator.generateKey(entry, "shorttitleINI"));
+        assertEquals("GreenSchedulingof", BibtexKeyGenerator.generateKey(entry, "shorttitle",
+                new BibDatabase()));
     }
 
     @Test
@@ -953,8 +953,8 @@ public class BibtexKeyGeneratorTest {
         database.insertEntry(entry1);
         entry2.setField("title", "Green Scheduling of Whatever");
 
-        assertEquals("Green Scheduling of", BibtexKeyGenerator.generateKey(entry1, "shorttitle",
-                ',', database));
+        assertEquals("GreenSchedulingof", BibtexKeyGenerator.generateKey(entry1, "shorttitle",
+                database));
     }
 
     @Test
@@ -968,7 +968,20 @@ public class BibtexKeyGeneratorTest {
         database.insertEntry(entry1);
         entry2.setField("title", "Green Scheduling of Whatever");
 
-        assertEquals("GSo", BibtexKeyGenerator.generateKey(entry1, "shorttitleINI", ',', database));
+        assertEquals("GSo", BibtexKeyGenerator.generateKey(entry1, "shorttitleINI", database));
     }
 
+    @Test
+    public void generateKeyStripsColonFromTitle() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "Green Scheduling of: Whatever");
+        assertEquals("GreenSchedulingOfWhatever", BibtexKeyGenerator.generateKey(entry, "title"));
+    }
+
+    @Test
+    public void generateKeyStripsApostropheFromTitle() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "Green Scheduling of `Whatever`");
+        assertEquals("GreenSchedulingofWhatever", BibtexKeyGenerator.generateKey(entry, "title"));
+    }
 }

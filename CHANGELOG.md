@@ -58,6 +58,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue where double clicking on an entry in the integrity check dialog resulted in an exception [#3485](https://github.com/JabRef/jabref/issues/3485)
  - We fixed an issue where the entry type could sometimes not be changed when the entry editor was open [#3435](https://github.com/JabRef/jabref/issues/3435)
  - We fixed an issue where dropping a pdf on the entry table and renaming it triggered an exception [#3490](https://github.com/JabRef/jabref/issues/3490)
+ - We improved the key generator to remove certain illegal characters such as colons or apostrophes. [#3359](https://github.com/JabRef/jabref/issues/3359)
 
  ### Removed
 
