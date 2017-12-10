@@ -2,6 +2,7 @@ package org.jabref.logic.util.io;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class RegExpBasedFileFinderTests {
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[bibtexkey].*\\\\.[extension]", ',');
 
         //when
-        List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
+        Collection<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
 
         //then
         assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/pdfInDatabase.pdf")),
@@ -72,7 +73,7 @@ public class RegExpBasedFileFinderTests {
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[year]_[auth]_[firstpage].*\\\\.[extension]", ',');
 
         //when
-        List<Path> result = fileFinder.findAssociatedFiles(entry, dirs, extensions);
+        Collection<Path> result = fileFinder.findAssociatedFiles(entry, dirs, extensions);
 
         //then
         assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2003_Hippel_209.pdf")),
@@ -94,7 +95,7 @@ public class RegExpBasedFileFinderTests {
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[year]_[auth]_[firstpage]\\\\.[extension]", ',');
 
         //when
-        List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
+        Collection<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
 
         //then
         assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2017_Gražulis_726.pdf")),
@@ -114,7 +115,7 @@ public class RegExpBasedFileFinderTests {
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[bibtexkey].*\\\\.[extension]", ',');
 
         //when
-        List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
+        Collection<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
 
         //then
         assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/pdfInSubdirectory.pdf")),
@@ -134,7 +135,7 @@ public class RegExpBasedFileFinderTests {
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("*/[bibtexkey].*\\\\.[extension]", ',');
 
         //when
-        List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
+        Collection<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
 
         //then
         Assert.assertTrue(result.isEmpty());

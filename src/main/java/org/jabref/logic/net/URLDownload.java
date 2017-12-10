@@ -259,7 +259,7 @@ public class URLDownload {
 
         // Take everything after the last '/' as name + extension
         String fileNameWithExtension = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
-        String fileName = FileUtil.getFileName(fileNameWithExtension);
+        String fileName = FileUtil.getBaseName(fileNameWithExtension);
         String extension = "." + FileHelper.getFileExtension(fileNameWithExtension).orElse("tmp");
 
         // Create temporary file and download to it

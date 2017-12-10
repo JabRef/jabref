@@ -13,7 +13,9 @@ import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -44,22 +46,21 @@ class CiteKeyBasedFileFinder implements FileFinder {
         nextFile:
         for (Path file : filesWithExtension) {
             String name = file.getFileName().toString();
-            int dot = name.lastIndexOf('.');
-            // First, look for exact matches:
+            String nameWithoutExtension = FileUtil.getBaseName(name);
+
+            // First, look for exact matches
             for (BibEntry entry : entries) {
                 Optional<String> citeKey = entry.getCiteKeyOptional();
-                if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && (dot > 0)
-                        && name.substring(0, dot).equals(citeKey.get())) {
+                if (StringUtil.isNotBlank(citeKey) && nameWithoutExtension.equals(citeKey.get())) {
                     result.get(entry).add(file);
                     continue nextFile;
                 }
             }
-            // If we get here, we did not find any exact matches. If non-exact
-            // matches are allowed, try to find one:
+            // If we get here, we did not find any exact matches. If non-exact matches are allowed, try to find one
             if (!exactKeyOnly) {
                 for (BibEntry entry : entries) {
                     Optional<String> citeKey = entry.getCiteKeyOptional();
-                    if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && name.startsWith(citeKey.get())) {
+                    if (StringUtil.isNotBlank(citeKey) && matches(name, citeKey.get())) {
                         result.get(entry).add(file);
                         continue nextFile;
                     }
@@ -70,10 +71,21 @@ class CiteKeyBasedFileFinder implements FileFinder {
         return result;
     }
 
+    private boolean matches(String filename, String citeKey) {
+        boolean startsWithKey = filename.startsWith(citeKey);
+        if (startsWithKey) {
+            // The file name starts with the key, that's already a good start
+            // However, we do not want to match "JabRefa" for "JabRef" since this is probably a file belonging to another entry published in the same time / same name
+            char charAfterKey = filename.charAt(citeKey.length());
+            return !StringUtil.contains(BibtexKeyPatternUtil.CHARS, charAfterKey);
+        }
+        return false;
+    }
+
     /**
      * Returns a list of all files in the given directories which have one of the given extension.
      */
-    public Set<Path> findFilesByExtension(List<Path> directories, List<String> extensions) {
+    private Set<Path> findFilesByExtension(List<Path> directories, List<String> extensions) {
         Objects.requireNonNull(extensions, "Extensions must not be null!");
 
         BiPredicate<Path, BasicFileAttributes> isFileWithCorrectExtension = (path, attributes) ->
