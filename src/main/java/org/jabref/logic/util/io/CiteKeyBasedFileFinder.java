@@ -66,7 +66,7 @@ class CiteKeyBasedFileFinder implements FileFinder {
             }
         }
 
-        return result;
+        return result.stream().sorted().collect(Collectors.toList());
     }
 
     private boolean matches(String filename, String citeKey) {

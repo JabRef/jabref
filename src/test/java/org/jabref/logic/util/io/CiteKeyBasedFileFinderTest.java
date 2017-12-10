@@ -92,7 +92,7 @@ public class CiteKeyBasedFileFinderTest {
 
         List<Path> results = fileFinder.findAssociatedFiles(entry, Collections.singletonList(pdfsDir), Collections.singletonList("pdf"));
 
-        assertEquals(Arrays.asList(pdfFile, secondPdfFile), results);
+        assertEquals(Arrays.asList(secondPdfFile, pdfFile), results);
     }
 
     @Test
