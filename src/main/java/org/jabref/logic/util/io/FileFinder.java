@@ -1,11 +1,13 @@
 package org.jabref.logic.util.io;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.jabref.model.entry.BibEntry;
+
+import com.google.common.collect.Multimap;
 
 public interface FileFinder {
 
@@ -17,10 +19,9 @@ public interface FileFinder {
      * @param directories The root directories to search.
      * @param extensions  The extensions that are acceptable.
      */
-    Map<BibEntry, List<Path>> findAssociatedFiles(List<BibEntry> entries, List<Path> directories, List<String> extensions);
+    Multimap<BibEntry, Path> findAssociatedFiles(List<BibEntry> entries, List<Path> directories, List<String> extensions);
 
-    default List<Path> findAssociatedFiles(BibEntry entry, List<Path> directories, List<String> extensions) {
-        Map<BibEntry, List<Path>> associatedFiles = findAssociatedFiles(Collections.singletonList(entry), directories, extensions);
-        return associatedFiles.getOrDefault(entry, Collections.emptyList());
+    default Collection<Path> findAssociatedFiles(BibEntry entry, List<Path> directories, List<String> extensions) {
+        return findAssociatedFiles(Collections.singletonList(entry), directories, extensions).get(entry);
     }
 }

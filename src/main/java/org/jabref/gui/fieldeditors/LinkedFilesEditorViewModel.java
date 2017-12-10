@@ -158,9 +158,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     private List<LinkedFileViewModel> findAssociatedNotLinkedFiles(BibEntry entry) {
         List<LinkedFileViewModel> result = new ArrayList<>();
 
-        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil();
-        List<LinkedFile> linkedFiles = util.findassociatedNotLinkedFiles(entry, databaseContext, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
-
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
+        List<LinkedFile> linkedFiles = util.findAssociatedNotLinkedFiles(entry);
         for (LinkedFile linkedFile : linkedFiles) {
             LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(linkedFile, entry, databaseContext);
             newLinkedFile.markAsAutomaticallyFound();

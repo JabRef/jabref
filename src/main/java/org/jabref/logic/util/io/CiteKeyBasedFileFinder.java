@@ -4,11 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -19,6 +16,8 @@ import java.util.stream.Stream;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileHelper;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,19 +31,14 @@ class CiteKeyBasedFileFinder implements FileFinder {
     }
 
     @Override
-    public Map<BibEntry, List<Path>> findAssociatedFiles(List<BibEntry> entries, List<Path> directories, List<String> extensions) {
+    public Multimap<BibEntry, Path> findAssociatedFiles(List<BibEntry> entries, List<Path> directories, List<String> extensions) {
         Objects.requireNonNull(directories);
         Objects.requireNonNull(entries);
 
-        Map<BibEntry, List<Path>> result = new HashMap<>();
+        Multimap<BibEntry, Path> result = ArrayListMultimap.create();
 
         // First scan directories
         Set<Path> filesWithExtension = findFilesByExtension(directories, extensions);
-
-        // Initialize Result-Set
-        for (BibEntry entry : entries) {
-            result.put(entry, new ArrayList<>());
-        }
 
         // Now look for keys
         nextFile:

@@ -6,9 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -18,6 +16,8 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -65,10 +65,10 @@ class RegExpBasedFileFinder implements FileFinder {
     }
 
     @Override
-    public Map<BibEntry, List<Path>> findAssociatedFiles(List<BibEntry> entries, List<Path> directories, List<String> extensions) {
-        Map<BibEntry, List<Path>> res = new HashMap<>();
+    public Multimap<BibEntry, Path> findAssociatedFiles(List<BibEntry> entries, List<Path> directories, List<String> extensions) {
+        Multimap<BibEntry, Path> res = ArrayListMultimap.create();
         for (BibEntry entry : entries) {
-            res.put(entry, findFiles(entry, extensions, directories));
+            res.putAll(entry, findFiles(entry, extensions, directories));
         }
         return res;
     }
