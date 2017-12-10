@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
@@ -72,9 +70,9 @@ public class CiteKeyBasedFileFinderTest {
         List<Path> dirs = Arrays.asList(graphicsDir, pdfsDir);
         FileFinder fileFinder = new CiteKeyBasedFileFinder(false);
 
-        Collection<Path> results = fileFinder.findAssociatedFiles(entry, dirs, extensions);
+        List<Path> results = fileFinder.findAssociatedFiles(entry, dirs, extensions);
 
-        assertEquals(Arrays.asList(jpgFile, pdfFile), results.stream().sorted().collect(Collectors.toList()));
+        assertEquals(Arrays.asList(jpgFile, pdfFile), results);
     }
 
     @Test
@@ -82,7 +80,7 @@ public class CiteKeyBasedFileFinderTest {
         Files.createFile(pdfsDir.resolve("HipKro03a - Hello second paper.pdf"));
         FileFinder fileFinder = new CiteKeyBasedFileFinder(false);
 
-        Collection<Path> results = fileFinder.findAssociatedFiles(entry, Collections.singletonList(pdfsDir), Collections.singletonList("pdf"));
+        List<Path> results = fileFinder.findAssociatedFiles(entry, Collections.singletonList(pdfsDir), Collections.singletonList("pdf"));
 
         assertEquals(Collections.singletonList(pdfFile), results);
     }
@@ -92,7 +90,7 @@ public class CiteKeyBasedFileFinderTest {
         Path secondPdfFile = Files.createFile(pdfsDir.resolve("HipKro03_Hello second paper.pdf"));
         FileFinder fileFinder = new CiteKeyBasedFileFinder(false);
 
-        Collection<Path> results = fileFinder.findAssociatedFiles(entry, Collections.singletonList(pdfsDir), Collections.singletonList("pdf"));
+        List<Path> results = fileFinder.findAssociatedFiles(entry, Collections.singletonList(pdfsDir), Collections.singletonList("pdf"));
 
         assertEquals(Arrays.asList(pdfFile, secondPdfFile), results);
     }
@@ -103,7 +101,7 @@ public class CiteKeyBasedFileFinderTest {
         List<Path> dirs = Collections.singletonList(rootDir.resolve("asdfasdf/asdfasdf"));
         CiteKeyBasedFileFinder fileFinder = new CiteKeyBasedFileFinder(false);
 
-        Collection<Path> results = fileFinder.findAssociatedFiles(entry, dirs, extensions);
+        List<Path> results = fileFinder.findAssociatedFiles(entry, dirs, extensions);
 
         assertEquals(Collections.emptyList(), results);
     }

@@ -16,8 +16,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -64,15 +62,6 @@ class RegExpBasedFileFinder implements FileFinder {
         return expandedStringBuffer.toString();
     }
 
-    @Override
-    public Multimap<BibEntry, Path> findAssociatedFiles(List<BibEntry> entries, List<Path> directories, List<String> extensions) {
-        Multimap<BibEntry, Path> res = ArrayListMultimap.create();
-        for (BibEntry entry : entries) {
-            res.putAll(entry, findFiles(entry, extensions, directories));
-        }
-        return res;
-    }
-
     /**
      * Method for searching for files using regexp. A list of extensions and directories can be
      * given.
@@ -81,7 +70,8 @@ class RegExpBasedFileFinder implements FileFinder {
      * @param directories The root directories to search.
      * @return A list of files paths matching the given criteria.
      */
-    private List<Path> findFiles(BibEntry entry, List<String> extensions, List<Path> directories) {
+    @Override
+    public List<Path> findAssociatedFiles(BibEntry entry, List<Path> directories, List<String> extensions) {
         String extensionRegExp = '(' + String.join("|", extensions) + ')';
         return findFile(entry, directories, extensionRegExp);
     }

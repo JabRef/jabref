@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -48,7 +47,7 @@ public class AutoSetFileLinksUtil {
 
         // Run the search operation
         FileFinder fileFinder = FileFinders.constructFromConfiguration(autoLinkPreferences);
-        Collection<Path> result = fileFinder.findAssociatedFiles(entry, directories, extensions);
+        List<Path> result = fileFinder.findAssociatedFiles(entry, directories, extensions);
 
         // Collect the found files that are not yet linked
         for (Path foundFile : result) {
