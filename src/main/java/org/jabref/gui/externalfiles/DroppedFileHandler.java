@@ -32,6 +32,7 @@ import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XMPUtil;
@@ -449,7 +450,11 @@ public class DroppedFileHandler {
         tm.addEntry(tm.getRowCount(), new FileListEntry("", filename, fileType));
         String newValue = tm.getStringRepresentation();
         UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE, oldValue.orElse(null), newValue);
-        entry.setField(FieldName.FILE, newValue);
+
+        // make sure that the update runs in the Java FX thread to avoid exception in listeners
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            entry.setField(FieldName.FILE, newValue);
+        });
 
         if (edits == null) {
             panel.getUndoManager().addEdit(edit);

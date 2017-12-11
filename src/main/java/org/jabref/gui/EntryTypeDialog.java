@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -46,7 +47,6 @@ import org.jabref.model.entry.IEEETranEntryTypes;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jdesktop.swingx.VerticalLayout;
 
 /**
  * Dialog that prompts the user to choose a type for an entry.
@@ -89,7 +89,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
     private JPanel createEntryGroupsPanel() {
         JPanel panel = new JPanel();
-        panel.setLayout(new VerticalLayout());
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         if (frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
             panel.add(createEntryGroupPanel("biblatex", BiblatexEntryTypes.ALL));
@@ -216,7 +216,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
         constraints.fill = GridBagConstraints.NONE;
         jPanel.add(generateButton, constraints);
 
-        jPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("ID-based_entry_generator")));
+        jPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("ID-based entry generator")));
 
         SwingUtilities.invokeLater(() -> idTextField.requestFocus());
 

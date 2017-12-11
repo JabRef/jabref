@@ -56,9 +56,9 @@ public class Linux implements NativeDesktop {
         String cmd;
 
         if (desktopSession.contains("gnome")) {
-            cmd = "nautilus " + filePath;
+            cmd = "nautilus" + filePath.toString().replace(" ", "\\ ");
         } else if (desktopSession.contains("kde")) {
-            cmd = "dolphin --select " + filePath;
+            cmd = "dolphin --select " + filePath.toString().replace(" ", "\\ ");
         } else {
             cmd = "xdg-open " + filePath.toAbsolutePath().getParent().toString();
         }

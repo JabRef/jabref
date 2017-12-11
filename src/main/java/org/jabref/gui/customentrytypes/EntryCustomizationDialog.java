@@ -8,7 +8,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -54,16 +54,12 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
 
     protected GridBagLayout gbl = new GridBagLayout();
     protected GridBagConstraints con = new GridBagConstraints();
-    protected JButton helpButton;
     protected JButton delete;
     private final JabRefFrame frame;
     private FieldSetComponent reqComp;
     private FieldSetComponent optComp;
     private FieldSetComponent optComp2;
     private EntryTypeList typeComp;
-    private JButton ok;
-    private JButton cancel;
-    private JButton apply;
     private final List<String> preset = InternalBibtexFields.getAllPublicFieldNames();
     private String lastSelected;
     private final Map<String, Set<String>> reqLists = new HashMap<>();
@@ -103,9 +99,7 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
         right.setLayout(new GridLayout(biblatexMode ? 2 : 1, 2));
 
         List<String> entryTypes = new ArrayList<>();
-        for (String s : EntryTypes.getAllTypes(bibDatabaseMode)) {
-            entryTypes.add(s);
-        }
+        entryTypes.addAll(EntryTypes.getAllTypes(bibDatabaseMode));
 
         typeComp = new EntryTypeList(entryTypes, bibDatabaseMode);
         typeComp.addListSelectionListener(this);
@@ -137,9 +131,9 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
 
         //right.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Globals.lang("Fields")));
         right.setBorder(BorderFactory.createEtchedBorder());
-        ok = new JButton(Localization.lang("OK"));
-        cancel = new JButton(Localization.lang("Cancel"));
-        apply = new JButton(Localization.lang("Apply"));
+        JButton ok = new JButton(Localization.lang("OK"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
+        JButton apply = new JButton(Localization.lang("Apply"));
         ok.addActionListener(e -> {
             applyChanges();
             dispose();
@@ -342,7 +336,7 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
                 }
             }
             EntryTypes.removeType(name, bibDatabaseMode);
-            updateEntriesForChangedTypes(Arrays.asList(name.toLowerCase(Locale.ENGLISH)));
+            updateEntriesForChangedTypes(Collections.singletonList(name.toLowerCase(Locale.ENGLISH)));
             changed.remove(name);
             reqLists.remove(name);
             optLists.remove(name);

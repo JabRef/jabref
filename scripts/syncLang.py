@@ -1,11 +1,12 @@
 # coding=utf-8
+from __future__ import division
 
+import codecs
 import datetime
 import logging
 import os
 import subprocess
 import sys
-from io import TextIOWrapper
 
 logging.basicConfig(level=logging.INFO)
 
@@ -14,19 +15,19 @@ URL_BASE = "https://github.com/JabRef/jabref/tree/master/src/main/resources/l10n
 
 
 class Git:
-    def get_current_branch(self) -> str:
+    def get_current_branch(self):
         """
         :return: the current git branch
         """
         return self.__call_command('git rev-parse --abbrev-ref HEAD')
 
-    def get_current_hash_short(self) -> str:
+    def get_current_hash_short(self):
         """
         :return: the current git hash (short)
         """
         return self.__call_command('git rev-parse --short HEAD')
 
-    def __call_command(self, command: str) -> str:
+    def __call_command(self, command):
         """
         :param command: a shell command
         :return: the output of the shell command
@@ -38,7 +39,7 @@ class Keys:
     def __init__(self, lines):
         self.lines = lines
 
-    def duplicates(self) -> list:
+    def duplicates(self):
         """
         return: list of unicode strings
         """
@@ -48,15 +49,15 @@ class Keys:
             key, value = self.__extract_key_and_value(line=line)
             if key:
                 if key in keys_checked:
-                    duplicates.append("{key}={value}".format(key=key, value=value))
-                    translation_in_list = "{key}={value}".format(key=key, value=keys_checked[key])
+                    duplicates.append(u"{key}={value}".format(key=key, value=value))
+                    translation_in_list = "u{key}={value}".format(key=key, value=keys_checked[key])
                     if translation_in_list not in duplicates:
                         duplicates.append(translation_in_list)
                 else:
                     keys_checked[key] = value
         return duplicates
 
-    def fix_duplicates(self) -> tuple:
+    def fix_duplicates(self):
         """
         Fixes all unambiguous duplicates
         :return: (list of unicode strings, list of unicode strings): not fixed ambiguous duplicates, fixed unambiguous duplicates
@@ -83,7 +84,7 @@ class Keys:
 
         return keys, not_fixed, fixed
 
-    def keys_from_lines(self) -> list:
+    def keys_from_lines(self):
         """
         Builds a list of all translation keys in the list of lines.
 
@@ -97,7 +98,7 @@ class Keys:
         return keys
 
     @staticmethod
-    def key_from_line(line) -> str:
+    def key_from_line(line):
         """
         Tries to extract the key from the line
 
@@ -112,7 +113,7 @@ class Keys:
                 return line[0:index_key_end].strip()
         return None
 
-    def empty_keys(self) -> list:
+    def empty_keys(self):
         """
         :return: list of unicode strings: the keys with empty values
         """
@@ -123,7 +124,7 @@ class Keys:
                 not_translated.append(key)
         return not_translated
 
-    def translations_as_dict(self) -> dict:
+    def translations_as_dict(self):
         """
         :return: dict of unicode strings:
         """
@@ -135,7 +136,7 @@ class Keys:
         return translations
 
     @staticmethod
-    def __extract_key_and_value(line) -> tuple:
+    def __extract_key_and_value(line):
         """
         Tries to extract the key and value from the line
         :param line: unicode string
@@ -151,7 +152,7 @@ class Keys:
 
 
 class SyncLang:
-    def __init__(self, extended: bool, out_file='status.md'):
+    def __init__(self, extended, out_file='status.md'):
         """
         :param extended: boolean: if the keys with problems should be printed
 
@@ -237,7 +238,7 @@ class SyncLang:
             if self.extended and num_keys_duplicate != 0:
                 logging.info("\t\t{}".format(", ".join(keys_duplicate)))
 
-    def __all_menu_properties(self) -> list:
+    def __all_menu_properties(self):
         """
         :return: list of strings: all the Menu_*.preferences files with the english at the beginning
         """
@@ -245,14 +246,14 @@ class SyncLang:
         menu_property_files.insert(0, self.main_menu_preferences)
         return menu_property_files
 
-    def __other_menu_properties(self) -> list:
+    def __other_menu_properties(self):
         """
         :return: list of strings: all the Menu_*.preferences files without the english one
         """
         menu_property_files = [s for s in os.listdir(RES_DIR) if (s.startswith('Menu_') and not (s.startswith('Menu_en')))]
         return [os.path.join(RES_DIR, file) for file in menu_property_files]
 
-    def __all_jabref_properties(self) -> list:
+    def __all_jabref_properties(self):
         """
         :return: list of strings: all the JabRef_*.preferences files with the english at the beginning
         """
@@ -260,7 +261,7 @@ class SyncLang:
         jabref_property_files.insert(0, os.path.join(RES_DIR, "JabRef_en.properties"))
         return jabref_property_files
 
-    def __other_jabref_properties(self) -> list:
+    def __other_jabref_properties(self):
         """
         :return: list of strings: all the JabRef_*.preferences files without the english one
         """
@@ -313,7 +314,7 @@ class SyncLang:
             for line in main_lines:
                 key = main_keys.key_from_line(line)
                 if key is not None:
-                    other_lines_to_write.append("{key}={value}\n".format(key=key, value=keys[key]))
+                    other_lines_to_write.append(u"{key}={value}\n".format(key=key, value=keys[key]))
                 else:
                     other_lines_to_write.append(line)
 
@@ -345,7 +346,7 @@ class SyncLang:
                 logging.info("\thas been sorted successfully")
 
     @staticmethod
-    def __format_filename(filepath) -> str:
+    def __format_filename(filepath):
         """
         removes the res_dir path
 
@@ -361,20 +362,20 @@ class SyncLang:
         :param filename: string
         :param content: list of unicode unicode: the lines to write
         """
-        with open(filename, 'w', newline='\n', encoding='UTF-8') as f:
+        with codecs.open(filename, 'w', encoding="UTF-8") as f:
             f.writelines(content)
 
     @staticmethod
-    def __read_file_as_lines(filename, encoding="UTF-8") -> list:
+    def __read_file_as_lines(filename):
         """
         :param filename: string
         :param encoding: string: the encoding of the file to read (standard: `UTF-8`)
         :return: list of unicode strings: the lines of the file
         """
-        with open(filename, 'r', newline='', encoding=encoding) as file:
-            return ["{}\n".format(line.strip()) for line in file.readlines()]
+        with codecs.open(filename, 'r', encoding="UTF-8") as file:
+            return [u"{}\n".format(line.strip()) for line in file.readlines()]
 
-    def __missing_keys(self, first_list: list, second_list: list) -> list:
+    def __missing_keys(self, first_list, second_list):
         """
         Finds all keys in the first list that are not present in the second list
 
@@ -392,7 +393,8 @@ class SyncLang:
         """
         Creates a markdown file of the current status.
         """
-        def _write_properties(output_file: TextIOWrapper, property_files: list):
+
+        def _write_properties(output_file, property_files):
             output_file.write("\n| Property file | Keys | Keys translated | Keys not translated | % translated |\n")
             output_file.write("| ------------- | ---- | --------------- | ------------------- | ------------ |\n")
 
@@ -403,26 +405,30 @@ class SyncLang:
                 num_keys_missing_value = len(keys.empty_keys())
                 num_keys_translated = num_keys - num_keys_missing_value
 
-                output_file.write(f"| [{os.path.basename(file)}]({URL_BASE}{os.path.basename(file)}) | "
-                                  f"{num_keys} | "
-                                  f"{num_keys_translated} | "
-                                  f"{num_keys_missing_value} | "
-                                  f"{_percentage(num_keys, num_keys_translated)} |\n")
+                output_file.write("| [%s](%s%s) | %d | %d | %d | %d |\n" % (os.path.basename(file),
+                                                                            URL_BASE,
+                                                                            os.path.basename(file),
+                                                                            num_keys,
+                                                                            num_keys_translated,
+                                                                            num_keys_missing_value,
+                                                                            _percentage(num_keys, num_keys_translated)
+                                                                            )
+                                  )
 
-        def _percentage(whole: int, part: int) -> int:
+        def _percentage(whole, part):
             if whole == 0:
                 return 0
             return int(part / whole * 100.0)
 
-        with open(self.markdown_output, "w", newline="\n", encoding='utf-8') as status_file:
-            status_file.write(f'### Localization files status ({datetime.datetime.now().strftime("%Y-%m-%d %H:%M")} - '
-                              f'Branch `{Git().get_current_branch()}` `{Git().get_current_hash_short()}`)\n\n')
+        with codecs.open(self.markdown_output, "w", encoding="UTF-8") as status_file:
+            status_file.write('### Localization files status (' + datetime.datetime.now().strftime(
+                "%Y-%m-%d %H:%M") + ' - Branch `' + Git().get_current_branch() + '` `' + Git().get_current_hash_short() + '`)\n\n')
             status_file.write('Note: To get the current status from your local repository, run `python ./scripts/syncLang.py markdown`\n')
 
             _write_properties(status_file, self.__all_menu_properties())
             _write_properties(status_file, self.__all_jabref_properties())
 
-        logging.info(f'Current status written to {self.markdown_output}')
+        logging.info('Current status written to ' + self.markdown_output)
 
 
 if '__main__' == __name__:

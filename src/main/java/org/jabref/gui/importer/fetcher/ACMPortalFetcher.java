@@ -49,7 +49,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(ACMPortalFetcher.class);
 
-    private static final String START_URL = "http://portal.acm.org/";
+    private static final String START_URL = "https://portal.acm.org/";
     private static final String SEARCH_URL_PART = "results.cfm?query=";
     private static final String SEARCH_URL_PART_II = "&dl=";
     private static final String END_URL = "&coll=Portal&short=0";//&start=";

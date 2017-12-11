@@ -6,7 +6,6 @@ import javax.swing.JButton;
 
 import org.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import org.jabref.gui.preftabs.PreferencesDialog;
-import org.jabref.testutils.category.GUITests;
 
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
@@ -16,7 +15,7 @@ import org.junit.experimental.categories.Category;
 
 import static org.assertj.swing.finder.WindowFinder.findDialog;
 
-@Category(GUITests.class)
+@Category(org.jabref.testutils.category.GUITest.class)
 public class GUITest extends AbstractUITest {
 
     @Test

@@ -9,7 +9,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.jabref.logic.importer.util.OAI2Handler;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITest;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,7 +25,8 @@ import org.xml.sax.SAXException;
  * @author Christian Kopf
  * @author Christopher Oezbek
  */
-@Category(GUITests.class)
+
+@Category(GUITest.class)
 public class OAI2HandlerFetcherTest {
 
     protected OAI2Handler handler;
