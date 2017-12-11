@@ -38,12 +38,35 @@ public class LocalizationTest {
     }
 
     @Test
-    public void testKnownTranslation() {
+    public void testKnownTranslationWithGroups() {
         Localization.setLanguage("en");
         String knownKey = "Groups";
         assertEquals(knownKey, Localization.lang(knownKey));
         String knownValueWithMnemonics = "&Groups";
         assertEquals(knownValueWithMnemonics, Localization.menuTitle(knownKey));
+    }
+
+    @Test
+    public void testKnownEnglishTranslationOfUndo() {
+        Localization.setLanguage("en");
+        String knownKey = "Undo";
+        assertEquals(knownKey, Localization.lang(knownKey));
+        String knownValueWithMnemonics = "&Undo";
+        assertEquals(knownValueWithMnemonics, Localization.menuTitle(knownKey));
+    }
+
+    @Test
+    public void testKnownGermanTranslationDoesNotHaveAmpersand() {
+        Localization.setLanguage("de");
+        assertEquals("Alle speichern", Localization.lang("Save all"));
+    }
+
+    @Test
+    public void testKnownGermanTranslation() {
+        Localization.setLanguage("de");
+        String knownKey = "Save all";
+        assertEquals("Alle speichern", Localization.lang(knownKey));
+        assertEquals( "A&lle speichern", Localization.menuTitle(knownKey));
     }
 
     @Test
