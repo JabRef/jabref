@@ -142,7 +142,7 @@ public class LocalizationConsistencyTest {
                         "1. PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n" +
                         "2. EXECUTE: gradlew localizationUpdate\n" +
                         missingKeys.parallelStream()
-                                .map(key -> String.format("\n%s=%s\n", key.getKey(), key.getKey()))
+                                .map(key -> String.format("\n%s=%s\n", key.getKey(), key.getKey().replaceAll("\\\\ ", " ")))
                                 .collect(Collectors.toList()),
                 Collections.<LocalizationEntry>emptyList(), missingKeys);
     }
