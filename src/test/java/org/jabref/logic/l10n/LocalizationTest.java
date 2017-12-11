@@ -21,6 +21,7 @@ public class LocalizationTest {
     public void restoreDefaultLocale() {
         Locale.setDefault(locale);
         javax.swing.JComponent.setDefaultLocale(locale);
+        Localization.setLanguage("en");
     }
 
     @Test
