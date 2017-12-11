@@ -8,8 +8,7 @@ import org.jabref.logic.l10n.Localization;
 class ClearField extends MenuItem {
 
     public ClearField(TextArea opener) {
-        super(Localization.lang("Clear text"));
+        super(Localization.lang("Clear"));
         setOnAction(event -> opener.setText(""));
     }
-
 }
