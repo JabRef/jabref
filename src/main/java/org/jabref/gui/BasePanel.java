@@ -1984,7 +1984,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     public void updateTimeStamp() {
-        changeMonitor.ifPresent(DatabaseChangeMonitor::updateTimestampAndFileSize);
+        changeMonitor.ifPresent(DatabaseChangeMonitor::markAsSaved);
     }
 
     public Path getTempFile() {

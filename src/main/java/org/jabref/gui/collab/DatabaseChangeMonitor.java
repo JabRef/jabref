@@ -136,10 +136,10 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
 
     public void markExternalChangesAsResolved() {
         updatedExternally = false;
-        updateTimestampAndFileSize();
+        markAsSaved();
     }
 
-    public void updateTimestampAndFileSize() {
+    public void markAsSaved() {
         database.getDatabasePath().ifPresent(file -> {
             try {
                 timeStamp = Files.getLastModifiedTime(file).toMillis();
