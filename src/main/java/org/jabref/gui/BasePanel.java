@@ -896,7 +896,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 
             String sb = String.join(",", keys);
             String citeCommand = Optional.ofNullable(Globals.prefs.get(JabRefPreferences.CITE_COMMAND))
-                    .filter(cite -> cite.contains("\\"))    // must contain \
+                    .filter(cite -> cite.contains("\\")) // must contain \
                     .orElse("\\cite");
             StringSelection ss = new StringSelection(citeCommand + "{" + sb + '}');
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
@@ -947,7 +947,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             try {
                 layout = new LayoutHelper(sr,
                         Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader))
-                        .getLayoutFromText();
+                                .getLayoutFromText();
             } catch (IOException e) {
                 LOGGER.info("Could not get layout", e);
                 return;
@@ -1039,7 +1039,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     private boolean saveDatabase(File file, boolean selectedOnly, Charset enc,
-                                 SavePreferences.DatabaseSaveType saveType) throws SaveException {
+            SavePreferences.DatabaseSaveType saveType) throws SaveException {
         SaveSession session;
         frame.block();
         final String SAVE_DATABASE = Localization.lang("Save library");
@@ -1092,7 +1092,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             String tryDiff = Localization.lang("Try different encoding");
             int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), SAVE_DATABASE,
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                    new String[]{Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
+                    new String[] {Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
@@ -1693,7 +1693,9 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         NamedCompound compound = new NamedCompound(Localization.lang("Change entry type"));
         for (BibEntry entry : entries) {
             compound.addEdit(new UndoableChangeType(entry, entry.getType(), newType));
-            entry.setType(newType);
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                entry.setType(newType);
+            });
         }
 
         output(formatOutputMessage(Localization.lang("Changed type to '%0' for", newType), entries.size()));
@@ -1737,7 +1739,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                 Optional<String> oldKey = bes.getCiteKeyOptional();
                 if (!(oldKey.isPresent()) || oldKey.get().isEmpty()) {
                     BibtexKeyPatternUtil.makeAndSetLabel(bibDatabaseContext.getMetaData()
-                                    .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                            .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
                             bibDatabaseContext.getDatabase(),
                             bes, Globals.prefs.getBibtexKeyPatternPreferences());
                     bes.getCiteKeyOptional().ifPresent(
@@ -2031,6 +2033,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     private class GroupTreeListener {
+
         @Subscribe
         public void listen(EntryAddedEvent addedEntryEvent) {
             // if the added entry is an undo don't add it to the current group
@@ -2056,7 +2059,8 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                 currentEditor.close();
             }
 
-            if (selectionListener.getPreview().getEntry().equals(entryRemovedEvent.getBibEntry())) {
+            BibEntry previewEntry = selectionListener.getPreview().getEntry();
+            if ((previewEntry != null) && previewEntry.equals(entryRemovedEvent.getBibEntry())) {
                 selectionListener.setPreviewActive(false);
             }
         }

@@ -51,6 +51,10 @@ after_failure:
   # show test results if build fails
   - $TRAVIS_BUILD_DIR/scripts/after-failure.sh
 
+branches:
+  only: 
+    - master
+
 # cache gradle dependencies
 # https://docs.travis-ci.com/user/languages/java#Caching
 before_cache:
