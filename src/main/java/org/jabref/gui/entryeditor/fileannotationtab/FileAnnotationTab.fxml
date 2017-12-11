@@ -74,7 +74,7 @@
                         </cursor></MaterialDesignIconView>
                         </graphic>
                         <tooltip>
-                            <Tooltip text="Copy to clipboard" />
+                            <Tooltip text="%Copy to clipboard" />
                         </tooltip>
                     </Button>
                 </HBox>
