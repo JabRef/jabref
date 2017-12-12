@@ -28,12 +28,12 @@ import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
+import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.shared.exception.DatabaseNotSupportedException;
-import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.shared.exception.NotASharedDatabaseException;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;
