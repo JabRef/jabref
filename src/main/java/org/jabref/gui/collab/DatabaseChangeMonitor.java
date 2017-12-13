@@ -136,6 +136,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
 
     public void markExternalChangesAsResolved() {
         updatedExternally = false;
+        markAsSaved();
     }
 
     public void markAsSaved() {
