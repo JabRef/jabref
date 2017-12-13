@@ -31,15 +31,12 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.SaveSession;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.shared.DBMSSynchronizer;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
-import org.jabref.model.database.shared.DatabaseConnectionProperties;
 import org.jabref.model.database.shared.DatabaseLocation;
-import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -320,13 +317,9 @@ public class SaveDatabaseAction extends AbstractWorker {
 
         if (context.getLocation() == DatabaseLocation.SHARED) {
             // Save all properties dependent on the ID. This makes it possible to restore them.
-            DatabaseSynchronizer synchronizer = context.getDBMSSynchronizer();
-            if (synchronizer instanceof DBMSSynchronizer) {
-                DatabaseConnectionProperties properties = ((DBMSSynchronizer) synchronizer).getDBProcessor()
-                        .getDBMSConnectionProperties();
-                new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID())
-                        .putAllDBMSConnectionProperties(properties);
-            }
+            new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID())
+                    .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
+
         }
 
         context.setDatabaseFile(file);

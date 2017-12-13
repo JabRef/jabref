@@ -19,4 +19,6 @@ public interface DatabaseSynchronizer {
     void synchronizeSharedEntry(BibEntry bibEntry);
 
     void synchronizeLocalDatabase();
+
+    DatabaseConnectionProperties getConnectionProperties();
 }

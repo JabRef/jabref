@@ -47,7 +47,6 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnection;
 import org.jabref.logic.shared.DBMSConnectionProperties;
-import org.jabref.logic.shared.DBMSSynchronizer;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
@@ -56,7 +55,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
-import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -464,14 +462,8 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
         return panels.parallelStream().anyMatch(panel -> {
             BibDatabaseContext context = panel.getBibDatabaseContext();
 
-            DatabaseSynchronizer synchronizer = context.getDBMSSynchronizer();
-            if (synchronizer instanceof DBMSSynchronizer) {
-                return ((context.getLocation() == DatabaseLocation.SHARED) &&
-                        this.connectionProperties.equals(((DBMSSynchronizer)context.getDBMSSynchronizer())
-                                .getDBProcessor().getDBMSConnectionProperties()));
-            } else {
-                return false;
-            }
+            return ((context.getLocation() == DatabaseLocation.SHARED) &&
+                    this.connectionProperties.equals(context.getDBMSSynchronizer().getConnectionProperties()));
         });
     }
 

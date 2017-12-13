@@ -21,8 +21,8 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.database.event.EntryRemovedEvent;
-import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.database.shared.DatabaseConnection;
+import org.jabref.model.database.shared.DatabaseConnectionProperties;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
@@ -46,7 +46,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private static final Log LOGGER = LogFactory.getLog(DBMSSynchronizer.class);
 
     private DBMSProcessor dbmsProcessor;
-    private DBMSType dbmsType;
     private String dbName;
     private final BibDatabaseContext bibDatabaseContext;
     private MetaData metaData;
@@ -354,7 +353,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     @Override
     public void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException, SQLException {
-        this.dbmsType = connection.getProperties().getType();
         this.dbName = connection.getProperties().getDatabase();
         this.currentConnection = connection.getConnection();
         this.dbmsProcessor = DBMSProcessor.getProcessorInstance(connection);
@@ -382,6 +380,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     public DBMSProcessor getDBProcessor() {
         return dbmsProcessor;
+    }
+
+    @Override
+    public DatabaseConnectionProperties getConnectionProperties() {
+        return dbmsProcessor.getDBMSConnectionProperties();
     }
 
     public void setMetaData(MetaData metaData) {
