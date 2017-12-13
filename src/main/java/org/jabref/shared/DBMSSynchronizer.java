@@ -52,7 +52,7 @@ public class DBMSSynchronizer {
     private final EventBus eventBus;
     private Connection currentConnection;
     private final Character keywordSeparator;
-    private GlobalBibtexKeyPattern globalCiteKeyPattern;
+    private final GlobalBibtexKeyPattern globalCiteKeyPattern;
 
     public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
             GlobalBibtexKeyPattern globalCiteKeyPattern) {
@@ -74,9 +74,9 @@ public class DBMSSynchronizer {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntryEvents may be posted.
         // In this case DBSynchronizer should not try to insert the bibEntry entry again (but it would not harm).
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
-            dbmsProcessor.insertEntry(event.getBibEntry());
             synchronizeLocalMetaData();
             synchronizeLocalDatabase(); // Pull changes for the case that there were some
+            dbmsProcessor.insertEntry(event.getBibEntry());
         }
     }
 
@@ -261,7 +261,9 @@ public class DBMSSynchronizer {
         }
 
         try {
+            metaData.setEventPropagation(false);
             MetaDataParser.parse(metaData, dbmsProcessor.getSharedMetaData(), keywordSeparator);
+            metaData.setEventPropagation(true);
         } catch (ParseException e) {
             LOGGER.error("Parse error", e);
         }

@@ -85,6 +85,11 @@ public class HTMLCharsTest {
      */
 
     @Test
+    public void testQuoteSingle() {
+        assertEquals("&#39;", layout.format("{\\textquotesingle}"));
+    }
+
+    @Test
     public void unknownCommandIsKept() {
         assertEquals("aaaa", layout.format("\\aaaa"));
     }
