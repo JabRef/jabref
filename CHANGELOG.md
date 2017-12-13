@@ -35,8 +35,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added an option to mass append to fields via the Quality -> set/clear/append/rename fields dialog. [#2721](https://github.com/JabRef/jabref/issues/2721)
 - We added a check on startup to ensure JabRef is run with an adequate Java version. [3310](https://github.com/JabRef/jabref/issues/3310)
 - In the preference, all installed java Look and Feels are now listed and selectable
+- We added an ID fetcher for [IACR eprints](https://eprint.iacr.org/). [#3473](https://github.com/JabRef/jabref/pull/3473)
 - We added a clear option to the right-click menu of the text field in the entry editor. [koppor#198](https://github.com/koppor/jabref/issues/198)
-
 
 ### Fixed
  - We fixed the translation of \textendash and \textquotesingle in the entry preview [#3307](https://github.com/JabRef/jabref/issues/3307)
