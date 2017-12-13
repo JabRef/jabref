@@ -35,6 +35,7 @@ deployment:
       - ./gradlew -Pinstall4jDir="install4j7" clean release --stacktrace
       # upload at all circumstances
       - scripts/upload-to-builds.jabref.org.sh
+      - ./gradlew dependencyUpdates -Drevision=release -DoutputFormatter=json -DoutputDir=build/releases
   development:
      # match all branches; this is executed, if "release" is not matched - see https://circleci.com/docs/configuration/
     branch: /.*/
