@@ -18,7 +18,7 @@ buildscript {
 plugins {
     id 'com.gradle.build-scan' version '1.11'
     id 'com.install4j.gradle' version '7.0.3'
-    id 'com.github.johnrengelman.shadow' version '2.0.1'
+    id 'com.github.johnrengelman.shadow' version '2.0.2'
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
     id "com.simonharrer.modernizer" version '1.5.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.3'
