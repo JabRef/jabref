@@ -29,6 +29,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
+import org.jabref.gui.AbstractView;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
@@ -187,7 +188,7 @@ public class GlobalSearchBar extends JPanel {
         container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             Scene scene = new Scene(searchField);
-            scene.getStylesheets().add(GlobalSearchBar.class.getResource("../Main.css").toExternalForm());
+            scene.getStylesheets().add(AbstractView.class.getResource("Main.css").toExternalForm());
             container.setScene(scene);
             container.addKeyListener(new SearchKeyAdapter());
         });
