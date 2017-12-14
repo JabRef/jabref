@@ -28,7 +28,11 @@ class GroupChangeViewModel extends ChangeViewModel {
 
     @Override
     public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
-        final GroupTreeNode root = panel.getBibDatabaseContext().getMetaData().getGroups().orElse(null);
+        GroupTreeNode root = panel.getBibDatabaseContext().getMetaData().getGroups().orElse(null);
+        if(root == null) {
+            root = new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup());
+            panel.getBibDatabaseContext().getMetaData().setGroups(root);
+        }
         final UndoableModifySubtree undo = new UndoableModifySubtree(
                 new GroupTreeNodeViewModel(panel.getBibDatabaseContext().getMetaData().getGroups().orElse(null)),
                 new GroupTreeNodeViewModel(root), Localization.lang("Modified groups"));
@@ -47,14 +51,17 @@ class GroupChangeViewModel extends ChangeViewModel {
         undoEdit.addEdit(undo);
 
         // Update tmp database:
-        tmpGroupRoot.removeAllChildren();
-        if (changedGroups != null) {
-            GroupTreeNode copied = changedGroups.copySubtree();
-            tmpGroupRoot.setGroup(copied.getGroup());
-            for (GroupTreeNode child : copied.getChildren()) {
-                child.copySubtree().moveTo(tmpGroupRoot);
+        if (tmpGroupRoot != null) {
+            tmpGroupRoot.removeAllChildren();
+            if (changedGroups != null) {
+                GroupTreeNode copied = changedGroups.copySubtree();
+                tmpGroupRoot.setGroup(copied.getGroup());
+                for (GroupTreeNode child : copied.getChildren()) {
+                    child.copySubtree().moveTo(tmpGroupRoot);
+                }
             }
         }
+
         return true;
     }
 
