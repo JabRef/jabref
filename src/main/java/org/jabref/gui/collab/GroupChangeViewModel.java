@@ -29,7 +29,7 @@ class GroupChangeViewModel extends ChangeViewModel {
     @Override
     public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
         GroupTreeNode root = panel.getBibDatabaseContext().getMetaData().getGroups().orElse(null);
-        if(root == null) {
+        if (root == null) {
             root = new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup());
             panel.getBibDatabaseContext().getMetaData().setGroups(root);
         }
