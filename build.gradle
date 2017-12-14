@@ -152,7 +152,7 @@ dependencies {
     testRuntime 'org.junit.vintage:junit-vintage-engine:4.12.1'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.9.1'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.9.1'
-    testCompile 'org.mockito:mockito-core:2.12.0'
+    testCompile 'org.mockito:mockito-core:2.13.0'
     testCompile 'com.github.tomakehurst:wiremock:2.12.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
