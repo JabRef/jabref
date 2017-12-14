@@ -102,8 +102,8 @@ dependencies {
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
 
-    antlr4 'org.antlr:antlr4:4.7'
-    compile 'org.antlr:antlr4-runtime:4.7'
+    antlr4 'org.antlr:antlr4:4.7.1'
+    compile 'org.antlr:antlr4-runtime:4.7.1'
 
     // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
     compile 'mysql:mysql-connector-java:5.1.44'
