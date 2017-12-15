@@ -33,25 +33,25 @@ import org.jbibtex.Key;
  * In the current scheme, {@link #makeBibliography} can be called as usual
  * SwingWorker task and to the best of my knowledge, concurrent calls will pile up and processed sequentially.
  */
-public class CSLAdapter {
+class CSLAdapter {
 
     private static final BibTeXConverter BIBTEX_CONVERTER = new BibTeXConverter();
-    private static String style;
-    private static CitationStyleOutputFormat format;
-    private static JabRefItemDataProvider dataProvider = new JabRefItemDataProvider();
-    private static CSL cslInstance;
+    private final JabRefItemDataProvider dataProvider;
+    private String style;
+    private CitationStyleOutputFormat format;
+    private CSL cslInstance;
+
+    public CSLAdapter() {
+        dataProvider = new JabRefItemDataProvider();
+    }
 
     /**
      * Creates the bibliography of the provided items. This method needs to run synchronized because the underlying
      * CSL engine is not thread-safe.
      */
-    static synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat) throws IOException {
+    public synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat) throws IOException, IllegalArgumentException {
+        dataProvider.setData(bibEntries);
         initialize(style, outputFormat);
-        List<CSLItemData> cslItemData = new ArrayList<>(bibEntries.size());
-        for (BibEntry bibEntry : bibEntries) {
-            cslItemData.add(bibEntryToCSLItemData(bibEntry));
-        }
-        dataProvider.setData(cslItemData);
         cslInstance.registerCitationItems(dataProvider.getIds());
         final Bibliography bibliography = cslInstance.makeBibliography();
         return Arrays.asList(bibliography.getEntries());
@@ -64,31 +64,16 @@ public class CSLAdapter {
      * @param newFormat usually HTML or RTF.
      * @throws IOException An error occurred in the underlying JavaScript framework
      */
-    private static void initialize(String newStyle, CitationStyleOutputFormat newFormat) throws IOException {
-        if (cslInstance == null || !Objects.equals(newStyle, CSLAdapter.style) || !Objects.equals(newFormat, CSLAdapter.format)) {
+    private void initialize(String newStyle, CitationStyleOutputFormat newFormat) throws IOException {
+        if (cslInstance == null || !Objects.equals(newStyle, style)) {
             cslInstance = new CSL(dataProvider, newStyle);
             style = newStyle;
         }
 
-        if (!Objects.equals(newFormat, CSLAdapter.format)) {
+        if (!Objects.equals(newFormat, format)) {
             cslInstance.setOutputFormat(newFormat.getFormat());
             format = newFormat;
         }
-    }
-
-    /**
-     * Converts the {@link BibEntry} into {@link CSLItemData}.
-     */
-    private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry) {
-        String citeKey = bibEntry.getCiteKeyOptional().orElse("");
-        BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType()), new Key(citeKey));
-
-        // Not every field is already generated into latex free fields
-        for (String key : bibEntry.getFieldMap().keySet()) {
-            Optional<String> latexFreeField = bibEntry.getLatexFreeField(key);
-            latexFreeField.ifPresent(value -> bibTeXEntry.addField(new Key(key), new DigitStringValue(value)));
-        }
-        return BIBTEX_CONVERTER.toItemData(bibTeXEntry);
     }
 
     /**
@@ -99,8 +84,12 @@ public class CSLAdapter {
 
         private ItemDataProvider dataProvider = new ListItemDataProvider();
 
-        public void setData(List<CSLItemData> data) {
-            dataProvider = new ListItemDataProvider(data);
+        void setData(List<BibEntry> data) {
+            List<CSLItemData> cslItemData = new ArrayList<>(data.size());
+            for (BibEntry bibEntry : data) {
+                cslItemData.add(bibEntryToCSLItemData(bibEntry));
+            }
+            dataProvider = new ListItemDataProvider(cslItemData);
         }
 
         @Override
@@ -111,6 +100,21 @@ public class CSLAdapter {
         @Override
         public String[] getIds() {
             return dataProvider.getIds();
+        }
+
+        /**
+         * Converts the {@link BibEntry} into {@link CSLItemData}.
+         */
+        private CSLItemData bibEntryToCSLItemData(BibEntry bibEntry) {
+            String citeKey = bibEntry.getCiteKeyOptional().orElse("");
+            BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType()), new Key(citeKey));
+
+            // Not every field is already generated into latex free fields
+            for (String key : bibEntry.getFieldMap().keySet()) {
+                Optional<String> latexFreeField = bibEntry.getLatexFreeField(key);
+                latexFreeField.ifPresent(value -> bibTeXEntry.addField(new Key(key), new DigitStringValue(value)));
+            }
+            return BIBTEX_CONVERTER.toItemData(bibTeXEntry);
         }
     }
 }

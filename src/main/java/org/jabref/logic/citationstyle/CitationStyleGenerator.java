@@ -19,6 +19,7 @@ import org.jbibtex.TokenMgrException;
 public class CitationStyleGenerator {
 
     private static final Log LOGGER = LogFactory.getLog(CitationStyleGenerator.class);
+    private static final CSLAdapter cslAdapter = new CSLAdapter();
 
     private CitationStyleGenerator() {
     }
@@ -53,7 +54,10 @@ public class CitationStyleGenerator {
      */
     public static List<String> generateCitations(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat) {
         try {
-            return CSLAdapter.makeBibliography(bibEntries, style, outputFormat);
+            return cslAdapter.makeBibliography(bibEntries, style, outputFormat);
+        } catch (IllegalArgumentException ignored) {
+            LOGGER.error("Could not generate BibEntry citation. The CSL engine could not create a preview for your item.");
+            return Collections.singletonList(Localization.lang("Cannot generate preview based on selected citation style."));
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
             LOGGER.error("Could not generate BibEntry citation", e);
             return Collections.singletonList(Localization.lang("Cannot generate preview based on selected citation style."));

@@ -1,6 +1,5 @@
 package org.jabref.logic.citationstyle;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
@@ -43,7 +42,7 @@ public class CitationStyle {
 
     public static final String DEFAULT = "/ieee.csl";
     private static final Log LOGGER = LogFactory.getLog(CitationStyle.class);
-    private static List<CitationStyle> STYLES = new ArrayList<>();
+    private static final List<CitationStyle> STYLES = new ArrayList<>();
 
     private final String filePath;
     private final String title;
@@ -139,7 +138,7 @@ public class CitationStyle {
 
             // This is a quick fix to have the styles when running JabRef in a development environment.
             // The styles.jar is not extracted into the JabRef.jar and therefore, we search the classpath for it.
-            if ((new File(path)).isDirectory()) {
+            if (Files.isDirectory(Paths.get(path))) {
                 final String cp = System.getProperty("java.class.path");
                 final String[] entries = cp.split(System.getProperty("path.separator"));
                 for (String entry : entries) {
