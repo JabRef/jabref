@@ -33,6 +33,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added a dialog to show that JabRef is working on checking integrity. [#3358](https://github.com/JabRef/jabref/issues/3358)
 - When you click the PDF icon in the file list of the entry editor, then the file is opened. [#3491](https://github.com/JabRef/jabref/issues/3491)
 - We added an option to mass append to fields via the Quality -> set/clear/append/rename fields dialog. [#2721](https://github.com/JabRef/jabref/issues/2721)
+- We enhanced the cleanup functionality to normalize month names in other languages such as German, too.
 - We added a check on startup to ensure JabRef is run with an adequate Java version. [3310](https://github.com/JabRef/jabref/issues/3310)
 - In the preference, all installed java Look and Feels are now listed and selectable
 - We added an ID fetcher for [IACR eprints](https://eprint.iacr.org/). [#3473](https://github.com/JabRef/jabref/pull/3473)
