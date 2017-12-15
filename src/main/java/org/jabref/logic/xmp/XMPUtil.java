@@ -629,7 +629,7 @@ public class XMPUtil {
                  *
                  * Bibtex-Fields used: year, month
                  */
-                entry.getPublicationDate()
+                entry.getFieldOrAlias(FieldName.DATE)
                         .ifPresent(publicationDate -> dcSchema.addSequenceValue("dc:date", publicationDate));
                 continue;
             }

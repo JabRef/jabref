@@ -588,8 +588,8 @@ public class BibEntry implements Cloneable {
      *
      * @return will return the publication date of the entry or null if no year was found.
      */
-    public Optional<String> getPublicationDate() {
-        return getFieldOrAlias(FieldName.DATE);
+    public Optional<Date> getPublicationDate() {
+        return getFieldOrAlias(FieldName.DATE).flatMap(Date::parse);
     }
 
     public String getParsedSerialization() {
