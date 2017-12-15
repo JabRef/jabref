@@ -24,6 +24,7 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
     @Override
     public StringConverter<T> getStringConverter() {
         return new StringConverter<T>() {
+
             @Override
             public String toString(T object) {
                 if (object == null) {
@@ -38,7 +39,11 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
                 if (string == null) {
                     return null;
                 } else {
-                    return getItemMap().getOrDefault(string, null);
+
+                    if (getItemMap().get(string) == null) {
+                        getItemMap().put(string, (T) string);
+                    }
+                    return getItemMap().get(string);
                 }
             }
         };
