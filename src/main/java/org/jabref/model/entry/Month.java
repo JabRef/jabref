@@ -1,7 +1,11 @@
 package org.jabref.model.entry;
 
+import java.text.DateFormatSymbols;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -93,8 +97,44 @@ public enum Month {
             int number = Integer.parseInt(value);
             return Month.getMonthByNumber(number);
         } catch (NumberFormatException e) {
-            return Optional.empty();
+            return parseLocalizedMonth(value);
         }
+    }
+
+    /**
+     * Parses a month having the string in a localized form such as "Juli"
+     *
+     * @param value the text value - must not me null
+     * @return the corresponding month instance, empty if none was found
+     */
+    private static Optional<Month> parseLocalizedMonth(String value) {
+        Objects.requireNonNull(value);
+
+        // Normalize month name to unicode, which is returned by DateFormatSymbols.getMonths() - see below
+        value = new LatexToUnicodeAdapter().format(value);
+
+        Optional<Month> month = Optional.empty();
+
+        if (value.equalsIgnoreCase("Maerz")) {
+            // this value is not treated by LatexToUnicodeAdapter, so a special handling is required.
+            month = Month.getMonthByNumber(3);
+        } else {
+            Locale[] availableLocales = Locale.getAvailableLocales();
+            int i = 0;
+            do {
+                String[] months = new DateFormatSymbols(availableLocales[i]).getMonths();
+                int j = 0;
+                do {
+                    if (value.equalsIgnoreCase(months[j])) {
+                        month = Month.getMonthByNumber(j + 1);
+                    }
+                    j++;
+                } while (!month.isPresent() && (j < months.length));
+                i++;
+            } while (!month.isPresent() && (i < availableLocales.length));
+        }
+
+        return month;
     }
 
     /**
