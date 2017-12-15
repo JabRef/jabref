@@ -2096,7 +2096,8 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                 currentEditor.close();
             }
 
-            if (preview.getEntry().equals(entryRemovedEvent.getBibEntry())) {
+            BibEntry previewEntry = selectionListener.getPreview().getEntry();
+            if ((previewEntry != null) && previewEntry.equals(entryRemovedEvent.getBibEntry())) {
                 preview.close();
             }
         }
