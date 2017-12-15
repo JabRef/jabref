@@ -1,5 +1,6 @@
 package org.jabref.logic.citationstyle;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
@@ -35,21 +36,23 @@ import org.xml.sax.SAXException;
 
 
 /**
- * Representation of a CitationStyle
- * Stores its name, the filepath and the style itself
+ * Representation of a CitationStyle.
+ * Stores its name, the file path and the style itself
  */
 public class CitationStyle {
 
     public static final String DEFAULT = "/ieee.csl";
     private static final Log LOGGER = LogFactory.getLog(CitationStyle.class);
+    private static List<CitationStyle> STYLES = new ArrayList<>();
 
-    private final String filepath;
+    private final String filePath;
     private final String title;
     private final String source;
 
 
+
     private CitationStyle(final String filename, final String title, final String source) {
-        this.filepath = Objects.requireNonNull(filename);
+        this.filePath = Objects.requireNonNull(filename);
         this.title = Objects.requireNonNull(title);
         this.source = Objects.requireNonNull(source);
     }
@@ -115,19 +118,37 @@ public class CitationStyle {
         return null;
     }
 
+    /**
+     * Provides the default citation style which is currently IEEE
+     * @return default citation style
+     */
     public static CitationStyle getDefault() {
         return createCitationStyleFromFile(DEFAULT);
     }
 
     /**
-     * THIS ONLY WORKS WHEN JabRef IS STARTED AS AN APPLICATION (JAR)
-     *
-     * Reads all available CitationStyle in the Jar
+     * Provides the citation styles that come with JabRef.
+     * @return list of available citation styles
      */
     public static List<CitationStyle> discoverCitationStyles() {
+        if (!STYLES.isEmpty()) {
+            return STYLES;
+        }
         try {
-            final List<CitationStyle> citationStyles = new ArrayList<>();
             String path = CitationStyle.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+
+            // This is a quick fix to have the styles when running JabRef in a development environment.
+            // The styles.jar is not extracted into the JabRef.jar and therefore, we search the classpath for it.
+            if ((new File(path)).isDirectory()) {
+                final String cp = System.getProperty("java.class.path");
+                final String[] entries = cp.split(System.getProperty("path.separator"));
+                for (String entry : entries) {
+                    if (entry.matches(".*styles-1\\.0\\.1-SNAPSHOT\\.jar")) {
+                        path = entry;
+                        break;
+                    }
+                }
+            }
 
             try (JarFile file = new JarFile(path)) {
                 Enumeration<JarEntry> entries = file.entries();
@@ -136,12 +157,12 @@ public class CitationStyle {
                     if (!filename.startsWith("dependent") && filename.endsWith("csl")) {
                         CitationStyle citationStyle = CitationStyle.createCitationStyleFromFile(filename);
                         if (citationStyle != null) {
-                            citationStyles.add(citationStyle);
+                            STYLES.add(citationStyle);
                         }
                     }
                 }
             }
-            return citationStyles;
+            return STYLES;
         } catch (IOException | URISyntaxException ex) {
             LOGGER.error("something went wrong while searching available CitationStyles. " +
                     "Are you running directly from source code?", ex);
@@ -164,8 +185,8 @@ public class CitationStyle {
         return source;
     }
 
-    public String getFilepath() {
-        return filepath;
+    public String getFilePath() {
+        return filePath;
     }
 
     @Override
