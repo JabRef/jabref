@@ -77,7 +77,6 @@ import org.jabref.gui.renderer.GeneralRenderer;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.comparator.IconComparator;
 import org.jabref.gui.util.component.CheckBoxMessage;
 import org.jabref.logic.bibtex.DuplicateCheck;
@@ -87,7 +86,6 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportInspector;
 import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.Defaults;
 import org.jabref.model.FieldChange;
@@ -234,8 +232,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         centerPan.setLayout(new BorderLayout());
 
         contentPane.setTopComponent(new JScrollPane(glTable));
-        JFXPanel container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
-        DefaultTaskExecutor.runInJavaFXThread(() -> container.setScene(new Scene(preview)));
+        JFXPanel container = CustomJFXPanel.wrap(new Scene(preview));
         contentPane.setBottomComponent(container);
 
         centerPan.add(contentPane, BorderLayout.CENTER);

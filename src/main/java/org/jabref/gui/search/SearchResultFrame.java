@@ -52,13 +52,11 @@ import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.MainTableNameFormatter;
 import org.jabref.gui.renderer.GeneralRenderer;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.comparator.IconComparator;
 import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
@@ -155,8 +153,7 @@ public class SearchResultFrame {
 
         contentPane.setTopComponent(sp);
 
-        JFXPanel container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
-        DefaultTaskExecutor.runInJavaFXThread(() -> container.setScene(new Scene(preview)));
+        JFXPanel container = CustomJFXPanel.wrap(new Scene(preview));
         contentPane.setBottomComponent(container);
 
         // Key bindings:

@@ -19,6 +19,7 @@ import javafx.scene.web.WebView;
 
 import org.jabref.Globals;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
@@ -45,6 +46,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
+    private final KeyBindingRepository keyBindingRepository;
 
     private Optional<BasePanel> basePanel = Optional.empty();
 
@@ -72,6 +74,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         this.basePanel = Optional.ofNullable(panel);
         this.clipBoardManager = new ClipBoardManager();
         this.dialogService = new FXDialogService();
+        this.keyBindingRepository = Globals.getKeyPrefs();
 
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             // Set up scroll pane for preview pane
@@ -121,12 +124,15 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
 
     private ContextMenu createPopupMenu() {
         MenuItem copyPreview = new MenuItem(Localization.lang("Copy preview"), IconTheme.JabRefIcon.COPY.getGraphicNode());
+        copyPreview.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.COPY_PREVIEW));
         copyPreview.setOnAction(event -> copyPreviewToClipBoard());
         MenuItem printEntryPreview = new MenuItem(Localization.lang("Print entry preview"), IconTheme.JabRefIcon.PRINTED.getGraphicNode());
         printEntryPreview.setOnAction(event -> print());
-        MenuItem previousPreviewLayout = new MenuItem(Localization.menuTitle("Previous preview layout"));
+        MenuItem previousPreviewLayout = new MenuItem(Localization.menuTitleFX("Previous preview layout"));
+        previousPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.PREVIOUS_PREVIEW_LAYOUT));
         previousPreviewLayout.setOnAction(event -> basePanel.ifPresent(BasePanel::previousPreviewStyle));
-        MenuItem nextPreviewLayout = new MenuItem(Localization.menuTitle("Next preview layout"));
+        MenuItem nextPreviewLayout = new MenuItem(Localization.menuTitleFX("Next preview layout"));
+        nextPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.NEXT_PREVIEW_LAYOUT));
         nextPreviewLayout.setOnAction(event -> basePanel.ifPresent(BasePanel::nextPreviewStyle));
 
         ContextMenu menu = new ContextMenu();
@@ -274,8 +280,13 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     }
 
     public void print() {
+        PrinterJob job = PrinterJob.createPrinterJob();
+        boolean proceed = dialogService.showPrintDialog(job);
+        if (!proceed) {
+            return;
+        }
+
         BackgroundTask.wrap(() -> {
-            PrinterJob job = PrinterJob.createPrinterJob();
             job.getJobSettings().setJobName(bibEntry.flatMap(BibEntry::getCiteKeyOptional).orElse("NO ENTRY"));
             previewView.getEngine().print(job);
             job.endJob();

@@ -10,10 +10,8 @@ import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableRemoveEntry;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
@@ -46,8 +44,7 @@ class EntryDeleteChangeViewModel extends ChangeViewModel {
 
         PreviewPanel previewPanel = new PreviewPanel(null, null);
         previewPanel.setEntry(memEntry);
-        container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
-        DefaultTaskExecutor.runInJavaFXThread(() -> container.setScene(new Scene(previewPanel)));
+        container = CustomJFXPanel.wrap(new Scene(previewPanel));
     }
 
     @Override

@@ -55,7 +55,6 @@ import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.util.FileExtensions;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -158,8 +157,7 @@ class StyleSelectDialog {
         builder.add(new JScrollPane(table)).xyw(1, 3, 5);
         builder.add(addButton).xy(3, 5);
         builder.add(removeButton).xy(5, 5);
-        JFXPanel container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
-        DefaultTaskExecutor.runInJavaFXThread(() -> container.setScene(new Scene(preview)));
+        JFXPanel container = CustomJFXPanel.wrap(new Scene(preview));
         builder.add(container).xyw(1, 7, 5);
         builder.padding("5dlu, 5dlu, 5dlu, 5dlu");
 
