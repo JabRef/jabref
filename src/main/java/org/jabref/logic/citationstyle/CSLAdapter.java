@@ -33,17 +33,13 @@ import org.jbibtex.Key;
  * In the current scheme, {@link #makeBibliography} can be called as usual
  * SwingWorker task and to the best of my knowledge, concurrent calls will pile up and processed sequentially.
  */
-class CSLAdapter {
+public class CSLAdapter {
 
     private static final BibTeXConverter BIBTEX_CONVERTER = new BibTeXConverter();
-    private final JabRefItemDataProvider dataProvider;
+    private final JabRefItemDataProvider dataProvider = new JabRefItemDataProvider();
     private String style;
     private CitationStyleOutputFormat format;
     private CSL cslInstance;
-
-    public CSLAdapter() {
-        dataProvider = new JabRefItemDataProvider();
-    }
 
     /**
      * Creates the bibliography of the provided items. This method needs to run synchronized because the underlying
@@ -84,7 +80,7 @@ class CSLAdapter {
 
         private ItemDataProvider dataProvider = new ListItemDataProvider();
 
-        void setData(List<BibEntry> data) {
+        public void setData(List<BibEntry> data) {
             List<CSLItemData> cslItemData = new ArrayList<>(data.size());
             for (BibEntry bibEntry : data) {
                 cslItemData.add(bibEntryToCSLItemData(bibEntry));
