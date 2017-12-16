@@ -63,6 +63,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue where dropping a pdf on the entry table and renaming it triggered an exception [#3490](https://github.com/JabRef/jabref/issues/3490)
  - We fixed an issue where integrating external changes to a bib file caused instability [#3498](https://github.com/JabRef/jabref/issues/3498)
  - We fixed an issue where fetched entries from the ACM fetcher could not be imported [#3500](https://github.com/JabRef/jabref/issues/3500)
+ - We fixed an issue where custom data in combobox fields in the entry editor was not saved [#3538](https://github.com/JabRef/jabref/issues/3538)
 
  ### Removed
 
