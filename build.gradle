@@ -11,14 +11,14 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.2'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0-M1'
     }
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '1.10.3'
+    id 'com.gradle.build-scan' version '1.11'
     id 'com.install4j.gradle' version '7.0.3'
-    id 'com.github.johnrengelman.shadow' version '2.0.1'
+    id 'com.github.johnrengelman.shadow' version '2.0.2'
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
     id "com.simonharrer.modernizer" version '1.5.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.3'
@@ -102,8 +102,8 @@ dependencies {
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
 
-    antlr4 'org.antlr:antlr4:4.7'
-    compile 'org.antlr:antlr4-runtime:4.7'
+    antlr4 'org.antlr:antlr4:4.7.1'
+    compile 'org.antlr:antlr4-runtime:4.7.1'
 
     // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
     compile 'mysql:mysql-connector-java:5.1.44'
@@ -145,14 +145,14 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.9'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.2'
-    testCompile 'org.junit.jupiter:junit-jupiter-params:5.0.2'
-    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.2'
-    testCompile 'org.junit.platform:junit-platform-launcher:1.0.2'
-    testRuntime 'org.junit.vintage:junit-vintage-engine:4.12.1'
-    testRuntime 'org.apache.logging.log4j:log4j-core:2.9.1'
-    testRuntime 'org.apache.logging.log4j:log4j-jul:2.9.1'
-    testCompile 'org.mockito:mockito-core:2.12.0'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.0-M1'
+    testCompile 'org.junit.jupiter:junit-jupiter-params:5.1.0-M1'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.1.0-M1'
+    testRuntime 'org.junit.vintage:junit-vintage-engine:5.1.0-M1'
+    testCompile 'org.junit.platform:junit-platform-launcher:1.1.0-M1'
+    testRuntime 'org.apache.logging.log4j:log4j-core:2.10.0'
+    testRuntime 'org.apache.logging.log4j:log4j-jul:2.10.0'
+    testCompile 'org.mockito:mockito-core:2.13.0'
     testCompile 'com.github.tomakehurst:wiremock:2.12.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
