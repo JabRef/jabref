@@ -30,7 +30,6 @@ import org.jabref.gui.filelist.FileListEntryEditor;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -287,23 +286,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
                                 Localization.lang("Cannot delete file"),
                                 Localization.lang("File permission error"));
                         LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
+                        return false;
                     }
                 }
             }
-
         } else {
-            Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.ERROR, Localization.lang("File not found"),
-                    (Localization.lang("Could not find file '%0'.", linkedFile.getLink()) + OS.NEWLINE + Localization.lang("Pressing 'remove' will remove the file from the entry")),
-                    removeFromEntry, ButtonType.CANCEL);
-
-            if (buttonType.isPresent()) {
-                if (buttonType.get().equals(removeFromEntry)) {
-                    return true;
-                }
-            }
+            LOGGER.warn(Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
         }
-
-        return false;
+        return true;
 
     }
 
