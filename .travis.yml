@@ -20,10 +20,7 @@ env:
     - TEST_SUITE=guiTest
     - TEST_SUITE=checkstyle
     - TEST_SUITE=codecov
-    - if type == cron
-      notifications:
-        email:
-        - linus@lynyus.de
+
 
 matrix:
     fast_finish: true
