@@ -8,14 +8,15 @@ import java.nio.charset.StandardCharsets;
 
 import org.jabref.logic.remote.client.RemoteListenerClient;
 import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
+import org.jabref.logic.util.OS;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 public class RemoteTest {
 
@@ -61,8 +62,9 @@ public class RemoteTest {
     }
 
     @Test
-    @Disabled("This test fails on MacOs. Need to investigate!")
     public void testPortAlreadyInUse() throws IOException {
+        assumeFalse(OS.OS_X);
+
         final int port = 34567;
 
         try (ServerSocket socket = new ServerSocket(port)) {

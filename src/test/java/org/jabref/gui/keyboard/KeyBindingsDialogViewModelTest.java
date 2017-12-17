@@ -10,16 +10,17 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
+import org.jabref.logic.util.OS;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -95,8 +96,9 @@ public class KeyBindingsDialogViewModelTest {
     }
 
     @Test
-    @Disabled("This test fails on MacOs. Need to investigate!")
     public void testSaveNewKeyBindingsToPreferences() {
+        assumeFalse(OS.OS_X);
+
         setKeyBindingViewModel(KeyBinding.ABBREVIATE);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "J", "J", KeyCode.J, true, true, true, false);
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
@@ -122,8 +124,9 @@ public class KeyBindingsDialogViewModelTest {
     }
 
     @Test
-    @Disabled("This test fails on MacOs. Need to investigate!")
     public void testSetAllKeyBindingsToDefault() {
+        assumeFalse(OS.OS_X);
+
         setKeyBindingViewModel(KeyBinding.ABBREVIATE);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "C", "C", KeyCode.C, true, true, true, false);
 
@@ -155,8 +158,9 @@ public class KeyBindingsDialogViewModelTest {
     }
 
     @Test
-    @Disabled("This test fails on MacOs. Need to investigate!")
     public void testSetSingleKeyBindingToDefault() {
+        assumeFalse(OS.OS_X);
+
         KeyBindingViewModel viewModel = setKeyBindingViewModel(KeyBinding.ABBREVIATE);
         model.selectedKeyBindingProperty().set(viewModel);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "C", "C", KeyCode.C, true, true, true, false);
@@ -175,8 +179,9 @@ public class KeyBindingsDialogViewModelTest {
     }
 
     @Test
-    @Disabled("This test fails on MacOs. Need to investigate!")
     public void testConversionAwtKeyEventJavafxKeyEvent() {
+        assumeFalse(OS.OS_X);
+
         java.awt.event.KeyEvent evt = new java.awt.event.KeyEvent(mock(JFrame.class), 0, 0, InputEvent.CTRL_MASK, java.awt.event.KeyEvent.VK_S, java.awt.event.KeyEvent.CHAR_UNDEFINED);
 
         Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(evt);
