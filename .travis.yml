@@ -47,7 +47,7 @@ script:
   - if [ "$TEST_SUITE" == "checkstyle" ]; then ./gradlew checkstyleMain checkstyleTest checkstyleJmh; fi
   - if [ "$TEST_SUITE" == "guiTest" ]; then ./buildres/gui-tests.sh; fi
   - if [ "$TEST_SUITE" == "codecov" ]; then ./gradlew jacocoJunit5TestReport; bash <(curl -s https://codecov.io/bash); fi
-  - if [ "$DEPENDENCY_UPDATE" == "yes" ]; then ./gradlew depencencyUpdate; fi
+  - if [ "$DEPENDENCY_UPDATE" == "yes" ]; then ./gradlew depencencyUpdates; fi
 
 
 after_failure:
