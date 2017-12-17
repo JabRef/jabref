@@ -169,6 +169,8 @@ dependencies {
     testCompile 'org.xmlunit:xmlunit-matchers:2.5.1'
     testCompile 'com.tngtech.archunit:archunit-junit:0.5.0'
     testCompile 'org.slf4j:slf4j-jcl:1.7.25' // required by ArchUnit to enable logging over jcl
+
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.5'
 }
 
 dependencyUpdates {
@@ -398,7 +400,7 @@ afterEvaluate {
 checkstyle {
     // do not use other packages for checkstyle, excluding gen(erated) sources
     checkstyleMain.source = "src/main/java"
-    toolVersion = '8.3'
+    toolVersion = '8.5'
 }
 
 checkstyleMain.shouldRunAfter test
