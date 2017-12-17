@@ -151,10 +151,9 @@ public class CitationStyle {
                 path = foundStyle.orElse(path);
             }
 
-            try (FileSystem jarfs = FileSystems.newFileSystem(Paths.get(path), null)) {
+            try (FileSystem jarFs = FileSystems.newFileSystem(Paths.get(path), null)) {
 
-                List<Path> allStyles = Files.find(jarfs.getRootDirectories().iterator().next(), 1, (file, attr) -> file.toString().endsWith("csl")).collect(Collectors.toList());
-                allStyles.forEach(System.out::println);
+                List<Path> allStyles = Files.find(jarFs.getRootDirectories().iterator().next(), 1, (file, attr) -> file.toString().endsWith("csl")).collect(Collectors.toList());
 
                 for (Path style : allStyles) {
                     CitationStyle citationStyle = CitationStyle.createCitationStyleFromFile(style.getFileName().toString());
