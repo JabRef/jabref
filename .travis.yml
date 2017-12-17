@@ -6,6 +6,9 @@ language: java
 dist: trusty
 sudo: required
 
+git:
+  depth: 1
+
 services:
   - postgresql
   - mysql
@@ -52,7 +55,7 @@ after_failure:
   - $TRAVIS_BUILD_DIR/scripts/after-failure.sh
 
 branches:
-  only: 
+  only:
     - master
 
 # cache gradle dependencies
