@@ -20,7 +20,7 @@ env:
     - TEST_SUITE=guiTest
     - TEST_SUITE=checkstyle
     - TEST_SUITE=codecov
-
+    - DEPENDENCY_UPDATE=yes
 
 matrix:
     fast_finish: true
@@ -47,7 +47,7 @@ script:
   - if [ "$TEST_SUITE" == "checkstyle" ]; then ./gradlew checkstyleMain checkstyleTest checkstyleJmh; fi
   - if [ "$TEST_SUITE" == "guiTest" ]; then ./buildres/gui-tests.sh; fi
   - if [ "$TEST_SUITE" == "codecov" ]; then ./gradlew jacocoJunit5TestReport; bash <(curl -s https://codecov.io/bash); fi
-  - if type == cron; then ./gradlew depencencyUpdate; fi
+  - if [ "$DEPENDENCY_UPDATE" == "yes" ] then ./gradlew depencencyUpdate; fi
 
 
 after_failure:
