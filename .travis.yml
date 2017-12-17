@@ -7,7 +7,7 @@ dist: trusty
 sudo: required
 
 git:
-  depth: false
+  depth: 1
 
 services:
   - postgresql
