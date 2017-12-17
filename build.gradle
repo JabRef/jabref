@@ -214,9 +214,12 @@ dependencyUpdates.resolutionStrategy = {
         }
     }
 }
-task checkOutdatedDependencies(dependsOn: "dependencyUpdates") {
-    def dependencyReport = new JsonSlurper().parseText(new File("build/dependencyUpdates/report.json").text)
-    assert dependencyReport.outdated.count == 0: "There are outdated dependencies in build.gradle!\n Run ./gradlew dependencyUpdates to see which"
+
+task checkOutdatedDependencies(dependsOn: dependencyUpdates) {
+    doLast {
+        def dependencyReport = new JsonSlurper().parseText(new File("build/dependencyUpdates/report.json").text)
+        assert dependencyReport.outdated.count == 0: "There are outdated dependencies in build.gradle!\n Run ./gradlew dependencyUpdates to see which"
+    }
 }
 
 clean {
@@ -309,6 +312,7 @@ javadoc {
     }
 }
 
+// Test tasks
 junitPlatform {
     filters {
         tags {
@@ -337,6 +341,7 @@ task guiTest(type: Test) {
     }
 }
 
+// Test result tasks
 task copyTestResources(type: Copy) {
     from "${projectDir}/src/test/resources"
     into "${buildDir}/classes/test"
@@ -387,6 +392,8 @@ afterEvaluate {
     }
 }
 
+
+// Code quality tasks
 checkstyle {
     // do not use other packages for checkstyle, excluding gen(erated) sources
     checkstyleMain.source = "src/main/java"
@@ -402,6 +409,7 @@ modernizer {
     failOnViolations = false
 }
 
+// Release tasks
 shadowJar {
     classifier 'fat'
 }
@@ -494,8 +502,3 @@ jmh {
     iterations = 10
     fork = 2
 }
-
-
-
-
-
