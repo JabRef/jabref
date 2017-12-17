@@ -47,12 +47,20 @@ script:
   - if [ "$TEST_SUITE" == "guiTest" ]; then ./buildres/gui-tests.sh; fi
   - if [ "$TEST_SUITE" == "codecov" ]; then ./gradlew jacocoJunit5TestReport; bash <(curl -s https://codecov.io/bash); fi
 
+jobs:
+  include:
+  - if: type == "cron"
+  - ./gradlew depencencyUpdate
+  notifications:
+    email:
+      - linus@lynyus.de
+
 after_failure:
   # show test results if build fails
   - $TRAVIS_BUILD_DIR/scripts/after-failure.sh
 
 branches:
-  only: 
+  only:
     - master
 
 # cache gradle dependencies
