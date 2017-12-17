@@ -6,6 +6,9 @@ language: java
 dist: trusty
 sudo: required
 
+git:
+  depth: 1
+
 services:
   - postgresql
   - mysql
