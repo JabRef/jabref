@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -35,7 +36,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
     private final ListProperty<FileAnnotationViewModel> annotations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Path> files = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<FileAnnotationViewModel> currentAnnotation = new SimpleObjectProperty<>();
-    private final ObjectProperty<Boolean> annotationEmpty = new SimpleObjectProperty<>(null);
+    private ReadOnlyBooleanProperty annotationEmpty;
 
     private final FileAnnotationCache cache;
     private final BibEntry entry;
@@ -60,7 +61,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         return currentAnnotation;
     }
 
-    public ObjectProperty<Boolean> isAnnotationsEmpty() {
+    public ReadOnlyBooleanProperty isAnnotationsEmpty() {
         return annotationEmpty;
     }
 
@@ -89,11 +90,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
                 .map(FileAnnotationViewModel::new)
                 .collect(Collectors.toList());
         annotations.setAll(newAnnotations);
-        if (annotations.isEmpty()) {
-            annotationEmpty.setValue(true);
-        } else {
-            annotationEmpty.setValue(false);
-        }
+        annotationEmpty = annotations.emptyProperty();
         try {
             fileMonitor.addListenerForFile(currentFile, fileListener);
         } catch (IOException e) {
