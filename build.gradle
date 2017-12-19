@@ -1,3 +1,4 @@
+import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
 
 // to update the gradle wrapper, execute ./gradlew wrapper --gradle-version 4.0
@@ -57,8 +58,16 @@ mainClassName = "org.jabref.JabRefMain"
 ext.minRequiredJavaVersion = "1.8.0_144"
 ext.allowJava9 = false
 
-install4j {
-    installDir = file(project.ext.install4jDir)
+sourceSets {
+    main {
+        java {
+            srcDirs = ["src/main/java", "src/main/gen"]
+        }
+
+        resources {
+            srcDirs = ["src/main/java", "src/main/resources"]
+        }
+    }
 }
 
 repositories {
@@ -160,18 +169,64 @@ dependencies {
     testCompile 'org.xmlunit:xmlunit-matchers:2.5.1'
     testCompile 'com.tngtech.archunit:archunit-junit:0.5.0'
     testCompile 'org.slf4j:slf4j-jcl:1.7.25' // required by ArchUnit to enable logging over jcl
+
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.5'
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ["src/main/java", "src/main/gen"]
-        }
+dependencyUpdates {
+    outputFormatter = "json"
+}
 
-        resources {
-            srcDirs = ["src/main/java", "src/main/resources"]
+// We have some dependencies which cannot be updated due to various reasons.
+dependencyUpdates.resolutionStrategy = {
+    componentSelection {
+        withModule("org.controlsfx:controlsfx") { ComponentSelection selection ->
+            if (selection.candidate.version ==~ /9.*/) { // Reject version 9 or higher
+                selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
+            }
+        }
+        withModule("com.microsoft.azure:applicationinsights-core") { ComponentSelection selection ->
+            if (selection.candidate.version.equals("1.0.10")) {
+                selection.reject("Version 1.0.10 is broken... waiting for 1.0.11")
+            }
+        }
+        withModule("com.microsoft.azure:applicationinsights-logging-log4j2") { ComponentSelection selection ->
+            if (selection.candidate.version.equals("1.0.10")) {
+                selection.reject("Version 1.0.10 is broken... waiting for 1.0.11")
+            }
+        }
+        withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
+            if (selection.candidate.version ==~ /2.*/) {
+                selection.reject("Cannot be upgraded to version 2")
+            }
+        }
+        withModule("org.apache.pdfbox:fontbox") { ComponentSelection selection ->
+            if (selection.candidate.version ==~ /2.*/) {
+                selection.reject("update to 2.0.x is not possible - see https://github.com/JabRef/jabref/pull/1096#issuecomment-208857517")
+            }
+        }
+        withModule("org.apache.pdfbox:pdfbox") { ComponentSelection selection ->
+            if (selection.candidate.version ==~ /2.*/) {
+                selection.reject("update to 2.0.x is not possible - see https://github.com/JabRef/jabref/pull/1096#issuecomment-208857517")
+            }
+        }
+        withModule("mysql:mysql-connector-java") { ComponentSelection selection ->
+            if (selection.candidate.version ==~ /[6-9].*/) {
+                selection.reject("http://dev.mysql.com/downloads/connector/j/ lists the version 5.* as last stable version.")
+            }
         }
     }
+}
+
+task checkOutdatedDependencies(dependsOn: dependencyUpdates) {
+    doLast {
+        def dependencyReport = new JsonSlurper().parseText(new File("build/dependencyUpdates/report.json").text)
+        assert dependencyReport.outdated.count == 0: "There are outdated dependencies in build.gradle!\n Run ./gradlew dependencyUpdates to see which"
+    }
+}
+
+clean {
+    delete "src/main/gen"
 }
 
 processResources {
@@ -195,9 +250,6 @@ processResources {
     }
 }
 
-clean {
-    delete "src/main/gen"
-}
 
 task generateSource(dependsOn: ["generateBstGrammarSource", "generateSearchGrammarSource"]) {
     group = 'JabRef'
@@ -263,6 +315,7 @@ javadoc {
     }
 }
 
+// Test tasks
 junitPlatform {
     filters {
         tags {
@@ -291,6 +344,7 @@ task guiTest(type: Test) {
     }
 }
 
+// Test result tasks
 task copyTestResources(type: Copy) {
     from "${projectDir}/src/test/resources"
     into "${buildDir}/classes/test"
@@ -341,6 +395,24 @@ afterEvaluate {
     }
 }
 
+
+// Code quality tasks
+checkstyle {
+    // do not use other packages for checkstyle, excluding gen(erated) sources
+    checkstyleMain.source = "src/main/java"
+    toolVersion = '8.5'
+}
+
+checkstyleMain.shouldRunAfter test
+checkstyleTest.shouldRunAfter test
+
+modernizer {
+    // We have more than 20 issues, which are not fixed yet. Nevertheless, we produce the modernizer output.
+    // See https://github.com/andrewgaul/modernizer-maven-plugin for more information on modernizer
+    failOnViolations = false
+}
+
+// Release tasks
 shadowJar {
     classifier 'fat'
 }
@@ -378,6 +450,10 @@ if (hasProperty('dev')) {
     project.version += "--snapshot--" + infoString
 }
 
+install4j {
+    installDir = file(project.ext.install4jDir)
+}
+
 // has to be defined AFTER 'dev' things to have the correct project.version
 task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
     projectFile = file('jabref.install4j')
@@ -398,14 +474,6 @@ task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
     }
 }
 
-checkstyle {
-    // do not use other packages for checkstyle, excluding gen(erated) sources
-    checkstyleMain.source = "src/main/java"
-    toolVersion = '8.3'
-}
-
-checkstyleMain.shouldRunAfter test
-checkstyleTest.shouldRunAfter test
 
 task release(dependsOn: ["media", "releaseJar"]) {
     group = 'JabRef - Release'
@@ -436,10 +504,4 @@ jmh {
     warmupIterations = 5
     iterations = 10
     fork = 2
-}
-
-modernizer {
-    // We have more than 20 issues, which are not fixed yet. Nevertheless, we produce the modernizer output.
-    // See https://github.com/andrewgaul/modernizer-maven-plugin for more information on modernizer
-    failOnViolations = false
 }
