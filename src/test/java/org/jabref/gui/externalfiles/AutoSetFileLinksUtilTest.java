@@ -1,13 +1,11 @@
 package org.jabref.gui.externalfiles;
 
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.logic.util.io.AutoLinkPreferences;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -30,16 +28,13 @@ public class AutoSetFileLinksUtilTest {
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final ExternalFileTypes externalFileTypes = mock(ExternalFileTypes.class);
     private final BibEntry entry = new BibEntry("article");
-    private Path file;
-    private List<Path> dirs;
     @Rule public TemporaryFolder folder = new TemporaryFolder();
 
     @Before
     public void setUp() throws Exception {
         entry.setCiteKey("CiteKey");
-        file = folder.newFile("CiteKey.pdf").toPath();
-        dirs = Collections.singletonList(folder.getRoot().toPath());
-        when(databaseContext.getFileDirectoriesAsPaths(any())).thenReturn(dirs);
+        folder.newFile("CiteKey.pdf");
+        when(databaseContext.getFileDirectoriesAsPaths(any())).thenReturn(Collections.singletonList(folder.getRoot().toPath()));
         when(externalFileTypes.getExternalFileTypeSelection()).thenReturn(new TreeSet<>(externalFileTypes.getDefaultExternalFileTypes()));
 
     }
@@ -48,8 +43,7 @@ public class AutoSetFileLinksUtilTest {
     public void test() {
         //Due to mocking the externalFileType class, the file extension will not be found
 
-        String relativeFilePath = FileUtil.shortenFileName(file, dirs).toString();
-        List<LinkedFile> expected = Collections.singletonList(new LinkedFile("", relativeFilePath, ""));
+        List<LinkedFile> expected = Collections.singletonList(new LinkedFile("", "CiteKey.pdf", ""));
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil();
         List<LinkedFile> actual = util.findassociatedNotLinkedFiles(entry, databaseContext, fileDirPrefs, autoLinkPrefs, externalFileTypes);
