@@ -20,6 +20,7 @@ import org.jabref.JabRefMain;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
+import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -38,7 +39,7 @@ public class ExportFormat implements IExportFormat {
     private String consoleName;
     private String lfFileName;
     private String directory;
-    private String extension;
+    private FileExtensions extension;
     private Charset encoding; // If this value is set, it will be used to override
     // the default encoding for the getCurrentBasePanel.
     private LayoutFormatterPreferences layoutPreferences;
@@ -56,7 +57,7 @@ public class ExportFormat implements IExportFormat {
      * @param directory   Directory in which to find the layout file.
      * @param extension   Should contain the . (for instance .txt).
      */
-    public ExportFormat(String displayName, String consoleName, String lfFileName, String directory, String extension) {
+    public ExportFormat(String displayName, String consoleName, String lfFileName, String directory, FileExtensions extension) {
         this.displayName = displayName;
         this.consoleName = consoleName;
         this.lfFileName = lfFileName;
@@ -76,8 +77,8 @@ public class ExportFormat implements IExportFormat {
      * @param layoutPreferences Preferences for layout
      * @param savePreferences Preferences for saving
      */
-    public ExportFormat(String displayName, String consoleName, String lfFileName, String directory, String extension,
-            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
+    public ExportFormat(String displayName, String consoleName, String lfFileName, String directory,
+            FileExtensions extension, LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
         this(displayName, consoleName, lfFileName, directory, extension);
         this.layoutPreferences = layoutPreferences;
         this.savePreferences = savePreferences;
@@ -131,7 +132,7 @@ public class ExportFormat implements IExportFormat {
      * @see IExportFormat#getExtension()
      */
     @Override
-    public String getExtension() {
+    public FileExtensions getExtension() {
         return extension;
     }
 
@@ -239,7 +240,7 @@ public class ExportFormat implements IExportFormat {
             Layout defLayout;
             LayoutHelper layoutHelper;
             try (Reader reader = getReader(lfFileName + ".layout")) {
-                layoutHelper = new LayoutHelper(reader,layoutPreferences);
+                layoutHelper = new LayoutHelper(reader, layoutPreferences);
                 defLayout = layoutHelper.getLayoutFromText();
             }
             if (defLayout != null) {
