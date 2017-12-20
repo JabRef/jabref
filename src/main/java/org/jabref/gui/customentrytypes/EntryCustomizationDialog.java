@@ -8,7 +8,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -54,21 +54,17 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
 
     protected GridBagLayout gbl = new GridBagLayout();
     protected GridBagConstraints con = new GridBagConstraints();
-    protected JButton helpButton;
     protected JButton delete;
     private final JabRefFrame frame;
     private FieldSetComponent reqComp;
     private FieldSetComponent optComp;
     private FieldSetComponent optComp2;
     private EntryTypeList typeComp;
-    private JButton ok;
-    private JButton cancel;
-    private JButton apply;
     private final List<String> preset = InternalBibtexFields.getAllPublicFieldNames();
     private String lastSelected;
-    private final Map<String, List<String>> reqLists = new HashMap<>();
-    private final Map<String, List<String>> optLists = new HashMap<>();
-    private final Map<String, List<String>> opt2Lists = new HashMap<>();
+    private final Map<String, Set<String>> reqLists = new HashMap<>();
+    private final Map<String, Set<String>> optLists = new HashMap<>();
+    private final Map<String, Set<String>> opt2Lists = new HashMap<>();
     private final Set<String> defaulted = new HashSet<>();
     private final Set<String> changed = new HashSet<>();
 
@@ -103,9 +99,7 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
         right.setLayout(new GridLayout(biblatexMode ? 2 : 1, 2));
 
         List<String> entryTypes = new ArrayList<>();
-        for (String s : EntryTypes.getAllTypes(bibDatabaseMode)) {
-            entryTypes.add(s);
-        }
+        entryTypes.addAll(EntryTypes.getAllTypes(bibDatabaseMode));
 
         typeComp = new EntryTypeList(entryTypes, bibDatabaseMode);
         typeComp.addListSelectionListener(this);
@@ -137,9 +131,9 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
 
         //right.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Globals.lang("Fields")));
         right.setBorder(BorderFactory.createEtchedBorder());
-        ok = new JButton(Localization.lang("OK"));
-        cancel = new JButton(Localization.lang("Cancel"));
-        apply = new JButton(Localization.lang("Apply"));
+        JButton ok = new JButton(Localization.lang("OK"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
+        JButton apply = new JButton(Localization.lang("Apply"));
         ok.addActionListener(e -> {
             applyChanges();
             dispose();
@@ -198,17 +192,17 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
         if (selectedTypeName == null) {
             return;
         }
-        List<String> requiredFieldsSelectedType = reqLists.get(selectedTypeName);
+        Set<String> requiredFieldsSelectedType = reqLists.get(selectedTypeName);
         if (requiredFieldsSelectedType == null) {
             Optional<EntryType> type = EntryTypes.getType(selectedTypeName, bibDatabaseMode);
             if (type.isPresent()) {
-                List<String> req = type.get().getRequiredFields();
+                Set<String> req = type.get().getRequiredFields();
 
-                List<String> opt;
+                Set<String> opt;
                 if (biblatexMode) {
                     opt = type.get().getPrimaryOptionalFields();
 
-                    List<String> opt2 = type.get().getSecondaryOptionalFields();
+                    Set<String> opt2 = type.get().getSecondaryOptionalFields();
 
                     optComp2.setFields(opt2);
                     optComp2.setEnabled(true);
@@ -221,12 +215,12 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
                 optComp.setEnabled(true);
             } else {
                 // New entry
-                reqComp.setFields(new ArrayList<>());
+                reqComp.setFields(new HashSet<>());
                 reqComp.setEnabled(true);
-                optComp.setFields(new ArrayList<>());
+                optComp.setFields(new HashSet<>());
                 optComp.setEnabled(true);
                 if (biblatexMode) {
-                    optComp2.setFields(new ArrayList<>());
+                    optComp2.setFields(new HashSet<>());
                     optComp2.setEnabled(true);
                 }
                 reqComp.requestFocus();
@@ -249,18 +243,18 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
         List<String> actuallyChangedTypes = new ArrayList<>();
 
         // Iterate over our map of required fields, and list those types if necessary:
-        List<String> types = typeComp.getFields();
-        for (Map.Entry<String, List<String>> stringListEntry : reqLists.entrySet()) {
+        Set<String> types = typeComp.getFields();
+        for (Map.Entry<String, Set<String>> stringListEntry : reqLists.entrySet()) {
             if (!types.contains(stringListEntry.getKey())) {
                 continue;
             }
 
-            List<String> requiredFieldsList = stringListEntry.getValue();
-            List<String> optionalFieldsList = optLists.get(stringListEntry.getKey());
-            List<String> secondaryOptionalFieldsLists = opt2Lists.get(stringListEntry.getKey());
+            Set<String> requiredFieldsList = stringListEntry.getValue();
+            Set<String> optionalFieldsList = optLists.get(stringListEntry.getKey());
+            Set<String> secondaryOptionalFieldsLists = opt2Lists.get(stringListEntry.getKey());
 
             if (secondaryOptionalFieldsLists == null) {
-                secondaryOptionalFieldsLists = new ArrayList<>(0);
+                secondaryOptionalFieldsLists = new HashSet<>(0);
             }
 
             // If this type is already existing, check if any changes have
@@ -278,16 +272,16 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
 
             Optional<EntryType> oldType = EntryTypes.getType(stringListEntry.getKey(), bibDatabaseMode);
             if (oldType.isPresent()) {
-                List<String> oldRequiredFieldsList = oldType.get().getRequiredFieldsFlat();
-                List<String> oldOptionalFieldsList = oldType.get().getOptionalFields();
+                Set<String> oldRequiredFieldsList = oldType.get().getRequiredFieldsFlat();
+                Set<String> oldOptionalFieldsList = oldType.get().getOptionalFields();
                 if (biblatexMode) {
-                    List<String> oldPrimaryOptionalFieldsLists = oldType.get().getPrimaryOptionalFields();
-                    List<String> oldSecondaryOptionalFieldsList = oldType.get().getSecondaryOptionalFields();
-                    if (equalLists(oldRequiredFieldsList, requiredFieldsList) && equalLists(oldPrimaryOptionalFieldsLists, optionalFieldsList) &&
-                            equalLists(oldSecondaryOptionalFieldsList, secondaryOptionalFieldsLists)) {
+                    Set<String> oldPrimaryOptionalFieldsLists = oldType.get().getPrimaryOptionalFields();
+                    Set<String> oldSecondaryOptionalFieldsList = oldType.get().getSecondaryOptionalFields();
+                    if (oldRequiredFieldsList.equals(requiredFieldsList) && oldPrimaryOptionalFieldsLists.equals(optionalFieldsList) &&
+                            oldSecondaryOptionalFieldsList.equals(secondaryOptionalFieldsLists)) {
                         changesMade = false;
                     }
-                } else if (equalLists(oldRequiredFieldsList, requiredFieldsList) && equalLists(oldOptionalFieldsList, optionalFieldsList)) {
+                } else if (oldRequiredFieldsList.equals(requiredFieldsList) && oldOptionalFieldsList.equals(optionalFieldsList)) {
                     changesMade = false;
                 }
             }
@@ -342,7 +336,7 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
                 }
             }
             EntryTypes.removeType(name, bibDatabaseMode);
-            updateEntriesForChangedTypes(Arrays.asList(name.toLowerCase(Locale.ENGLISH)));
+            updateEntriesForChangedTypes(Collections.singletonList(name.toLowerCase(Locale.ENGLISH)));
             changed.remove(name);
             reqLists.remove(name);
             optLists.remove(name);
@@ -350,26 +344,6 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
                 opt2Lists.remove(name);
             }
         }
-    }
-
-    private static boolean equalLists(List<String> one, List<String> two) {
-        if ((one == null) && (two == null)) {
-            return true; // Both null.
-        }
-        if ((one == null) || (two == null)) {
-            return false; // One of them null, the other not.
-        }
-        if (one.size() != two.size()) {
-            return false; // Different length.
-        }
-        // If we get here, we know that both are non-null, and that they have the same length.
-        for (int i = 0; i < one.size(); i++) {
-            if (!one.get(i).equals(two.get(i))) {
-                return false;
-            }
-        }
-        // If we get here, all entries have matched.
-        return true;
     }
 
     private void updateEntriesForChangedTypes(List<String> actuallyChangedTypes) {
@@ -403,10 +377,10 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
 
             Optional<EntryType> type = EntryTypes.getStandardType(lastSelected, bibDatabaseMode);
             if (type.isPresent()) {
-                List<String> of = type.get().getOptionalFields();
-                List<String> req = type.get().getRequiredFields();
-                List<String> opt1 = new ArrayList<>();
-                List<String> opt2 = new ArrayList<>();
+                Set<String> of = type.get().getOptionalFields();
+                Set<String> req = type.get().getRequiredFields();
+                Set<String> opt1 = new HashSet<>();
+                Set<String> opt2 = new HashSet<>();
 
                 if (!(of.isEmpty())) {
                     if (biblatexMode) {

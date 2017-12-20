@@ -290,7 +290,7 @@ public class JabRefDesktop {
             LOGGER.error("Could not open browser", exception);
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);
-            String copiedToClipboard = Localization.lang("The_link_has_been_copied_to_the_clipboard.");
+            String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
             JabRefGUI.getMainFrame().output(couldNotOpenBrowser);
             JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(), couldNotOpenBrowser + "\n" + openManually + "\n" +
                     copiedToClipboard, couldNotOpenBrowser, JOptionPane.ERROR_MESSAGE);
@@ -335,7 +335,7 @@ public class JabRefDesktop {
                     LOGGER.error("Open console", exception);
 
                     JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(),
-                            Localization.lang("Error_occured_while_executing_the_command_\"%0\".", commandLoggingText),
+                            Localization.lang("Error occured while executing the command \"%0\".", commandLoggingText),
                             Localization.lang("Open console") + " - " + Localization.lang("Error"),
                             JOptionPane.ERROR_MESSAGE);
                     JabRefGUI.getMainFrame().output(null);

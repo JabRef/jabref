@@ -92,7 +92,7 @@ public class AuxParserResult {
             }
         }
         if (nestedAuxCount > 0) {
-            result.append(Localization.lang("nested_AUX_files")).append(' ').append(nestedAuxCount);
+            result.append(Localization.lang("nested AUX files")).append(' ').append(nestedAuxCount);
         }
         return result.toString();
     }

@@ -4,6 +4,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.FieldName;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -123,17 +124,13 @@ public class BracketedPatternTest {
         BibEntry another_bibentry = null;
         BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
         pattern.expand(another_bibentry, ';', another_database);
-        // The control should not reach this point, exception should be triggered:
-        assert(false);
     }
 
     @Test(expected = NullPointerException.class)
-    public void brachetedExpressionDefaultConstructorTest() {
+    public void bracketedExpressionDefaultConstructorTest() {
         BibDatabase another_database = null;
         BracketedPattern pattern = new BracketedPattern();
         pattern.expand(bibentry, ';', another_database);
-        // The control should not reach this point, exception should be triggered:
-        assert (false);
     }
 
     @Test
@@ -154,6 +151,41 @@ public class BracketedPatternTest {
         assertEquals("HipKro03", BracketedPattern.expandBrackets("[bibtexkey]", separator, dbentry, database));
 
         assertEquals("HipKro03", BracketedPattern.expandBrackets("[bibtexkey:]", separator, dbentry, database));
+    }
+
+    @Test
+    public void testResolvedFieldAndFormat() {
+        BibEntry child = new BibEntry();
+        child.setField(FieldName.CROSSREF, "HipKro03");
+        database.insertEntry(child);
+
+        Character separator = ';';
+        assertEquals("Eric von Hippel and Georg von Krogh",
+                BracketedPattern.expandBrackets("[author]", separator, child, database));
+
+        assertEquals("", BracketedPattern.expandBrackets("[unknownkey]", separator, child, database));
+
+        assertEquals("", BracketedPattern.expandBrackets("[:]", separator, child, database));
+
+        assertEquals("", BracketedPattern.expandBrackets("[:lower]", separator, child, database));
+
+        assertEquals("eric von hippel and georg von krogh",
+                BracketedPattern.expandBrackets("[author:lower]", separator, child, database));
+
+        // the bibtexkey is not inherited
+        assertEquals("", BracketedPattern.expandBrackets("[bibtexkey]", separator, child, database));
+
+        assertEquals("", BracketedPattern.expandBrackets("[bibtexkey:]", separator, child, database));
+    }
+
+    @Test
+    public void testResolvedParentNotInDatabase() {
+        BibEntry child = new BibEntry();
+        child.setField(FieldName.CROSSREF, "HipKro03");
+        database.removeEntry(dbentry);
+        database.insertEntry(child);
+
+        assertEquals("", BracketedPattern.expandBrackets("[author]", ';', child, database));
     }
 
 }

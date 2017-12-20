@@ -519,7 +519,7 @@ public class ArgumentProcessor {
                             database, entry, Globals.prefs.getBibtexKeyPatternPreferences());
                 }
             } else {
-                LOGGER.info(Localization.lang("No meta data present in BIB_file. Cannot regenerate BibTeX keys"));
+                LOGGER.info(Localization.lang("No meta data present in BIB file. Cannot regenerate BibTeX keys"));
             }
         }
     }

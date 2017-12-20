@@ -3,9 +3,7 @@
  */
 package org.jabref.logic.importer.fetcher;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -55,13 +53,13 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             MrDLibImporter importer = new MrDLibImporter();
             ParserResult parserResult = new ParserResult();
             try {
-                if (importer.isRecognizedFormat(new BufferedReader(new StringReader(response)))) {
-                    parserResult = importer.importDatabase(new BufferedReader(new StringReader(response)));
+                if (importer.isRecognizedFormat(response)) {
+                    parserResult = importer.importDatabase(response);
                 } else {
                     // For displaying An ErrorMessage
                     BibEntry errorBibEntry = new BibEntry();
                     errorBibEntry.setField("html_representation",
-                            Localization.lang("Error_while_fetching_from_%0", "Mr.DLib"));
+                            Localization.lang("Error while fetching from %0", "Mr.DLib"));
                     BibDatabase errorBibDataBase = new BibDatabase();
                     errorBibDataBase.insertEntry(errorBibEntry);
                     parserResult = new ParserResult(errorBibDataBase);

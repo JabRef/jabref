@@ -2,6 +2,7 @@ package org.jabref.gui.externalfiles;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import javax.swing.JOptionPane;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
@@ -81,9 +83,9 @@ public class FindFullTextAction extends AbstractWorker {
             BibEntry entry = download.getValue();
             Optional<URL> result = download.getKey();
             if (result.isPresent()) {
-                List<String> dirs = basePanel.getBibDatabaseContext()
-                        .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
-                if (dirs.isEmpty()) {
+                Optional<Path> dir = basePanel.getBibDatabaseContext().getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences());
+
+                if (!dir.isPresent()) {
                     JOptionPane.showMessageDialog(basePanel.frame(),
                             Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
                                     + " -> " + Localization.lang("File"),
@@ -94,13 +96,16 @@ public class FindFullTextAction extends AbstractWorker {
                         basePanel.getBibDatabaseContext(), entry);
                 try {
                     def.download(result.get(), file -> {
-                        Optional<FieldChange> fieldChange = entry.addFile(file);
-                        if (fieldChange.isPresent()) {
-                            UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
-                                    entry.getField(FieldName.FILE).orElse(null), fieldChange.get().getNewValue());
-                            basePanel.getUndoManager().addEdit(edit);
-                            basePanel.markBaseChanged();
-                        }
+                        DefaultTaskExecutor.runInJavaFXThread(() -> {
+                            Optional<FieldChange> fieldChange = entry.addFile(file);
+                            if (fieldChange.isPresent()) {
+                                UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
+                                        entry.getField(FieldName.FILE).orElse(null), fieldChange.get().getNewValue());
+                                basePanel.getUndoManager().addEdit(edit);
+                                basePanel.markBaseChanged();
+                            }
+                        });
+
                     });
                 } catch (IOException e) {
                     LOGGER.warn("Problem downloading file", e);

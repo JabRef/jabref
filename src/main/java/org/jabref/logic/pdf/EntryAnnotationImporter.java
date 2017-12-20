@@ -1,5 +1,6 @@
 package org.jabref.logic.pdf;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,14 +44,14 @@ public class EntryAnnotationImporter {
      * @param databaseContext The context is needed for the importer.
      * @return Map from each PDF to a list of file annotations
      */
-    public Map<String, List<FileAnnotation>> importAnnotationsFromFiles(BibDatabaseContext databaseContext) {
-        Map<String, List<FileAnnotation>> annotations = new HashMap<>();
+    public Map<Path, List<FileAnnotation>> importAnnotationsFromFiles(BibDatabaseContext databaseContext) {
+        Map<Path, List<FileAnnotation>> annotations = new HashMap<>();
         AnnotationImporter importer = new PdfAnnotationImporter();
 
         //import annotationsOfFiles if the selected files are valid which is checked in getFilteredFileList()
         for (LinkedFile linkedFile : this.getFilteredFileList()) {
             linkedFile.findIn(databaseContext, JabRefPreferences.getInstance().getFileDirectoryPreferences())
-                    .ifPresent(file -> annotations.put(file.getFileName().toString(), importer.importAnnotations(file)));
+                    .ifPresent(file -> annotations.put(file, importer.importAnnotations(file)));
         }
         return annotations;
     }

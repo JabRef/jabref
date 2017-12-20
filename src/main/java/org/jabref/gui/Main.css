@@ -62,8 +62,27 @@
 }
 
 .tooltip {
-    -fx-background-color: #757575; /* For some reason it does not work if we use -fx-dark-background here */
-    -fx-effect:none;
+    -fx-background-color: #616161;
+    -fx-opacity: 95%;
+    -fx-text-fill: rgba(255, 255, 255, 0.9);
+    -fx-font-size: 1em;
+}
+
+.tooltip > TextFlow > Text {
+    -fx-fill: rgba(255, 255, 255, 0.9);
+    -fx-font-size: 1em;
+}
+
+.tooltip > TextFlow > .tooltip-text-bold {
+    -fx-font-weight: bold;
+}
+
+.tooltip > TextFlow > .tooltip-text-italic {
+    -fx-font-style: italic;
+}
+
+.tooltip > TextFlow > .tooltip-text-monospaced {
+    -fx-font-family: monospace;
 }
 
 .flatButton {

@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -46,7 +47,6 @@ import org.jabref.model.entry.IEEETranEntryTypes;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jdesktop.swingx.VerticalLayout;
 
 /**
  * Dialog that prompts the user to choose a type for an entry.
@@ -89,7 +89,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
     private JPanel createEntryGroupsPanel() {
         JPanel panel = new JPanel();
-        panel.setLayout(new VerticalLayout());
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         if (frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
             panel.add(createEntryGroupPanel("biblatex", BiblatexEntryTypes.ALL));
@@ -216,7 +216,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
         constraints.fill = GridBagConstraints.NONE;
         jPanel.add(generateButton, constraints);
 
-        jPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("ID-based_entry_generator")));
+        jPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("ID-based entry generator")));
 
         SwingUtilities.invokeLater(() -> idTextField.requestFocus());
 
@@ -331,7 +331,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                 } else if (searchID.trim().isEmpty()) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("The given search ID was empty."), Localization.lang("Empty search ID"), JOptionPane.WARNING_MESSAGE);
                 } else if (!fetcherException) {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(frame,
                             Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage,

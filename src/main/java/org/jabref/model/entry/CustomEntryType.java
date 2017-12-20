@@ -1,11 +1,12 @@
 package org.jabref.model.entry;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,22 +19,22 @@ public class CustomEntryType implements EntryType {
 
     public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
     private final String name;
-    private final List<String> required;
-    private final List<String> optional;
-    private final List<String> primaryOptional;
+    private final Set<String> required;
+    private final Set<String> optional;
+    private final Set<String> primaryOptional;
 
-    public CustomEntryType(String name, List<String> required, List<String> primaryOptional, List<String> secondaryOptional) {
+    public CustomEntryType(String name, Collection<String> required, Collection<String> primaryOptional, Collection<String> secondaryOptional) {
         this.name = StringUtil.capitalizeFirst(name);
-        this.primaryOptional = primaryOptional;
-        this.required = required;
-        this.optional = Stream.concat(primaryOptional.stream(), secondaryOptional.stream()).collect(Collectors.toList());
+        this.primaryOptional = new LinkedHashSet<>(primaryOptional);
+        this.required = new LinkedHashSet<>(required);
+        this.optional = Stream.concat(primaryOptional.stream(), secondaryOptional.stream()).collect(Collectors.toSet());
     }
 
-    public CustomEntryType(String name, List<String> required, List<String> optional) {
+    public CustomEntryType(String name, Collection<String> required, Collection<String> optional) {
         this.name = StringUtil.capitalizeFirst(name);
-        this.required = required;
-        this.optional = optional;
-        this.primaryOptional = optional;
+        this.required = new LinkedHashSet<>(required);
+        this.optional = new LinkedHashSet<>(optional);
+        this.primaryOptional = new LinkedHashSet<>(optional);
     }
 
     public CustomEntryType(String name, String required, String optional) {
@@ -82,25 +83,25 @@ public class CustomEntryType implements EntryType {
     }
 
     @Override
-    public List<String> getOptionalFields() {
-        return Collections.unmodifiableList(optional);
+    public Set<String> getOptionalFields() {
+        return Collections.unmodifiableSet(optional);
     }
 
     @Override
-    public List<String> getRequiredFields() {
-        return Collections.unmodifiableList(required);
+    public Set<String> getRequiredFields() {
+        return Collections.unmodifiableSet(required);
     }
 
     @Override
-    public List<String> getPrimaryOptionalFields() {
-        return Collections.unmodifiableList(primaryOptional);
+    public Set<String> getPrimaryOptionalFields() {
+        return Collections.unmodifiableSet(primaryOptional);
     }
 
     @Override
-    public List<String> getSecondaryOptionalFields() {
-        List<String> result = new ArrayList<>(optional);
+    public Set<String> getSecondaryOptionalFields() {
+        Set<String> result = new LinkedHashSet<>(optional);
         result.removeAll(primaryOptional);
-        return Collections.unmodifiableList(result);
+        return Collections.unmodifiableSet(result);
     }
 
     /**

@@ -7,13 +7,6 @@ import java.util.Set;
  * Class for keeping properties of a single BibTeX/biblatex field
  */
 public class BibtexSingleField {
-    // some field constants
-    public static final double DEFAULT_FIELD_WEIGHT = 1;
-    public static final double MAX_FIELD_WEIGHT = 2;
-
-    public static final double SMALL_W = 0.30;
-    public static final double MEDIUM_W = 0.5;
-    public static final double LARGE_W = 1.5;
 
     public static final int DEFAULT_FIELD_LENGTH = 100;
 
@@ -31,8 +24,7 @@ public class BibtexSingleField {
     // default is: not standard, public, displayable and writable
     private final Set<Flag> flags = EnumSet.of(Flag.DISPLAYABLE, Flag.WRITEABLE);
 
-    private int length = DEFAULT_FIELD_LENGTH;
-    private double weight = DEFAULT_FIELD_WEIGHT;
+    private final int length;
 
     // properties contains a set of FieldProperty to e.g. tell the EntryEditor to add a specific
     // function to this field, to format names, or to control the integrity checks.
@@ -43,26 +35,12 @@ public class BibtexSingleField {
     // private String otherNames = null ;
 
     public BibtexSingleField(String fieldName, boolean pStandard) {
-        name = fieldName;
-        setFlag(pStandard, Flag.STANDARD);
-    }
-
-    public BibtexSingleField(String fieldName, boolean pStandard, double pWeight) {
-        name = fieldName;
-        setFlag(pStandard, Flag.STANDARD);
-        weight = pWeight;
+        this(fieldName, pStandard, DEFAULT_FIELD_LENGTH);
     }
 
     public BibtexSingleField(String fieldName, boolean pStandard, int pLength) {
         name = fieldName;
         setFlag(pStandard, Flag.STANDARD);
-        length = pLength;
-    }
-
-    public BibtexSingleField(String fieldName, boolean pStandard, double pWeight, int pLength) {
-        name = fieldName;
-        setFlag(pStandard, Flag.STANDARD);
-        weight = pWeight;
         length = pLength;
     }
 
@@ -113,22 +91,15 @@ public class BibtexSingleField {
         return flags.contains(Flag.WRITEABLE);
     }
 
-    public void setExtras(Set<FieldProperty> pExtras) {
-        properties = pExtras;
+    public BibtexSingleField withProperties(FieldProperty first, FieldProperty... rest) {
+        properties = EnumSet.of(first, rest);
+        return this;
     }
 
     // fieldExtras contains mappings to tell the EntryEditor to add a specific
     // function to this field, for instance a "browse" button for the "pdf" field.
-    public Set<FieldProperty> getFieldProperties() {
+    public Set<FieldProperty> getProperties() {
         return properties;
-    }
-
-    public void setWeight(double value) {
-        this.weight = value;
-    }
-
-    public double getWeight() {
-        return this.weight;
     }
 
     /**
@@ -138,7 +109,7 @@ public class BibtexSingleField {
         return this.length;
     }
 
-    public String getFieldName() {
+    public String getName() {
         return name;
     }
 

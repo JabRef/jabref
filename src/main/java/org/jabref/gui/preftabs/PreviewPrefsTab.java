@@ -3,6 +3,7 @@ package org.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -208,8 +209,8 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 }
                 try {
                     get().stream()
-                            .filter(style -> !previewPreferences.getPreviewCycle().contains(style.getFilepath()))
-                            .sorted((style0, style1) -> style0.getTitle().compareTo(style1.getTitle()))
+                            .filter(style -> !previewPreferences.getPreviewCycle().contains(style.getFilePath()))
+                            .sorted(Comparator.comparing(CitationStyle::getTitle))
                             .forEach(availableModel::addElement);
 
                     btnRight.setEnabled(!availableModel.isEmpty());
@@ -230,7 +231,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         while (elements.hasMoreElements()) {
             Object obj = elements.nextElement();
             if (obj instanceof CitationStyle) {
-                styles.add(((CitationStyle) obj).getFilepath());
+                styles.add(((CitationStyle) obj).getFilePath());
             } else if (obj instanceof String) {
                 styles.add("Preview");
             }

@@ -86,6 +86,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             if (dragboard.hasFiles()) {
                 List<LinkedFileViewModel> linkedFiles = dragboard.getFiles().stream().map(File::toPath).map(viewModel::fromFile).collect(Collectors.toList());
                 items.addAll(linkedFiles);
+                success = true;
             }
             event.setDropCompleted(success);
             event.consume();
@@ -148,6 +149,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     private static Node createFileDisplay(LinkedFileViewModel linkedFile) {
         Text icon = MaterialDesignIconFactory.get().createIcon(linkedFile.getTypeIcon());
+        icon.setOnMouseClicked(event -> linkedFile.open());
         Text link = new Text(linkedFile.getLink());
         Text desc = new Text(linkedFile.getDescription());
 

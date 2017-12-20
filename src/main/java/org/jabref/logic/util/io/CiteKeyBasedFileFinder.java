@@ -88,10 +88,12 @@ class CiteKeyBasedFileFinder implements FileFinder {
 
         Set<Path> result = new HashSet<>();
         for (Path directory : directories) {
-            try (Stream<Path> files = Files.find(directory, Integer.MAX_VALUE, isFileWithCorrectExtension)) {
-                result.addAll(files.collect(Collectors.toSet()));
-            } catch (IOException e) {
-                LOGGER.error("Problem in finding files", e);
+            if (Files.exists(directory)) {
+                try (Stream<Path> files = Files.find(directory, Integer.MAX_VALUE, isFileWithCorrectExtension)) {
+                    result.addAll(files.collect(Collectors.toSet()));
+                } catch (IOException e) {
+                    LOGGER.error("Problem in finding files", e);
+                }
             }
         }
         return result;

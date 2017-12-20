@@ -13,7 +13,10 @@ import org.jabref.logic.msbib.MSBibDatabase;
 import org.jabref.logic.util.FileExtensions;
 
 import org.w3c.dom.Document;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Importer for the MS Office 2007 XML bibliography format
@@ -35,6 +38,23 @@ public class MsBibImporter extends Importer {
         Document docin;
         try {
             DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            dbuild.setErrorHandler(new ErrorHandler() {
+
+                @Override
+                public void warning(SAXParseException exception) throws SAXException {
+                    // ignore warnings
+                }
+
+                @Override
+                public void fatalError(SAXParseException exception) throws SAXException {
+                    throw exception;
+                }
+
+                @Override
+                public void error(SAXParseException exception) throws SAXException {
+                    throw exception;
+                }
+            });
             docin = dbuild.parse(new InputSource(reader));
         } catch (Exception e) {
             return false;
