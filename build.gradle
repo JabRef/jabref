@@ -153,10 +153,11 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.0.0-BETA'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.0.0-BETA'
 
-    compile 'org.apache.lucene:lucene-core:6.6.0'
-    compile 'org.apache.lucene:lucene-queryparser:6.6.0'
-    compile 'org.apache.lucene:lucene-queries:6.6.0'
-    compile 'org.apache.lucene:lucene-analyzers-common:6.6.0'
+    compile 'org.apache.lucene:lucene-core:7.1.0'
+    compile 'org.apache.lucene:lucene-queryparser:7.1.0'
+    compile 'org.apache.lucene:lucene-queries:7.1.0'
+    compile 'org.apache.lucene:lucene-analyzers-common:7.1.0'
+    compile 'org.apache.lucene:lucene-backward-codecs:7.1.0'
 
 
     testCompile 'junit:junit:4.12'
