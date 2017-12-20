@@ -20,22 +20,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
-import org.jabref.logic.importer.fileformat.bibtexml.Article;
-import org.jabref.logic.importer.fileformat.bibtexml.Book;
-import org.jabref.logic.importer.fileformat.bibtexml.Booklet;
-import org.jabref.logic.importer.fileformat.bibtexml.Conference;
-import org.jabref.logic.importer.fileformat.bibtexml.Entry;
-import org.jabref.logic.importer.fileformat.bibtexml.File;
-import org.jabref.logic.importer.fileformat.bibtexml.Inbook;
-import org.jabref.logic.importer.fileformat.bibtexml.Incollection;
-import org.jabref.logic.importer.fileformat.bibtexml.Inproceedings;
-import org.jabref.logic.importer.fileformat.bibtexml.Manual;
-import org.jabref.logic.importer.fileformat.bibtexml.Mastersthesis;
-import org.jabref.logic.importer.fileformat.bibtexml.Misc;
-import org.jabref.logic.importer.fileformat.bibtexml.Phdthesis;
-import org.jabref.logic.importer.fileformat.bibtexml.Proceedings;
-import org.jabref.logic.importer.fileformat.bibtexml.Techreport;
-import org.jabref.logic.importer.fileformat.bibtexml.Unpublished;
+import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -54,7 +39,7 @@ public class BibTeXMLExportFormat extends ExportFormat {
 
 
     public BibTeXMLExportFormat() {
-        super("BibTeXML", "bibtexml", null, null, ".xml");
+        super("BibTeXML", "bibtexml", null, null, FileExtensions.XML);
     }
 
     @Override

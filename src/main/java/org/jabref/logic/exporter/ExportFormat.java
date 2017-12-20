@@ -132,7 +132,7 @@ public class ExportFormat implements IExportFormat {
      * @see IExportFormat#getExtension()
      */
     @Override
-    public FileExtensions getExtension() {
+    public FileExtensions getFileExtension() {
         return extension;
     }
 

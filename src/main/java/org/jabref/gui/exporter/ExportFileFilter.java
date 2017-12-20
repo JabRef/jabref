@@ -6,6 +6,7 @@ import java.util.Locale;
 import javax.swing.filechooser.FileFilter;
 
 import org.jabref.logic.exporter.IExportFormat;
+import org.jabref.logic.util.FileExtensions;
 
 /**
  * File filter that lets the user choose export format while choosing file to
@@ -14,13 +15,13 @@ import org.jabref.logic.exporter.IExportFormat;
 public class ExportFileFilter extends FileFilter implements Comparable<ExportFileFilter> {
 
     private final IExportFormat format;
-    private final String extension;
+    private final FileExtensions extension;
     private final String name;
 
 
     public ExportFileFilter(IExportFormat format) {
         this.format = format;
-        this.extension = format.getExtension();
+        this.extension = format.getFileExtension();
         this.name = format.getDisplayName() + " (*" + extension
                 + ')';
     }
@@ -29,7 +30,7 @@ public class ExportFileFilter extends FileFilter implements Comparable<ExportFil
         return format;
     }
 
-    public String getExtension() {
+    public FileExtensions getExtension() {
         return extension;
     }
 
@@ -38,7 +39,7 @@ public class ExportFileFilter extends FileFilter implements Comparable<ExportFil
         if (file.isDirectory()) {
             return true;
         } else {
-            return file.getPath().toLowerCase(Locale.ROOT).endsWith(extension);
+            return file.getPath().toLowerCase(Locale.ROOT).endsWith(extension.toString());
         }
     }
 

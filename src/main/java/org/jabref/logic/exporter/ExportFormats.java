@@ -22,7 +22,7 @@ public class ExportFormats {
     public static void initAllExports(Map<String, ExportFormat> customFormats,
             LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
 
-        ExportFormats.EXPORT_FORMATS.clear();
+        EXPORT_FORMATS.clear();
 
         // Initialize Build-In Export Formats
         putFormat(new ExportFormat("HTML", "html", "html", null, FileExtensions.HTML, layoutPreferences, savePreferences));
@@ -105,5 +105,11 @@ public class ExportFormats {
 
     private static void putFormat(IExportFormat format) {
         ExportFormats.EXPORT_FORMATS.put(format.getConsoleName(), format);
+    }
+
+    //  getExtension from ExportFormat map
+    public static FileExtensions getFileExtension(String extension) {
+        ExportFormat exportFormat = (ExportFormat) EXPORT_FORMATS.get(extension);
+        return exportFormat.getFileExtension();
     }
 }

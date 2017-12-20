@@ -20,7 +20,8 @@ public interface IExportFormat {
      */
     String getDisplayName();
 
-    FileExtensions getExtension();
+    FileExtensions getFileExtension();
+
 
     /**
      * Perform the export.
