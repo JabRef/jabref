@@ -15,6 +15,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.util.Callback;
+import javafx.util.Pair;
 
 /**
  * Taken from https://gist.github.com/lestard/011e9ed4433f9eb791a8
@@ -25,6 +26,7 @@ public class RecursiveTreeItem<T> extends TreeItem<T> {
     private Callback<T, ObservableList<T>> childrenFactory;
     private ObjectProperty<Predicate<T>> filter = new SimpleObjectProperty<>();
     private FilteredList<T> children;
+    private Pair<T, Boolean> lastVisibility;
 
     public RecursiveTreeItem(final T value, Callback<T, ObservableList<T>> func) {
         this(value, func, null, null);
@@ -52,7 +54,7 @@ public class RecursiveTreeItem<T> extends TreeItem<T> {
             bindExpandedProperty(value, expandedProperty);
         }
 
-        valueProperty().addListener((obs, oldValue, newValue)-> {
+        valueProperty().addListener((obs, oldValue, newValue) -> {
             if (newValue != null) {
                 addChildrenListener(newValue);
                 bindExpandedProperty(newValue, expandedProperty);
@@ -76,7 +78,7 @@ public class RecursiveTreeItem<T> extends TreeItem<T> {
             while (change.next()) {
 
                 if (change.wasRemoved()) {
-                    change.getRemoved().forEach(t-> {
+                    change.getRemoved().forEach(t -> {
                         final List<TreeItem<T>> itemsToRemove = getChildren().stream().filter(treeItem -> treeItem.getValue().equals(t)).collect(Collectors.toList());
                         getChildren().removeAll(itemsToRemove);
                     });
@@ -99,12 +101,19 @@ public class RecursiveTreeItem<T> extends TreeItem<T> {
             return true;
         }
 
+        if (lastVisibility != null && lastVisibility.getKey().equals(t)) {
+            return lastVisibility.getValue();
+        }
+
         if (filter.get().test(t)) {
             // Node is directly matched -> so show it
+            lastVisibility = new Pair<>(t, true);
             return true;
         }
 
         // Are there children (or children of children...) that are matched? If yes we also need to show this node
-        return childrenFactory.call(t).stream().anyMatch(this::showNode);
+        final boolean isShown = childrenFactory.call(t).stream().anyMatch(this::showNode);
+        lastVisibility = new Pair<>(t, isShown);
+        return isShown;
     }
 }
