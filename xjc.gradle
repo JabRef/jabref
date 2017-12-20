@@ -3,6 +3,7 @@ configurations {
 }
 
 dependencies {
+    // Cannot be updated.
     xjc 'com.sun.xml.bind:jaxb-xjc:2.2.4-1'
 }
 

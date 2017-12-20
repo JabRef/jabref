@@ -6,7 +6,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.mock;
 
-@Category(FetcherTests.class)
+@Category(FetcherTest.class)
 public class IsbnViaChimboriFetcherTest extends AbstractIsbnFetcherTest {
 
     @Before
@@ -25,13 +25,13 @@ public class IsbnViaChimboriFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry = new BibEntry();
         bibEntry.setType(BiblatexEntryTypes.BOOK);
         bibEntry.setField("bibtexkey", "9780321356680");
-        bibEntry.setField("title", "Effective Java (Java Series)");
-        bibEntry.setField("publisher", "Addison-Wesley Professional");
+        bibEntry.setField("title", "Effective Java (2nd Edition)");
+        bibEntry.setField("publisher", "Addison-Wesley");
         bibEntry.setField("year", "2008");
         bibEntry.setField("author", "Joshua Bloch");
         bibEntry.setField("isbn", "978-0321356680");
         bibEntry.setField("url",
-                "https://www.amazon.com/Effective-Java-Joshua-Bloch-ebook/dp/B00B8V09HY?SubscriptionId=0JYN1NVW651KCA56C102&tag=techkie-20&linkCode=xm2&camp=2025&creative=165953&creativeASIN=B00B8V09HY");
+                "https://www.amazon.com/Effective-Java-2nd-Joshua-Bloch/dp/0321356683?SubscriptionId=0JYN1NVW651KCA56C102&tag=techkie-20&linkCode=xm2&camp=2025&creative=165953&creativeASIN=0321356683");
 
         fetcher = new IsbnViaChimboriFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }

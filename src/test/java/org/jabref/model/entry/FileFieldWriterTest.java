@@ -112,7 +112,7 @@ public class FileFieldWriterTest {
     @Test
     public void testFileFieldWriterGetStringRepresentation() {
         LinkedFile file = new LinkedFile("test", "X:\\Users\\abc.pdf", "PDF");
-        assertEquals("test:X\\:\\\\Users\\\\abc.pdf:PDF", FileFieldWriter.getStringRepresentation(file));
+        assertEquals("test:X\\:/Users/abc.pdf:PDF", FileFieldWriter.getStringRepresentation(file));
     }
 
 
