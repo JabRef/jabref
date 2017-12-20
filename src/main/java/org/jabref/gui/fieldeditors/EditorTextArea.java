@@ -11,7 +11,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-import com.sun.javafx.scene.control.skin.TextAreaSkin;
+//import com.sun.javafx.scene.control.skin.TextAreaSkin;
 
 public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable {
 

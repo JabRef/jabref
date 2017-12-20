@@ -41,7 +41,6 @@ import org.jabref.logic.importer.fileformat.bibtexml.Phdthesis;
 import org.jabref.logic.importer.fileformat.bibtexml.Proceedings;     
 import org.jabref.logic.importer.fileformat.bibtexml.Techreport;      
 import org.jabref.logic.importer.fileformat.bibtexml.Unpublished;
-
 /**
  * Export format for the BibTeXML format.
  */
