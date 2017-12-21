@@ -24,6 +24,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -43,7 +44,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenOfficeDocumentCreator() {
-        super("OpenOffice/LibreOffice Calc", "oocalc", null, null, ".sxc");
+        super("OpenOffice/LibreOffice Calc", "oocalc", null, null, FileExtensions.SXC);
     }
 
     @Override
