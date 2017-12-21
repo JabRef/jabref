@@ -14,6 +14,7 @@ import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -57,8 +58,9 @@ public class AutoSetFileLinksUtil {
                         .orElse(Optional.of(new UnknownExternalFileType("")));
 
                 String strType = type.isPresent() ? type.get().getName() : "";
-
-                LinkedFile linkedFile = new LinkedFile("", foundFile.toString(), strType);
+                String relativeFilePath = FileUtil.shortenFileName(foundFile, dirs)
+                        .toString();
+                LinkedFile linkedFile = new LinkedFile("", relativeFilePath, strType);
                 linkedFiles.add(linkedFile);
             }
         }

@@ -65,6 +65,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue where integrating external changes to a bib file caused instability [#3498](https://github.com/JabRef/jabref/issues/3498)
  - We fixed an issue where fetched entries from the ACM fetcher could not be imported [#3500](https://github.com/JabRef/jabref/issues/3500)
  - We fixed an issue where custom data in combobox fields in the entry editor was not saved [#3538](https://github.com/JabRef/jabref/issues/3538)
+ - We fixed an issue where automatically found files where not added with a relative paths when the bib file is in the same directory as the files [#3476](https://github.com/JabRef/jabref/issues/3476)
 
  ### Removed
 
