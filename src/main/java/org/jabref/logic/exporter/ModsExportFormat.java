@@ -1,6 +1,5 @@
 package org.jabref.logic.exporter;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
@@ -14,6 +13,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
+import org.jabref.logic.importer.fileformat.bibtexml.File;
 import org.jabref.logic.importer.fileformat.mods.AbstractDefinition;
 import org.jabref.logic.importer.fileformat.mods.CodeOrText;
 import org.jabref.logic.importer.fileformat.mods.DateDefinition;
@@ -43,6 +43,7 @@ import org.jabref.logic.importer.fileformat.mods.SubjectDefinition;
 import org.jabref.logic.importer.fileformat.mods.TitleInfoDefinition;
 import org.jabref.logic.importer.fileformat.mods.TypeOfResourceDefinition;
 import org.jabref.logic.importer.fileformat.mods.UrlDefinition;
+import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -61,7 +62,7 @@ class ModsExportFormat extends ExportFormat {
 
 
     public ModsExportFormat() {
-        super("MODS", "mods", null, null, ".xml");
+        super("MODS", "mods", null, null, FileExtensions.XML);
     }
 
     @Override

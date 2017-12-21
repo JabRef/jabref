@@ -42,7 +42,11 @@ public enum FileExtensions {
     CLASS(Localization.lang("%0 file", "CLASS"), "class"),
     JAR(Localization.lang("%0 file", "JAR"), "jar"),
     XML(Localization.lang("%0 file", "XML"), "xml"),
-    ZIP(Localization.lang("%0 file", "ZIP"), "zip");
+    ZIP(Localization.lang("%0 file", "ZIP"), "zip"),
+    HTML(Localization.lang("%0 file", "HTML"), "html"),
+    RTF(Localization.lang("%0 file", "RTF"), "rtf"),
+    CSV(Localization.lang("%0 file", "CSV"), "csv"),
+    RDF(Localization.lang("%0 file", "RDF"), "rdf");
 
     private final String[] extension;
     private final String description;
