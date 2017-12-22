@@ -1,6 +1,5 @@
 package org.jabref.gui.search;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -24,10 +23,13 @@ import javax.swing.SwingUtilities;
 import javafx.css.PseudoClass;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
+import org.jabref.gui.AbstractView;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
@@ -56,11 +58,6 @@ import org.jabref.preferences.SearchPreferences;
 import org.fxmisc.easybind.EasyBind;
 
 public class GlobalSearchBar extends JPanel {
-
-    private static final Color NEUTRAL_COLOR = Color.WHITE;
-    private static final Color NO_RESULTS_COLOR = new Color(232, 202, 202);
-    private static final Color RESULTS_FOUND_COLOR = new Color(217, 232, 202);
-    private static final Color ADVANCED_SEARCH_COLOR = new Color(102, 255, 255);
 
     private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
     private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
@@ -190,9 +187,10 @@ public class GlobalSearchBar extends JPanel {
 
         container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-            container.setScene(new Scene(searchField));
+            Scene scene = new Scene(searchField);
+            scene.getStylesheets().add(AbstractView.class.getResource("Main.css").toExternalForm());
+            container.setScene(scene);
             container.addKeyListener(new SearchKeyAdapter());
-
         });
 
         setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -244,7 +242,7 @@ public class GlobalSearchBar extends JPanel {
 
         SearchResultFrame searchDialog = new SearchResultFrame(currentBasePanel.frame(),
                 Localization.lang("Search results in library %0 for %1", currentBasePanel.getBibDatabaseContext()
-                        .getDatabaseFile().map(File::getName).orElse(GUIGlobals.UNTITLED_TITLE),
+                                .getDatabaseFile().map(File::getName).orElse(GUIGlobals.UNTITLED_TITLE),
                         this.getSearchQuery().localize()),
                 getSearchQuery(), false);
         List<BibEntry> entries = currentBasePanel.getDatabase().getEntries().stream()
@@ -366,7 +364,6 @@ public class GlobalSearchBar extends JPanel {
                 searchCompleter,
                 new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
                 new AppendPersonNamesStrategy());
-
     }
 
     public SearchQueryHighlightObservable getSearchQueryHighlightObservable() {
@@ -385,7 +382,7 @@ public class GlobalSearchBar extends JPanel {
         return searchQuery;
     }
 
-    public void updateResults(int matched, String description, boolean grammarBasedSearch) {
+    public void updateResults(int matched, TextFlow description, boolean grammarBasedSearch) {
         if (matched == 0) {
             currentResults.setText(Localization.lang("No results found."));
             searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
@@ -393,7 +390,11 @@ public class GlobalSearchBar extends JPanel {
             currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
             searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
         }
-        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setTooltip(new Tooltip(description)));
+        Tooltip tooltip = new Tooltip();
+        tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        tooltip.setGraphic(description);
+        tooltip.setMaxHeight(10);
+        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setTooltip(tooltip));
         openCurrentResultsInDialog.setEnabled(true);
     }
 
@@ -408,7 +409,6 @@ public class GlobalSearchBar extends JPanel {
 
         setDontSelectSearchBar();
         DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchTerm));
-
     }
 
     public void setDontSelectSearchBar() {

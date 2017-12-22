@@ -56,7 +56,7 @@ public class Localization {
     public static String lang(String key, String... params) {
         if (localizedMessages == null) {
             // I'm logging this because it should never happen
-            LOGGER.error("Messages are not initialized.");
+            LOGGER.error("Messages are not initialized before accessing " + key);
             setLanguage("en");
         }
         return lookup(localizedMessages, "message", key, params);
@@ -135,8 +135,8 @@ public class Localization {
         ResourceBundle menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
         Objects.requireNonNull(messages, "Could not load " + RESOURCE_PREFIX + " resource.");
         Objects.requireNonNull(menuTitles, "Could not load " + MENU_RESOURCE_PREFIX + " resource.");
-        localizedMessages = new LocalizationBundle(createLookupMap(messages));
         localizedMenuTitles = new LocalizationBundle(createLookupMap(menuTitles));
+        localizedMessages = new LocalizationBundle(createLookupMap(messages, localizedMenuTitles));
     }
 
     /**
@@ -151,6 +151,31 @@ public class Localization {
                 Collectors.toMap(
                         key -> new LocalizationKey(key).getTranslationValue(),
                         key -> new LocalizationKey(baseBundle.getString(key)).getTranslationValue())
+        ));
+    }
+
+    /**
+     * Helper function to create a HashMap from the key/value pairs of a bundle and existing localized menu titles.
+     * Currently, JabRef has two translations for the same string: One for the menu and one for other parts of the
+     * application. The menu might contain an ampersand (&), which causes issues when used outside the menu.
+     * With this fix, the ampersand is removed
+     */
+    private static HashMap<String,String> createLookupMap(ResourceBundle baseBundle, LocalizationBundle localizedMenuTitles) {
+        final ArrayList<String> baseKeys = Collections.list(baseBundle.getKeys());
+        return new HashMap<>(baseKeys.stream().collect(
+                Collectors.toMap(
+                        key -> new LocalizationKey(key).getTranslationValue(),
+                        key -> {
+                            String menuTranslationValue = localizedMenuTitles.lookup.get(key);
+                            String plainTranslationValue = new LocalizationKey(baseBundle.getString(key)).getTranslationValue();
+                            String translationValue;
+                            if (plainTranslationValue.contains("&") && plainTranslationValue.equals(menuTranslationValue)) {
+                                translationValue = plainTranslationValue.replace("&", "");
+                            } else {
+                                translationValue = plainTranslationValue;
+                            }
+                            return translationValue;
+                        })
         ));
     }
 

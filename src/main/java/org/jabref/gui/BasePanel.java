@@ -198,7 +198,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
 
-    private DatabaseChangeMonitor changeMonitor;
+    private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
 
     public BasePanel(JabRefFrame frame, BibDatabaseContext bibDatabaseContext) {
         Objects.requireNonNull(frame);
@@ -228,7 +228,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         Optional<File> file = bibDatabaseContext.getDatabaseFile();
         if (file.isPresent()) {
             // Register so we get notifications about outside changes to the file.
-            changeMonitor = new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), this);
+            changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), this));
         } else {
             if (bibDatabaseContext.getDatabase().hasEntries()) {
                 // if the database is not empty and no file is assigned,
@@ -237,6 +237,8 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                 this.baseChanged = true;
             }
         }
+
+        this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
     }
 
     public static void runWorker(AbstractWorker worker) throws Exception {
@@ -894,7 +896,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 
             String sb = String.join(",", keys);
             String citeCommand = Optional.ofNullable(Globals.prefs.get(JabRefPreferences.CITE_COMMAND))
-                    .filter(cite -> cite.contains("\\"))    // must contain \
+                    .filter(cite -> cite.contains("\\")) // must contain \
                     .orElse("\\cite");
             StringSelection ss = new StringSelection(citeCommand + "{" + sb + '}');
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
@@ -945,7 +947,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             try {
                 layout = new LayoutHelper(sr,
                         Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader))
-                        .getLayoutFromText();
+                                .getLayoutFromText();
             } catch (IOException e) {
                 LOGGER.info("Could not get layout", e);
                 return;
@@ -1037,7 +1039,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     private boolean saveDatabase(File file, boolean selectedOnly, Charset enc,
-                                 SavePreferences.DatabaseSaveType saveType) throws SaveException {
+            SavePreferences.DatabaseSaveType saveType) throws SaveException {
         SaveSession session;
         frame.block();
         final String SAVE_DATABASE = Localization.lang("Save library");
@@ -1090,7 +1092,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             String tryDiff = Localization.lang("Try different encoding");
             int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), SAVE_DATABASE,
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                    new String[]{Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
+                    new String[] {Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
@@ -1691,7 +1693,9 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         NamedCompound compound = new NamedCompound(Localization.lang("Change entry type"));
         for (BibEntry entry : entries) {
             compound.addEdit(new UndoableChangeType(entry, entry.getType(), newType));
-            entry.setType(newType);
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                entry.setType(newType);
+            });
         }
 
         output(formatOutputMessage(Localization.lang("Changed type to '%0' for", newType), entries.size()));
@@ -1735,7 +1739,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                 Optional<String> oldKey = bes.getCiteKeyOptional();
                 if (!(oldKey.isPresent()) || oldKey.get().isEmpty()) {
                     BibtexKeyPatternUtil.makeAndSetLabel(bibDatabaseContext.getMetaData()
-                                    .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                            .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
                             bibDatabaseContext.getDatabase(),
                             bes, Globals.prefs.getBibtexKeyPatternPreferences());
                     bes.getCiteKeyOptional().ifPresent(
@@ -1796,7 +1800,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
      * Perform necessary cleanup when this BasePanel is closed.
      */
     public void cleanUp() {
-        changeMonitor.unregister();
+        changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
 
         // Check if there is a FileUpdatePanel for this BasePanel being shown. If so,
         // remove it:
@@ -1823,11 +1827,11 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     public boolean isUpdatedExternally() {
-        return changeMonitor.hasBeenModifiedExternally();
+        return changeMonitor.map(DatabaseChangeMonitor::hasBeenModifiedExternally).orElse(false);
     }
 
     public void markExternalChangesAsResolved() {
-        changeMonitor.markExternalChangesAsResolved();
+        changeMonitor.ifPresent(DatabaseChangeMonitor::markExternalChangesAsResolved);
     }
 
     public SidePaneManager getSidePaneManager() {
@@ -1975,16 +1979,16 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     public void resetChangeMonitor() {
-        changeMonitor.unregister();
-        changeMonitor = new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), this);
+        changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
+        changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), this));
     }
 
     public void updateTimeStamp() {
-        changeMonitor.markAsSaved();
+        changeMonitor.ifPresent(DatabaseChangeMonitor::markAsSaved);
     }
 
     public Path getTempFile() {
-        return changeMonitor.getTempFile();
+        return changeMonitor.map(DatabaseChangeMonitor::getTempFile).orElse(null);
     }
 
     private static class SearchAndOpenFile {
@@ -2029,6 +2033,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     private class GroupTreeListener {
+
         @Subscribe
         public void listen(EntryAddedEvent addedEntryEvent) {
             // if the added entry is an undo don't add it to the current group
@@ -2054,7 +2059,8 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                 currentEditor.close();
             }
 
-            if (selectionListener.getPreview().getEntry().equals(entryRemovedEvent.getBibEntry())) {
+            BibEntry previewEntry = selectionListener.getPreview().getEntry();
+            if ((previewEntry != null) && previewEntry.equals(entryRemovedEvent.getBibEntry())) {
                 selectionListener.setPreviewActive(false);
             }
         }

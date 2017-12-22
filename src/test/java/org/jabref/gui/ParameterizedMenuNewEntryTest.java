@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.jabref.model.strings.StringUtil;
-import org.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITest;
 
 import org.assertj.swing.fixture.JTableFixture;
 import org.junit.Test;
@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-@Category(GUITests.class)
+@Category(GUITest.class)
 public class ParameterizedMenuNewEntryTest extends AbstractUITest {
 
     private final String databaseMode;

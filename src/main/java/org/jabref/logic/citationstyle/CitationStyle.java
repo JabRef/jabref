@@ -5,17 +5,20 @@ import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -33,23 +36,25 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-
 /**
- * Representation of a CitationStyle
- * Stores its name, the filepath and the style itself
+ * Representation of a CitationStyle.
+ * Stores its name, the file path and the style itself
  */
 public class CitationStyle {
 
     public static final String DEFAULT = "/ieee.csl";
     private static final Log LOGGER = LogFactory.getLog(CitationStyle.class);
 
-    private final String filepath;
+    private static final Pattern SNAPSHOT_NAME = Pattern.compile(".*styles-1\\.0\\.1-SNAPSHOT\\.jar");
+
+    private static final List<CitationStyle> STYLES = new ArrayList<>();
+
+    private final String filePath;
     private final String title;
     private final String source;
 
-
     private CitationStyle(final String filename, final String title, final String source) {
-        this.filepath = Objects.requireNonNull(filename);
+        this.filePath = Objects.requireNonNull(filename);
         this.title = Objects.requireNonNull(title);
         this.source = Objects.requireNonNull(source);
     }
@@ -58,22 +63,33 @@ public class CitationStyle {
      * Creates an CitationStyle instance out of the style string
      */
     private static CitationStyle createCitationStyleFromSource(final String source, final String filename) {
-        try {
-            DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            InputSource is = new InputSource();
-            is.setCharacterStream(new StringReader(source));
+        if ((filename != null) && !filename.isEmpty() && (source != null) && !source.isEmpty()) {
+            try {
+                DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                InputSource is = new InputSource();
+                is.setCharacterStream(new StringReader(stripInvalidProlog(source)));
 
-            Document doc = db.parse(is);
-            NodeList nodes = doc.getElementsByTagName("info");
+                Document doc = db.parse(is);
+                NodeList nodes = doc.getElementsByTagName("info");
 
-            NodeList titleNode = ((Element) nodes.item(0)).getElementsByTagName("title");
-            String title = ((CharacterData) titleNode.item(0).getFirstChild()).getData();
+                NodeList titleNode = ((Element) nodes.item(0)).getElementsByTagName("title");
+                String title = ((CharacterData) titleNode.item(0).getFirstChild()).getData();
 
-            return new CitationStyle(filename, title, source);
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            LOGGER.error("Error while parsing source", e);
+                return new CitationStyle(filename, title, source);
+            } catch (ParserConfigurationException | SAXException | IOException e) {
+                LOGGER.error("Error while parsing source", e);
+            }
         }
         return null;
+    }
+
+    private static String stripInvalidProlog(String source) {
+        int startIndex = source.indexOf("<");
+        if (startIndex > 0) {
+            return source.substring(startIndex, source.length());
+        } else {
+            return source;
+        }
     }
 
     /**
@@ -104,36 +120,51 @@ public class CitationStyle {
         return null;
     }
 
+    /**
+     * Provides the default citation style which is currently IEEE
+     * @return default citation style
+     */
     public static CitationStyle getDefault() {
         return createCitationStyleFromFile(DEFAULT);
     }
 
     /**
-     * THIS ONLY WORKS WHEN JabRef IS STARTED AS AN APPLICATION (JAR)
-     *
-     * Reads all available CitationStyle in the Jar
+     * Provides the citation styles that come with JabRef.
+     * @return list of available citation styles
      */
     public static List<CitationStyle> discoverCitationStyles() {
+        if (!STYLES.isEmpty()) {
+            return STYLES;
+        }
         try {
-            final List<CitationStyle> citationStyles = new ArrayList<>();
-            String path = CitationStyle.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
 
-            try (JarFile file = new JarFile(path)) {
-                Enumeration<JarEntry> entries = file.entries();
-                while (entries.hasMoreElements()) {
-                    String filename = entries.nextElement().getName();
-                    if (!filename.startsWith("dependent") && filename.endsWith("csl")) {
-                        CitationStyle citationStyle = CitationStyle.createCitationStyleFromFile(filename);
-                        if (citationStyle != null) {
-                            citationStyles.add(citationStyle);
-                        }
+            Path filePath = Paths.get(CitationStyle.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            String path = filePath.toString();
+
+            // This is a quick fix to have the styles when running JabRef in a development environment.
+            // The styles.jar is not extracted into the JabRef.jar and therefore, we search the classpath for it.
+            if (Files.isDirectory(filePath)) {
+                final String cp = System.getProperty("java.class.path");
+                final String[] entries = cp.split(System.getProperty("path.separator"));
+
+                Optional<String> foundStyle = Arrays.stream(entries).filter(entry -> SNAPSHOT_NAME.matcher(entry).matches()).findFirst();
+                path = foundStyle.orElse(path);
+            }
+
+            try (FileSystem jarFs = FileSystems.newFileSystem(Paths.get(path), null)) {
+
+                List<Path> allStyles = Files.find(jarFs.getRootDirectories().iterator().next(), 1, (file, attr) -> file.toString().endsWith("csl")).collect(Collectors.toList());
+
+                for (Path style : allStyles) {
+                    CitationStyle citationStyle = CitationStyle.createCitationStyleFromFile(style.getFileName().toString());
+                    if (citationStyle != null) {
+                        STYLES.add(citationStyle);
                     }
                 }
             }
-            return citationStyles;
+            return STYLES;
         } catch (IOException | URISyntaxException ex) {
-            LOGGER.error("something went wrong while searching available CitationStyles. " +
-                    "Are you running directly from source code?", ex);
+            LOGGER.error("something went wrong while searching available CitationStyles. Are you running directly from source code?", ex);
         }
         return Collections.emptyList();
     }
@@ -153,8 +184,8 @@ public class CitationStyle {
         return source;
     }
 
-    public String getFilepath() {
-        return filepath;
+    public String getFilePath() {
+        return filePath;
     }
 
     @Override
@@ -176,8 +207,7 @@ public class CitationStyle {
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(source);
     }
 
