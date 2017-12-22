@@ -18,7 +18,6 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jabref.logic.util.FileExtensions;
 
 /**
  * This class handles user defined custom export formats. They are initially
