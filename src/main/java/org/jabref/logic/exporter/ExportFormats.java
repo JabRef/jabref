@@ -117,8 +117,16 @@ public class ExportFormats {
     }
 
     public static FileExtensions getFileExtension(String consoleName) {
-        ExportFormat exportFormat = (ExportFormat) EXPORT_FORMATS.get(consoleName);
-        return exportFormat.getExtension();
+        if (checkExportFormatExisit(consoleName)) {
+            ExportFormat exportFormat = (ExportFormat) EXPORT_FORMATS.get(consoleName);
+            return exportFormat.getExtension();
+        }else {
+            return FileExtensions.DEFAULT;
+        }
+    }
+
+    private static boolean checkExportFormatExisit(String consoleName) {
+        return EXPORT_FORMATS.keySet().contains(consoleName);
     }
 
     private static void putFormat(IExportFormat format) {

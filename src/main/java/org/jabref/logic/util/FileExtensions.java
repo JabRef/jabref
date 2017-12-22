@@ -48,7 +48,8 @@ public enum FileExtensions {
     HTML(Localization.lang("%0 file", "HTML"), "html"),
     RTF(Localization.lang("%0 file", "RTF"), "rtf"),
     RDF(Localization.lang("%0 file", "RDF"), "rdf"),
-    CSV(Localization.lang("%0 file", "CSV"), "csv");
+    CSV(Localization.lang("%0 file", "CSV"), "csv"),
+    DEFAULT(Localization.lang("%0 file", "DEFAULT"), "default");
 
     private final String[] extension;
     private final String description;
