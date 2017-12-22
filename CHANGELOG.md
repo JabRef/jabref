@@ -38,6 +38,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added an ID fetcher for [IACR eprints](https://eprint.iacr.org/). [#3473](https://github.com/JabRef/jabref/pull/3473)
 - We added a clear option to the right-click menu of the text field in the entry editor. [koppor#198](https://github.com/koppor/jabref/issues/198)
 - We improved the performance and memory footprint of the citation preview when [CSL styles](http://citationstyles.org/) are used. [#2533](https://github.com/JabRef/jabref/issues/2533)
+- We disabled the auto completion as default, because it still causes issues. [#3522](https://github.com/JabRef/jabref/issues/3522)
 
 ### Fixed
  - We fixed the translation of `\textendash` and `\textquotesingle` in the entry preview. [#3307](https://github.com/JabRef/jabref/issues/3307)
