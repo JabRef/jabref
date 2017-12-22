@@ -291,7 +291,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 }
             }
         } else {
-            LOGGER.warn(Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+            LOGGER.warn("Could not find file " + linkedFile.getLink());
         }
         return true;
 
