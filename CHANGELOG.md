@@ -40,7 +40,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We improved the performance and memory footprint of the citation preview when [CSL styles](http://citationstyles.org/) are used. [#2533](https://github.com/JabRef/jabref/issues/2533)
 
 ### Fixed
- - We fixed the translation of \textendash and \textquotesingle in the entry preview. [#3307](https://github.com/JabRef/jabref/issues/3307)
+ - We fixed the translation of `\textendash` and `\textquotesingle` in the entry preview. [#3307](https://github.com/JabRef/jabref/issues/3307)
  - We fixed an issue where JabRef would not terminated after asking to collect anonymous statistics. [#2955 comment](https://github.com/JabRef/jabref/issues/2955#issuecomment-334591123)
  - We fixed an issue where JabRef would not shut down when started with the `-n` (No GUI) option. [#3247](https://github.com/JabRef/jabref/issues/3247)
  - We improved the way metadata is updated in remote databases. [#3235](https://github.com/JabRef/jabref/issues/3235)
