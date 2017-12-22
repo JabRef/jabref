@@ -120,7 +120,7 @@ public class ExportFormats {
         if (checkExportFormatExisit(consoleName)) {
             ExportFormat exportFormat = (ExportFormat) EXPORT_FORMATS.get(consoleName);
             return exportFormat.getExtension();
-        }else {
+        } else {
             return FileExtensions.DEFAULT;
         }
     }
@@ -132,5 +132,4 @@ public class ExportFormats {
     private static void putFormat(IExportFormat format) {
         ExportFormats.EXPORT_FORMATS.put(format.getConsoleName(), format);
     }
-
 }
