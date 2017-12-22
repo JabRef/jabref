@@ -39,7 +39,7 @@ public class ExportFileFilter extends FileFilter implements Comparable<ExportFil
         if (file.isDirectory()) {
             return true;
         } else {
-            return file.getPath().toLowerCase(Locale.ROOT).endsWith(extension.toString());
+            return file.getPath().toLowerCase(Locale.ROOT).endsWith(extension.getExtensionsAsList().toString());
         }
     }
 

@@ -77,9 +77,9 @@ public class ExportFormat implements IExportFormat {
      * @param layoutPreferences Preferences for layout
      * @param savePreferences Preferences for saving
      */
-    public ExportFormat(String displayName, String consoleName, String lfFileName, String directory, String extension,
+    public ExportFormat(String displayName, String consoleName, String lfFileName, String directory, FileExtensions extension,
             LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
-        this(displayName, consoleName, lfFileName, directory, FileExtensions.AUX);
+        this(displayName, consoleName, lfFileName, directory, extension);
         this.layoutPreferences = layoutPreferences;
         this.savePreferences = savePreferences;
     }
