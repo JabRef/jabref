@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -35,13 +36,14 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
     private final ListProperty<FileAnnotationViewModel> annotations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Path> files = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<FileAnnotationViewModel> currentAnnotation = new SimpleObjectProperty<>();
+    private ReadOnlyBooleanProperty annotationEmpty;
 
     private final FileAnnotationCache cache;
     private final BibEntry entry;
     private Map<Path, List<FileAnnotation>> fileAnnotations;
     private Path currentFile;
-    private FileUpdateMonitor fileMonitor;
-    private FileUpdateListener fileListener = this::reloadAnnotations;
+    private final FileUpdateMonitor fileMonitor;
+    private final FileUpdateListener fileListener = this::reloadAnnotations;
 
     public FileAnnotationTabViewModel(FileAnnotationCache cache, BibEntry entry, FileUpdateMonitor fileMonitor) {
         this.cache = cache;
@@ -57,6 +59,10 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
 
     public ObjectProperty<FileAnnotationViewModel> currentAnnotationProperty() {
         return currentAnnotation;
+    }
+
+    public ReadOnlyBooleanProperty isAnnotationsEmpty() {
+        return annotationEmpty;
     }
 
     public ListProperty<FileAnnotationViewModel> annotationsProperty() {
@@ -84,7 +90,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
                 .map(FileAnnotationViewModel::new)
                 .collect(Collectors.toList());
         annotations.setAll(newAnnotations);
-
+        annotationEmpty = annotations.emptyProperty();
         try {
             fileMonitor.addListenerForFile(currentFile, fileListener);
         } catch (IOException e) {
