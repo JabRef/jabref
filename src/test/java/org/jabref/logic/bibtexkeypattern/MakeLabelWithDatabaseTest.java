@@ -206,11 +206,11 @@ public class MakeLabelWithDatabaseTest {
     }
 
     @Test
-    public void generateKeyEmptyFieldColonInDefaultText() {
+    public void generateKeyEmptyFieldNoColonInDefaultText() {
         bibtexKeyPattern.setDefaultValue("[author:(Problem:No Author Provided)]");
         entry.clearField("author");
         new BibtexKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
-        assertEquals(Optional.of("Problem:NoAuthorProvided"), entry.getCiteKeyOptional());
+        assertEquals(Optional.of("ProblemNoAuthorProvided"), entry.getCiteKeyOptional());
     }
 
     @Test

@@ -29,6 +29,8 @@ public class BibtexKeyGenerator extends BracketedPattern {
      * All single characters that we can use for extending a key to make it unique.
      */
     private static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
+    private static final String KEY_ILLEGAL_CHARACTERS = "{}(),\\\"#~^':`";
+    private static final String KEY_UNWANTED_CHARACTERS = "{}(),\\\"";
     private final AbstractBibtexKeyPattern citeKeyPattern;
     private final BibDatabase database;
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
@@ -40,9 +42,9 @@ public class BibtexKeyGenerator extends BracketedPattern {
     }
 
     public BibtexKeyGenerator(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase database, BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
-        this.citeKeyPattern = citeKeyPattern;
-        this.database = database;
-        this.bibtexKeyPatternPreferences = bibtexKeyPatternPreferences;
+        this.citeKeyPattern = Objects.requireNonNull(citeKeyPattern);
+        this.database = Objects.requireNonNull(database);
+        this.bibtexKeyPatternPreferences = Objects.requireNonNull(bibtexKeyPatternPreferences);
     }
 
     static String generateKey(BibEntry entry, String value) {
@@ -90,7 +92,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
             StringBuilder newKey = new StringBuilder();
             for (int i = 0; i < key.length(); i++) {
                 char c = key.charAt(i);
-                if (!Character.isWhitespace(c) && ("{}(),\\\"".indexOf(c) == -1)) {
+                if (!Character.isWhitespace(c) && (KEY_UNWANTED_CHARACTERS.indexOf(c) == -1)) {
                     newKey.append(c);
                 }
             }
@@ -100,7 +102,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
         StringBuilder newKey = new StringBuilder();
         for (int i = 0; i < key.length(); i++) {
             char c = key.charAt(i);
-            if (!Character.isWhitespace(c) && ("{}(),\\\"#~^':`".indexOf(c) == -1)) {
+            if (!Character.isWhitespace(c) && (KEY_ILLEGAL_CHARACTERS.indexOf(c) == -1)) {
                 newKey.append(c);
             }
         }
