@@ -47,8 +47,8 @@ apply from: 'localization.gradle'
 apply from: 'xjc.gradle'
 
 group = "org.jabref"
-version = "4.1-dev"
-project.ext.threeDotVersion = "4.0.3.1"
+version = "4.2-dev"
+project.ext.threeDotVersion = "4.1.0.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -121,7 +121,7 @@ dependencies {
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
-    compile 'com.google.guava:guava:23.5-jre'
+    compile 'com.google.guava:guava:23.6-jre'
 
     // JavaFX stuff
     compile 'com.airhacks:afterburner.fx:1.7.0'
@@ -150,8 +150,8 @@ dependencies {
 
     compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
 
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.0.0-BETA'
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.0.0-BETA'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '1.0.9'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.9'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.0-M1'
@@ -197,6 +197,16 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject("Version 1.0.10 is broken... waiting for 1.0.11")
             }
         }
+        withModule("com.microsoft.azure:applicationinsights-core") { ComponentSelection selection ->
+            if (selection.candidate.version.equals("2.0.0-BETA")) {
+                selection.reject("Version 2.0.0-BETA is broken... waiting for a working version... see #3561")
+            }
+        }
+        withModule("com.microsoft.azure:applicationinsights-logging-log4j2") { ComponentSelection selection ->
+            if (selection.candidate.version.equals("2.0.0-BETA")) {
+                selection.reject("Version 2.0.0-BETA is broken... waiting for a working version... see #3561")
+            }
+        }
         withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /2.*/) {
                 selection.reject("Cannot be upgraded to version 2")
@@ -217,6 +227,7 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject("http://dev.mysql.com/downloads/connector/j/ lists the version 5.* as last stable version.")
             }
         }
+
     }
 }
 
@@ -396,7 +407,6 @@ afterEvaluate {
         }
     }
 }
-
 
 // Code quality tasks
 checkstyle {

@@ -16,7 +16,7 @@ public class BibtexTestData {
         return database.getEntryByKey("HipKro03").get();
     }
 
-    public static BibDatabase getBibtexDatabase(ImportFormatPreferences importFormatPreferences) throws IOException {
+    private static BibDatabase getBibtexDatabase(ImportFormatPreferences importFormatPreferences) throws IOException {
         String article = "@ARTICLE{HipKro03,\n" + "  author = {Eric von Hippel and Georg von Krogh},\n"
                         + "  title = {Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science},\n"
                         + "  journal = {Organization Science},\n" + "  year = {2003},\n" + "  volume = {14},\n"
