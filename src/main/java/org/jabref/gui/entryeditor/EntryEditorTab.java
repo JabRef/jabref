@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import javafx.scene.control.Tab;
 
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.model.entry.BibEntry;
 
 public abstract class EntryEditorTab extends Tab {
@@ -32,7 +33,7 @@ public abstract class EntryEditorTab extends Tab {
     public void notifyAboutFocus(BibEntry entry) {
         if (!entry.equals(currentEntry)) {
             currentEntry = entry;
-            bindToEntry(entry);
+            DefaultTaskExecutor.runInJavaFXThread(() -> bindToEntry(entry));
         }
         handleFocus();
     }

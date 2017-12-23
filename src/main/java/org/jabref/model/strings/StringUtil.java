@@ -719,8 +719,4 @@ public class StringUtil {
     public static boolean containsIgnoreCase(String text, String searchString) {
         return StringUtils.containsIgnoreCase(text, searchString);
     }
-
-    public static boolean contains(String string, char character) {
-        return string.indexOf(character) != -1;
-    }
 }

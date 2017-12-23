@@ -59,10 +59,8 @@ class CiteKeyBasedFileFinder implements FileFinder {
                 continue;
             }
             // If we get here, we did not find any exact matches. If non-exact matches are allowed, try to find one
-            if (!exactKeyOnly) {
-                if (matches(name, citeKey)) {
+            if (!exactKeyOnly && matches(name, citeKey)) {
                     result.add(file);
-                }
             }
         }
 
@@ -75,7 +73,7 @@ class CiteKeyBasedFileFinder implements FileFinder {
             // The file name starts with the key, that's already a good start
             // However, we do not want to match "JabRefa" for "JabRef" since this is probably a file belonging to another entry published in the same time / same name
             char charAfterKey = filename.charAt(citeKey.length());
-            return !StringUtil.contains(BibtexKeyPatternUtil.CHARS, charAfterKey);
+            return !BibtexKeyPatternUtil.CHARS.contains(Character.toString(charAfterKey));
         }
         return false;
     }
