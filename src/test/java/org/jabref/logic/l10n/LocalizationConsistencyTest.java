@@ -48,7 +48,7 @@ public class LocalizationConsistencyTest {
     }
 
     @Test
-    public void allFilesMustHaveSameKeys() {
+    public void nonEnglishFilesMustHaveSubsetOfKeys() {
         for (String bundle : Arrays.asList("JabRef", "Menu")) {
             Set<String> englishKeys = LocalizationParser
                     .getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, "en"));
@@ -59,12 +59,11 @@ public class LocalizationConsistencyTest {
                 Set<String> nonEnglishKeys = LocalizationParser
                         .getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, lang));
 
-                List<String> missing = new ArrayList<>(englishKeys);
-                missing.removeAll(nonEnglishKeys);
+                // we do not check for missing keys as Crowdin adds them automatically
+
                 List<String> obsolete = new ArrayList<>(nonEnglishKeys);
                 obsolete.removeAll(englishKeys);
 
-                assertEquals("Missing keys of " + lang, Collections.emptyList(), missing);
                 assertEquals("Obsolete keys of " + lang, Collections.emptyList(), obsolete);
             }
         }

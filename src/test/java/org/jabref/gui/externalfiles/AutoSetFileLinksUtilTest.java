@@ -1,6 +1,5 @@
 package org.jabref.gui.externalfiles;
 
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
@@ -29,14 +28,12 @@ public class AutoSetFileLinksUtilTest {
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final ExternalFileTypes externalFileTypes = mock(ExternalFileTypes.class);
     private final BibEntry entry = new BibEntry("article");
-    private Path file;
-
     @Rule public TemporaryFolder folder = new TemporaryFolder();
 
     @Before
     public void setUp() throws Exception {
         entry.setCiteKey("CiteKey");
-        file = folder.newFile("CiteKey.pdf").toPath();
+        folder.newFile("CiteKey.pdf");
         when(databaseContext.getFileDirectoriesAsPaths(any())).thenReturn(Collections.singletonList(folder.getRoot().toPath()));
         when(externalFileTypes.getExternalFileTypeSelection()).thenReturn(new TreeSet<>(externalFileTypes.getDefaultExternalFileTypes()));
 
@@ -45,7 +42,8 @@ public class AutoSetFileLinksUtilTest {
     @Test
     public void test() {
         //Due to mocking the externalFileType class, the file extension will not be found
-        List<LinkedFile> expected = Collections.singletonList(new LinkedFile("", file.toString(), ""));
+
+        List<LinkedFile> expected = Collections.singletonList(new LinkedFile("", "CiteKey.pdf", ""));
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil();
         List<LinkedFile> actual = util.findassociatedNotLinkedFiles(entry, databaseContext, fileDirPrefs, autoLinkPrefs, externalFileTypes);
