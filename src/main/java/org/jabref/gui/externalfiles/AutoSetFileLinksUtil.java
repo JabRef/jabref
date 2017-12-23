@@ -68,8 +68,7 @@ public class AutoSetFileLinksUtil {
                         .orElse(Optional.of(new UnknownExternalFileType("")));
 
                 String strType = type.isPresent() ? type.get().getName() : "";
-                String relativeFilePath = FileUtil.shortenFileName(foundFile, dirs)
-                        .toString();
+                String relativeFilePath = FileUtil.shortenFileName(foundFile, directories).toString();
                 LinkedFile linkedFile = new LinkedFile("", relativeFilePath, strType);
                 linkedFiles.add(linkedFile);
             }
