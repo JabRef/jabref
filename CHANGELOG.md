@@ -9,8 +9,63 @@ Here, the categories "Changed" for added and changed functionality,
 
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
-
 ## [Unreleased]
+
+### Changed
+
+### Fixed
+
+### Removed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## [4.1] - 2017-12-23
 
 ### Changed
 - We added bracketed expresion support for file search patterns, import file name patterns and file directory patters, in addition to bibtexkey patterns.
@@ -56,6 +111,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue where the same Java Look and Feel would be listed more than once in the Preferences. [#3391](https://github.com/JabRef/jabref/issues/3391)
  - We fixed an issue where errors in citation styles triggered an exception when opening the preferences dialog. [#3389](https://github.com/JabRef/jabref/issues/3389)
  - We fixed an issue where entries were displayed twice after insertion into a shared database. [#3164](https://github.com/JabRef/jabref/issues/3164)
+ - We improved the auto link algorithm so that files starting with a similar key are no longer found (e.g, `Einstein1902` vs `Einstein1902a`). [#3472](https://github.com/JabRef/jabref/issues/3472) 
  - We fixed an issue where special fields (such as `printed`) could not be cleared when syncing special fields via the keywords. [#3432](https://github.com/JabRef/jabref/issues/3432)
  - We fixed an issue where the tooltip of the global search bar showed html tags instead of formatting the text. [#3381](https://github.com/JabRef/jabref/issues/3381)
  - We fixed an issue where timestamps were not updated for changed entries. [#2810](https://github.com/JabRef/jabref/issues/2810)
@@ -69,52 +125,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue where custom data in combobox fields in the entry editor was not saved. [#3538](https://github.com/JabRef/jabref/issues/3538)
  - We fixed an issue where automatically found files were not added with a relative paths when the bib file is in the same directory as the files. [#3476](https://github.com/JabRef/jabref/issues/3476)
  - We improved the key generator to remove certain illegal characters such as colons or apostrophes. [#3359](https://github.com/JabRef/jabref/issues/3359)
-
- ### Removed
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ## [4.0] - 2017-10-04
@@ -331,7 +341,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 The changelog of versions 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of 2.11 and versions before is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v4.0...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v4.1...HEAD
+[4.1]: https://github.com/JabRef/jabref/compare/v4.0...v4.1
 [4.0]: https://github.com/JabRef/jabref/compare/v4.0-beta3...v4.0
 [4.0-beta3]: https://github.com/JabRef/jabref/compare/v4.0-beta2...v4.0-beta3
 [4.0-beta2]: https://github.com/JabRef/jabref/compare/v4.0-beta...v4.0-beta2

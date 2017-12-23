@@ -82,11 +82,11 @@ public class AutoSetLinks {
 
         Runnable r = () -> {
             boolean foundAny = false;
-            AutoSetFileLinksUtil util = new AutoSetFileLinksUtil();
+            AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
 
             for (BibEntry entry : entries) {
 
-                List<LinkedFile> linkedFiles = util.findassociatedNotLinkedFiles(entry, databaseContext, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
+                List<LinkedFile> linkedFiles = util.findAssociatedNotLinkedFiles(entry);
 
                 if (ce != null) {
                     for (LinkedFile linkedFile : linkedFiles) {

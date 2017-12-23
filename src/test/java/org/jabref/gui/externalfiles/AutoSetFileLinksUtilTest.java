@@ -35,8 +35,7 @@ public class AutoSetFileLinksUtilTest {
         entry.setCiteKey("CiteKey");
         folder.newFile("CiteKey.pdf");
         when(databaseContext.getFileDirectoriesAsPaths(any())).thenReturn(Collections.singletonList(folder.getRoot().toPath()));
-        when(externalFileTypes.getExternalFileTypeSelection()).thenReturn(new TreeSet<>(externalFileTypes.getDefaultExternalFileTypes()));
-
+        when(externalFileTypes.getExternalFileTypeSelection()).thenReturn(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes()));
     }
 
     @Test
@@ -45,8 +44,8 @@ public class AutoSetFileLinksUtilTest {
 
         List<LinkedFile> expected = Collections.singletonList(new LinkedFile("", "CiteKey.pdf", ""));
 
-        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil();
-        List<LinkedFile> actual = util.findassociatedNotLinkedFiles(entry, databaseContext, fileDirPrefs, autoLinkPrefs, externalFileTypes);
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, fileDirPrefs, autoLinkPrefs, externalFileTypes);
+        List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
         assertEquals(expected, actual);
     }
 
