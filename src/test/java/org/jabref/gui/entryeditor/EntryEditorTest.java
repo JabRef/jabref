@@ -6,27 +6,33 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 
+import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.fxmisc.richtext.CodeArea;
 import org.junit.Test;
+import org.mockito.Answers;
 import org.testfx.framework.junit.ApplicationTest;
+
+import static org.mockito.Mockito.mock;
 
 public class EntryEditorTest extends ApplicationTest {
 
-    public Stage stage;
-    public Scene scene;
-    public CodeArea area;
-    TabPane pane;
-    SourceTab sourceTab;
+    private Stage stage;
+    private Scene scene;
+    private CodeArea area;
+    private TabPane pane;
+    private SourceTab sourceTab;
 
     @Override
     public void start(Stage stage) throws Exception {
         area = new CodeArea();
         area.appendText("some example\n text to go here\n across a couple of \n lines....");
-        sourceTab = new SourceTab(new BibDatabaseContext(), new LatexFieldFormatterPreferences());
+        JabRefPreferences preferences = mock(JabRefPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), new LatexFieldFormatterPreferences(), preferences);
         pane = new TabPane(
                 new Tab("main area", area),
                 new Tab("other tab", new Label("some text")),
@@ -45,7 +51,7 @@ public class EntryEditorTest extends ApplicationTest {
     }
 
     @Test
-    public void test() throws Exception {
+    public void switchingFromSourceTabDoesNotThrowException() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setField("test", "testvalue");
 
