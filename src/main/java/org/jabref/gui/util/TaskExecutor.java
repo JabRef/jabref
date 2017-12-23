@@ -1,5 +1,7 @@
 package org.jabref.gui.util;
 
+import java.util.concurrent.Future;
+
 import javafx.concurrent.Task;
 
 import org.jabref.gui.externalfiles.FileDownloadTask;
@@ -13,12 +15,12 @@ import org.jabref.gui.externalfiles.FileDownloadTask;
 public interface TaskExecutor {
 
     /**
-     * Runs the given task.
+     * Runs the given task and returns a Future representing that task.
      *
-     * @param task the task to run
      * @param <V>  type of return value of the task
+     * @param task the task to run
      */
-    <V> void execute(BackgroundTask<V> task);
+    <V> Future<?> execute(BackgroundTask<V> task);
 
     /**
      * Runs the given download task.

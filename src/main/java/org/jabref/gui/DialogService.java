@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javafx.concurrent.Task;
+import javafx.print.PrinterJob;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
@@ -183,4 +184,13 @@ public interface DialogService {
      */
     FileChooser getConfiguredFileChooser(FileDialogConfiguration fileDialogConfiguration);
 
+    /**
+     * Displays a Print Dialog. Allow the user to update job state such as printer and settings. These changes will be
+     * available in the appropriate properties after the print dialog has returned. The print dialog is also used to
+     * confirm the user wants to proceed with printing.
+     *
+     * @param job the print job to customize
+     * @return false if the user opts to cancel printing
+     */
+    boolean showPrintDialog(PrinterJob job);
 }
