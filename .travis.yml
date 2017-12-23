@@ -6,6 +6,9 @@ language: java
 dist: trusty
 sudo: required
 
+git:
+  depth: 1
+
 services:
   - postgresql
   - mysql
@@ -20,12 +23,14 @@ env:
     - TEST_SUITE=guiTest
     - TEST_SUITE=checkstyle
     - TEST_SUITE=codecov
+    - DEPENDENCY_UPDATES=check
 
 matrix:
     fast_finish: true
     allow_failures:
       - env: TEST_SUITE=fetcherTest
       - env: TEST_SUITE=codecov
+      - env: DEPENDENCY_UPDATES=check
 
 # JavaFX localization tests need a running X environment
 before_install:
@@ -46,13 +51,14 @@ script:
   - if [ "$TEST_SUITE" == "checkstyle" ]; then ./gradlew checkstyleMain checkstyleTest checkstyleJmh; fi
   - if [ "$TEST_SUITE" == "guiTest" ]; then ./buildres/gui-tests.sh; fi
   - if [ "$TEST_SUITE" == "codecov" ]; then ./gradlew jacocoJunit5TestReport; bash <(curl -s https://codecov.io/bash); fi
+  - if [ "$DEPENDENCY_UPDATES" == "check" ]; then ./gradlew -q checkOutdatedDependencies; fi
 
 after_failure:
   # show test results if build fails
   - $TRAVIS_BUILD_DIR/scripts/after-failure.sh
 
 branches:
-  only: 
+  only:
     - master
 
 # cache gradle dependencies

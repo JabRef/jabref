@@ -14,51 +14,56 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 - We added bracketed expresion support for file search patterns, import file name patterns and file directory patters, in addition to bibtexkey patterns.
-- We added support for '[entrytype]' bracketed expression.
+- We added support for `[entrytype]` bracketed expression.
 - Updated French translation
 - We improved the handling of abstracts in the "Astrophysics Data System" fetcher. [#2471](https://github.com/JabRef/jabref/issues/2471)
 - We added support for pasting entries in different formats [#3143](https://github.com/JabRef/jabref/issues/3143)
 - In the annotation tab, PDF files are now monitored for new or changed annotation. A manual reload is no longer necessary. [#3292](https://github.com/JabRef/jabref/issues/3292)
 - We increased the relative size of the "abstract" field in the entry editor. [Feature request in the forum](http://discourse.jabref.org/t/entry-preview-in-version-4/827)
 - Crossreferenced entries are now used when a BibTex key is generated for an entry with empty fields. [#2811](https://github.com/JabRef/jabref/issues/2811)
-- We now set the WM_CLASS of the UI to org-jabref-JabRefMain to allow certain Un*x window managers to properly identify its windows
+- We now set the `WM_CLASS` of the UI to org-jabref-JabRefMain to allow certain Un*x window managers to properly identify its windows
 - We changed the default paths for the OpenOffice/LibreOffice binaries to the default path for LibreOffice
 - File annotation tab now removes newlines and hyphens before newlines from content and displays an empty String instead of N/A if no contents are found. [#3280](https://github.com/JabRef/jabref/issues/3280)
 - We moved the groups field from the "Other fields" tab to "General" (you may have to reset your editor preferences under Options > Set up general fields)
 - We no longer create a new entry editor when selecting a new entry to increase performance. [#3187](https://github.com/JabRef/jabref/pull/3187)
-- We added the possibility to copy linked files from entries to a single output folder [#2539](https://github.com/JabRef/jabref/pull/2593)
+- We added the possibility to copy linked files from entries to a single output folder. [#2539](https://github.com/JabRef/jabref/pull/2593)
 - We increased performance and decreased the memory footprint of the entry editor drastically. [#3331](https://github.com/JabRef/jabref/pull/3331)
 - Late initialization of the context menus in the entry editor. This improves performance and memory footprint further [#3340](https://github.com/JabRef/jabref/pull/3340)
-- Integrity check "Abbreviation Detection" detects abbreviated names for journals and booktitles based on the internal list instead of only looking for "." signs. Fixes [#3144](https://github.com/JabRef/jabref/issues/3144).
+- Integrity check "Abbreviation Detection" detects abbreviated names for journals and booktitles based on the internal list instead of only looking for `.` signs. Fixes [#3144](https://github.com/JabRef/jabref/issues/3144).
 - We added a dialog to show that JabRef is working on checking integrity. [#3358](https://github.com/JabRef/jabref/issues/3358)
-- We added an option to mass append to fields via the Quality -> set/clear/append/rename fields dialog. [#2721](https://github.com/JabRef/jabref/issues/2721)
+- When you click the PDF icon in the file list of the entry editor, then the file is opened. [#3491](https://github.com/JabRef/jabref/issues/3491)
+- We added an option to mass append to fields via the Quality -> [set/clear/append/rename fields dialog](http://help.jabref.org/en/SetClearRenameFields). [#2721](https://github.com/JabRef/jabref/issues/2721)
 - We added a check on startup to ensure JabRef is run with an adequate Java version. [3310](https://github.com/JabRef/jabref/issues/3310)
 - In the preference, all installed java Look and Feels are now listed and selectable
+- We added an ID fetcher for [IACR eprints](https://eprint.iacr.org/). [#3473](https://github.com/JabRef/jabref/pull/3473)
+- We added a clear option to the right-click menu of the text field in the entry editor. [koppor#198](https://github.com/koppor/jabref/issues/198)
+- We improved the performance and memory footprint of the citation preview when [CSL styles](http://citationstyles.org/) are used. [#2533](https://github.com/JabRef/jabref/issues/2533)
+- We disabled the auto completion as default, because it still causes issues. [#3522](https://github.com/JabRef/jabref/issues/3522)
 
 ### Fixed
- - We fixed the translation of \textendash and \textquotesingle in the entry preview [#3307](https://github.com/JabRef/jabref/issues/3307)
- - We fixed an issue where JabRef would not terminated after asking to collect anonymous statistics [#2955 comment](https://github.com/JabRef/jabref/issues/2955#issuecomment-334591123)
- - We fixed an issue where JabRef would not shut down when started with the '-n' (No GUI) option. [#3247](https://github.com/JabRef/jabref/issues/3247)
+ - We fixed the translation of `\textendash` and `\textquotesingle` in the entry preview. [#3307](https://github.com/JabRef/jabref/issues/3307)
+ - We fixed an issue where JabRef would not terminated after asking to collect anonymous statistics. [#2955 comment](https://github.com/JabRef/jabref/issues/2955#issuecomment-334591123)
+ - We fixed an issue where JabRef would not shut down when started with the `-n` (No GUI) option. [#3247](https://github.com/JabRef/jabref/issues/3247)
  - We improved the way metadata is updated in remote databases. [#3235](https://github.com/JabRef/jabref/issues/3235)
- - We improved font rendering of the Entry Editor for Linux based systems [#3295](https://github.com/JabRef/jabref/issues/3295)
- - We fixed an issue where JabRef would freeze when trying to replace the original entry after a merge with new information from identifiers like DOI/ISBN etc. [3294](https://github.com/JabRef/jabref/issues/3294)
+ - We improved font rendering of the Entry Editor for Linux based systems. [#3295](https://github.com/JabRef/jabref/issues/3295)
+ - We fixed an issue where JabRef would freeze when trying to replace the original entry after a merge with new information from identifiers like DOI/ISBN etc. [#3294](https://github.com/JabRef/jabref/issues/3294)
  - We no longer allow to add a field multiple times in customized entry types and thereby fix an issue in the entry editor that resulted from having a field multiple times. [#3046](https://github.com/JabRef/jabref/issues/3046)
  - We fixed an issue where JabRef would not show the translated content at some points, although there existed a translation
- - We fixed an issue where editing in the source tab would override content of other entries [#3352](https://github.com/JabRef/jabref/issues/3352#issue-268580818)
- - We fixed an issue where file links created under windows could not be opened on Linux/OSX [#3311](https://github.com/JabRef/jabref/issues/3311)
- - We fixed several issues with the automatic linking of files in the entry editor where files were not found or not correctly saved in the bibtex source [#3346](https://github.com/JabRef/jabref/issues/3346)
- - We fixed an issue where fetching entries from crossref that had no titles caused an error [#3376](https://github.com/JabRef/jabref/issues/3376)
+ - We fixed an issue where editing in the source tab would override content of other entries. [#3352](https://github.com/JabRef/jabref/issues/3352#issue-268580818)
+ - We fixed an issue where file links created under Windows could not be opened on Linux/OSX. [#3311](https://github.com/JabRef/jabref/issues/3311)
+ - We fixed several issues with the automatic linking of files in the entry editor where files were not found or not correctly saved in the bibtex source. [#3346](https://github.com/JabRef/jabref/issues/3346)
+ - We fixed an issue where fetching entries from crossref that had no titles caused an error. [#3376](https://github.com/JabRef/jabref/issues/3376)
  - We fixed an issue where the same Java Look and Feel would be listed more than once in the Preferences. [#3391](https://github.com/JabRef/jabref/issues/3391)
- - We fixed an issue where errors in citation styles triggered an exception when opening the preferences dialog [#3389](https://github.com/JabRef/jabref/issues/3389)
+ - We fixed an issue where errors in citation styles triggered an exception when opening the preferences dialog. [#3389](https://github.com/JabRef/jabref/issues/3389)
  - We fixed an issue where entries were displayed twice after insertion into a shared database. [#3164](https://github.com/JabRef/jabref/issues/3164)
  - We improved the auto link algorithm so that files starting with a similar key are no longer found (e.g, `Einstein1902` vs `Einstein1902a`). [#3472](https://github.com/JabRef/jabref/issues/3472) 
- - We fixed an issue where special fields (such as `printed`) could not be cleared when syncing special fields via the keywords [#3432](https://github.com/JabRef/jabref/issues/3432)
- - We fixed an issue where the tooltip of the global search bar showed html tags instead of formatting the text [#3381](https://github.com/JabRef/jabref/issues/3381)
- - We fixed an issue where timestamps were not updated for changed entries [#2810](https://github.com/JabRef/jabref/issues/2810)
- - We fixed an issue where trying to fetch data from Medline/PubMed resulted in an error [#3463](https://github.com/JabRef/jabref/issues/3463)
- - We fixed an issue where double clicking on an entry in the integrity check dialog resulted in an exception [#3485](https://github.com/JabRef/jabref/issues/3485)
  - We fixed an issue where the entry type could sometimes not be changed when the entry editor was open [#3435](https://github.com/JabRef/jabref/issues/3435)
- - We fixed an issue where dropping a pdf on the entry table and renaming it triggered an exception [#3490](https://github.com/JabRef/jabref/issues/3490)
+ - We fixed an issue where dropping a pdf on the entry table and renaming it triggered an exception. [#3490](https://github.com/JabRef/jabref/issues/3490)
+ - We fixed an issue where no longer existing files could not be removed from the entry by pressing the <kbd>del</kbd> key. [#3493](https://github.com/JabRef/jabref/issues/3493)
+ - We fixed an issue where integrating external changes to a bib file caused instability. [#3498](https://github.com/JabRef/jabref/issues/3498)
+ - We fixed an issue where fetched entries from the ACM fetcher could not be imported. [#3500](https://github.com/JabRef/jabref/issues/3500)
+ - We fixed an issue where custom data in combobox fields in the entry editor was not saved. [#3538](https://github.com/JabRef/jabref/issues/3538)
+ - We fixed an issue where automatically found files were not added with a relative paths when the bib file is in the same directory as the files. [#3476](https://github.com/JabRef/jabref/issues/3476)
 
  ### Removed
 
