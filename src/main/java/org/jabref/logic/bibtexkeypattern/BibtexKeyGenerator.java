@@ -28,7 +28,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
     /*
      * All single characters that we can use for extending a key to make it unique.
      */
-    private static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
+    public static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
     private static final String KEY_ILLEGAL_CHARACTERS = "{}(),\\\"#~^':`";
     private static final String KEY_UNWANTED_CHARACTERS = "{}(),\\\"";
     private final AbstractBibtexKeyPattern citeKeyPattern;
