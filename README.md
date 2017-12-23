@@ -1,9 +1,10 @@
-# JabRef Version 4.1
+# JabRef Development Version
 
 [![Build Status](https://travis-ci.org/JabRef/jabref.svg?branch=master)](https://travis-ci.org/JabRef/jabref)
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
 [![Donation](https://img.shields.io/badge/donate%20to-jabref-orange.svg)](https://donations.jabref.org)
 
+This version is a development version. Features may not work as expected.
 
 Development builds are available at [builds.jabref.org](https://builds.jabref.org/master/) whereas the [latest release is available via GitHub](https://github.com/JabRef/jabref/releases/latest).
 

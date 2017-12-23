@@ -9,6 +9,61 @@ Here, the categories "Changed" for added and changed functionality,
 
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
+## [Unreleased]
+
+### Changed
+
+### Fixed
+
+### Removed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## [4.1] - 2017-12-23
 
@@ -285,6 +340,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 The changelog of versions 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of 2.11 and versions before is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
+[Unreleased]: https://github.com/JabRef/jabref/compare/v4.1...HEAD
 [4.1]: https://github.com/JabRef/jabref/compare/v4.0...4.1
 [4.0]: https://github.com/JabRef/jabref/compare/v4.0-beta3...v4.0
 [4.0-beta3]: https://github.com/JabRef/jabref/compare/v4.0-beta2...v4.0-beta3
