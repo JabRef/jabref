@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import org.jabref.logic.exporter.ExportFormat;
+import org.jabref.logic.exporter.ExportFormats;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -90,7 +91,7 @@ public class CustomExportList {
         } else {
             lfFileName = s.get(1);
         }
-        ExportFormat format = new ExportFormat(s.get(0), s.get(0), lfFileName, null, s.get(2), layoutPreferences,
+        ExportFormat format = new ExportFormat(s.get(0), s.get(0), lfFileName, null, ExportFormats.getFileExtension(s.get(2)), layoutPreferences,
                 savePreferences);
         format.setCustomExport(true);
         return Optional.of(format);

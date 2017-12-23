@@ -86,7 +86,7 @@ public class HTMLCharsTest {
 
     @Test
     public void testQuoteSingle() {
-        assertEquals("&apos;", layout.format("{\\textquotesingle}"));
+        assertEquals("&#39;", layout.format("{\\textquotesingle}"));
     }
 
     @Test

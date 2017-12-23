@@ -10,5 +10,3 @@ AUTHORS eol=lf
 
 # disable after a release
 # CHANGELOG.md merge=union
-
-src/main/resources/l10n/*.properties merge=union
