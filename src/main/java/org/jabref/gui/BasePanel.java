@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -36,6 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -69,7 +71,11 @@ import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.filelist.AttachFileAction;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
+import org.jabref.gui.groups.DeleteDialog;
+import org.jabref.gui.groups.DeleteDialog.DeleteResult;
 import org.jabref.gui.groups.GroupAddRemoveDialog;
+import org.jabref.gui.groups.GroupTreeNodeViewModel;
+import org.jabref.gui.groups.UndoableChangeEntriesOfGroup;
 import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.journals.UnabbreviateAction;
@@ -136,10 +142,10 @@ import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 import org.jabref.shared.DBMSSynchronizer;
-
 import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -760,19 +766,56 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     /**
-     * Removes the selected entries from the database
+     * Removes the selected entries from the database or selected groups
      *
      * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as
      *            "deleted". If true the action will be localized as "cut"
      */
     private void delete(boolean cut) {
-        List<BibEntry> entries = mainTable.getSelectedEntries();
+    	List<FieldChange> changesRemove = new ArrayList<>();
+    	
+    	List<BibEntry> entries = mainTable.getSelectedEntries();
         if (entries.isEmpty()) {
             return;
         }
-        if (!cut && !showDeleteConfirmationDialog(entries.size())) {
-            return;
+    	
+        Set<String> allEnriesGroups = new HashSet<String>(); 
+
+        for (BibEntry entry : entries) {
+        	if (entry.getField("groups").isPresent()) {
+        		System.out.println(entry.getField("groups"));
+        		String[] groups = entry.getField("groups").get().split(",");
+        		for (String group : groups){
+        			allEnriesGroups.add(group);
+        		}
+        	}
         }
+        System.out.println(allEnriesGroups);
+               
+        if (!cut) { 
+        	DeleteDialog diag = new DeleteDialog(Globals.stateManager.getSelectedGroup(bibDatabaseContext), allEnriesGroups);
+        	diag.setVisible(true);
+
+        	DeleteResult resultDialog = diag.getResult();
+
+        	if (resultDialog == DeleteResult.REMOVE_FROM_GROUPS) { 
+        		for (GroupTreeNode node: Globals.stateManager.getSelectedGroup(bibDatabaseContext)) {
+        			changesRemove = node.removeEntriesFromGroup(entries);
+
+        			if (!changesRemove.isEmpty()) {
+        				AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node), changesRemove);
+        				undoManager.addEdit(undoRemove);
+        			}
+        		}
+
+        		markBaseChanged();
+        		mainTable.requestFocus();
+        		return;
+        	} else if (resultDialog == DeleteResult.CANCEL) { 
+        		return;
+        	} 
+        }
+
 
         // select the next entry to stay at the same place as before (or the previous if we're already at the end)
         if (mainTable.getSelectedRow() != (mainTable.getRowCount() - 1)) {
