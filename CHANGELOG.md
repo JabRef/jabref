@@ -14,6 +14,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Changed
 
 ### Fixed
+- We fixed the name of an exported file.
 
 ### Removed
 
