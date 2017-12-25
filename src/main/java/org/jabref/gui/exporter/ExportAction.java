@@ -31,7 +31,6 @@ import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import sun.plugin.dom.exception.InvalidStateException;
 
 public class ExportAction {
 
@@ -90,7 +89,7 @@ public class ExportAction {
                             return;
                         }
                     }
-                final Exporter format = FileFilterConverter.getExporter(selectedExtensionFilter, exporters).orElseThrow(() -> new InvalidStateException("User didn't selected a file type for the extension"));
+                final Exporter format = FileFilterConverter.getExporter(selectedExtensionFilter, exporters).orElseThrow(() -> new IllegalStateException("User didn't selected a file type for the extension"));
                     List<BibEntry> entries;
                     if (selectedOnly) {
                         // Selected entries
