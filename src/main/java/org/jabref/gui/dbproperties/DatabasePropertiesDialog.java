@@ -167,11 +167,40 @@ public class DatabasePropertiesDialog extends JabRefDialog {
         am.put("close", closeAction);
 
         ok.addActionListener(e -> {
-            storeSettings();
+            if (propertiesChanged()) {
+                storeSettings();
+            }
             dispose();
         });
 
         cancel.addActionListener(e -> dispose());
+    }
+
+    private boolean propertiesChanged() {
+        Charset oldEncoding = panel.getBibDatabaseContext().getMetaData().getEncoding()
+                .orElse(Globals.prefs.getDefaultEncoding());
+        Charset newEncoding = (Charset) encoding.getSelectedItem();
+        boolean saveActionsChanged = fieldFormatterCleanupsPanel.hasChanged();
+        boolean saveOrderConfigChanged = newAndOldOrderCinfigIsSame(getNewSaveOrderConfig(), oldSaveOrderConfig);
+        boolean changed = saveOrderConfigChanged || !newEncoding.equals(oldEncoding)
+                || !oldFileVal.equals(fileDir.getText()) || !oldFileIndvVal.equals(fileDirIndv.getText())
+                || (oldProtectVal != protect.isSelected()) || saveActionsChanged;
+        return changed;
+    }
+
+    private boolean newAndOldOrderCinfigIsSame(SaveOrderConfig newSaveOrderConfig, SaveOrderConfig oldSaveOrderConfig) {
+        return newSaveOrderConfig.equals(oldSaveOrderConfig) ? false : true;
+    }
+
+    private SaveOrderConfig getNewSaveOrderConfig() {
+        SaveOrderConfig saveOrderConfig = null;
+        if (saveInOriginalOrder.isSelected()) {
+            saveOrderConfig = SaveOrderConfig.getDefaultSaveOrder();
+        } else {
+            saveOrderConfig = saveOrderPanel.getSaveOrderConfig();
+            saveOrderConfig.setSaveInSpecifiedOrder();
+        }
+        return saveOrderConfig;
     }
 
     private void setupSortOrderConfiguration() {
@@ -270,21 +299,10 @@ public class DatabasePropertiesDialog extends JabRefDialog {
             metaData.markAsNotProtected();
         }
 
-        SaveOrderConfig newSaveOrderConfig;
-        if (saveInOriginalOrder.isSelected()) {
-            newSaveOrderConfig = SaveOrderConfig.getDefaultSaveOrder();
-        } else {
-            newSaveOrderConfig = saveOrderPanel.getSaveOrderConfig();
-            newSaveOrderConfig.setSaveInSpecifiedOrder();
-        }
+        SaveOrderConfig newSaveOrderConfig = getNewSaveOrderConfig();
 
         // See if any of the values have been modified:
-        boolean saveOrderConfigChanged;
-        if (newSaveOrderConfig.equals(oldSaveOrderConfig)) {
-            saveOrderConfigChanged = false;
-        } else {
-            saveOrderConfigChanged = true;
-        }
+        boolean saveOrderConfigChanged = newAndOldOrderCinfigIsSame(getNewSaveOrderConfig(), oldSaveOrderConfig);
 
         if (saveOrderConfigChanged) {
             if (newSaveOrderConfig.equals(SaveOrderConfig.getDefaultSaveOrder())) {
