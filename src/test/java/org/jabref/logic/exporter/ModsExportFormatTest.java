@@ -1,6 +1,5 @@
 package org.jabref.logic.exporter;
 
-import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -27,10 +26,10 @@ import static org.mockito.Mockito.mock;
 public class ModsExportFormatTest {
 
     public Charset charset;
-    private ModsExportFormat modsExportFormat;
+    private ModsExporter modsExportFormat;
     private BibDatabaseContext databaseContext;
     private BibtexImporter bibtexImporter;
-    private File tempFile;
+    private Path tempFile;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -41,23 +40,22 @@ public class ModsExportFormatTest {
     public void setUp() throws Exception {
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
-        modsExportFormat = new ModsExportFormat();
+        modsExportFormat = new ModsExporter();
         bibtexImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
-        tempFile = testFolder.newFile();
+        tempFile = testFolder.newFile().toPath();
         importFile = Paths.get(ModsExportFormatTest.class.getResource("ModsExportFormatTestAllFields.bib").toURI());
     }
 
     @Test(expected = SaveException.class)
-    public final void testPerformExportTrowsSaveException() throws Exception {
+    public final void exportForNonexistentPathThrowsSaveException() throws Exception {
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
 
-        modsExportFormat.performExport(databaseContext, "", charset, entries);
+        modsExportFormat.export(databaseContext, Paths.get("non-existing"), charset, entries);
     }
 
     @Test
-    public final void testPerformExportEmptyEntry() throws Exception {
-        String canonicalPath = tempFile.getCanonicalPath();
-        modsExportFormat.performExport(databaseContext, canonicalPath, charset, Collections.emptyList());
-        Assert.assertEquals(Collections.emptyList(), Files.readAllLines(Paths.get(canonicalPath)));
+    public final void exportForNoEntriesWritesNothing() throws Exception {
+        modsExportFormat.export(databaseContext, tempFile, charset, Collections.emptyList());
+        Assert.assertEquals(Collections.emptyList(), Files.readAllLines(tempFile));
     }
 }

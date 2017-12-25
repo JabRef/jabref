@@ -45,7 +45,7 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.DatabaseLocation;
 import org.jabref.preferences.JabRefPreferences;
@@ -470,8 +470,8 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
     private void showFileChooser() {
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileExtensions.BIBTEX_DB)
-                .withDefaultExtension(FileExtensions.BIBTEX_DB)
+                .addExtensionFilter(FileType.BIBTEX_DB)
+                .withDefaultExtension(FileType.BIBTEX_DB)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
         DialogService ds = new FXDialogService();
 

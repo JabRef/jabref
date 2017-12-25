@@ -1,9 +1,9 @@
 package org.jabref.logic.exporter;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -43,16 +43,16 @@ import org.jabref.logic.importer.fileformat.mods.SubjectDefinition;
 import org.jabref.logic.importer.fileformat.mods.TitleInfoDefinition;
 import org.jabref.logic.importer.fileformat.mods.TypeOfResourceDefinition;
 import org.jabref.logic.importer.fileformat.mods.UrlDefinition;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
 
 /**
- * ExportFormat for exporting in MODS XML format.
+ * TemplateExporter for exporting in MODS XML format.
  */
-class ModsExportFormat extends ExportFormat {
+class ModsExporter extends TemplateExporter {
 
     protected static final String MODS_NAMESPACE_URI = "http://www.loc.gov/mods/v3";
     private static final String MINUS = "-";
@@ -60,14 +60,13 @@ class ModsExportFormat extends ExportFormat {
     private static final String MODS_SCHEMA_LOCATION = "http://www.loc.gov/standards/mods/v3/mods-3-6.xsd";
     private JAXBContext context;
 
-
-    public ModsExportFormat() {
-        super("MODS", "mods", null, null, FileExtensions.XML);
+    public ModsExporter() {
+        super("MODS", "mods", null, null, FileType.XML);
     }
 
     @Override
-    public void performExport(final BibDatabaseContext databaseContext, final String file, final Charset encoding,
-            List<BibEntry> entries) throws SaveException, IOException {
+    public void export(final BibDatabaseContext databaseContext, final Path file, final Charset encoding,
+                       List<BibEntry> entries) throws SaveException, IOException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (entries.isEmpty()) { // Only export if entries exist
@@ -168,7 +167,7 @@ class ModsExportFormat extends ExportFormat {
         }
     }
 
-    private void createMarshallerAndWriteToFile(String file, JAXBElement<ModsCollectionDefinition> jaxbElement)
+    private void createMarshallerAndWriteToFile(Path file, JAXBElement<ModsCollectionDefinition> jaxbElement)
             throws JAXBException {
 
         if (context == null) {
@@ -180,7 +179,7 @@ class ModsExportFormat extends ExportFormat {
         marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, MODS_SCHEMA_LOCATION);
 
         // Write to File
-        marshaller.marshal(jaxbElement, new File(file));
+        marshaller.marshal(jaxbElement, file.toFile());
     }
 
     private void addRelatedAndOriginInfoToModsGroup(RelatedItemDefinition relatedItem, PartDefinition partDefinition,

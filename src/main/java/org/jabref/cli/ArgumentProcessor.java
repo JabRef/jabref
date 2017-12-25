@@ -21,13 +21,13 @@ import org.jabref.gui.importer.fetcher.EntryFetchers;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.ExportFormat;
-import org.jabref.logic.exporter.ExportFormats;
+import org.jabref.logic.exporter.Exporter;
+import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.FileSaveSession;
-import org.jabref.logic.exporter.IExportFormat;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.SaveSession;
+import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.OpenDatabase;
@@ -250,7 +250,7 @@ public class ArgumentProcessor {
                 formatName = data[2];
                 break;
             case 2:
-                //default ExportFormat: HTML table (with Abstract & BibTeX)
+                //default exporter: HTML table (with Abstract & BibTeX)
                 formatName = "tablerefsabsbib";
                 break;
             default:
@@ -261,14 +261,14 @@ public class ArgumentProcessor {
             }
 
             //export new database
-            IExportFormat format = ExportFormats.getExportFormat(formatName);
-            if (format == null) {
+            Optional<Exporter> exporter = Globals.exportFactory.getExporterByName(formatName);
+            if (!exporter.isPresent()) {
                 System.err.println(Localization.lang("Unknown export format") + ": " + formatName);
             } else {
-                // We have an ExportFormat instance:
+                // We have an TemplateExporter instance:
                 try {
                     System.out.println(Localization.lang("Exporting") + ": " + data[1]);
-                    format.performExport(databaseContext, data[1],
+                    exporter.get().export(databaseContext, Paths.get(data[1]),
                             databaseContext.getMetaData().getEncoding().orElse(Globals.prefs.getDefaultEncoding()),
                             matches);
                 } catch (Exception ex) {
@@ -438,18 +438,17 @@ public class ArgumentProcessor {
             Globals.prefs.fileDirForDatabase = databaseContext
                     .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
             System.out.println(Localization.lang("Exporting") + ": " + data[0]);
-            IExportFormat format = ExportFormats.getExportFormat(data[1]);
-            if (format == null) {
+            Optional<Exporter> exporter = Globals.exportFactory.getExporterByName(data[1]);
+            if (!exporter.isPresent()) {
                 System.err.println(Localization.lang("Unknown export format") + ": " + data[1]);
             } else {
-                // We have an ExportFormat instance:
+                // We have an exporter:
                 try {
-                    format.performExport(pr.getDatabaseContext(), data[0],
+                    exporter.get().export(pr.getDatabaseContext(), Paths.get(data[0]),
                             pr.getDatabaseContext().getMetaData().getEncoding()
                                     .orElse(Globals.prefs.getDefaultEncoding()),
                             pr.getDatabaseContext().getDatabase().getEntries());
                 } catch (Exception ex) {
-
                     System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
                             + Throwables.getStackTraceAsString(ex));
                 }
@@ -463,12 +462,12 @@ public class ArgumentProcessor {
             Globals.prefs.importPreferences(cli.getPreferencesImport());
             EntryTypes.loadCustomEntryTypes(Globals.prefs.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
                     Globals.prefs.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
-            Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
+            Map<String, TemplateExporter> customExporters = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
                     Globals.journalAbbreviationLoader);
             LayoutFormatterPreferences layoutPreferences = Globals.prefs
                     .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
             SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
-            ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
+            Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences);
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }

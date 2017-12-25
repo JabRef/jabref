@@ -8,7 +8,6 @@ import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
-import javafx.stage.FileChooser;
 
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -140,6 +139,7 @@ public interface DialogService {
      * Shows a new file save dialog. The method doesn't return until the
      * displayed file save dialog is dismissed. The return value specifies the
      * file chosen by the user or an empty {@link Optional} if no selection has been made.
+     * After a file was selected, the given file dialog configuration is updated with the selected extension type (if any).
      *
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
@@ -150,6 +150,7 @@ public interface DialogService {
      * displayed open dialog is dismissed. The return value specifies
      * the file chosen by the user or an empty {@link Optional} if no selection has been
      * made.
+     * After a file was selected, the given file dialog configuration is updated with the selected extension type (if any).
      *
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
@@ -174,13 +175,4 @@ public interface DialogService {
      * @return the selected directory or an empty {@link Optional} if no directory has been selected
      */
     Optional<Path> showDirectorySelectionDialog(DirectoryDialogConfiguration directoryDialogConfiguration);
-
-    /**
-     * Gets the configured {@link FileChooser}, should only be necessary in rare use cases.
-     * For normal usage use the show-Methods which directly return the selected file(s)
-     * @param fileDialogConfiguration
-     * @return A configured instance of the {@link FileChooser}
-     */
-    FileChooser getConfiguredFileChooser(FileDialogConfiguration fileDialogConfiguration);
-
 }

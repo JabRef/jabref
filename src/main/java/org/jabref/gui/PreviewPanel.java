@@ -33,7 +33,7 @@ import org.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.worker.CitationStyleWorker;
 import org.jabref.logic.citationstyle.CitationStyle;
-import org.jabref.logic.exporter.ExportFormats;
+import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;
@@ -205,11 +205,11 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         if (CitationStyle.isCitationStyleFile(style)) {
             if (basePanel.isPresent()) {
                 layout = Optional.empty();
-                CitationStyle citationStyle = CitationStyle.createCitationStyleFromFile(style);
-                if (citationStyle != null) {
+                CitationStyle.createCitationStyleFromFile(style)
+                        .ifPresent(citationStyle -> {
                     basePanel.get().getCitationStyleCache().setCitationStyle(citationStyle);
                     basePanel.get().output(Localization.lang("Preview style changed to: %0", citationStyle.getTitle()));
-                }
+                        });
             }
         } else {
             updatePreviewLayout(previewPreferences.getPreviewStyle());
@@ -262,7 +262,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
     }
 
     public void update() {
-        ExportFormats.entryNumber = 1; // Set entry number in case that is included in the preview layout.
+        ExporterFactory.entryNumber = 1; // Set entry number in case that is included in the preview layout.
 
         if (citationStyleWorker.isPresent()) {
             citationStyleWorker.get().cancel(true);

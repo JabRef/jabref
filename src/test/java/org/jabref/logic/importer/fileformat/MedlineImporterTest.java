@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -63,7 +63,7 @@ public class MedlineImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(FileExtensions.MEDLINE, importer.getExtensions());
+        assertEquals(FileType.MEDLINE, importer.getFileType());
     }
 
     @Test

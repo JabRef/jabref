@@ -9,7 +9,6 @@ import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +19,7 @@ import org.jabref.JabRefMain;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -30,16 +29,16 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Base class for export formats based on templates.
  */
-public class ExportFormat implements IExportFormat {
+public class TemplateExporter implements Exporter {
 
     private static final String LAYOUT_PREFIX = "/resource/layout/";
 
-    private static final Log LOGGER = LogFactory.getLog(ExportFormat.class);
+    private static final Log LOGGER = LogFactory.getLog(TemplateExporter.class);
     private String displayName;
     private String consoleName;
     private String lfFileName;
     private String directory;
-    private FileExtensions extension;
+    private FileType extension;
     private Charset encoding; // If this value is set, it will be used to override
     // the default encoding for the getCurrentBasePanel.
     private LayoutFormatterPreferences layoutPreferences;
@@ -57,7 +56,7 @@ public class ExportFormat implements IExportFormat {
      * @param directory   Directory in which to find the layout file.
      * @param extension   Should contain the . (for instance .txt).
      */
-    public ExportFormat(String displayName, String consoleName, String lfFileName, String directory, FileExtensions extension) {
+    public TemplateExporter(String displayName, String consoleName, String lfFileName, String directory, FileType extension) {
         this.displayName = displayName;
         this.consoleName = consoleName;
         this.lfFileName = lfFileName;
@@ -77,8 +76,8 @@ public class ExportFormat implements IExportFormat {
      * @param layoutPreferences Preferences for layout
      * @param savePreferences Preferences for saving
      */
-    public ExportFormat(String displayName, String consoleName, String lfFileName, String directory, FileExtensions extension,
-            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
+    public TemplateExporter(String displayName, String consoleName, String lfFileName, String directory, FileType extension,
+                            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
         this(displayName, consoleName, lfFileName, directory, extension);
         this.layoutPreferences = layoutPreferences;
         this.savePreferences = savePreferences;
@@ -87,7 +86,7 @@ public class ExportFormat implements IExportFormat {
     /**
      * Empty default constructor for subclasses
      */
-    protected ExportFormat() {
+    protected TemplateExporter() {
         // intentionally empty
     }
 
@@ -103,15 +102,15 @@ public class ExportFormat implements IExportFormat {
     }
 
     /**
-     * @see IExportFormat#getConsoleName()
+     * @see Exporter#getId()
      */
     @Override
-    public String getConsoleName() {
+    public String getId() {
         return consoleName;
     }
 
     /**
-     * @see IExportFormat#getDisplayName()
+     * @see Exporter#getDisplayName()
      */
     @Override
     public String getDisplayName() {
@@ -124,15 +123,16 @@ public class ExportFormat implements IExportFormat {
      *
      * @param encoding The name of the encoding to use.
      */
-    public void setEncoding(Charset encoding) {
+    public TemplateExporter withEncoding(Charset encoding) {
         this.encoding = encoding;
+        return this;
     }
 
     /**
-     * @see IExportFormat#getExtension()
+     * @see Exporter#getFileType()
      */
     @Override
-    public FileExtensions getExtension() {
+    public FileType getFileType() {
         return extension;
     }
 
@@ -141,7 +141,7 @@ public class ExportFormat implements IExportFormat {
      * be read.
      * <p>
      * <p>
-     * Subclasses of ExportFormat are free to override and provide their own
+     * Subclasses of TemplateExporter are free to override and provide their own
      * implementation.
      *
      * @param filename the filename
@@ -181,14 +181,13 @@ public class ExportFormat implements IExportFormat {
     }
 
     @Override
-    public void performExport(final BibDatabaseContext databaseContext, final String file,
-            final Charset encoding, List<BibEntry> entries) throws Exception {
+    public void export(final BibDatabaseContext databaseContext, final Path file,
+                       final Charset encoding, List<BibEntry> entries) throws Exception {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (entries.isEmpty()) { // Do not export if no entries to export -- avoids exports with only template text
             return;
         }
-        Path outFile = Paths.get(file);
         SaveSession ss = null;
         if (this.encoding != null) {
             try {
@@ -252,9 +251,9 @@ public class ExportFormat implements IExportFormat {
             Map<String, Layout> layouts = new HashMap<>();
             Layout layout;
 
-            ExportFormats.entryNumber = 0;
+            ExporterFactory.entryNumber = 0;
             for (BibEntry entry : sorted) {
-                ExportFormats.entryNumber++; // Increment entry counter.
+                ExporterFactory.entryNumber++; // Increment entry counter.
                 // Get the layout
                 String type = entry.getType();
                 if (layouts.containsKey(type)) {
@@ -309,7 +308,7 @@ public class ExportFormat implements IExportFormat {
                 sb.append(String.join(", ", missingFormatters));
                 LOGGER.warn(sb);
             }
-            finalizeSaveSession(ss, outFile);
+            finalizeSaveSession(ss, file);
         }
 
     }

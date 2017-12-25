@@ -26,15 +26,15 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 @RunWith(Parameterized.class)
-public class ExportFormatTest {
+public class ExporterTest {
 
-    public IExportFormat exportFormat;
+    public Exporter exportFormat;
     public String exportFormatName;
     public BibDatabaseContext databaseContext;
     public Charset charset;
     public List<BibEntry> entries;
 
-    public ExportFormatTest(IExportFormat format, String name) {
+    public ExporterTest(Exporter format, String name) {
         exportFormat = format;
         exportFormatName = name;
     }
@@ -50,40 +50,37 @@ public class ExportFormatTest {
         entries = Collections.emptyList();
     }
 
+    @Parameterized.Parameters(name = "{index}: {1}")
+    public static Collection<Object[]> exportFormats() {
+        Collection<Object[]> result = new ArrayList<>();
+
+        Map<String, TemplateExporter> customFormats = new HashMap<>();
+        LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class);
+        SavePreferences savePreferences = mock(SavePreferences.class);
+        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences);
+
+        for (Exporter format : exporterFactory.getExporters()) {
+            result.add(new Object[]{format, format.getDisplayName()});
+        }
+        return result;
+    }
+
     @Test
     public void testExportingEmptyDatabaseYieldsEmptyFile() throws Exception {
         File tmpFile = testFolder.newFile();
-        String filename = tmpFile.getCanonicalPath();
-        exportFormat.performExport(databaseContext, filename, charset, entries);
+        exportFormat.export(databaseContext, tmpFile.toPath(), charset, entries);
         assertEquals(Collections.emptyList(), Files.readAllLines(tmpFile.toPath()));
     }
 
     @Test(expected = NullPointerException.class)
     public void testExportingNullDatabaseThrowsNPE() throws Exception {
         File tmpFile = testFolder.newFile();
-        String filename = tmpFile.getCanonicalPath();
-        exportFormat.performExport(null, filename, charset, entries);
+        exportFormat.export(null, tmpFile.toPath(), charset, entries);
     }
 
     @Test(expected = NullPointerException.class)
     public void testExportingNullEntriesThrowsNPE() throws Exception {
         File tmpFile = testFolder.newFile();
-        String filename = tmpFile.getCanonicalPath();
-        exportFormat.performExport(databaseContext, filename, charset, null);
-    }
-
-    @Parameterized.Parameters(name = "{index}: {1}")
-    public static Collection<Object[]> exportFormats() {
-        Collection<Object[]> result = new ArrayList<>();
-
-        Map<String, ExportFormat> customFormats = new HashMap<>();
-        LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class);
-        SavePreferences savePreferences = mock(SavePreferences.class);
-        ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
-
-        for (IExportFormat format : ExportFormats.getExportFormats().values()) {
-            result.add(new Object[] {format, format.getDisplayName()});
-        }
-        return result;
+        exportFormat.export(databaseContext, tmpFile.toPath(), charset, null);
     }
 }

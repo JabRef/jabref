@@ -7,12 +7,11 @@ import java.util.StringJoiner;
 import org.jabref.logic.l10n.Localization;
 
 /**
- * This enum contains all kind of file extensions for open and save dialogs.
+ * This enum contains a list of file types used in open and save dialogs.
  *
- * Important: Enter the extension without a dot! The dot is added implicitly.
+ * @implNote Enter the extensions without a dot! The dot is added implicitly.
  */
-public enum FileExtensions {
-    //important: No dot before the extension!
+public enum FileType {
     BIBTEX_DB(String.format("%1s %2s", "BibTex", Localization.lang("Library")), "bib"),
     BIBTEXML(Localization.lang("%0 file", "BibTeXML"), "bibx", "xml"),
     BILBIOSCAPE(Localization.lang("%0 file", "Biblioscape"), "txt"),
@@ -51,32 +50,27 @@ public enum FileExtensions {
     CSV(Localization.lang("%0 file", "CSV"), "csv"),
     DEFAULT(Localization.lang("%0 file", "DEFAULT"), "default");
 
-    private final String[] extension;
+    private final String[] extensions;
     private final String description;
 
-    private FileExtensions(String description, String... extension) {
-        this.extension = extension;
+    FileType(String description, String... extensions) {
         this.description = description;
+        this.extensions = extensions;
     }
 
-    //Array because a) is varags and b) gets passed as varags parameter to FileExtensionNameFilter
-    public String[] getExtensions() {
-        return extension;
-    }
-
-    public List<String> getExtensionsAsList() {
-        return Arrays.asList(extension);
+    public List<String> getExtensions() {
+        return Arrays.asList(extensions);
     }
 
     public String getDescription() {
         StringJoiner sj = new StringJoiner(", ", description + " (", ")");
-        for (String ext : extension) {
+        for (String ext : extensions) {
             sj.add("*." + ext);
         }
         return sj.toString();
     }
 
     public String getFirstExtensionWithDot() {
-        return "." + extension[0].trim();
+        return "." + extensions[0].trim();
     }
 }
