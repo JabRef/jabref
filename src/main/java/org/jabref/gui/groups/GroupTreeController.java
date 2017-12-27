@@ -90,10 +90,10 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                 this::updateSelection
         );
 
-        // We try to to prevent publishing changes in the searchfield directly to the search task that takes some time
+        // We try to to prevent publishing changes in the search field directly to the search task that takes some time
         // for larger group structures.
         final Timer searchTask = FxTimer.create(Duration.ofMillis(400), () -> {
-            LOGGER.info("Run Search " + searchField.getText());
+            LOGGER.debug("Run group search " + searchField.getText());
             viewModel.filterTextProperty().setValue(searchField.textProperty().getValue());
         });
         searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());

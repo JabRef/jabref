@@ -1,8 +1,6 @@
 package org.jabref.gui.util;
 
-import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -15,7 +13,6 @@ import javafx.collections.transformation.FilteredList;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.util.Callback;
-import javafx.util.Pair;
 
 /**
  * Taken from https://gist.github.com/lestard/011e9ed4433f9eb791a8
@@ -25,8 +22,7 @@ public class RecursiveTreeItem<T> extends TreeItem<T> {
     private final Callback<T, BooleanProperty> expandedProperty;
     private Callback<T, ObservableList<T>> childrenFactory;
     private ObjectProperty<Predicate<T>> filter = new SimpleObjectProperty<>();
-    private FilteredList<T> children;
-    private Pair<T, Boolean> lastVisibility;
+    private FilteredList<RecursiveTreeItem<T>> children;
 
     public RecursiveTreeItem(final T value, Callback<T, ObservableList<T>> func) {
         this(value, func, null, null);
@@ -69,51 +65,38 @@ public class RecursiveTreeItem<T> extends TreeItem<T> {
     }
 
     private void addChildrenListener(T value) {
-        children = new FilteredList<>(childrenFactory.call(value));
+        children = new FilteredList<>(
+                BindingsHelper.mapBacked(childrenFactory.call(value),
+                        child -> new RecursiveTreeItem<>(child, getGraphic(), childrenFactory, expandedProperty, filter)));
         children.predicateProperty().bind(Bindings.createObjectBinding(() -> this::showNode, filter));
 
-        addAsChildren(children, 0);
+        getChildren().addAll(0, children);
 
-        children.addListener((ListChangeListener<T>) change -> {
+        children.addListener((ListChangeListener<RecursiveTreeItem<T>>) change -> {
             while (change.next()) {
 
                 if (change.wasRemoved()) {
-                    change.getRemoved().forEach(t -> {
-                        final List<TreeItem<T>> itemsToRemove = getChildren().stream().filter(treeItem -> treeItem.getValue().equals(t)).collect(Collectors.toList());
-                        getChildren().removeAll(itemsToRemove);
-                    });
+                    getChildren().removeAll(change.getRemoved());
                 }
 
                 if (change.wasAdded()) {
-                    addAsChildren(change.getAddedSubList(), change.getFrom());
+                    getChildren().addAll(change.getFrom(), change.getAddedSubList());
                 }
             }
         });
     }
 
-    private void addAsChildren(List<? extends T> children, int startIndex) {
-        List<RecursiveTreeItem<T>> treeItems = children.stream().map(child -> new RecursiveTreeItem<>(child, getGraphic(), childrenFactory, expandedProperty, filter)).collect(Collectors.toList());
-        getChildren().addAll(startIndex, treeItems);
-    }
-
-    private boolean showNode(T t) {
+    private boolean showNode(RecursiveTreeItem<T> node) {
         if (filter.get() == null) {
             return true;
         }
 
-        if (lastVisibility != null && lastVisibility.getKey().equals(t)) {
-            return lastVisibility.getValue();
-        }
-
-        if (filter.get().test(t)) {
+        if (filter.get().test(node.getValue())) {
             // Node is directly matched -> so show it
-            lastVisibility = new Pair<>(t, true);
             return true;
         }
 
         // Are there children (or children of children...) that are matched? If yes we also need to show this node
-        final boolean isShown = childrenFactory.call(t).stream().anyMatch(this::showNode);
-        lastVisibility = new Pair<>(t, isShown);
-        return isShown;
+        return node.children.getSource().stream().anyMatch(this::showNode);
     }
 }
