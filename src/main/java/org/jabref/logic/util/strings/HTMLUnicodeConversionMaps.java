@@ -896,7 +896,7 @@ public class HTMLUnicodeConversionMaps {
         LATEX_HTML_CONVERSION_MAP.put("relax", "");
         LATEX_UNICODE_CONVERSION_MAP.put("relax", "");
         // Support a special version of apostrophe
-        LATEX_HTML_CONVERSION_MAP.put("textquotesingle", "&apos;");
+        LATEX_HTML_CONVERSION_MAP.put("textquotesingle", "&#39;");
         LATEX_UNICODE_CONVERSION_MAP.put("textquotesingle", "'"); // apostrophe, U+00027
     }
 
