@@ -23,10 +23,10 @@ import org.jabref.model.entry.BibEntry;
 /**
  * TemplateExporter for exporting in MSBIB XML format.
  */
-class MSBibExporter extends TemplateExporter {
+class MSBibExporter extends Exporter {
 
     public MSBibExporter() {
-        super("MS Office 2007", "MSBib", null, null, FileType.XML);
+        super("MSBib", "MS Office 2007", FileType.XML);
     }
 
     @Override
@@ -52,7 +52,7 @@ class MSBibExporter extends TemplateExporter {
             } catch (TransformerException | IllegalArgumentException | TransformerFactoryConfigurationError e) {
                 throw new Error(e);
             }
-            finalizeSaveSession(session, file);
+            session.finalize(file);
         } catch (IOException ex) {
             throw new SaveException(ex);
         }

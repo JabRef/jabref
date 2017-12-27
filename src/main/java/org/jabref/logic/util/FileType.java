@@ -3,6 +3,7 @@ package org.jabref.logic.util;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.l10n.Localization;
 
@@ -72,5 +73,9 @@ public enum FileType {
 
     public String getFirstExtensionWithDot() {
         return "." + extensions[0].trim();
+    }
+
+    public List<String> getExtensionsWithDot() {
+        return getExtensions().stream().map(extension -> "." + extension).collect(Collectors.toList());
     }
 }

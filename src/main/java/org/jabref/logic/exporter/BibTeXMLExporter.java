@@ -47,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Export format for the BibTeXML format.
  */
-public class BibTeXMLExporter extends TemplateExporter {
+public class BibTeXMLExporter extends Exporter {
 
     private static final String BIBTEXML_NAMESPACE_URI = "http://bibtexml.sf.net/";
     private static final Locale ENGLISH = Locale.ENGLISH;
@@ -55,7 +55,7 @@ public class BibTeXMLExporter extends TemplateExporter {
     private JAXBContext context;
 
     public BibTeXMLExporter() {
-        super("BibTeXML", "bibtexml", null, null, FileType.XML);
+        super("bibtexml", "BibTeXML", FileType.XML);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class BibTeXMLExporter extends TemplateExporter {
         for (BibEntry bibEntry : entries) {
             Entry entry = new Entry();
 
-            bibEntry.getCiteKeyOptional().ifPresent(citeKey -> entry.setId(citeKey));
+            bibEntry.getCiteKeyOptional().ifPresent(entry::setId);
 
             String type = bibEntry.getType().toLowerCase(ENGLISH);
             switch (type) {
@@ -240,7 +240,7 @@ public class BibTeXMLExporter extends TemplateExporter {
     }
 
     private <T> List<Method> getListOfSetMethods(T entryType) {
-        return Arrays.asList(entryType.getClass().getDeclaredMethods()).stream()
+        return Arrays.stream(entryType.getClass().getDeclaredMethods())
                 .filter(method -> method.getName().startsWith("set")).collect(Collectors.toList());
     }
 

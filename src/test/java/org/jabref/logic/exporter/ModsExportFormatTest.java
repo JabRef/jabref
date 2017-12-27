@@ -6,12 +6,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.List;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,7 +33,6 @@ public class ModsExportFormatTest {
     public TemporaryFolder testFolder = new TemporaryFolder();
     private Path importFile;
 
-
     @Before
     public void setUp() throws Exception {
         databaseContext = new BibDatabaseContext();
@@ -44,13 +41,6 @@ public class ModsExportFormatTest {
         bibtexImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
         tempFile = testFolder.newFile().toPath();
         importFile = Paths.get(ModsExportFormatTest.class.getResource("ModsExportFormatTestAllFields.bib").toURI());
-    }
-
-    @Test(expected = SaveException.class)
-    public final void exportForNonexistentPathThrowsSaveException() throws Exception {
-        List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
-
-        modsExportFormat.export(databaseContext, Paths.get("non-existing"), charset, entries);
     }
 
     @Test

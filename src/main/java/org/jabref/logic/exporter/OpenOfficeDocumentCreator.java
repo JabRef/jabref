@@ -13,6 +13,7 @@ import java.io.Writer;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +37,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * @author alver
  */
-public class OpenOfficeDocumentCreator extends TemplateExporter {
+public class OpenOfficeDocumentCreator extends Exporter {
 
     private static final Log LOGGER = LogFactory.getLog(OpenOfficeDocumentCreator.class);
 
@@ -45,11 +46,11 @@ public class OpenOfficeDocumentCreator extends TemplateExporter {
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenOfficeDocumentCreator() {
-        super("OpenOffice/LibreOffice Calc", "oocalc", null, null, FileType.SXC);
+        super("oocalc", "OpenOffice/LibreOffice Calc", FileType.SXC);
     }
 
     private static void storeOpenOfficeFile(Path file, InputStream source) throws Exception {
-        try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file.toFile())))) {
+        try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(file)))) {
             ZipEntry zipEntry = new ZipEntry("content.xml");
             out.putNextEntry(zipEntry);
             int c;

@@ -13,6 +13,7 @@ import java.io.Writer;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * @author alver
  */
-public class OpenDocumentSpreadsheetCreator extends TemplateExporter {
+public class OpenDocumentSpreadsheetCreator extends Exporter {
 
     private static final Log LOGGER = LogFactory.getLog(OpenDocumentSpreadsheetCreator.class);
 
@@ -47,12 +48,12 @@ public class OpenDocumentSpreadsheetCreator extends TemplateExporter {
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenDocumentSpreadsheetCreator() {
-        super(Localization.lang("OpenDocument spreadsheet"), "ods", null, null, FileType.ODS);
+        super("ods", Localization.lang("OpenDocument spreadsheet"), FileType.ODS);
     }
 
     private static void storeOpenDocumentSpreadsheetFile(Path file, InputStream source) throws IOException {
 
-        try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file.toFile())))) {
+        try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(file)))) {
 
             //addResourceFile("mimetype", "/resource/ods/mimetype", out);
             ZipEntry ze = new ZipEntry("mimetype");

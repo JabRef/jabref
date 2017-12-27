@@ -8,22 +8,38 @@ import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-public interface Exporter {
+public abstract class Exporter {
+
+    private String id;
+    private String displayName;
+    private FileType fileType;
+
+    public Exporter(String id, String displayName, FileType fileType) {
+        this.id = id;
+        this.displayName = displayName;
+        this.fileType = fileType;
+    }
 
     /**
      * Returns a one-word ID (used, for example, to identify the exporter in the console).
      */
-    String getId();
+    public String getId() {
+        return id;
+    }
 
     /**
      * Returns the name of the exporter (to display to the user).
      */
-    String getDisplayName();
+    public String getDisplayName() {
+        return displayName;
+    }
 
     /**
      * Returns the type of files this exporter creates.
      */
-    FileType getFileType();
+    public FileType getFileType() {
+        return fileType;
+    }
 
     /**
      * Performs the export.
@@ -33,9 +49,9 @@ public interface Exporter {
      * @param encoding        the encoding to use
      * @param entries         a list containing all entries that should be exported
      */
-    void export(BibDatabaseContext databaseContext, Path file, Charset encoding, List<BibEntry> entries) throws Exception;
+    public abstract void export(BibDatabaseContext databaseContext, Path file, Charset encoding, List<BibEntry> entries) throws Exception;
 
-    default String getDescription() {
+    public String getDescription() {
         return getFileType().getDescription();
     }
 }

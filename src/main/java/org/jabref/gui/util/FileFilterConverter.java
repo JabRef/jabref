@@ -1,4 +1,4 @@
-package org.jabref.gui.importer;
+package org.jabref.gui.util;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,10 +18,19 @@ public class FileFilterConverter {
     private FileFilterConverter() {
     }
 
+    public static FileChooser.ExtensionFilter toExtensionFilter(FileType fileType) {
+        return new FileChooser.ExtensionFilter(fileType.getDescription(),
+                fileType.getExtensions().stream().map(ending -> "*." + ending).collect(Collectors.toList()));
+    }
+
     private static FileChooser.ExtensionFilter convertImporter(String description, Collection<Importer> formats) {
         List<FileType> fileTypes = formats.stream().map(Importer::getFileType).collect(Collectors.toList());
-        List<String> flatExtensions = fileTypes.stream().flatMap(extList -> extList.getExtensions().stream())
-                .map(ending -> "*." + ending)
+        return toExtensionFilter(description, fileTypes);
+    }
+
+    private static FileChooser.ExtensionFilter toExtensionFilter(String description, List<FileType> fileTypes) {
+        List<String> flatExtensions = fileTypes.stream().flatMap(extList -> extList.getExtensionsWithDot().stream())
+                .map(ending -> "*" + ending)
                 .collect(Collectors.toList());
 
         return new FileChooser.ExtensionFilter(description, flatExtensions.toArray(new String[flatExtensions.size()]));

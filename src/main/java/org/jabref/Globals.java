@@ -49,13 +49,13 @@ public class Globals {
      * Manager for the state of the GUI.
      */
     public static StateManager stateManager = new StateManager();
+    public static ExporterFactory exportFactory;
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
     // Background tasks
     private static GlobalFocusListener focusListener;
     private static FileUpdateMonitor fileUpdateMonitor;
     private static TelemetryClient telemetryClient;
-    public static ExporterFactory exportFactory;
 
     private Globals() {
     }

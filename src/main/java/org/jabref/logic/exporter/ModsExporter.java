@@ -52,7 +52,7 @@ import org.jabref.model.entry.FieldName;
 /**
  * TemplateExporter for exporting in MODS XML format.
  */
-class ModsExporter extends TemplateExporter {
+class ModsExporter extends Exporter {
 
     protected static final String MODS_NAMESPACE_URI = "http://www.loc.gov/mods/v3";
     private static final String MINUS = "-";
@@ -61,7 +61,7 @@ class ModsExporter extends TemplateExporter {
     private JAXBContext context;
 
     public ModsExporter() {
-        super("MODS", "mods", null, null, FileType.XML);
+        super("mods", "MODS", FileType.XML);
     }
 
     @Override

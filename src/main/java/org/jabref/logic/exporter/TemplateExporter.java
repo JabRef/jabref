@@ -29,21 +29,16 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Base class for export formats based on templates.
  */
-public class TemplateExporter implements Exporter {
+public class TemplateExporter extends Exporter {
 
     private static final String LAYOUT_PREFIX = "/resource/layout/";
 
     private static final Log LOGGER = LogFactory.getLog(TemplateExporter.class);
-    private String displayName;
-    private String consoleName;
-    private String lfFileName;
-    private String directory;
-    private FileType extension;
-    private Charset encoding; // If this value is set, it will be used to override
-    // the default encoding for the getCurrentBasePanel.
-    private LayoutFormatterPreferences layoutPreferences;
-
-    private SavePreferences savePreferences;
+    private final String lfFileName;
+    private final String directory;
+    private final LayoutFormatterPreferences layoutPreferences;
+    private final SavePreferences savePreferences;
+    private Charset encoding; // If this value is set, it will be used to override the default encoding for the getCurrentBasePanel.
     private boolean customExport;
 
     /**
@@ -57,11 +52,7 @@ public class TemplateExporter implements Exporter {
      * @param extension   Should contain the . (for instance .txt).
      */
     public TemplateExporter(String displayName, String consoleName, String lfFileName, String directory, FileType extension) {
-        this.displayName = displayName;
-        this.consoleName = consoleName;
-        this.lfFileName = lfFileName;
-        this.directory = directory;
-        this.extension = extension;
+        this(displayName, consoleName, lfFileName, directory, extension, null, null);
     }
 
     /**
@@ -78,16 +69,11 @@ public class TemplateExporter implements Exporter {
      */
     public TemplateExporter(String displayName, String consoleName, String lfFileName, String directory, FileType extension,
                             LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
-        this(displayName, consoleName, lfFileName, directory, extension);
+        super(consoleName, displayName, extension);
+        this.lfFileName = Objects.requireNonNull(lfFileName);
+        this.directory = directory;
         this.layoutPreferences = layoutPreferences;
         this.savePreferences = savePreferences;
-    }
-
-    /**
-     * Empty default constructor for subclasses
-     */
-    protected TemplateExporter() {
-        // intentionally empty
     }
 
     /**
@@ -102,22 +88,6 @@ public class TemplateExporter implements Exporter {
     }
 
     /**
-     * @see Exporter#getId()
-     */
-    @Override
-    public String getId() {
-        return consoleName;
-    }
-
-    /**
-     * @see Exporter#getDisplayName()
-     */
-    @Override
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    /**
      * Set an encoding which will be used in preference to the default value
      * obtained from the basepanel.
      *
@@ -126,14 +96,6 @@ public class TemplateExporter implements Exporter {
     public TemplateExporter withEncoding(Charset encoding) {
         this.encoding = encoding;
         return this;
-    }
-
-    /**
-     * @see Exporter#getFileType()
-     */
-    @Override
-    public FileType getFileType() {
-        return extension;
     }
 
     /**
@@ -308,7 +270,7 @@ public class TemplateExporter implements Exporter {
                 sb.append(String.join(", ", missingFormatters));
                 LOGGER.warn(sb);
             }
-            finalizeSaveSession(ss, file);
+            ss.finalize(file);
         }
 
     }
@@ -349,15 +311,5 @@ public class TemplateExporter implements Exporter {
                 LOGGER.warn("Problem opening formatter file.", ex);
             }
         }
-    }
-
-    public void finalizeSaveSession(final SaveSession ss, Path file) throws SaveException, IOException {
-        ss.getWriter().flush();
-        ss.getWriter().close();
-
-        if (!ss.getWriter().couldEncodeAll()) {
-            LOGGER.warn("Could not encode...");
-        }
-        ss.commit(file);
     }
 }

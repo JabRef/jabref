@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 
@@ -61,18 +60,13 @@ public class FileDialogConfiguration {
         private FileChooser.ExtensionFilter defaultExtension;
         private String initialFileName;
 
-        public Builder addExtensionFilter(FileType extension) {
-            extensionFilters.add(toFilter(extension));
+        public Builder addExtensionFilter(FileType fileType) {
+            extensionFilters.add(FileFilterConverter.toExtensionFilter(fileType));
             return this;
         }
 
-        private FileChooser.ExtensionFilter toFilter(FileType extension) {
-            return new FileChooser.ExtensionFilter(extension.getDescription(),
-                    extension.getExtensions().stream().map(ending -> "*." + ending).collect(Collectors.toList()));
-        }
-
-        public Builder addExtensionFilters(Collection<FileType> extensions) {
-            extensions.forEach(this::addExtensionFilter);
+        public Builder addExtensionFilters(Collection<FileType> fileTypes) {
+            fileTypes.forEach(this::addExtensionFilter);
             return this;
         }
 
@@ -107,8 +101,8 @@ public class FileDialogConfiguration {
             return this;
         }
 
-        public Builder withDefaultExtension(FileType extension) {
-            defaultExtension = toFilter(extension);
+        public Builder withDefaultExtension(FileType fileType) {
+            defaultExtension = FileFilterConverter.toExtensionFilter(fileType);
             return this;
         }
 
