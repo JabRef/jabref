@@ -51,11 +51,19 @@ public class WebFetchersTest {
 
     @Test
     public void getSearchBasedFetchersReturnsAllFetcherDerivingFromSearchBasedFetcher() throws Exception {
-        List<SearchBasedFetcher> idFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences);
+        List<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences);
 
         Set<Class<? extends SearchBasedFetcher>> expected = reflections.getSubTypesOf(SearchBasedFetcher.class);
         expected.remove(SearchBasedParserFetcher.class);
-        assertEquals(expected, getClasses(idFetchers));
+        assertEquals(expected, getClasses(searchBasedFetchers));
+    }
+
+    @Test
+    public void getFullTextFetchersReturnsAllFetcherDerivingFromFullTextFetcher() throws Exception {
+        List<FulltextFetcher> fullTextFetchers = WebFetchers.getFullTextFetchers(importFormatPreferences);
+
+        Set<Class<? extends FulltextFetcher>> expected = reflections.getSubTypesOf(FulltextFetcher.class);
+        assertEquals(expected, getClasses(fullTextFetchers));
     }
 
     @Test
