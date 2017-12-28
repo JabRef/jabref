@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -29,11 +28,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.undo.CannotRedoException;
@@ -41,7 +37,10 @@ import javax.swing.undo.CannotUndoException;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
+import javafx.geometry.Orientation;
 import javafx.scene.Scene;
+import javafx.scene.control.SplitPane;
+import javafx.scene.layout.StackPane;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
@@ -148,13 +147,11 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.fxmisc.easybind.EasyBind;
 
-public class BasePanel extends JPanel implements ClipboardOwner {
+public class BasePanel extends StackPane implements ClipboardOwner {
 
     private static final Log LOGGER = LogFactory.getLog(BasePanel.class);
-
-    // Divider size for BaseFrame split pane. 0 means non-resizable.
-    private static final int SPLIT_PANE_DIVIDER_SIZE = 4;
 
     private final BibDatabaseContext bibDatabaseContext;
     private final MainTableDataModel tableModel;
@@ -180,7 +177,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
     private EntryEditor currentEditor;
     private MainTableSelectionListener selectionListener;
-    private JSplitPane splitPane;
+    private SplitPane splitPane;
     private boolean saving;
 
     // AutoCompleter used in the search bar
@@ -1348,8 +1345,8 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     public void setupMainPanel() {
-        splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        splitPane.setDividerSize(SPLIT_PANE_DIVIDER_SIZE);
+        splitPane = new SplitPane();
+        splitPane.setOrientation(Orientation.HORIZONTAL);
         adjustSplitter(); // restore last splitting state (before mainTable is created as creation affects the stored size of the entryEditors)
 
         // check whether a mainTable already existed and a floatSearch was active
@@ -1357,26 +1354,17 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 
         createMainTable();
 
-        splitPane.setTopComponent(mainTable.getPane());
+        splitPane.getItems().add(mainTable.getPane());
 
-        // Remove borders
-        splitPane.setBorder(BorderFactory.createEmptyBorder());
-        setBorder(BorderFactory.createEmptyBorder());
-
-        // If an entry is currently being shown, make sure it stays shown,
-        // otherwise set the bottom component to null.
+        // If an entry is currently being shown, make sure it stays shown.
         if (mode == BasePanelMode.SHOWING_PREVIEW) {
             mode = BasePanelMode.SHOWING_NOTHING;
             highlightEntry(selectionListener.getPreview().getEntry());
         } else if (mode == BasePanelMode.SHOWING_EDITOR) {
             mode = BasePanelMode.SHOWING_NOTHING;
-        } else {
-            splitPane.setBottomComponent(null);
         }
 
-        setLayout(new BorderLayout());
-        removeAll();
-        add(splitPane, BorderLayout.CENTER);
+        this.getChildren().setAll(splitPane);
 
         // Set up name autocompleter for search:
         instantiateSearchAutoCompleter();
@@ -1390,12 +1378,8 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             mainTable.showFloatSearch();
         }
 
-        splitPane.revalidate();
-        revalidate();
-        repaint();
-
         // saves the divider position as soon as it changes
-        splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, event -> saveDividerLocation());
+        EasyBind.subscribe(splitPane.getDividers().get(0).positionProperty(), position -> saveDividerLocation(position));
     }
 
     /**
@@ -1446,16 +1430,14 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 
     public void adjustSplitter() {
         if (mode == BasePanelMode.SHOWING_PREVIEW) {
-            splitPane.setDividerLocation(
-                    splitPane.getHeight() - Globals.prefs.getPreviewPreferences().getPreviewPanelHeight());
+            splitPane.setDividerPositions(Globals.prefs.getPreviewPreferences().getPreviewPanelDividerPosition().doubleValue());
         } else {
-            splitPane.setDividerLocation(
-                    splitPane.getHeight() - Globals.prefs.getInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT));
+            splitPane.setDividerPositions(Globals.prefs.getDouble(JabRefPreferences.ENTRY_EDITOR_HEIGHT));
         }
     }
 
     private boolean isShowingEditor() {
-        return (splitPane.getBottomComponent() != null) && (splitPane.getBottomComponent() instanceof EntryEditor);
+        return mode == BasePanelMode.SHOWING_EDITOR;
     }
 
     public void showEntry(final BibEntry bibEntry) {
@@ -1516,16 +1498,12 @@ public class BasePanel extends JPanel implements ClipboardOwner {
      * @param editor The entry editor to add.
      */
     public void showEntryEditor(EntryEditor editor) {
-        if (mode == BasePanelMode.SHOWING_EDITOR) {
-            Globals.prefs.putInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT,
-                    splitPane.getHeight() - splitPane.getDividerLocation());
-        }
         mode = BasePanelMode.SHOWING_EDITOR;
         if (currentEditor != null) {
             currentEditor.setMovingToDifferentEntry();
         }
         currentEditor = editor;
-        splitPane.setBottomComponent(editor);
+        splitPane.getItems().set(1, editor);
         if (editor.getEntry() != getShowing()) {
             newEntryShowing(editor.getEntry());
         }
@@ -1790,20 +1768,17 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     /**
-     * Depending on whether a preview or an entry editor is showing, save the current divider location in the correct
-     * preference setting.
+     * Depending on whether a preview or an entry editor is showing, save the current divider location in the correct preference setting.
      */
-    public void saveDividerLocation() {
+    private void saveDividerLocation(Number position) {
         if (mode == BasePanelMode.SHOWING_PREVIEW) {
-            int previewPanelHeight = splitPane.getHeight() - splitPane.getDividerLocation();
             PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
                     .getBuilder()
-                    .withPreviewPanelHeight(previewPanelHeight)
+                    .withPreviewPanelDividerPosition(position)
                     .build();
             Globals.prefs.storePreviewPreferences(previewPreferences);
         } else if (mode == BasePanelMode.SHOWING_EDITOR) {
-            Globals.prefs.putInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT,
-                    splitPane.getHeight() - splitPane.getDividerLocation());
+            Globals.prefs.putDouble(JabRefPreferences.ENTRY_EDITOR_HEIGHT, position.doubleValue());
         }
     }
 

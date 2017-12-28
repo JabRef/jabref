@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Panel;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
@@ -100,7 +101,7 @@ import org.fxmisc.easybind.EasyBind;
  * events whenever a field of the entry changes, enabling the text fields to
  * update themselves if the change is made from somewhere else.
  */
-public class EntryEditor extends JPanel implements EntryContainer {
+public class EntryEditor extends Panel implements EntryContainer {
 
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 

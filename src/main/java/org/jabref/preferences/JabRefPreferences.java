@@ -1015,6 +1015,10 @@ public class JabRefPreferences implements PreferencesService {
         return prefs.getInt(key, getIntDefault(key));
     }
 
+    public double getDouble(String key) {
+        return prefs.getDouble(key, getDoubleDefault(key));
+    }
+
     public int getIntDefault(String key) {
         if (key.equals(JabRefPreferences.MENU_FONT_SIZE)) {
             Integer menuFontSize = (Integer) defaults.get(key);
@@ -1028,6 +1032,10 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
+    private double getDoubleDefault(String key) {
+        return (double) defaults.get(key);
+    }
+
     public void put(String key, String value) {
         prefs.put(key, value);
     }
@@ -1038,6 +1046,10 @@ public class JabRefPreferences implements PreferencesService {
 
     public void putInt(String key, int value) {
         prefs.putInt(key, value);
+    }
+
+    public void putDouble(String key, double value) {
+        prefs.putDouble(key, value);
     }
 
     public void remove(String key) {
@@ -1454,7 +1466,7 @@ public class JabRefPreferences implements PreferencesService {
     public JabRefPreferences storePreviewPreferences(PreviewPreferences previewPreferences) {
         putInt(CYCLE_PREVIEW_POS, previewPreferences.getPreviewCyclePosition());
         putStringList(CYCLE_PREVIEW, previewPreferences.getPreviewCycle());
-        putInt(PREVIEW_PANEL_HEIGHT, previewPreferences.getPreviewPanelHeight());
+        putDouble(PREVIEW_PANEL_HEIGHT, previewPreferences.getPreviewPanelDividerPosition().doubleValue());
         put(PREVIEW_STYLE, previewPreferences.getPreviewStyle());
         putBoolean(PREVIEW_ENABLED, previewPreferences.isPreviewPanelEnabled());
         return this;
