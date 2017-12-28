@@ -25,5 +25,6 @@ public enum FieldProperty {
     MULTIPLE_ENTRY_LINK,
     PUBLICATION_STATE,
     MULTILINE_TEXT,
-    VERBATIM
+    VERBATIM,
+    KEY
 }
