@@ -77,7 +77,6 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.integrity.BracesCorrector;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQueryHighlightListener;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabase;
@@ -165,7 +164,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         BorderLayout layout = new BorderLayout();
         setLayout(layout);
 
-        container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+        container = CustomJFXPanel.create();
         // Create type-label
         typeLabel = new TypeLabel("");
         setupToolBar();

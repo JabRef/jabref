@@ -79,6 +79,17 @@ public class Localization {
     }
 
     /**
+     * Return the translated string for usage in JavaFX menus.
+     *
+     * @implNote This is only a temporary workaround. In the long term, the & sign should be removed from the language
+     * files.
+     */
+    public static String menuTitleFX(String key, String... params) {
+        // Remove & sign, which is not used by JavaFX to signify the shortcut
+        return menuTitle(key, params).replace("&", "");
+    }
+
+    /**
      * Sets the language and loads the appropriate translations. Note, that this function should be called before any
      * other function of this class.
      *

@@ -16,6 +16,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.jabref.logic.msbib.MSBibDatabase;
+import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -25,7 +26,7 @@ import org.jabref.model.entry.BibEntry;
 class MSBibExportFormat extends ExportFormat {
 
     public MSBibExportFormat() {
-        super("MS Office 2007", "MSBib", null, null, ".xml");
+        super("MS Office 2007", "MSBib", null, null, FileExtensions.XML);
     }
 
     @Override
