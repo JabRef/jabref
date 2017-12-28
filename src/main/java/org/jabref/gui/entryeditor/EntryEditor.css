@@ -10,8 +10,8 @@
 .editorPane {
     -fx-hgap: 10;
     -fx-vgap: 6;
-    -fx-background-color: text-area-background;
-    -fx-padding: 5 0 0 5;
+    -fx-background-color: -fx-light-background;
+    -fx-padding: 5 5 0 15;
 }
 
 .date-picker > .date-picker-display-node {
@@ -34,4 +34,56 @@
 
 .list-cell:odd {
     -fx-background-color: text-area-background;
+}
+
+#typeLabel {
+    -fx-padding: 0.1em;
+    -fx-font-size: 1.166667em;
+    -fx-font-weight: bold;
+}
+
+.flatButton.narrow {
+    -fx-padding: 0.1em;
+}
+
+.flatButtonNoSpaceBottom.narrow {
+    -fx-padding: 0.1em 0.1em -0.2em 0.1em;
+}
+
+.flatButtonNoSpaceTop.narrow {
+    -fx-padding: -0.2em 0.1em 0.1em 0.1em;
+}
+
+#tabbed {
+    -fx-open-tab-animation: NONE;
+    -fx-close-tab-animation: NONE;
+}
+
+#tabbed > .tab-header-area > .tab-header-background {
+    -fx-background-color: #dadad8;
+}
+
+#tabbed > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-light-background;
+}
+
+#tabbed > .tab-header-area .glyph-icon {
+    -glyph-size: 13px;
+}
+
+#tabbed > .tab-header-area {
+    -fx-padding: 0.416667em 5 0.0em 0em;
+}
+
+.editorPane .glyph-icon {
+    -glyph-size: 16px;
+}
+
+.tool-bar {
+    -fx-background-color: #dadad8;
+    -fx-background-insets: 0;
+}
+
+.tool-bar > .container > .separator {
+    -fx-background-color: #5e5f5e;
 }

@@ -4,8 +4,6 @@ import java.util.concurrent.Future;
 
 import javafx.concurrent.Task;
 
-import org.jabref.gui.externalfiles.FileDownloadTask;
-
 /**
  * An object that executes submitted {@link Task}s. This
  * interface provides a way of decoupling task submission from the
@@ -21,13 +19,6 @@ public interface TaskExecutor {
      * @param task the task to run
      */
     <V> Future<?> execute(BackgroundTask<V> task);
-
-    /**
-     * Runs the given download task.
-     *
-     * @param downloadTask the task to run
-     */
-    void execute(FileDownloadTask downloadTask);
 
     /**
      * Shutdown the task executor.

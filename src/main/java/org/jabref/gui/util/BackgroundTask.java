@@ -4,7 +4,13 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
+
+import org.fxmisc.easybind.EasyBind;
 
 /**
  * This class is essentially a wrapper around {@link Task}.
@@ -14,19 +20,41 @@ import javafx.concurrent.Task;
  *
  * @param <V> type of the return value of the task
  */
-public class BackgroundTask<V> {
-    private final Callable<V> callable;
+public abstract class BackgroundTask<V> {
     private Runnable onRunning;
     private Consumer<V> onSuccess;
     private Consumer<Exception> onException;
     private Runnable onFinished;
+    private ObjectProperty<BackgroundProgress> progress = new SimpleObjectProperty<>(new BackgroundProgress(0, 0));
+    private DoubleProperty workDone = new SimpleDoubleProperty(0);
 
-    private BackgroundTask(Callable<V> callable) {
-        this.callable = callable;
+    public BackgroundTask() {
+        workDone.bind(EasyBind.map(progressProperty(), BackgroundTask.BackgroundProgress::getWorkDone));
     }
 
     public static <V> BackgroundTask<V> wrap(Callable<V> callable) {
-        return new BackgroundTask<>(callable);
+        return new BackgroundTask<V>() {
+            @Override
+            protected V call() throws Exception {
+                return callable.call();
+            }
+        };
+    }
+
+    public double getWorkDone() {
+        return workDone.get();
+    }
+
+    public DoubleProperty workDoneProperty() {
+        return workDone;
+    }
+
+    public BackgroundProgress getProgress() {
+        return progress.get();
+    }
+
+    public ObjectProperty<BackgroundProgress> progressProperty() {
+        return progress;
     }
 
     private static <T> Consumer<T> chain(Runnable first, Consumer<T> second) {
@@ -60,9 +88,7 @@ public class BackgroundTask<V> {
         return this;
     }
 
-    V call() throws Exception {
-        return callable.call();
-    }
+    protected abstract V call() throws Exception;
 
     Runnable getOnRunning() {
         return onRunning;
@@ -92,5 +118,29 @@ public class BackgroundTask<V> {
     public BackgroundTask<V> onFinished(Runnable onFinished) {
         this.onFinished = onFinished;
         return this;
+    }
+
+    protected void updateProgress(double workDone, double max) {
+        progress.setValue(new BackgroundProgress(workDone, max));
+    }
+
+    public class BackgroundProgress {
+
+        private final double workDone;
+        private final double max;
+
+        public BackgroundProgress(double workDone, double max) {
+
+            this.workDone = workDone;
+            this.max = max;
+        }
+
+        public double getWorkDone() {
+            return workDone;
+        }
+
+        public double getMax() {
+            return max;
+        }
     }
 }

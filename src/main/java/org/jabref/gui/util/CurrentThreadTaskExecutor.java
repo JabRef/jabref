@@ -6,8 +6,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import org.jabref.gui.externalfiles.FileDownloadTask;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -46,11 +44,6 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
             }
             return new FailedFuture(exception);
         }
-    }
-
-    @Override
-    public void execute(FileDownloadTask downloadTask) {
-        downloadTask.run();
     }
 
     @Override
