@@ -341,7 +341,7 @@ public class IntegrityCheckTest {
         new IntegrityCheck(context,
                 mock(FileDirectoryPreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")))
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true)
                 .checkBibtexDatabase();
 
         assertEquals(clonedEntry, entry);
@@ -379,7 +379,7 @@ public class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FileDirectoryPreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")))
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true)
                 .checkBibtexDatabase();
         assertFalse(messages.toString(), messages.isEmpty());
     }
@@ -388,8 +388,8 @@ public class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FileDirectoryPreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW"))
-                ).checkBibtexDatabase();
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true
+        ).checkBibtexDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
 

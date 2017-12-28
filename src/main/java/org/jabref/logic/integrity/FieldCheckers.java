@@ -17,11 +17,11 @@ public class FieldCheckers {
 
     private Multimap<String, ValueChecker> fieldChecker;
 
-    public FieldCheckers(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences, JournalAbbreviationRepository abbreviationRepository) {
-        fieldChecker = getAllMap(databaseContext, fileDirectoryPreferences, abbreviationRepository);
+    public FieldCheckers(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences, JournalAbbreviationRepository abbreviationRepository, boolean enforceLegalKey) {
+        fieldChecker = getAllMap(databaseContext, fileDirectoryPreferences, abbreviationRepository, enforceLegalKey);
     }
 
-    private static Multimap<String, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences, JournalAbbreviationRepository abbreviationRepository) {
+    private static Multimap<String, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences, JournalAbbreviationRepository abbreviationRepository, boolean enforceLegalKey) {
         ArrayListMultimap<String, ValueChecker> fieldCheckers = ArrayListMultimap.create(50, 10);
 
         for (String field : InternalBibtexFields.getJournalNameFields()) {
@@ -47,7 +47,7 @@ public class FieldCheckers {
         fieldCheckers.put(FieldName.PAGES, new PagesChecker(databaseContext));
         fieldCheckers.put(FieldName.URL, new UrlChecker());
         fieldCheckers.put(FieldName.YEAR, new YearChecker());
-        fieldCheckers.put(FieldName.KEY, new ValidBibtexKeyChecker());
+        fieldCheckers.put(FieldName.KEY, new ValidBibtexKeyChecker(enforceLegalKey));
 
         return fieldCheckers;
     }

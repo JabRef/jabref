@@ -60,11 +60,11 @@ public class ChangeEntryTypeMenu {
             populateSubMenu(menu, Localization.lang("Custom"), EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBLATEX), entry, undoManager);
         } else {
             // Default BibTeX
-            populateSubMenu(menu, Localization.lang("BibTeX"), BibtexEntryTypes.ALL, entry, undoManager);
+            populateSubMenu(menu, Localization.BIBTEX, BibtexEntryTypes.ALL, entry, undoManager);
             menu.getItems().remove(0); // Remove separator
 
             // IEEETran
-            populateSubMenu(menu, Localization.lang("IEEETran"), IEEETranEntryTypes.ALL, entry, undoManager);
+            populateSubMenu(menu, "IEEETran", IEEETranEntryTypes.ALL, entry, undoManager);
 
             // Custom types
             populateSubMenu(menu, Localization.lang("Custom"), EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBTEX), entry, undoManager);

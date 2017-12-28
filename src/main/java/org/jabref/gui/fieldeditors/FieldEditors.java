@@ -34,7 +34,7 @@ public class FieldEditors {
 
         AutoCompleteSuggestionProvider<?> suggestionProvider = getSuggestionProvider(fieldName, suggestionProviders, databaseContext.getMetaData());
 
-        FieldCheckers fieldCheckers = new FieldCheckers(databaseContext, preferences.getFileDirectoryPreferences(), journalAbbreviationLoader.getRepository(journalAbbreviationPreferences));
+        FieldCheckers fieldCheckers = new FieldCheckers(databaseContext, preferences.getFileDirectoryPreferences(), journalAbbreviationLoader.getRepository(journalAbbreviationPreferences), preferences.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
 
         if (preferences.getTimestampPreferences().getTimestampField().equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
             if (fieldExtras.contains(FieldProperty.ISO_DATE)) {
