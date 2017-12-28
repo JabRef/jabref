@@ -53,17 +53,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final DoubleProperty downloadProgress = new SimpleDoubleProperty(-1);
     private final BooleanProperty downloadOngoing = new SimpleBooleanProperty(false);
     private final BooleanProperty isAutomaticallyFound = new SimpleBooleanProperty(false);
-
-    public boolean isCanWriteXMPMetadata() {
-        return canWriteXMPMetadata.get();
-    }
-
-    public BooleanProperty canWriteXMPMetadataProperty() {
-        return canWriteXMPMetadata;
-    }
-
     private final BooleanProperty canWriteXMPMetadata = new SimpleBooleanProperty(false);
-
     private final DialogService dialogService = new FXDialogService();
     private final BibEntry entry;
     private final TaskExecutor taskExecutor;
@@ -76,6 +66,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(100)));
         canWriteXMPMetadata.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
+    }
+
+    public BooleanProperty canWriteXMPMetadataProperty() {
+        return canWriteXMPMetadata;
     }
 
     public boolean isAutomaticallyFound() {
@@ -311,32 +305,30 @@ public class LinkedFileViewModel extends AbstractViewModel {
             LOGGER.warn("Could not find file " + linkedFile.getLink());
         }
         return true;
-
     }
 
     public void edit() {
         FileListEntryEditor editor = new FileListEntryEditor(linkedFile, false, true, databaseContext);
         SwingUtilities.invokeLater(() -> editor.setVisible(true, false));
-
     }
 
     public void writeXMPMetadata() {
         // Localization.lang("Writing XMP-metadata...")
         BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {
-                Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
-                if (!file.isPresent()) {
+            Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
+            if (!file.isPresent()) {
+                // TODO: Print error message
+                // Localization.lang("PDF does not exist");
+            } else {
+                try {
+                    XMPUtil.writeXMP(file.get(), entry, databaseContext.getDatabase(), Globals.prefs.getXMPPreferences());
+                } catch (IOException | TransformerException ex) {
                     // TODO: Print error message
-                    // Localization.lang("PDF does not exist");
-                } else {
-                    try {
-                        XMPUtil.writeXMP(file.get(), entry, databaseContext.getDatabase(), Globals.prefs.getXMPPreferences());
-                    } catch (IOException | TransformerException ex) {
-                        // TODO: Print error message
-                        // Localization.lang("Error while writing") + " '" + file.toString() + "': " + ex;
-                    }
+                    // Localization.lang("Error while writing") + " '" + file.toString() + "': " + ex;
                 }
-                return null;
-            });
+            }
+            return null;
+        });
 
         // Localization.lang("Finished writing XMP-metadata.")
 
