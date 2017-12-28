@@ -5,11 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
+import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.OptionalUtil;
 
 import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.ItemDataProvider;
@@ -90,8 +89,10 @@ public class CSLAdapter {
 
             // Not every field is already generated into latex free fields
             HTMLChars latexToHtmlConverter = new HTMLChars();
+            RemoveNewlinesFormatter removeNewlinesFormatter = new RemoveNewlinesFormatter();
             for (String key : bibEntry.getFieldMap().keySet()) {
                 bibEntry.getField(key)
+                        .map(removeNewlinesFormatter::format)
                         .map(latexToHtmlConverter::format)
                         .ifPresent(value -> bibTeXEntry.addField(new Key(key), new DigitStringValue(value)));
             }
@@ -106,14 +107,16 @@ public class CSLAdapter {
         @Override
         public CSLItemData retrieveItem(String id) {
             return data.stream()
-                    .filter(entry -> entry.getCiteKeyOptional().equals(Optional.of(id)))
+                    .filter(entry -> entry.getCiteKeyOptional().orElse("").equals(id))
                     .map(JabRefItemDataProvider::bibEntryToCSLItemData)
                     .findFirst().orElse(null);
         }
 
         @Override
         public String[] getIds() {
-            return data.stream().flatMap(entry -> OptionalUtil.toStream(entry.getCiteKeyOptional())).toArray(String[]::new);
+            return data.stream()
+                    .map(entry -> entry.getCiteKeyOptional().orElse(""))
+                    .toArray(String[]::new);
         }
     }
 }
