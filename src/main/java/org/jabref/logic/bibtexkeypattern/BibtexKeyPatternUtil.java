@@ -21,10 +21,9 @@ import org.apache.commons.logging.LogFactory;
  * This is the utility class of the LabelPattern package.
  */
 public class BibtexKeyPatternUtil extends BracketedPattern {
-    private static final Log LOGGER = LogFactory.getLog(BibtexKeyPatternUtil.class);
-
     // All single characters that we can use for extending a key to make it unique:
-    private static final String CHARS = "abcdefghijklmnopqrstuvwxyz";
+    public static final String CHARS = "abcdefghijklmnopqrstuvwxyz";
+    private static final Log LOGGER = LogFactory.getLog(BibtexKeyPatternUtil.class);
 
     private BibtexKeyPatternUtil() {
     }

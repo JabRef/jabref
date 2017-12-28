@@ -4,6 +4,7 @@ files:
     languages_mapping:
       two_letters_code:
         pt-BR: pt_BR
+        id: in
   - source: /src/main/resources/l10n/JabRef_en.properties
     translation: /src/main/resources/l10n/JabRef_%two_letters_code%.properties
     languages_mapping:

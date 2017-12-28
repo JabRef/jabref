@@ -280,10 +280,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public boolean delete() {
         Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
+        ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"));
+
         if (file.isPresent()) {
-
-            ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"));
-
             ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
             Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
                     Localization.lang("Delete '%0'", file.get().toString()),
@@ -304,17 +303,15 @@ public class LinkedFileViewModel extends AbstractViewModel {
                                 Localization.lang("Cannot delete file"),
                                 Localization.lang("File permission error"));
                         LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
+                        return false;
                     }
                 }
-            } else {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("File not found"),
-                        Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
-                return true;
             }
+        } else {
+            LOGGER.warn("Could not find file " + linkedFile.getLink());
         }
+        return true;
 
-        return false;
     }
 
     public void edit() {

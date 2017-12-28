@@ -3,6 +3,7 @@ package org.jabref.logic.exporter;
 import java.nio.charset.Charset;
 import java.util.List;
 
+import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -19,7 +20,7 @@ public interface IExportFormat {
      */
     String getDisplayName();
 
-    String getExtension();
+    FileExtensions getExtension();
 
     /**
      * Perform the export.

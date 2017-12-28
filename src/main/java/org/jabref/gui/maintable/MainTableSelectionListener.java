@@ -42,7 +42,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
-import org.jabref.preferences.PreviewPreferences;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
@@ -66,7 +65,6 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     // key strokes cycle between all entries starting with the same letter:
     private final int[] lastPressed = new int[20];
     private PreviewPanel preview;
-    private boolean previewActive = Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled();
     private boolean workingOnPreview;
     private boolean enabled = true;
     private int lastPressedCount;
@@ -77,13 +75,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         this.table = table;
         this.panel = panel;
         this.tableRows = table.getTableModel().getTableRows();
-        PreviewPanel previewPanel = panel.getPreviewPanel();
-        if (previewPanel != null) {
-            preview = previewPanel;
-        } else {
-            preview = new PreviewPanel(panel.getBibDatabaseContext(), null, panel);
-            panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview);
-        }
+        preview = panel.getPreviewPanel();
     }
 
     public void setEnabled(boolean enabled) {
@@ -113,25 +105,23 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             if ((mode == BasePanelMode.WILL_SHOW_EDITOR) || (mode == BasePanelMode.SHOWING_EDITOR)) {
                 panel.showAndEdit(newSelected);
                 SwingUtilities.invokeLater(() -> table.ensureVisible(table.getSelectedRow()));
-            } else {
+            } else if (panel.getMode() == BasePanelMode.SHOWING_NOTHING || panel.getMode() == BasePanelMode.SHOWING_PREVIEW) {
                 // Either nothing or a preview was shown. Update the preview.
-                if (previewActive) {
-                    updatePreview(newSelected, false);
-                }
+                updatePreview(newSelected);
             }
         }
     }
 
-    private void updatePreview(final BibEntry toShow, final boolean changedPreview) {
-        updatePreview(toShow, changedPreview, 0);
+    private void updatePreview(final BibEntry toShow) {
+        updatePreview(toShow, 0);
     }
 
-    private void updatePreview(final BibEntry toShow, final boolean changedPreview, int repeats) {
+    private void updatePreview(final BibEntry toShow, int repeats) {
         if (workingOnPreview) {
             if (repeats > 0) {
                 return; // We've already waited once. Give up on this selection.
             }
-            Timer t = new Timer(50, actionEvent -> updatePreview(toShow, changedPreview, 1));
+            Timer t = new Timer(50, actionEvent -> updatePreview(toShow, 1));
             t.setRepeats(false);
             t.start();
             return;
@@ -141,16 +131,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         if ((list.size() != 1) || (list.get(0) != toShow)) {
             return;
         }
-        final BasePanelMode mode = panel.getMode();
         workingOnPreview = true;
         SwingUtilities.invokeLater(() -> {
-            preview.setEntry(toShow);
-
-            // If nothing was already shown, set the preview and move the separator:
-            if (changedPreview || (mode == BasePanelMode.SHOWING_NOTHING)) {
-                panel.showPreview(preview);
-                panel.adjustSplitter();
-            }
+            panel.showPreview(toShow);
             workingOnPreview = false;
         });
     }
@@ -398,13 +381,12 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     }
 
     public void entryEditorClosing(EntryEditor editor) {
-        preview.setEntry(editor.getEntry());
-        if (previewActive) {
-            panel.showPreview(preview);
+        if (Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled()) {
+            panel.showPreview(editor.getEntry());
         } else {
             panel.hideBottomComponent();
+            panel.adjustSplitter();
         }
-        panel.adjustSplitter();
         table.requestFocus();
     }
 
@@ -416,40 +398,6 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     @Override
     public void mouseExited(MouseEvent e) {
         // Do nothing
-    }
-
-    public void setPreviewActive(boolean enabled) {
-        previewActive = enabled;
-        if (previewActive) {
-            if (!table.getSelected().isEmpty()) {
-                updatePreview(table.getSelected().get(0), false);
-            }
-        } else {
-            panel.hideBottomComponent();
-        }
-    }
-
-    public void nextPreviewStyle() {
-        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() + 1);
-    }
-
-    public void previousPreviewStyle() {
-        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() - 1);
-    }
-
-    private void cyclePreview(int newPosition) {
-        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
-                .getBuilder()
-                .withPreviewCyclePosition(newPosition)
-                .build();
-        Globals.prefs.storePreviewPreferences(previewPreferences);
-
-        preview.updateLayout();
-        preview.update();
-        panel.showPreview(preview);
-        if (!table.getSelected().isEmpty()) {
-            updatePreview(table.getSelected().get(0), true);
-        }
     }
 
     /**

@@ -6,9 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -64,15 +62,6 @@ class RegExpBasedFileFinder implements FileFinder {
         return expandedStringBuffer.toString();
     }
 
-    @Override
-    public Map<BibEntry, List<Path>> findAssociatedFiles(List<BibEntry> entries, List<Path> directories, List<String> extensions) {
-        Map<BibEntry, List<Path>> res = new HashMap<>();
-        for (BibEntry entry : entries) {
-            res.put(entry, findFiles(entry, extensions, directories));
-        }
-        return res;
-    }
-
     /**
      * Method for searching for files using regexp. A list of extensions and directories can be
      * given.
@@ -81,7 +70,8 @@ class RegExpBasedFileFinder implements FileFinder {
      * @param directories The root directories to search.
      * @return A list of files paths matching the given criteria.
      */
-    private List<Path> findFiles(BibEntry entry, List<String> extensions, List<Path> directories) {
+    @Override
+    public List<Path> findAssociatedFiles(BibEntry entry, List<Path> directories, List<String> extensions) {
         String extensionRegExp = '(' + String.join("|", extensions) + ')';
         return findFile(entry, directories, extensionRegExp);
     }

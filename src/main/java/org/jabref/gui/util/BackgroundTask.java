@@ -1,6 +1,7 @@
 package org.jabref.gui.util;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 import javafx.beans.property.DoubleProperty;
@@ -106,8 +107,8 @@ public abstract class BackgroundTask<V> {
         return this;
     }
 
-    public void executeWith(TaskExecutor taskExecutor) {
-        taskExecutor.execute(this);
+    public Future<?> executeWith(TaskExecutor taskExecutor) {
+        return taskExecutor.execute(this);
     }
 
     /**

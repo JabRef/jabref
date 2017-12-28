@@ -257,7 +257,7 @@ public class LocalizationParser {
                 // escape chars which are not allowed in property file keys
                 String languagePropertyKey = new LocalizationKey(languageKey).getPropertiesKey();
 
-                if (languagePropertyKey.endsWith("_")) {
+                if (languagePropertyKey.endsWith(" ")) {
                     throw new RuntimeException(languageKey + " ends with a space. As this is a localization key, this is illegal!");
                 }
 
