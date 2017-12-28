@@ -4,6 +4,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.function.Consumer;
 
@@ -43,8 +44,8 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     @Override
-    public <V> void execute(BackgroundTask<V> task) {
-        EXECUTOR.submit(getJavaFXTask(task));
+    public <V> Future<?> execute(BackgroundTask<V> task) {
+        return EXECUTOR.submit(getJavaFXTask(task));
     }
 
     @Override
