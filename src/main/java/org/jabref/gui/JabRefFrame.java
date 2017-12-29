@@ -194,10 +194,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             IconTheme.getImage("about"), IconTheme.getImage("about"));
     private final AbstractAction jabrefFacebookAction = new OpenBrowserAction("https://www.facebook.com/JabRef/",
             "Facebook", Localization.lang("Opens JabRef's Facebook page"),
-            IconTheme.JabRefIcon.FACEBOOK.getSmallIcon(), IconTheme.JabRefIcon.FACEBOOK.getIcon());
+            IconTheme.JabRefIcons.FACEBOOK.getSmallIcon(), IconTheme.JabRefIcons.FACEBOOK.getIcon());
     private final AbstractAction jabrefBlogAction = new OpenBrowserAction("https://blog.jabref.org/",
             Localization.menuTitle("Blog"), Localization.lang("Opens JabRef's blog"),
-            IconTheme.JabRefIcon.BLOG.getSmallIcon(), IconTheme.JabRefIcon.BLOG.getIcon());
+            IconTheme.JabRefIcons.BLOG.getSmallIcon(), IconTheme.JabRefIcons.BLOG.getIcon());
     private final AbstractAction developmentVersionAction = new OpenBrowserAction("https://builds.jabref.org/master/",
             Localization.menuTitle("Development version"),
             Localization.lang("Opens a link where the current development version can be downloaded"));
@@ -205,22 +205,22 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             "https://github.com/JabRef/jabref/blob/master/CHANGELOG.md", Localization.menuTitle("View change log"),
             Localization.lang("See what has been changed in the JabRef versions"));
     private final AbstractAction forkMeOnGitHubAction = new OpenBrowserAction("https://github.com/JabRef/jabref",
-            Localization.menuTitle("Fork me on GitHub"), Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcon.GITHUB.getSmallIcon(), IconTheme.JabRefIcon.GITHUB.getIcon());
+            Localization.menuTitle("Fork me on GitHub"), Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcons.GITHUB.getSmallIcon(), IconTheme.JabRefIcons.GITHUB.getIcon());
     private final AbstractAction donationAction = new OpenBrowserAction("https://github.com/JabRef/jabref/wiki/Donations",
-            Localization.menuTitle("Donate to JabRef"), Localization.lang("Donate to JabRef"), IconTheme.JabRefIcon.DONATE.getSmallIcon(), IconTheme.JabRefIcon.DONATE.getIcon());
+            Localization.menuTitle("Donate to JabRef"), Localization.lang("Donate to JabRef"), IconTheme.JabRefIcons.DONATE.getSmallIcon(), IconTheme.JabRefIcons.DONATE.getIcon());
     private final AbstractAction openForumAction = new OpenBrowserAction("http://discourse.jabref.org/",
-            Localization.menuTitle("Online help forum"), Localization.lang("Online help forum"), IconTheme.JabRefIcon.FORUM.getSmallIcon(), IconTheme.JabRefIcon.FORUM.getIcon());
+            Localization.menuTitle("Online help forum"), Localization.lang("Online help forum"), IconTheme.JabRefIcons.FORUM.getSmallIcon(), IconTheme.JabRefIcons.FORUM.getIcon());
     private final AbstractAction help = new HelpAction(Localization.menuTitle("Online help"), Localization.lang("Online help"),
             HelpFile.CONTENTS, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
     private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), Localization.lang("About JabRef"),
             IconTheme.getImage("about"));
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, Localization.menuTitle("Edit entry"),
-            Localization.lang("Edit entry"), Globals.getKeyPrefs().getKey(KeyBinding.EDIT_ENTRY), IconTheme.JabRefIcon.EDIT_ENTRY.getIcon());
+            Localization.lang("Edit entry"), Globals.getKeyPrefs().getKey(KeyBinding.EDIT_ENTRY), IconTheme.JabRefIcons.EDIT_ENTRY.getIcon());
     private final AbstractAction focusTable = new GeneralAction(Actions.FOCUS_TABLE,
             Localization.menuTitle("Focus entry table"),
             Localization.lang("Move the keyboard focus to the entry table"), Globals.getKeyPrefs().getKey(KeyBinding.FOCUS_ENTRY_TABLE));
     private final AbstractAction save = new GeneralAction(Actions.SAVE, Localization.menuTitle("Save library"),
-            Localization.lang("Save library"), Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), IconTheme.JabRefIcon.SAVE.getIcon());
+            Localization.lang("Save library"), Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), IconTheme.JabRefIcons.SAVE.getIcon());
     private final AbstractAction saveAs = new GeneralAction(Actions.SAVE_AS,
             Localization.menuTitle("Save library as..."), Localization.lang("Save library as..."),
             Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE_AS));
@@ -234,55 +234,55 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction importNew = ImportFormats.getImportAction(this, true);
     private final AbstractAction sortTabs = new SortTabsAction(this);
     private final AbstractAction undo = new GeneralAction(Actions.UNDO, Localization.menuTitle("Undo"),
-            Localization.lang("Undo"), Globals.getKeyPrefs().getKey(KeyBinding.UNDO), IconTheme.JabRefIcon.UNDO.getIcon());
+            Localization.lang("Undo"), Globals.getKeyPrefs().getKey(KeyBinding.UNDO), IconTheme.JabRefIcons.UNDO.getIcon());
     private final AbstractAction redo = new GeneralAction(Actions.REDO, Localization.menuTitle("Redo"),
-            Localization.lang("Redo"), Globals.getKeyPrefs().getKey(KeyBinding.REDO), IconTheme.JabRefIcon.REDO.getIcon());
+            Localization.lang("Redo"), Globals.getKeyPrefs().getKey(KeyBinding.REDO), IconTheme.JabRefIcons.REDO.getIcon());
     private final AbstractAction forward = new GeneralAction(Actions.FORWARD, Localization.menuTitle("Forward"),
-            Localization.lang("Forward"), Globals.getKeyPrefs().getKey(KeyBinding.FORWARD), IconTheme.JabRefIcon.RIGHT.getIcon());
+            Localization.lang("Forward"), Globals.getKeyPrefs().getKey(KeyBinding.FORWARD), IconTheme.JabRefIcons.RIGHT.getIcon());
     private final AbstractAction back = new GeneralAction(Actions.BACK, Localization.menuTitle("Back"),
-            Localization.lang("Back"), Globals.getKeyPrefs().getKey(KeyBinding.BACK), IconTheme.JabRefIcon.LEFT.getIcon());
+            Localization.lang("Back"), Globals.getKeyPrefs().getKey(KeyBinding.BACK), IconTheme.JabRefIcons.LEFT.getIcon());
     private final AbstractAction deleteEntry = new GeneralAction(Actions.DELETE, Localization.menuTitle("Delete entry"),
-            Localization.lang("Delete entry"), Globals.getKeyPrefs().getKey(KeyBinding.DELETE_ENTRY), IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
+            Localization.lang("Delete entry"), Globals.getKeyPrefs().getKey(KeyBinding.DELETE_ENTRY), IconTheme.JabRefIcons.DELETE_ENTRY.getIcon());
     private final AbstractAction copy = new EditAction(Actions.COPY, Localization.menuTitle("Copy"),
-            Localization.lang("Copy"), Globals.getKeyPrefs().getKey(KeyBinding.COPY), IconTheme.JabRefIcon.COPY.getIcon());
+            Localization.lang("Copy"), Globals.getKeyPrefs().getKey(KeyBinding.COPY), IconTheme.JabRefIcons.COPY.getIcon());
     private final AbstractAction paste = new EditAction(Actions.PASTE, Localization.menuTitle("Paste"),
-            Localization.lang("Paste"), Globals.getKeyPrefs().getKey(KeyBinding.PASTE), IconTheme.JabRefIcon.PASTE.getIcon());
+            Localization.lang("Paste"), Globals.getKeyPrefs().getKey(KeyBinding.PASTE), IconTheme.JabRefIcons.PASTE.getIcon());
     private final AbstractAction cut = new EditAction(Actions.CUT, Localization.menuTitle("Cut"),
-            Localization.lang("Cut"), Globals.getKeyPrefs().getKey(KeyBinding.CUT), IconTheme.JabRefIcon.CUT.getIcon());
+            Localization.lang("Cut"), Globals.getKeyPrefs().getKey(KeyBinding.CUT), IconTheme.JabRefIcons.CUT.getIcon());
     private final AbstractAction openConsole = new GeneralAction(Actions.OPEN_CONSOLE,
             Localization.menuTitle("Open terminal here"),
             Localization.lang("Open terminal here"),
             Globals.getKeyPrefs().getKey(KeyBinding.OPEN_CONSOLE),
-            IconTheme.JabRefIcon.CONSOLE.getIcon());
+            IconTheme.JabRefIcons.CONSOLE.getIcon());
     private final AbstractAction pullChangesFromSharedDatabase = new GeneralAction(Actions.PULL_CHANGES_FROM_SHARED_DATABASE,
             Localization.menuTitle("Pull changes from shared database"),
             Localization.lang("Pull changes from shared database"),
             Globals.getKeyPrefs().getKey(KeyBinding.PULL_CHANGES_FROM_SHARED_DATABASE),
-            IconTheme.JabRefIcon.PULL.getIcon());
+            IconTheme.JabRefIcons.PULL.getIcon());
     private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, Localization.menuTitle("Mark entries"),
-            Localization.lang("Mark entries"), Globals.getKeyPrefs().getKey(KeyBinding.MARK_ENTRIES), IconTheme.JabRefIcon.MARK_ENTRIES.getIcon());
+            Localization.lang("Mark entries"), Globals.getKeyPrefs().getKey(KeyBinding.MARK_ENTRIES), IconTheme.JabRefIcons.MARK_ENTRIES.getIcon());
     private final JMenu markSpecific = JabRefFrame.subMenu(Localization.menuTitle("Mark specific color"));
     private final AbstractAction unmark = new GeneralAction(Actions.UNMARK_ENTRIES,
             Localization.menuTitle("Unmark entries"), Localization.lang("Unmark entries"),
-            Globals.getKeyPrefs().getKey(KeyBinding.UNMARK_ENTRIES), IconTheme.JabRefIcon.UNMARK_ENTRIES.getIcon());
+            Globals.getKeyPrefs().getKey(KeyBinding.UNMARK_ENTRIES), IconTheme.JabRefIcons.UNMARK_ENTRIES.getIcon());
     private final AbstractAction unmarkAll = new GeneralAction(Actions.UNMARK_ALL, Localization.menuTitle("Unmark all"));
     private final AbstractAction toggleRelevance = new GeneralAction(
             new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getActionName(),
             new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getMenuString(),
             new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getToolTipText(),
-            IconTheme.JabRefIcon.RELEVANCE.getIcon());
+            IconTheme.JabRefIcons.RELEVANCE.getIcon());
     private final AbstractAction toggleQualityAssured = new GeneralAction(
             new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getActionName(),
             new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getMenuString(),
             new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getToolTipText(),
-            IconTheme.JabRefIcon.QUALITY_ASSURED.getIcon());
+            IconTheme.JabRefIcons.QUALITY_ASSURED.getIcon());
     private final AbstractAction togglePrinted = new GeneralAction(
             new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getActionName(),
             new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getMenuString(),
             new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getToolTipText(),
-            IconTheme.JabRefIcon.PRINTED.getIcon());
+            IconTheme.JabRefIcons.PRINTED.getIcon());
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
-            Localization.lang("Search"), Globals.getKeyPrefs().getKey(KeyBinding.SEARCH), IconTheme.JabRefIcon.SEARCH.getIcon());
+            Localization.lang("Search"), Globals.getKeyPrefs().getKey(KeyBinding.SEARCH), IconTheme.JabRefIcons.SEARCH.getIcon());
     private final AbstractAction manageSelectors = new GeneralAction(Actions.MANAGE_SELECTORS,
             Localization.menuTitle("Manage content selectors"));
     private final AbstractAction copyPreview = new GeneralAction(Actions.COPY_CITATION_HTML, Localization.lang("Copy preview"),
@@ -314,7 +314,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Edit strings"),
             Localization.lang("Edit strings"),
             Globals.getKeyPrefs().getKey(KeyBinding.EDIT_STRINGS),
-            IconTheme.JabRefIcon.EDIT_STRINGS.getIcon());
+            IconTheme.JabRefIcons.EDIT_STRINGS.getIcon());
     private final AbstractAction customizeAction = new CustomizeEntryTypeAction();
     private final Action toggleToolbar = enableToggle(new AbstractAction(Localization.menuTitle("Hide/show toolbar")) {
 
@@ -336,7 +336,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Toggle entry preview"),
             Localization.lang("Toggle entry preview"),
             Globals.getKeyPrefs().getKey(KeyBinding.TOGGLE_ENTRY_PREVIEW),
-            IconTheme.JabRefIcon.TOGGLE_ENTRY_PREVIEW.getIcon()));
+            IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW.getIcon()));
     private final AbstractAction nextPreviewStyle = new GeneralAction(Actions.NEXT_PREVIEW_STYLE,
             Localization.menuTitle("Next preview layout"),
             Globals.getKeyPrefs().getKey(KeyBinding.NEXT_PREVIEW_LAYOUT));
@@ -347,7 +347,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Autogenerate BibTeX keys"),
             Localization.lang("Autogenerate BibTeX keys"),
             Globals.getKeyPrefs().getKey(KeyBinding.AUTOGENERATE_BIBTEX_KEYS),
-            IconTheme.JabRefIcon.MAKE_KEY.getIcon());
+            IconTheme.JabRefIcons.MAKE_KEY.getIcon());
     private final AbstractAction writeXmpAction = new GeneralAction(Actions.WRITE_XMP,
             Localization.menuTitle("Write XMP-metadata to PDFs"),
             Localization.lang("Will write XMP-metadata to the PDFs linked from selected entries."),
@@ -359,14 +359,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Open file"),
             Localization.lang("Open file"),
             Globals.getKeyPrefs().getKey(KeyBinding.OPEN_FILE),
-            IconTheme.JabRefIcon.FILE.getIcon());
+            IconTheme.JabRefIcons.FILE.getIcon());
     private final AbstractAction openUrl = new GeneralAction(Actions.OPEN_URL,
             Localization.menuTitle("Open URL or DOI"),
             Localization.lang("Open URL or DOI"),
             Globals.getKeyPrefs().getKey(KeyBinding.OPEN_URL_OR_DOI),
-            IconTheme.JabRefIcon.WWW.getIcon());
+            IconTheme.JabRefIcons.WWW.getIcon());
     private final AbstractAction dupliCheck = new GeneralAction(Actions.DUPLI_CHECK,
-            Localization.menuTitle("Find duplicates"), IconTheme.JabRefIcon.FIND_DUPLICATES.getIcon());
+            Localization.menuTitle("Find duplicates"), IconTheme.JabRefIcons.FIND_DUPLICATES.getIcon());
     private final AbstractAction plainTextImport = new GeneralAction(Actions.PLAIN_TEXT_IMPORT,
             Localization.menuTitle("New entry from plain text") + ELLIPSES,
             Globals.getKeyPrefs().getKey(KeyBinding.NEW_FROM_PLAIN_TEXT));
@@ -375,7 +375,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction customFileTypesAction = ExternalFileTypeEditor.getAction(this);
     private final AbstractAction exportToClipboard = new GeneralAction(Actions.EXPORT_TO_CLIPBOARD,
             Localization.menuTitle("Export selected entries to clipboard"),
-            IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getIcon());
+            IconTheme.JabRefIcons.EXPORT_TO_CLIPBOARD.getIcon());
     private final AbstractAction autoSetFile = new GeneralAction(Actions.AUTO_SET_FILE,
             Localization.lang("Synchronize file links") + ELLIPSES,
             Globals.getKeyPrefs().getKey(KeyBinding.SYNCHRONIZE_FILES));
@@ -399,11 +399,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Cleanup entries") + ELLIPSES,
             Localization.lang("Cleanup entries"),
             Globals.getKeyPrefs().getKey(KeyBinding.CLEANUP),
-            IconTheme.JabRefIcon.CLEANUP_ENTRIES.getIcon());
+            IconTheme.JabRefIcons.CLEANUP_ENTRIES.getIcon());
     private final AbstractAction mergeEntries = new GeneralAction(Actions.MERGE_ENTRIES,
             Localization.menuTitle("Merge entries") + ELLIPSES,
             Localization.lang("Merge entries"),
-            IconTheme.JabRefIcon.MERGE_ENTRIES.getIcon());
+            IconTheme.JabRefIcons.MERGE_ENTRIES.getIcon());
     private final AbstractAction downloadFullText = new GeneralAction(Actions.DOWNLOAD_FULL_TEXT,
             Localization.menuTitle("Look up full text documents"),
             Globals.getKeyPrefs().getKey(KeyBinding.DOWNLOAD_FULL_TEXT));
@@ -415,7 +415,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Find and remove duplicate BibTeX keys"),
             Globals.getKeyPrefs().getKey(KeyBinding.RESOLVE_DUPLICATE_BIBTEX_KEYS));
     private final AbstractAction sendAsEmail = new GeneralAction(Actions.SEND_AS_EMAIL,
-            Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getIcon());
+            Localization.lang("Send as email"), IconTheme.JabRefIcons.EMAIL.getIcon());
     private final MassSetFieldAction massSetField = new MassSetFieldAction(this);
     private final ManageKeywordsAction manageKeywords = new ManageKeywordsAction(this);
     private final JMenu lookupIdentifiers = JabRefFrame.subMenu(Localization.menuTitle("Look up document identifier..."));

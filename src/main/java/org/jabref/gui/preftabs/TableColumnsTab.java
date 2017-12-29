@@ -453,7 +453,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class DeleteRowAction extends AbstractAction {
 
         public DeleteRowAction() {
-            super("Delete row", IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
+            super("Delete row", IconTheme.JabRefIcons.REMOVE_NOBOX.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete rows"));
         }
 
@@ -483,7 +483,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class AddRowAction extends AbstractAction {
 
         public AddRowAction() {
-            super("Add row", IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
+            super("Add row", IconTheme.JabRefIcons.ADD_NOBOX.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Insert rows"));
         }
 
@@ -534,7 +534,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class MoveRowUpAction extends AbstractMoveRowAction {
 
         public MoveRowUpAction() {
-            super("Up", IconTheme.JabRefIcon.UP.getIcon());
+            super("Up", IconTheme.JabRefIcons.UP.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Move up"));
         }
 
@@ -567,7 +567,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class MoveRowDownAction extends AbstractMoveRowAction {
 
         public MoveRowDownAction() {
-            super("Down", IconTheme.JabRefIcon.DOWN.getIcon());
+            super("Down", IconTheme.JabRefIcons.DOWN.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Down"));
         }
 

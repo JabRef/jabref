@@ -88,42 +88,42 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         }
 
         copySpecialMenu.add(new GeneralAction(Actions.EXPORT_TO_CLIPBOARD, Localization.lang("Export to clipboard"),
-                IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getSmallIcon()));
+                IconTheme.JabRefIcons.EXPORT_TO_CLIPBOARD.getSmallIcon()));
 
-        add(new GeneralAction(Actions.COPY, Localization.lang("Copy"), IconTheme.JabRefIcon.COPY.getSmallIcon(), KeyBinding.COPY));
+        add(new GeneralAction(Actions.COPY, Localization.lang("Copy"), IconTheme.JabRefIcons.COPY.getSmallIcon(), KeyBinding.COPY));
         add(copySpecialMenu);
-        add(new GeneralAction(Actions.PASTE, Localization.lang("Paste"), IconTheme.JabRefIcon.PASTE.getSmallIcon(), KeyBinding.PASTE));
-        add(new GeneralAction(Actions.CUT, Localization.lang("Cut"), IconTheme.JabRefIcon.CUT.getSmallIcon(), KeyBinding.CUT));
-        add(new GeneralAction(Actions.DELETE, Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getSmallIcon(), KeyBinding.DELETE_ENTRY));
-        GeneralAction printPreviewAction = new GeneralAction(Actions.PRINT_PREVIEW, Localization.lang("Print entry preview"), IconTheme.JabRefIcon.PRINTED.getSmallIcon());
+        add(new GeneralAction(Actions.PASTE, Localization.lang("Paste"), IconTheme.JabRefIcons.PASTE.getSmallIcon(), KeyBinding.PASTE));
+        add(new GeneralAction(Actions.CUT, Localization.lang("Cut"), IconTheme.JabRefIcons.CUT.getSmallIcon(), KeyBinding.CUT));
+        add(new GeneralAction(Actions.DELETE, Localization.lang("Delete"), IconTheme.JabRefIcons.DELETE_ENTRY.getSmallIcon(), KeyBinding.DELETE_ENTRY));
+        GeneralAction printPreviewAction = new GeneralAction(Actions.PRINT_PREVIEW, Localization.lang("Print entry preview"), IconTheme.JabRefIcons.PRINTED.getSmallIcon());
         printPreviewAction.setEnabled(!multiple);
         add(printPreviewAction);
 
         addSeparator();
 
-        add(new GeneralAction(Actions.SEND_AS_EMAIL, Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getSmallIcon()));
+        add(new GeneralAction(Actions.SEND_AS_EMAIL, Localization.lang("Send as email"), IconTheme.JabRefIcons.EMAIL.getSmallIcon()));
         addSeparator();
         add(new CopyFilesAction());
 
         JMenu markSpecific = JabRefFrame.subMenu(Localization.menuTitle("Mark specific color"));
-        markSpecific.setIcon(IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon());
+        markSpecific.setIcon(IconTheme.JabRefIcons.MARK_ENTRIES.getSmallIcon());
         for (int i = 0; i < EntryMarker.MAX_MARKING_LEVEL; i++) {
             markSpecific.add(new MarkEntriesAction(frame, i).getMenuItem());
         }
 
         if (multiple) {
-            add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entries"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon(), KeyBinding.MARK_ENTRIES));
+            add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entries"), IconTheme.JabRefIcons.MARK_ENTRIES.getSmallIcon(), KeyBinding.MARK_ENTRIES));
             add(markSpecific);
-            add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entries"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon(), KeyBinding.UNMARK_ENTRIES));
+            add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entries"), IconTheme.JabRefIcons.UNMARK_ENTRIES.getSmallIcon(), KeyBinding.UNMARK_ENTRIES));
         } else if (be != null) {
             Optional<String> marked = be.getField(FieldName.MARKED_INTERNAL);
             // We have to check for "" too as the marked field may be empty
             if ((!marked.isPresent()) || marked.get().isEmpty()) {
-                add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entry"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon(), KeyBinding.MARK_ENTRIES));
+                add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entry"), IconTheme.JabRefIcons.MARK_ENTRIES.getSmallIcon(), KeyBinding.MARK_ENTRIES));
                 add(markSpecific);
             } else {
                 add(markSpecific);
-                add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entry"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon(), KeyBinding.UNMARK_ENTRIES));
+                add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entry"), IconTheme.JabRefIcons.UNMARK_ENTRIES.getSmallIcon(), KeyBinding.UNMARK_ENTRIES));
             }
         }
 
@@ -174,7 +174,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         add(openFileAction);
 
         GeneralAction openUrlAction = new GeneralAction(Actions.OPEN_URL, Localization.lang("Open URL or DOI"),
-                IconTheme.JabRefIcon.WWW.getSmallIcon(), KeyBinding.OPEN_URL_OR_DOI);
+                IconTheme.JabRefIcons.WWW.getSmallIcon(), KeyBinding.OPEN_URL_OR_DOI);
         openUrlAction.setEnabled(isFieldSetForSelectedEntry(FieldName.URL) || isFieldSetForSelectedEntry(FieldName.DOI));
         add(openUrlAction);
 
@@ -190,14 +190,14 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         add(frame.getMassSetField());
 
         GeneralAction attachFileAction = new GeneralAction(Actions.ADD_FILE_LINK, Localization.lang("Attach file"),
-                IconTheme.JabRefIcon.ATTACH_FILE.getSmallIcon());
+                IconTheme.JabRefIcons.ATTACH_FILE.getSmallIcon());
         attachFileAction.setEnabled(!multiple);
         add(attachFileAction);
 
         add(frame.getManageKeywords());
 
         GeneralAction mergeEntriesAction = new GeneralAction(Actions.MERGE_ENTRIES,
-                Localization.lang("Merge entries") + "...", IconTheme.JabRefIcon.MERGE_ENTRIES.getSmallIcon());
+                Localization.lang("Merge entries") + "...", IconTheme.JabRefIcons.MERGE_ENTRIES.getSmallIcon());
         mergeEntriesAction.setEnabled(areExactlyTwoEntriesSelected());
         add(mergeEntriesAction);
 
@@ -279,7 +279,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 }
             }
         }
-        return IconTheme.JabRefIcon.FILE.getSmallIcon();
+        return IconTheme.JabRefIcons.FILE.getSmallIcon();
     }
 
     class GeneralAction extends AbstractAction {

@@ -53,9 +53,9 @@ public class ExternalFileTypeEditor extends JabRefDialog {
     private FileTypeTableModel tableModel;
     private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
-    private final JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
-    private final JButton remove = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
-    private final JButton edit = new JButton(IconTheme.JabRefIcon.EDIT.getIcon());
+    private final JButton add = new JButton(IconTheme.JabRefIcons.ADD_NOBOX.getIcon());
+    private final JButton remove = new JButton(IconTheme.JabRefIcons.REMOVE_NOBOX.getIcon());
+    private final JButton edit = new JButton(IconTheme.JabRefIcons.EDIT.getIcon());
     private final JButton toDefaults = new JButton(Localization.lang("Default"));
     private final EditListener editListener = new EditListener();
 
@@ -125,7 +125,7 @@ public class ExternalFileTypeEditor extends JabRefDialog {
         add.addActionListener(e -> {
             // Generate a new file type:
             ExternalFileType type = new ExternalFileType("", "", "", "", "new",
-                    IconTheme.JabRefIcon.FILE.getSmallIcon());
+                    IconTheme.JabRefIcons.FILE);
             // Show the file type editor:
             getEditor(type).setVisible(true);
             if (entryEditor.okPressed()) {

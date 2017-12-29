@@ -114,7 +114,7 @@ public class OpenOfficePanel extends AbstractWorker {
     private final StyleLoader loader;
 
     public OpenOfficePanel(JabRefFrame jabRefFrame, SidePaneManager spManager) {
-        Icon connectImage = IconTheme.JabRefIcon.CONNECT_OPEN_OFFICE.getSmallIcon();
+        Icon connectImage = IconTheme.JabRefIcons.CONNECT_OPEN_OFFICE.getSmallIcon();
 
         connect = new JButton(connectImage);
         manualConnect = new JButton(connectImage);
@@ -123,10 +123,10 @@ public class OpenOfficePanel extends AbstractWorker {
         connect.setPreferredSize(new Dimension(24, 24));
         manualConnect.setPreferredSize(new Dimension(24, 24));
 
-        selectDocument = new JButton(IconTheme.JabRefIcon.OPEN.getSmallIcon());
+        selectDocument = new JButton(IconTheme.JabRefIcons.OPEN.getSmallIcon());
         selectDocument.setToolTipText(Localization.lang("Select Writer document"));
         selectDocument.setPreferredSize(new Dimension(24, 24));
-        update = new JButton(IconTheme.JabRefIcon.REFRESH.getSmallIcon());
+        update = new JButton(IconTheme.JabRefIcons.REFRESH.getSmallIcon());
         update.setToolTipText(Localization.lang("Sync OpenOffice/LibreOffice bibliography"));
         update.setPreferredSize(new Dimension(24, 24));
         preferences = new OpenOfficePreferences(Globals.prefs);

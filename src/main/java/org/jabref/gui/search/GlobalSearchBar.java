@@ -69,7 +69,7 @@ public class GlobalSearchBar extends JPanel {
     private final JButton searchModeButton = new JButton();
     private final JLabel currentResults = new JLabel("");
     private final SearchQueryHighlightObservable searchQueryHighlightObservable = new SearchQueryHighlightObservable();
-    private final JButton openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
+    private final JButton openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcons.OPEN_IN_NEW_WINDOW.getSmallIcon());
     private final JFXPanel container;
     private SearchWorker searchWorker;
     private GlobalSearchWorker globalSearchWorker;
@@ -93,7 +93,7 @@ public class GlobalSearchBar extends JPanel {
         currentResults.setPreferredSize(new Dimension(150, 5));
         currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
 
-        JToggleButton globalSearch = new JToggleButton(IconTheme.JabRefIcon.GLOBAL_SEARCH.getSmallIcon(), searchPreferences.isGlobalSearch());
+        JToggleButton globalSearch = new JToggleButton(IconTheme.JabRefIcons.GLOBAL_SEARCH.getSmallIcon(), searchPreferences.isGlobalSearch());
         globalSearch.setToolTipText(Localization.lang("Search in all open libraries"));
 
         // default action to be performed for toggling globalSearch
@@ -152,7 +152,7 @@ public class GlobalSearchBar extends JPanel {
 
         globalSearch.addActionListener(globalSearchStandardAction);
 
-        openCurrentResultsInDialog.setDisabledIcon(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon().createDisabledIcon());
+        openCurrentResultsInDialog.setDisabledIcon(IconTheme.JabRefIcons.OPEN_IN_NEW_WINDOW.disabled().getSmallIcon());
         openCurrentResultsInDialog.addActionListener(event -> {
             if (globalSearch.isSelected()) {
                 performGlobalSearch();
@@ -163,7 +163,7 @@ public class GlobalSearchBar extends JPanel {
         openCurrentResultsInDialog.setEnabled(false);
         updateOpenCurrentResultsTooltip(globalSearch.isSelected());
 
-        regularExp = new JToggleButton(IconTheme.JabRefIcon.REG_EX.getSmallIcon(),
+        regularExp = new JToggleButton(IconTheme.JabRefIcons.REG_EX.getSmallIcon(),
                 searchPreferences.isRegularExpression());
         regularExp.setToolTipText(Localization.lang("regular expression"));
         regularExp.addActionListener(event -> {
@@ -171,7 +171,7 @@ public class GlobalSearchBar extends JPanel {
             performSearch();
         });
 
-        caseSensitive = new JToggleButton(IconTheme.JabRefIcon.CASE_SENSITIVE.getSmallIcon(),
+        caseSensitive = new JToggleButton(IconTheme.JabRefIcons.CASE_SENSITIVE.getSmallIcon(),
                 searchPreferences.isCaseSensitive());
         caseSensitive.setToolTipText(Localization.lang("Case sensitive"));
         caseSensitive.addActionListener(event -> {
