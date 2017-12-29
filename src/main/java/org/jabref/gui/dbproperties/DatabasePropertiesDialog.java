@@ -189,7 +189,7 @@ public class DatabasePropertiesDialog extends JabRefDialog {
     }
 
     private boolean newAndOldOrderConfigIsSame(SaveOrderConfig newSaveOrderConfig, SaveOrderConfig oldSaveOrderConfig) {
-        return newSaveOrderConfig.equals(oldSaveOrderConfig) ? false : true;
+        return !newSaveOrderConfig.equals(oldSaveOrderConfig);
     }
 
     private SaveOrderConfig getNewSaveOrderConfig() {
