@@ -93,8 +93,8 @@ class StyleSelectDialog {
     private final JMenuItem show = new JMenuItem(Localization.lang("View"));
     private final JMenuItem remove = new JMenuItem(Localization.lang("Remove"));
     private final JMenuItem reload = new JMenuItem(Localization.lang("Reload"));
-    private final JButton addButton = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
-    private final JButton removeButton = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
+    private final JButton addButton = new JButton(IconTheme.JabRefIcons.ADD_NOBOX.getIcon());
+    private final JButton removeButton = new JButton(IconTheme.JabRefIcons.REMOVE_NOBOX.getIcon());
     private PreviewPanel preview;
     private ActionListener removeAction;
 

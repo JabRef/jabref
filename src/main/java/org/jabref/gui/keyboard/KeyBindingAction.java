@@ -15,7 +15,7 @@ public class KeyBindingAction extends AbstractAction {
 
     public KeyBindingAction() {
         super(Localization.lang("Customize key bindings"));
-        this.putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.KEY_BINDINGS.getSmallIcon());
+        this.putValue(Action.SMALL_ICON, IconTheme.JabRefIcons.KEY_BINDINGS.getSmallIcon());
     }
 
     @Override

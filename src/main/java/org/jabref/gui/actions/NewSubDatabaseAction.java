@@ -21,7 +21,7 @@ public class NewSubDatabaseAction extends MnemonicAwareAction {
     private final JabRefFrame jabRefFrame;
 
     public NewSubDatabaseAction(JabRefFrame jabRefFrame) {
-        super(IconTheme.JabRefIcon.NEW.getIcon());
+        super(IconTheme.JabRefIcons.NEW.getIcon());
         this.jabRefFrame = jabRefFrame;
         putValue(Action.NAME, Localization.menuTitle("New sublibrary based on AUX file") + "...");
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("New BibTeX sublibrary"));

@@ -19,7 +19,7 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
         this.fields = fields;
 
         setText(name);
-        setGraphic(IconTheme.JabRefIcon.OPTIONAL.getGraphicNode());
+        setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());
     }
 
     @Override

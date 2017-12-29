@@ -55,7 +55,7 @@ public class SourceTab extends EntryEditorTab {
         this.mode = bibDatabaseContext.getMode();
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
-        this.setGraphic(IconTheme.JabRefIcon.SOURCE.getGraphicNode());
+        this.setGraphic(IconTheme.JabRefIcons.SOURCE.getGraphicNode());
         this.undoManager = undoManager;
         this.fieldFormatterPreferences = fieldFormatterPreferences;
     }

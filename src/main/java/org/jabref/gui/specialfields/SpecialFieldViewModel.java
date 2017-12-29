@@ -6,6 +6,7 @@ import javax.swing.Icon;
 
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
@@ -30,17 +31,36 @@ public class SpecialFieldViewModel {
     public Icon getRepresentingIcon() {
         switch (field) {
             case PRINTED:
-                return IconTheme.JabRefIcon.PRINTED.getSmallIcon();
+                return IconTheme.JabRefIcons.PRINTED.getSmallIcon();
             case PRIORITY:
-                return IconTheme.JabRefIcon.PRIORITY.getSmallIcon();
+                return IconTheme.JabRefIcons.PRIORITY.getSmallIcon();
             case QUALITY:
-                return IconTheme.JabRefIcon.QUALITY.getSmallIcon();
+                return IconTheme.JabRefIcons.QUALITY.getSmallIcon();
             case RANKING:
-                return IconTheme.JabRefIcon.RANKING.getIcon();
+                return IconTheme.JabRefIcons.RANKING.getIcon();
             case READ_STATUS:
-                return IconTheme.JabRefIcon.READ_STATUS.getSmallIcon();
+                return IconTheme.JabRefIcons.READ_STATUS.getSmallIcon();
             case RELEVANCE:
-                return IconTheme.JabRefIcon.RELEVANCE.getSmallIcon();
+                return IconTheme.JabRefIcons.RELEVANCE.getSmallIcon();
+            default:
+                throw new IllegalArgumentException("There is no icon mapping for special field " + field);
+        }
+    }
+
+    public JabRefIcon getIcon() {
+        switch (field) {
+            case PRINTED:
+                return IconTheme.JabRefIcons.PRINTED;
+            case PRIORITY:
+                return IconTheme.JabRefIcons.PRIORITY;
+            case QUALITY:
+                return IconTheme.JabRefIcons.QUALITY;
+            case RANKING:
+                return IconTheme.JabRefIcons.RANKING;
+            case READ_STATUS:
+                return IconTheme.JabRefIcons.READ_STATUS;
+            case RELEVANCE:
+                return IconTheme.JabRefIcons.RELEVANCE;
             default:
                 throw new IllegalArgumentException("There is no icon mapping for special field " + field);
         }

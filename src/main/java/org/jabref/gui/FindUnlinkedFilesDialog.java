@@ -987,7 +987,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
                 if (value instanceof EntryFromFileCreator) {
                     EntryFromFileCreator creator = (EntryFromFileCreator) value;
                     if (creator.getExternalFileType() != null) {
-                        label.setIcon(creator.getExternalFileType().getIcon());
+                        label.setIcon(creator.getExternalFileType().getIcon().getSmallIcon());
                     }
                 }
                 return label;

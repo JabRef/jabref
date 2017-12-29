@@ -76,40 +76,40 @@ public class GUIGlobals {
      */
     public static void init() {
         JLabel label;
-        label = new JLabel(IconTheme.JabRefIcon.PDF_FILE.getSmallIcon());
+        label = new JLabel(IconTheme.JabRefIcons.PDF_FILE.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " PDF");
         GUIGlobals.TABLE_ICONS.put(FieldName.PDF, label);
 
-        label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
+        label = new JLabel(IconTheme.JabRefIcons.WWW.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " URL");
         GUIGlobals.TABLE_ICONS.put(FieldName.URL, label);
 
-        label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
+        label = new JLabel(IconTheme.JabRefIcons.WWW.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " CiteSeer URL");
         GUIGlobals.TABLE_ICONS.put("citeseerurl", label);
 
-        label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
+        label = new JLabel(IconTheme.JabRefIcons.WWW.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " ArXiv URL");
         GUIGlobals.TABLE_ICONS.put(FieldName.EPRINT, label);
 
-        label = new JLabel(IconTheme.JabRefIcon.DOI.getSmallIcon());
+        label = new JLabel(IconTheme.JabRefIcons.DOI.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " DOI " + Localization.lang("web link"));
         GUIGlobals.TABLE_ICONS.put(FieldName.DOI, label);
 
-        label = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
+        label = new JLabel(IconTheme.JabRefIcons.FILE.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " PS");
         GUIGlobals.TABLE_ICONS.put(FieldName.PS, label);
 
-        label = new JLabel(IconTheme.JabRefIcon.FOLDER.getSmallIcon());
+        label = new JLabel(IconTheme.JabRefIcons.FOLDER.getSmallIcon());
         label.setToolTipText(Localization.lang("Open folder"));
         GUIGlobals.TABLE_ICONS.put(FieldName.FOLDER, label);
 
-        label = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
+        label = new JLabel(IconTheme.JabRefIcons.FILE.getSmallIcon());
         label.setToolTipText(Localization.lang("Open file"));
         GUIGlobals.TABLE_ICONS.put(FieldName.FILE, label);
 
         for (ExternalFileType fileType : ExternalFileTypes.getInstance().getExternalFileTypeSelection()) {
-            label = new JLabel(fileType.getIcon());
+            label = new JLabel(fileType.getIcon().getSmallIcon());
             label.setToolTipText(Localization.lang("Open %0 file", fileType.getName()));
             GUIGlobals.TABLE_ICONS.put(fileType.getName(), label);
         }

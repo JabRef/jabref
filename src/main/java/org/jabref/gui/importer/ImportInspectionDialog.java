@@ -176,9 +176,9 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
     private final Map<BibEntry, Set<GroupTreeNode>> groupAdditions = new HashMap<>();
     private final JCheckBox autoGenerate = new JCheckBox(Localization.lang("Generate keys"),
             Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION));
-    private final JLabel duplLabel = new JLabel(IconTheme.JabRefIcon.DUPLICATE.getSmallIcon());
-    private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
-    private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
+    private final JLabel duplLabel = new JLabel(IconTheme.JabRefIcons.DUPLICATE.getSmallIcon());
+    private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcons.FILE.getSmallIcon());
+    private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcons.WWW.getSmallIcon());
     private BasePanel panel;
     private boolean generatedKeys; // Set to true after keys have been generated.
     private boolean defaultSelected = true;
@@ -900,7 +900,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
     private class DeleteListener extends AbstractAction {
 
         public DeleteListener() {
-            super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getSmallIcon());
+            super(Localization.lang("Delete"), IconTheme.JabRefIcons.DELETE_ENTRY.getSmallIcon());
         }
 
         @Override
@@ -1046,7 +1046,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                     description = flEntry.getLink();
                 }
                 menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry.getLink(),
-                        flEntry.getType().get().getIcon(), panel.getBibDatabaseContext(), flEntry.getType()));
+                        flEntry.getType().get().getIcon().getSmallIcon(), panel.getBibDatabaseContext(), flEntry.getType()));
                 count++;
             }
             if (count == 0) {
@@ -1431,7 +1431,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                         entry.getField(FieldName.FILE).ifPresent(model::setContent);
                         fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
                         if ((model.getRowCount() > 0) && model.getEntry(0).getType().isPresent()) {
-                            fileLabel.setIcon(model.getEntry(0).getType().get().getIcon());
+                            fileLabel.setIcon(model.getEntry(0).getType().get().getIcon().getSmallIcon());
                         }
                         return fileLabel;
                     } else {

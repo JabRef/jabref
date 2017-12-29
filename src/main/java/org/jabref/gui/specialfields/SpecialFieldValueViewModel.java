@@ -6,6 +6,7 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
 
@@ -20,40 +21,48 @@ public class SpecialFieldValueViewModel {
     }
 
     public Icon getSpecialFieldValueIcon() {
+        JabRefIcon icon = getIcon();
+        if (icon == null) {
+            return null;
+        } else {
+            return icon.getSmallIcon();
+        }
+    }
 
+    public JabRefIcon getIcon() {
         switch (value) {
             case PRINTED:
-                return IconTheme.JabRefIcon.PRINTED.getSmallIcon();
+                return IconTheme.JabRefIcons.PRINTED;
             case CLEAR_PRIORITY:
                 return null;
             case PRIORITY_HIGH:
-                return IconTheme.JabRefIcon.PRIORITY_HIGH.getSmallIcon();
+                return IconTheme.JabRefIcons.PRIORITY_HIGH;
             case PRIORITY_MEDIUM:
-                return IconTheme.JabRefIcon.PRIORITY_MEDIUM.getSmallIcon();
+                return IconTheme.JabRefIcons.PRIORITY_MEDIUM;
             case PRIORITY_LOW:
-                return IconTheme.JabRefIcon.PRIORITY_LOW.getSmallIcon();
+                return IconTheme.JabRefIcons.PRIORITY_LOW;
             case QUALITY_ASSURED:
-                return IconTheme.JabRefIcon.QUALITY_ASSURED.getSmallIcon();
+                return IconTheme.JabRefIcons.QUALITY_ASSURED;
             case CLEAR_RANK:
                 return null;
             case RANK_1:
-                return IconTheme.JabRefIcon.RANK1.getSmallIcon();
+                return IconTheme.JabRefIcons.RANK1;
             case RANK_2:
-                return IconTheme.JabRefIcon.RANK2.getSmallIcon();
+                return IconTheme.JabRefIcons.RANK2;
             case RANK_3:
-                return IconTheme.JabRefIcon.RANK3.getSmallIcon();
+                return IconTheme.JabRefIcons.RANK3;
             case RANK_4:
-                return IconTheme.JabRefIcon.RANK4.getSmallIcon();
+                return IconTheme.JabRefIcons.RANK4;
             case RANK_5:
-                return IconTheme.JabRefIcon.RANK5.getSmallIcon();
+                return IconTheme.JabRefIcons.RANK5;
             case CLEAR_READ_STATUS:
                 return null;
             case READ:
-                return IconTheme.JabRefIcon.READ_STATUS_READ.getSmallIcon();
+                return IconTheme.JabRefIcons.READ_STATUS_READ;
             case SKIMMED:
-                return IconTheme.JabRefIcon.READ_STATUS_SKIMMED.getSmallIcon();
+                return IconTheme.JabRefIcons.READ_STATUS_SKIMMED;
             case RELEVANT:
-                return IconTheme.JabRefIcon.RELEVANCE.getSmallIcon();
+                return IconTheme.JabRefIcons.RELEVANCE;
             default:
                 throw new IllegalArgumentException("There is no icon mapping for special field value " + value);
         }

@@ -13,7 +13,7 @@ public class SearchTextField {
     public static TextField create() {
         CustomTextField textField = (CustomTextField) TextFields.createClearableTextField();
         textField.setPromptText(Localization.lang("Search") + "...");
-        textField.setLeft(IconTheme.JabRefIcon.SEARCH.getGraphicNode());
+        textField.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
         return textField;
     }
 }

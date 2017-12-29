@@ -79,9 +79,9 @@ public class ProtectedTermsDialog {
     private final JMenuItem remove = new JMenuItem(Localization.lang("Remove"));
     private final JMenuItem reload = new JMenuItem(Localization.lang("Reload"));
     private final JMenuItem enabled = new JCheckBoxMenuItem(Localization.lang("Enabled"));
-    private final JButton loadButton = new JButton(IconTheme.JabRefIcon.OPEN.getIcon());
-    private final JButton removeButton = new JButton(IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
-    private final JButton newButton = new JButton(IconTheme.JabRefIcon.NEW.getIcon());
+    private final JButton loadButton = new JButton(IconTheme.JabRefIcons.OPEN.getIcon());
+    private final JButton removeButton = new JButton(IconTheme.JabRefIcons.DELETE_ENTRY.getIcon());
+    private final JButton newButton = new JButton(IconTheme.JabRefIcons.NEW.getIcon());
     private ActionListener removeAction;
 
     private final JButton ok = new JButton(Localization.lang("OK"));

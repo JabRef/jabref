@@ -20,7 +20,7 @@ import org.jabref.gui.actions.MnemonicAwareAction;
 
 public abstract class SidePaneComponent extends JPanel {
 
-    protected final JButton close = new JButton(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
+    protected final JButton close = new JButton(IconTheme.JabRefIcons.CLOSE.getSmallIcon());
 
     protected final SidePaneManager manager;
 
@@ -37,12 +37,12 @@ public abstract class SidePaneComponent extends JPanel {
         close.setBorder(null);
         close.addActionListener(e -> hideAway());
 
-        JButton up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
+        JButton up = new JButton(IconTheme.JabRefIcons.UP.getSmallIcon());
         up.setMargin(new Insets(0, 0, 0, 0));
         up.setBorder(null);
         up.addActionListener(e -> moveUp());
 
-        JButton down = new JButton(IconTheme.JabRefIcon.DOWN.getSmallIcon());
+        JButton down = new JButton(IconTheme.JabRefIcons.DOWN.getSmallIcon());
         down.setMargin(new Insets(0, 0, 0, 0));
         down.setBorder(null);
         down.addActionListener(e -> moveDown());
@@ -123,7 +123,7 @@ public abstract class SidePaneComponent extends JPanel {
 
     public class ToggleAction extends MnemonicAwareAction {
 
-        public ToggleAction(String text, String description, KeyStroke key, IconTheme.JabRefIcon icon) {
+        public ToggleAction(String text, String description, KeyStroke key, JabRefIcon icon) {
             super(icon.getIcon());
             putValue(Action.NAME, text);
             putValue(Action.ACCELERATOR_KEY, key);

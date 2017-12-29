@@ -40,7 +40,7 @@ public class GroupSidePane extends SidePaneComponent {
      * regexp for the group.
      */
     public GroupSidePane(JabRefFrame frame, SidePaneManager manager) {
-        super(manager, IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon(), Localization.lang("Groups"));
+        super(manager, IconTheme.JabRefIcons.TOGGLE_GROUPS.getIcon(), Localization.lang("Groups"));
 
         Globals.stateManager.activeGroupProperty()
                 .addListener((observable, oldValue, newValue) -> updateShownEntriesAccordingToSelectedGroups(newValue));
@@ -57,7 +57,7 @@ public class GroupSidePane extends SidePaneComponent {
         toggleAction = new ToggleAction(Localization.menuTitle("Toggle groups interface"),
                 Localization.lang("Toggle groups interface"),
                 Globals.getKeyPrefs().getKey(KeyBinding.TOGGLE_GROUPS_INTERFACE),
-                IconTheme.JabRefIcon.TOGGLE_GROUPS);
+                IconTheme.JabRefIcons.TOGGLE_GROUPS);
 
         this.frame = frame;
 
