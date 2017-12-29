@@ -181,16 +181,13 @@ public class DatabasePropertiesDialog extends JabRefDialog {
                 .orElse(Globals.prefs.getDefaultEncoding());
         Charset newEncoding = (Charset) encoding.getSelectedItem();
         boolean saveActionsChanged = fieldFormatterCleanupsPanel.hasChanged();
-        boolean saveOrderConfigChanged = newAndOldOrderConfigIsSame(getNewSaveOrderConfig(), oldSaveOrderConfig);
+        boolean saveOrderConfigChanged = !getNewSaveOrderConfig().equals(oldSaveOrderConfig);
         boolean changed = saveOrderConfigChanged || !newEncoding.equals(oldEncoding)
                 || !oldFileVal.equals(fileDir.getText()) || !oldFileIndvVal.equals(fileDirIndv.getText())
                 || (oldProtectVal != protect.isSelected()) || saveActionsChanged;
         return changed;
     }
 
-    private boolean newAndOldOrderConfigIsSame(SaveOrderConfig newSaveOrderConfig, SaveOrderConfig oldSaveOrderConfig) {
-        return !newSaveOrderConfig.equals(oldSaveOrderConfig);
-    }
 
     private SaveOrderConfig getNewSaveOrderConfig() {
         SaveOrderConfig saveOrderConfig = null;
@@ -302,7 +299,7 @@ public class DatabasePropertiesDialog extends JabRefDialog {
         SaveOrderConfig newSaveOrderConfig = getNewSaveOrderConfig();
 
         // See if any of the values have been modified:
-        boolean saveOrderConfigChanged = newAndOldOrderConfigIsSame(getNewSaveOrderConfig(), oldSaveOrderConfig);
+        boolean saveOrderConfigChanged = !getNewSaveOrderConfig().equals(oldSaveOrderConfig);;
 
         if (saveOrderConfigChanged) {
             if (newSaveOrderConfig.equals(SaveOrderConfig.getDefaultSaveOrder())) {
