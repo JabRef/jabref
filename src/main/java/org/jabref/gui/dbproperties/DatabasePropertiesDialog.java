@@ -298,9 +298,9 @@ public class DatabasePropertiesDialog extends JabRefDialog {
 
         SaveOrderConfig newSaveOrderConfig = getNewSaveOrderConfig();
 
-        // See if any of the values have been modified:
-        boolean saveOrderConfigChanged = !getNewSaveOrderConfig().equals(oldSaveOrderConfig);;
+        boolean saveOrderConfigChanged = !getNewSaveOrderConfig().equals(oldSaveOrderConfig);
 
+        // See if any of the values have been modified:
         if (saveOrderConfigChanged) {
             if (newSaveOrderConfig.equals(SaveOrderConfig.getDefaultSaveOrder())) {
                 metaData.clearSaveOrderConfig();
