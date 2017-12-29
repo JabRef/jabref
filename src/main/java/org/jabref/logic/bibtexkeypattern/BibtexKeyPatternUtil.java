@@ -3,8 +3,10 @@ package org.jabref.logic.bibtexkeypattern;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.jabref.logic.util.BracketedPattern;
+import org.jabref.model.FieldChange;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -19,10 +21,9 @@ import org.apache.commons.logging.LogFactory;
  * This is the utility class of the LabelPattern package.
  */
 public class BibtexKeyPatternUtil extends BracketedPattern {
-    private static final Log LOGGER = LogFactory.getLog(BibtexKeyPatternUtil.class);
-
     // All single characters that we can use for extending a key to make it unique:
-    private static final String CHARS = "abcdefghijklmnopqrstuvwxyz";
+    public static final String CHARS = "abcdefghijklmnopqrstuvwxyz";
+    private static final Log LOGGER = LogFactory.getLog(BibtexKeyPatternUtil.class);
 
     private BibtexKeyPatternUtil() {
     }
@@ -38,10 +39,9 @@ public class BibtexKeyPatternUtil extends BracketedPattern {
      * @param entry a <code>BibEntry</code>
      * @return modified BibEntry
      */
-    public static void makeAndSetLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase database, BibEntry entry,
-            BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
+    public static Optional<FieldChange> makeAndSetLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase database, BibEntry entry, BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
         String newKey = makeLabel(citeKeyPattern, database, entry, bibtexKeyPatternPreferences);
-        entry.setCiteKey(newKey);
+        return entry.setCiteKey(newKey);
     }
 
     private static String makeLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase database, BibEntry entry, BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {

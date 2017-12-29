@@ -5,10 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -16,7 +15,9 @@ import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
 
 import org.apache.commons.logging.Log;
@@ -32,54 +33,55 @@ class CiteKeyBasedFileFinder implements FileFinder {
     }
 
     @Override
-    public Map<BibEntry, List<Path>> findAssociatedFiles(List<BibEntry> entries, List<Path> directories, List<String> extensions) {
+    public List<Path> findAssociatedFiles(BibEntry entry, List<Path> directories, List<String> extensions) {
         Objects.requireNonNull(directories);
-        Objects.requireNonNull(entries);
+        Objects.requireNonNull(entry);
 
-        Map<BibEntry, List<Path>> result = new HashMap<>();
+        Optional<String> citeKeyOptional = entry.getCiteKeyOptional();
+        if (StringUtil.isBlank(citeKeyOptional)) {
+            return Collections.emptyList();
+        }
+        String citeKey = citeKeyOptional.get();
+
+        List<Path> result = new ArrayList<>();
 
         // First scan directories
         Set<Path> filesWithExtension = findFilesByExtension(directories, extensions);
 
-        // Initialize Result-Set
-        for (BibEntry entry : entries) {
-            result.put(entry, new ArrayList<>());
-        }
-
         // Now look for keys
-        nextFile:
         for (Path file : filesWithExtension) {
             String name = file.getFileName().toString();
-            int dot = name.lastIndexOf('.');
-            // First, look for exact matches:
-            for (BibEntry entry : entries) {
-                Optional<String> citeKey = entry.getCiteKeyOptional();
-                if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && (dot > 0)
-                        && name.substring(0, dot).equals(citeKey.get())) {
-                    result.get(entry).add(file);
-                    continue nextFile;
-                }
+            String nameWithoutExtension = FileUtil.getBaseName(name);
+
+            // First, look for exact matches
+            if (nameWithoutExtension.equals(citeKey)) {
+                result.add(file);
+                continue;
             }
-            // If we get here, we did not find any exact matches. If non-exact
-            // matches are allowed, try to find one:
-            if (!exactKeyOnly) {
-                for (BibEntry entry : entries) {
-                    Optional<String> citeKey = entry.getCiteKeyOptional();
-                    if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && name.startsWith(citeKey.get())) {
-                        result.get(entry).add(file);
-                        continue nextFile;
-                    }
-                }
+            // If we get here, we did not find any exact matches. If non-exact matches are allowed, try to find one
+            if (!exactKeyOnly && matches(name, citeKey)) {
+                    result.add(file);
             }
         }
 
-        return result;
+        return result.stream().sorted().collect(Collectors.toList());
+    }
+
+    private boolean matches(String filename, String citeKey) {
+        boolean startsWithKey = filename.startsWith(citeKey);
+        if (startsWithKey) {
+            // The file name starts with the key, that's already a good start
+            // However, we do not want to match "JabRefa" for "JabRef" since this is probably a file belonging to another entry published in the same time / same name
+            char charAfterKey = filename.charAt(citeKey.length());
+            return !BibtexKeyPatternUtil.CHARS.contains(Character.toString(charAfterKey));
+        }
+        return false;
     }
 
     /**
      * Returns a list of all files in the given directories which have one of the given extension.
      */
-    public Set<Path> findFilesByExtension(List<Path> directories, List<String> extensions) {
+    private Set<Path> findFilesByExtension(List<Path> directories, List<String> extensions) {
         Objects.requireNonNull(extensions, "Extensions must not be null!");
 
         BiPredicate<Path, BasicFileAttributes> isFileWithCorrectExtension = (path, attributes) ->

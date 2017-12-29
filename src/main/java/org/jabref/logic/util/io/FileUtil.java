@@ -27,6 +27,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.OptionalUtil;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -65,13 +66,8 @@ public class FileUtil {
     /**
      * Returns the name part of a file name (i.e., everything in front of last ".").
      */
-    public static String getFileName(String fileNameWithExtension) {
-        int dotPosition = fileNameWithExtension.lastIndexOf('.');
-        if (dotPosition >= 0) {
-            return fileNameWithExtension.substring(0, dotPosition);
-        } else {
-            return fileNameWithExtension;
-        }
+    public static String getBaseName(String fileNameWithExtension) {
+        return FilenameUtils.getBaseName(fileNameWithExtension);
     }
 
     /**
@@ -80,7 +76,7 @@ public class FileUtil {
      * Currently, only the length is restricted to 255 chars, see MAXIMUM_FILE_NAME_LENGTH.
      */
     public static String getValidFileName(String fileName) {
-        String nameWithoutExtension = getFileName(fileName);
+        String nameWithoutExtension = getBaseName(fileName);
 
         if (nameWithoutExtension.length() > MAXIMUM_FILE_NAME_LENGTH) {
             Optional<String> extension = getFileExtension(fileName);

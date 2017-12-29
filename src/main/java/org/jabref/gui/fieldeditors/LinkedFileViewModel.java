@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.swing.SwingUtilities;
+import javax.xml.transform.TransformerException;
 
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
@@ -27,10 +28,13 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntryEditor;
+import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.xmp.XMPUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -49,16 +53,23 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final DoubleProperty downloadProgress = new SimpleDoubleProperty(-1);
     private final BooleanProperty downloadOngoing = new SimpleBooleanProperty(false);
     private final BooleanProperty isAutomaticallyFound = new SimpleBooleanProperty(false);
-
+    private final BooleanProperty canWriteXMPMetadata = new SimpleBooleanProperty(false);
     private final DialogService dialogService = new FXDialogService();
     private final BibEntry entry;
+    private final TaskExecutor taskExecutor;
 
-    public LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext) {
+    public LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
         this.linkedFile = linkedFile;
         this.databaseContext = databaseContext;
         this.entry = entry;
+        this.taskExecutor = taskExecutor;
 
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(100)));
+        canWriteXMPMetadata.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
+    }
+
+    public BooleanProperty canWriteXMPMetadataProperty() {
+        return canWriteXMPMetadata;
     }
 
     public boolean isAutomaticallyFound() {
@@ -263,10 +274,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public boolean delete() {
         Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
+        ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"));
+
         if (file.isPresent()) {
-
-            ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"));
-
             ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
             Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
                     Localization.lang("Delete '%0'", file.get().toString()),
@@ -287,22 +297,42 @@ public class LinkedFileViewModel extends AbstractViewModel {
                                 Localization.lang("Cannot delete file"),
                                 Localization.lang("File permission error"));
                         LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
+                        return false;
                     }
                 }
-            } else {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("File not found"),
-                        Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
-                return true;
             }
+        } else {
+            LOGGER.warn("Could not find file " + linkedFile.getLink());
         }
-
-        return false;
+        return true;
     }
 
     public void edit() {
         FileListEntryEditor editor = new FileListEntryEditor(linkedFile, false, true, databaseContext);
         SwingUtilities.invokeLater(() -> editor.setVisible(true, false));
+    }
 
+    public void writeXMPMetadata() {
+        // Localization.lang("Writing XMP-metadata...")
+        BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {
+            Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
+            if (!file.isPresent()) {
+                // TODO: Print error message
+                // Localization.lang("PDF does not exist");
+            } else {
+                try {
+                    XMPUtil.writeXMP(file.get(), entry, databaseContext.getDatabase(), Globals.prefs.getXMPPreferences());
+                } catch (IOException | TransformerException ex) {
+                    // TODO: Print error message
+                    // Localization.lang("Error while writing") + " '" + file.toString() + "': " + ex;
+                }
+            }
+            return null;
+        });
+
+        // Localization.lang("Finished writing XMP-metadata.")
+
+        // TODO: Show progress
+        taskExecutor.execute(writeTask);
     }
 }

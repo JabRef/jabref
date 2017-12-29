@@ -82,7 +82,7 @@ public class ExportAction {
 
                     ExportFileFilter eff = (ExportFileFilter) ff;
                     String path = file.getPath();
-                    if (!path.endsWith(eff.getExtension())) {
+                    if (!path.endsWith(eff.getExtension().getExtensionsAsList().toString())) {
                         path = path + eff.getExtension();
                     }
                     file = new File(path);

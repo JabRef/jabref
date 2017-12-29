@@ -80,7 +80,7 @@ public class SharedDatabaseUIManager {
     @Subscribe
     public void listen(SharedEntryNotPresentEvent event) {
         BasePanel panel = jabRefFrame.getCurrentBasePanel();
-        EntryEditor entryEditor = panel.getCurrentEditor();
+        EntryEditor entryEditor = panel.getEntryEditor();
 
         panel.getUndoManager().addEdit(new UndoableRemoveEntry(panel.getDatabase(), event.getBibEntry(), panel));
 
