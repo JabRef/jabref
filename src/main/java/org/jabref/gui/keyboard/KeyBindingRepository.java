@@ -142,7 +142,6 @@ public class KeyBindingRepository {
      * Returns the KeyStroke for this binding, as defined by the defaults, or in the Preferences.
      */
     public KeyStroke getKey(KeyBinding bindName) {
-
         String s = get(bindName.getConstant());
         s = s.replace("+", " "); //swing needs the keys without pluses but whitespace between the modifiers
 
@@ -153,7 +152,7 @@ public class KeyBindingRepository {
         }
     }
 
-    private KeyCombination getKeyCombination(KeyBinding bindName) {
+    public KeyCombination getKeyCombination(KeyBinding bindName) {
         String binding = get(bindName.getConstant());
         if (OS.OS_X) {
             binding = binding.replace("ctrl", "meta");

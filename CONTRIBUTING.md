@@ -82,10 +82,9 @@ because <additional rationale>.
 
 ### When adding a new Localization.lang entry
 Add new `Localization.lang("KEY")` to Java file.
-Tests fail. In the test output a snippet is generated which must be added to the English translation file. There is also a snippet generated for the non-English files, but this is irrelevant.
-Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
-With `gradlew localizationUpdate` the "KEY" is added to the other translation files as well.
-Tests are green again.
+Tests fail. In the test output a snippet is generated which must be added to the English translation file.
+Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`.
+[Crowdin](http://translate.jabref.org/) will automatically pick up the new string and add it to the other translations.
 
 You can also directly run the specific test in your IDE. The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java`
 Find more information in the [JabRef Wiki](https://github.com/JabRef/jabref/wiki/Code-Howtos#using-localization-correctly).

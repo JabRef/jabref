@@ -27,7 +27,10 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.event.CaretListener;
 
+import javafx.scene.Node;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
@@ -36,6 +39,8 @@ import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.search.rules.describer.SearchDescribers;
+import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.entry.FieldName;
@@ -325,7 +330,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
         builderAll.getPanel().getActionMap().put("close", cancelAction);
 
         okButton.addActionListener(e -> {
-                isOkPressed = true;
+            isOkPressed = true;
             try {
                 String groupName = nameField.getText().trim();
                 if (explicitRadioButton.isSelected()) {
@@ -566,7 +571,8 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
             s1 = searchGroupSearchExpression.getText().trim();
             okEnabled = okEnabled & !s1.isEmpty();
             if (okEnabled) {
-                setDescription(new SearchQuery(s1, isCaseSensitive(), isRegex()).getDescription());
+                setDescription(fromTextFlowToHTMLString(SearchDescribers.getSearchDescriberFor(
+                        new SearchQuery(s1, isCaseSensitive(), isRegex())).getDescription()));
 
                 if (isRegex()) {
                     try {
@@ -589,6 +595,15 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
             setNameFontItalic(false);
         }
         okButton.setEnabled(okEnabled);
+    }
+
+    private String fromTextFlowToHTMLString(TextFlow textFlow) {
+        StringBuilder htmlStringBuilder = new StringBuilder();
+        for (Node node : textFlow.getChildren()) {
+            if (node instanceof Text)
+                htmlStringBuilder.append(TooltipTextUtil.textToHTMLString((Text) node));
+        }
+        return htmlStringBuilder.toString();
     }
 
     private boolean isRegex() {

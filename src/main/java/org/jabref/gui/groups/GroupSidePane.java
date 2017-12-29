@@ -17,7 +17,6 @@ import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.groups.GroupTreeNode;
@@ -62,9 +61,7 @@ public class GroupSidePane extends SidePaneComponent {
 
         this.frame = frame;
 
-        this.setTitle(Localization.lang("Groups"));
-
-        JFXPanel groupsPane = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+        JFXPanel groupsPane = CustomJFXPanel.create();
 
         add(groupsPane);
         // Execute on JavaFX Application Thread

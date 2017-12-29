@@ -1,5 +1,6 @@
 package org.jabref.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -11,15 +12,13 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
 import org.jabref.gui.actions.MnemonicAwareAction;
 
-import org.jdesktop.swingx.JXTitledPanel;
-import org.jdesktop.swingx.painter.MattePainter;
-
-public abstract class SidePaneComponent extends JXTitledPanel {
+public abstract class SidePaneComponent extends JPanel {
 
     protected final JButton close = new JButton(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
 
@@ -29,12 +28,9 @@ public abstract class SidePaneComponent extends JXTitledPanel {
 
 
     public SidePaneComponent(SidePaneManager manager, Icon icon, String title) {
-        super(title);
+        super(new BorderLayout());
         this.manager = manager;
 
-        this.add(new JLabel(icon));
-
-        setTitleForeground(new Color(79, 95, 143));
         setBorder(BorderFactory.createEmptyBorder());
 
         close.setMargin(new Insets(0, 0, 0, 0));
@@ -51,15 +47,28 @@ public abstract class SidePaneComponent extends JXTitledPanel {
         down.setBorder(null);
         down.addActionListener(e -> moveDown());
 
-        JToolBar tlb = new OSXCompatibleToolbar();
-        tlb.add(up);
-        tlb.add(down);
-        tlb.add(close);
-        tlb.setOpaque(false);
-        tlb.setFloatable(false);
-        this.getUI().getTitleBar().add(tlb);
-        setTitlePainter(new MattePainter(Color.lightGray));
+        JPanel titlePanel = new JPanel(new BorderLayout());
+        titlePanel.add(new JLabel(icon), BorderLayout.WEST);
+        JLabel titleLabel = new JLabel(title);
+        titleLabel.setOpaque(true);
+        titleLabel.setForeground(new Color(79, 95, 143));
+        titlePanel.add(titleLabel, BorderLayout.CENTER);
 
+        JToolBar toolbar = new OSXCompatibleToolbar();
+        toolbar.add(up);
+        toolbar.add(down);
+        toolbar.add(close);
+        toolbar.setOpaque(false);
+        toolbar.setFloatable(false);
+
+        titlePanel.add(toolbar, BorderLayout.EAST);
+
+
+        this.add(titlePanel, BorderLayout.NORTH);
+    }
+
+    public void setContentContainer(JPanel panel) {
+        this.add(panel, BorderLayout.CENTER);
     }
 
     private void hideAway() {

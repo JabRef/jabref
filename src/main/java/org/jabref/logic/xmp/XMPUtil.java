@@ -417,12 +417,19 @@ public class XMPUtil {
      *                 resolve strings. If the database is null the strings will not be resolved.
      * @throws TransformerException If the entry was malformed or unsupported.
      * @throws IOException          If the file could not be written to or could not be found.
+     * @deprecated use overlood {@link #writeXMP(Path, BibEntry, BibDatabase, XMPPreferences)} instead
      */
+    @Deprecated
     public static void writeXMP(File file, BibEntry entry,
                                 BibDatabase database, XMPPreferences xmpPreferences) throws IOException, TransformerException {
         List<BibEntry> l = new LinkedList<>();
         l.add(entry);
         XMPUtil.writeXMP(file, l, database, true, xmpPreferences);
+    }
+
+    public static void writeXMP(Path file, BibEntry entry,
+                                BibDatabase database, XMPPreferences xmpPreferences) throws IOException, TransformerException {
+        writeXMP(file.toFile(), entry, database, xmpPreferences);
     }
 
     /**

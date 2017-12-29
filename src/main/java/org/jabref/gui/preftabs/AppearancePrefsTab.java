@@ -3,9 +3,7 @@ package org.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridBagLayout;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -17,6 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.jabref.gui.GUIGlobals;
 import org.jabref.logic.l10n.Localization;
@@ -58,26 +57,16 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     static class LookAndFeel {
 
-        private static final List<String> LOOKS = Arrays.asList(
-                UIManager.getSystemLookAndFeelClassName(),
-                UIManager.getCrossPlatformLookAndFeelClassName(),
-                "com.jgoodies.looks.plastic.Plastic3DLookAndFeel",
-                "com.jgoodies.looks.windows.WindowsLookAndFeel");
-
         public static Set<String> getAvailableLookAndFeels() {
 
             Set<String> lookAndFeels = new HashSet<>();
+            lookAndFeels.add("com.jgoodies.looks.plastic.Plastic3DLookAndFeel");
+            lookAndFeels.add("com.jgoodies.looks.windows.WindowsLookAndFeel");
 
-            for (String l : LOOKS) {
-                try {
-                    // Try to find L&F
-                    Class.forName(l);
-                    lookAndFeels.add(l);
-                } catch (ClassNotFoundException | IllegalAccessError ignored) {
-                    // LookAndFeel class does not exist or we don't have rights to access it
-                    // Ignore it
-                }
+            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                lookAndFeels.add(info.getClassName());
             }
+
             return lookAndFeels;
         }
     }

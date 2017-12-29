@@ -24,7 +24,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class LocalizationConsistencyTest {
@@ -49,7 +48,7 @@ public class LocalizationConsistencyTest {
     }
 
     @Test
-    public void allFilesMustHaveSameKeys() {
+    public void nonEnglishFilesMustHaveSubsetOfKeys() {
         for (String bundle : Arrays.asList("JabRef", "Menu")) {
             Set<String> englishKeys = LocalizationParser
                     .getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, "en"));
@@ -60,12 +59,11 @@ public class LocalizationConsistencyTest {
                 Set<String> nonEnglishKeys = LocalizationParser
                         .getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, lang));
 
-                List<String> missing = new ArrayList<>(englishKeys);
-                missing.removeAll(nonEnglishKeys);
+                // we do not check for missing keys as Crowdin adds them automatically
+
                 List<String> obsolete = new ArrayList<>(nonEnglishKeys);
                 obsolete.removeAll(englishKeys);
 
-                assertEquals("Missing keys of " + lang, Collections.emptyList(), missing);
                 assertEquals("Obsolete keys of " + lang, Collections.emptyList(), obsolete);
             }
         }
@@ -143,7 +141,7 @@ public class LocalizationConsistencyTest {
                         "1. PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n" +
                         "2. EXECUTE: gradlew localizationUpdate\n" +
                         missingKeys.parallelStream()
-                                .map(key -> String.format("\n%s=%s\n", key.getKey(), key.getKey()))
+                                .map(key -> String.format("\n%s=%s\n", key.getKey(), key.getKey().replaceAll("\\\\ ", " ")))
                                 .collect(Collectors.toList()),
                 Collections.<LocalizationEntry>emptyList(), missingKeys);
     }
@@ -199,23 +197,6 @@ public class LocalizationConsistencyTest {
         for (LocalizationEntry e : keys) {
             assertTrue("Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey(),
                     e.getKey().startsWith("\"") || e.getKey().endsWith("\""));
-        }
-    }
-
-    @Test
-    public void localizationTestForInvalidStrings() {
-        for (String bundle : Arrays.asList("JabRef", "Menu")) {
-            for (String lang : Languages.LANGUAGES.values()) {
-                String propertyFilePath = String.format("/l10n/%s_%s.properties", bundle, lang);
-
-                // find any spaces
-                for (Map.Entry<Object, Object> entry : LocalizationParser.getProperties(propertyFilePath).entrySet()) {
-                    assertFalse("Found an invalid character in the '" + lang + "' localization of '" + bundle +
-                            "': The key of " + entry.getKey().toString() + "=" + entry.getValue() + " contains a space!", entry.getKey().toString().contains(" "));
-                    assertFalse("Found an invalid character in the '" + lang + "' localization of '" + bundle +
-                            "': The value of " + entry.getKey().toString() + "=" + entry.getValue() + " contains a space!", entry.getValue().toString().contains(" "));
-                }
-            }
         }
     }
 

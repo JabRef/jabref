@@ -34,6 +34,11 @@
     -fx-dark-background: #757575;
 
     /*
+     * A strong white as background
+     */
+    -fx-light-background: #ffffff;
+
+    /*
      * A strong blue for backgrounds of active items (toggle button, selected list item)
      */
     -fx-active-background: #6A9FCD;
@@ -62,10 +67,31 @@
 }
 
 .tooltip {
-    -fx-background-color: #757575; /* For some reason it does not work if we use -fx-dark-background here */
-    -fx-effect:none;
+    -fx-background-color: #616161;
+    -fx-opacity: 95%;
+    -fx-text-fill: rgba(255, 255, 255, 0.9);
+    -fx-font-size: 1em;
 }
 
+.tooltip > TextFlow > Text {
+    -fx-fill: rgba(255, 255, 255, 0.9);
+    -fx-font-size: 1em;
+}
+
+.tooltip > TextFlow > .tooltip-text-bold {
+    -fx-font-weight: bold;
+}
+
+.tooltip > TextFlow > .tooltip-text-italic {
+    -fx-font-style: italic;
+}
+
+.tooltip > TextFlow > .tooltip-text-monospaced {
+    -fx-font-family: monospace;
+}
+
+.flatButtonNoSpaceBottom,
+.flatButtonNoSpaceTop,
 .flatButton {
     -fx-shadow-highlight-color: transparent;
     -fx-outer-border: transparent;
@@ -81,4 +107,12 @@
     -fx-background-color: -fx-active-background;
     -fx-text-fill: white;
     -fx-fill: white;
+}
+
+.flatButtonNoSpaceBottom {
+    -fx-padding: 0.5em 0.5em -0.1em 0.5em;
+}
+
+.flatButtonNoSpaceTop {
+    -fx-padding: -0.1em 0.5em 0.5em 0.5em;
 }

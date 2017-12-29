@@ -2,7 +2,7 @@ package org.jabref.gui;
 
 import javax.swing.JButton;
 
-import org.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITest;
 
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
@@ -14,7 +14,7 @@ import static org.assertj.swing.finder.WindowFinder.findDialog;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@Category(GUITests.class)
+@Category(GUITest.class)
 public class UndoTest extends AbstractUITest {
 
     @Test
