@@ -188,7 +188,6 @@ public class DatabasePropertiesDialog extends JabRefDialog {
         return changed;
     }
 
-
     private SaveOrderConfig getNewSaveOrderConfig() {
         SaveOrderConfig saveOrderConfig = null;
         if (saveInOriginalOrder.isSelected()) {
@@ -270,7 +269,6 @@ public class DatabasePropertiesDialog extends JabRefDialog {
     }
 
     private void storeSettings() {
-
         Charset oldEncoding = panel.getBibDatabaseContext().getMetaData().getEncoding()
                 .orElse(Globals.prefs.getDefaultEncoding());
         Charset newEncoding = (Charset) encoding.getSelectedItem();
