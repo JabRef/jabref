@@ -1,6 +1,7 @@
 package org.jabref.gui.filelist;
 
 import javafx.scene.control.Alert.AlertType;
+
 import javafx.scene.control.DialogPane;
 
 import org.jabref.gui.AbstractDialogView;
@@ -16,4 +17,11 @@ public class FileListDialogView extends AbstractDialogView {
         filelistDialog.show();
 
     }
+
+    public boolean okPressed() {
+        FileListDialogViewModel viewModel = (FileListDialogViewModel) this.getController().get().getViewModel();
+
+        return false;
+    }
+
 }

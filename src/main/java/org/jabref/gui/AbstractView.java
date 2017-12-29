@@ -32,7 +32,7 @@ public class AbstractView extends FXMLView {
 
         // Notify controller about the stage, where it is displayed
         view.sceneProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue.getWindow() instanceof Stage) {
+            if ((newValue != null) && (newValue.getWindow() instanceof Stage)) {
                 Stage stage = (Stage) newValue.getWindow();
                 if (stage != null) {
                     getController().ifPresent(controller -> controller.setStage(stage));
@@ -42,7 +42,7 @@ public class AbstractView extends FXMLView {
         return view;
     }
 
-    private Optional<AbstractController> getController() {
+    public Optional<AbstractController> getController() {
         return Optional.ofNullable(presenterProperty.get()).map(
                 presenter -> (AbstractController) presenter);
     }

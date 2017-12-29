@@ -27,7 +27,12 @@ public class AttachFileAction implements BaseAction {
 
         FileListDialogView dlg = new FileListDialogView();
 
-        Platform.runLater(() -> dlg.show());
+        Platform.runLater(() -> {
+            dlg.show();
+
+        });
+        //
+
         /*   FileListEntryEditor editor = new FileListEntryEditor(flEntry, false, true,
                 panel.getBibDatabaseContext());
         editor.setVisible(true, true);

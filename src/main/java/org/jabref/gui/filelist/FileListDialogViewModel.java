@@ -39,6 +39,16 @@ public class FileListDialogViewModel extends AbstractViewModel {
 
     private boolean showSaveDialog;
 
+    private boolean okPressed;
+
+    public boolean isOkPressed() {
+        return okPressed;
+    }
+
+    public void setOkPressed() {
+        okPressed = true;
+    }
+
     public FileListDialogViewModel(BibDatabaseContext bibDatabaseContext, DialogService dialogService) {
 
         this.bibDatabaseContext = bibDatabaseContext;
