@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import org.jabref.gui.groups.GroupMatcher;
 import org.jabref.gui.search.HitOrMissComparator;
 import org.jabref.gui.search.matchers.EverythingMatcher;
@@ -27,7 +30,7 @@ public class MainTableDataModel {
     private final SortedList<BibEntry> sortedForMarkingSearchGrouping;
     private final StartStopListFilterAction filterSearchToggle;
     private final StartStopListFilterAction filterGroupToggle;
-    private final EventList<BibEntry> finalList;
+    private final ObservableList<BibEntryTableViewModel> finalList;
     private final FilterAndSortingState filterAndSortingState = new FilterAndSortingState();
 
     public MainTableDataModel(BibDatabaseContext context) {
@@ -51,7 +54,9 @@ public class MainTableDataModel {
         filterSearchToggle = new StartStopListFilterAction(searchFilterList, SearchMatcher.INSTANCE,
                 EverythingMatcher.INSTANCE);
 
-        finalList = searchFilterList;
+        // TODO
+        //finalList = searchFilterList;
+        finalList = FXCollections.observableArrayList(entries.stream().map(BibEntryTableViewModel::new).collect(Collectors.toList()));
     }
 
     public void updateSortOrder() {
@@ -146,15 +151,11 @@ public class MainTableDataModel {
             return;
         }
 
-        if (floatMarkedEntries) {
-            filterAndSortingState.markingState = true;
-        } else {
-            filterAndSortingState.markingState = false;
-        }
+        filterAndSortingState.markingState = floatMarkedEntries;
         updateSortOrder();
     }
 
-    EventList<BibEntry> getTableRows() {
+    ObservableList<BibEntryTableViewModel> getTableRows() {
         return finalList;
     }
 

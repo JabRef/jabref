@@ -89,7 +89,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result)) {
                 action.performAction(panel, result);
-                panel.frame().getTabbedPane().setSelectedComponent(panel);
+                panel.frame().showBasePanel(panel);
             }
         }
     }
@@ -148,7 +148,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // Check if any of the files are already open:
         for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext();) {
             Path file = iterator.next();
-            for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
+            for (int i = 0; i < frame.getTabbedPane().getTabs().size(); i++) {
                 BasePanel basePanel = frame.getBasePanelAt(i);
                 if ((basePanel.getBibDatabaseContext().getDatabasePath().isPresent())
                         && basePanel.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
@@ -183,7 +183,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         else if (toRaise != null) {
             frame.output(Localization.lang("File '%0' is already open.",
                     toRaise.getBibDatabaseContext().getDatabaseFile().get().getPath()));
-            frame.getTabbedPane().setSelectedComponent(toRaise);
+            frame.showBasePanel(toRaise);
         }
 
         frame.output(Localization.lang("Files opened") + ": " + (filesToOpen.size()));

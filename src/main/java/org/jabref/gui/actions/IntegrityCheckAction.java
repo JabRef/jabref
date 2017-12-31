@@ -88,7 +88,7 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
         }
 
         if (messages.isEmpty()) {
-            JOptionPane.showMessageDialog(frame.getCurrentBasePanel(), Localization.lang("No problems found."));
+            JOptionPane.showMessageDialog(frame, Localization.lang("No problems found."));
         } else {
             Map<String, Boolean> showMessage = new HashMap<>();
             // prepare data model

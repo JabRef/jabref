@@ -99,13 +99,14 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
             List<BibEntry> selectedEntries = basePanel.getSelectedEntries();
             boolean isHitSelected = selectedEntries.stream().anyMatch(BibEntry::isSearchHit);
             if (!isHitSelected && !matchedEntries.isEmpty()) {
-                for (int i = 0; i < basePanel.getMainTable().getRowCount(); i++) {
+                /*for (int i = 0; i < basePanel.getMainTable().getRowCount(); i++) {
                     BibEntry entry = basePanel.getMainTable().getEntryAt(i);
                     if (entry.isSearchHit()) {
                         basePanel.getMainTable().setSelected(i);
                         break;
                     }
                 }
+                */
             }
         }
 

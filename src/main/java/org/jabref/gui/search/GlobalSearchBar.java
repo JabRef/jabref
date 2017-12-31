@@ -18,7 +18,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
 
 import javafx.css.PseudoClass;
 import javafx.embed.swing.JFXPanel;
@@ -29,7 +28,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
-import org.jabref.gui.AbstractView;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
@@ -184,13 +182,8 @@ public class GlobalSearchBar extends JPanel {
 
         EasyBind.subscribe(searchField.textProperty(), searchText -> performSearch());
 
-        container = CustomJFXPanel.create();
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            Scene scene = new Scene(searchField);
-            scene.getStylesheets().add(AbstractView.class.getResource("Main.css").toExternalForm());
-            container.setScene(scene);
-            container.addKeyListener(new SearchKeyAdapter());
-        });
+        container = CustomJFXPanel.wrap(new Scene(searchField));
+        container.addKeyListener(new SearchKeyAdapter());
 
         setLayout(new FlowLayout(FlowLayout.RIGHT));
         JToolBar toolBar = new OSXCompatibleToolbar();
@@ -284,9 +277,9 @@ public class GlobalSearchBar extends JPanel {
         if (currentBasePanel != null) {
             clearSearch(currentBasePanel);
             MainTable mainTable = frame.getCurrentBasePanel().getMainTable();
-            Globals.getFocusListener().setFocused(mainTable);
+            //Globals.getFocusListener().setFocused(mainTable);
             mainTable.requestFocus();
-            SwingUtilities.invokeLater(() -> mainTable.ensureVisible(mainTable.getSelectedRow()));
+            //SwingUtilities.invokeLater(() -> mainTable.ensureVisible(mainTable.getSelectedRow()));
         }
     }
 

@@ -297,7 +297,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     }
 
     public void close() {
-        basePanel.ifPresent(BasePanel::hideBottomComponent);
+        basePanel.ifPresent(BasePanel::closeBottomPane);
     }
 
     private void copyPreviewToClipBoard() {

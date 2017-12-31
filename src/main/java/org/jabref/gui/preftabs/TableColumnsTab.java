@@ -614,12 +614,14 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             final HashMap<String, Integer> map = new HashMap<>();
 
             // first element (#) not inside tableRows
-            for (int i = 1; i < panel.getMainTable().getColumnCount(); i++) {
-                String name = panel.getMainTable().getColumnName(i);
+            /*
+            for (TableColumn<BibEntry, ?> column : panel.getMainTable().getColumns()) {
+                String name = column.getText();
                 if ((name != null) && !name.isEmpty()) {
                     map.put(name.toLowerCase(Locale.ROOT), i);
                 }
             }
+            */
             Collections.sort(tableRows, (o1, o2) -> {
                 Integer n1 = map.get(o1.getName());
                 Integer n2 = map.get(o2.getName());
@@ -647,6 +649,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             if (panel == null) {
                 return;
             }
+            /*
             TableColumnModel colMod = panel.getMainTable().getColumnModel();
             colSetup.setValueAt(String.valueOf(colMod.getColumn(0).getWidth()), 0, 1);
             for (int i = 1; i < colMod.getColumnCount(); i++) {
@@ -669,6 +672,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 colSetup.revalidate();
                 colSetup.repaint();
             }
+            */
 
         }
     }

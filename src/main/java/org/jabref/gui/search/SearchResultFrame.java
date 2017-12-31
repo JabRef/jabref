@@ -406,7 +406,7 @@ public class SearchResultFrame {
         BasePanel basePanel = entryHome.get(entry);
         frame.showBasePanel(basePanel);
         basePanel.requestFocus();
-        basePanel.highlightEntry(entry);
+        basePanel.clearAndSelect(entry);
     }
 
     public void dispose() {

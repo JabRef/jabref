@@ -1,0 +1,48 @@
+.table-view {
+
+}
+
+.table-view .column-header-background {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-font-weight: bold;
+    -fx-size: 3em;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: darkgrey;
+}
+
+.table-view .column-header > .label {
+    -fx-padding: 0 1em 0 1em;
+    -fx-alignment: center-left;
+    -fx-text-fill: -fx-unimportant;
+}
+
+.table-view .column-header .glyph-icon {
+    -fx-alignment: baseline-center;
+    -fx-text-fill: -fx-unimportant;
+    -fx-fill: -fx-unimportant;
+}
+
+.table-cell {
+    -fx-padding: 0.5em 1em 0.5em 1em;
+    -fx-cell-size: 4.0em;
+}
+
+.table-row-cell:odd {
+    -fx-background: -fx-control-inner-background;
+}
+
+.column-icon {
+    -fx-alignment: baseline-center;
+    -fx-padding: 0;
+}
+
+.column-header.column-icon > .label {
+    -fx-padding: 0;
+    -fx-alignment: baseline-center;
+}
+

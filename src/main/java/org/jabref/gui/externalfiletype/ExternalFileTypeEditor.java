@@ -372,9 +372,6 @@ public class ExternalFileTypeEditor extends JabRefDialog {
             }
             editor.setValues();
             editor.setVisible(true);
-            if ((frame != null) && (frame.getCurrentBasePanel() != null)) {
-                frame.getCurrentBasePanel().getMainTable().repaint();
-            }
         }
     }
 

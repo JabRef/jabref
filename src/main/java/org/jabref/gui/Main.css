@@ -24,6 +24,11 @@
     -fx-info: #2c3e50;
 
     /*
+     * A dark gray to indicate something not so important
+     */
+    -fx-unimportant: #595959;
+
+    /*
      * A light gray for accented background
      */
     -fx-accented-background: #dadad8;

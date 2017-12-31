@@ -22,7 +22,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -43,7 +42,6 @@ import org.jabref.gui.SidePaneManager;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -304,9 +302,11 @@ public class OpenOfficePanel extends AbstractWorker {
         content.setLayout(new BorderLayout());
         content.add(mainBuilder.getPanel(), BorderLayout.CENTER);
 
+        /*
         frame.getTabbedPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(Globals.getKeyPrefs().getKey(KeyBinding.REFRESH_OO), "Refresh OO");
         frame.getTabbedPane().getActionMap().put("Refresh OO", updateAction);
+        */
 
     }
 

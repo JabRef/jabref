@@ -49,7 +49,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.MenuElement;
@@ -60,6 +59,12 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.Tooltip;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
@@ -82,6 +87,7 @@ import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.customentrytypes.EntryCustomizationDialog;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.exporter.ExportAction;
@@ -147,6 +153,7 @@ import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.fxmisc.easybind.EasyBind;
 import osx.macadapter.MacAdapter;
 
 /**
@@ -447,10 +454,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final List<Object> twoEntriesOnlyActions = new LinkedList<>();
     private final List<Object> atLeastOneEntryActions = new LinkedList<>();
     private PreferencesDialog prefsDialog;
-    private int lastTabbedPanelSelectionIndex = -1;
     // The sidepane manager takes care of populating the sidepane.
     private SidePaneManager sidePaneManager;
-    private JTabbedPane tabbedPane; // initialized at constructor
+    private final TabPane tabbedPane = new TabPane();
     private final AbstractAction exportAll = ExportAction.getExportAction(this, false);
     private final AbstractAction exportSelected = ExportAction.getExportAction(this, true);
     /* References to the toggle buttons in the toolbar */
@@ -461,12 +467,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private GeneralFetcher generalFetcher;
     private OpenOfficePanel openOfficePanel;
     private GroupSidePane groupSidePane;
-    private int previousTabCount = -1;
     private JMenu newSpec;
 
     public JabRefFrame() {
         init();
-        updateEnabledState();
     }
 
     private static Action enableToggle(Action a, boolean initialValue) {
@@ -560,7 +564,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private void init() {
 
-        tabbedPane = new DragDropPopupPane(tabPopupMenu());
+        // TODO: popup
+        // tabbedPane = new DragDropPopupPane(tabPopupMenu());
 
         MyGlassPane glassPane = new MyGlassPane();
         setGlassPane(glassPane);
@@ -596,16 +601,18 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         pw.displayWindowAtStoredLocation();
 
         tabbedPane.setBorder(null);
-        tabbedPane.setForeground(GUIGlobals.INACTIVE_TABBED_COLOR);
+        // TODO: Color
+        //tabbedPane.setForeground(GUIGlobals.INACTIVE_TABBED_COLOR);
 
         /*
          * The following state listener makes sure focus is registered with the
          * correct database when the user switches tabs. Without this,
          * cut/paste/copy operations would some times occur in the wrong tab.
          */
-        tabbedPane.addChangeListener(e -> {
-
-            markActiveBasePanel();
+        EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), e -> {
+            if (e == null) {
+                return;
+            }
 
             BasePanel currentBasePanel = getCurrentBasePanel();
             if (currentBasePanel == null) {
@@ -634,7 +641,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
             generalFetcher.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GeneralFetcher.class));
             openOfficePanel.getToggleAction().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
-            Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
+            // TODO: Can't notify focus listener since it is expecting a swing component
+            //Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
             setWindowTitle();
             editModeAction.initName();
             // Update search autocompleter with information for the correct database:
@@ -832,12 +840,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         boolean close = true;
 
         List<String> filenames = new ArrayList<>();
-        if (tabbedPane.getTabCount() > 0) {
-            for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+        for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
                 BibDatabaseContext context = getBasePanelAt(i).getBibDatabaseContext();
 
                 if (getBasePanelAt(i).isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
-                    tabbedPane.setSelectedIndex(i);
+                    tabbedPane.getSelectionModel().select(i);
                     String filename = context.getDatabaseFile().map(File::getAbsolutePath).orElse(GUIGlobals.UNTITLED_TITLE);
                     int answer = showSaveDialog(filename);
 
@@ -873,10 +880,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 BackupManager.shutdown(context);
                 context.getDatabaseFile().map(File::getAbsolutePath).ifPresent(filenames::add);
             }
-        }
 
         if (close) {
-            for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+            for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
                 if (getBasePanelAt(i).isSaving()) {
                     // There is a database still being saved, so we need to wait.
                     WaitForSaveOperation w = new WaitForSaveOperation(this);
@@ -895,8 +901,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void initLayout() {
-        tabbedPane.putClientProperty(Options.NO_CONTENT_BORDER_KEY, Boolean.TRUE);
-
         setProgressBarVisible(false);
 
         pushApplications = new PushToApplications();
@@ -913,7 +917,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         splitPane.setDividerSize(2);
         splitPane.setBorder(null);
-        splitPane.setRightComponent(tabbedPane);
+        JFXPanel tabbedPaneContainer = CustomJFXPanel.wrap(new Scene(tabbedPane));
+        splitPane.setRightComponent(tabbedPaneContainer);
         splitPane.setLeftComponent(sidePaneManager.getPanel());
         getContentPane().add(splitPane, BorderLayout.CENTER);
 
@@ -947,7 +952,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         // Drag and drop for tabbedPane:
         TransferHandler xfer = new EntryTableTransferHandler(null, this, null);
-        tabbedPane.setTransferHandler(xfer);
+        // TODO:
+        //tabbedPane.setTransferHandler(xfer);
         tlb.setTransferHandler(xfer);
         mb.setTransferHandler(xfer);
         sidePaneManager.getPanel().setTransferHandler(xfer);
@@ -959,7 +965,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * @param i Index of base
      */
     public BasePanel getBasePanelAt(int i) {
-        return (BasePanel) tabbedPane.getComponentAt(i);
+        return (BasePanel) tabbedPane.getTabs().get(i).getContent();
     }
 
     /**
@@ -969,68 +975,57 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public List<BasePanel> getBasePanelList() {
         List<BasePanel> returnList = new ArrayList<>();
         for (int i = 0; i < getBasePanelCount(); i++) {
-            returnList.add((BasePanel) tabbedPane.getComponentAt(i));
+            returnList.add(getBasePanelAt(i));
         }
         return returnList;
     }
 
     public void showBasePanelAt(int i) {
-        tabbedPane.setSelectedIndex(i);
+        tabbedPane.getSelectionModel().select(i);
     }
 
     public void showBasePanel(BasePanel bp) {
-        tabbedPane.setSelectedComponent(bp);
+        tabbedPane.getSelectionModel().select(getTab(bp));
     }
 
     /**
      * Returns the currently viewed BasePanel.
      */
     public BasePanel getCurrentBasePanel() {
-        if (tabbedPane == null) {
+        if (tabbedPane == null || tabbedPane.getSelectionModel().getSelectedItem() == null) {
             return null;
         }
-        return (BasePanel) tabbedPane.getSelectedComponent();
+        return (BasePanel) tabbedPane.getSelectionModel().getSelectedItem().getContent();
     }
 
     /**
      * @return the BasePanel count.
      */
     public int getBasePanelCount() {
-        return tabbedPane.getComponentCount();
+        return tabbedPane.getTabs().size();
+    }
+
+    private Tab getTab(BasePanel comp) {
+        for (Tab tab : tabbedPane.getTabs()) {
+            if (tab.getContent() == comp) {
+                return tab;
+            }
+        }
+        return null;
     }
 
     /**
-     * handle the color of active and inactive JTabbedPane tabs
+     * @deprecated do not operate on tabs but on BibDatabaseContexts
      */
-    private void markActiveBasePanel() {
-        int now = tabbedPane.getSelectedIndex();
-        int len = tabbedPane.getTabCount();
-        if ((lastTabbedPanelSelectionIndex > -1) && (lastTabbedPanelSelectionIndex < len)) {
-            tabbedPane.setForegroundAt(lastTabbedPanelSelectionIndex, GUIGlobals.INACTIVE_TABBED_COLOR);
-        }
-        if ((now > -1) && (now < len)) {
-            tabbedPane.setForegroundAt(now, GUIGlobals.ACTIVE_TABBED_COLOR);
-        }
-        lastTabbedPanelSelectionIndex = now;
-    }
-
-    private int getTabIndex(JComponent comp) {
-        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-            if (tabbedPane.getComponentAt(i) == comp) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    public JTabbedPane getTabbedPane() {
+    @Deprecated
+    public TabPane getTabbedPane() {
         return tabbedPane;
     }
 
-    public void setTabTitle(JComponent comp, String title, String toolTip) {
-        int index = getTabIndex(comp);
-        tabbedPane.setTitleAt(index, title);
-        tabbedPane.setToolTipTextAt(index, toolTip);
+    public void setTabTitle(BasePanel comp, String title, String toolTip) {
+        Tab tab = getTab(comp);
+        tab.setText(title);
+        tab.setTooltip(new Tooltip(toolTip));
     }
 
     private void fillMenu() {
@@ -1299,7 +1294,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     .filter(p -> p.getBibDatabaseContext().getDatabaseFile().equals(pr.getFile())).findFirst();
 
             if (panel.isPresent()) {
-                tabbedPane.setSelectedComponent(panel.get());
+                tabbedPane.getSelectionModel().select(getTab(panel.get()));
             } else {
                 addTab(pr.getDatabaseContext(), focusPanel);
             }
@@ -1445,8 +1440,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         atLeastOneEntryActions.clear();
         atLeastOneEntryActions.addAll(Arrays.asList(downloadFullText, lookupIdentifiers, exportLinkedFiles));
 
-        tabbedPane.addChangeListener(event -> updateEnabledState());
-
+        tabbedPane.getTabs().addListener(this::updateEnabledState);
     }
 
     /**
@@ -1454,10 +1448,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * <p>
      * The action that are affected are set in initActions.
      */
-    public void updateEnabledState() {
-        int tabCount = tabbedPane.getTabCount();
-        if (tabCount != previousTabCount) {
-            previousTabCount = tabCount;
+    public void updateEnabledState(ListChangeListener.Change<? extends Tab> change) {
+        int tabCount = tabbedPane.getTabs().size();
+        if (!change.next()) {
+            return;
+        }
+        if (change.wasAdded() || change.wasRemoved()) {
             setEnabled(openDatabaseOnlyActions, tabCount > 0);
             setEnabled(severalDatabasesOnlyActions, tabCount > 1);
         }
@@ -1503,7 +1499,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         // We want to notify all tabs about the changes to
         // avoid problems when changing the column set.
-        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+        for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
             BasePanel bf = getBasePanelAt(i);
 
             // Update tables:
@@ -1548,43 +1544,46 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 if (!uniqPath.equals(file.get().getName()) && uniqPath.contains(File.separator)) {
                     // remove filename
                     uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
-                    tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
+                    tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
                 } else {
                     // set original filename (again)
-                    tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle());
+                    tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
                 }
             } else {
-                tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle());
+                tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
             }
-            tabbedPane.setToolTipTextAt(i, file.map(File::getAbsolutePath).orElse(null));
+            tabbedPane.getTabs().get(i).setTooltip(new Tooltip(file.map(File::getAbsolutePath).orElse(null)));
         }
     }
 
     public void addTab(BasePanel basePanel, boolean raisePanel) {
-        // add tab
-        tabbedPane.add(basePanel.getTabTitle(), basePanel);
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            // add tab
+            Tab newTab = new Tab(basePanel.getTabTitle(), basePanel);
+            tabbedPane.getTabs().add(newTab);
 
-        // update all tab titles
-        updateAllTabTitles();
+            // update all tab titles
+            updateAllTabTitles();
 
-        if (raisePanel) {
-            tabbedPane.setSelectedComponent(basePanel);
-        }
+            if (raisePanel) {
+                tabbedPane.getSelectionModel().select(newTab);
+            }
 
-        // Register undo/redo listener
-        basePanel.getUndoManager().registerListener(new UndoRedoEventManager());
+            // Register undo/redo listener
+            basePanel.getUndoManager().registerListener(new UndoRedoEventManager());
 
-        BibDatabaseContext context = basePanel.getBibDatabaseContext();
+            BibDatabaseContext context = basePanel.getBibDatabaseContext();
 
-        if (readyForAutosave(context)) {
-            AutosaveManager autosaver = AutosaveManager.start(context);
-            autosaver.registerListener(new AutosaveUIManager(basePanel));
-        }
+            if (readyForAutosave(context)) {
+                AutosaveManager autosaver = AutosaveManager.start(context);
+                autosaver.registerListener(new AutosaveUIManager(basePanel));
+            }
 
-        BackupManager.start(context);
+            BackupManager.start(context);
 
-        // Track opening
-        trackOpenNewDatabase(basePanel);
+            // Track opening
+            trackOpenNewDatabase(basePanel);
+        });
     }
 
     private void trackOpenNewDatabase(BasePanel basePanel) {
@@ -1640,6 +1639,15 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 createDisabledIconsForButtons((JPanel) component);
             }
         }
+    }
+
+    public void sortTabs() {
+        // We are going to be crude: remove all tabs and re-add them in a sorted way
+        // This is ugly, but otherwise we run into issues: https://stackoverflow.com/questions/37328760/javafx-tabpane-sorting-tabs-creates-havoc
+        List<Tab> tabs = new ArrayList<>(tabbedPane.getTabs());
+        tabs.sort((o1, o2) -> o2.getText().compareTo(o1.getText()));
+        tabbedPane.getTabs().clear();
+        tabbedPane.getTabs().setAll(tabs);
     }
 
     /**
@@ -1815,6 +1823,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 JOptionPane.WARNING_MESSAGE, null, options, options[2]);
     }
 
+    private void closeTab(Tab tab) {
+        closeTab(getBasePanel(tab));
+    }
+
+    private BasePanel getBasePanel(Tab tab) {
+        return (BasePanel) tab.getContent();
+    }
+
     private void closeTab(BasePanel panel) {
         // empty tab without database
         if (panel == null) {
@@ -1868,12 +1884,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private void removeTab(BasePanel panel) {
         panel.cleanUp();
-        tabbedPane.remove(panel);
-        if (tabbedPane.getTabCount() > 0) {
-            markActiveBasePanel();
-        }
+        tabbedPane.getTabs().remove(getTab(panel));
         setWindowTitle();
-        updateEnabledState();
         output(Localization.lang("Closed library") + '.');
         // update tab titles
         updateAllTabTitles();
@@ -1988,7 +2000,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             initName();
 
             // update all elements in current base panel
-            JabRefFrame.this.getCurrentBasePanel().hideBottomComponent();
+            JabRefFrame.this.getCurrentBasePanel().closeBottomPane();
             JabRefFrame.this.getCurrentBasePanel().updateEntryEditorIfShowing();
         }
     }
@@ -2047,9 +2059,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (tabbedPane.getTabCount() > 0) {
+            if (tabbedPane.getTabs().size() > 0) {
                 try {
-                    ((BasePanel) tabbedPane.getSelectedComponent()).runCommand(command);
+                    getCurrentBasePanel().runCommand(command);
                 } catch (Throwable ex) {
                     LOGGER.error("Problem with executing command: " + command, ex);
                 }
@@ -2080,7 +2092,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private class ShowPrefsAction extends MnemonicAwareAction {
 
         public ShowPrefsAction() {
-            super(IconTheme.JabRefIcon.PREFERENCES.getIcon());
+            super(IconTheme.JabRefIcons.PREFERENCES.getIcon());
             putValue(Action.NAME, Localization.menuTitle("Preferences"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Preferences"));
         }
@@ -2105,15 +2117,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int i = tabbedPane.getSelectedIndex();
-            int newI = next ? i + 1 : i - 1;
-            if (newI < 0) {
-                newI = tabbedPane.getTabCount() - 1;
+            if (next) {
+                tabbedPane.getSelectionModel().selectNext();
+            } else {
+                tabbedPane.getSelectionModel().selectPrevious();
             }
-            if (newI == tabbedPane.getTabCount()) {
-                newI = 0;
-            }
-            tabbedPane.setSelectedIndex(newI);
         }
     }
 
@@ -2317,7 +2325,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private class CloseDatabaseAction extends MnemonicAwareAction {
 
         public CloseDatabaseAction() {
-            super(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
+            super(IconTheme.JabRefIcons.CLOSE.getSmallIcon());
             putValue(Action.NAME, Localization.menuTitle("Close library"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current library"));
             putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DATABASE));
@@ -2333,10 +2341,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            final Component[] panels = tabbedPane.getComponents();
+            final List<Tab> tabs = tabbedPane.getTabs();
 
-            for (Component p : panels) {
-                closeTab((BasePanel) p);
+            for (Tab tab : tabs) {
+                closeTab(tab);
             }
         }
     }
@@ -2346,11 +2354,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         @Override
         public void actionPerformed(ActionEvent e) {
             final BasePanel active = getCurrentBasePanel();
-            final Component[] panels = tabbedPane.getComponents();
+            final List<Tab> tabs = tabbedPane.getTabs();
 
-            for (Component p : panels) {
-                if (!Objects.equals(p, active)) {
-                    closeTab((BasePanel) p);
+            for (Tab tab : tabs) {
+                if (!tab.getContent().equals(active)) {
+                    closeTab(tab);
                 }
             }
         }

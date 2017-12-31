@@ -217,7 +217,6 @@ public class SynchronizeFileField extends AbstractWorker {
                                     fileTypes.add(newType);
                                     Collections.sort(fileTypes);
                                     ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);
-                                    panel.getMainTable().repaint();
                                 }
                             } else {
                                 // User wants to change the type of this link.

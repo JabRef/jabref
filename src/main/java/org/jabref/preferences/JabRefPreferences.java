@@ -31,7 +31,6 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
-import javax.swing.JTable;
 import javax.swing.UIManager;
 
 import org.jabref.JabRefException;
@@ -502,8 +501,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SIZE_X, 1024);
         defaults.put(SIZE_Y, 768);
         defaults.put(WINDOW_MAXIMISED, Boolean.FALSE);
-        defaults.put(AUTO_RESIZE_MODE, JTable.AUTO_RESIZE_ALL_COLUMNS);
-        defaults.put(ENTRY_EDITOR_HEIGHT, 400);
+        defaults.put(AUTO_RESIZE_MODE, Boolean.TRUE);
+        defaults.put(ENTRY_EDITOR_HEIGHT, 0.75);
         defaults.put(TABLE_COLOR_CODES_ON, Boolean.FALSE);
         defaults.put(TABLE_RESOLVED_COLOR_CODES_ON, Boolean.FALSE);
         defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
@@ -1033,7 +1032,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private double getDoubleDefault(String key) {
-        return (double) defaults.get(key);
+        return ((Number) defaults.get(key)).doubleValue();
     }
 
     public void put(String key, String value) {
@@ -1475,7 +1474,7 @@ public class JabRefPreferences implements PreferencesService {
     public PreviewPreferences getPreviewPreferences() {
         int cyclePos = getInt(CYCLE_PREVIEW_POS);
         List<String> cycle = getStringList(CYCLE_PREVIEW);
-        int panelHeight = getInt(PREVIEW_PANEL_HEIGHT);
+        double panelHeight = getDouble(PREVIEW_PANEL_HEIGHT);
         String style = get(PREVIEW_STYLE);
         String styleDefault = (String) defaults.get(PREVIEW_STYLE);
         boolean enabled = getBoolean(PREVIEW_ENABLED);
