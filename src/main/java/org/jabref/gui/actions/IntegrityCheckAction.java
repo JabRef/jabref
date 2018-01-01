@@ -29,6 +29,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -53,8 +54,8 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
         IntegrityCheck check = new IntegrityCheck(frame.getCurrentBasePanel().getBibDatabaseContext(),
                 Globals.prefs.getFileDirectoryPreferences(),
                 Globals.prefs.getBibtexKeyPatternPreferences(),
-                Globals.journalAbbreviationLoader
-                        .getRepository(Globals.prefs.getJournalAbbreviationPreferences()));
+                Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
+                Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
 
         final JDialog integrityDialog = new JDialog(frame, true);
         integrityDialog.setUndecorated(true);

@@ -40,6 +40,8 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
@@ -55,6 +57,7 @@ import org.jabref.gui.bibtexkeypattern.SearchFixDuplicateLabels;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.collab.FileUpdatePanel;
 import org.jabref.gui.contentselector.ContentSelectorDialog;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.ExportToClipboardAction;
@@ -169,11 +172,14 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     // Keeps track of the string dialog if it is open.
     private final Map<String, Object> actions = new HashMap<>();
     private final SidePaneManager sidePaneManager;
+    private final PreviewPanel preview;
+    private final JFXPanel previewContainer;
 
     // To contain instantiated entry editors. This is to save time
     // As most enums, this must not be null
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
-    private EntryEditor currentEditor;
+    private final EntryEditor entryEditor;
+    private final JFXPanel entryEditorContainer;
     private MainTableSelectionListener selectionListener;
     private JSplitPane splitPane;
     private boolean saving;
@@ -215,6 +221,10 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext);
 
+        this.preview = new PreviewPanel(this, getBibDatabaseContext());
+        DefaultTaskExecutor.runInJavaFXThread(() -> frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview));
+        this.previewContainer = CustomJFXPanel.wrap(new Scene(preview));
+
         setupMainPanel();
 
         setupActions();
@@ -239,6 +249,37 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         }
 
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
+
+        entryEditor = new EntryEditor(this);
+        entryEditorContainer = setupEntryEditor(entryEditor);
+
+    }
+
+    private static JFXPanel setupEntryEditor(EntryEditor entryEditor) {
+        JFXPanel container = CustomJFXPanel.wrap(new Scene(entryEditor));
+        container.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+
+                //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
+                Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
+                if (keyBinding.isPresent()) {
+                    switch (keyBinding.get()) {
+                        case CUT:
+                        case COPY:
+                        case PASTE:
+                        case DELETE_ENTRY:
+                        case SELECT_ALL:
+                            e.consume();
+                            break;
+                        default:
+                            //do nothing
+                    }
+                }
+            }
+        });
+        return container;
     }
 
     public static void runWorker(AbstractWorker worker) throws Exception {
@@ -687,8 +728,8 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             frame.setPreviewToggle(enabled);
         });
 
-        actions.put(Actions.NEXT_PREVIEW_STYLE, (BaseAction) selectionListener::nextPreviewStyle);
-        actions.put(Actions.PREVIOUS_PREVIEW_STYLE, (BaseAction) selectionListener::previousPreviewStyle);
+        actions.put(Actions.NEXT_PREVIEW_STYLE, (BaseAction) this::nextPreviewStyle);
+        actions.put(Actions.PREVIOUS_PREVIEW_STYLE, (BaseAction) this::previousPreviewStyle);
 
         actions.put(Actions.MANAGE_SELECTORS, (BaseAction) () -> {
             ContentSelectorDialog csd = new ContentSelectorDialog(frame, frame, BasePanel.this, false, null);
@@ -766,7 +807,16 @@ public class BasePanel extends JPanel implements ClipboardOwner {
      *            "deleted". If true the action will be localized as "cut"
      */
     private void delete(boolean cut) {
-        List<BibEntry> entries = mainTable.getSelectedEntries();
+        delete(cut, mainTable.getSelectedEntries());
+    }
+
+    /**
+     * Removes the selected entries from the database
+     *
+     * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as
+     *            "deleted". If true the action will be localized as "cut"
+     */
+    private void delete(boolean cut, List<BibEntry> entries) {
         if (entries.isEmpty()) {
             return;
         }
@@ -803,6 +853,10 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 
         // prevent the main table from loosing focus
         mainTable.requestFocus();
+    }
+
+    public void delete(BibEntry entry) {
+        delete(false, Collections.singletonList(entry));
     }
 
     private void paste() {
@@ -1067,7 +1121,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             if (ex.specificEntry()) {
                 // Error occurred during processing of the entry. Highlight it:
                 highlightEntry(ex.getEntry());
-                showEntry(ex.getEntry());
+                showAndEdit(ex.getEntry());
             } else {
                 LOGGER.warn("Could not save", ex);
             }
@@ -1173,9 +1227,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                 // The database just changed.
                 markBaseChanged();
 
-                final EntryEditor entryEditor = getEntryEditor(be);
-                this.showEntryEditor(entryEditor);
-                entryEditor.requestFocus();
+                this.showAndEdit(be);
 
                 return be;
             } catch (KeyCollisionException ex) {
@@ -1214,14 +1266,11 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     public void editEntryByIdAndFocusField(final String entryId, final String fieldName) {
-        final Optional<BibEntry> entry = bibDatabaseContext.getDatabase().getEntryById(entryId);
-        entry.ifPresent(e -> {
-            mainTable.setSelected(mainTable.findEntry(e));
+        bibDatabaseContext.getDatabase().getEntryById(entryId).ifPresent(entry -> {
+            mainTable.setSelected(mainTable.findEntry(entry));
             selectionListener.editSignalled();
-            final EntryEditor editor = getEntryEditor(e);
-            editor.setFocusToField(fieldName);
-            this.showEntryEditor(editor);
-            editor.requestFocus();
+            showAndEdit(entry);
+            entryEditor.setFocusToField(fieldName);
         });
     }
 
@@ -1264,7 +1313,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                         break;
                     case SHOWING_EDITOR:
                     case WILL_SHOW_EDITOR:
-                        entryEditorClosing(getCurrentEditor());
+                        entryEditorClosing(getEntryEditor());
                         break;
                     default:
                         LOGGER.warn("unknown BasePanelMode: '" + mode + "', doing nothing");
@@ -1445,93 +1494,66 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         }
     }
 
-    private boolean isShowingEditor() {
-        return (splitPane.getBottomComponent() != null) && (splitPane.getBottomComponent() instanceof EntryEditor);
-    }
-
-    public void showEntry(final BibEntry bibEntry) {
-
-        if (getShowing() == bibEntry) {
-            if (splitPane.getBottomComponent() == null) {
-                // This is the special occasion when showing is set to an
-                // entry, but no entry editor is in fact shown. This happens
-                // after Preferences dialog is closed, and it means that we
-                // must make sure the same entry is shown again. We do this by
-                // setting showing to null, and recursively calling this method.
-                newEntryShowing(null);
-                showEntry(bibEntry);
-            }
-            return;
-        }
-
-        String visName = null;
-        if ((getShowing() != null) && isShowingEditor()) {
-            visName = ((EntryEditor) splitPane.getBottomComponent()).getVisibleTabName();
-        }
-
-        // We must instantiate a new editor.
-        EntryEditor entryEditor = getEntryEditor(bibEntry);
-        if (visName != null) {
-            entryEditor.setVisibleTab(visName);
-        }
-        showEntryEditor(entryEditor);
-
-        newEntryShowing(bibEntry);
+    public EntryEditor getEntryEditor() {
+        return entryEditor;
     }
 
     /**
-     * Get an entry editor ready to edit the given entry.
-     *
-     * @param entry The entry to be edited.
-     * @return A suitable entry editor.
-     */
-    public EntryEditor getEntryEditor(BibEntry entry) {
-        if (currentEditor != null) {
-            currentEditor.setEntry(entry);
-            return currentEditor;
-        } else {
-            EntryEditor editor = new EntryEditor(this);
-            editor.setEntry(entry);
-            return editor;
-        }
-    }
-
-    public EntryEditor getCurrentEditor() {
-        return currentEditor;
-    }
-
-    /**
-     * Sets the given entry editor as the bottom component in the split pane. If an entry editor already was shown,
+     * Sets the entry editor as the bottom component in the split pane. If an entry editor already was shown,
      * makes sure that the divider doesn't move. Updates the mode to SHOWING_EDITOR.
+     * Then shows the given entry.
      *
-     * @param editor The entry editor to add.
+     * @param entry The entry to edit.
      */
-    public void showEntryEditor(EntryEditor editor) {
+    public void showAndEdit(BibEntry entry) {
         if (mode == BasePanelMode.SHOWING_EDITOR) {
-            Globals.prefs.putInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT,
-                    splitPane.getHeight() - splitPane.getDividerLocation());
+            Globals.prefs.putInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT, splitPane.getHeight() - splitPane.getDividerLocation());
         }
         mode = BasePanelMode.SHOWING_EDITOR;
-        if (currentEditor != null) {
-            currentEditor.setMovingToDifferentEntry();
+        splitPane.setBottomComponent(entryEditorContainer);
+
+        if (entry != getShowing()) {
+            entryEditor.setEntry(entry);
+            newEntryShowing(entry);
         }
-        currentEditor = editor;
-        splitPane.setBottomComponent(editor);
-        if (editor.getEntry() != getShowing()) {
-            newEntryShowing(editor.getEntry());
-        }
+        entryEditor.requestFocus();
         adjustSplitter();
     }
 
     /**
      * Sets the given preview panel as the bottom component in the split panel. Updates the mode to SHOWING_PREVIEW.
      *
-     * @param preview The preview to show.
+     * @param entry The entry to show in the preview.
      */
-    public void showPreview(PreviewPanel preview) {
+    public void showPreview(BibEntry entry) {
+        preview.setEntry(entry);
         mode = BasePanelMode.SHOWING_PREVIEW;
-        splitPane.setBottomComponent(preview);
+        splitPane.setBottomComponent(previewContainer);
         adjustSplitter();
+    }
+
+    private void showPreview() {
+        if (!mainTable.getSelected().isEmpty()) {
+            showPreview(mainTable.getSelected().get(0));
+        }
+    }
+
+    public void nextPreviewStyle() {
+        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() + 1);
+    }
+
+    public void previousPreviewStyle() {
+        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() - 1);
+    }
+
+    private void cyclePreview(int newPosition) {
+        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
+                .getBuilder()
+                .withPreviewCyclePosition(newPosition)
+                .build();
+        Globals.prefs.storePreviewPreferences(previewPreferences);
+
+        preview.updateLayout(previewPreferences);
     }
 
     /**
@@ -1594,7 +1616,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
      * Closes the entry editor or preview panel if it is showing the given entry.
      */
     public void ensureNotShowingBottomPanel(BibEntry entry) {
-        if (((mode == BasePanelMode.SHOWING_EDITOR) && (currentEditor.getEntry() == entry))
+        if (((mode == BasePanelMode.SHOWING_EDITOR) && (entryEditor.getEntry() == entry))
                 || ((mode == BasePanelMode.SHOWING_PREVIEW) && (selectionListener.getPreview().getEntry() == entry))) {
             hideBottomComponent();
         }
@@ -1602,12 +1624,9 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 
     public void updateEntryEditorIfShowing() {
         if (mode == BasePanelMode.SHOWING_EDITOR) {
-            if (!currentEditor.getDisplayedBibEntryType().equals(currentEditor.getEntry().getType())) {
-                // The entry has changed type, so we must get a new editor.
-                newEntryShowing(null);
-                final EntryEditor newEditor = getEntryEditor(currentEditor.getEntry());
-                showEntryEditor(newEditor);
-            }
+            BibEntry currentEntry = entryEditor.getEntry();
+            showAndEdit(null);
+            showAndEdit(currentEntry);
         }
     }
 
@@ -1756,14 +1775,6 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     /**
-     * Activates or deactivates the entry preview, depending on the argument. When deactivating, makes sure that any
-     * visible preview is hidden.
-     */
-    private void setPreviewActive(boolean enabled) {
-        selectionListener.setPreviewActive(enabled);
-    }
-
-    /**
      * Depending on whether a preview or an entry editor is showing, save the current divider location in the correct
      * preference setting.
      */
@@ -1785,15 +1796,6 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     @Override
     public void lostOwnership(Clipboard clipboard, Transferable contents) {
         // Nothing
-    }
-
-    private void setEntryEditorEnabled(boolean enabled) {
-        if ((getShowing() != null) && (splitPane.getBottomComponent() instanceof EntryEditor)) {
-            EntryEditor ed = (EntryEditor) splitPane.getBottomComponent();
-            if (ed.isEnabled() != enabled) {
-                ed.setEnabled(enabled);
-            }
-        }
     }
 
     /**
@@ -1864,7 +1866,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
      *
      * @param entry The entry that is now to be shown.
      */
-    public void newEntryShowing(BibEntry entry) {
+    private void newEntryShowing(BibEntry entry) {
 
         // If this call is the result of a Back or Forward operation, we must take
         // care not to make any history changes, since the necessary changes will
@@ -1937,6 +1939,14 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         }
     }
 
+    private void setPreviewActive(boolean enabled) {
+        if (enabled) {
+            showPreview();
+        } else {
+            preview.close();
+        }
+    }
+
     public CountingUndoManager getUndoManager() {
         return undoManager;
     }
@@ -1967,11 +1977,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     public PreviewPanel getPreviewPanel() {
-        if (selectionListener == null) {
-            // only occurs if this is called while instantiating this BasePanel
-            return null;
-        }
-        return selectionListener.getPreview();
+        return preview;
     }
 
     public FileAnnotationCache getAnnotationCache() {
@@ -2055,13 +2061,13 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         @Subscribe
         public void listen(EntryRemovedEvent entryRemovedEvent) {
             // if the entry that is displayed in the current entry editor is removed, close the entry editor
-            if (isShowingEditor() && currentEditor.getEntry().equals(entryRemovedEvent.getBibEntry())) {
-                currentEditor.close();
+            if ((mode == BasePanelMode.SHOWING_EDITOR) && entryEditor.getEntry().equals(entryRemovedEvent.getBibEntry())) {
+                entryEditor.close();
             }
 
             BibEntry previewEntry = selectionListener.getPreview().getEntry();
             if ((previewEntry != null) && previewEntry.equals(entryRemovedEvent.getBibEntry())) {
-                selectionListener.setPreviewActive(false);
+                preview.close();
             }
         }
     }
@@ -2208,9 +2214,8 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 
         @Override
         public void action() throws Exception {
-            selectionListener.setPreviewActive(true);
-            showPreview(selectionListener.getPreview());
-            selectionListener.getPreview().getPrintAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+            showPreview();
+            preview.print();
         }
     }
 

@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
+import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
+import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.model.entry.BibEntry;
 
 import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.ItemDataProvider;
-import de.undercouch.citeproc.ListItemDataProvider;
 import de.undercouch.citeproc.bibtex.BibTeXConverter;
 import de.undercouch.citeproc.csl.CSLItemData;
 import de.undercouch.citeproc.output.Bibliography;
@@ -78,39 +78,45 @@ public class CSLAdapter {
      */
     private static class JabRefItemDataProvider implements ItemDataProvider {
 
-        private ItemDataProvider dataProvider = new ListItemDataProvider();
-
-        public void setData(List<BibEntry> data) {
-            List<CSLItemData> cslItemData = new ArrayList<>(data.size());
-            for (BibEntry bibEntry : data) {
-                cslItemData.add(bibEntryToCSLItemData(bibEntry));
-            }
-            dataProvider = new ListItemDataProvider(cslItemData);
-        }
-
-        @Override
-        public CSLItemData retrieveItem(String id) {
-            return dataProvider.retrieveItem(id);
-        }
-
-        @Override
-        public String[] getIds() {
-            return dataProvider.getIds();
-        }
+        private ArrayList<BibEntry> data = new ArrayList<>();
 
         /**
          * Converts the {@link BibEntry} into {@link CSLItemData}.
          */
-        private CSLItemData bibEntryToCSLItemData(BibEntry bibEntry) {
+        private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry) {
             String citeKey = bibEntry.getCiteKeyOptional().orElse("");
             BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType()), new Key(citeKey));
 
             // Not every field is already generated into latex free fields
+            HTMLChars latexToHtmlConverter = new HTMLChars();
+            RemoveNewlinesFormatter removeNewlinesFormatter = new RemoveNewlinesFormatter();
             for (String key : bibEntry.getFieldMap().keySet()) {
-                Optional<String> latexFreeField = bibEntry.getLatexFreeField(key);
-                latexFreeField.ifPresent(value -> bibTeXEntry.addField(new Key(key), new DigitStringValue(value)));
+                bibEntry.getField(key)
+                        .map(removeNewlinesFormatter::format)
+                        .map(latexToHtmlConverter::format)
+                        .ifPresent(value -> bibTeXEntry.addField(new Key(key), new DigitStringValue(value)));
             }
             return BIBTEX_CONVERTER.toItemData(bibTeXEntry);
+        }
+
+        public void setData(List<BibEntry> data) {
+            this.data.clear();
+            this.data.addAll(data);
+        }
+
+        @Override
+        public CSLItemData retrieveItem(String id) {
+            return data.stream()
+                    .filter(entry -> entry.getCiteKeyOptional().orElse("").equals(id))
+                    .map(JabRefItemDataProvider::bibEntryToCSLItemData)
+                    .findFirst().orElse(null);
+        }
+
+        @Override
+        public String[] getIds() {
+            return data.stream()
+                    .map(entry -> entry.getCiteKeyOptional().orElse(""))
+                    .toArray(String[]::new);
         }
     }
 }

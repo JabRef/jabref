@@ -4,16 +4,16 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.function.Consumer;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
-import org.jabref.gui.externalfiles.FileDownloadTask;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.fxmisc.easybind.EasyBind;
 
 /**
  * A very simple implementation of the {@link TaskExecutor} interface.
@@ -43,13 +43,8 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     @Override
-    public <V> void execute(BackgroundTask<V> task) {
-        EXECUTOR.submit(getJavaFXTask(task));
-    }
-
-    @Override
-    public void execute(FileDownloadTask downloadTask) {
-        EXECUTOR.submit(downloadTask);
+    public <V> Future<?> execute(BackgroundTask<V> task) {
+        return EXECUTOR.submit(getJavaFXTask(task));
     }
 
     @Override
@@ -59,6 +54,10 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
         Task<V> javaTask = new Task<V>() {
+
+            {
+                EasyBind.subscribe(task.progressProperty(), progress -> updateProgress(progress.getWorkDone(), progress.getMax()));
+            }
 
             @Override
             public V call() throws Exception {
