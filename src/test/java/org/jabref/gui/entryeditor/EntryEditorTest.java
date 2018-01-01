@@ -8,18 +8,21 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.fxmisc.richtext.CodeArea;
-import org.junit.Test;
-import org.mockito.Answers;
-import org.testfx.framework.junit.ApplicationTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.testfx.api.FxRobot;
+import org.testfx.framework.junit5.ApplicationExtension;
+import org.testfx.framework.junit5.Start;
 
 import static org.mockito.Mockito.mock;
 
-public class EntryEditorTest extends ApplicationTest {
+@ExtendWith(ApplicationExtension.class)
+public class EntryEditorTest {
 
     private Stage stage;
     private Scene scene;
@@ -27,12 +30,11 @@ public class EntryEditorTest extends ApplicationTest {
     private TabPane pane;
     private SourceTab sourceTab;
 
-    @Override
-    public void start(Stage stage) throws Exception {
+    @Start
+    public void onStart(Stage stage) {
         area = new CodeArea();
         area.appendText("some example\n text to go here\n across a couple of \n lines....");
-        JabRefPreferences preferences = mock(JabRefPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), new LatexFieldFormatterPreferences(), preferences);
+        sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), new LatexFieldFormatterPreferences(), mock(ImportFormatPreferences.class));
         pane = new TabPane(
                 new Tab("main area", area),
                 new Tab("other tab", new Label("some text")),
@@ -51,22 +53,22 @@ public class EntryEditorTest extends ApplicationTest {
     }
 
     @Test
-    public void switchingFromSourceTabDoesNotThrowException() throws Exception {
+    void switchingFromSourceTabDoesNotThrowException(FxRobot robot) throws Exception {
         BibEntry entry = new BibEntry();
         entry.setField("test", "testvalue");
 
         // Update source editor
-        interact(() -> pane.getSelectionModel().select(2));
-        interact(() -> sourceTab.bindToEntry(entry));
-        clickOn(1200, 500);
-        interrupt(100);
+        robot.interact(() -> pane.getSelectionModel().select(2));
+        robot.interact(() -> sourceTab.bindToEntry(entry));
+        robot.clickOn(1200, 500);
+        robot.interrupt(100);
 
         // Switch to different tab & update entry
-        interact(() -> pane.getSelectionModel().select(1));
-        interact(() -> stage.setWidth(600));
-        interact(() -> entry.setField("test", "new value"));
+        robot.interact(() -> pane.getSelectionModel().select(1));
+        robot.interact(() -> stage.setWidth(600));
+        robot.interact(() -> entry.setField("test", "new value"));
 
         // No exception should be thrown
-        interrupt(100);
+        robot.interrupt(100);
     }
 }

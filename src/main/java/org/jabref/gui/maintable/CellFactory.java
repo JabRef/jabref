@@ -16,7 +16,7 @@ public class CellFactory {
 
     private final Map<String, Node> TABLE_ICONS = new HashMap<>();
 
-    public CellFactory() {
+    public CellFactory(ExternalFileTypes externalFileTypes) {
         Node label;
         label = IconTheme.JabRefIcons.PDF_FILE.getGraphicNode();
         //label.setToo(Localization.lang("Open") + " PDF");
@@ -50,7 +50,7 @@ public class CellFactory {
         //label.setToolTipText(Localization.lang("Open file"));
         TABLE_ICONS.put(FieldName.FILE, label);
 
-        for (ExternalFileType fileType : ExternalFileTypes.getInstance().getExternalFileTypeSelection()) {
+        for (ExternalFileType fileType : externalFileTypes.getExternalFileTypeSelection()) {
             label = fileType.getIcon().getGraphicNode();
             //label.setToolTipText(Localization.lang("Open %0 file", fileType.getName()));
             TABLE_ICONS.put(fileType.getName(), label);

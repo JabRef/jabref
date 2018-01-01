@@ -56,7 +56,7 @@ class ResolveDuplicateLabelDialog {
             JCheckBox cb = new JCheckBox(Localization.lang("Generate BibTeX key"), !first);
             b.appendRows("1dlu, p");
             b.add(cb).xy(1, row);
-            PreviewPanel previewPanel = new PreviewPanel(null, null);
+            PreviewPanel previewPanel = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences());
             previewPanel.setEntry(entry);
             JFXPanel container = CustomJFXPanel.wrap(new Scene(previewPanel));
             container.setPreferredSize(new Dimension(800, 90));

@@ -43,7 +43,6 @@ import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.BaseAction;
-import org.jabref.gui.actions.CleanupAction;
 import org.jabref.gui.actions.CopyBibTeXKeyAndLinkAction;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteUpdater;
@@ -92,7 +91,6 @@ import org.jabref.gui.util.component.CheckBoxMessage;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.gui.worker.CallBack;
 import org.jabref.gui.worker.CitationStyleToClipboardWorker;
-import org.jabref.gui.worker.MarkEntriesAction;
 import org.jabref.gui.worker.SendAsEMailAction;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.citationstyle.CitationStyleCache;
@@ -138,6 +136,7 @@ import org.jabref.shared.DBMSSynchronizer;
 import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fxmisc.easybind.EasyBind;
@@ -164,6 +163,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private final Map<String, Object> actions = new HashMap<>();
     private final SidePaneManager sidePaneManager;
     private final PreviewPanel preview;
+    private final BasePanelPreferences preferences;
+    private final ExternalFileTypes externalFileTypes;
 
     // To contain instantiated entry editors. This is to save time
     // As most enums, this must not be null
@@ -195,24 +196,20 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
 
-    public BasePanel(JabRefFrame frame, BibDatabaseContext bibDatabaseContext) {
-        Objects.requireNonNull(frame);
-        Objects.requireNonNull(bibDatabaseContext);
+    public BasePanel(JabRefFrame frame, BasePanelPreferences preferences, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes) {
+        this.preferences = Objects.requireNonNull(preferences);
+        this.frame = Objects.requireNonNull(frame);
+        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
+        this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
 
-        this.bibDatabaseContext = bibDatabaseContext;
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
 
         this.sidePaneManager = frame.getSidePaneManager();
-        this.frame = frame;
         this.tableModel = new MainTableDataModel(getBibDatabaseContext());
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext);
-
-        this.preview = new PreviewPanel(this, getBibDatabaseContext());
-        DefaultTaskExecutor.runInJavaFXThread(() -> frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview));
-        this.previewContainer = CustomJFXPanel.wrap(new Scene(preview));
 
         setupMainPanel();
 
@@ -239,9 +236,9 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
-        this.entryEditor = new EntryEditor(this);
+        this.entryEditor = new EntryEditor(this, preferences.getEntryEditorPreferences());
 
-        this.preview = new PreviewPanel(this, getBibDatabaseContext());
+        this.preview = new PreviewPanel(this, getBibDatabaseContext(), preferences.getKeyBindings(), preferences.getPreviewPreferences());
         DefaultTaskExecutor.runInJavaFXThread(() -> frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview));
     }
 
@@ -267,7 +264,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
-        SwingUtilities.invokeLater(() -> this.markBaseChanged());
+        // TODO:
+        //SwingUtilities.invokeLater(() -> this.markBaseChanged());
 
     }
 
@@ -330,7 +328,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
     private void setupActions() {
         SaveDatabaseAction saveAction = new SaveDatabaseAction(this);
-        CleanupAction cleanUpAction = new CleanupAction(this, Globals.prefs);
+        // TODO
+        //CleanupAction cleanUpAction = new CleanupAction(this, Globals.prefs);
 
         actions.put(Actions.UNDO, undoAction);
         actions.put(Actions.REDO, redoAction);
@@ -486,7 +485,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         });
 
         // The action for cleaning up entry.
-        actions.put(Actions.CLEANUP, cleanUpAction);
+        //actions.put(Actions.CLEANUP, cleanUpAction);
 
         actions.put(Actions.MERGE_ENTRIES, (BaseAction) () -> new MergeEntriesDialog(BasePanel.this));
 
@@ -602,7 +601,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             }
         });
 
-        actions.put(Actions.MARK_ENTRIES, new MarkEntriesAction(frame, 0));
+        // TODO
+        //actions.put(Actions.MARK_ENTRIES, new MarkEntriesAction(frame, 0));
 
         actions.put(Actions.UNMARK_ENTRIES, (BaseAction) () -> {
             try {
@@ -1218,7 +1218,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         bibDatabaseContext.getDatabase().registerListener(tableModel.getListSynchronizer());
         bibDatabaseContext.getDatabase().registerListener(SpecialFieldDatabaseChangeListener.getInstance());
 
-        mainTable = new MainTable(tableModel, frame, this, bibDatabaseContext.getDatabase());
+        mainTable = new MainTable(tableModel, frame, this, bibDatabaseContext.getDatabase(), preferences.getTablePreferences(), externalFileTypes);
 
         mainTable.updateFont();
 
@@ -1359,7 +1359,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
      * Set up auto completion for this database
      */
     private void setupAutoCompletion() {
-        AutoCompletePreferences autoCompletePreferences = Globals.prefs.getAutoCompletePreferences();
+        AutoCompletePreferences autoCompletePreferences = preferences.getAutoCompletePreferences();
         if (autoCompletePreferences.shouldAutoComplete()) {
             suggestionProviders = new SuggestionProviders(autoCompletePreferences, Globals.journalAbbreviationLoader);
             suggestionProviders.indexDatabase(getDatabase());
@@ -1401,11 +1401,11 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         }
     }
 
-    public void adjustSplitter() {
+    private void adjustSplitter() {
         if (mode == BasePanelMode.SHOWING_PREVIEW) {
             splitPane.setDividerPositions(Globals.prefs.getPreviewPreferences().getPreviewPanelDividerPosition().doubleValue());
-        } else {
-            splitPane.setDividerPositions(Globals.prefs.getDouble(JabRefPreferences.ENTRY_EDITOR_HEIGHT));
+        } else if (mode == BasePanelMode.SHOWING_EDITOR) {
+            splitPane.setDividerPositions(preferences.getEntryEditorDividerPosition());
         }
     }
 
@@ -1421,8 +1421,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
      * @param entry The entry to edit.
      */
     public void showAndEdit(BibEntry entry) {
-        mode = BasePanelMode.SHOWING_EDITOR;
-        showBottomPane(entryEditor);
+        showBottomPane(BasePanelMode.SHOWING_EDITOR);
 
         if (entry != getShowing()) {
             entryEditor.setEntry(entry);
@@ -1431,12 +1430,27 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         entryEditor.requestFocus();
     }
 
-    private void showBottomPane(Node pane) {
+    private void showBottomPane(BasePanelMode newMode) {
+        Node pane;
+        switch (newMode) {
+            case SHOWING_PREVIEW:
+                pane = preview;
+                break;
+            case SHOWING_EDITOR:
+                pane = entryEditor;
+                break;
+            default:
+                throw new NotImplementedException("new mode not recognized: " + newMode.name());
+        }
+
         if (splitPane.getItems().size() == 2) {
             splitPane.getItems().set(1, pane);
         } else {
             splitPane.getItems().add(1, pane);
         }
+
+        mode = newMode;
+
         adjustSplitter();
     }
 
@@ -1452,8 +1466,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
      * @param entry The entry to show in the preview.
      */
     private void showPreview(BibEntry entry) {
-        mode = BasePanelMode.SHOWING_PREVIEW;
-        showBottomPane(preview);
+        showBottomPane(BasePanelMode.SHOWING_PREVIEW);
 
         preview.setEntry(entry);
     }
@@ -1720,7 +1733,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                     .build();
             Globals.prefs.storePreviewPreferences(previewPreferences);
         } else if (mode == BasePanelMode.SHOWING_EDITOR) {
-            Globals.prefs.putDouble(JabRefPreferences.ENTRY_EDITOR_HEIGHT, position.doubleValue());
+            preferences.setEntryEditorDividerPosition(position.doubleValue());
         }
     }
 
@@ -1979,12 +1992,15 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 return;
             }
 
+            // TODO:
             // Automatically add new entry to the selected group (or set of groups)
+            /*
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)) {
                 final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
                 Globals.stateManager.getSelectedGroup(bibDatabaseContext).forEach(
                         selectedGroup -> selectedGroup.addEntriesToGroup(entries));
             }
+            */
         }
     }
 

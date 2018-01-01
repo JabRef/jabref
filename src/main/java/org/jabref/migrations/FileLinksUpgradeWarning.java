@@ -1,6 +1,7 @@
 package org.jabref.migrations;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -13,7 +14,6 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
-import org.jabref.gui.entryeditor.EntryEditorTabList;
 import org.jabref.gui.importer.actions.GUIPostOpenAction;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -248,17 +248,13 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
     }
 
     private boolean showsFileInGenFields() {
-        boolean found = false;
-        EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
-        outer: for (int i = 0; i < tabList.getTabCount(); i++) {
-            List<String> fields = tabList.getTabFields(i);
-            for (String field : fields) {
+        for (Map.Entry<String, List<String>> tab : Globals.prefs.getEntryEditorTabList().entrySet()) {
+            for (String field : tab.getValue()) {
                 if (field.equals(FieldName.FILE)) {
-                    found = true;
-                    break outer;
+                    return true;
                 }
             }
         }
-        return found;
+        return false;
     }
 }

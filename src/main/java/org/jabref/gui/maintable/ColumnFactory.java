@@ -3,13 +3,13 @@ package org.jabref.gui.maintable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
 
-import org.jabref.Globals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefIcon;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -21,7 +21,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.specialfields.SpecialField;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.fxmisc.easybind.EasyBind;
 
@@ -29,27 +28,29 @@ class ColumnFactory {
 
     private static final String STYLE_ICON = "column-icon";
 
+    private final ColumnPreferences preferences;
     private final ExternalFileTypes externalFileTypes;
     private final BibDatabase database;
     private final CellFactory cellFactory;
 
-    public ColumnFactory(BibDatabase database) {
-        this.database = database;
-        externalFileTypes = ExternalFileTypes.getInstance();
-        cellFactory = new CellFactory();
+    public ColumnFactory(BibDatabase database, ColumnPreferences preferences, ExternalFileTypes externalFileTypes) {
+        this.database = Objects.requireNonNull(database);
+        this.preferences = Objects.requireNonNull(preferences);
+        this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
+        this.cellFactory = new CellFactory(externalFileTypes);
     }
 
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
         // Add column for linked files
-        if (Globals.prefs.getBoolean(JabRefPreferences.FILE_COLUMN)) {
+        if (preferences.showFileColumn()) {
             columns.add(createFileColumn());
         }
 
         // Add column for DOI/URL
-        if (Globals.prefs.getBoolean(JabRefPreferences.URL_COLUMN)) {
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREFER_URL_DOI)) {
+        if (preferences.showUrlColumn()) {
+            if (preferences.preferDoiOverUrl()) {
                 columns.add(createIconColumn(IconTheme.JabRefIcons.DOI, FieldName.DOI, FieldName.URL));
             } else {
                 columns.add(createIconColumn(IconTheme.JabRefIcons.WWW, FieldName.URL, FieldName.DOI));
@@ -57,44 +58,22 @@ class ColumnFactory {
         }
 
         // Add column for eprints
-        if (Globals.prefs.getBoolean(JabRefPreferences.ARXIV_COLUMN)) {
+        if (preferences.showEprintColumn()) {
             columns.add(createIconColumn(IconTheme.JabRefIcons.WWW, FieldName.EPRINT));
         }
 
         // Add columns for other file types
-        if (Globals.prefs.getBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS)) {
-            List<String> desiredColumns = Globals.prefs.getStringList(JabRefPreferences.LIST_OF_FILE_COLUMNS);
-            for (String desiredColumn : desiredColumns) {
-                columns.add(createExtraFileColumn(desiredColumn));
-            }
+        for (String column : preferences.getExtraFileColumns()) {
+            columns.add(createExtraFileColumn(column));
         }
+
 
         // Add 'normal' bibtex fields as configured in the preferences
         columns.addAll(createNormalColumns());
 
         // Add the "special" icon columns (e.g., ranking, file, ...) that are enabled in preferences
-        if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
-                columns.add(createSpecialFieldColumn(SpecialField.RANKING));
-            }
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
-                columns.add(createSpecialFieldColumn(SpecialField.RELEVANCE));
-            }
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
-                columns.add(createSpecialFieldColumn(SpecialField.QUALITY));
-            }
-
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
-                columns.add(createSpecialFieldColumn(SpecialField.PRIORITY));
-            }
-
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
-                columns.add(createSpecialFieldColumn(SpecialField.PRINTED));
-            }
-
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
-                columns.add(createSpecialFieldColumn(SpecialField.READ_STATUS));
-            }
+        for (SpecialField field : preferences.getSpecialFieldColumns()) {
+            columns.add(createSpecialFieldColumn((field)));
         }
 
         return columns;
@@ -104,8 +83,7 @@ class ColumnFactory {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
         // Read table columns from preferences
-        List<String> columnSettings = Globals.prefs.getStringList(JabRefPreferences.COLUMN_NAMES);
-        for (String columnName : columnSettings) {
+        for (String columnName : preferences.getNormalColumns()) {
             // Stored column name will be used as header
             // There might be more than one field to display, e.g., "author/editor" or "date/year" - so split
             String[] fields = columnName.split(FieldName.FIELD_SEPARATOR);

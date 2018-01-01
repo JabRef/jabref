@@ -431,7 +431,7 @@ public class JabRefPreferences implements PreferencesService {
     private final Preferences prefs;
     private GlobalBibtexKeyPattern keyPattern;
     // Object containing info about customized entry editor tabs.
-    private EntryEditorTabList tabList;
+    private Map<String, List<String>> tabList;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -1309,7 +1309,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    public EntryEditorTabList getEntryEditorTabList() {
+    public Map<String, List<String>> getEntryEditorTabList() {
         if (tabList == null) {
             updateEntryEditorTabList();
         }
@@ -1317,7 +1317,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void updateEntryEditorTabList() {
-        tabList = new EntryEditorTabList();
+        tabList = EntryEditorTabList.create(this);
     }
 
     /**

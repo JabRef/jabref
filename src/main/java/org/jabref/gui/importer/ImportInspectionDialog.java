@@ -53,6 +53,7 @@ import javafx.scene.Scene;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.BasePanelPreferences;
 import org.jabref.gui.DuplicateResolverDialog;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.EntryMarker;
@@ -66,6 +67,7 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiles.AutoSetLinks;
 import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListEntryEditor;
 import org.jabref.gui.filelist.FileListTableModel;
@@ -200,7 +202,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         this.undoName = undoName;
         this.newDatabase = newDatabase;
         setIconImages(IconTheme.getLogoSet());
-        preview = new PreviewPanel(panel, bibDatabaseContext);
+        preview = new PreviewPanel(panel, bibDatabaseContext, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences());
 
         duplLabel.setToolTipText(Localization.lang("Possible duplicate of existing entry. Click to resolve."));
 
@@ -802,7 +804,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             if (newDatabase) {
                 // Create a new BasePanel for the entries:
                 Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
-                panel = new BasePanel(frame, new BibDatabaseContext(defaults));
+                panel = new BasePanel(frame, BasePanelPreferences.from(Globals.prefs), new BibDatabaseContext(defaults), ExternalFileTypes.getInstance());
             }
 
             boolean groupingCanceled = false;

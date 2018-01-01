@@ -2,6 +2,8 @@ package org.jabref.preferences;
 
 import java.util.List;
 
+import org.jabref.Globals;
+import org.jabref.logic.layout.LayoutFormatterPreferences;
 
 public class PreviewPreferences {
 
@@ -47,6 +49,14 @@ public class PreviewPreferences {
 
     public Builder getBuilder() {
         return new Builder(this);
+    }
+
+    public String getCurrentPreviewStyle() {
+        return getPreviewCycle().get(getPreviewCyclePosition());
+    }
+
+    public LayoutFormatterPreferences getLayoutFormatterPreferences() {
+        return Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
     }
 
     public static class Builder {

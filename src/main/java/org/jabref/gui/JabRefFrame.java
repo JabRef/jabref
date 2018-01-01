@@ -95,6 +95,7 @@ import org.jabref.gui.exporter.ExportCustomizationDialog;
 import org.jabref.gui.exporter.SaveAllAction;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiletype.ExternalFileTypeEditor;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.groups.EntryTableTransferHandler;
 import org.jabref.gui.groups.GroupSidePane;
 import org.jabref.gui.help.AboutAction;
@@ -525,7 +526,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // only Bibtex
         List<NewEntryAction> actions = new ArrayList<>();
         for (EntryType type : BibtexEntryTypes.ALL) {
-            KeyStroke keyStroke = new ChangeEntryTypeMenu().entryShortCuts.get(type.getName());
+            KeyStroke keyStroke = new ChangeEntryTypeMenu(Globals.getKeyPrefs()).entryShortCuts.get(type.getName());
             if (keyStroke == null) {
                 actions.add(new NewEntryAction(this, type.getName()));
             } else {
@@ -635,7 +636,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 globalSearchBar.setSearchTerm(content);
             }
 
-            currentBasePanel.getPreviewPanel().updateLayout();
+            currentBasePanel.getPreviewPanel().updateLayout(Globals.prefs.getPreviewPreferences());
 
             groupSidePane.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
             previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
@@ -1597,9 +1598,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
-        BasePanel bp = new BasePanel(JabRefFrame.this, databaseContext);
-        addTab(bp, raisePanel);
-        return bp;
+        return DefaultTaskExecutor.runInJavaFXThread(() -> {
+            BasePanel bp = new BasePanel(this, BasePanelPreferences.from(Globals.prefs), databaseContext, ExternalFileTypes.getInstance());
+            addTab(bp, raisePanel);
+            return bp;
+        });
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {

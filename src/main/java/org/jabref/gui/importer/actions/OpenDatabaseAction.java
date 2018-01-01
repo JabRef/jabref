@@ -21,12 +21,14 @@ import javax.swing.SwingUtilities;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.BasePanelPreferences;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.gui.autosaveandbackup.BackupUIManager;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
@@ -270,7 +272,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     .execute(() -> ParserResultWarningDialog.showParserResultWarningDialog(result, frame));
         }
 
-        BasePanel basePanel = new BasePanel(frame, result.getDatabaseContext());
+        BasePanel basePanel = new BasePanel(frame, BasePanelPreferences.from(Globals.prefs), result.getDatabaseContext(), ExternalFileTypes.getInstance());
 
         // file is set to null inside the EventDispatcherThread
         SwingUtilities.invokeLater(() -> frame.addTab(basePanel, raisePanel));

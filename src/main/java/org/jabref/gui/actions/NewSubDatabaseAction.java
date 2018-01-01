@@ -6,9 +6,11 @@ import javax.swing.Action;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.BasePanelPreferences;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.auximport.FromAuxDialog;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabaseContext;
@@ -38,7 +40,7 @@ public class NewSubDatabaseAction extends MnemonicAwareAction {
 
         if (dialog.generatePressed()) {
             Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
-            BasePanel bp = new BasePanel(jabRefFrame, new BibDatabaseContext(dialog.getGenerateDB(), defaults));
+            BasePanel bp = new BasePanel(jabRefFrame, BasePanelPreferences.from(Globals.prefs), new BibDatabaseContext(dialog.getGenerateDB(), defaults), ExternalFileTypes.getInstance());
             jabRefFrame.addTab(bp, true);
             jabRefFrame.output(Localization.lang("New library created."));
         }

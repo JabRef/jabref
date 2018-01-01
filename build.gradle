@@ -169,7 +169,7 @@ dependencies {
     testCompile 'com.tngtech.archunit:archunit-junit:0.5.0'
     testCompile 'org.slf4j:slf4j-jcl:1.7.25' // required by ArchUnit to enable logging over jcl
     testCompile "org.testfx:testfx-core:4.0.+"
-    testCompile "org.testfx:testfx-junit:4.0.+"
+    testCompile "org.testfx:testfx-junit5:4.0.+"
 
     checkstyle 'com.puppycrawl.tools:checkstyle:8.5'
 }
@@ -503,7 +503,7 @@ task releaseJar(dependsOn: "shadowJar") {
             }
         }
         // set executable with read permissions (first true) and for all (false)
-        file("$buildDir/releases/JabRef-${project.version}.jar").setExecutable(true, false);
+        file("$buildDir/releases/JabRef-${project.version}.jar").setExecutable(true, false)
     }
 }
 

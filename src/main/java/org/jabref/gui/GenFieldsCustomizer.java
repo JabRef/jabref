@@ -6,7 +6,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -21,7 +23,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import org.jabref.Globals;
-import org.jabref.gui.entryeditor.EntryEditorTabList;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
@@ -143,11 +144,10 @@ public class GenFieldsCustomizer extends JabRefDialog {
     private void setFieldsText() {
         StringBuilder sb = new StringBuilder();
 
-        EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
-        for (int i = 0; i < tabList.getTabCount(); i++) {
-            sb.append(tabList.getTabName(i));
+        for (Map.Entry<String, List<String>> tab : Globals.prefs.getEntryEditorTabList().entrySet()) {
+            sb.append(tab.getKey());
             sb.append(':');
-            sb.append(String.join(";", tabList.getTabFields(i)));
+            sb.append(String.join(";", tab.getValue()));
             sb.append('\n');
         }
 

@@ -17,6 +17,7 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.EntryMarker;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.renderer.CompleteRenderer;
 import org.jabref.gui.renderer.GeneralRenderer;
 import org.jabref.gui.renderer.IncompleteRenderer;
@@ -50,8 +51,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private static final Log LOGGER = LogFactory.getLog(MainTable.class);
 
     private final BasePanel panel;
-    private final boolean tableColorCodes;
-    private final boolean tableResolvedColorCodes;
+    //private final boolean tableColorCodes;
+    //private final boolean tableResolvedColorCodes;
 
     private final ScrollPane pane;
     // needed to activate/deactivate the listener
@@ -67,22 +68,22 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         }
 
     static {
-        MainTable.updateRenderers();
+        //MainTable.updateRenderers();
     }
 
     public MainTable(MainTableDataModel model, JabRefFrame frame,
-                     BasePanel panel, BibDatabase database) {
+                     BasePanel panel, BibDatabase database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes) {
         super();
         this.model = model;
 
-        this.getColumns().addAll(new ColumnFactory(database).createColumns());
+        this.getColumns().addAll(new ColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes).createColumns());
         this.setRowFactory(new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
                     if (event.getClickCount() == 2) {
                         panel.showAndEdit(entry.getEntry());
                     }
                 }));
-        if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_RESIZE_MODE)) {
+        if (preferences.resizeColumnsToFit()) {
             this.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         }
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -99,11 +100,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.pane.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
         // TODO: Color
-        tableColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON);
-        tableResolvedColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_RESOLVED_COLOR_CODES_ON);
+        //tableColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON);
+        //tableResolvedColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_RESOLVED_COLOR_CODES_ON);
         //pane.getViewport().setBackground(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND));
         //setGridColor(Globals.prefs.getColor(JabRefPreferences.GRID_COLOR));
-        if (!Globals.prefs.getBoolean(JabRefPreferences.TABLE_SHOW_GRID)) {
+        if (!preferences.showGrid()) {
             this.setStyle("-fx-table-cell-border-color: transparent;");
         }
 

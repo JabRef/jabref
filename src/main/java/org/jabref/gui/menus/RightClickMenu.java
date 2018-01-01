@@ -53,7 +53,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
     public RightClickMenu(JabRefFrame frame, BasePanel panel) {
         this.panel = panel;
-        JMenu typeMenu = new ChangeEntryTypeMenu().getChangeEntryTypeMenu(panel);
+        JMenu typeMenu = new ChangeEntryTypeMenu(Globals.getKeyPrefs()).getChangeEntryTypeMenu(panel);
         // Are multiple entries selected?
         boolean multiple = areMultipleEntriesSelected();
 

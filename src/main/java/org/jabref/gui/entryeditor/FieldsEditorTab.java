@@ -71,6 +71,12 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     }
 
     private Region setupPanel(BibEntry entry, boolean compressed, SuggestionProviders suggestionProviders, UndoManager undoManager) {
+        // The preferences might be not initialized in tests -> return empty node
+        // TODO: Replace this ugly workaround by proper injection propagation
+        if (Globals.prefs == null) {
+            return new Region();
+        }
+
         editors.clear();
 
         EntryType entryType = EntryTypes.getTypeOrDefault(entry.getType(), databaseContext.getMode());
