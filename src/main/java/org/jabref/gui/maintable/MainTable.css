@@ -1,14 +1,17 @@
 .table-view {
-
+    -fx-border-width: 0;
+    -fx-padding: 0;
+    -fx-border-insets: 0;
+    -fx-background-color: -fx-light-background;
 }
 
 .table-view .column-header-background {
-    -fx-background-color: -fx-control-inner-background;
+    -fx-background-color: -fx-light-background;
 }
 
 .table-view .column-header,
 .table-view .filler {
-    -fx-background-color: -fx-control-inner-background;
+    -fx-background-color: -fx-light-background;
     -fx-font-weight: bold;
     -fx-size: 3em;
     -fx-border-width: 0 0 1 0;
@@ -45,4 +48,3 @@
     -fx-padding: 0;
     -fx-alignment: baseline-center;
 }
-

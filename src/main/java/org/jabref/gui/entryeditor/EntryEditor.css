@@ -54,27 +54,6 @@
     -fx-padding: -0.2em 0.1em 0.1em 0.1em;
 }
 
-#tabbed {
-    -fx-open-tab-animation: NONE;
-    -fx-close-tab-animation: NONE;
-}
-
-#tabbed > .tab-header-area > .tab-header-background {
-    -fx-background-color: #dadad8;
-}
-
-#tabbed > .tab-header-area > .headers-region > .tab:selected {
-    -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-light-background;
-}
-
-#tabbed > .tab-header-area .glyph-icon {
-    -glyph-size: 13px;
-}
-
-#tabbed > .tab-header-area {
-    -fx-padding: 0.416667em 5 0.0em 0em;
-}
-
 .editorPane .glyph-icon {
     -glyph-size: 16px;
 }

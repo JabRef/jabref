@@ -48,6 +48,10 @@
      */
     -fx-active-background: #6A9FCD;
 
+    /*
+     * A dark gray for borders
+     */
+    -fx-border: #868786;
 }
 
 .hyperlink {
@@ -120,4 +124,71 @@
 
 .flatButtonNoSpaceTop {
     -fx-padding: -0.1em 0.5em 0.5em 0.5em;
+}
+
+.tab-pane {
+    -fx-open-tab-animation: NONE;
+    -fx-close-tab-animation: NONE;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: -fx-accented-background;
+    -fx-border-color: -fx-border;
+    -fx-border-width: 0.5 0.5 0.5 0.5;
+    -fx-padding: 0.4em 0.9em 0.4em 0.9em;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab .tab-label {
+    -fx-text-fill: -fx-unimportant;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: -fx-light-background;
+    -fx-border-color: -fx-active-background;
+    -fx-border-width: 3 0 0 0;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-label {
+    -fx-text-fill: black;
+}
+
+.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+    -fx-border-width: 0;
+    -fx-border-insets: 0;
+    -fx-border-radius: 0;
+}
+
+.tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: -fx-accented-background;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab .glyph-icon {
+    -glyph-size: 13px;
+    -fx-text-fill: -fx-unimportant;
+    -fx-fill: -fx-unimportant;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
+    -fx-text-fill: black;
+    -fx-fill: black;
+}
+
+.tab-pane > .tab-header-area {
+    -fx-padding: 0.416667em 5 0.0em 0em;
+}
+
+.table-view {
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.table-view:focused {
+    -fx-background-insets: 0;
+}
+
+.split-pane > .split-pane-divider {
+    -fx-background-color: -fx-accented-background;
+    -fx-padding: 0 0.15ex 0 0.15ex;
 }
