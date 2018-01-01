@@ -210,6 +210,10 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext);
 
+        this.preview = new PreviewPanel(this, getBibDatabaseContext());
+        DefaultTaskExecutor.runInJavaFXThread(() -> frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview));
+        this.previewContainer = CustomJFXPanel.wrap(new Scene(preview));
+
         setupMainPanel();
 
         setupActions();

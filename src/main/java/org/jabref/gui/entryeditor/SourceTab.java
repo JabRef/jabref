@@ -13,7 +13,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.Tooltip;
 
-import org.jabref.Globals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
@@ -33,6 +32,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.preferences.JabRefPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -47,17 +47,19 @@ public class SourceTab extends EntryEditorTab {
     private static final Log LOGGER = LogFactory.getLog(SourceTab.class);
     private final LatexFieldFormatterPreferences fieldFormatterPreferences;
     private final BibDatabaseMode mode;
+    private final JabRefPreferences preferences;
     private UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator(sourceIsValid);
 
-    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences) {
+    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, JabRefPreferences preferences) {
         this.mode = bibDatabaseContext.getMode();
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
         this.setGraphic(IconTheme.JabRefIcons.SOURCE.getGraphicNode());
         this.undoManager = undoManager;
         this.fieldFormatterPreferences = fieldFormatterPreferences;
+        this.preferences = preferences;
     }
 
     private static String getSourceString(BibEntry entry, BibDatabaseMode type, LatexFieldFormatterPreferences fieldFormatterPreferences) throws IOException {
@@ -71,7 +73,7 @@ public class SourceTab extends EntryEditorTab {
     private CodeArea createSourceEditor() {
         CodeArea codeArea = new CodeArea();
         codeArea.setWrapText(true);
-        codeArea.lookup(".styled-text-area").setStyle("-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
+        codeArea.lookup(".styled-text-area").setStyle("-fx-font-size: " + preferences.getFontSizeFX() + "pt;");
         return codeArea;
     }
 
@@ -113,11 +115,11 @@ public class SourceTab extends EntryEditorTab {
     }
 
     private void storeSource(String text) {
-        if (text.isEmpty()) {
+        if (currentEntry == null || text.isEmpty()) {
             return;
         }
 
-        BibtexParser bibtexParser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
+        BibtexParser bibtexParser = new BibtexParser(preferences.getImportFormatPreferences());
         try {
             ParserResult parserResult = bibtexParser.parse(new StringReader(text));
             BibDatabase database = parserResult.getDatabase();
@@ -164,7 +166,7 @@ public class SourceTab extends EntryEditorTab {
                 String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
-                    new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences())
+                    new LatexFieldFormatter(preferences.getLatexFieldFormatterPreferences())
                             .format(newValue, fieldName);
 
                     compound.addEdit(new UndoableFieldChange(currentEntry, fieldName, oldValue, newValue));

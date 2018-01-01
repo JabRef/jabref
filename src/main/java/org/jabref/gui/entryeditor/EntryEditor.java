@@ -168,7 +168,7 @@ public class EntryEditor extends BorderPane {
         tabs.add(new RelatedArticlesTab(Globals.prefs));
 
         // Source tab
-        sourceTab = new SourceTab(bibDatabaseContext, undoManager, Globals.prefs.getLatexFieldFormatterPreferences());
+        sourceTab = new SourceTab(bibDatabaseContext, undoManager, Globals.prefs.getLatexFieldFormatterPreferences(), Globals.prefs);
         tabs.add(sourceTab);
         return tabs;
     }
