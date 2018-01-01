@@ -141,6 +141,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fxmisc.easybind.EasyBind;
+import org.fxmisc.easybind.Subscription;
 
 public class BasePanel extends StackPane implements ClipboardOwner {
 
@@ -187,6 +188,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private StringDialog stringDialog;
     private SuggestionProviders suggestionProviders;
 
+    private Subscription dividerPositionSubscription;
+
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
 
@@ -232,7 +235,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
-        entryEditor = new EntryEditor(this);
+        this.entryEditor = new EntryEditor(this);
 
         this.preview = new PreviewPanel(this, getBibDatabaseContext());
         DefaultTaskExecutor.runInJavaFXThread(() -> frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview));
@@ -346,7 +349,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 new SaveSelectedAction(SavePreferences.DatabaseSaveType.PLAIN_BIBTEX));
 
         // The action for copying selected entries.
-        actions.put(Actions.COPY, (BaseAction) () -> copy());
+        actions.put(Actions.COPY, (BaseAction) this::copy);
 
         actions.put(Actions.PRINT_PREVIEW, new PrintPreviewAction());
 
@@ -362,7 +365,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         //    This allows you to (a) paste entire bibtex entries from a text editor, web browser, etc
         //                       (b) copy and paste entries between multiple instances of JabRef (since
         //         only the text representation seems to get as far as the X clipboard, at least on my system)
-        actions.put(Actions.PASTE, (BaseAction) () -> paste());
+        actions.put(Actions.PASTE, (BaseAction) this::paste);
 
         actions.put(Actions.SELECT_ALL, (BaseAction) mainTable.getSelectionModel()::selectAll);
 
@@ -1342,7 +1345,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             mainTable.showFloatSearch();
         }
         // Saves the divider position as soon as it changes
-        EasyBind.monadic(Bindings.valueAt(splitPane.getDividers(), 0))
+        // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
+        dividerPositionSubscription = EasyBind.monadic(Bindings.valueAt(splitPane.getDividers(), 0))
                 .flatMap(SplitPane.Divider::positionProperty)
                 .subscribe((observable, oldValue, newValue) -> saveDividerLocation(newValue));
     }
