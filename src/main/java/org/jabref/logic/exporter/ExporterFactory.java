@@ -78,22 +78,22 @@ public class ExporterFactory {
      * @return The string describing available exporters.
      */
     public String getExportersAsString(int maxLineLength, int firstLineSubtraction, String linePrefix) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         int lastBreak = -firstLineSubtraction;
 
         for (Exporter exporter : exporters) {
             String name = exporter.getId();
-            if (((sb.length() + 2 + name.length()) - lastBreak) > maxLineLength) {
-                sb.append(",\n");
-                lastBreak = sb.length();
-                sb.append(linePrefix);
-            } else if (sb.length() > 0) {
-                sb.append(", ");
+            if (((builder.length() + 2 + name.length()) - lastBreak) > maxLineLength) {
+                builder.append(",\n");
+                lastBreak = builder.length();
+                builder.append(linePrefix);
+            } else if (builder.length() > 0) {
+                builder.append(", ");
             }
-            sb.append(name);
+            builder.append(name);
         }
 
-        return sb.toString();
+        return builder.toString();
     }
 
     /**

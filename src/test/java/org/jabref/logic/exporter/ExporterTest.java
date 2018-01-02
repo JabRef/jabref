@@ -1,9 +1,9 @@
 package org.jabref.logic.exporter;
 
-import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -67,20 +67,20 @@ public class ExporterTest {
 
     @Test
     public void testExportingEmptyDatabaseYieldsEmptyFile() throws Exception {
-        File tmpFile = testFolder.newFile();
-        exportFormat.export(databaseContext, tmpFile.toPath(), charset, entries);
-        assertEquals(Collections.emptyList(), Files.readAllLines(tmpFile.toPath()));
+        Path tmpFile = testFolder.newFile().toPath();
+        exportFormat.export(databaseContext, tmpFile, charset, entries);
+        assertEquals(Collections.emptyList(), Files.readAllLines(tmpFile));
     }
 
     @Test(expected = NullPointerException.class)
     public void testExportingNullDatabaseThrowsNPE() throws Exception {
-        File tmpFile = testFolder.newFile();
-        exportFormat.export(null, tmpFile.toPath(), charset, entries);
+        Path tmpFile = testFolder.newFile().toPath();
+        exportFormat.export(null, tmpFile, charset, entries);
     }
 
     @Test(expected = NullPointerException.class)
     public void testExportingNullEntriesThrowsNPE() throws Exception {
-        File tmpFile = testFolder.newFile();
-        exportFormat.export(databaseContext, tmpFile.toPath(), charset, null);
+        Path tmpFile = testFolder.newFile().toPath();
+        exportFormat.export(databaseContext, tmpFile, charset, null);
     }
 }

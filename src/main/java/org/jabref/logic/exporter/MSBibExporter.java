@@ -50,7 +50,7 @@ class MSBibExporter extends Exporter {
                 trans.setOutputProperty(OutputKeys.INDENT, "yes");
                 trans.transform(source, result);
             } catch (TransformerException | IllegalArgumentException | TransformerFactoryConfigurationError e) {
-                throw new Error(e);
+                throw new SaveException(e);
             }
             session.finalize(file);
         } catch (IOException ex) {

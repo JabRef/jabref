@@ -86,21 +86,17 @@ public class ImportFormats {
             }
 
             private void doImport(Path file, SortedSet<Importer> importers, FileChooser.ExtensionFilter selectedExtensionFilter) {
-                try {
-                    if (!Files.exists(file)) {
-                        JOptionPane.showMessageDialog(frame,
-                                Localization.lang("File not found") + ": '" + file.getFileName() + "'.",
-                                Localization.lang("Import"), JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                    Optional<Importer> format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
-                    ImportMenuItem importMenu = new ImportMenuItem(frame, newDatabase, format.orElse(null));
-                    importMenu.automatedImport(Collections.singletonList(file.toString()));
-                    // Set last working dir for import
-                    Globals.prefs.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, file.getParent().toString());
-                } catch (Exception ex) {
-                    LOGGER.warn("Cannot import file", ex);
+                if (!Files.exists(file)) {
+                    JOptionPane.showMessageDialog(frame,
+                            Localization.lang("File not found") + ": '" + file.getFileName() + "'.",
+                            Localization.lang("Import"), JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
+                Optional<Importer> format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
+                ImportMenuItem importMenu = new ImportMenuItem(frame, newDatabase, format.orElse(null));
+                importMenu.automatedImport(Collections.singletonList(file.toString()));
+                // Set last working dir for import
+                Globals.prefs.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, file.getParent().toString());
             }
         }
 
