@@ -1,7 +1,5 @@
 package org.jabref.model.database.shared;
 
-import java.sql.SQLException;
-
 import org.jabref.model.entry.BibEntry;
 
 public interface DatabaseSynchronizer {
@@ -14,7 +12,7 @@ public interface DatabaseSynchronizer {
 
     void registerListener(Object listener);
 
-    void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException, SQLException;
+    void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException;
 
     void synchronizeSharedEntry(BibEntry bibEntry);
 

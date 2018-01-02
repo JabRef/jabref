@@ -143,16 +143,20 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * @throws DatabaseNotSupportedException if the version of shared database does not match
      *          the version of current shared database support ({@link DBMSProcessor}).
      */
-    public void initializeDatabases() throws DatabaseNotSupportedException, SQLException {
-        if (!dbmsProcessor.checkBaseIntegrity()) {
-            LOGGER.info("Integrity check failed. Fixing...");
-            dbmsProcessor.setupSharedDatabase();
+    public void initializeDatabases() throws DatabaseNotSupportedException {
+        try {
+            if (!dbmsProcessor.checkBaseIntegrity()) {
+                LOGGER.info("Integrity check failed. Fixing...");
+                dbmsProcessor.setupSharedDatabase();
 
-            // This check should only be performed once on initial database setup.
-            // Calling dbmsProcessor.setupSharedDatabase() lets dbmsProcessor.checkBaseIntegrity() be true.
-            if (dbmsProcessor.checkForPre3Dot6Intergrity()) {
-                throw new DatabaseNotSupportedException();
+                // This check should only be performed once on initial database setup.
+                // Calling dbmsProcessor.setupSharedDatabase() lets dbmsProcessor.checkBaseIntegrity() be true.
+                if (dbmsProcessor.checkForPre3Dot6Intergrity()) {
+                    throw new DatabaseNotSupportedException();
+                }
             }
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
         }
 
         dbmsProcessor.startNotificationListener(this);
@@ -352,7 +356,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     @Override
-    public void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException, SQLException {
+    public void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException {
         this.dbName = connection.getProperties().getDatabase();
         this.currentConnection = connection.getConnection();
         this.dbmsProcessor = DBMSProcessor.getProcessorInstance(connection);
