@@ -35,7 +35,7 @@ import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.DatabaseLocation;
+import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.preferences.JabRefPreferences;
