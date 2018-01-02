@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.concurrent.Task;
+import javafx.print.PrinterJob;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -193,4 +194,8 @@ public class FXDialogService implements DialogService {
         return chooser;
     }
 
+    @Override
+    public boolean showPrintDialog(PrinterJob job) {
+        return job.showPrintDialog(null);
+    }
 }

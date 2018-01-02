@@ -84,6 +84,10 @@ public class BibtexKeyGenerator extends BracketedPattern {
      * @param key             the key to clean
      * @param enforceLegalKey make sure that the key is legal in all respects
      */
+    public static Optional<FieldChange> makeAndSetLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase database, BibEntry entry,
+        return entry.setCiteKey(newKey);
+    }
+
     public static String cleanKey(String key, boolean enforceLegalKey) {
         if (!enforceLegalKey) {
             // User doesn't want us to enforce legal characters. We must still look

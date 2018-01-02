@@ -16,7 +16,6 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelMode;
 import org.jabref.gui.EntryTypeDialog;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.externalfiles.DroppedFileHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntry;
@@ -222,8 +221,7 @@ public class PdfImporter {
         SwingUtilities.invokeLater(() -> panel.highlightEntry(entry));
 
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
-            EntryEditor editor = panel.getEntryEditor(entry);
-            panel.showEntryEditor(editor);
+            panel.showAndEdit(entry);
         }
         res.add(entry);
     }
@@ -259,7 +257,7 @@ public class PdfImporter {
                     panel.setMode(BasePanelMode.WILL_SHOW_EDITOR);
                 }
 
-                SwingUtilities.invokeLater(() -> panel.showEntry(bibEntry));
+                SwingUtilities.invokeLater(() -> panel.showAndEdit(bibEntry));
 
                 // The database just changed.
                 panel.markBaseChanged();
