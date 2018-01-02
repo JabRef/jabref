@@ -143,8 +143,6 @@ import org.jabref.preferences.LastFocusedTabPreferences;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import com.jgoodies.looks.HeaderStyle;
-import com.jgoodies.looks.Options;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
@@ -895,7 +893,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void initLayout() {
-        tabbedPane.putClientProperty(Options.NO_CONTENT_BORDER_KEY, Boolean.TRUE);
 
         setProgressBarVisible(false);
 
@@ -1307,7 +1304,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void createToolBar() {
-        tlb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         tlb.setBorder(null);
         tlb.setRollover(true);
 

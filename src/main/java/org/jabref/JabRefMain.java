@@ -129,6 +129,7 @@ public class JabRefMain extends Application {
         PreferencesMigrations.upgradeStoredCustomEntryTypes();
         PreferencesMigrations.upgradeKeyBindingsToJavaFX();
         PreferencesMigrations.addCrossRefRelatedFieldsForAutoComplete();
+        PreferencesMigrations.upgradeObsoleteLookAndFeels();
 
         // Update handling of special fields based on preferences
         InternalBibtexFields

@@ -65,11 +65,6 @@ Project: JGoodies Forms
 URL:     http://www.jgoodies.com/downloads/libraries/
 License: BSD
 
-Id:      com.jgoodies:jgoodies-looks
-Project: JGoodies Looks
-URL:     http://www.jgoodies.com/downloads/libraries/
-License: BSD
-
 Id:      com.mashape.unirest
 Project: Unirest for Java
 URL:     https://github.com/Mashape/unirest-java

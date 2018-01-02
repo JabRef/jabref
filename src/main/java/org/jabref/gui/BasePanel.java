@@ -221,6 +221,10 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext);
 
+        this.preview = new PreviewPanel(this, getBibDatabaseContext());
+        DefaultTaskExecutor.runInJavaFXThread(() -> frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview));
+        this.previewContainer = CustomJFXPanel.wrap(new Scene(preview));
+
         setupMainPanel();
 
         setupActions();
@@ -249,9 +253,6 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         entryEditor = new EntryEditor(this);
         entryEditorContainer = setupEntryEditor(entryEditor);
 
-        this.preview = new PreviewPanel(this, getBibDatabaseContext());
-        DefaultTaskExecutor.runInJavaFXThread(() -> frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview));
-        this.previewContainer = CustomJFXPanel.wrap(new Scene(preview));
     }
 
     private static JFXPanel setupEntryEditor(EntryEditor entryEditor) {
@@ -2060,7 +2061,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         @Subscribe
         public void listen(EntryRemovedEvent entryRemovedEvent) {
             // if the entry that is displayed in the current entry editor is removed, close the entry editor
-            if (mode == BasePanelMode.SHOWING_EDITOR && entryEditor.getEntry().equals(entryRemovedEvent.getBibEntry())) {
+            if ((mode == BasePanelMode.SHOWING_EDITOR) && entryEditor.getEntry().equals(entryRemovedEvent.getBibEntry())) {
                 entryEditor.close();
             }
 
