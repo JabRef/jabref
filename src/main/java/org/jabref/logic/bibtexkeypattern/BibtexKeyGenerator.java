@@ -23,12 +23,11 @@ import org.apache.commons.logging.LogFactory;
  * This is the utility class of the LabelPattern package.
  */
 public class BibtexKeyGenerator extends BracketedPattern {
-    private static final Log LOGGER = LogFactory.getLog(BibtexKeyGenerator.class);
-
     /*
      * All single characters that we can use for extending a key to make it unique.
      */
     public static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
+    private static final Log LOGGER = LogFactory.getLog(BibtexKeyGenerator.class);
     private static final String KEY_ILLEGAL_CHARACTERS = "{}(),\\\"#~^':`";
     private static final String KEY_UNWANTED_CHARACTERS = "{}(),\\\"";
     private final AbstractBibtexKeyPattern citeKeyPattern;
@@ -73,19 +72,6 @@ public class BibtexKeyGenerator extends BracketedPattern {
         } else {
             return APPENDIX_CHARACTERS.substring(number, number + 1);
         }
-    }
-
-    /**
-     * This method returns a String similar to the one passed in, except that it is molded into a form that is
-     * acceptable for bibtex.
-     * <p>
-     * Watch-out that the returned string might be of length 0 afterwards.
-     *
-     * @param key             the key to clean
-     * @param enforceLegalKey make sure that the key is legal in all respects
-     */
-    public static Optional<FieldChange> makeAndSetLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase database, BibEntry entry,
-        return entry.setCiteKey(newKey);
     }
 
     public static String cleanKey(String key, boolean enforceLegalKey) {
