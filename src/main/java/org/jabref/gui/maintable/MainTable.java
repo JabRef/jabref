@@ -82,7 +82,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     if (event.getClickCount() == 2) {
                         panel.showAndEdit(entry.getEntry());
                     }
-                }));
+                })
+                .withContextMenu(RightClickMenu::create));
         if (preferences.resizeColumnsToFit()) {
             this.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         }

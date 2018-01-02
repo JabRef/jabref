@@ -1,4 +1,4 @@
-package org.jabref.gui.menus;
+package org.jabref.gui.maintable;
 
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
@@ -16,6 +16,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import javafx.scene.control.ContextMenu;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.EntryMarker;
@@ -25,6 +27,7 @@ import org.jabref.gui.actions.Actions;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.specialfields.SpecialFieldMenuAction;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
@@ -318,4 +321,14 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         }
     }
 
+    public static ContextMenu create(BibEntryTableViewModel entry) {
+        ContextMenu contextMenu = new ContextMenu();
+
+        javafx.scene.control.MenuItem copy = new javafx.scene.control.MenuItem();
+        copy.setText(Localization.lang("Copy"));
+        copy.setGraphic(IconTheme.JabRefIcons.COPY.getGraphicNode());
+        contextMenu.getItems().add(copy);
+
+        return contextMenu;
+    }
 }
