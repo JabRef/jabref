@@ -13,14 +13,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @FetcherTest
-class oaDOITest {
+class OpenAccessDoiTest {
 
-    private oaDOI finder;
+    private OpenAccessDoi finder;
     private BibEntry entry;
 
     @BeforeEach
     void setUp() {
-        finder = new oaDOI();
+        finder = new OpenAccessDoi();
         entry = new BibEntry();
     }
 

@@ -22,7 +22,7 @@ import org.json.JSONObject;
  *
  * @implSpec API is documented at https://oadoi.org/api/v2
  */
-public class oaDOI implements FulltextFetcher {
+public class OpenAccessDoi implements FulltextFetcher {
     private static String API_URL = "https://api.oadoi.org/v2/";
 
     @Override

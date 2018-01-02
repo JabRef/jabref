@@ -21,10 +21,10 @@ import org.jabref.logic.importer.fetcher.IsbnFetcher;
 import org.jabref.logic.importer.fetcher.LibraryOfCongress;
 import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
+import org.jabref.logic.importer.fetcher.OpenAccessDoi;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
 import org.jabref.logic.importer.fetcher.SpringerLink;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
-import org.jabref.logic.importer.fetcher.oaDOI;
 import org.jabref.logic.importer.fetcher.zbMATH;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
@@ -133,7 +133,7 @@ public class WebFetchers {
         fetchers.add(new IEEE());
         // Meta search
         fetchers.add(new GoogleScholar(importFormatPreferences));
-        fetchers.add(new oaDOI());
+        fetchers.add(new OpenAccessDoi());
 
         return fetchers;
     }
