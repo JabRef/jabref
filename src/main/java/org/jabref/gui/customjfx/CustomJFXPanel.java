@@ -4,8 +4,11 @@ import java.awt.event.InputMethodEvent;
 import java.lang.reflect.Field;
 
 import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
 
 import org.jabref.gui.customjfx.support.InputMethodSupport;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.logic.util.OS;
 
 import com.sun.javafx.embed.EmbeddedSceneInterface;
 import org.apache.commons.logging.Log;
@@ -21,7 +24,7 @@ public class CustomJFXPanel extends JFXPanel {
     private static final Log LOGGER = LogFactory.getLog(CustomJFXPanel.class);
     private Field scenePeerField = null;
 
-    public CustomJFXPanel() {
+    private CustomJFXPanel() {
         super();
         try {
             scenePeerField = this.getClass().getSuperclass().getDeclaredField("scenePeer");
@@ -30,6 +33,16 @@ public class CustomJFXPanel extends JFXPanel {
             LOGGER.error("Could not access scenePeer Field", e);
 
         }
+    }
+
+    public static JFXPanel create() {
+        return OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+    }
+
+    public static JFXPanel wrap(Scene scene) {
+        JFXPanel container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+        DefaultTaskExecutor.runInJavaFXThread(() -> container.setScene(scene));
+        return container;
     }
 
     @Override

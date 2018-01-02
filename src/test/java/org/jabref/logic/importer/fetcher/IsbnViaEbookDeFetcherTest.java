@@ -63,7 +63,7 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setType(BiblatexEntryTypes.BOOK);
         bibEntry.setField("bibtexkey", "9783642434730");
         bibEntry.setField("title", "Fundamentals of Business Process Management");
-        bibEntry.setField("publisher", "Springer");
+        bibEntry.setField("publisher", "Springer Berlin Heidelberg");
         bibEntry.setField("year", "2015");
         bibEntry.setField("author", "Dumas, Marlon and Rosa, Marcello La and Mendling, Jan and Reijers, Hajo A.");
         bibEntry.setField("date", "2015-04-12");

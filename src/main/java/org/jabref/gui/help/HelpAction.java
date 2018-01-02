@@ -72,30 +72,7 @@ public class HelpAction extends MnemonicAwareAction {
         return button;
     }
 
-    public JLabel getHelpLabel(String labelText) {
-        JLabel helpLabel = new JLabel("<html><u>" + labelText + "</u></html>");
-        helpLabel.setForeground(Color.BLUE);
-        helpLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        helpLabel.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                openHelpPage();
-            }
-        });
-        return helpLabel;
-    }
-
-    public void setHelpFile(HelpFile urlPart) {
-        this.helpPage = urlPart;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        openHelpPage();
-    }
-
-    private void openHelpPage() {
+    public static void openHelpPage(HelpFile helpPage) {
         String lang = Globals.prefs.get(JabRefPreferences.LANGUAGE);
         StringBuilder sb = new StringBuilder("https://help.jabref.org/");
 
@@ -107,5 +84,28 @@ public class HelpAction extends MnemonicAwareAction {
         }
         sb.append(helpPage.getPageName());
         JabRefDesktop.openBrowserShowPopup(sb.toString());
+    }
+
+    public void setHelpFile(HelpFile urlPart) {
+        this.helpPage = urlPart;
+    }
+
+    public JLabel getHelpLabel(String labelText) {
+        JLabel helpLabel = new JLabel("<html><u>" + labelText + "</u></html>");
+        helpLabel.setForeground(Color.BLUE);
+        helpLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        helpLabel.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                openHelpPage(helpPage);
+            }
+        });
+        return helpLabel;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        openHelpPage(helpPage);
     }
 }
