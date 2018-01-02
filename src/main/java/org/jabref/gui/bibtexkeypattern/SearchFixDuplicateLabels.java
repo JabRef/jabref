@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.swing.JCheckBox;
 
@@ -12,8 +13,9 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.worker.AbstractWorker;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
@@ -91,13 +93,10 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
         // Do the actual generation:
         if (!toGenerateFor.isEmpty()) {
             NamedCompound ce = new NamedCompound(Localization.lang("Resolve duplicate BibTeX keys"));
+            BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(panel.getBibDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences());
             for (BibEntry entry : toGenerateFor) {
-                String oldKey = entry.getCiteKeyOptional().orElse(null);
-                BibtexKeyPatternUtil.makeAndSetLabel(panel.getBibDatabaseContext().getMetaData()
-                        .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
-                        panel.getDatabase(), entry,
-                        Globals.prefs.getBibtexKeyPatternPreferences());
-                ce.addEdit(new UndoableKeyChange(entry, oldKey, entry.getCiteKeyOptional().get()));
+                Optional<FieldChange> change = keyGenerator.generateAndSetKey(entry);
+                change.ifPresent(fieldChange -> ce.addEdit(new UndoableKeyChange(fieldChange)));
             }
             ce.end();
             panel.getUndoManager().addEdit(ce);

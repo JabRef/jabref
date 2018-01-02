@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.Globals;
-import org.jabref.logic.exporter.ExportFormats;
 import org.jabref.logic.l10n.Localization;
 
 import org.apache.commons.cli.CommandLine;
@@ -246,7 +245,7 @@ public class JabRefCLI {
         String importFormats = Globals.IMPORT_FORMAT_READER.getImportFormatList();
         String importFormatsList = String.format("%s:%n%s%n", Localization.lang("Available import formats"), importFormats);
 
-        String outFormats = ExportFormats.getConsoleExportList(70, 20, "");
+        String outFormats = Globals.exportFactory.getExportersAsString(70, 20, "");
         String outFormatsList = String.format("%s: %s%n", Localization.lang("Available export formats"), outFormats);
 
         String footer = '\n' + importFormatsList + outFormatsList + "\nPlease report issues at https://github.com/JabRef/jabref/issues.";

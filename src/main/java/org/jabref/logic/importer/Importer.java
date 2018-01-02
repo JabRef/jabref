@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Objects;
 
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 
 /**
  * Role of an importer for JabRef.
@@ -133,14 +133,14 @@ public abstract class Importer implements Comparable<Importer> {
     public abstract String getName();
 
     /**
-     * Returns the file extensions that this importer can read
-     * @return {@link FileExtensions} correspoding to the importer
+     * Returns the type of files that this importer can read
+     * @return {@link FileType} corresponding to the importer
      */
-    public abstract FileExtensions getExtensions();
+    public abstract FileType getFileType();
 
     /**
-     * Returns a one-word ID which identifies this import format.
-     * Used for example, to identify the format when used from the command line.
+     * Returns a one-word ID which identifies this importer.
+     * Used for example, to identify the importer when used from the command line.
      *
      * @return ID, must be unique and not <code>null</code>
      */

@@ -15,7 +15,7 @@ import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
@@ -73,7 +73,7 @@ class CiteKeyBasedFileFinder implements FileFinder {
             // The file name starts with the key, that's already a good start
             // However, we do not want to match "JabRefa" for "JabRef" since this is probably a file belonging to another entry published in the same time / same name
             char charAfterKey = filename.charAt(citeKey.length());
-            return !BibtexKeyPatternUtil.CHARS.contains(Character.toString(charAfterKey));
+            return !BibtexKeyGenerator.APPENDIX_CHARACTERS.contains(Character.toString(charAfterKey));
         }
         return false;
     }

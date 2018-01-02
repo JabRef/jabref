@@ -53,7 +53,7 @@ import org.jabref.logic.importer.fileformat.mods.StringPlusLanguagePlusSupplied;
 import org.jabref.logic.importer.fileformat.mods.SubjectDefinition;
 import org.jabref.logic.importer.fileformat.mods.TitleInfoDefinition;
 import org.jabref.logic.importer.fileformat.mods.UrlDefinition;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
@@ -473,8 +473,8 @@ public class ModsImporter extends Importer implements Parser {
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return FileExtensions.MODS;
+    public FileType getFileType() {
+        return FileType.MODS;
     }
 
     @Override

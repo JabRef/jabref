@@ -20,12 +20,12 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.jabref.JabRefGUI;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
@@ -205,11 +205,8 @@ public class FreeCiteImporter extends Importer {
                     // autogenerate label (BibTeX key)
                     if (JabRefGUI.getMainFrame() != null) {
                         // only possible in GUI mode
-                        BibtexKeyPatternUtil.makeAndSetLabel(
-                                JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getMetaData()
-                                        .getCiteKeyPattern(importFormatPreferences.getBibtexKeyPatternPreferences().getKeyPattern()),
-                                JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabase(), e,
-                                importFormatPreferences.getBibtexKeyPatternPreferences());
+                        new BibtexKeyGenerator(JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext(), importFormatPreferences.getBibtexKeyPatternPreferences())
+                                .generateAndSetKey(e);
                     }
 
                     res.add(e);
@@ -231,8 +228,8 @@ public class FreeCiteImporter extends Importer {
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return FileExtensions.FREECITE;
+    public FileType getFileType() {
+        return FileType.FREECITE;
     }
 
     @Override

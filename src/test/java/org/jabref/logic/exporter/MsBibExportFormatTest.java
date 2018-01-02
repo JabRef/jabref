@@ -1,10 +1,10 @@
 package org.jabref.logic.exporter;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,8 +22,8 @@ public class MsBibExportFormatTest {
 
     public BibDatabaseContext databaseContext;
     public Charset charset;
-    public File tempFile;
-    public MSBibExportFormat msBibExportFormat;
+    public Path tempFile;
+    public MSBibExporter msBibExportFormat;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -33,15 +33,14 @@ public class MsBibExportFormatTest {
     public void setUp() throws Exception {
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
-        msBibExportFormat = new MSBibExportFormat();
-        tempFile = testFolder.newFile();
+        msBibExportFormat = new MSBibExporter();
+        tempFile = testFolder.newFile().toPath();
     }
 
     @Test
     public final void testPerformExportWithNoEntry() throws IOException, SaveException {
         List<BibEntry> entries = Collections.emptyList();
-        String tempFileName = tempFile.getCanonicalPath();
-        msBibExportFormat.performExport(databaseContext, tempFileName, charset, entries);
-        assertEquals(Collections.emptyList(), Files.readAllLines(tempFile.toPath()));
+        msBibExportFormat.export(databaseContext, tempFile, charset, entries);
+        assertEquals(Collections.emptyList(), Files.readAllLines(tempFile));
     }
 }

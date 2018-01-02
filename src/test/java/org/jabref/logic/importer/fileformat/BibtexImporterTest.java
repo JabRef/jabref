@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.Before;
@@ -112,7 +112,7 @@ public class BibtexImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(FileExtensions.BIBTEX_DB, importer.getExtensions());
+        assertEquals(FileType.BIBTEX_DB, importer.getFileType());
     }
 
     @Test

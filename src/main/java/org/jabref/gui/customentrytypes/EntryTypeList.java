@@ -12,7 +12,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.jabref.Globals;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
@@ -57,7 +57,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
             return;
         }
 
-        String testString = BibtexKeyPatternUtil.checkLegalKey(s,
+        String testString = BibtexKeyGenerator.cleanKey(s,
                 Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
         if (!testString.equals(s) || (s.indexOf('&') >= 0)) {
             // Report error and exit.

@@ -32,7 +32,7 @@ import org.jabref.logic.exporter.SaveSession;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
@@ -293,8 +293,8 @@ public class SaveDatabaseAction extends AbstractWorker {
         // configure file dialog
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileExtensions.BIBTEX_DB)
-                .withDefaultExtension(FileExtensions.BIBTEX_DB)
+                .addExtensionFilter(FileType.BIBTEX_DB)
+                .withDefaultExtension(FileType.BIBTEX_DB)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
         DialogService ds = new FXDialogService();
 

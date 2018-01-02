@@ -61,10 +61,10 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
         // style. Therefore, we extract the style source from the file.
         String styleSource = null;
         if (CitationStyle.isCitationStyleFile(style)) {
-            final CitationStyle citationStyleFromFile = CitationStyle.createCitationStyleFromFile(style);
-            if (citationStyleFromFile != null && !citationStyleFromFile.getSource().isEmpty()) {
-                styleSource = citationStyleFromFile.getSource();
-            }
+            styleSource = CitationStyle.createCitationStyleFromFile(style)
+                    .filter(citationStyleFromFile -> !citationStyleFromFile.getSource().isEmpty())
+                    .map(CitationStyle::getSource)
+                    .orElse(null);
         }
         if (styleSource != null) {
             return CitationStyleGenerator.generateCitations(selectedEntries, styleSource, outputFormat);

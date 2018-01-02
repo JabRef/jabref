@@ -1,15 +1,12 @@
 package org.jabref.gui.fieldeditors;
 
-import java.util.Optional;
-
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.undo.UndoableKeyChange;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.integrity.FieldCheckers;
-import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 
 public class BibtexKeyEditorViewModel extends AbstractEditorViewModel {
@@ -25,11 +22,8 @@ public class BibtexKeyEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void generateKey() {
-        Optional<FieldChange> fieldChange = BibtexKeyPatternUtil.makeAndSetLabel(
-                bibDatabaseContext.getMetaData().getCiteKeyPattern(keyPatternPreferences.getKeyPattern()),
-                bibDatabaseContext.getDatabase(),
-                entry,
-                keyPatternPreferences);
-        fieldChange.ifPresent(change -> undoManager.addEdit(new UndoableKeyChange(change)));
+        new BibtexKeyGenerator(bibDatabaseContext, keyPatternPreferences)
+                .generateAndSetKey(entry)
+                .ifPresent(change -> undoManager.addEdit(new UndoableKeyChange(change)));
     }
 }

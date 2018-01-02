@@ -22,7 +22,7 @@ import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.undo.UndoableInsertEntry;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.PdfContentImporter;
 import org.jabref.logic.importer.fileformat.PdfXmpImporter;
@@ -213,10 +213,8 @@ public class PdfImporter {
         // insert entry to database and link file
         panel.getDatabase().insertEntry(entry);
         panel.markBaseChanged();
-        BibtexKeyPatternUtil.makeAndSetLabel(panel.getBibDatabaseContext().getMetaData()
-                .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()), panel.getDatabase(),
-                entry,
-                Globals.prefs.getBibtexKeyPatternPreferences());
+        new BibtexKeyGenerator(panel.getBibDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences())
+                .generateAndSetKey(entry);
         DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
         dfh.linkPdfToEntry(fileName, entry);
 
