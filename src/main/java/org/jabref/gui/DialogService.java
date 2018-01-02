@@ -49,13 +49,15 @@ public interface DialogService {
 
     /**
      * Create and display error dialog displaying the given exception.
-     * @param message the error message
+     *
+     * @param message   the error message
      * @param exception the exception causing the error
      */
     void showErrorDialogAndWait(String message, Throwable exception);
 
     /**
      * Create and display error dialog displaying the given exception.
+     *
      * @param exception the exception causing the error
      */
     default void showErrorDialogAndWait(Exception exception) {
@@ -64,6 +66,7 @@ public interface DialogService {
 
     /**
      * Create and display error dialog displaying the given message.
+     *
      * @param message the error message
      */
     void showErrorDialogAndWait(String message);
@@ -106,7 +109,7 @@ public interface DialogService {
      * @return Optional with the pressed Button as ButtonType
      */
     Optional<ButtonType> showCustomButtonDialogAndWait(Alert.AlertType type, String title, String content,
-            ButtonType... buttonTypes);
+                                                       ButtonType... buttonTypes);
 
     /**
      * This will create and display a new dialog showing a custom {@link DialogPane}
@@ -126,12 +129,14 @@ public interface DialogService {
 
     /**
      * Constructs and shows a canceable {@link ProgressDialog}. Clicking cancel will cancel the underlying service and close the dialog
+     *
      * @param task The {@link Task} which executes the work and for which to show the dialog
      */
     <V> void showCanceableProgressDialogAndWait(Task<V> task);
 
     /**
      * Notify the user in an non-blocking way (i.e., update status message instead of showing a dialog).
+     *
      * @param message the message to show.
      */
     void notify(String message);
@@ -176,6 +181,7 @@ public interface DialogService {
      * @return the selected directory or an empty {@link Optional} if no directory has been selected
      */
     Optional<Path> showDirectorySelectionDialog(DirectoryDialogConfiguration directoryDialogConfiguration);
+
     /**
      * Displays a Print Dialog. Allow the user to update job state such as printer and settings. These changes will be
      * available in the appropriate properties after the print dialog has returned. The print dialog is also used to
