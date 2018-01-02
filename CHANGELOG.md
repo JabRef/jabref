@@ -13,9 +13,11 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 
+
 ### Fixed
 
 ### Removed
+- We removed the Look and Feels from jgoodies, because these are not compatible with Java 9
 
 
 
