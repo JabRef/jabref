@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
@@ -43,7 +43,7 @@ public class CopacImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        Assert.assertEquals(FileExtensions.COPAC, importer.getExtensions());
+        Assert.assertEquals(FileType.COPAC, importer.getFileType());
 
     }
 

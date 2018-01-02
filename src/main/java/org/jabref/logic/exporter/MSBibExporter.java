@@ -3,7 +3,7 @@ package org.jabref.logic.exporter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,22 +16,22 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.jabref.logic.msbib.MSBibDatabase;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 /**
- * ExportFormat for exporting in MSBIB XML format.
+ * TemplateExporter for exporting in MSBIB XML format.
  */
-class MSBibExportFormat extends ExportFormat {
+class MSBibExporter extends Exporter {
 
-    public MSBibExportFormat() {
-        super("MS Office 2007", "MSBib", null, null, FileExtensions.XML);
+    public MSBibExporter() {
+        super("MSBib", "MS Office 2007", FileType.XML);
     }
 
     @Override
-    public void performExport(final BibDatabaseContext databaseContext, final String file,
-            final Charset encoding, List<BibEntry> entries) throws SaveException {
+    public void export(final BibDatabaseContext databaseContext, final Path file,
+                       final Charset encoding, List<BibEntry> entries) throws SaveException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
 
@@ -50,9 +50,9 @@ class MSBibExportFormat extends ExportFormat {
                 trans.setOutputProperty(OutputKeys.INDENT, "yes");
                 trans.transform(source, result);
             } catch (TransformerException | IllegalArgumentException | TransformerFactoryConfigurationError e) {
-                throw new Error(e);
+                throw new SaveException(e);
             }
-            finalizeSaveSession(session, Paths.get(file));
+            session.finalize(file);
         } catch (IOException ex) {
             throw new SaveException(ex);
         }

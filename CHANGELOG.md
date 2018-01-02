@@ -15,6 +15,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 
 ### Fixed
+- We fixed the missing dot in the name of an exported file. [#3576](https://github.com/JabRef/jabref/issues/3576)
 
 ### Removed
 - We removed the Look and Feels from jgoodies, because these are not compatible with Java 9

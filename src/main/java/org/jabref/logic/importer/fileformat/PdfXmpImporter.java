@@ -9,7 +9,7 @@ import java.util.Objects;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.xmp.XMPPreferences;
 import org.jabref.logic.xmp.XMPUtil;
 
@@ -31,8 +31,8 @@ public class PdfXmpImporter extends Importer {
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return FileExtensions.XMP;
+    public FileType getFileType() {
+        return FileType.XMP;
     }
 
     @Override

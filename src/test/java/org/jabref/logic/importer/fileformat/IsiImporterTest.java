@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.Rule;
@@ -49,7 +49,7 @@ public class IsiImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(FileExtensions.ISI, importer.getExtensions());
+        assertEquals(FileType.ISI, importer.getFileType());
     }
 
     @Test

@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -72,16 +72,16 @@ public class FileDialogConfigurationTest {
     @Test
     public void testSingleExtension() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withDefaultExtension(FileExtensions.BIBTEX_DB).build();
+                .withDefaultExtension(FileType.BIBTEX_DB).build();
 
-        FileChooser.ExtensionFilter filter = toFilter(FileExtensions.BIBTEX_DB);
+        FileChooser.ExtensionFilter filter = toFilter(FileType.BIBTEX_DB);
 
         assertEquals(filter.getExtensions(), fileDialogConfiguration.getDefaultExtension().getExtensions());
     }
 
     @Test
     public void testMultipleExtension() {
-        EnumSet<FileExtensions> extensions = EnumSet.allOf(FileExtensions.class);
+        EnumSet<FileType> extensions = EnumSet.allOf(FileType.class);
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilters(extensions).build();
@@ -94,9 +94,9 @@ public class FileDialogConfigurationTest {
 
     }
 
-    private FileChooser.ExtensionFilter toFilter(FileExtensions extension) {
+    private FileChooser.ExtensionFilter toFilter(FileType extension) {
         return new FileChooser.ExtensionFilter(extension.getDescription(),
-                extension.getExtensionsAsList().stream().map(ending -> "*." + ending).collect(Collectors.toList()));
+                extension.getExtensions().stream().map(ending -> "*." + ending).collect(Collectors.toList()));
     }
 
 }

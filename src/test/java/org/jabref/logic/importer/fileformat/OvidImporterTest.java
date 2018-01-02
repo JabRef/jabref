@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
@@ -41,7 +41,7 @@ public class OvidImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        Assert.assertEquals(FileExtensions.OVID, importer.getExtensions());
+        Assert.assertEquals(FileType.OVID, importer.getFileType());
     }
 
     @Test

@@ -1,5 +1,6 @@
 package org.jabref.logic.exporter;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,7 +10,12 @@ import java.util.Objects;
 
 import org.jabref.model.FieldChange;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public abstract class SaveSession {
+
+    private static final Log LOGGER = LogFactory.getLog(SaveSession.class);
 
     protected boolean backup;
     protected final Charset encoding;
@@ -48,5 +54,15 @@ public abstract class SaveSession {
 
     public void addFieldChanges(List<FieldChange> newUndoableFieldChanges) {
         this.undoableFieldChanges.addAll(newUndoableFieldChanges);
+    }
+
+    public void finalize(Path file) throws SaveException, IOException {
+        getWriter().flush();
+        getWriter().close();
+
+        if (!getWriter().couldEncodeAll()) {
+            LOGGER.warn("Could not encode...");
+        }
+        commit(file);
     }
 }

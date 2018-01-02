@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -36,7 +37,7 @@ import org.jabref.logic.importer.fileformat.bibtexml.Phdthesis;
 import org.jabref.logic.importer.fileformat.bibtexml.Proceedings;
 import org.jabref.logic.importer.fileformat.bibtexml.Techreport;
 import org.jabref.logic.importer.fileformat.bibtexml.Unpublished;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -46,21 +47,20 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Export format for the BibTeXML format.
  */
-public class BibTeXMLExportFormat extends ExportFormat {
+public class BibTeXMLExporter extends Exporter {
 
     private static final String BIBTEXML_NAMESPACE_URI = "http://bibtexml.sf.net/";
     private static final Locale ENGLISH = Locale.ENGLISH;
-    private static final Log LOGGER = LogFactory.getLog(BibTeXMLExportFormat.class);
+    private static final Log LOGGER = LogFactory.getLog(BibTeXMLExporter.class);
     private JAXBContext context;
 
-
-    public BibTeXMLExportFormat() {
-        super("BibTeXML", "bibtexml", null, null, FileExtensions.XML);
+    public BibTeXMLExporter() {
+        super("bibtexml", "BibTeXML", FileType.XML);
     }
 
     @Override
-    public void performExport(final BibDatabaseContext databaseContext, final String resultFile, final Charset encoding,
-            List<BibEntry> entries) throws SaveException {
+    public void export(final BibDatabaseContext databaseContext, final Path resultFile, final Charset encoding,
+                       List<BibEntry> entries) throws SaveException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (entries.isEmpty()) { // Only export if entries exist
@@ -71,7 +71,7 @@ public class BibTeXMLExportFormat extends ExportFormat {
         for (BibEntry bibEntry : entries) {
             Entry entry = new Entry();
 
-            bibEntry.getCiteKeyOptional().ifPresent(citeKey -> entry.setId(citeKey));
+            bibEntry.getCiteKeyOptional().ifPresent(entry::setId);
 
             String type = bibEntry.getType().toLowerCase(ENGLISH);
             switch (type) {
@@ -126,7 +126,7 @@ public class BibTeXMLExportFormat extends ExportFormat {
         createMarshallerAndWriteToFile(file, resultFile);
     }
 
-    private void createMarshallerAndWriteToFile(File file, String resultFile) throws SaveException {
+    private void createMarshallerAndWriteToFile(File file, Path resultFile) throws SaveException {
         try {
             if (context == null) {
                 context = JAXBContext.newInstance(File.class);
@@ -134,7 +134,7 @@ public class BibTeXMLExportFormat extends ExportFormat {
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-            marshaller.marshal(file, new java.io.File(resultFile));
+            marshaller.marshal(file, resultFile.toFile());
         } catch (JAXBException e) {
             throw new SaveException(e);
         }
@@ -240,7 +240,7 @@ public class BibTeXMLExportFormat extends ExportFormat {
     }
 
     private <T> List<Method> getListOfSetMethods(T entryType) {
-        return Arrays.asList(entryType.getClass().getDeclaredMethods()).stream()
+        return Arrays.stream(entryType.getClass().getDeclaredMethods())
                 .filter(method -> method.getName().startsWith("set")).collect(Collectors.toList());
     }
 
