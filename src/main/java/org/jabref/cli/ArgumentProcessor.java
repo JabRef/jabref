@@ -18,7 +18,7 @@ import org.jabref.JabRefException;
 import org.jabref.gui.externalfiles.AutoSetLinks;
 import org.jabref.gui.importer.fetcher.EntryFetcher;
 import org.jabref.gui.importer.fetcher.EntryFetchers;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.ExportFormat;
@@ -47,7 +47,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.SearchPreferences;
 
@@ -509,17 +508,11 @@ public class ArgumentProcessor {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
 
-            MetaData metaData = parserResult.getMetaData();
-            if (metaData != null) {
-                LOGGER.info(Localization.lang("Regenerating BibTeX keys according to metadata"));
-                for (BibEntry entry : database.getEntries()) {
-                    // try to make a new label
-                    BibtexKeyPatternUtil.makeAndSetLabel(
-                            metaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
-                            database, entry, Globals.prefs.getBibtexKeyPatternPreferences());
-                }
-            } else {
-                LOGGER.info(Localization.lang("No meta data present in BIB file. Cannot regenerate BibTeX keys"));
+            LOGGER.info(Localization.lang("Regenerating BibTeX keys according to metadata"));
+
+            BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(parserResult.getDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences());
+            for (BibEntry entry : database.getEntries()) {
+                keyGenerator.generateAndSetKey(entry);
             }
         }
     }
