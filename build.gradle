@@ -133,7 +133,7 @@ dependencies {
     compile 'org.fxmisc.richtext:richtextfx:0.8.1'
 
     // Cannot be updated to 9.*.* until Jabref works with Java 9
-    compile 'org.controlsfx:controlsfx:8.40.14'
+    compile 'org.controlsfx:controlsfx:8.40.15-SNAPSHOT'
 
     compile 'org.jsoup:jsoup:1.11.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
@@ -503,7 +503,7 @@ task releaseJar(dependsOn: "shadowJar") {
             }
         }
         // set executable with read permissions (first true) and for all (false)
-        file("$buildDir/releases/JabRef-${project.version}.jar").setExecutable(true, false);
+        file("$buildDir/releases/JabRef-${project.version}.jar").setExecutable(true, false)
     }
 }
 
