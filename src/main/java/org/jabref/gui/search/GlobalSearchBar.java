@@ -52,7 +52,6 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.search.SearchQueryHighlightObservable;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.SearchPreferences;
 
 import org.fxmisc.easybind.EasyBind;
