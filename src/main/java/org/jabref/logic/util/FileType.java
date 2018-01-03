@@ -1,7 +1,9 @@
 package org.jabref.logic.util;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
@@ -53,6 +55,7 @@ public enum FileType {
 
     private final String[] extensions;
     private final String description;
+    private final static EnumSet<FileType> allFileTypes = EnumSet.allOf(FileType.class);
 
     FileType(String description, String... extensions) {
         this.description = description;
@@ -77,5 +80,10 @@ public enum FileType {
 
     public List<String> getExtensionsWithDot() {
         return getExtensions().stream().map(extension -> "." + extension).collect(Collectors.toList());
+    }
+
+    public static FileType parse(String fileExtension) {
+        Optional<FileType> fileType = allFileTypes.stream().filter(f -> f.getExtensionsWithDot().stream().anyMatch(fileExtension::equals)).findFirst();
+        return fileType.orElse(FileType.DEFAULT);
     }
 }
