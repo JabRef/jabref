@@ -1,14 +1,13 @@
 package org.jabref.preferences;
 
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import org.jabref.Globals;
-import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -31,12 +30,13 @@ import org.apache.commons.logging.LogFactory;
 
 public class CustomExportList {
 
+    private static EnumSet<FileType> allFiles = EnumSet.allOf(FileType.class);
+
     private static final Log LOGGER = LogFactory.getLog(CustomExportList.class);
     private final EventList<List<String>> list;
     private final SortedList<List<String>> sorted;
 
     private final Map<String, TemplateExporter> formats = new TreeMap<>();
-
 
     public CustomExportList(Comparator<List<String>> comp) {
         list = new BasicEventList<>();
@@ -44,8 +44,8 @@ public class CustomExportList {
     }
 
     private static FileType getFileExtension(String consoleName) {
-        Optional<Exporter> exporter = Globals.exportFactory.getExporterByName(consoleName);
-        return exporter.map(Exporter::getFileType).orElse(FileType.DEFAULT);
+        Optional<FileType> fileType = allFiles.stream().filter(f -> f.getExtensionsWithDot().stream().anyMatch(consoleName::equals)).findFirst();
+        return fileType.orElse(FileType.DEFAULT);
     }
 
     public int size() {
@@ -57,7 +57,7 @@ public class CustomExportList {
     }
 
     public Map<String, TemplateExporter> getCustomExportFormats(JabRefPreferences prefs,
-                                                                JournalAbbreviationLoader loader) {
+            JournalAbbreviationLoader loader) {
         Objects.requireNonNull(prefs);
         Objects.requireNonNull(loader);
         formats.clear();
@@ -88,7 +88,7 @@ public class CustomExportList {
     }
 
     private Optional<TemplateExporter> createFormat(List<String> s, LayoutFormatterPreferences layoutPreferences,
-                                                    SavePreferences savePreferences) {
+            SavePreferences savePreferences) {
         if (s.size() < 3) {
             return Optional.empty();
         }
@@ -132,7 +132,7 @@ public class CustomExportList {
     }
 
     public void remove(List<String> toRemove, LayoutFormatterPreferences layoutPreferences,
-                       SavePreferences savePreferences) {
+            SavePreferences savePreferences) {
         createFormat(toRemove, layoutPreferences, savePreferences).ifPresent(format -> {
             formats.remove(format.getId());
             list.remove(toRemove);
