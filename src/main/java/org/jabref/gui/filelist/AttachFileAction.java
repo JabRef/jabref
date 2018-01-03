@@ -25,7 +25,7 @@ public class AttachFileAction implements BaseAction {
         BibEntry entry = panel.getSelectedEntries().get(0);
         LinkedFile flEntry = new LinkedFile("", "", "");
 
-        FileListDialogView dlg = new FileListDialogView();
+        FileListDialogView dlg = new FileListDialogView(FileListDialogOptions.SHOW_OPEN_BUTTON);
 
         Platform.runLater(() -> {
             dlg.show();

@@ -1,6 +1,7 @@
 package org.jabref.gui.filelist;
 
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -35,11 +36,15 @@ public class FileListDialogController extends AbstractController<FileListDialogV
 
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
+    @Inject private EnumSet<FileListDialogOptions> dialogoptions;
 
     @FXML
     private void initialize() {
         viewModel = new FileListDialogViewModel(stateManager.getActiveDatabase().get(), dialogService);
         setBindings();
+
+        System.out.println(dialogoptions);
+
     }
 
     private void setBindings() {
