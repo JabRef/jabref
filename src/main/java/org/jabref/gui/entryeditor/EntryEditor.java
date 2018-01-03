@@ -52,7 +52,9 @@ public class EntryEditor extends BorderPane {
 
     private final BibDatabaseContext bibDatabaseContext;
     private final CountingUndoManager undoManager;
-
+    private final BasePanel panel;
+    private final List<SearchQueryHighlightListener> searchListeners = new ArrayList<>();
+    private final List<EntryEditorTab> tabs;
     /**
      * A reference to the entry this editor works on.
      */
@@ -60,9 +62,6 @@ public class EntryEditor extends BorderPane {
     @FXML private TabPane tabbed;
     @FXML private Button typeChangeButton;
     @FXML private Button fetcherButton;
-    private final BasePanel panel;
-    private final List<SearchQueryHighlightListener> searchListeners = new ArrayList<>();
-    private final List<EntryEditorTab> tabs;
     private SourceTab sourceTab;
     @FXML private Label typeLabel;
     private final EntryEditorPreferences preferences;

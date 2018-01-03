@@ -70,7 +70,7 @@ public class BindingsHelper {
      * the items are converted when the are inserted (and at the initialization) instead of when they are accessed.
      * Thus the initial CPU overhead and memory consumption is higher but the access to list items is quicker.
      */
-    public static <A, B> MappedList mapBacked(ObservableList<A> source, Function<A, B> mapper) {
+    public static <A, B> MappedList<B, A> mapBacked(ObservableList<A> source, Function<A, B> mapper) {
         return new MappedList<>(source, mapper);
     }
 

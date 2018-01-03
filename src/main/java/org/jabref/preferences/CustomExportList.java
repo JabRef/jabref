@@ -7,11 +7,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import org.jabref.logic.exporter.ExportFormat;
-import org.jabref.logic.exporter.ExportFormats;
+import org.jabref.Globals;
+import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.util.FileType;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -33,7 +35,7 @@ public class CustomExportList {
     private final EventList<List<String>> list;
     private final SortedList<List<String>> sorted;
 
-    private final Map<String, ExportFormat> formats = new TreeMap<>();
+    private final Map<String, TemplateExporter> formats = new TreeMap<>();
 
 
     public CustomExportList(Comparator<List<String>> comp) {
@@ -41,13 +43,9 @@ public class CustomExportList {
         sorted = new SortedList<>(list, comp);
     }
 
-    public Map<String, ExportFormat> getCustomExportFormats(JabRefPreferences prefs,
-            JournalAbbreviationLoader loader) {
-        Objects.requireNonNull(prefs);
-        Objects.requireNonNull(loader);
-        formats.clear();
-        readPrefs(prefs, loader);
-        return formats;
+    private static FileType getFileExtension(String consoleName) {
+        Optional<Exporter> exporter = Globals.exportFactory.getExporterByName(consoleName);
+        return exporter.map(Exporter::getFileType).orElse(FileType.DEFAULT);
     }
 
     public int size() {
@@ -56,6 +54,15 @@ public class CustomExportList {
 
     public EventList<List<String>> getSortedList() {
         return sorted;
+    }
+
+    public Map<String, TemplateExporter> getCustomExportFormats(JabRefPreferences prefs,
+                                                                JournalAbbreviationLoader loader) {
+        Objects.requireNonNull(prefs);
+        Objects.requireNonNull(loader);
+        formats.clear();
+        readPrefs(prefs, loader);
+        return formats;
     }
 
     private void readPrefs(JabRefPreferences prefs, JournalAbbreviationLoader loader) {
@@ -68,9 +75,9 @@ public class CustomExportList {
         LayoutFormatterPreferences layoutPreferences = prefs.getLayoutFormatterPreferences(loader);
         SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(prefs);
         while (!((s = prefs.getStringList(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i)).isEmpty())) {
-            Optional<ExportFormat> format = createFormat(s, layoutPreferences, savePreferences);
+            Optional<TemplateExporter> format = createFormat(s, layoutPreferences, savePreferences);
             if (format.isPresent()) {
-                formats.put(format.get().getConsoleName(), format.get());
+                formats.put(format.get().getId(), format.get());
                 list.add(s);
             } else {
                 String customExportFormat = prefs.get(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i);
@@ -80,8 +87,8 @@ public class CustomExportList {
         }
     }
 
-    private Optional<ExportFormat> createFormat(List<String> s, LayoutFormatterPreferences layoutPreferences,
-            SavePreferences savePreferences) {
+    private Optional<TemplateExporter> createFormat(List<String> s, LayoutFormatterPreferences layoutPreferences,
+                                                    SavePreferences savePreferences) {
         if (s.size() < 3) {
             return Optional.empty();
         }
@@ -91,7 +98,7 @@ public class CustomExportList {
         } else {
             lfFileName = s.get(1);
         }
-        ExportFormat format = new ExportFormat(s.get(0), s.get(0), lfFileName, null, ExportFormats.getFileExtension(s.get(2)), layoutPreferences,
+        TemplateExporter format = new TemplateExporter(s.get(0), s.get(0), lfFileName, null, getFileExtension(s.get(2)), layoutPreferences,
                 savePreferences);
         format.setCustomExport(true);
         return Optional.of(format);
@@ -99,16 +106,8 @@ public class CustomExportList {
 
     public void addFormat(List<String> s, LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
         createFormat(s, layoutPreferences, savePreferences).ifPresent(format -> {
-            formats.put(format.getConsoleName(), format);
+            formats.put(format.getId(), format);
             list.add(s);
-        });
-    }
-
-    public void remove(List<String> toRemove, LayoutFormatterPreferences layoutPreferences,
-            SavePreferences savePreferences) {
-        createFormat(toRemove, layoutPreferences, savePreferences).ifPresent(format -> {
-            formats.remove(format.getConsoleName());
-            list.remove(toRemove);
         });
     }
 
@@ -132,4 +131,11 @@ public class CustomExportList {
         }
     }
 
+    public void remove(List<String> toRemove, LayoutFormatterPreferences layoutPreferences,
+                       SavePreferences savePreferences) {
+        createFormat(toRemove, layoutPreferences, savePreferences).ifPresent(format -> {
+            formats.remove(format.getId());
+            list.remove(toRemove);
+        });
+    }
 }

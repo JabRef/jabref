@@ -24,7 +24,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 
 import de.undercouch.citeproc.helper.CSLUtils;
 import org.apache.commons.logging.Log;
@@ -62,7 +62,7 @@ public class CitationStyle {
     /**
      * Creates an CitationStyle instance out of the style string
      */
-    private static CitationStyle createCitationStyleFromSource(final String source, final String filename) {
+    private static Optional<CitationStyle> createCitationStyleFromSource(final String source, final String filename) {
         if ((filename != null) && !filename.isEmpty() && (source != null) && !source.isEmpty()) {
             try {
                 DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -75,12 +75,12 @@ public class CitationStyle {
                 NodeList titleNode = ((Element) nodes.item(0)).getElementsByTagName("title");
                 String title = ((CharacterData) titleNode.item(0).getFirstChild()).getData();
 
-                return new CitationStyle(filename, title, source);
+                return Optional.of(new CitationStyle(filename, title, source));
             } catch (ParserConfigurationException | SAXException | IOException e) {
                 LOGGER.error("Error while parsing source", e);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     private static String stripInvalidProlog(String source) {
@@ -95,10 +95,10 @@ public class CitationStyle {
     /**
      * Loads the CitationStyle from the given file
      */
-    public static CitationStyle createCitationStyleFromFile(final String styleFile) {
+    public static Optional<CitationStyle> createCitationStyleFromFile(final String styleFile) {
         if (!isCitationStyleFile(styleFile)) {
             LOGGER.error("Can only load style files: " + styleFile);
-            return null;
+            return Optional.empty();
         }
 
         try {
@@ -117,7 +117,7 @@ public class CitationStyle {
         } catch (IOException e) {
             LOGGER.error("Error reading source file", e);
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -125,7 +125,7 @@ public class CitationStyle {
      * @return default citation style
      */
     public static CitationStyle getDefault() {
-        return createCitationStyleFromFile(DEFAULT);
+        return createCitationStyleFromFile(DEFAULT).orElse(new CitationStyle("", "Empty", ""));
     }
 
     /**
@@ -156,10 +156,8 @@ public class CitationStyle {
                 List<Path> allStyles = Files.find(jarFs.getRootDirectories().iterator().next(), 1, (file, attr) -> file.toString().endsWith("csl")).collect(Collectors.toList());
 
                 for (Path style : allStyles) {
-                    CitationStyle citationStyle = CitationStyle.createCitationStyleFromFile(style.getFileName().toString());
-                    if (citationStyle != null) {
-                        STYLES.add(citationStyle);
-                    }
+                    CitationStyle.createCitationStyleFromFile(style.getFileName().toString())
+                            .ifPresent(STYLES::add);
                 }
             }
             return STYLES;
@@ -173,7 +171,7 @@ public class CitationStyle {
      * Checks if the given style file is a CitationStyle
      */
     public static boolean isCitationStyleFile(String styleFile) {
-        return Arrays.stream(FileExtensions.CITATION_STYLE.getExtensions()).anyMatch(styleFile::endsWith);
+        return FileType.CITATION_STYLE.getExtensions().stream().anyMatch(styleFile::endsWith);
     }
 
     public String getTitle() {

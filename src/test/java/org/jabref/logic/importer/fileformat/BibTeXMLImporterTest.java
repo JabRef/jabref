@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class BibTeXMLImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(FileExtensions.BIBTEXML, importer.getExtensions());
+        assertEquals(FileType.BIBTEXML, importer.getFileType());
     }
 
     @Test

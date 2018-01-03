@@ -139,7 +139,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.database.DatabaseLocation;
+import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
@@ -150,8 +150,6 @@ import org.jabref.preferences.LastFocusedTabPreferences;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import com.jgoodies.looks.HeaderStyle;
-import com.jgoodies.looks.Options;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fxmisc.easybind.EasyBind;
@@ -902,6 +900,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void initLayout() {
+
         setProgressBarVisible(false);
 
         pushApplications = new PushToApplications();
@@ -1303,7 +1302,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void createToolBar() {
-        tlb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         tlb.setBorder(null);
         tlb.setRollover(true);
 

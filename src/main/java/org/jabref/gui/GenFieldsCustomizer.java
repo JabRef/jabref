@@ -25,7 +25,7 @@ import javax.swing.JTextArea;
 import org.jabref.Globals;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
@@ -120,7 +120,7 @@ public class GenFieldsCustomizer extends JabRefDialog {
                         Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            String testString = BibtexKeyPatternUtil.checkLegalKey(parts[1],
+            String testString = BibtexKeyGenerator.cleanKey(parts[1],
                     Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
             if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
                 // Report error and exit.

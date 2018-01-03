@@ -83,7 +83,7 @@ import org.jabref.gui.util.comparator.IconComparator;
 import org.jabref.gui.util.component.CheckBoxMessage;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportInspector;
 import org.jabref.logic.importer.OutputPrinter;
@@ -458,10 +458,8 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             database.insertEntry(entry);
 
             // Generate a unique key:
-            BibtexKeyPatternUtil.makeAndSetLabel(
-                    localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
-                    database, entry,
-                    Globals.prefs.getBibtexKeyPatternPreferences());
+            new BibtexKeyGenerator(localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                    database, Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(entry);
             // Remove the entry from the database again, since we only added it in
             // order to
             // make sure the key was unique:
@@ -502,10 +500,8 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 entry.setId(IdGenerator.next());
                 database.insertEntry(entry);
 
-                BibtexKeyPatternUtil.makeAndSetLabel(
-                        localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
-                        database, entry,
-                        Globals.prefs.getBibtexKeyPatternPreferences());
+                new BibtexKeyGenerator(localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                        database, Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(entry);
                 // Add the generated key to our list:   -- TODO: Why??
                 keys.add(entry.getCiteKeyOptional());
             }

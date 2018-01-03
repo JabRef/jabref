@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,7 +34,7 @@ public class RISImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        Assert.assertEquals(FileExtensions.RIS, importer.getExtensions());
+        Assert.assertEquals(FileType.RIS, importer.getFileType());
     }
 
     @Test

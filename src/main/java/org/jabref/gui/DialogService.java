@@ -9,7 +9,6 @@ import javafx.print.PrinterJob;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
-import javafx.stage.FileChooser;
 
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -50,13 +49,15 @@ public interface DialogService {
 
     /**
      * Create and display error dialog displaying the given exception.
-     * @param message the error message
+     *
+     * @param message   the error message
      * @param exception the exception causing the error
      */
     void showErrorDialogAndWait(String message, Throwable exception);
 
     /**
      * Create and display error dialog displaying the given exception.
+     *
      * @param exception the exception causing the error
      */
     default void showErrorDialogAndWait(Exception exception) {
@@ -65,6 +66,7 @@ public interface DialogService {
 
     /**
      * Create and display error dialog displaying the given message.
+     *
      * @param message the error message
      */
     void showErrorDialogAndWait(String message);
@@ -107,7 +109,7 @@ public interface DialogService {
      * @return Optional with the pressed Button as ButtonType
      */
     Optional<ButtonType> showCustomButtonDialogAndWait(Alert.AlertType type, String title, String content,
-            ButtonType... buttonTypes);
+                                                       ButtonType... buttonTypes);
 
     /**
      * This will create and display a new dialog showing a custom {@link DialogPane}
@@ -127,12 +129,14 @@ public interface DialogService {
 
     /**
      * Constructs and shows a canceable {@link ProgressDialog}. Clicking cancel will cancel the underlying service and close the dialog
+     *
      * @param task The {@link Task} which executes the work and for which to show the dialog
      */
     <V> void showCanceableProgressDialogAndWait(Task<V> task);
 
     /**
      * Notify the user in an non-blocking way (i.e., update status message instead of showing a dialog).
+     *
      * @param message the message to show.
      */
     void notify(String message);
@@ -141,6 +145,7 @@ public interface DialogService {
      * Shows a new file save dialog. The method doesn't return until the
      * displayed file save dialog is dismissed. The return value specifies the
      * file chosen by the user or an empty {@link Optional} if no selection has been made.
+     * After a file was selected, the given file dialog configuration is updated with the selected extension type (if any).
      *
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
@@ -151,6 +156,7 @@ public interface DialogService {
      * displayed open dialog is dismissed. The return value specifies
      * the file chosen by the user or an empty {@link Optional} if no selection has been
      * made.
+     * After a file was selected, the given file dialog configuration is updated with the selected extension type (if any).
      *
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
@@ -175,14 +181,6 @@ public interface DialogService {
      * @return the selected directory or an empty {@link Optional} if no directory has been selected
      */
     Optional<Path> showDirectorySelectionDialog(DirectoryDialogConfiguration directoryDialogConfiguration);
-
-    /**
-     * Gets the configured {@link FileChooser}, should only be necessary in rare use cases.
-     * For normal usage use the show-Methods which directly return the selected file(s)
-     * @param fileDialogConfiguration
-     * @return A configured instance of the {@link FileChooser}
-     */
-    FileChooser getConfiguredFileChooser(FileDialogConfiguration fileDialogConfiguration);
 
     /**
      * Displays a Print Dialog. Allow the user to update job state such as printer and settings. These changes will be

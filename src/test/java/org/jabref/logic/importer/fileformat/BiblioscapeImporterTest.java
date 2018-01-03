@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,7 +28,7 @@ public class BiblioscapeImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        Assert.assertEquals(FileExtensions.BILBIOSCAPE, importer.getExtensions());
+        Assert.assertEquals(FileType.BILBIOSCAPE, importer.getFileType());
     }
 
     @Test

@@ -30,7 +30,7 @@ import org.jabref.Globals;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.bibtex.DuplicateCheck;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -319,7 +319,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                         diag.toFront();
                     } else {
                 		// Regenerate CiteKey of imported BibEntry
-                        BibtexKeyPatternUtil.makeAndSetLabel(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern(), frame.getCurrentBasePanel().getDatabase(), bibEntry, Globals.prefs.getBibtexKeyPatternPreferences());
+                        new BibtexKeyGenerator(frame.getCurrentBasePanel().getBibDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(bibEntry);
                         // Update Timestamps
                         if (Globals.prefs.getTimestampPreferences().includeCreatedTimestamp()) {
                             bibEntry.setField(Globals.prefs.getTimestampPreferences().getTimestampField(), Globals.prefs.getTimestampPreferences().now());
