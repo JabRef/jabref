@@ -192,3 +192,26 @@
     -fx-background-color: -fx-accented-background;
     -fx-padding: 0 0.15ex 0 0.15ex;
 }
+
+.table-row-cell:hover,
+.tree-table-row-cell:hover {
+    -fx-background-color: lightgrey;
+}
+
+.table-row-cell:selected,
+.tree-table-row-cell:selected {
+    -fx-background-color: #6A9FCD;
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+.tree-table-row-cell:selected > .tree-table-cell > .glyph-icon {
+    -fx-fill: white;
+    -fx-text-fill: white;
+}
+
+.table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:selected,
+.tree-table-view > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell .tree-table-cell:selected {
+    -fx-border-color: transparent;
+    -fx-background-insets: 0;
+}
