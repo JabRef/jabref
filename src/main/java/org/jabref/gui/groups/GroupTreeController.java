@@ -42,6 +42,7 @@ import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.groups.AllEntriesGroup;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -250,12 +251,12 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
     }
 
     private void updateSelection(List<TreeItem<GroupNodeViewModel>> newSelectedGroups) {
-        if (newSelectedGroups == null) {
+        if (newSelectedGroups == null || newSelectedGroups.isEmpty()) {
             viewModel.selectedGroupsProperty().clear();
         } else {
             List<GroupNodeViewModel> list = new ArrayList<>();
             for (TreeItem<GroupNodeViewModel> model : newSelectedGroups) {
-                if (model != null && model.getValue() != null) {
+                if (model != null && model.getValue() != null && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)) {
                     list.add(model.getValue());
                 }
             }
