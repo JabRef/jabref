@@ -23,4 +23,4 @@ fi
 cd ~/.install4j7/jres/
 wget --quiet -nc https://files.jabref.org/jres/windows-x86-1.8.0_152.tar.gz
 wget --quiet -nc https://files.jabref.org/jres/windows-amd64-1.8.0_152.tar.gz
-wget --quiet -nc https://files.jabref.org/jres/macosx-amd64-1.8.0_152_unpacked.tar.gz
+wget --quiet -nc https://files.jabref.org/jres/macosx-amd64-1.8.0_144_unpacked.tar.gz
