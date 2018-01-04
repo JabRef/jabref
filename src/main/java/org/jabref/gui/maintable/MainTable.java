@@ -286,42 +286,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         return renderer;
     }
-
-    // TODO: Set column widths
-    private void setWidths() {
-        // Setting column widths:
-        int ncWidth = Globals.prefs.getInt(JabRefPreferences.NUMBER_COL_WIDTH);
-        List<String> widthsFromPreferences = Globals.prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS);
-        TableColumnModel cm = getColumnModel();
-        cm.getColumn(0).setPreferredWidth(ncWidth);
-        for (int i = 1; i < cm.getColumnCount(); i++) {
-            MainTableColumn mainTableColumn = tableFormat.getTableColumn(cm.getColumn(i).getModelIndex());
-            if (SpecialField.RANKING.getFieldName().equals(mainTableColumn.getColumnName())) {
-                cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
-                cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
-                cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
-            } else if (mainTableColumn.isIconColumn()) {
-                cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
-                cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
-                cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
-            } else {
-                List<String> allColumns = Globals.prefs.getStringList(JabRefPreferences.COLUMN_NAMES);
-                // find index of current mainTableColumn in allColumns
-                for (int j = 0; j < allColumns.size(); j++) {
-                    if (allColumns.get(j).equalsIgnoreCase(mainTableColumn.getDisplayName())) {
-                        try {
-                            // set preferred width by using found index j in the width array
-                            cm.getColumn(i).setPreferredWidth(Integer.parseInt(widthsFromPreferences.get(j)));
-                        } catch (NumberFormatException e) {
-                            LOGGER.info("Exception while setting column widths. Choosing default.", e);
-                            cm.getColumn(i).setPreferredWidth(BibtexSingleField.DEFAULT_FIELD_LENGTH);
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-    }
     */
 
     public BibEntry getEntryAt(int row) {

@@ -8,7 +8,8 @@ import java.util.Set;
  */
 public class BibtexSingleField {
 
-    public static final int DEFAULT_FIELD_LENGTH = 100;
+    // TODO: This constant should be moved to the gui package, probably to ColumnFactory
+    public static final double DEFAULT_FIELD_LENGTH = 100;
 
     private enum Flag {
         STANDARD,
@@ -24,7 +25,7 @@ public class BibtexSingleField {
     // default is: not standard, public, displayable and writable
     private final Set<Flag> flags = EnumSet.of(Flag.DISPLAYABLE, Flag.WRITEABLE);
 
-    private final int length;
+    private final double length;
 
     // properties contains a set of FieldProperty to e.g. tell the EntryEditor to add a specific
     // function to this field, to format names, or to control the integrity checks.
@@ -38,7 +39,7 @@ public class BibtexSingleField {
         this(fieldName, pStandard, DEFAULT_FIELD_LENGTH);
     }
 
-    public BibtexSingleField(String fieldName, boolean pStandard, int pLength) {
+    public BibtexSingleField(String fieldName, boolean pStandard, double pLength) {
         name = fieldName;
         setFlag(pStandard, Flag.STANDARD);
         length = pLength;
@@ -105,7 +106,7 @@ public class BibtexSingleField {
     /**
      * @return The maximum (expected) length of the field value; <em>not</em> the length of the field name
      */
-    public int getLength() {
+    public double getLength() {
         return this.length;
     }
 

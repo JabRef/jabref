@@ -1503,8 +1503,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
             // Update tables:
             if (bf.getDatabase() != null) {
-                bf.setupMainPanel();
-
+                DefaultTaskExecutor.runInJavaFXThread(bf::setupMainPanel);
             }
         }
     }

@@ -362,13 +362,13 @@ public class SearchResultFrame {
                     cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
                     break;
                 case DATABASE_COL: {
-                    int width = InternalBibtexFields.getFieldLength(FieldName.AUTHOR);
-                    cm.getColumn(i).setPreferredWidth(width);
+                    Double width = InternalBibtexFields.getFieldLength(FieldName.AUTHOR);
+                    cm.getColumn(i).setPreferredWidth(width.intValue());
                     break;
                 }
                 default: {
-                    int width = InternalBibtexFields.getFieldLength(FIELDS[i - PAD]);
-                    cm.getColumn(i).setPreferredWidth(width);
+                    Double width = InternalBibtexFields.getFieldLength(FIELDS[i - PAD]);
+                    cm.getColumn(i).setPreferredWidth(width.intValue());
                     break;
                 }
             }

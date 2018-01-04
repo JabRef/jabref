@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
 
+import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefIcon;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -87,7 +88,9 @@ class ColumnFactory {
             // Stored column name will be used as header
             // There might be more than one field to display, e.g., "author/editor" or "date/year" - so split
             String[] fields = columnName.split(FieldName.FIELD_SEPARATOR);
-            columns.add(new StringTableColumn(columnName, Arrays.asList(fields), database));
+            StringTableColumn column = new StringTableColumn(columnName, Arrays.asList(fields), database);
+            column.setPrefWidth(preferences.getPrefColumnWidth(columnName));
+            columns.add(column);
         }
         return columns;
     }
@@ -96,8 +99,13 @@ class ColumnFactory {
         TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> column = new TableColumn<>();
         column.setGraphic(new SpecialFieldViewModel(specialField).getIcon().getGraphicNode());
         column.getStyleClass().add(STYLE_ICON);
-        column.setMinWidth(30);
-        column.setMaxWidth(30);
+        if (specialField == SpecialField.RANKING) {
+            column.setMinWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
+            column.setMaxWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
+        } else {
+            column.setMinWidth(GUIGlobals.WIDTH_ICON_COL);
+            column.setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
+        }
         column.setCellValueFactory(cellData -> cellData.getValue().getSpecialField(specialField));
         column.setCellFactory(
                 new ValueTableCellFactory<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>>()
@@ -110,8 +118,8 @@ class ColumnFactory {
         TableColumn<BibEntryTableViewModel, List<LinkedFile>> column = new TableColumn<>();
         column.setGraphic(IconTheme.JabRefIcons.FILE.getGraphicNode());
         column.getStyleClass().add(STYLE_ICON);
-        column.setMinWidth(30);
-        column.setMaxWidth(30);
+        column.setMinWidth(GUIGlobals.WIDTH_ICON_COL);
+        column.setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
         column.setCellFactory(
                 new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
@@ -126,8 +134,8 @@ class ColumnFactory {
         TableColumn<BibEntryTableViewModel, String> column = new TableColumn<>();
         column.setGraphic(icon.getGraphicNode());
         column.getStyleClass().add(STYLE_ICON);
-        column.setMinWidth(30);
-        column.setMaxWidth(30);
+        column.setMinWidth(GUIGlobals.WIDTH_ICON_COL);
+        column.setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(firstField)).orElse(cellData.getValue().getField(secondField)));
         column.setCellFactory(
                 new ValueTableCellFactory<BibEntryTableViewModel, String>()
@@ -139,8 +147,8 @@ class ColumnFactory {
         TableColumn<BibEntryTableViewModel, String> column = new TableColumn<>();
         column.setGraphic(icon.getGraphicNode());
         column.getStyleClass().add(STYLE_ICON);
-        column.setMinWidth(30);
-        column.setMaxWidth(30);
+        column.setMinWidth(GUIGlobals.WIDTH_ICON_COL);
+        column.setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> cellData.getValue().getField(field));
         column.setCellFactory(
                 new ValueTableCellFactory<BibEntryTableViewModel, String>()
@@ -160,8 +168,8 @@ class ColumnFactory {
                         .map(ExternalFileType::getIcon).orElse(IconTheme.JabRefIcons.FILE)
                         .getGraphicNode());
         column.getStyleClass().add(STYLE_ICON);
-        column.setMinWidth(30);
-        column.setMaxWidth(30);
+        column.setMinWidth(GUIGlobals.WIDTH_ICON_COL);
+        column.setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
         column.setCellFactory(
                 new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()

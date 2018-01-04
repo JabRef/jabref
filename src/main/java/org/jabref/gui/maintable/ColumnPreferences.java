@@ -3,11 +3,20 @@ package org.jabref.gui.maintable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
+import org.jabref.model.entry.BibtexSingleField;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.preferences.JabRefPreferences;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class ColumnPreferences {
+
+    private static final Log LOGGER = LogFactory.getLog(ColumnPreferences.class);
 
     private final boolean showFileColumn;
     private final boolean showUrlColumn;
@@ -16,8 +25,9 @@ public class ColumnPreferences {
     private final List<String> normalColumns;
     private final List<SpecialField> specialFieldColumns;
     private final List<String> extraFileColumns;
+    private final Map<String, Double> columnWidths;
 
-    public ColumnPreferences(boolean showFileColumn, boolean showUrlColumn, boolean preferDoiOverUrl, boolean showEprintColumn, List<String> normalColumns, List<SpecialField> specialFieldColumns, List<String> extraFileColumns) {
+    public ColumnPreferences(boolean showFileColumn, boolean showUrlColumn, boolean preferDoiOverUrl, boolean showEprintColumn, List<String> normalColumns, List<SpecialField> specialFieldColumns, List<String> extraFileColumns, Map<String, Double> columnWidths) {
         this.showFileColumn = showFileColumn;
         this.showUrlColumn = showUrlColumn;
         this.preferDoiOverUrl = preferDoiOverUrl;
@@ -25,6 +35,7 @@ public class ColumnPreferences {
         this.normalColumns = normalColumns;
         this.specialFieldColumns = specialFieldColumns;
         this.extraFileColumns = extraFileColumns;
+        this.columnWidths = columnWidths;
     }
 
     public static ColumnPreferences from(JabRefPreferences preferences) {
@@ -35,8 +46,31 @@ public class ColumnPreferences {
                 preferences.getBoolean(JabRefPreferences.ARXIV_COLUMN),
                 preferences.getStringList(JabRefPreferences.COLUMN_NAMES),
                 createSpecialFieldColumns(preferences),
-                createExtraFileColumns(preferences)
+                createExtraFileColumns(preferences),
+                createColumnWidths(preferences)
         );
+    }
+
+    private static Map<String, Double> createColumnWidths(JabRefPreferences preferences) {
+        List<String> columns = preferences.getStringList(JabRefPreferences.COLUMN_NAMES);
+        List<Double> widths = preferences
+                .getStringList(JabRefPreferences.COLUMN_WIDTHS)
+                .stream()
+                .map(string -> {
+                    try {
+                        return Double.parseDouble(string);
+                    } catch (NumberFormatException e) {
+                        LOGGER.error("Exception while parsing column widths. Choosing default.", e);
+                        return BibtexSingleField.DEFAULT_FIELD_LENGTH;
+                    }
+                })
+                .collect(Collectors.toList());
+
+        Map<String, Double> map = new TreeMap<>();
+        for (int i = 0; i < columns.size(); i++) {
+            map.put(columns.get(i), widths.get(i));
+        }
+        return map;
     }
 
     private static List<String> createExtraFileColumns(JabRefPreferences preferences) {
@@ -103,5 +137,9 @@ public class ColumnPreferences {
 
     public List<String> getNormalColumns() {
         return normalColumns;
+    }
+
+    public double getPrefColumnWidth(String columnName) {
+        return columnWidths.getOrDefault(columnName, BibtexSingleField.DEFAULT_FIELD_LENGTH);
     }
 }
