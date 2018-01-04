@@ -160,7 +160,7 @@ dependencies {
     testRuntime 'org.apache.logging.log4j:log4j-core:2.10.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.10.0'
     testCompile 'org.mockito:mockito-core:2.13.0'
-    testCompile 'com.github.tomakehurst:wiremock:2.12.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.13.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.5.1'
@@ -170,7 +170,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.5'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.7'
 }
 
 dependencyUpdates {
