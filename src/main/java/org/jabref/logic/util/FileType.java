@@ -53,9 +53,9 @@ public enum FileType {
     CSV(Localization.lang("%0 file", "CSV"), "csv"),
     DEFAULT(Localization.lang("%0 file", "DEFAULT"), "default");
 
+    private static final EnumSet<FileType> ALL_FILE_TYPES = EnumSet.allOf(FileType.class);
     private final String[] extensions;
     private final String description;
-    private final static EnumSet<FileType> allFileTypes = EnumSet.allOf(FileType.class);
 
     FileType(String description, String... extensions) {
         this.description = description;
@@ -83,7 +83,7 @@ public enum FileType {
     }
 
     public static FileType parse(String fileExtension) {
-        Optional<FileType> fileType = allFileTypes.stream().filter(f -> f.getExtensionsWithDot().stream().anyMatch(fileExtension::equals)).findFirst();
+        Optional<FileType> fileType = ALL_FILE_TYPES.stream().filter(f -> f.getExtensionsWithDot().stream().anyMatch(fileExtension::equals)).findFirst();
         return fileType.orElse(FileType.DEFAULT);
     }
 }
