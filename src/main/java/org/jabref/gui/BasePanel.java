@@ -2024,6 +2024,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                     }
                 }
             } catch (IOException ex) {
+                LOGGER.error("Problems with finding/or opening files ", ex);
                 basePanel.output(Localization.lang("Error") + ": " + ex.getMessage());
             }
         }

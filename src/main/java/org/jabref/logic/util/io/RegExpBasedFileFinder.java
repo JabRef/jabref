@@ -2,7 +2,6 @@ package org.jabref.logic.util.io;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,7 +47,7 @@ class RegExpBasedFileFinder implements FileFinder {
      * @return
      */
     public static String expandBrackets(String bracketString, BibEntry entry, BibDatabase database,
-                                        Character keywordDelimiter) {
+            Character keywordDelimiter) {
         Matcher matcher = SQUARE_BRACKETS_PATTERN.matcher(bracketString);
         StringBuffer expandedStringBuffer = new StringBuffer();
         while (matcher.find()) {
@@ -175,23 +174,16 @@ class RegExpBasedFileFinder implements FileFinder {
             // Do for all direct and indirect subdirs
             if ("**".equals(dirToProcess)) {
                 String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
-
+                List<Path> files = new ArrayList<>();
                 Path finalActualDirectory = actualDirectory;
-                try {
-                    Files.walk(actualDirectory).forEach(subElement -> {
-                        // We only want to transverse directory (and not the current one; this is already done below)
-                        if (!finalActualDirectory.equals(subElement) && Files.isDirectory(subElement)) {
-                            try {
-                                res.addAll(findFile(entry, subElement, restOfFileString, extensionRegExp));
-                            } catch (IOException e) {
-                                // this is an ugly workaround to handle the checked exception in streams
-                                throw new UncheckedIOException(e);
-                            }
-                        }
-                    });
-                } catch (UncheckedIOException e) {
-                    throw new IOException(e);
+
+                files = Files.walk(actualDirectory).filter(subElement -> !finalActualDirectory.equals(subElement) && Files.isDirectory(subElement)).collect(Collectors.toList());
+                // We only want to transverse directory (and not the current one; this is already done below)
+
+                for (Path subElement : files) {
+                    res.addAll(findFile(entry, subElement, restOfFileString, extensionRegExp));
                 }
+
             } // End process directory information
         }
 
