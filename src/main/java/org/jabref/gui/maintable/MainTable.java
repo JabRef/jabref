@@ -88,7 +88,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             this.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         }
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        this.setItems(model.getTableRows());
+        this.setItems(model.getEntriesFiltered());
 
         // TODO: Cannot add focus listener as it is expecting an swing component
         //addFocusListener(Globals.getFocusListener());
@@ -289,7 +289,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     */
 
     public BibEntry getEntryAt(int row) {
-        return model.getTableRows().get(row).getEntry();
+        return model.getEntriesFiltered().get(row).getEntry();
     }
 
     public List<BibEntry> getSelectedEntries() {
@@ -423,7 +423,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     */
 
     public Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {
-        return model.getTableRows().stream()
+        return model.getEntriesFiltered().stream()
                 .filter(viewModel -> viewModel.getEntry().equals(entry))
                 .findFirst();
     }
@@ -453,16 +453,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private Optional<BibEntry> getBibEntry(int row) {
         try {
-            return Optional.of(model.getTableRows().get(row).getEntry());
+            return Optional.of(model.getEntriesFiltered().get(row).getEntry());
         } catch (IndexOutOfBoundsException e) {
             return Optional.empty();
         }
-    }
-
-    public void showFloatSearch() {
-        this.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FLOAT);
-
-        scrollTo(0);
     }
 
     /**

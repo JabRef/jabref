@@ -1209,7 +1209,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     }
 
     private void createMainTable() {
-        bibDatabaseContext.getDatabase().registerListener(tableModel.getListSynchronizer());
         bibDatabaseContext.getDatabase().registerListener(SpecialFieldDatabaseChangeListener.getInstance());
 
         mainTable = new MainTable(tableModel, frame, this, bibDatabaseContext.getDatabase(), preferences.getTablePreferences(), externalFileTypes);
@@ -1327,8 +1326,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         splitPane.setOrientation(Orientation.VERTICAL);
         adjustSplitter(); // restore last splitting state (before mainTable is created as creation affects the stored size of the entryEditors)
 
-        // check whether a mainTable already existed and a floatSearch was active
-        boolean floatSearchActive = (mainTable != null) && (this.tableModel.getSearchState() == MainTableDataModel.DisplayOption.FLOAT);
+        // TODO: check whether a mainTable already existed and a floatSearch was active
+        //boolean floatSearchActive = (mainTable != null) && (this.tableModel.getSearchState() == MainTableDataModel.DisplayOption.FLOAT);
 
         createMainTable();
 
@@ -1347,11 +1346,11 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         setupAutoCompletion();
 
-        // restore floating search result
+        // TODO: restore floating search result
         // (needed if preferences have been changed which causes a recreation of the main table)
-        if (floatSearchActive) {
-            mainTable.showFloatSearch();
-        }
+        //if (floatSearchActive) {
+        //    mainTable.showFloatSearch();
+        //}
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
         dividerPositionSubscription = EasyBind.monadic(Bindings.valueAt(splitPane.getDividers(), 0))
