@@ -1219,6 +1219,16 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
         mainTable.addSelectionListener(listEvent -> Globals.stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
 
+        // Update entry editor and preview according to selected entries
+        mainTable.addSelectionListener(event ->
+                mainTable.getSelectedEntries().stream()
+                        .findFirst()
+                        .ifPresent(entry -> {
+                            preview.setEntry(entry);
+                            entryEditor.setEntry(entry);
+                        })
+        );
+
         // TODO: Register these actions globally
         /*
         String clearSearch = "clearSearch";
