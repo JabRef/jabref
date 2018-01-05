@@ -32,7 +32,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -159,8 +159,8 @@ public class FromAuxDialog extends JabRefDialog {
         JButton browseAuxFileButton = new JButton(Localization.lang("Browse"));
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileExtensions.AUX)
-                .withDefaultExtension(FileExtensions.AUX)
+                .addExtensionFilter(FileType.AUX)
+                .withDefaultExtension(FileType.AUX)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
         DialogService ds = new FXDialogService();
 

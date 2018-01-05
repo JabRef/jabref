@@ -1,7 +1,6 @@
 package org.jabref;
 
 import java.net.Authenticator;
-import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -13,13 +12,10 @@ import javafx.stage.Stage;
 
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.remote.JabRefMessageHandler;
-import org.jabref.logic.exporter.ExportFormat;
-import org.jabref.logic.exporter.ExportFormats;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -129,6 +125,7 @@ public class JabRefMain extends Application {
         PreferencesMigrations.upgradeStoredCustomEntryTypes();
         PreferencesMigrations.upgradeKeyBindingsToJavaFX();
         PreferencesMigrations.addCrossRefRelatedFieldsForAutoComplete();
+        PreferencesMigrations.upgradeObsoleteLookAndFeels();
 
         // Update handling of special fields based on preferences
         InternalBibtexFields
@@ -146,12 +143,7 @@ public class JabRefMain extends Application {
                 Globals.prefs.getXMPPreferences());
         EntryTypes.loadCustomEntryTypes(preferences.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
-        Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
-                Globals.journalAbbreviationLoader);
-        LayoutFormatterPreferences layoutPreferences = Globals.prefs
-                .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
-        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
-        ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
+        Globals.exportFactory = ExporterFactory.create(Globals.prefs, Globals.journalAbbreviationLoader);
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());

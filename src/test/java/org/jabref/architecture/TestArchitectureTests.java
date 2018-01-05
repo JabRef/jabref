@@ -26,6 +26,7 @@ public class TestArchitectureTests {
     private static final String CLASS_ORG_JABREF_PREFERENCES_TEST = "JabRefPreferencesTest";
     private static final String CLASS_ORG_JABREF_PREFERENCES_MIGRATIONS_TEST = "PreferencesMigrationsTest";
     private static final String CLASS_ORG_JABREF_UPDATE_TIMESTAMP_LISTENER_TEST = "UpdateTimestampListenerTest";
+    private static final String CLASS_ORG_JABREF_ENTRY_EDITOR_TEST = "EntryEditorTest";
 
     private final String forbiddenPackage;
 
@@ -40,6 +41,7 @@ public class TestArchitectureTests {
         exceptions.add(CLASS_ORG_JABREF_PREFERENCES_TEST);
         exceptions.add(CLASS_ORG_JABREF_PREFERENCES_MIGRATIONS_TEST);
         exceptions.add(CLASS_ORG_JABREF_UPDATE_TIMESTAMP_LISTENER_TEST);
+        exceptions.add(CLASS_ORG_JABREF_ENTRY_EDITOR_TEST);
     }
 
     @Parameterized.Parameters(name = "tests independent of {0}?")

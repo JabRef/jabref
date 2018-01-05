@@ -25,7 +25,7 @@ import org.jabref.logic.importer.fileformat.bibtexml.Entry;
 import org.jabref.logic.importer.fileformat.bibtexml.File;
 import org.jabref.logic.importer.fileformat.bibtexml.Inbook;
 import org.jabref.logic.importer.fileformat.bibtexml.Incollection;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
@@ -53,8 +53,8 @@ public class BibTeXMLImporter extends Importer {
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return FileExtensions.BIBTEXML;
+    public FileType getFileType() {
+        return FileType.BIBTEXML;
     }
 
     @Override

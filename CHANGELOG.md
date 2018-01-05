@@ -12,10 +12,15 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- We added [oaDOI](https://oadoi.org/) as a fulltext provider, so that JabRef is now able to provide fulltexts for more than 90 million open-access articles.
+
 
 ### Fixed
+- We fixed the missing dot in the name of an exported file. [#3576](https://github.com/JabRef/jabref/issues/3576)
+- Autocompletion in the search bar can now be disabled via the preferences [#3598](https://github.com/JabRef/jabref/issues/3598)
 
 ### Removed
+- We removed the Look and Feels from jgoodies, because these are not compatible with Java 9
 
 
 
@@ -111,7 +116,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue where the same Java Look and Feel would be listed more than once in the Preferences. [#3391](https://github.com/JabRef/jabref/issues/3391)
  - We fixed an issue where errors in citation styles triggered an exception when opening the preferences dialog. [#3389](https://github.com/JabRef/jabref/issues/3389)
  - We fixed an issue where entries were displayed twice after insertion into a shared database. [#3164](https://github.com/JabRef/jabref/issues/3164)
- - We improved the auto link algorithm so that files starting with a similar key are no longer found (e.g, `Einstein1902` vs `Einstein1902a`). [#3472](https://github.com/JabRef/jabref/issues/3472) 
+ - We improved the auto link algorithm so that files starting with a similar key are no longer found (e.g, `Einstein1902` vs `Einstein1902a`). [#3472](https://github.com/JabRef/jabref/issues/3472)
  - We fixed an issue where special fields (such as `printed`) could not be cleared when syncing special fields via the keywords. [#3432](https://github.com/JabRef/jabref/issues/3432)
  - We fixed an issue where the tooltip of the global search bar showed html tags instead of formatting the text. [#3381](https://github.com/JabRef/jabref/issues/3381)
  - We fixed an issue where timestamps were not updated for changed entries. [#2810](https://github.com/JabRef/jabref/issues/2810)
@@ -124,6 +129,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue where fetched entries from the ACM fetcher could not be imported. [#3500](https://github.com/JabRef/jabref/issues/3500)
  - We fixed an issue where custom data in combobox fields in the entry editor was not saved. [#3538](https://github.com/JabRef/jabref/issues/3538)
  - We fixed an issue where automatically found files were not added with a relative paths when the bib file is in the same directory as the files. [#3476](https://github.com/JabRef/jabref/issues/3476)
+ - We improved the key generator to remove certain illegal characters such as colons or apostrophes. [#3359](https://github.com/JabRef/jabref/issues/3359)
 
 
 ## [4.0] - 2017-10-04

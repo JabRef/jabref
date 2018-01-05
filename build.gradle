@@ -88,7 +88,6 @@ dependencies {
 
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
-    compile 'com.jgoodies:jgoodies-looks:2.7.0'
 
     // update to 2.0.x is not possible - see https://github.com/JabRef/jabref/pull/1096#issuecomment-208857517
     compile 'org.apache.pdfbox:pdfbox:1.8.13'
@@ -161,15 +160,17 @@ dependencies {
     testRuntime 'org.apache.logging.log4j:log4j-core:2.10.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.10.0'
     testCompile 'org.mockito:mockito-core:2.13.0'
-    testCompile 'com.github.tomakehurst:wiremock:2.12.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.13.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.5.1'
     testCompile 'org.xmlunit:xmlunit-matchers:2.5.1'
     testCompile 'com.tngtech.archunit:archunit-junit:0.5.0'
     testCompile 'org.slf4j:slf4j-jcl:1.7.25' // required by ArchUnit to enable logging over jcl
+    testCompile "org.testfx:testfx-core:4.0.+"
+    testCompile "org.testfx:testfx-junit:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.5'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.7'
 }
 
 dependencyUpdates {
