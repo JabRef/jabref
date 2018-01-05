@@ -61,7 +61,7 @@ class ModsExporter extends Exporter {
     private JAXBContext context;
 
     public ModsExporter() {
-        super("mods", "MODS", FileType.XML);
+        super("mods", FileType.MODS.getDescription(), FileType.MODS);
     }
 
     @Override
