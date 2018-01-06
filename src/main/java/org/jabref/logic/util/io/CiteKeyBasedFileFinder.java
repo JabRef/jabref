@@ -1,6 +1,7 @@
 package org.jabref.logic.util.io;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -13,6 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
+
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
@@ -88,7 +90,11 @@ class CiteKeyBasedFileFinder implements FileFinder {
         Set<Path> result = new HashSet<>();
         for (Path directory : directories) {
             if (Files.exists(directory)) {
-                result.addAll(Files.find(directory, Integer.MAX_VALUE, isFileWithCorrectExtension).collect(Collectors.toSet()));
+                try {
+                    result.addAll(Files.find(directory, Integer.MAX_VALUE, isFileWithCorrectExtension).collect(Collectors.toSet()));
+                } catch (UncheckedIOException e) {
+                    throw new IOException("Problem in finding files", e);
+                }
             }
         }
         return result;

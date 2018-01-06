@@ -2,6 +2,7 @@ package org.jabref.logic.util.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -199,7 +200,7 @@ class RegExpBasedFileFinder implements FileFinder {
                     (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches())
                     .collect(Collectors.toList());
             res.addAll(matches);
-        } catch (PatternSyntaxException e) {
+        } catch (UncheckedIOException | PatternSyntaxException e) {
             throw new IOException("Could not look for " + filenameToLookFor, e);
         }
         return res;
