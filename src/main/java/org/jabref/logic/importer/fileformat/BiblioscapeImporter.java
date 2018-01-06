@@ -30,7 +30,7 @@ public class BiblioscapeImporter extends Importer {
 
     @Override
     public FileType getFileType() {
-        return FileType.BILBIOSCAPE;
+        return FileType.BIBLIOSCAPE;
     }
 
     @Override
