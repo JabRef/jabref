@@ -44,7 +44,7 @@ public class RegExpBasedFileFinderTests {
     }
 
     @Test
-    public void testFindFiles() {
+    public void testFindFiles() throws Exception {
         //given
         BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
         localEntry.setCiteKey("pdfInDatabase");
@@ -64,7 +64,7 @@ public class RegExpBasedFileFinderTests {
     }
 
     @Test
-    public void testYearAuthFirspageFindFiles() {
+    public void testYearAuthFirspageFindFiles() throws Exception {
         //given
         List<String> extensions = Collections.singletonList("pdf");
 
@@ -80,7 +80,7 @@ public class RegExpBasedFileFinderTests {
     }
 
     @Test
-    public void testAuthorWithDiacritics() {
+    public void testAuthorWithDiacritics() throws Exception {
         //given
         BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
         localEntry.setCiteKey("Grazulis2017");
@@ -102,7 +102,7 @@ public class RegExpBasedFileFinderTests {
     }
 
     @Test
-    public void testFindFileInSubdirectory() {
+    public void testFindFileInSubdirectory() throws Exception {
         //given
         BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
         localEntry.setCiteKey("pdfInSubdirectory");
@@ -122,7 +122,7 @@ public class RegExpBasedFileFinderTests {
     }
 
     @Test
-    public void testFindFileNonRecursive() {
+    public void testFindFileNonRecursive() throws Exception {
         //given
         BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
         localEntry.setCiteKey("pdfInSubdirectory");
