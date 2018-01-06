@@ -28,7 +28,7 @@ public class BiblioscapeImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        Assert.assertEquals(FileType.BILBIOSCAPE, importer.getFileType());
+        Assert.assertEquals(FileType.BIBLIOSCAPE, importer.getFileType());
     }
 
     @Test
