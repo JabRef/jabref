@@ -1619,7 +1619,6 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     public void updateEntryEditorIfShowing() {
         if (mode == BasePanelMode.SHOWING_EDITOR) {
             BibEntry currentEntry = entryEditor.getEntry();
-            showAndEdit(null);
             showAndEdit(currentEntry);
         }
     }
