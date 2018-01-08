@@ -1726,6 +1726,10 @@ public class BasePanel extends StackPane implements ClipboardOwner {
      * Depending on whether a preview or an entry editor is showing, save the current divider location in the correct preference setting.
      */
     private void saveDividerLocation(Number position) {
+        if (position == null) {
+            return;
+        }
+
         if (mode == BasePanelMode.SHOWING_PREVIEW) {
             PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
                     .getBuilder()

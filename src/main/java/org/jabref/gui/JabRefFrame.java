@@ -1023,9 +1023,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     public void setTabTitle(BasePanel comp, String title, String toolTip) {
-        Tab tab = getTab(comp);
-        tab.setText(title);
-        tab.setTooltip(new Tooltip(toolTip));
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            Tab tab = getTab(comp);
+            tab.setText(title);
+            tab.setTooltip(new Tooltip(toolTip));
+        });
     }
 
     private void fillMenu() {
