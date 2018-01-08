@@ -389,6 +389,7 @@ afterEvaluate {
     def junitPlatformTest = tasks.junitPlatformTest
 
     jacoco {
+        toolVersion = '0.8.0'
         applyTo(junitPlatformTest)
     }
 
