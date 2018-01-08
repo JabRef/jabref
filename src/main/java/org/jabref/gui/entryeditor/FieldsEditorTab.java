@@ -23,7 +23,6 @@ import javafx.scene.layout.RowConstraints;
 
 import org.jabref.Globals;
 import org.jabref.gui.FXDialogService;
-import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
@@ -64,10 +63,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
     private static void addColumn(GridPane gridPane, int columnIndex, Stream<Parent> nodes) {
         gridPane.addColumn(columnIndex, nodes.toArray(Node[]::new));
-    }
-
-    private String convertToHex(java.awt.Color color) {
-        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }
 
     private Region setupPanel(BibEntry entry, boolean compressed, SuggestionProviders suggestionProviders, UndoManager undoManager) {
@@ -131,13 +126,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);
 
             setRegularRowLayout(gridPane, rows);
-        }
-
-        if (GUIGlobals.currentFont != null) {
-            gridPane.setStyle(
-                    "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"
-                            + "text-area-foreground: " + convertToHex(GUIGlobals.editorTextColor) + ";"
-                            + "text-area-highlight: " + convertToHex(GUIGlobals.activeBackgroundColor) + ";");
         }
 
         // Warp everything in a scroll-pane

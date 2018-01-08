@@ -20,6 +20,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -75,6 +76,12 @@ public class EntryEditor extends BorderPane {
         ControlHelper.loadFXMLForControl(this);
 
         getStylesheets().add(EntryEditor.class.getResource("EntryEditor.css").toExternalForm());
+        if (GUIGlobals.currentFont != null) {
+            setStyle(
+                    "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"
+                            + "text-area-foreground: " + convertToHex(GUIGlobals.editorTextColor) + ";"
+                            + "text-area-highlight: " + convertToHex(GUIGlobals.activeBackgroundColor) + ";");
+        }
 
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
             EntryEditorTab activeTab = (EntryEditorTab) tab;
@@ -92,7 +99,7 @@ public class EntryEditor extends BorderPane {
      * Set-up key bindings specific for the entry editor.
      */
     private void setupKeyBindings() {
-        tabbed.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+        tabbed.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = preferences.getKeyBindings().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
@@ -115,7 +122,7 @@ public class EntryEditor extends BorderPane {
                         event.consume();
                         break;
                     default:
-                        // Pass other keys to children
+                        // Pass other keys to parent
                 }
             }
         });
@@ -261,5 +268,9 @@ public class EntryEditor extends BorderPane {
                 }
             }
         });
+    }
+
+    private String convertToHex(java.awt.Color color) {
+        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }
 }

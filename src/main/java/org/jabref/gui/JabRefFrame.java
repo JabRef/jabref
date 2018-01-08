@@ -13,6 +13,7 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -918,6 +919,29 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         splitPane.setDividerSize(2);
         splitPane.setBorder(null);
         JFXPanel tabbedPaneContainer = CustomJFXPanel.wrap(new Scene(tabbedPane));
+        // TODO: Remove this hack as soon as toolbar is implemented in JavaFX and these events are no longer captured globally
+        tabbedPaneContainer.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                // We need to consume a few events that have a global listener
+                // Otherwise, they propagate to the JFrame (i.e. "Ctrl + A" in the entry editor still triggers the "Select all" action)
+                Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
+                if (keyBinding.isPresent()) {
+                    switch (keyBinding.get()) {
+                        case CUT:
+                        case COPY:
+                        case PASTE:
+                        case DELETE_ENTRY:
+                        case SELECT_ALL:
+                            e.consume();
+                            break;
+                        default:
+                            //do nothing
+                    }
+                }
+            }
+        });
+
         splitPane.setRightComponent(tabbedPaneContainer);
         splitPane.setLeftComponent(sidePaneManager.getPanel());
         getContentPane().add(splitPane, BorderLayout.CENTER);

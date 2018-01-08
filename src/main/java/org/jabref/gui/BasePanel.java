@@ -189,7 +189,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private StringDialog stringDialog;
     private SuggestionProviders suggestionProviders;
 
-    private Subscription dividerPositionSubscription;
+    @SuppressWarnings({"FieldCanBeLocal", "unused"}) private Subscription dividerPositionSubscription;
 
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
