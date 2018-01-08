@@ -43,6 +43,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.BaseAction;
+import org.jabref.gui.actions.CleanupAction;
 import org.jabref.gui.actions.CopyBibTeXKeyAndLinkAction;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteUpdater;
@@ -328,8 +329,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
     private void setupActions() {
         SaveDatabaseAction saveAction = new SaveDatabaseAction(this);
-        // TODO
-        //CleanupAction cleanUpAction = new CleanupAction(this, Globals.prefs);
+        CleanupAction cleanUpAction = new CleanupAction(this, Globals.prefs);
 
         actions.put(Actions.UNDO, undoAction);
         actions.put(Actions.REDO, redoAction);
@@ -479,7 +479,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         });
 
         // The action for cleaning up entry.
-        //actions.put(Actions.CLEANUP, cleanUpAction);
+        actions.put(Actions.CLEANUP, cleanUpAction);
 
         actions.put(Actions.MERGE_ENTRIES, (BaseAction) () -> new MergeEntriesDialog(BasePanel.this));
 
