@@ -1,7 +1,8 @@
 import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
 
-// to update the gradle wrapper, execute ./gradlew wrapper --gradle-version 4.0
+// to update the gradle wrapper, execute
+// ./gradlew wrapper --gradle-version=4.4.1 --distribution-type=bin
 
 buildscript {
     repositories {
