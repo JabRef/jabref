@@ -1219,14 +1219,12 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         mainTable.addSelectionListener(listEvent -> Globals.stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
 
         // Update entry editor and preview according to selected entries
-        mainTable.addSelectionListener(event ->
-                mainTable.getSelectedEntries().stream()
-                        .findFirst()
-                        .ifPresent(entry -> {
-                            preview.setEntry(entry);
-                            entryEditor.setEntry(entry);
-                        })
-        );
+        mainTable.addSelectionListener(event -> mainTable.getSelectedEntries().stream()
+                .findFirst()
+                .ifPresent(entry -> {
+                    preview.setEntry(entry);
+                    entryEditor.setEntry(entry);
+                }));
 
         // TODO: Register these actions globally
         /*
@@ -1424,13 +1422,17 @@ public class BasePanel extends StackPane implements ClipboardOwner {
      * @param entry The entry to edit.
      */
     public void showAndEdit(BibEntry entry) {
-        showBottomPane(BasePanelMode.SHOWING_EDITOR);
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
 
-        if (entry != getShowing()) {
-            entryEditor.setEntry(entry);
-            newEntryShowing(entry);
-        }
-        entryEditor.requestFocus();
+            showBottomPane(BasePanelMode.SHOWING_EDITOR);
+
+            if (entry != getShowing()) {
+                entryEditor.setEntry(entry);
+                newEntryShowing(entry);
+            }
+            entryEditor.requestFocus();
+
+        });
     }
 
     private void showBottomPane(BasePanelMode newMode) {
