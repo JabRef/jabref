@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -189,7 +188,6 @@ class RegExpBasedFileFinder implements FileFinder {
         try {
             final Pattern toMatch = Pattern.compile('^' + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$',
                     Pattern.CASE_INSENSITIVE);
-
             try (Stream<Path> pathStream = Files.find(actualDirectory, 1,
                     (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches())) {
                 List<Path> matches = pathStream
@@ -199,7 +197,7 @@ class RegExpBasedFileFinder implements FileFinder {
         } catch (UncheckedIOException | PatternSyntaxException e) {
             throw new IOException("Could not look for " + filenameToLookFor, e);
         }
-        return Collections.emptyList();
+        return res;
     }
 
     private boolean isSubDirectory(Path rootDirectory, Path path) {
