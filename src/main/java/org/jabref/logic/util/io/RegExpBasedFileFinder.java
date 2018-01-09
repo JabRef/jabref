@@ -190,10 +190,12 @@ class RegExpBasedFileFinder implements FileFinder {
             final Pattern toMatch = Pattern.compile('^' + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$',
                     Pattern.CASE_INSENSITIVE);
 
-            List<Path> matches = Files.find(actualDirectory, 1,
-                    (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches())
-                    .collect(Collectors.toList());
-            res.addAll(matches);
+            try (Stream<Path> pathStream = Files.find(actualDirectory, 1,
+                    (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches())) {
+                List<Path> matches = pathStream
+                        .collect(Collectors.toList());
+                res.addAll(matches);
+            }
         } catch (UncheckedIOException | PatternSyntaxException e) {
             throw new IOException("Could not look for " + filenameToLookFor, e);
         }
