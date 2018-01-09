@@ -41,7 +41,7 @@ public class AutoSetFileLinksUtil {
         this.externalFileTypes = externalFileTypes;
     }
 
-    public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) {
+    public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {
         List<LinkedFile> linkedFiles = new ArrayList<>();
 
         List<String> extensions = externalFileTypes.getExternalFileTypeSelection().stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
