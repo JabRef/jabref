@@ -5,11 +5,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.BiPredicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.util.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
@@ -42,12 +46,6 @@ class RegExpBasedFileFinder implements FileFinder {
      * Takes a string that contains bracketed expression and expands each of these using getFieldAndFormat.
      * <p>
      * Unknown Bracket expressions are silently dropped.
-     *
-     * @param bracketString
-     * @param entry
-     * @param database
-     * @param keywordDelimiter
-     * @return
      */
     public static String expandBrackets(String bracketString, BibEntry entry, BibDatabase database,
                                         Character keywordDelimiter) {
@@ -65,8 +63,9 @@ class RegExpBasedFileFinder implements FileFinder {
     /**
      * Method for searching for files using regexp. A list of extensions and directories can be
      * given.
-     * @param entry The entry to search for.
-     * @param extensions The extensions that are acceptable.
+     *
+     * @param entry       The entry to search for.
+     * @param extensions  The extensions that are acceptable.
      * @param directories The root directories to search.
      * @return A list of files paths matching the given criteria.
      */
@@ -85,10 +84,10 @@ class RegExpBasedFileFinder implements FileFinder {
      * http://sourceforge.net/tracker/index.php?func=detail&aid=1503410&group_id=92314&atid=600309
      *
      * Requirements:
-     *  - Be able to find the associated PDF in a set of given directories.
-     *  - Be able to return a relative path or absolute path.
-     *  - Be fast.
-     *  - Allow for flexible naming schemes in the PDFs.
+     * - Be able to find the associated PDF in a set of given directories.
+     * - Be able to return a relative path or absolute path.
+     * - Be fast.
+     * - Allow for flexible naming schemes in the PDFs.
      *
      * Syntax scheme for file:
      * <ul>
@@ -98,16 +97,13 @@ class RegExpBasedFileFinder implements FileFinder {
      * <li>.* Anything else is taken to be a Regular expression.</li>
      * </ul>
      *
-     * @param entry
-     *            non-null
-     * @param dirs
-     *            A set of root directories to start the search from. Paths are
-     *            returned relative to these directories if relative is set to
-     *            true. These directories will not be expanded or anything. Use
-     *            the file attribute for this.
-     *
+     * @param entry non-null
+     * @param dirs  A set of root directories to start the search from. Paths are
+     *              returned relative to these directories if relative is set to
+     *              true. These directories will not be expanded or anything. Use
+     *              the file attribute for this.
      * @return Will return the first file found to match the given criteria or
-     *         null if none was found.
+     * null if none was found.
      */
     private List<Path> findFile(BibEntry entry, List<Path> dirs, String extensionRegExp) {
         List<Path> res = new ArrayList<>();
@@ -178,14 +174,12 @@ class RegExpBasedFileFinder implements FileFinder {
             if ("**".equals(dirToProcess)) {
                 String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
 
-                try {
-                    Path finalActualDirectory = actualDirectory;
-                    Files.walk(actualDirectory).forEach(subElement -> {
-                        // We only want to transverse directory (and not the current one; this is already done below)
-                        if (!finalActualDirectory.equals(subElement) && Files.isDirectory(subElement)) {
-                            res.addAll(findFile(entry, subElement, restOfFileString, extensionRegExp));
-                        }
-                    });
+                try (Stream<Path> pathStream = Files.walk(actualDirectory)) {
+                    final Path rootDirectory = actualDirectory;
+                    // We only want to transverse directory (and not the current one; this is already done below)
+                    pathStream.filter(path -> isSubDirectory(rootDirectory, path))
+                            .map(subElement -> findFile(entry, subElement, restOfFileString, extensionRegExp))
+                            .forEach(res::addAll);
                 } catch (IOException e) {
                     LOGGER.debug(e);
                 }
@@ -197,14 +191,21 @@ class RegExpBasedFileFinder implements FileFinder {
         String filenameToLookFor = expandBrackets(filePart, entry, null, keywordDelimiter).replaceAll(EXT_MARKER, extensionRegExp);
         final Pattern toMatch = Pattern.compile('^' + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$',
                 Pattern.CASE_INSENSITIVE);
-        try {
-            List<Path> matches = Files.find(actualDirectory, 1,
-                    (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches())
-                    .collect(Collectors.toList());
-            res.addAll(matches);
+        BiPredicate<Path, BasicFileAttributes> matcher = (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches();
+        res.addAll(collectMatchingFiles(actualDirectory, matcher));
+        return res;
+    }
+
+    private List<Path> collectMatchingFiles(Path actualDirectory, BiPredicate<Path, BasicFileAttributes> matcher) {
+        try (Stream<Path> pathStream = Files.find(actualDirectory, 1, matcher)) {
+            return pathStream.collect(Collectors.toList());
         } catch (IOException e) {
             LOGGER.debug(e);
         }
-        return res;
+        return Collections.emptyList();
+    }
+
+    private boolean isSubDirectory(Path rootDirectory, Path path) {
+        return !rootDirectory.equals(path) && Files.isDirectory(path);
     }
 }
