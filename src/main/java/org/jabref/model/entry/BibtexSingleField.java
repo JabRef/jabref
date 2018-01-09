@@ -8,7 +8,7 @@ import java.util.Set;
  */
 public class BibtexSingleField {
 
-    // TODO: This constant should be moved to the gui package, probably to ColumnFactory
+    // TODO: This constant should be moved to the gui package, probably to MainTableColumnFactory
     public static final double DEFAULT_FIELD_LENGTH = 100;
 
     private enum Flag {

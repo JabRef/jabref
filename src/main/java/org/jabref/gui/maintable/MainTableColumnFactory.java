@@ -25,7 +25,7 @@ import org.jabref.model.entry.specialfields.SpecialField;
 
 import org.fxmisc.easybind.EasyBind;
 
-class ColumnFactory {
+class MainTableColumnFactory {
 
     private static final String STYLE_ICON = "column-icon";
 
@@ -34,7 +34,7 @@ class ColumnFactory {
     private final BibDatabase database;
     private final CellFactory cellFactory;
 
-    public ColumnFactory(BibDatabase database, ColumnPreferences preferences, ExternalFileTypes externalFileTypes) {
+    public MainTableColumnFactory(BibDatabase database, ColumnPreferences preferences, ExternalFileTypes externalFileTypes) {
         this.database = Objects.requireNonNull(database);
         this.preferences = Objects.requireNonNull(preferences);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
@@ -64,10 +64,7 @@ class ColumnFactory {
         }
 
         // Add columns for other file types
-        for (String column : preferences.getExtraFileColumns()) {
-            columns.add(createExtraFileColumn(column));
-        }
-
+        columns.addAll(preferences.getExtraFileColumns().stream().map(this::createExtraFileColumn).collect(Collectors.toList()));
 
         // Add 'normal' bibtex fields as configured in the preferences
         columns.addAll(createNormalColumns());

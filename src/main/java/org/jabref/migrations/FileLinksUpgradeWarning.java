@@ -1,7 +1,6 @@
 package org.jabref.migrations;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -56,7 +55,6 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
      * GUIGlobals.FILE_FIELD.
      *
      * @param database The database to modify.
-     * @param fields   The fields to find links in.
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
     private static NamedCompound upgradePdfPsToFile(BibDatabase database) {
@@ -248,8 +246,8 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
     }
 
     private boolean showsFileInGenFields() {
-        for (Map.Entry<String, List<String>> tab : Globals.prefs.getEntryEditorTabList().entrySet()) {
-            for (String field : tab.getValue()) {
+        for (List<String> fields : Globals.prefs.getEntryEditorTabList().values()) {
+            for (String field : fields) {
                 if (field.equals(FieldName.FILE)) {
                     return true;
                 }
