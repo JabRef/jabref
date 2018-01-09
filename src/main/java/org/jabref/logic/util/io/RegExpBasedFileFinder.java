@@ -6,9 +6,11 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiPredicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -189,15 +191,20 @@ class RegExpBasedFileFinder implements FileFinder {
         try {
             final Pattern toMatch = Pattern.compile('^' + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$',
                     Pattern.CASE_INSENSITIVE);
-
-            List<Path> matches = Files.find(actualDirectory, 1,
-                    (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches())
-                    .collect(Collectors.toList());
-            res.addAll(matches);
+            BiPredicate<Path, BasicFileAttributes> matcher = (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches();
+            res.addAll(colelct(actualDirectory, matcher));
         } catch (UncheckedIOException | PatternSyntaxException e) {
             throw new IOException("Could not look for " + filenameToLookFor, e);
         }
         return Collections.emptyList();
+    }
+
+    private List<Path> colelct(Path actualDirectory, BiPredicate<Path, BasicFileAttributes> matcher) {
+        try (Stream<Path> pathStream = Files.find(actualDirectory, 1, matcher)) {
+            return pathStream.collect(Collectors.toList());
+        } catch (IOException ioe) {
+            return Collections.emptyList();
+        }
     }
 
     private boolean isSubDirectory(Path rootDirectory, Path path) {
