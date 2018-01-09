@@ -186,7 +186,6 @@ class RegExpBasedFileFinder implements FileFinder {
         String filePart = fileParts[fileParts.length - 1].replace("[extension]", EXT_MARKER);
         String filenameToLookFor = expandBrackets(filePart, entry, null, keywordDelimiter).replaceAll(EXT_MARKER, extensionRegExp);
 
-
         try {
             final Pattern toMatch = Pattern.compile('^' + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$',
                     Pattern.CASE_INSENSITIVE);
