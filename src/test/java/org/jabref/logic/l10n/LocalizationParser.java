@@ -19,6 +19,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.fxml.FXMLLoader;
 
@@ -77,26 +78,32 @@ public class LocalizationParser {
 
     public static Set<LocalizationEntry> findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest type)
             throws IOException {
-        return Files.walk(Paths.get("src/main"))
-                .filter(LocalizationParser::isJavaFile)
-                .flatMap(path -> getLocalizationParametersInJavaFile(path, type).stream())
-                .collect(Collectors.toSet());
+        try (Stream<Path> pathStream = Files.walk(Paths.get("src/main"))) {
+            return pathStream
+                    .filter(LocalizationParser::isJavaFile)
+                    .flatMap(path -> getLocalizationParametersInJavaFile(path, type).stream())
+                    .collect(Collectors.toSet());
+        }
     }
 
     private static Set<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundleForTest type)
             throws IOException {
-        return Files.walk(Paths.get("src/main"))
-                .filter(LocalizationParser::isJavaFile)
-                .flatMap(path -> getLanguageKeysInJavaFile(path, type).stream())
-                .collect(Collectors.toSet());
+        try (Stream<Path> pathStream = Files.walk(Paths.get("src/main"))) {
+            return pathStream
+                    .filter(LocalizationParser::isJavaFile)
+                    .flatMap(path -> getLanguageKeysInJavaFile(path, type).stream())
+                    .collect(Collectors.toSet());
+        }
     }
 
     private static Set<LocalizationEntry> findLocalizationEntriesInFxmlFiles(LocalizationBundleForTest type)
             throws IOException {
-        return Files.walk(Paths.get("src/main"))
-                .filter(LocalizationParser::isFxmlFile)
-                .flatMap(path -> getLanguageKeysInFxmlFile(path, type).stream())
-                .collect(Collectors.toSet());
+        try (Stream<Path> pathStream = Files.walk(Paths.get("src/main"))) {
+            return pathStream
+                    .filter(LocalizationParser::isFxmlFile)
+                    .flatMap(path -> getLanguageKeysInFxmlFile(path, type).stream())
+                    .collect(Collectors.toSet());
+        }
     }
 
     public static SortedSet<String> getKeysInPropertiesFile(String path) {
@@ -113,7 +120,7 @@ public class LocalizationParser {
     public static Properties getProperties(String path) {
         Properties properties = new Properties();
         try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(path);
-                InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+             InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
             properties.load(reader);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -141,7 +148,6 @@ public class LocalizationParser {
             for (String key : keys) {
                 result.add(new LocalizationEntry(path, key, type));
             }
-
         } catch (IOException ignore) {
             ignore.printStackTrace();
         }
@@ -161,7 +167,6 @@ public class LocalizationParser {
             for (String key : keys) {
                 result.add(new LocalizationEntry(path, key, type));
             }
-
         } catch (IOException ignore) {
             ignore.printStackTrace();
         }
@@ -268,7 +273,6 @@ public class LocalizationParser {
                 if (!languagePropertyKey.trim().isEmpty()) {
                     result.add(languagePropertyKey);
                 }
-
             }
 
             return result;
@@ -308,5 +312,4 @@ public class LocalizationParser {
             return result;
         }
     }
-
 }
