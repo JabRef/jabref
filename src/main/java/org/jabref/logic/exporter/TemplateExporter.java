@@ -68,12 +68,29 @@ public class TemplateExporter extends Exporter {
      * @param savePreferences Preferences for saving
      */
     public TemplateExporter(String displayName, String consoleName, String lfFileName, String directory, FileType extension,
-                            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
+            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
         super(consoleName, displayName, extension);
         this.lfFileName = Objects.requireNonNull(lfFileName);
         this.directory = directory;
         this.layoutPreferences = layoutPreferences;
         this.savePreferences = savePreferences;
+    }
+
+    /**
+     * Initialize another export format based on templates stored in dir with
+     * layoutFile lfFilename.
+     * The display name is automatically derived from the FileType
+     *
+     *
+     * @param consoleName Name to call this format in the console.
+     * @param lfFileName  Name of the main layout file.
+     * @param directory   Directory in which to find the layout file.
+     * @param extension   Should contain the . (for instance .txt).
+     * @param layoutPreferences Preferences for layout
+     * @param savePreferences Preferences for saving
+     */
+    public TemplateExporter(String consoleName, String lfFileName, String directory, FileType extension, LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
+        this(extension.getDescription(), consoleName, lfFileName, directory, extension, layoutPreferences, savePreferences);
     }
 
     /**
@@ -144,7 +161,7 @@ public class TemplateExporter extends Exporter {
 
     @Override
     public void export(final BibDatabaseContext databaseContext, final Path file,
-                       final Charset encoding, List<BibEntry> entries) throws Exception {
+            final Charset encoding, List<BibEntry> entries) throws Exception {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (entries.isEmpty()) { // Do not export if no entries to export -- avoids exports with only template text
@@ -201,7 +218,7 @@ public class TemplateExporter extends Exporter {
             Layout defLayout;
             LayoutHelper layoutHelper;
             try (Reader reader = getReader(lfFileName + ".layout")) {
-                layoutHelper = new LayoutHelper(reader,layoutPreferences);
+                layoutHelper = new LayoutHelper(reader, layoutPreferences);
                 defLayout = layoutHelper.getLayoutFromText();
             }
             if (defLayout != null) {
