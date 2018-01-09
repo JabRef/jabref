@@ -85,7 +85,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 })
                 .withContextMenu(RightClickMenu::create));
         if (preferences.resizeColumnsToFit()) {
-            this.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+            this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
         }
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         this.setItems(model.getEntriesFiltered());

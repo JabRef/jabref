@@ -100,11 +100,9 @@ class ColumnFactory {
         column.setGraphic(new SpecialFieldViewModel(specialField).getIcon().getGraphicNode());
         column.getStyleClass().add(STYLE_ICON);
         if (specialField == SpecialField.RANKING) {
-            column.setMinWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
-            column.setMaxWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
+            setExactWidth(column, GUIGlobals.WIDTH_ICON_COL_RANKING);
         } else {
-            column.setMinWidth(GUIGlobals.WIDTH_ICON_COL);
-            column.setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
+            setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         }
         column.setCellValueFactory(cellData -> cellData.getValue().getSpecialField(specialField));
         column.setCellFactory(
@@ -114,12 +112,17 @@ class ColumnFactory {
         return column;
     }
 
+    private void setExactWidth(TableColumn<?, ?> column, int widthIconCol) {
+        column.setMinWidth(widthIconCol);
+        column.setPrefWidth(widthIconCol);
+        column.setMaxWidth(widthIconCol);
+    }
+
     private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createFileColumn() {
         TableColumn<BibEntryTableViewModel, List<LinkedFile>> column = new TableColumn<>();
         column.setGraphic(IconTheme.JabRefIcons.FILE.getGraphicNode());
         column.getStyleClass().add(STYLE_ICON);
-        column.setMinWidth(GUIGlobals.WIDTH_ICON_COL);
-        column.setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
+        setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
         column.setCellFactory(
                 new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
@@ -134,8 +137,7 @@ class ColumnFactory {
         TableColumn<BibEntryTableViewModel, String> column = new TableColumn<>();
         column.setGraphic(icon.getGraphicNode());
         column.getStyleClass().add(STYLE_ICON);
-        column.setMinWidth(GUIGlobals.WIDTH_ICON_COL);
-        column.setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
+        setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(firstField)).orElse(cellData.getValue().getField(secondField)));
         column.setCellFactory(
                 new ValueTableCellFactory<BibEntryTableViewModel, String>()
@@ -147,8 +149,7 @@ class ColumnFactory {
         TableColumn<BibEntryTableViewModel, String> column = new TableColumn<>();
         column.setGraphic(icon.getGraphicNode());
         column.getStyleClass().add(STYLE_ICON);
-        column.setMinWidth(GUIGlobals.WIDTH_ICON_COL);
-        column.setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
+        setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> cellData.getValue().getField(field));
         column.setCellFactory(
                 new ValueTableCellFactory<BibEntryTableViewModel, String>()
@@ -168,8 +169,7 @@ class ColumnFactory {
                         .map(ExternalFileType::getIcon).orElse(IconTheme.JabRefIcons.FILE)
                         .getGraphicNode());
         column.getStyleClass().add(STYLE_ICON);
-        column.setMinWidth(GUIGlobals.WIDTH_ICON_COL);
-        column.setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
+        setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
         column.setCellFactory(
                 new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
