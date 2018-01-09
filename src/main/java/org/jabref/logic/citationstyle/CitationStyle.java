@@ -2,6 +2,7 @@ package org.jabref.logic.citationstyle;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -161,7 +162,7 @@ public class CitationStyle {
                 }
             }
             return STYLES;
-        } catch (IOException | URISyntaxException ex) {
+        } catch (UncheckedIOException | IOException | URISyntaxException ex) {
             LOGGER.error("something went wrong while searching available CitationStyles. Are you running directly from source code?", ex);
         }
         return Collections.emptyList();

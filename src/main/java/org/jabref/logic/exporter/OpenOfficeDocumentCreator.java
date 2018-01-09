@@ -46,7 +46,7 @@ public class OpenOfficeDocumentCreator extends Exporter {
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenOfficeDocumentCreator() {
-        super("oocalc", "OpenOffice/LibreOffice Calc", FileType.SXC);
+        super("oocalc", FileType.SXC.getDescription(), FileType.SXC);
     }
 
     private static void storeOpenOfficeFile(Path file, InputStream source) throws Exception {

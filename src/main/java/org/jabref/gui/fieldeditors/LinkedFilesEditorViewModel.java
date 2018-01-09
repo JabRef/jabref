@@ -159,11 +159,15 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         List<LinkedFileViewModel> result = new ArrayList<>();
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
-        List<LinkedFile> linkedFiles = util.findAssociatedNotLinkedFiles(entry);
-        for (LinkedFile linkedFile : linkedFiles) {
-            LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor);
-            newLinkedFile.markAsAutomaticallyFound();
-            result.add(newLinkedFile);
+        try {
+            List<LinkedFile> linkedFiles = util.findAssociatedNotLinkedFiles(entry);
+            for (LinkedFile linkedFile : linkedFiles) {
+                LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor);
+                newLinkedFile.markAsAutomaticallyFound();
+                result.add(newLinkedFile);
+            }
+        } catch (IOException e) {
+            dialogService.showErrorDialogAndWait("Error accessing the file system", e);
         }
 
         return result;

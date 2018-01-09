@@ -58,6 +58,7 @@ public class CleanupPresetPanel {
         } else {
             cleanUpMovePDF = new JCheckBox(Localization.lang("Move linked files to default file directory %0", "..."));
             cleanUpMovePDF.setEnabled(false);
+            // Since the directory does not exist, we cannot move it to there. So, this option is not checked - regardless of the presets stored in the preferences.
             cleanUpMovePDF.setSelected(false);
         }
 

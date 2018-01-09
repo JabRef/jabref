@@ -2,6 +2,7 @@ package org.jabref.logic.util.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.util.BracketedPattern;
@@ -16,11 +18,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 class RegExpBasedFileFinder implements FileFinder {
-    private static final Log LOGGER = LogFactory.getLog(RegExpBasedFileFinder.class);
 
     private static final String EXT_MARKER = "__EXTENSION__";
 
@@ -50,7 +48,7 @@ class RegExpBasedFileFinder implements FileFinder {
      * @return
      */
     public static String expandBrackets(String bracketString, BibEntry entry, BibDatabase database,
-                                        Character keywordDelimiter) {
+            Character keywordDelimiter) {
         Matcher matcher = SQUARE_BRACKETS_PATTERN.matcher(bracketString);
         StringBuffer expandedStringBuffer = new StringBuffer();
         while (matcher.find()) {
@@ -71,7 +69,7 @@ class RegExpBasedFileFinder implements FileFinder {
      * @return A list of files paths matching the given criteria.
      */
     @Override
-    public List<Path> findAssociatedFiles(BibEntry entry, List<Path> directories, List<String> extensions) {
+    public List<Path> findAssociatedFiles(BibEntry entry, List<Path> directories, List<String> extensions) throws IOException {
         String extensionRegExp = '(' + String.join("|", extensions) + ')';
         return findFile(entry, directories, extensionRegExp);
     }
@@ -109,7 +107,7 @@ class RegExpBasedFileFinder implements FileFinder {
      * @return Will return the first file found to match the given criteria or
      *         null if none was found.
      */
-    private List<Path> findFile(BibEntry entry, List<Path> dirs, String extensionRegExp) {
+    private List<Path> findFile(BibEntry entry, List<Path> dirs, String extensionRegExp) throws IOException {
         List<Path> res = new ArrayList<>();
         for (Path directory : dirs) {
             res.addAll(findFile(entry, directory, regExp, extensionRegExp));
@@ -121,7 +119,7 @@ class RegExpBasedFileFinder implements FileFinder {
      * The actual work-horse. Will find absolute filepaths starting from the
      * given directory using the given regular expression string for search.
      */
-    private List<Path> findFile(BibEntry entry, Path directory, String file, String extensionRegExp) {
+    private List<Path> findFile(BibEntry entry, Path directory, String file, String extensionRegExp) throws IOException {
         List<Path> res = new ArrayList<>();
 
         String fileName = file;
@@ -177,33 +175,33 @@ class RegExpBasedFileFinder implements FileFinder {
             // Do for all direct and indirect subdirs
             if ("**".equals(dirToProcess)) {
                 String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
+                List<Path> files = new ArrayList<>();
+                Path finalActualDirectory = actualDirectory;
 
-                try {
-                    Path finalActualDirectory = actualDirectory;
-                    Files.walk(actualDirectory).forEach(subElement -> {
-                        // We only want to transverse directory (and not the current one; this is already done below)
-                        if (!finalActualDirectory.equals(subElement) && Files.isDirectory(subElement)) {
-                            res.addAll(findFile(entry, subElement, restOfFileString, extensionRegExp));
-                        }
-                    });
-                } catch (IOException e) {
-                    LOGGER.debug(e);
+                files = Files.walk(actualDirectory).filter(subElement -> !finalActualDirectory.equals(subElement) && Files.isDirectory(subElement)).collect(Collectors.toList());
+                // We only want to transverse directory (and not the current one; this is already done below)
+
+                for (Path subElement : files) {
+                    res.addAll(findFile(entry, subElement, restOfFileString, extensionRegExp));
                 }
+
             } // End process directory information
         }
 
         // Last step: check if the given file can be found in this directory
         String filePart = fileParts[fileParts.length - 1].replace("[extension]", EXT_MARKER);
         String filenameToLookFor = expandBrackets(filePart, entry, null, keywordDelimiter).replaceAll(EXT_MARKER, extensionRegExp);
-        final Pattern toMatch = Pattern.compile('^' + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$',
-                Pattern.CASE_INSENSITIVE);
+
         try {
+            final Pattern toMatch = Pattern.compile('^' + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$',
+                    Pattern.CASE_INSENSITIVE);
+
             List<Path> matches = Files.find(actualDirectory, 1,
                     (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches())
                     .collect(Collectors.toList());
             res.addAll(matches);
-        } catch (IOException e) {
-            LOGGER.debug(e);
+        } catch (UncheckedIOException | PatternSyntaxException e) {
+            throw new IOException("Could not look for " + filenameToLookFor, e);
         }
         return res;
     }

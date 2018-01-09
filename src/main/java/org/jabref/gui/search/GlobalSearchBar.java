@@ -350,10 +350,12 @@ public class GlobalSearchBar extends JPanel {
     }
 
     public void setAutoCompleter(AutoCompleteSuggestionProvider<Author> searchCompleter) {
-        AutoCompletionTextInputBinding.autoComplete(searchField,
-                searchCompleter,
-                new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
-                new AppendPersonNamesStrategy());
+        if (Globals.prefs.getAutoCompletePreferences().shouldAutoComplete()) {
+            AutoCompletionTextInputBinding.autoComplete(searchField,
+                    searchCompleter,
+                    new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
+                    new AppendPersonNamesStrategy());
+        }
     }
 
     public SearchQueryHighlightObservable getSearchQueryHighlightObservable() {
