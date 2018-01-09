@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -153,8 +154,10 @@ public class CitationStyle {
 
             try (FileSystem jarFs = FileSystems.newFileSystem(Paths.get(path), null)) {
 
-                List<Path> allStyles = Files.find(jarFs.getRootDirectories().iterator().next(), 1, (file, attr) -> file.toString().endsWith("csl")).collect(Collectors.toList());
-
+                List<Path> allStyles;
+                try (Stream<Path> stylefileStream = Files.find(jarFs.getRootDirectories().iterator().next(), 1, (file, attr) -> file.toString().endsWith("csl"))) {
+                   allStyles = stylefileStream.collect(Collectors.toList());
+                }
                 for (Path style : allStyles) {
                     CitationStyle.createCitationStyleFromFile(style.getFileName().toString())
                             .ifPresent(STYLES::add);
