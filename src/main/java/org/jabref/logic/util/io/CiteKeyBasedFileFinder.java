@@ -14,18 +14,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 class CiteKeyBasedFileFinder implements FileFinder {
 
-    private static final Log LOGGER = LogFactory.getLog(CiteKeyBasedFileFinder.class);
     private final boolean exactKeyOnly;
 
     CiteKeyBasedFileFinder(boolean exactKeyOnly) {
@@ -90,8 +87,8 @@ class CiteKeyBasedFileFinder implements FileFinder {
         Set<Path> result = new HashSet<>();
         for (Path directory : directories) {
             if (Files.exists(directory)) {
-                try {
-                    result.addAll(Files.find(directory, Integer.MAX_VALUE, isFileWithCorrectExtension).collect(Collectors.toSet()));
+                try (Stream<Path> pathStream = Files.find(directory, Integer.MAX_VALUE, isFileWithCorrectExtension)) {
+                    result.addAll(pathStream.collect(Collectors.toSet()));
                 } catch (UncheckedIOException e) {
                     throw new IOException("Problem in finding files", e);
                 }
