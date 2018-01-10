@@ -80,6 +80,10 @@ public class JabRefMain extends Application {
                             buildInfo.getMinRequiredJavaVersion()
                     )
             );
+
+            versionError.append("\n");
+            versionError.append(Localization.lang("Your Java Runtime Environment is located at %0.", checker.getJavaInstallationDirectory()));
+
             if (!buildInfo.isAllowJava9()) {
                 versionError.append("\n");
                 versionError.append(Localization.lang("Note that currently, JabRef does not run with Java 9."));
