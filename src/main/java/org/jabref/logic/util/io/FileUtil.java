@@ -3,6 +3,7 @@ package org.jabref.logic.util.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UncheckedIOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -288,9 +289,7 @@ public class FileUtil {
      * @return a suggested fileName
      */
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
-        String targetName = null;
-
-        targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
+        String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
 
         if ((targetName == null) || targetName.isEmpty()) {
             targetName = entry.getCiteKeyOptional().orElse("default");
@@ -336,7 +335,7 @@ public class FileUtil {
                     .filter(Files::isRegularFile)
                     .filter(f -> f.getFileName().toString().equals(filename))
                     .findFirst();
-        } catch (IOException ex) {
+        } catch (UncheckedIOException | IOException ex) {
             LOGGER.error("Error trying to locate the file " + filename + " inside the directory " + rootDirectory);
         }
         return Optional.empty();

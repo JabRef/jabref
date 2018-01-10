@@ -178,6 +178,8 @@ class RegExpBasedFileFinder implements FileFinder {
                     for (Path path : pathStream.filter(element -> isSubDirectory(rootDirectory, element)).collect(Collectors.toList())) {
                         resultFiles.addAll(findFile(entry, path, restOfFileString, extensionRegExp));
                     }
+                } catch (UncheckedIOException ioe) {
+                    throw new IOException(ioe);
                 }
             } // End process directory information
         }
@@ -201,7 +203,7 @@ class RegExpBasedFileFinder implements FileFinder {
     private List<Path> collectFilesWithMatcher(Path actualDirectory, BiPredicate<Path, BasicFileAttributes> matcher) {
         try (Stream<Path> pathStream = Files.find(actualDirectory, 1, matcher)) {
             return pathStream.collect(Collectors.toList());
-        } catch (IOException ioe) {
+        } catch (UncheckedIOException | IOException ioe) {
             return Collections.emptyList();
         }
     }

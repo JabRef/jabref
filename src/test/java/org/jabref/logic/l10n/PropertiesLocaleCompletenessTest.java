@@ -61,7 +61,6 @@ public class PropertiesLocaleCompletenessTest {
         Locale oldLocale = Locale.getDefault();
         try {
             Locale.setDefault(locale);
-
             ResourceBundle.getBundle(prefix, locale, new EncodingControl(StandardCharsets.UTF_8));
         } finally {
             Locale.setDefault(oldLocale);
