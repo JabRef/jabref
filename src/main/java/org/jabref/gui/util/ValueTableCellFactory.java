@@ -1,7 +1,10 @@
 package org.jabref.gui.util;
 
+import java.util.function.Function;
+
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
@@ -22,6 +25,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     private Callback<T, Node> toGraphic;
     private Callback<T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
     private Callback<T, String> toTooltip;
+    private Function<T, ContextMenu> contextMenuFactory;
 
     public ValueTableCellFactory<S, T> withText(Callback<T, String> toText) {
         this.toText = toText;
@@ -41,6 +45,11 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     public ValueTableCellFactory<S, T> withOnMouseClickedEvent(
             Callback<T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent) {
         this.toOnMouseClickedEvent = toOnMouseClickedEvent;
+        return this;
+    }
+
+    public ValueTableCellFactory<S, T> withContextMenu(Function<T, ContextMenu> contextMenuFactory) {
+        this.contextMenuFactory = contextMenuFactory;
         return this;
     }
 
@@ -73,6 +82,17 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                     }
                     if (toOnMouseClickedEvent != null) {
                         setOnMouseClicked(toOnMouseClickedEvent.call(item));
+                    }
+
+                    if (contextMenuFactory != null) {
+                        // We only create the context menu when really necessary
+                        setOnContextMenuRequested(event -> {
+                            if (!isEmpty()) {
+                                setContextMenu(contextMenuFactory.apply(item));
+                                getContextMenu().show(this, event.getScreenX(), event.getScreenY());
+                            }
+                            event.consume();
+                        });
                     }
                 }
             }

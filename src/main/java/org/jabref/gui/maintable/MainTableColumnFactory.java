@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 
 import org.jabref.gui.GUIGlobals;
@@ -22,7 +24,9 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.entry.specialfields.SpecialFieldValue;
 
+import org.controlsfx.control.Rating;
 import org.fxmisc.easybind.EasyBind;
 
 class MainTableColumnFactory {
@@ -94,19 +98,81 @@ class MainTableColumnFactory {
 
     private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(SpecialField specialField) {
         TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> column = new TableColumn<>();
-        column.setGraphic(new SpecialFieldViewModel(specialField).getIcon().getGraphicNode());
+        SpecialFieldViewModel specialFieldViewModel = new SpecialFieldViewModel(specialField);
+        column.setGraphic(specialFieldViewModel.getIcon().getGraphicNode());
         column.getStyleClass().add(STYLE_ICON);
         if (specialField == SpecialField.RANKING) {
             setExactWidth(column, GUIGlobals.WIDTH_ICON_COL_RANKING);
+            column.setCellFactory(
+                    new ValueTableCellFactory<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>>()
+                            .withGraphic(value -> value.map(this::createRating).orElse(null))
+            );
         } else {
             setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
+
+            if (specialField.isSingleValueField()) {
+                column.setCellFactory(
+                        new ValueTableCellFactory<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>>()
+                                .withGraphic(value -> createSpecialFieldIcon(value, specialFieldViewModel))
+                );
+            } else {
+                column.setCellFactory(
+                        new ValueTableCellFactory<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>>()
+                                .withGraphic(value -> createSpecialFieldIcon(value, specialFieldViewModel))
+                                .withContextMenu(value -> createSpecialFieldContextMenu(specialFieldViewModel))
+                );
+            }
         }
         column.setCellValueFactory(cellData -> cellData.getValue().getSpecialField(specialField));
-        column.setCellFactory(
-                new ValueTableCellFactory<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>>()
-                        .withGraphic(param -> param.map(specialFieldValue -> specialFieldValue.getIcon().getGraphicNode()).orElse(null)));
+
 
         return column;
+    }
+
+    private Rating createRating(SpecialFieldValueViewModel value) {
+        Rating ranking = new Rating();
+        ranking.setRating(toRating(value.getValue()));
+        EasyBind.subscribe(ranking.ratingProperty(), rating -> {
+        });
+        return ranking;
+    }
+
+    private int toRating(SpecialFieldValue ranking) {
+        switch (ranking) {
+            case RANK_1:
+                return 1;
+            case RANK_2:
+                return 2;
+            case RANK_3:
+                return 3;
+            case RANK_4:
+                return 4;
+            case RANK_5:
+                return 5;
+            default:
+                throw new UnsupportedOperationException(ranking + "is not a valid ranking");
+        }
+    }
+
+    private ContextMenu createSpecialFieldContextMenu(SpecialFieldViewModel specialField) {
+        ContextMenu contextMenu = new ContextMenu();
+
+        for (SpecialFieldValueViewModel value : specialField.getValues()) {
+            contextMenu.getItems().add(new MenuItem(value.getMenuString(), value.getIcon().map(JabRefIcon::getGraphicNode).orElse(null)));
+        }
+
+        return contextMenu;
+    }
+
+    private Node createSpecialFieldIcon(Optional<SpecialFieldValueViewModel> fieldValue, SpecialFieldViewModel specialField) {
+        return fieldValue
+                .flatMap(SpecialFieldValueViewModel::getIcon)
+                .map(JabRefIcon::getGraphicNode)
+                .orElseGet(() -> {
+                    Node node = specialField.getEmptyIcon().getGraphicNode();
+                    node.getStyleClass().add("empty-special-field");
+                    return node;
+                });
     }
 
     private void setExactWidth(TableColumn<?, ?> column, int widthIconCol) {

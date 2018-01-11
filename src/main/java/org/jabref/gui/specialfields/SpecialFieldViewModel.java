@@ -1,6 +1,8 @@
 package org.jabref.gui.specialfields;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.swing.Icon;
 
@@ -85,4 +87,13 @@ public class SpecialFieldViewModel {
         }
     }
 
+    public JabRefIcon getEmptyIcon() {
+        return getIcon();
+    }
+
+    public List<SpecialFieldValueViewModel> getValues() {
+        return field.getValues().stream()
+                .map(SpecialFieldValueViewModel::new)
+                .collect(Collectors.toList());
+    }
 }
