@@ -95,7 +95,7 @@ public class DOI implements Identifier {
      */
     public static Optional<DOI> parse(String doi) {
         try {
-            return Optional.ofNullable(new DOI(doi));
+            return Optional.of(new DOI(doi));
         } catch (IllegalArgumentException | NullPointerException e) {
             return Optional.empty();
         }

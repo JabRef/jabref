@@ -11,6 +11,7 @@ import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelMode;
 import org.jabref.gui.maintable.MainTableDataModel;
+import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -108,7 +109,9 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
             }
         }
 
-        globalSearchBar.updateResults(matchedEntries.size(), searchQuery.getDescription(), searchQuery.isGrammarBasedSearch());
+        globalSearchBar.updateResults(matchedEntries.size(),
+                SearchDescribers.getSearchDescriberFor(searchQuery).getDescription(),
+                searchQuery.isGrammarBasedSearch());
         globalSearchBar.getSearchQueryHighlightObservable().fireSearchlistenerEvent(searchQuery);
     }
 

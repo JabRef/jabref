@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
@@ -98,7 +98,7 @@ public class RepecNepImporterTest {
 
     @Test
     public void testGetExtension() {
-        Assert.assertEquals(FileExtensions.REPEC, testImporter.getExtensions());
+        Assert.assertEquals(FileType.REPEC, testImporter.getFileType());
     }
 
     @Test

@@ -68,8 +68,8 @@ public class ImporterTest {
     }
 
     @Test
-    public void getExtensionsDoesNotReturnNull() {
-        Assert.assertNotNull(format.getExtensions());
+    public void getFileTypeDoesNotReturnNull() {
+        Assert.assertNotNull(format.getFileType());
     }
 
     @Test

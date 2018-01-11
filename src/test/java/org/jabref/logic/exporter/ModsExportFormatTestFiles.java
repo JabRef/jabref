@@ -42,7 +42,7 @@ public class ModsExportFormatTestFiles {
     public Charset charset;
     private BibDatabaseContext databaseContext;
     private File tempFile;
-    private ModsExportFormat modsExportFormat;
+    private ModsExporter modsExportFormat;
     private BibtexImporter bibtexImporter;
     private ModsImporter modsImporter;
     private Path importFile;
@@ -69,7 +69,7 @@ public class ModsExportFormatTestFiles {
         databaseContext = new BibDatabaseContext();
         importFile = Paths.get(ModsExportFormatTestFiles.class.getResource(filename).toURI());
         charset = StandardCharsets.UTF_8;
-        modsExportFormat = new ModsExportFormat();
+        modsExportFormat = new ModsExporter();
         tempFile = testFolder.newFile();
         bibtexImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
         modsImporter = new ModsImporter();
@@ -82,7 +82,7 @@ public class ModsExportFormatTestFiles {
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
         Path xmlFile = Paths.get(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
 
-        modsExportFormat.performExport(databaseContext, tempFile.getPath(), charset, entries);
+        modsExportFormat.export(databaseContext, tempFile.toPath(), charset, entries);
 
         Builder control = Input.from(Files.newInputStream(xmlFile));
         Builder test = Input.from(Files.newInputStream(Paths.get(tempFilename)));
@@ -95,7 +95,7 @@ public class ModsExportFormatTestFiles {
     public final void testExportAsModsAndThenImportAsMods() throws Exception {
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
 
-        modsExportFormat.performExport(databaseContext, tempFile.getPath(), charset, entries);
+        modsExportFormat.export(databaseContext, tempFile.toPath(), charset, entries);
         BibEntryAssert.assertEquals(entries, Paths.get(tempFile.getPath()), modsImporter);
     }
 
@@ -107,7 +107,7 @@ public class ModsExportFormatTestFiles {
 
         List<BibEntry> entries = modsImporter.importDatabase(xmlFile, charset).getDatabase().getEntries();
 
-        modsExportFormat.performExport(databaseContext, tempFile.getPath(), charset, entries);
+        modsExportFormat.export(databaseContext, tempFile.toPath(), charset, entries);
 
         Builder control = Input.from(Files.newInputStream(xmlFile));
         Builder test = Input.from(Files.newInputStream(Paths.get(tempFilename)));

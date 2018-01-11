@@ -92,7 +92,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
 
         currentDatabase.ifPresent(database -> {
-            if (newValue == null) {
+            if (newValue == null || newValue.isEmpty()) {
                 stateManager.clearSelectedGroups(database);
             } else {
                 stateManager.setSelectedGroups(database, newValue.stream().map(GroupNodeViewModel::getGroupNode).collect(Collectors.toList()));

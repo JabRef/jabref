@@ -14,6 +14,7 @@ import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -26,22 +27,33 @@ import org.apache.commons.logging.LogFactory;
 public class AutoSetFileLinksUtil {
 
     private static final Log LOGGER = LogFactory.getLog(AutoSetLinks.class);
+    private List<Path> directories;
+    private AutoLinkPreferences autoLinkPreferences;
+    private ExternalFileTypes externalFileTypes;
 
-    public List<LinkedFile> findassociatedNotLinkedFiles(BibEntry entry, BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirPrefs, AutoLinkPreferences autoLinkPrefs, ExternalFileTypes externalFileTypes) {
+    public AutoSetFileLinksUtil(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
+        this(databaseContext.getFileDirectoriesAsPaths(fileDirectoryPreferences), autoLinkPreferences, externalFileTypes);
+    }
+
+    public AutoSetFileLinksUtil(List<Path> directories, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
+        this.directories = directories;
+        this.autoLinkPreferences = autoLinkPreferences;
+        this.externalFileTypes = externalFileTypes;
+    }
+
+    public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {
         List<LinkedFile> linkedFiles = new ArrayList<>();
 
-        List<Path> dirs = databaseContext.getFileDirectoriesAsPaths(fileDirPrefs);
         List<String> extensions = externalFileTypes.getExternalFileTypeSelection().stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
 
-        // Run the search operation:
-        FileFinder fileFinder = FileFinders.constructFromConfiguration(autoLinkPrefs);
-        List<Path> result = fileFinder.findAssociatedFiles(entry, dirs, extensions);
+        // Run the search operation
+        FileFinder fileFinder = FileFinders.constructFromConfiguration(autoLinkPreferences);
+        List<Path> result = fileFinder.findAssociatedFiles(entry, directories, extensions);
 
-        // Iterate over the entries:
-
+        // Collect the found files that are not yet linked
         for (Path foundFile : result) {
-            boolean existingSameFile = entry.getFiles().stream()
-                    .map(file -> file.findIn(dirs))
+            boolean fileAlreadyLinked = entry.getFiles().stream()
+                    .map(file -> file.findIn(directories))
                     .anyMatch(file -> {
                         try {
                             return file.isPresent() && Files.isSameFile(file.get(), foundFile);
@@ -50,15 +62,14 @@ public class AutoSetFileLinksUtil {
                         }
                         return false;
                     });
-            if (!existingSameFile) {
-
+            if (!fileAlreadyLinked) {
                 Optional<ExternalFileType> type = FileHelper.getFileExtension(foundFile)
                         .map(externalFileTypes::getExternalFileTypeByExt)
                         .orElse(Optional.of(new UnknownExternalFileType("")));
 
                 String strType = type.isPresent() ? type.get().getName() : "";
-
-                LinkedFile linkedFile = new LinkedFile("", foundFile.toString(), strType);
+                String relativeFilePath = FileUtil.shortenFileName(foundFile, directories).toString();
+                LinkedFile linkedFile = new LinkedFile("", relativeFilePath, strType);
                 linkedFiles.add(linkedFile);
             }
         }

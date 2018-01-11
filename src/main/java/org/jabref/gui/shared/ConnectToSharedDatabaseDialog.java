@@ -45,17 +45,16 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
-import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.DatabaseLocation;
+import org.jabref.logic.shared.DBMSConnection;
+import org.jabref.logic.shared.DBMSConnectionProperties;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.shared.security.Password;
+import org.jabref.logic.util.FileType;import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.shared.DBMSType;
+import org.jabref.model.database.shared.DatabaseLocation;
+import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.shared.DBMSConnection;
-import org.jabref.shared.DBMSConnectionProperties;
-import org.jabref.shared.DBMSType;
-import org.jabref.shared.exception.DatabaseNotSupportedException;
-import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.shared.prefs.SharedDatabasePreferences;
-import org.jabref.shared.security.Password;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -461,17 +460,17 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
         List<BasePanel> panels = JabRefGUI.getMainFrame().getBasePanelList();
         return panels.parallelStream().anyMatch(panel -> {
             BibDatabaseContext context = panel.getBibDatabaseContext();
+
             return ((context.getLocation() == DatabaseLocation.SHARED) &&
-                    this.connectionProperties.equals(context.getDBMSSynchronizer()
-                            .getDBProcessor().getDBMSConnectionProperties()));
+                    this.connectionProperties.equals(context.getDBMSSynchronizer().getConnectionProperties()));
         });
     }
 
     private void showFileChooser() {
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileExtensions.BIBTEX_DB)
-                .withDefaultExtension(FileExtensions.BIBTEX_DB)
+                .addExtensionFilter(FileType.BIBTEX_DB)
+                .withDefaultExtension(FileType.BIBTEX_DB)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
         DialogService ds = new FXDialogService();
 

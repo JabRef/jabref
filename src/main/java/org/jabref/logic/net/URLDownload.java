@@ -55,7 +55,8 @@ import org.apache.commons.logging.LogFactory;
  * Each call to a public method creates a new HTTP connection. Nothing is cached.
  */
 public class URLDownload {
-    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
+
+    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0";
 
     private static final Log LOGGER = LogFactory.getLog(URLDownload.class);
     private final URL source;
@@ -129,7 +130,7 @@ public class URLDownload {
         // Try to use HEAD request to avoid downloading the whole file
         try {
             contentType = Unirest.head(source.toString()).asString().getHeaders().get("Content-Type").get(0);
-            if (contentType != null && !contentType.isEmpty()) {
+            if ((contentType != null) && !contentType.isEmpty()) {
                 return contentType;
             }
         } catch (Exception e) {
@@ -139,7 +140,7 @@ public class URLDownload {
         // Use GET request as alternative if no HEAD request is available
         try {
             contentType = Unirest.get(source.toString()).asString().getHeaders().get("Content-Type").get(0);
-            if (contentType != null && !contentType.isEmpty()) {
+            if ((contentType != null) && !contentType.isEmpty()) {
                 return contentType;
             }
         } catch (Exception e) {
@@ -151,7 +152,7 @@ public class URLDownload {
             URLConnection connection = new URL(source.toString()).openConnection();
 
             contentType = connection.getContentType();
-            if (contentType != null && !contentType.isEmpty()) {
+            if ((contentType != null) && !contentType.isEmpty()) {
                 return contentType;
             }
         } catch (IOException e) {
@@ -259,7 +260,7 @@ public class URLDownload {
 
         // Take everything after the last '/' as name + extension
         String fileNameWithExtension = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
-        String fileName = FileUtil.getFileName(fileNameWithExtension);
+        String fileName = FileUtil.getBaseName(fileNameWithExtension);
         String extension = "." + FileHelper.getFileExtension(fileNameWithExtension).orElse("tmp");
 
         // Create temporary file and download to it
@@ -304,9 +305,9 @@ public class URLDownload {
             // normally, 3xx is redirect
             int status = ((HttpURLConnection) connection).getResponseCode();
             if (status != HttpURLConnection.HTTP_OK) {
-                if (status == HttpURLConnection.HTTP_MOVED_TEMP
-                        || status == HttpURLConnection.HTTP_MOVED_PERM
-                        || status == HttpURLConnection.HTTP_SEE_OTHER) {
+                if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
+                        || (status == HttpURLConnection.HTTP_MOVED_PERM)
+                        || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
                     // get redirect url from "location" header field
                     String newUrl = connection.getHeaderField("Location");
                     // open the new connnection again

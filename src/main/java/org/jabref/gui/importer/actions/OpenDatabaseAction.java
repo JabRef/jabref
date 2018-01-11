@@ -36,15 +36,15 @@ import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.exception.NotASharedDatabaseException;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.migrations.FileLinksUpgradeWarning;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.shared.exception.DatabaseNotSupportedException;
-import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.shared.exception.NotASharedDatabaseException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -102,8 +102,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
             DialogService ds = new FXDialogService();
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileExtensions.BIBTEX_DB)
-                    .withDefaultExtension(FileExtensions.BIBTEX_DB)
+                    .addExtensionFilter(FileType.BIBTEX_DB)
+                    .withDefaultExtension(FileType.BIBTEX_DB)
                     .withInitialDirectory(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)))
                     .build();
 

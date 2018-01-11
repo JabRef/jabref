@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -29,7 +30,7 @@ import org.jabref.Globals;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.bibtex.DuplicateCheck;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -46,7 +47,6 @@ import org.jabref.model.entry.IEEETranEntryTypes;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jdesktop.swingx.VerticalLayout;
 
 /**
  * Dialog that prompts the user to choose a type for an entry.
@@ -89,7 +89,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
     private JPanel createEntryGroupsPanel() {
         JPanel panel = new JPanel();
-        panel.setLayout(new VerticalLayout());
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         if (frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
             panel.add(createEntryGroupPanel("biblatex", BiblatexEntryTypes.ALL));
@@ -319,7 +319,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                         diag.toFront();
                     } else {
                 		// Regenerate CiteKey of imported BibEntry
-                        BibtexKeyPatternUtil.makeAndSetLabel(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern(), frame.getCurrentBasePanel().getDatabase(), bibEntry, Globals.prefs.getBibtexKeyPatternPreferences());
+                        new BibtexKeyGenerator(frame.getCurrentBasePanel().getBibDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(bibEntry);
                         // Update Timestamps
                         if (Globals.prefs.getTimestampPreferences().includeCreatedTimestamp()) {
                             bibEntry.setField(Globals.prefs.getTimestampPreferences().getTimestampField(), Globals.prefs.getTimestampPreferences().now());

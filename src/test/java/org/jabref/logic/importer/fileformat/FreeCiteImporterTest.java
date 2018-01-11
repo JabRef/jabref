@@ -7,15 +7,18 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
+@Category(FetcherTest.class)
 public class FreeCiteImporterTest {
 
     private FreeCiteImporter importer;
@@ -43,7 +46,7 @@ public class FreeCiteImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(FileExtensions.FREECITE, importer.getExtensions());
+        assertEquals(FileType.FREECITE, importer.getFileType());
     }
 
     @Test

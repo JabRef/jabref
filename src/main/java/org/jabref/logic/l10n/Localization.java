@@ -79,6 +79,17 @@ public class Localization {
     }
 
     /**
+     * Return the translated string for usage in JavaFX menus.
+     *
+     * @implNote This is only a temporary workaround. In the long term, the & sign should be removed from the language
+     * files.
+     */
+    public static String menuTitleFX(String key, String... params) {
+        // Remove & sign, which is not used by JavaFX to signify the shortcut
+        return menuTitle(key, params).replace("&", "");
+    }
+
+    /**
      * Sets the language and loads the appropriate translations. Note, that this function should be called before any
      * other function of this class.
      *
@@ -135,8 +146,8 @@ public class Localization {
         ResourceBundle menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
         Objects.requireNonNull(messages, "Could not load " + RESOURCE_PREFIX + " resource.");
         Objects.requireNonNull(menuTitles, "Could not load " + MENU_RESOURCE_PREFIX + " resource.");
-        localizedMessages = new LocalizationBundle(createLookupMap(messages));
         localizedMenuTitles = new LocalizationBundle(createLookupMap(menuTitles));
+        localizedMessages = new LocalizationBundle(createLookupMap(messages, localizedMenuTitles));
     }
 
     /**
@@ -151,6 +162,31 @@ public class Localization {
                 Collectors.toMap(
                         key -> new LocalizationKey(key).getTranslationValue(),
                         key -> new LocalizationKey(baseBundle.getString(key)).getTranslationValue())
+        ));
+    }
+
+    /**
+     * Helper function to create a HashMap from the key/value pairs of a bundle and existing localized menu titles.
+     * Currently, JabRef has two translations for the same string: One for the menu and one for other parts of the
+     * application. The menu might contain an ampersand (&), which causes issues when used outside the menu.
+     * With this fix, the ampersand is removed
+     */
+    private static HashMap<String,String> createLookupMap(ResourceBundle baseBundle, LocalizationBundle localizedMenuTitles) {
+        final ArrayList<String> baseKeys = Collections.list(baseBundle.getKeys());
+        return new HashMap<>(baseKeys.stream().collect(
+                Collectors.toMap(
+                        key -> new LocalizationKey(key).getTranslationValue(),
+                        key -> {
+                            String menuTranslationValue = localizedMenuTitles.lookup.get(key);
+                            String plainTranslationValue = new LocalizationKey(baseBundle.getString(key)).getTranslationValue();
+                            String translationValue;
+                            if (plainTranslationValue.contains("&") && plainTranslationValue.equals(menuTranslationValue)) {
+                                translationValue = plainTranslationValue.replace("&", "");
+                            } else {
+                                translationValue = plainTranslationValue;
+                            }
+                            return translationValue;
+                        })
         ));
     }
 
