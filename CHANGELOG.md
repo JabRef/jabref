@@ -16,8 +16,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added [oaDOI](https://oadoi.org/) as a fulltext provider, so that JabRef is now able to provide fulltexts for more than 90 million open-access articles.
 - We changed one default of [Cleanup entries dialog](http://help.jabref.org/en/CleanupEntries): Per default, the PDF are not moved to the default file directory anymore. [#3619](https://github.com/JabRef/jabref/issues/3619)
 
->>>>>>> master
-
 ### Fixed
 - We fixed the missing dot in the name of an exported file. [#3576](https://github.com/JabRef/jabref/issues/3576)
 - Autocompletion in the search bar can now be disabled via the preferences. [#3598](https://github.com/JabRef/jabref/issues/3598)
