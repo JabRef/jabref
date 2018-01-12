@@ -6,6 +6,7 @@ Take a look at GitHub's excellent [help documentation] for a detailed explanatio
 We also have [code howtos](https://github.com/JabRef/jabref/wiki/Code-Howtos) and [guidelines for setting up a local workspace](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace).
 
 In case you have any question, do not hesitate to write one of our [JabRef developers](https://github.com/orgs/JabRef/teams/developers) an email.
+We should also be online at [gitter](https://gitter.im/JabRef/jabref).
 
 
 ## Formal requirements for a pull request
