@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -92,24 +93,26 @@ public class MainArchitectureTests {
 
         Predicate<String> isPackage = (s) -> s.startsWith("package " + firstPackage);
 
-        List<Path> files = Files.walk(Paths.get("src/main/"))
-                .filter(p -> p.toString().endsWith(".java"))
-                .filter(p -> {
-                    try {
-                        return Files.readAllLines(p, StandardCharsets.UTF_8).stream().anyMatch(isPackage);
-                    } catch (IOException e) {
-                        return false;
-                    }
-                })
-                .filter(p -> {
-                    try {
-                        return Files.readAllLines(p, StandardCharsets.UTF_8).stream().anyMatch(isExceptionPackage);
-                    } catch (IOException e) {
-                        return false;
-                    }
-                }).collect(Collectors.toList());
+        try (Stream<Path> pathStream = Files.walk(Paths.get("src/main/"))) {
+            List<Path> files = pathStream
+                    .filter(p -> p.toString().endsWith(".java"))
+                    .filter(p -> {
+                        try {
+                            return Files.readAllLines(p, StandardCharsets.UTF_8).stream().anyMatch(isPackage);
+                        } catch (IOException e) {
+                            return false;
+                        }
+                    })
+                    .filter(p -> {
+                        try {
+                            return Files.readAllLines(p, StandardCharsets.UTF_8).stream().anyMatch(isExceptionPackage);
+                        } catch (IOException e) {
+                            return false;
+                        }
+                    }).collect(Collectors.toList());
 
-        Assert.assertEquals("The following classes are not allowed to depend on " + secondPackage,
-                Collections.emptyList(), files);
+            Assert.assertEquals("The following classes are not allowed to depend on " + secondPackage,
+                    Collections.emptyList(), files);
+        }
     }
 }

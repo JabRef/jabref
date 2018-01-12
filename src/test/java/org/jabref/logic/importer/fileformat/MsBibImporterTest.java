@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.Test;
@@ -22,7 +22,7 @@ public class MsBibImporterTest {
     @Test
     public void testsGetExtensions() {
         MsBibImporter importer = new MsBibImporter();
-        assertEquals(FileExtensions.MSBIB, importer.getExtensions());
+        assertEquals(FileType.MSBIB, importer.getFileType());
     }
 
     @Test

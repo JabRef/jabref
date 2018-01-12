@@ -102,7 +102,7 @@ import org.jabref.gui.worker.CallBack;
 import org.jabref.gui.worker.CitationStyleToClipboardWorker;
 import org.jabref.gui.worker.MarkEntriesAction;
 import org.jabref.gui.worker.SendAsEMailAction;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -116,21 +116,21 @@ import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
-import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.DatabaseLocation;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.database.event.EntryRemovedEvent;
+import org.jabref.model.database.shared.DatabaseLocation;
+import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
@@ -139,9 +139,9 @@ import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
-import org.jabref.shared.DBMSSynchronizer;
 
 import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -489,16 +489,10 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 
                 // generate the new cite keys for each entry
                 final NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
-                AbstractBibtexKeyPattern citeKeyPattern = bibDatabaseContext.getMetaData()
-                        .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern());
+                BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(bibDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences());
                 for (BibEntry entry : entries) {
-                    String oldCiteKey = entry.getCiteKeyOptional().orElse("");
-                    BibtexKeyPatternUtil.makeAndSetLabel(citeKeyPattern, bibDatabaseContext.getDatabase(),
-                            entry, Globals.prefs.getBibtexKeyPatternPreferences());
-                    String newCiteKey = entry.getCiteKeyOptional().orElse("");
-                    if (!oldCiteKey.equals(newCiteKey)) {
-                        ce.addEdit(new UndoableKeyChange(entry, oldCiteKey, newCiteKey));
-                    }
+                    Optional<FieldChange> change = keyGenerator.generateAndSetKey(entry);
+                    change.ifPresent(fieldChange -> ce.addEdit(new UndoableKeyChange(fieldChange)));
                 }
                 ce.end();
 
@@ -591,7 +585,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                 .openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null)));
 
         actions.put(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, (BaseAction) () -> {
-            DBMSSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext()
+            DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext()
                     .getDBMSSynchronizer();
             dbmsSynchronizer.pullChanges();
         });
@@ -1625,7 +1619,6 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     public void updateEntryEditorIfShowing() {
         if (mode == BasePanelMode.SHOWING_EDITOR) {
             BibEntry currentEntry = entryEditor.getEntry();
-            showAndEdit(null);
             showAndEdit(currentEntry);
         }
     }
@@ -1754,15 +1747,12 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         if (Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING)) {
             NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
 
+            BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(bibDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences());
             for (BibEntry bes : bibDatabaseContext.getDatabase().getEntries()) {
                 Optional<String> oldKey = bes.getCiteKeyOptional();
-                if (!(oldKey.isPresent()) || oldKey.get().isEmpty()) {
-                    BibtexKeyPatternUtil.makeAndSetLabel(bibDatabaseContext.getMetaData()
-                            .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
-                            bibDatabaseContext.getDatabase(),
-                            bes, Globals.prefs.getBibtexKeyPatternPreferences());
-                    bes.getCiteKeyOptional().ifPresent(
-                            newKey -> ce.addEdit(new UndoableKeyChange(bes, oldKey.orElse(""), newKey)));
+                if (StringUtil.isBlank(oldKey)) {
+                    Optional<FieldChange> change = keyGenerator.generateAndSetKey(bes);
+                    change.ifPresent(fieldChange -> ce.addEdit(new UndoableKeyChange(fieldChange)));
                 }
             }
 
@@ -2022,18 +2012,19 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 
             // Run the search operation:
             FileFinder fileFinder = FileFinders.constructFromConfiguration(Globals.prefs.getAutoLinkPreferences());
+            try {
             List<Path> files = fileFinder.findAssociatedFiles(entry, dirs, extensions);
-            if (!files.isEmpty()) {
-                Path file = files.get(0);
-                Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByFile(file);
-                if (type.isPresent()) {
-                    try {
+                if (!files.isEmpty()) {
+                    Path file = files.get(0);
+                    Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByFile(file);
+                    if (type.isPresent()) {
                         JabRefDesktop.openExternalFileAnyFormat(file, basePanel.getBibDatabaseContext(), type);
                         basePanel.output(Localization.lang("External viewer called") + '.');
-                    } catch (IOException ex) {
-                        basePanel.output(Localization.lang("Error") + ": " + ex.getMessage());
                     }
                 }
+            } catch (IOException ex) {
+                LOGGER.error("Problems with finding/or opening files ", ex);
+                basePanel.output(Localization.lang("Error") + ": " + ex.getMessage());
             }
         }
     }
@@ -2230,8 +2221,8 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         @Override
         public void action() throws SaveException {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .withDefaultExtension(FileExtensions.BIBTEX_DB)
-                    .addExtensionFilter(FileExtensions.BIBTEX_DB)
+                    .withDefaultExtension(FileType.BIBTEX_DB)
+                    .addExtensionFilter(FileType.BIBTEX_DB)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
 
             DialogService ds = new FXDialogService();

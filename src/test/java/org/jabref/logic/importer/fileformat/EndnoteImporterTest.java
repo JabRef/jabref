@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.Before;
@@ -48,7 +48,7 @@ public class EndnoteImporterTest {
     @Test
     public void testsGetExtensions() {
 
-        assertEquals(FileExtensions.ENDNOTE, importer.getExtensions());
+        assertEquals(FileType.ENDNOTE, importer.getFileType());
 
     }
 

@@ -1,7 +1,8 @@
 import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
 
-// to update the gradle wrapper, execute ./gradlew wrapper --gradle-version 4.0
+// to update the gradle wrapper, execute
+// ./gradlew wrapper --gradle-version=4.4.1 --distribution-type=bin
 
 buildscript {
     repositories {
@@ -88,7 +89,6 @@ dependencies {
 
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
-    compile 'com.jgoodies:jgoodies-looks:2.7.0'
 
     // update to 2.0.x is not possible - see https://github.com/JabRef/jabref/pull/1096#issuecomment-208857517
     compile 'org.apache.pdfbox:pdfbox:1.8.13'
@@ -96,7 +96,7 @@ dependencies {
     compile 'org.apache.pdfbox:jempbox:1.8.13'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    compile 'org.bouncycastle:bcprov-jdk15on:1.58'
+    compile 'org.bouncycastle:bcprov-jdk15on:1.59'
 
     compile 'commons-cli:commons-cli:1.4'
 
@@ -161,7 +161,7 @@ dependencies {
     testRuntime 'org.apache.logging.log4j:log4j-core:2.10.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.10.0'
     testCompile 'org.mockito:mockito-core:2.13.0'
-    testCompile 'com.github.tomakehurst:wiremock:2.12.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.13.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.5.1'
@@ -171,7 +171,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.5'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.7'
 }
 
 dependencyUpdates {
@@ -390,6 +390,7 @@ afterEvaluate {
     def junitPlatformTest = tasks.junitPlatformTest
 
     jacoco {
+        toolVersion = '0.8.0'
         applyTo(junitPlatformTest)
     }
 

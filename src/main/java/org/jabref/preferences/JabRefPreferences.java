@@ -466,12 +466,12 @@ public class JabRefPreferences implements PreferencesService {
             defaults.put(WIN_LOOK_AND_FEEL, UIManager.getSystemLookAndFeelClassName());
             defaults.put(EMACS_PATH, "emacsclient");
         } else if (OS.WINDOWS) {
-            defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.looks.windows.WindowsLookAndFeel");
+            defaults.put(WIN_LOOK_AND_FEEL, "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
             defaults.put(EMACS_PATH, "emacsclient.exe");
         } else {
             // Linux
             defaults.put(FONT_FAMILY, "SansSerif");
-            defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
+            defaults.put(WIN_LOOK_AND_FEEL, "javax.swing.plaf.nimbus.NimbusLookAndFeel");
             defaults.put(EMACS_PATH, "emacsclient");
         }
 
@@ -909,12 +909,13 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private static void insertDefaultCleanupPreset(Map<String, Object> storage) {
-        EnumSet<CleanupPreset.CleanupStep> deactivedJobs = EnumSet.of(
+        EnumSet<CleanupPreset.CleanupStep> deactivatedJobs = EnumSet.of(
                 CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
+                CleanupPreset.CleanupStep.MOVE_PDF,
                 CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
                 CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
 
-        CleanupPreset preset = new CleanupPreset(EnumSet.complementOf(deactivedJobs), Cleanups.DEFAULT_SAVE_ACTIONS);
+        CleanupPreset preset = new CleanupPreset(EnumSet.complementOf(deactivatedJobs), Cleanups.DEFAULT_SAVE_ACTIONS);
 
         storage.put(CLEANUP_DOI, preset.isCleanUpDOI());
         storage.put(CLEANUP_ISSN, preset.isCleanUpISSN());
@@ -1208,7 +1209,7 @@ public class JabRefPreferences implements PreferencesService {
             if (!pattern.isDefaultValue(key)) {
                 // no default value
                 // the first entry in the array is the full pattern
-                // see org.jabref.logic.labelPattern.BibtexKeyPatternUtil.split(String)
+                // see org.jabref.logic.labelPattern.BibtexKeyGenerator.split(String)
                 pre.put(key, pattern.getValue(key).get(0));
             }
         }

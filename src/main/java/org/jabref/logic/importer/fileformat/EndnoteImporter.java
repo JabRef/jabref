@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -44,8 +44,8 @@ public class EndnoteImporter extends Importer {
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return FileExtensions.ENDNOTE;
+    public FileType getFileType() {
+        return FileType.ENDNOTE;
     }
 
     @Override
@@ -229,7 +229,7 @@ public class EndnoteImporter extends Importer {
                         type = "mastersthesis";
                     }
                 } else if ("F".equals(prefix)) {
-                    hm.put(BibEntry.KEY_FIELD, BibtexKeyPatternUtil.checkLegalKey(val,
+                    hm.put(BibEntry.KEY_FIELD, BibtexKeyGenerator.cleanKey(val,
                             preferences.getBibtexKeyPatternPreferences().isEnforceLegalKey()));
                 }
             }

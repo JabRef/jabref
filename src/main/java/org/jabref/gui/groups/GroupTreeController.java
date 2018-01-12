@@ -2,6 +2,7 @@ package org.jabref.gui.groups;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,12 +42,15 @@ import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.groups.AllEntriesGroup;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.fxmisc.easybind.EasyBind;
+import org.reactfx.util.FxTimer;
+import org.reactfx.util.Timer;
 
 public class GroupTreeController extends AbstractController<GroupTreeViewModel> {
 
@@ -87,7 +91,13 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                 this::updateSelection
         );
 
-        viewModel.filterTextProperty().bind(searchField.textProperty());
+        // We try to to prevent publishing changes in the search field directly to the search task that takes some time
+        // for larger group structures.
+        final Timer searchTask = FxTimer.create(Duration.ofMillis(400), () -> {
+            LOGGER.debug("Run group search " + searchField.getText());
+            viewModel.filterTextProperty().setValue(searchField.textProperty().getValue());
+        });
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
 
         groupTree.rootProperty().bind(
                 EasyBind.map(viewModel.rootGroupProperty(),
@@ -241,12 +251,12 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
     }
 
     private void updateSelection(List<TreeItem<GroupNodeViewModel>> newSelectedGroups) {
-        if (newSelectedGroups == null) {
+        if (newSelectedGroups == null || newSelectedGroups.isEmpty()) {
             viewModel.selectedGroupsProperty().clear();
         } else {
             List<GroupNodeViewModel> list = new ArrayList<>();
             for (TreeItem<GroupNodeViewModel> model : newSelectedGroups) {
-                if (model != null && model.getValue() != null) {
+                if (model != null && model.getValue() != null && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)) {
                     list.add(model.getValue());
                 }
             }
