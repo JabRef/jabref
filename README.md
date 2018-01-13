@@ -62,7 +62,7 @@ Try to double click the `jar` file or execute the following command:
 
 We are thankful for any bug reports or other feedback.
 If you have ideas for new features you want to be included in JabRef, [tell us in our forum](http://discourse.jabref.org/c/features)!
-If you have questions regarding the usage, or you want to give general feedback [the forum](http://discourse.jabref.org/c/help) is also the right place for this. JabRef comes with an [online help](https://help.jabref.org/).
+If you need support in using JabRef please read [the documentation](https://help.jabref.org/) first and have a look at our [community forum](http://discourse.jabref.org/c/help).
 You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) to send in bug reports.
 
 Explanation of donation possibilities and usage of donations is available at our [donations page](https://donations.jabref.org).
