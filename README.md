@@ -4,7 +4,7 @@
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
 [![Donation](https://img.shields.io/badge/donate%20to-jabref-orange.svg)](https://donations.jabref.org)
 
-JabRef is an open-source, cross-platform citation and reference management tool.
+JabRef is an open-source, cross-platform citation and reference management tool licensed under the  [MIT license](https://tldrlegal.com/license/mit-license).
 
 Stay on top of your literature: JabRef helps you to collect and organize sources, find the paper you need and discover the latest research.
 ![main table](https://www.jabref.org/img/JabRef-4-0-MainTable.png)
