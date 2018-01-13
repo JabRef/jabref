@@ -1,10 +1,17 @@
-# JabRef Development Version
+# JabRef
 
 [![Build Status](https://travis-ci.org/JabRef/jabref.svg?branch=master)](https://travis-ci.org/JabRef/jabref)
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
 [![Donation](https://img.shields.io/badge/donate%20to-jabref-orange.svg)](https://donations.jabref.org)
 [![Help Contribute to Open Source](https://www.codetriage.com/jabref/jabref/badges/users.svg)](https://www.codetriage.com/jabref/jabref)
 [![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+JabRef is an open-source, cross-platform citation and reference management tool.
+
+Stay on top of your literature: JabRef helps you to collect and organize sources, find the paper you need and discover the latest research.
+![main table](https://www.jabref.org/img/JabRef-4-0-MainTable.png)
+### Features
+- 
 
 This version is a development version. Features may not work as expected.
 
