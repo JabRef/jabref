@@ -45,7 +45,7 @@ JabRef supports you every step of your research work.
 
 Nightly development builds are available at [builds.jabref.org](https://builds.jabref.org/master/).
 Features may not work as expected in this version.
-The [latest release is available via GitHub](https://github.com/JabRef/jabref/releases/latest).
+The [latest stable release is available via GitHub](https://github.com/JabRef/jabref/releases/latest).
 
 JabRef runs on any system equipped with the Java Virtual Machine (1.8 or newer), which can be downloaded at no cost from [Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
 From JabRef 4.0 onwards, [JavaFX] support has to be available.
@@ -74,6 +74,7 @@ Explanation of donation possibilities and usage of donations is available at our
 
 To get your code added to JabRef, just fork JabRef and create a pull request.
 For details see [CONTRIBUTING](CONTRIBUTING.md).
+We view pull requests as a collaborative process. Submit a pull request early to get feedback from the team on work in progress. We will discuss changes with you and agree to merge them once everyone approves.
 
 If you want a step-by-step walkthrough on how to set-up your workspace, please check [this guideline](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace)
 
