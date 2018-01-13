@@ -11,7 +11,40 @@ JabRef is an open-source, cross-platform citation and reference management tool.
 Stay on top of your literature: JabRef helps you to collect and organize sources, find the paper you need and discover the latest research.
 ![main table](https://www.jabref.org/img/JabRef-4-0-MainTable.png)
 ### Features
-- 
+JabRef is a cross-platform application that works on Windows, Linux and Mac OS X. It is available free of charge and is actively developed.
+
+JabRef supports you every step of your research work.
+#### Collect
+- Search across many online scientific catalogues like CiteSeer, CrossRef, Google Scholar, IEEEXplore, INSPIRE-HEP, Medline PubMed, MathSciNet, Springer, arXiv and zbMATH
+- Import options for over 15 reference formats
+- Easily retrieve and link full text articles
+- Fetch complete bibliographic information based on ISBN, DOI, PubMed-ID and arXiv-ID
+- Extract metadata from PDFs
+- [Firefox add-on](https://addons.mozilla.org/en-US/firefox/addon/jabfox/) lets you import new references directly from the browser with one click
+	
+#### Organize
+- Group your research into hierachical collections and organize research items based on keywords/tags, search terms or your own manual assignments
+- Advanced search and filter features
+- Complete and fix bibliographic data by comparing with curated online catalogues such as Google Scholar, Springer or MathsciNet
+- Customizable citation key generator
+- Customize and add new metadata fields or reference types
+- Find and merge duplicates
+- Attach related documents: 20 different kinds of documents supported out of the box, completely customizable and extendable
+- Automatically rename and moves associated documents according to customizable rules
+- Keep track of what you read: ranking, priority, printed, quality-assured 
+	
+#### Cite
+- Native [BibTeX] and [Biblatex] support
+- Cite-as-you-write functionality for external applications such as Emacs, Kile, LyX, Texmaker, TeXstudio, Vim and WinEdt.
+- Format refrences in one of more thousands built-in citation styles or create your own style
+- Support for Word and LibreOffice/OpenOffice to insert and format citations
+	
+#### Share
+- Many built-in export options or create your own export format
+- Library is saved as a simple text file and thus easy to share with others via Dropbox & co and is version-control friendly
+- Work in a team: sync the contents of your library with a SQL database
+
+
 
 This version is a development version. Features may not work as expected.
 
@@ -20,17 +53,6 @@ Development builds are available at [builds.jabref.org](https://builds.jabref.or
 Explanation of donation possibilities and usage of donations is available at our [donations page](https://donations.jabref.org).
 
 We use [install4j], the multi-platform installer builder.
-
-### Background
-
-JabRef is a graphical Java application for editing [BibTeX] and [Biblatex] `.bib` databases.
-JabRef lets you organize your entries into overlapping logical groups, and with a single click limit your view to a single group or an intersection or union of several groups.
-You can customize the entry information shown in the main window, and sort by any of the standard BibTeX fields.
-JabRef can autogenerate BibTeX keys for your entries.
-JabRef also lets you easily link to PDF or web sources for your reference entries.
-
-JabRef can import from and export to several formats, and you can customize export filters.
-JabRef can be run as a command line application to convert from any import format to any export format.
 
 * Homepage: <https://www.jabref.org>
 * Development page: <https://github.com/JabRef/jabref>
