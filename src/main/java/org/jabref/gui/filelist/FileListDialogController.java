@@ -1,7 +1,6 @@
 package org.jabref.gui.filelist;
 
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -18,6 +17,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.model.entry.LinkedFile;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,15 +36,21 @@ public class FileListDialogController extends AbstractController<FileListDialogV
 
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
-    @Inject private EnumSet<FileListDialogOptions> dialogoptions;
+    @Inject private FileListDialogOptionDependency dependency;
 
     @FXML
     private void initialize() {
-        viewModel = new FileListDialogViewModel(stateManager.getActiveDatabase().get(), dialogService);
+        viewModel = new FileListDialogViewModel(stateManager.getActiveDatabase().get(), dialogService, dependency.getDialogOptions());
         setBindings();
 
-        System.out.println(dialogoptions);
+        //TODO: is a bit too early I think
+        /*     this.getStage().getScene().addEventHandler(WindowEvent.WINDOW_SHOWING, event -> {
 
+            System.out.println("Window showing event");
+
+        });
+        System.out.println(dependency.getDialogOptions());
+        */
     }
 
     private void setBindings() {

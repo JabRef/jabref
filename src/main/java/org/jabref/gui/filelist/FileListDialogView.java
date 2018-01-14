@@ -16,7 +16,11 @@ import org.jabref.gui.FXDialog;
 public class FileListDialogView extends AbstractDialogView {
 
     public FileListDialogView(FileListDialogOptions... options) {
-        super(createContext(options));
+        this(getDeps(options));
+    }
+
+    public FileListDialogView(FileListDialogOptionDependency deps) {
+        super(createContext(deps));
     }
 
     @Override
@@ -33,14 +37,20 @@ public class FileListDialogView extends AbstractDialogView {
         return viewModel.isOkPressed();
     }
 
-    private static Function<String, Object> createContext(FileListDialogOptions... options) {
+    private static Function<String, Object> createContext(FileListDialogOptionDependency dependency) {
         Map<String, Object> context = new HashMap<>();
 
-        EnumSet<FileListDialogOptions> opt = EnumSet.noneOf(FileListDialogOptions.class);
-        opt.addAll(Arrays.asList(options));
         //The "keys" of the HashMap must have the same name as the with @inject annotated field in the controller
-        context.put("dialogoptions", opt);
+        context.put("dependency", dependency);
 
         return context::get;
+    }
+
+    private static FileListDialogOptionDependency getDeps(FileListDialogOptions... options) {
+        EnumSet<FileListDialogOptions> set = EnumSet.noneOf(FileListDialogOptions.class);
+        set.addAll(Arrays.asList(options));
+        FileListDialogOptionDependency deps = new FileListDialogOptionDependency();
+        deps.setDialogOptions(set);
+        return deps;
     }
 }

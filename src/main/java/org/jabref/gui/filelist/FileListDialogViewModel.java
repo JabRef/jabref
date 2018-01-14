@@ -2,6 +2,7 @@ package org.jabref.gui.filelist;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -37,9 +38,8 @@ public class FileListDialogViewModel extends AbstractViewModel {
     private final BibDatabaseContext bibDatabaseContext;
     private final DialogService dialogService;
 
-    private boolean showSaveDialog;
-
     private boolean okPressed;
+    private final EnumSet<FileListDialogOptions> dialogOptions;
 
     public boolean isOkPressed() {
         return okPressed;
@@ -49,8 +49,8 @@ public class FileListDialogViewModel extends AbstractViewModel {
         okPressed = true;
     }
 
-    public FileListDialogViewModel(BibDatabaseContext bibDatabaseContext, DialogService dialogService) {
-
+    public FileListDialogViewModel(BibDatabaseContext bibDatabaseContext, DialogService dialogService, EnumSet<FileListDialogOptions> dialogOptions) {
+        this.dialogOptions = dialogOptions;
         this.bibDatabaseContext = bibDatabaseContext;
         this.dialogService = dialogService;
         externalfilesTypes.set(FXCollections.observableArrayList(ExternalFileTypes.getInstance().getExternalFileTypeSelection()));
@@ -85,7 +85,7 @@ public class FileListDialogViewModel extends AbstractViewModel {
                 .withInitialFileName(fileName).build();
         Optional<Path> path;
 
-        if (showSaveDialog) {
+        if (dialogOptions.contains(FileListDialogOptions.SHOW_SAVE_BUTTON)) {
             path = dialogService.showFileSaveDialog(fileDialogConfiguration);
         } else {
             path = dialogService.showFileOpenDialog(fileDialogConfiguration);
