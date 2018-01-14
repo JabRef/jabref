@@ -54,7 +54,7 @@ Fresh development builds are available at [builds.jabref.org](https://builds.jab
 The [latest stable release is available at FossHub](https://www.fosshub.com/JabRef.html).
 
 JabRef runs on any system equipped with the Java Virtual Machine (1.8), which can be downloaded at no cost from [Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html). Note that Java 9 is currently not supported.
-From JabRef 4.0 onwards, [JavaFX] support has to be available.
+From JabRef 4.0 onwards, [JavaFX] support has to be installed.
  - Windows: JabRef offers an installer, which also adds a shortcut to JabRef to your start menu. Please also see our [Windows FAQ](https://help.jabref.org/en/FAQwindows)
  - Linux: Please see our [Installation Guide](http://help.jabref.org/en/Installation).
  - Mac OS X: Please see our [Mac OS X FAQ](https://help.jabref.org/en/FAQosx).
@@ -80,14 +80,14 @@ Explanation of donation possibilities and usage of donations is available at our
 [![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![OpenHub](https://www.openhub.net/p/jabref/widgets/project_thin_badge.gif)](https://www.openhub.net/p/jabref)
 
-Want to be part of a Free and Open Source project that tens of thousands scientist use every day?
+Want to be part of a free and open-source project that tens of thousands scientist use every day?
 Check out our [issue tracker](https://github.com/JabRef/jabref/issues) to find something to work on.
 You are also welcome to contribute new features.
 To get your code included into JabRef, just fork JabRef and create a pull request.
-For details see [CONTRIBUTING](CONTRIBUTING.md).
+For details have a look at our [guidelines for contributing](CONTRIBUTING.md).
 We view pull requests as a collaborative process.
 Submit a pull request early to get feedback from the team on work in progress.
-We will discuss improvements with you and agree to merge them once the [DEVELOPERS](https://github.com/JabRef/jabref/blob/master/DEVELOPERS) approve.
+We will discuss improvements with you and agree to merge them once the [developers](https://github.com/JabRef/jabref/blob/master/DEVELOPERS) approve.
 
 If you want a step-by-step walk-through on how to set-up your workspace, please check [this guideline](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace).
 
@@ -106,7 +106,7 @@ Sources for the integration test are kept in `src/integrationTest`.
 
 ## Acknowledgements
 
-We use [install4j], the multi-platform installer builder. We've got an [Open Source License](https://www.ej-technologies.com/buy/install4j/openSource).
+We use [install4j], the multi-platform installer builder. We've got an [open-source license](https://www.ej-technologies.com/buy/install4j/openSource).
 
 ## License
 
