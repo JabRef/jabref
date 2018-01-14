@@ -1,4 +1,4 @@
-# JabRef
+# JabRef Bibliography Management
 
 [![Build Status](https://travis-ci.org/JabRef/jabref.svg?branch=master)](https://travis-ci.org/JabRef/jabref)
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
@@ -8,10 +8,14 @@ JabRef is an open-source, cross-platform citation and reference management tool 
 
 Stay on top of your literature: JabRef helps you to collect and organize sources, find the paper you need and discover the latest research.
 ![main table](https://www.jabref.org/img/JabRef-4-0-MainTable.png)
+
 ## Features
+
 JabRef is a cross-platform application that works on Windows, Linux and Mac OS X. It is available free of charge and is actively developed.
 JabRef supports you every step of your research work.
+
 #### Collect
+
 - Search across many online scientific catalogues like CiteSeer, CrossRef, Google Scholar, IEEEXplore, INSPIRE-HEP, Medline PubMed, MathSciNet, Springer, arXiv and zbMATH
 - Import options for over 15 reference formats
 - Easily retrieve and link full text articles
@@ -20,7 +24,8 @@ JabRef supports you every step of your research work.
 - [Firefox add-on](https://addons.mozilla.org/en-US/firefox/addon/jabfox/) that lets you import new references directly from the browser with one click
 	
 #### Organize
-- Group your research into hierachical collections and organize research items based on keywords/tags, search terms or your own manual assignments
+
+- Group your research into hierarchical collections and organize research items based on keywords/tags, search terms or your own manual assignments
 - Advanced search and filter features
 - Complete and fix bibliographic data by comparing with curated online catalogues such as Google Scholar, Springer or MathsciNet
 - Customizable citation key generator
@@ -31,20 +36,21 @@ JabRef supports you every step of your research work.
 - Keep track of what you read: ranking, priority, printed, quality-assured 
 	
 #### Cite
+
 - Native [BibTeX] and [Biblatex] support
 - Cite-as-you-write functionality for external applications such as Emacs, Kile, LyX, Texmaker, TeXstudio, Vim and WinEdt.
-- Format refrences in one of more thousands built-in citation styles or create your own style
+- Format references in one of more thousands built-in citation styles or create your own style
 - Support for Word and LibreOffice/OpenOffice to insert and format citations
 	
 #### Share
+
 - Many built-in export options or create your own export format
-- Library is saved as a simple text file and thus easy to share with others via Dropbox & co and is version-control friendly
+- Library is saved as a simple text file and thus easy to share with others via Dropbox and is version-control friendly
 - Work in a team: sync the contents of your library with a SQL database
 
 ## Installation
 
-Nightly development builds are available at [builds.jabref.org](https://builds.jabref.org/master/).
-Features may not work as expected in this version.
+Fresh development builds are available at [builds.jabref.org](https://builds.jabref.org/master/).
 The [latest stable release is available at FossHub](https://www.fosshub.com/JabRef.html).
 
 JabRef runs on any system equipped with the Java Virtual Machine (1.8 or newer), which can be downloaded at no cost from [Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
@@ -58,6 +64,7 @@ Try to double click the `jar` file or execute the following command:
      `java -jar <path to jar>`
 
 ## Bug Reports, Suggestions, Other Feedback
+
 [![Donation](https://img.shields.io/badge/donate%20to-jabref-orange.svg)](https://donations.jabref.org)
 
 We are thankful for any bug reports or other feedback.
@@ -68,15 +75,21 @@ You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) 
 Explanation of donation possibilities and usage of donations is available at our [donations page](https://donations.jabref.org).
 
 ## Contributing
+
 [![Help Contribute to Open Source](https://www.codetriage.com/jabref/jabref/badges/users.svg)](https://www.codetriage.com/jabref/jabref)
 [![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![OpenHub](https://www.openhub.net/p/jabref/widgets/project_thin_badge.gif)](https://www.openhub.net/p/jabref)
 
-To get your code added to JabRef, just fork JabRef and create a pull request.
+Want to be part of a Free and Open Source project that tens of thousands scientist use every day?
+Check out our [issue tracker](https://github.com/JabRef/jabref/issues) to find something to work on.
+You are also welcome to contribute new features.
+To get your code included into JabRef, just fork JabRef and create a pull request.
 For details see [CONTRIBUTING](CONTRIBUTING.md).
-We view pull requests as a collaborative process. Submit a pull request early to get feedback from the team on work in progress. We will discuss changes with you and agree to merge them once everyone approves.
+We view pull requests as a collaborative process.
+Submit a pull request early to get feedback from the team on work in progress.
+We will discuss improvements with you and agree to merge them once the [DEVELOPERS](https://github.com/JabRef/jabref/blob/master/DEVELOPERS) approve.
 
-If you want a step-by-step walkthrough on how to set-up your workspace, please check [this guideline](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace)
+If you want a step-by-step walk-through on how to set-up your workspace, please check [this guideline](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace).
 
 To compile JabRef from source, you need a Java compiler supporting Java 1.8 and `JAVA_HOME` pointing to this JDK.
 You have to set `GRADLE_OPTS` to `-Dfile.encoding=UTF-8` as [gradle uses the JVM's platform encoding](https://discuss.gradle.org/t/is-there-a-way-to-tell-gradle-to-read-gradle-build-scripts-using-a-specified-encoding/7535).
@@ -91,10 +104,12 @@ If you want to test the UI, execute `gradlew integrationTest`.
 Sources for the integration test are kept in `src/integrationTest`.
 
 
-## Acknowlegments
+## Acknowledgements
+
 We use [install4j], the multi-platform installer builder. We've got an [Open Source License](https://www.ej-technologies.com/buy/install4j/openSource).
 
 ## License
+
 Since version 3.6, JabRef is licensed under the [MIT license](https://tldrlegal.com/license/mit-license).
 See the [LICENSE.md](LICENSE.md) for the full MIT license.
 
