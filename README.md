@@ -16,18 +16,18 @@ JabRef supports you every step of your research work.
 
 #### Collect
 
-- Search across many online scientific catalogues like CiteSeer, CrossRef, Google Scholar, IEEEXplore, INSPIRE-HEP, Medline PubMed, MathSciNet, Springer, arXiv and zbMATH
+- Search across many online scientific catalogues like CiteSeer, CrossRef, Google Scholar, IEEEXplore, INSPIRE-HEP, Medline PubMed, MathSciNet, Springer, arXiv, and zbMATH
 - Import options for over 15 reference formats
-- Easily retrieve and link full text articles
+- Easily retrieve and link full-text articles
 - Fetch complete bibliographic information based on ISBN, DOI, PubMed-ID and arXiv-ID
 - Extract metadata from PDFs
-- [Firefox add-on](https://addons.mozilla.org/en-US/firefox/addon/jabfox/) that lets you import new references directly from the browser with one click
+- [Firefox Add-on](https://addons.mozilla.org/en-US/firefox/addon/jabfox/) that lets you import new references directly from the browser with one click
 	
 #### Organize
 
 - Group your research into hierarchical collections and organize research items based on keywords/tags, search terms or your own manual assignments
 - Advanced search and filter features
-- Complete and fix bibliographic data by comparing with curated online catalogues such as Google Scholar, Springer or MathsciNet
+- Complete and fix bibliographic data by comparing with curated online catalogues such as Google Scholar, Springer or MathSciNet
 - Customizable citation key generator
 - Customize and add new metadata fields or reference types
 - Find and merge duplicates
@@ -39,7 +39,7 @@ JabRef supports you every step of your research work.
 
 - Native [BibTeX] and [Biblatex] support
 - Cite-as-you-write functionality for external applications such as Emacs, Kile, LyX, Texmaker, TeXstudio, Vim and WinEdt.
-- Format references in one of more thousands built-in citation styles or create your own style
+- Format references in one of the many thousand built-in citation styles or create your own style
 - Support for Word and LibreOffice/OpenOffice to insert and format citations
 	
 #### Share
@@ -69,7 +69,7 @@ Try to double click the `jar` file or execute the following command:
 
 We are thankful for any bug reports or other feedback.
 If you have ideas for new features you want to be included in JabRef, [tell us in our forum](http://discourse.jabref.org/c/features)!
-If you need support in using JabRef please read [the documentation](https://help.jabref.org/) first and have a look at our [community forum](http://discourse.jabref.org/c/help).
+If you need support in using JabRef, please read [the documentation](https://help.jabref.org/) first and have a look at our [community forum](http://discourse.jabref.org/c/help).
 You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) to send in bug reports.
 
 Explanation of donation possibilities and usage of donations is available at our [donations page](https://donations.jabref.org).
