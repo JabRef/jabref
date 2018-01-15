@@ -269,6 +269,7 @@ public class IconTheme {
         CONSOLE(MaterialDesignIcon.CONSOLE), /*css: console */
         FORUM(MaterialDesignIcon.FORUM), /* css: forum */
         FACEBOOK(MaterialDesignIcon.FACEBOOK), /* css: facebook */
+        TWITTER(MaterialDesignIcon.TWITTER), /* css: twitter */
         BLOG(MaterialDesignIcon.RSS), /* css: rss */
         GLOBAL_SEARCH(MaterialDesignIcon.EARTH), /* css: earth */
         DATE_PICKER(MaterialDesignIcon.CALENDAR), /* css: calendar */
