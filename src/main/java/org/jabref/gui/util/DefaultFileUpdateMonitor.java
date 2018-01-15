@@ -8,6 +8,9 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 
+import org.jabref.model.util.FileUpdateListener;
+import org.jabref.model.util.FileUpdateMonitor;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.commons.logging.Log;
@@ -19,8 +22,8 @@ import org.apache.commons.logging.LogFactory;
  *
  * Implementation based on https://stackoverflow.com/questions/16251273/can-i-watch-for-single-file-change-with-watchservice-not-the-whole-directory
  */
-public class FileUpdateMonitor implements Runnable {
-    private static final Log LOGGER = LogFactory.getLog(FileUpdateMonitor.class);
+public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
+    private static final Log LOGGER = LogFactory.getLog(DefaultFileUpdateMonitor.class);
 
     private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
     private WatchService watcher;
@@ -63,12 +66,7 @@ public class FileUpdateMonitor implements Runnable {
         listeners.get(path).forEach(FileUpdateListener::fileUpdated);
     }
 
-    /**
-     * Add a new file to monitor.
-     *
-     * @param file The file to monitor.
-     * @throws IOException if the file does not exist.
-     */
+    @Override
     public void addListenerForFile(Path file, FileUpdateListener listener) throws IOException {
         // We can't watch files directly, so monitor their parent directory for updates
         Path directory = file.toAbsolutePath().getParent();
@@ -77,11 +75,7 @@ public class FileUpdateMonitor implements Runnable {
         listeners.put(file, listener);
     }
 
-    /**
-     * Removes a listener from the monitor.
-     *
-     * @param path The path to remove.
-     */
+    @Override
     public void removeListener(Path path, FileUpdateListener listener) {
         listeners.remove(path, listener);
     }

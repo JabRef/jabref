@@ -1,12 +1,18 @@
 package org.jabref.logic.importer.util;
 
+import java.io.IOException;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
+import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.MetadataSerializationConfiguration;
 import org.jabref.logic.util.strings.QuotedStringTokenizer;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
@@ -19,6 +25,7 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.FileUpdateMonitor;
 
 /**
  * Converts string representation of groups to a parsed {@link GroupTreeNode}.
@@ -28,7 +35,7 @@ public class GroupsParser {
     private GroupsParser() {
     }
 
-    public static GroupTreeNode importGroups(List<String> orderedData, Character keywordSeparator)
+    public static GroupTreeNode importGroups(List<String> orderedData, Character keywordSeparator, FileUpdateMonitor fileMonitor)
             throws ParseException {
         try {
             GroupTreeNode cursor = null;
@@ -45,7 +52,7 @@ public class GroupsParser {
                     throw new ParseException("Expected \"" + string + "\" to contain whitespace");
                 }
                 int level = Integer.parseInt(string.substring(0, spaceIndex));
-                AbstractGroup group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator);
+                AbstractGroup group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator, fileMonitor);
                 GroupTreeNode newNode = GroupTreeNode.fromGroup(group);
                 if (cursor == null) {
                     // create new root
@@ -72,11 +79,12 @@ public class GroupsParser {
      * Re-create a group instance from a textual representation.
      *
      * @param s The result from the group's toString() method.
+     * @param fileMonitor
      * @return New instance of the encoded group.
      * @throws ParseException If an error occurred and a group could not be created,
      *                        e.g. due to a malformed regular expression.
      */
-    public static AbstractGroup fromString(String s, Character keywordSeparator)
+    public static AbstractGroup fromString(String s, Character keywordSeparator, FileUpdateMonitor fileMonitor)
             throws ParseException {
         if (s.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)) {
             return keywordGroupFromString(s, keywordSeparator);
@@ -100,22 +108,26 @@ public class GroupsParser {
             return automaticKeywordGroupFromString(s);
         }
         if (s.startsWith(MetadataSerializationConfiguration.TEX_GROUP_ID)) {
-            return texGroupFromString(s);
+            return texGroupFromString(s, fileMonitor);
         }
 
         throw new ParseException("Unknown group: " + s);
     }
 
-    private static AbstractGroup texGroupFromString(String string) {
+    private static AbstractGroup texGroupFromString(String string, FileUpdateMonitor fileMonitor) throws ParseException {
         QuotedStringTokenizer tok = new QuotedStringTokenizer(string.substring(MetadataSerializationConfiguration.TEX_GROUP_ID
                 .length()), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
 
         String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
         GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
-        String path = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
-        TexGroup newGroup = new TexGroup(name, context, path);
-        addGroupDetails(tok, newGroup);
-        return newGroup;
+        try {
+            Path path = Paths.get(tok.nextToken());
+            TexGroup newGroup = new TexGroup(name, context, path, new DefaultAuxParser(new BibDatabase()), fileMonitor);
+            addGroupDetails(tok, newGroup);
+            return newGroup;
+        } catch (InvalidPathException | IOException ex) {
+            throw new ParseException(ex);
+        }
     }
 
     private static AbstractGroup automaticPersonsGroupFromString(String string) {

@@ -181,7 +181,7 @@ public class AppendDatabaseAction implements BaseAction {
                 Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent().toString());
                 // Should this be done _after_ we know it was successfully opened?
                 ParserResult parserResult = OpenDatabase.loadDatabase(file.toFile(),
-                        Globals.prefs.getImportFormatPreferences());
+                        Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
                 AppendDatabaseAction.mergeFromBibtex(panel, parserResult, importEntries, importStrings, importGroups,
                         importSelectorWords);
                 panel.output(Localization.lang("Imported from library") + " '" + file + "'");

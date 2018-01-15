@@ -233,7 +233,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
             ParserResult result;
             result = OpenDatabase.loadDatabase(fileToLoad.toString(),
-                    Globals.prefs.getImportFormatPreferences());
+                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
 
             if (result.getDatabase().isShared()) {
                 try {

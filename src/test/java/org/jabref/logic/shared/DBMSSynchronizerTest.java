@@ -8,8 +8,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
@@ -17,12 +20,10 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DBMSType;
+import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.database.shared.DatabaseNotSupportedException;
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.testutils.category.DatabaseTest;
 
 import org.junit.jupiter.api.AfterEach;
@@ -56,7 +57,7 @@ public class DBMSSynchronizerTest {
 
         pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
 
-        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern);
+        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
         dbmsProcessor = DBMSProcessor.getProcessorInstance(dbmsConnection);
 
         bibDatabase.registerListener(dbmsSynchronizer);

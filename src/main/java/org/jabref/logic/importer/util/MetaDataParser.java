@@ -17,6 +17,7 @@ import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,21 +25,23 @@ import org.apache.commons.logging.LogFactory;
 public class MetaDataParser {
 
     private static final Log LOGGER = LogFactory.getLog(MetaDataParser.class);
+    private static FileUpdateMonitor fileMonitor;
 
-    private MetaDataParser() {
+    public MetaDataParser(FileUpdateMonitor fileMonitor) {
+        MetaDataParser.fileMonitor = fileMonitor;
     }
 
     /**
      * Parses the given data map and returns a new resulting {@link MetaData} instance.
      */
-    public static MetaData parse(Map<String, String> data, Character keywordSeparator) throws ParseException {
+    public MetaData parse(Map<String, String> data, Character keywordSeparator) throws ParseException {
         return parse(new MetaData(), data, keywordSeparator);
     }
 
     /**
      * Parses the data map and changes the given {@link MetaData} instance respectively.
      */
-    public static MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator) throws ParseException {
+    public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator) throws ParseException {
         List<String> defaultCiteKeyPattern = new ArrayList<>();
         Map<String, List<String>> nonDefaultCiteKeyPatterns = new HashMap<>();
 
@@ -62,7 +65,7 @@ public class MetaDataParser {
             switch (entry.getKey()) {
                 case MetaData.GROUPSTREE:
                 case MetaData.GROUPSTREE_LEGACY:
-                    metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator));
+                    metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator, fileMonitor));
                     break;
                 case MetaData.SAVE_ACTIONS:
                     metaData.setSaveActions(Cleanups.parse(value));

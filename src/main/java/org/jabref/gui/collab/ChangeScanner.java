@@ -123,11 +123,11 @@ public class ChangeScanner implements Runnable {
 
             // Parse the temporary file.
             ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
-            ParserResult result = OpenDatabase.loadDatabase(tempFile.toFile(), importFormatPreferences);
+            ParserResult result = OpenDatabase.loadDatabase(tempFile.toFile(), importFormatPreferences, Globals.getFileUpdateMonitor());
             databaseInTemp = result.getDatabaseContext();
 
             // Parse the modified file.
-            result = OpenDatabase.loadDatabase(file, importFormatPreferences);
+            result = OpenDatabase.loadDatabase(file, importFormatPreferences, Globals.getFileUpdateMonitor());
             BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
 
             // Start looking at changes.

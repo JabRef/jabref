@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
@@ -47,7 +48,7 @@ public class DiVA implements IdBasedParserFetcher {
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(importFormatPreferences);
+        return new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
     }
 
     public boolean isValidId(String identifier) {

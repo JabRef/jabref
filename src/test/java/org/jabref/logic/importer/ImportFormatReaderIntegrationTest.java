@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.xmp.XMPPreferences;
 
 import org.junit.Before;
@@ -41,12 +42,12 @@ public class ImportFormatReaderIntegrationTest {
         reader = new ImportFormatReader();
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
-        reader.resetImportFormats(importFormatPreferences, mock(XMPPreferences.class));
+        reader.resetImportFormats(importFormatPreferences, mock(XMPPreferences.class), new DummyFileUpdateMonitor());
     }
 
     @Test
     public void testImportUnknownFormat() throws Exception {
-        ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(file);
+        ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(file, new DummyFileUpdateMonitor());
         assertEquals(count, unknownFormat.parserResult.getDatabase().getEntryCount());
     }
 

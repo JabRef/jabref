@@ -16,6 +16,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -77,7 +78,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         String actualEntry = getRequiredValueBetween("<PRE>", "</PRE>", bibtexCitationHtml);
 
         try {
-            return BibtexParser.singleFromString(actualEntry, prefs);
+            return BibtexParser.singleFromString(actualEntry, prefs, new DummyFileUpdateMonitor());
         } catch (ParseException e) {
             throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"), e);
         }

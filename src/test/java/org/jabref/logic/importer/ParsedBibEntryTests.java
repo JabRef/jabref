@@ -2,7 +2,9 @@ package org.jabref.logic.importer;
 
 import java.util.Optional;
 
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,7 +17,7 @@ public class ParsedBibEntryTests {
 
 
     private ImportFormatPreferences importFormatPreferences;
-
+    private FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
     @Before
     public void setUp() {
@@ -27,27 +29,27 @@ public class ParsedBibEntryTests {
 
         Assert.assertEquals(Optional.of("2003-02"),
                 (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }",
-                        importFormatPreferences)).get().getPublicationDate());
+                        importFormatPreferences, fileMonitor)).get().getPublicationDate());
 
         Assert.assertEquals(Optional.of("2003-03"),
                 (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = 3 }",
-                        importFormatPreferences)).get().getPublicationDate());
+                        importFormatPreferences, fileMonitor)).get().getPublicationDate());
 
         Assert.assertEquals(Optional.of("2003"),
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}}", importFormatPreferences))
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}}", importFormatPreferences, fileMonitor))
                         .get().getPublicationDate());
 
         Assert.assertEquals(Optional.empty(),
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, month = 3 }", importFormatPreferences)).get()
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, month = 3 }", importFormatPreferences, fileMonitor)).get()
                         .getPublicationDate());
 
         Assert.assertEquals(Optional.empty(),
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, author={bla}}", importFormatPreferences))
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, author={bla}}", importFormatPreferences, fileMonitor))
                         .get().getPublicationDate());
 
         Assert.assertEquals(Optional.of("2003-12"),
                 (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #DEC# }",
-                        importFormatPreferences)).get().getPublicationDate());
+                        importFormatPreferences, fileMonitor)).get().getPublicationDate());
 
     }
 

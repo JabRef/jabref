@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Objects;
 
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.help.HelpFile;
@@ -32,7 +33,6 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
 
     public DBLPFetcher(ImportFormatPreferences importFormatPreferences) {
         Objects.requireNonNull(importFormatPreferences);
-
         this.importFormatPreferences = importFormatPreferences;
     }
 
@@ -50,7 +50,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(importFormatPreferences);
+        return new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
     }
 
     @Override

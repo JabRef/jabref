@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -71,7 +72,7 @@ public class ModsExportFormatTestFiles {
         charset = StandardCharsets.UTF_8;
         modsExportFormat = new ModsExporter();
         tempFile = testFolder.newFile();
-        bibtexImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        bibtexImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
         modsImporter = new ModsImporter();
     }
 

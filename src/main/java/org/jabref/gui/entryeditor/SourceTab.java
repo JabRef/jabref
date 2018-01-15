@@ -32,6 +32,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
@@ -51,8 +52,9 @@ public class SourceTab extends EntryEditorTab {
     private UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator(sourceIsValid);
+    private FileUpdateMonitor fileMonitor;
 
-    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, JabRefPreferences preferences) {
+    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, JabRefPreferences preferences, FileUpdateMonitor fileMonitor) {
         this.mode = bibDatabaseContext.getMode();
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
@@ -60,6 +62,7 @@ public class SourceTab extends EntryEditorTab {
         this.undoManager = undoManager;
         this.fieldFormatterPreferences = fieldFormatterPreferences;
         this.preferences = preferences;
+        this.fileMonitor = fileMonitor;
     }
 
     private static String getSourceString(BibEntry entry, BibDatabaseMode type, LatexFieldFormatterPreferences fieldFormatterPreferences) throws IOException {
@@ -119,7 +122,7 @@ public class SourceTab extends EntryEditorTab {
             return;
         }
 
-        BibtexParser bibtexParser = new BibtexParser(preferences.getImportFormatPreferences());
+        BibtexParser bibtexParser = new BibtexParser(preferences.getImportFormatPreferences(), fileMonitor);
         try {
             ParserResult parserResult = bibtexParser.parse(new StringReader(text));
             BibDatabase database = parserResult.getDatabase();

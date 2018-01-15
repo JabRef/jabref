@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -40,7 +41,7 @@ public class BibsonomyScraper {
 
             URL url = new URL(BibsonomyScraper.BIBSONOMY_SCRAPER + cleanURL + BibsonomyScraper.BIBSONOMY_SCRAPER_POST);
             String bibtex = new URLDownload(url).asString();
-            return BibtexParser.singleFromString(bibtex, importFormatPreferences);
+            return BibtexParser.singleFromString(bibtex, importFormatPreferences, new DummyFileUpdateMonitor());
         } catch (IOException ex) {
             LOGGER.warn("Could not download entry", ex);
             return Optional.empty();

@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jabref.JabRefMain;
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -139,7 +140,7 @@ public class OOBibStyleTest {
     @Test
     public void testGetCitationMarker() throws IOException {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile, StandardCharsets.UTF_8));
+        ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(Importer.getReader(testBibtexFile, StandardCharsets.UTF_8));
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
@@ -160,7 +161,7 @@ public class OOBibStyleTest {
     @Test
     public void testLayout() throws IOException {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile, StandardCharsets.UTF_8));
+        ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(Importer.getReader(testBibtexFile, StandardCharsets.UTF_8));
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
         BibDatabase db = result.getDatabase();

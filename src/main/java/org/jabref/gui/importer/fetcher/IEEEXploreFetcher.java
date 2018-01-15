@@ -148,7 +148,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             bibtexPage = preprocessBibtexResultsPage(bibtexPage);
 
             //parse the page into Bibtex entries
-            Collection<BibEntry> parsedBibtexCollection = new BibtexParser(Globals.prefs.getImportFormatPreferences())
+            Collection<BibEntry> parsedBibtexCollection = new BibtexParser(Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor())
                     .parseEntries(bibtexPage);
             int nEntries = parsedBibtexCollection.size();
             Iterator<BibEntry> parsedBibtexCollectionIterator = parsedBibtexCollection.iterator();

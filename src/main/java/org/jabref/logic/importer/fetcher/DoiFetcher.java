@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.help.HelpFile;
@@ -55,7 +56,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 String bibtexString = download.asString();
 
                 // BibTeX entry
-                Optional<BibEntry> fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences);
+                Optional<BibEntry> fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences, new DummyFileUpdateMonitor());
                 fetchedEntry.ifPresent(this::doPostCleanup);
                 return fetchedEntry;
             } else {

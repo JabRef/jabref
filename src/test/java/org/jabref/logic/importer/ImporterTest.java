@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.importer.fileformat.BibTeXMLImporter;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -105,7 +106,7 @@ public class ImporterTest {
         // @formatter:off
         return Arrays.asList(
                 new Object[]{new BiblioscapeImporter()},
-                new Object[]{new BibtexImporter(importFormatPreferences)},
+                new Object[]{new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor())},
                 new Object[]{new BibTeXMLImporter()},
                 new Object[]{new CopacImporter()},
                 new Object[]{new EndnoteImporter(importFormatPreferences)},

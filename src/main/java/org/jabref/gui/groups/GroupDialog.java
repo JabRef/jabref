@@ -7,6 +7,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -41,8 +43,10 @@ import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.TooltipTextUtil;
+import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.groups.AbstractGroup;
@@ -415,7 +419,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
                     }
                 } else if (texRadioButton.isSelected()) {
                     resultingGroup = new TexGroup(groupName, getContext(),
-                            texGroupFilePath.getText().trim());
+                            Paths.get(texGroupFilePath.getText().trim()), new DefaultAuxParser(new BibDatabase()), Globals.getFileUpdateMonitor());
                 }
                 try {
                     resultingGroup.setColor(Color.valueOf(colorField.getText()));
@@ -426,7 +430,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
                 resultingGroup.setIconName(iconField.getText());
 
                 dispose();
-            } catch (IllegalArgumentException exception) {
+            } catch (IllegalArgumentException | IOException exception) {
                 jabrefFrame.showMessage(exception.getLocalizedMessage());
             }
         });

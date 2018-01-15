@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.jabref.Globals;
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.StringSaveSession;
@@ -73,7 +74,7 @@ public class Benchmarks {
 
     @Benchmark
     public ParserResult parse() throws IOException {
-        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
+        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences(), new DummyFileUpdateMonitor());
         return parser.parse(new StringReader(bibtexString));
     }
 

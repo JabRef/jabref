@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.bst.VM.BstEntry;
 import org.jabref.logic.bst.VM.StackFunction;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -643,7 +644,7 @@ public class TestVM {
     }
 
     private static BibEntry bibtexString2BibtexEntry(String s) throws IOException {
-        ParserResult result = new BibtexParser(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS)).parse(new StringReader(s));
+        ParserResult result = new BibtexParser(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).parse(new StringReader(s));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
         return c.iterator().next();

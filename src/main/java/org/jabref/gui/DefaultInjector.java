@@ -4,7 +4,7 @@ import java.util.function.Function;
 
 import org.jabref.Globals;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.util.FileUpdateMonitor;
+import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.preferences.PreferencesService;
@@ -36,7 +36,7 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.journalAbbreviationLoader;
         } else if (clazz == StateManager.class) {
             return Globals.stateManager;
-        } else if (clazz == FileUpdateMonitor.class) {
+        } else if (clazz == DefaultFileUpdateMonitor.class) {
             return Globals.getFileUpdateMonitor();
         } else {
             try {

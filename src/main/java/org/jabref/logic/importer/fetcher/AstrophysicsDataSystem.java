@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
@@ -120,7 +121,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(preferences);
+        return new BibtexParser(preferences, new DummyFileUpdateMonitor());
     }
 
     @Override

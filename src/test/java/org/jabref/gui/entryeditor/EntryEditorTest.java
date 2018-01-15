@@ -7,6 +7,7 @@ import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -32,7 +33,7 @@ public class EntryEditorTest extends ApplicationTest {
         area = new CodeArea();
         area.appendText("some example\n text to go here\n across a couple of \n lines....");
         JabRefPreferences preferences = mock(JabRefPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), new LatexFieldFormatterPreferences(), preferences);
+        sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), new LatexFieldFormatterPreferences(), preferences, new DummyFileUpdateMonitor());
         pane = new TabPane(
                 new Tab("main area", area),
                 new Tab("other tab", new Label("some text")),

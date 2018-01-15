@@ -3,6 +3,7 @@ package org.jabref;
 import java.io.IOException;
 import java.io.StringReader;
 
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -25,7 +26,7 @@ public class BibtexTestData {
                         + "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n" + "  issn = {1526-5455},"
                         + "\n" + "  publisher = {INFORMS}\n" + "}";
 
-        BibtexParser parser = new BibtexParser(importFormatPreferences);
+        BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
         ParserResult result = parser.parse(new StringReader(article));
 
         return result.getDatabase();

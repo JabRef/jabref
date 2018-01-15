@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
@@ -92,7 +93,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
                     Collectors.joining(OS.NEWLINE));
 
             List<BibEntry> entries = new ArrayList<>();
-            BibtexParser bibtexParser = new BibtexParser(preferences);
+            BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
             Pattern pattern = Pattern.compile("<pre>(?s)(.*)</pre>");
             Matcher matcher = pattern.matcher(response);
             while (matcher.find()) {

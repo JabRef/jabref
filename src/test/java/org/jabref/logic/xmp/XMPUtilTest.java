@@ -29,6 +29,7 @@ import java.util.TimeZone;
 import javax.xml.transform.TransformerException;
 
 import org.jabref.cli.XMPUtilMain;
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
@@ -39,6 +40,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.io.CharStreams;
 import org.apache.jempbox.xmp.XMPMetadata;
@@ -67,6 +69,7 @@ import static org.mockito.Mockito.when;
  */
 public class XMPUtilTest {
 
+    private static final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
     /**
@@ -78,6 +81,7 @@ public class XMPUtilTest {
 
 
     private ImportFormatPreferences importFormatPreferences;
+
     /**
      * Wrap bibtex-data (<bibtex:author>...) into an rdf:Description.
      *
@@ -139,7 +143,7 @@ public class XMPUtilTest {
 
     private static BibEntry bibtexString2BibtexEntry(String s, ImportFormatPreferences importFormatPreferences)
             throws IOException {
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(s));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(s));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
         return c.iterator().next();
@@ -448,7 +452,7 @@ public class XMPUtilTest {
                         + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)}," + "\n"
                         + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29},"
                         + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"),
-                importFormatPreferences);
+                importFormatPreferences, fileMonitor);
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
@@ -726,7 +730,7 @@ public class XMPUtilTest {
                         + "\n" + "  booktitle = {<randomXML>}," + "\n" + "  year = {2005}," + "\n"
                         + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29}," + "\n"
                         + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"),
-                importFormatPreferences);
+                importFormatPreferences, fileMonitor);
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
@@ -773,7 +777,7 @@ public class XMPUtilTest {
         ParserResult result = BibtexParser
                 .parse(new StringReader("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
                         + "  title = {Title A}}\n" + "@inProceedings{foo," + "  author={Norton Bar}}"),
-                        importFormatPreferences);
+                        importFormatPreferences, fileMonitor);
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(2, c.size());
@@ -1047,7 +1051,7 @@ public class XMPUtilTest {
                         + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)},\n"
                         + "  year = {2005},\n" + "  owner = {oezbek},\n" + "  timestamp = {2006.05.29},\n"
                         + "  url = {http://james.howison.name/publications.html}}"),
-                importFormatPreferences);
+                importFormatPreferences, fileMonitor);
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
@@ -1139,7 +1143,7 @@ public class XMPUtilTest {
                 System.setOut(oldOut);
                 String bibtex = s.toString();
 
-                ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtex));
+                ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtex));
                 Collection<BibEntry> c = result.getDatabase().getEntries();
                 Assert.assertEquals(1, c.size());
                 BibEntry x = c.iterator().next();
@@ -1289,7 +1293,7 @@ public class XMPUtilTest {
                         + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)}," + "\n"
                         + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29},"
                         + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"),
-                        importFormatPreferences);
+                        importFormatPreferences, fileMonitor);
 
         Collection<BibEntry> c = original.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
@@ -1332,7 +1336,7 @@ public class XMPUtilTest {
 
         try (BufferedReader fr = Files.newBufferedReader(Paths.get("src/test/resources/org/jabref/util/twente.bib"),
                 StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(importFormatPreferences).parse(fr);
+            ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(fr);
 
             Assert.assertEquals("Arvind", result.getDatabase().resolveForStrings("#Arvind#"));
 

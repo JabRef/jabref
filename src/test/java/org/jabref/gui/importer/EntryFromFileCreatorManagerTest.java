@@ -2,13 +2,13 @@ package org.jabref.gui.importer;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.importer.ImportDataTest;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
@@ -47,10 +47,10 @@ public class EntryFromFileCreatorManagerTest {
 
     @Test
     @Ignore
-    public void testAddEntrysFromFiles() throws FileNotFoundException, IOException {
+    public void testAddEntrysFromFiles() throws IOException {
         try (FileInputStream stream = new FileInputStream(ImportDataTest.UNLINKED_FILES_TEST_BIB);
                 InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(mock(ImportFormatPreferences.class)).parse(reader);
+            ParserResult result = new BibtexParser(mock(ImportFormatPreferences.class), new DummyFileUpdateMonitor()).parse(reader);
             BibDatabase database = result.getDatabase();
 
             List<File> files = new ArrayList<>();

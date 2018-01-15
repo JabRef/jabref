@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
+import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
@@ -31,7 +32,7 @@ public abstract class AbstractIsbnFetcher implements IdBasedParserFetcher {
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(importFormatPreferences);
+        return new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
     }
 
 }
