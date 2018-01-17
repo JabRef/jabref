@@ -210,22 +210,27 @@ public class RisImporter extends Importer {
                             comment = comment + " ";
                         }
                         comment = comment + value;
-                    } else if ("ID".equals(tag)) {
-                        fields.put("refid", value);
-                    } else if ("M3".equals(tag) || "DO".equals(tag)) {
+                    }  else if ("M3".equals(tag) || "DO".equals(tag)) {
                         addDoi(fields, value);
+                    } else if ("C3".equals(tag)) {
+                        fields.put(FieldName.EVENTTITLE, value);
+                    } else if ("N1".equals(tag) || "RN".equals(tag)) {
+                        fields.put(FieldName.NOTE, value);
+                    } else if ("ST".equals(tag)) {
+                        fields.put(FieldName.SHORTTITLE, value);
+                    } else if ("C2".equals(tag)) {
+                        fields.put(FieldName.EPRINT, value);
+                        fields.put(FieldName.EPRINTTYPE, "pubmed");
+                    } else if ("TA".equals(tag)) {
+                        fields.put(FieldName.TRANSLATOR, value);
                     }
                     // fields for which there is no direct mapping in the bibtext standard
                     else if ("AV".equals(tag)) {
                         fields.put("archive_location", value);
-                    } else if ("C3".equals(tag)) {
-                        fields.put("event", value);
                     } else if ("CN".equals(tag) || "VO".equals(tag)) {
                         fields.put("call-number", value);
                     } else if ("DB".equals(tag)) {
                         fields.put("archive", value);
-                    } else if ("N1".equals(tag) || "RN".equals(tag)) {
-                        fields.put("note", value);
                     } else if ("NV".equals(tag)) {
                         fields.put("number-of-volumes", value);
                     } else if ("OP".equals(tag)) {
@@ -236,12 +241,8 @@ public class RisImporter extends Importer {
                         fields.put("status", value);
                     } else if ("SE".equals(tag)) {
                         fields.put("section", value);
-                    } else if ("ST".equals(tag)) {
-                        fields.put("shortTitle", value);
-                    } else if ("C2".equals(tag)) {
-                        fields.put("pubmed-identifier", value);
-                    } else if ("TA".equals(tag)) {
-                        fields.put("translator", value);
+                    } else if ("ID".equals(tag)) {
+                        fields.put("refid", value);
                     }
                 }
                 // fix authors
