@@ -1,5 +1,6 @@
 package org.jabref.gui.util;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import javafx.event.EventHandler;
@@ -7,7 +8,9 @@ import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
@@ -21,35 +24,50 @@ import org.jabref.model.strings.StringUtil;
  */
 public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, TableCell<S, T>> {
 
-    private Callback<T, String> toText;
-    private Callback<T, Node> toGraphic;
-    private Callback<T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
-    private Callback<T, String> toTooltip;
+    private Function<T, String> toText;
+    private BiFunction<S, T, Node> toGraphic;
+    private BiFunction<S, T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
+    private Function<T, String> toTooltip;
     private Function<T, ContextMenu> contextMenuFactory;
+    private BiFunction<S, T, ContextMenu> menuFactory;
 
-    public ValueTableCellFactory<S, T> withText(Callback<T, String> toText) {
+    public ValueTableCellFactory<S, T> withText(Function<T, String> toText) {
         this.toText = toText;
         return this;
     }
 
-    public ValueTableCellFactory<S, T> withGraphic(Callback<T, Node> toGraphic) {
+    public ValueTableCellFactory<S, T> withGraphic(Function<T, Node> toGraphic) {
+        this.toGraphic = (rowItem, value) -> toGraphic.apply(value);
+        return this;
+    }
+
+    public ValueTableCellFactory<S, T> withGraphic(BiFunction<S, T, Node> toGraphic) {
         this.toGraphic = toGraphic;
         return this;
     }
 
-    public ValueTableCellFactory<S, T> withTooltip(Callback<T, String> toTooltip) {
+    public ValueTableCellFactory<S, T> withTooltip(Function<T, String> toTooltip) {
         this.toTooltip = toTooltip;
         return this;
     }
 
-    public ValueTableCellFactory<S, T> withOnMouseClickedEvent(
-            Callback<T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent) {
+    public ValueTableCellFactory<S, T> withOnMouseClickedEvent(BiFunction<S, T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent) {
         this.toOnMouseClickedEvent = toOnMouseClickedEvent;
+        return this;
+    }
+
+    public ValueTableCellFactory<S, T> withOnMouseClickedEvent(Function<T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent) {
+        this.toOnMouseClickedEvent = (rowItem, value) -> toOnMouseClickedEvent.apply(value);
         return this;
     }
 
     public ValueTableCellFactory<S, T> withContextMenu(Function<T, ContextMenu> contextMenuFactory) {
         this.contextMenuFactory = contextMenuFactory;
+        return this;
+    }
+
+    public ValueTableCellFactory<S, T> withMenu(BiFunction<S, T, ContextMenu> menuFactory) {
+        this.menuFactory = menuFactory;
         return this;
     }
 
@@ -62,26 +80,28 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
             protected void updateItem(T item, boolean empty) {
                 super.updateItem(item, empty);
 
-                if (empty || (item == null)) {
+                if (empty || (item == null) || (getTableRow() == null) || (getTableRow().getItem() == null)) {
                     setText(null);
                     setGraphic(null);
                     setOnMouseClicked(null);
                     setTooltip(null);
                 } else {
+                    S rowItem = ((TableRow<S>) getTableRow()).getItem();
+
                     if (toText != null) {
-                        setText(toText.call(item));
+                        setText(toText.apply(item));
                     }
                     if (toGraphic != null) {
-                        setGraphic(toGraphic.call(item));
+                        setGraphic(toGraphic.apply(rowItem, item));
                     }
                     if (toTooltip != null) {
-                        String tooltipText = toTooltip.call(item);
+                        String tooltipText = toTooltip.apply(item);
                         if (StringUtil.isNotBlank(tooltipText)) {
                             setTooltip(new Tooltip(tooltipText));
                         }
                     }
                     if (toOnMouseClickedEvent != null) {
-                        setOnMouseClicked(toOnMouseClickedEvent.call(item));
+                        setOnMouseClicked(toOnMouseClickedEvent.apply(rowItem, item));
                     }
 
                     if (contextMenuFactory != null) {
@@ -94,8 +114,22 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                             event.consume();
                         });
                     }
+
+                    if (menuFactory != null) {
+                        setOnMouseClicked(event -> {
+                            if (event.getButton() == MouseButton.PRIMARY) {
+                                ContextMenu menu = menuFactory.apply(rowItem, item);
+                                menu.show(this, event.getScreenX(), event.getScreenY());
+                                event.consume();
+                            }
+                        });
+                    }
                 }
             }
         };
+    }
+
+    public void install(TableColumn<S, T> column) {
+        column.setCellFactory(this);
     }
 }

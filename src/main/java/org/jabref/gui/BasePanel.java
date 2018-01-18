@@ -638,26 +638,26 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         // Note that we can't put the number of entries that have been reverted into the undoText as the concrete number cannot be injected
         actions.put(new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getActionName(),
-                new SpecialFieldViewModel(SpecialField.RELEVANCE).getSpecialFieldAction(
+                new SpecialFieldViewModel(SpecialField.RELEVANCE, undoManager).getSpecialFieldAction(
                         SpecialField.RELEVANCE.getValues().get(0), frame));
         actions.put(new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getActionName(),
-                new SpecialFieldViewModel(SpecialField.QUALITY)
+                new SpecialFieldViewModel(SpecialField.QUALITY, undoManager)
                         .getSpecialFieldAction(SpecialField.QUALITY.getValues().get(0), frame));
         actions.put(new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getActionName(),
-                new SpecialFieldViewModel(SpecialField.PRINTED).getSpecialFieldAction(
+                new SpecialFieldViewModel(SpecialField.PRINTED, undoManager).getSpecialFieldAction(
                         SpecialField.PRINTED.getValues().get(0), frame));
 
         for (SpecialFieldValue prio : SpecialField.PRIORITY.getValues()) {
             actions.put(new SpecialFieldValueViewModel(prio).getActionName(),
-                    new SpecialFieldViewModel(SpecialField.PRIORITY).getSpecialFieldAction(prio, this.frame));
+                    new SpecialFieldViewModel(SpecialField.PRIORITY, undoManager).getSpecialFieldAction(prio, this.frame));
         }
         for (SpecialFieldValue rank : SpecialField.RANKING.getValues()) {
             actions.put(new SpecialFieldValueViewModel(rank).getActionName(),
-                    new SpecialFieldViewModel(SpecialField.RANKING).getSpecialFieldAction(rank, this.frame));
+                    new SpecialFieldViewModel(SpecialField.RANKING, undoManager).getSpecialFieldAction(rank, this.frame));
         }
         for (SpecialFieldValue status : SpecialField.READ_STATUS.getValues()) {
             actions.put(new SpecialFieldValueViewModel(status).getActionName(),
-                    new SpecialFieldViewModel(SpecialField.READ_STATUS).getSpecialFieldAction(status, this.frame));
+                    new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager).getSpecialFieldAction(status, this.frame));
         }
 
         actions.put(Actions.TOGGLE_PREVIEW, (BaseAction) () -> {

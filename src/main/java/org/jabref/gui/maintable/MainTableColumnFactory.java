@@ -7,10 +7,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.input.MouseButton;
 
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
@@ -19,8 +22,10 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
+import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.specialfields.SpecialField;
@@ -37,12 +42,14 @@ class MainTableColumnFactory {
     private final ExternalFileTypes externalFileTypes;
     private final BibDatabase database;
     private final CellFactory cellFactory;
+    private final UndoManager undoManager;
 
-    public MainTableColumnFactory(BibDatabase database, ColumnPreferences preferences, ExternalFileTypes externalFileTypes) {
+    public MainTableColumnFactory(BibDatabase database, ColumnPreferences preferences, ExternalFileTypes externalFileTypes, UndoManager undoManager) {
         this.database = Objects.requireNonNull(database);
         this.preferences = Objects.requireNonNull(preferences);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
-        this.cellFactory = new CellFactory(externalFileTypes);
+        this.cellFactory = new CellFactory(externalFileTypes, undoManager);
+        this.undoManager = undoManager;
     }
 
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
@@ -98,67 +105,54 @@ class MainTableColumnFactory {
 
     private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(SpecialField specialField) {
         TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> column = new TableColumn<>();
-        SpecialFieldViewModel specialFieldViewModel = new SpecialFieldViewModel(specialField);
+        SpecialFieldViewModel specialFieldViewModel = new SpecialFieldViewModel(specialField, undoManager);
         column.setGraphic(specialFieldViewModel.getIcon().getGraphicNode());
         column.getStyleClass().add(STYLE_ICON);
         if (specialField == SpecialField.RANKING) {
             setExactWidth(column, GUIGlobals.WIDTH_ICON_COL_RANKING);
-            column.setCellFactory(
-                    new ValueTableCellFactory<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>>()
-                            .withGraphic(value -> value.map(this::createRating).orElse(null))
-            );
+            new OptionalValueTableCellFactory<BibEntryTableViewModel, SpecialFieldValueViewModel>()
+                    .withGraphicIfPresent(this::createRating)
+                    .install(column);
         } else {
             setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
 
             if (specialField.isSingleValueField()) {
-                column.setCellFactory(
-                        new ValueTableCellFactory<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>>()
-                                .withGraphic(value -> createSpecialFieldIcon(value, specialFieldViewModel))
-                );
+                new OptionalValueTableCellFactory<BibEntryTableViewModel, SpecialFieldValueViewModel>()
+                        .withGraphic((entry, value) -> createSpecialFieldIcon(value, specialFieldViewModel))
+                        .withOnMouseClickedEvent((entry, value) -> event -> {
+                            if (event.getButton() == MouseButton.PRIMARY) {
+                                specialFieldViewModel.toggle(entry.getEntry());
+                            }
+                        })
+                        .install(column);
             } else {
-                column.setCellFactory(
-                        new ValueTableCellFactory<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>>()
-                                .withGraphic(value -> createSpecialFieldIcon(value, specialFieldViewModel))
-                                .withContextMenu(value -> createSpecialFieldContextMenu(specialFieldViewModel))
-                );
+                new OptionalValueTableCellFactory<BibEntryTableViewModel, SpecialFieldValueViewModel>()
+                        .withGraphic((entry, value) -> createSpecialFieldIcon(value, specialFieldViewModel))
+                        .withMenu((entry, value) -> createSpecialFieldMenu(entry.getEntry(), specialFieldViewModel))
+                        .install(column);
             }
         }
         column.setCellValueFactory(cellData -> cellData.getValue().getSpecialField(specialField));
 
-
         return column;
     }
 
-    private Rating createRating(SpecialFieldValueViewModel value) {
+    private Rating createRating(BibEntryTableViewModel entry, SpecialFieldValueViewModel value) {
         Rating ranking = new Rating();
-        ranking.setRating(toRating(value.getValue()));
-        EasyBind.subscribe(ranking.ratingProperty(), rating -> {
-        });
+        ranking.setRating(value.getValue().toRating());
+        EasyBind.subscribe(ranking.ratingProperty(), rating ->
+                new SpecialFieldViewModel(SpecialField.RANKING, undoManager).setSpecialFieldValue(entry.getEntry(), SpecialFieldValue.getRating(rating.intValue()))
+        );
         return ranking;
     }
 
-    private int toRating(SpecialFieldValue ranking) {
-        switch (ranking) {
-            case RANK_1:
-                return 1;
-            case RANK_2:
-                return 2;
-            case RANK_3:
-                return 3;
-            case RANK_4:
-                return 4;
-            case RANK_5:
-                return 5;
-            default:
-                throw new UnsupportedOperationException(ranking + "is not a valid ranking");
-        }
-    }
-
-    private ContextMenu createSpecialFieldContextMenu(SpecialFieldViewModel specialField) {
+    private ContextMenu createSpecialFieldMenu(BibEntry entry, SpecialFieldViewModel specialField) {
         ContextMenu contextMenu = new ContextMenu();
 
         for (SpecialFieldValueViewModel value : specialField.getValues()) {
-            contextMenu.getItems().add(new MenuItem(value.getMenuString(), value.getIcon().map(JabRefIcon::getGraphicNode).orElse(null)));
+            MenuItem menuItem = new MenuItem(value.getMenuString(), value.getIcon().map(JabRefIcon::getGraphicNode).orElse(null));
+            menuItem.setOnAction(event -> specialField.setSpecialFieldValue(entry, value.getValue()));
+            contextMenu.getItems().add(menuItem);
         }
 
         return contextMenu;
@@ -187,9 +181,9 @@ class MainTableColumnFactory {
         column.getStyleClass().add(STYLE_ICON);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
-        column.setCellFactory(
                 new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
-                        .withGraphic(this::createFileIcon));
+                        .withGraphic(this::createFileIcon)
+                        .install(column);
         return column;
     }
 
@@ -202,9 +196,9 @@ class MainTableColumnFactory {
         column.getStyleClass().add(STYLE_ICON);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(firstField)).orElse(cellData.getValue().getField(secondField)));
-        column.setCellFactory(
                 new ValueTableCellFactory<BibEntryTableViewModel, String>()
-                        .withGraphic(cellFactory::getTableIcon));
+                        .withGraphic(cellFactory::getTableIcon)
+                        .install(column);
         return column;
     }
 
@@ -214,9 +208,9 @@ class MainTableColumnFactory {
         column.getStyleClass().add(STYLE_ICON);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> cellData.getValue().getField(field));
-        column.setCellFactory(
                 new ValueTableCellFactory<BibEntryTableViewModel, String>()
-                        .withGraphic(cellFactory::getTableIcon));
+                        .withGraphic(cellFactory::getTableIcon)
+                        .install(column);
         return column;
     }
 
@@ -234,9 +228,9 @@ class MainTableColumnFactory {
         column.getStyleClass().add(STYLE_ICON);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
-        column.setCellFactory(
                 new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
-                        .withGraphic(linkedFiles -> createFileIcon(linkedFiles.stream().filter(linkedFile -> linkedFile.getFileType().equalsIgnoreCase(externalFileTypeName)).collect(Collectors.toList()))));
+                        .withGraphic(linkedFiles -> createFileIcon(linkedFiles.stream().filter(linkedFile -> linkedFile.getFileType().equalsIgnoreCase(externalFileTypeName)).collect(Collectors.toList())))
+                        .install(column);
 
         return column;
     }
