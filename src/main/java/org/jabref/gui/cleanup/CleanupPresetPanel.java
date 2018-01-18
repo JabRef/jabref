@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -74,6 +75,9 @@ public class CleanupPresetPanel {
                 "Convert to biblatex format (for example, move the value of the 'journal' field to 'journaltitle')"));
         cleanUpBibtex = new JCheckBox(Localization.lang(
                 "Convert to BibTeX format (for example, move the value of the 'journaltitle' field to 'journal')"));
+        ButtonGroup biblatexConversion = new ButtonGroup(); // Only make "to Biblatex" or "to BibTeX" selectable
+        biblatexConversion.add(cleanUpBiblatex);
+        biblatexConversion.add(cleanUpBibtex);
 
         cleanUpFormatters = new FieldFormatterCleanupsPanel(Localization.lang("Run field formatter:"),
                 Cleanups.DEFAULT_SAVE_ACTIONS);
