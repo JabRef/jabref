@@ -79,7 +79,7 @@ For more details refer to the [field mapping help page](http://help.jabref.org/e
 ## [4.1] - 2017-12-23
 
 ### Changed
-- We added bracketed expresion support for file search patterns, import file name patterns and file directory patters, in addition to bibtexkey patterns.
+- We added bracketed expression support for file search patterns, import file name patterns and file directory patters, in addition to bibtexkey patterns.
 - We added support for `[entrytype]` bracketed expression.
 - Updated French translation
 - We improved the handling of abstracts in the "Astrophysics Data System" fetcher. [#2471](https://github.com/JabRef/jabref/issues/2471)
