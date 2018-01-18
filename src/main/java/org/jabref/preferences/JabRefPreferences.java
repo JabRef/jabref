@@ -583,7 +583,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(MERGE_ENTRIES_DIFF_MODE, 2);
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
-        defaults.put(VALIDATE_IN_ENTRY_EDITOR, Boolean.FALSE);
+        defaults.put(VALIDATE_IN_ENTRY_EDITOR, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
@@ -909,12 +909,13 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private static void insertDefaultCleanupPreset(Map<String, Object> storage) {
-        EnumSet<CleanupPreset.CleanupStep> deactivedJobs = EnumSet.of(
+        EnumSet<CleanupPreset.CleanupStep> deactivatedJobs = EnumSet.of(
                 CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
+                CleanupPreset.CleanupStep.MOVE_PDF,
                 CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
                 CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
 
-        CleanupPreset preset = new CleanupPreset(EnumSet.complementOf(deactivedJobs), Cleanups.DEFAULT_SAVE_ACTIONS);
+        CleanupPreset preset = new CleanupPreset(EnumSet.complementOf(deactivatedJobs), Cleanups.DEFAULT_SAVE_ACTIONS);
 
         storage.put(CLEANUP_DOI, preset.isCleanUpDOI());
         storage.put(CLEANUP_ISSN, preset.isCleanUpISSN());

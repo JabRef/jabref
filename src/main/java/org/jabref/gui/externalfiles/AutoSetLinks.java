@@ -3,6 +3,8 @@ package org.jabref.gui.externalfiles;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +30,12 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class AutoSetLinks {
+
+    private static final Log LOGGER = LogFactory.getLog(AutoSetLinks.class);
 
     private AutoSetLinks() {
     }
@@ -86,7 +93,12 @@ public class AutoSetLinks {
 
             for (BibEntry entry : entries) {
 
-                List<LinkedFile> linkedFiles = util.findAssociatedNotLinkedFiles(entry);
+                List<LinkedFile> linkedFiles = new ArrayList<>();
+                try {
+                    linkedFiles = util.findAssociatedNotLinkedFiles(entry);
+                } catch (IOException e) {
+                    LOGGER.error(e);
+                }
 
                 if (ce != null) {
                     for (LinkedFile linkedFile : linkedFiles) {

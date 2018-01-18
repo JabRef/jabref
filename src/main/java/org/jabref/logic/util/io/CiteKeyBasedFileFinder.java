@@ -1,6 +1,7 @@
 package org.jabref.logic.util.io;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -20,12 +21,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 class CiteKeyBasedFileFinder implements FileFinder {
 
-    private static final Log LOGGER = LogFactory.getLog(CiteKeyBasedFileFinder.class);
     private final boolean exactKeyOnly;
 
     CiteKeyBasedFileFinder(boolean exactKeyOnly) {
@@ -33,7 +30,7 @@ class CiteKeyBasedFileFinder implements FileFinder {
     }
 
     @Override
-    public List<Path> findAssociatedFiles(BibEntry entry, List<Path> directories, List<String> extensions) {
+    public List<Path> findAssociatedFiles(BibEntry entry, List<Path> directories, List<String> extensions) throws IOException {
         Objects.requireNonNull(directories);
         Objects.requireNonNull(entry);
 
@@ -60,7 +57,7 @@ class CiteKeyBasedFileFinder implements FileFinder {
             }
             // If we get here, we did not find any exact matches. If non-exact matches are allowed, try to find one
             if (!exactKeyOnly && matches(name, citeKey)) {
-                    result.add(file);
+                result.add(file);
             }
         }
 
@@ -81,20 +78,19 @@ class CiteKeyBasedFileFinder implements FileFinder {
     /**
      * Returns a list of all files in the given directories which have one of the given extension.
      */
-    private Set<Path> findFilesByExtension(List<Path> directories, List<String> extensions) {
+    private Set<Path> findFilesByExtension(List<Path> directories, List<String> extensions) throws IOException {
         Objects.requireNonNull(extensions, "Extensions must not be null!");
 
-        BiPredicate<Path, BasicFileAttributes> isFileWithCorrectExtension = (path, attributes) ->
-                !Files.isDirectory(path)
-                        && extensions.contains(FileHelper.getFileExtension(path).orElse(""));
+        BiPredicate<Path, BasicFileAttributes> isFileWithCorrectExtension = (path, attributes) -> !Files.isDirectory(path)
+                && extensions.contains(FileHelper.getFileExtension(path).orElse(""));
 
         Set<Path> result = new HashSet<>();
         for (Path directory : directories) {
             if (Files.exists(directory)) {
-                try (Stream<Path> files = Files.find(directory, Integer.MAX_VALUE, isFileWithCorrectExtension)) {
-                    result.addAll(files.collect(Collectors.toSet()));
-                } catch (IOException e) {
-                    LOGGER.error("Problem in finding files", e);
+                try (Stream<Path> pathStream = Files.find(directory, Integer.MAX_VALUE, isFileWithCorrectExtension)) {
+                    result.addAll(pathStream.collect(Collectors.toSet()));
+                } catch (UncheckedIOException e) {
+                    throw new IOException("Problem in finding files", e);
                 }
             }
         }
