@@ -133,7 +133,7 @@ dependencies {
     compile 'org.fxmisc.richtext:richtextfx:0.8.1'
 
     // Cannot be updated to 9.*.* until Jabref works with Java 9
-    compile 'org.controlsfx:controlsfx:8.40.14'
+    compile 'org.controlsfx:controlsfx:8.40.15-SNAPSHOT'
 
     compile 'org.jsoup:jsoup:1.11.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
@@ -161,7 +161,7 @@ dependencies {
     testRuntime 'org.apache.logging.log4j:log4j-core:2.10.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.10.0'
     testCompile 'org.mockito:mockito-core:2.13.0'
-    testCompile 'com.github.tomakehurst:wiremock:2.13.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.14.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.5.1'
@@ -504,7 +504,7 @@ task releaseJar(dependsOn: "shadowJar") {
             }
         }
         // set executable with read permissions (first true) and for all (false)
-        file("$buildDir/releases/JabRef-${project.version}.jar").setExecutable(true, false);
+        file("$buildDir/releases/JabRef-${project.version}.jar").setExecutable(true, false)
     }
 }
 

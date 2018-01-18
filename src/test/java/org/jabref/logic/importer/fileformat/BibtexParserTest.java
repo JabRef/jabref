@@ -27,6 +27,7 @@ import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.Date;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.groups.AllEntriesGroup;
@@ -1760,5 +1761,23 @@ public class BibtexParserTest {
         ParserResult result = parser.parse(new StringReader(""));
         assertFalse(result.hasWarnings());
         assertEquals(Optional.empty(), result.getDatabase().getPreamble());
+    }
+
+    @Test
+    public void parseYearWithMonthString() throws Exception {
+        Optional<BibEntry> result = parser.parseSingleEntry("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }");
+        assertEquals(new Date(2003, 2), result.get().getPublicationDate().get());
+    }
+
+    @Test
+    public void parseYearWithMonthNumber() throws Exception {
+        Optional<BibEntry> result = parser.parseSingleEntry("@ARTICLE{HipKro03, year = {2003}, month = 2 }");
+        assertEquals(new Date(2003, 2), result.get().getPublicationDate().get());
+    }
+
+    @Test
+    public void parseYear() throws Exception {
+        Optional<BibEntry> result = parser.parseSingleEntry("@ARTICLE{HipKro03, year = {2003} }");
+        assertEquals(new Date(2003), result.get().getPublicationDate().get());
     }
 }

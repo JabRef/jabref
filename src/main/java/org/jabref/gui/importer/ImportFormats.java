@@ -75,7 +75,6 @@ public class ImportFormats {
                 FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                         .addExtensionFilter(allImports)
                         .addExtensionFilters(extensions)
-                        .withDefaultExtension(allImports)
                         .withInitialDirectory(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY))
                         .build();
                 DialogService dialogService = new FXDialogService();

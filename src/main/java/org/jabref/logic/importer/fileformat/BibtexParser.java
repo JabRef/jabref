@@ -127,6 +127,10 @@ public class BibtexParser implements Parser {
         return parseEntries(new StringReader(bibtexString));
     }
 
+    public Optional<BibEntry> parseSingleEntry(String bibtexString) throws ParseException {
+        return parseEntries(bibtexString).stream().findFirst();
+    }
+
     /**
      * Will parse the BibTex-Data found when reading from reader. Ignores any encoding supplied in the file by
      * "Encoding: myEncoding".
