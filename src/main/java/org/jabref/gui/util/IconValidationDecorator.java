@@ -39,7 +39,7 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
         return IconTheme.JabRefIcon.WARNING.getGraphicNode();
     }
 
-    private Node createDecorationNode(ValidationMessage message) {
+    public Node createDecorationNode(ValidationMessage message) {
         Node graphic = Severity.ERROR == message.getSeverity() ? createErrorNode() : createWarningNode();
         graphic.getStyleClass().add(Severity.ERROR == message.getSeverity() ? "error-icon" : "warning-icon");
         Label label = new Label();

@@ -84,10 +84,24 @@ because <additional rationale>.
 ### When adding a new Localization.lang entry
 Add new `Localization.lang("KEY")` to Java file.
 Tests fail. In the test output a snippet is generated which must be added to the English translation file.
+
+Example:
+
+```
+java.lang.AssertionError: DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE
+PASTE THESE INTO THE ENGLISH LANGUAGE FILE
+[
+Opens\ JabRef's\ Twitter\ page=Opens JabRef's Twitter page
+]
+Expected :[]
+Actual   :[Opens\ JabRef's\ Twitter\ page (src\main\java\org\jabref\gui\JabRefFrame.java LANG)]
+```
+
 Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`.
 [Crowdin](http://translate.jabref.org/) will automatically pick up the new string and add it to the other translations.
 
-You can also directly run the specific test in your IDE. The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java`
+You can also directly run the specific test in your IDE.
+The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java`
 Find more information in the [JabRef Wiki](https://github.com/JabRef/jabref/wiki/Code-Howtos#using-localization-correctly).
 
 
