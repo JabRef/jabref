@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
@@ -24,6 +23,7 @@ import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.DatabaseTest;
 
 import org.junit.jupiter.api.AfterEach;

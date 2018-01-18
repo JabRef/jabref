@@ -1,14 +1,11 @@
-package org.jabref.gui.util;
+package org.jabref.model.util;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-import org.jabref.model.util.FileUpdateListener;
-import org.jabref.model.util.FileUpdateMonitor;
-
 /**
  * This {@link FileUpdateMonitor} does nothing.
- * Normally, you want to use {@link DefaultFileUpdateMonitor} except if you don't care about updates.
+ * Normally, you want to use {@link org.jabref.gui.util.DefaultFileUpdateMonitor} except if you don't care about updates.
  */
 public class DummyFileUpdateMonitor implements FileUpdateMonitor {
     @Override

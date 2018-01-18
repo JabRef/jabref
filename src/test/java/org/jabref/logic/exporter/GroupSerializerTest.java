@@ -7,7 +7,6 @@ import java.util.List;
 
 import javafx.scene.paint.Color;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.groups.AllEntriesGroup;
@@ -23,6 +22,7 @@ import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Before;
 import org.junit.Test;

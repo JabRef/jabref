@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Before;
 import org.junit.Rule;

@@ -7,10 +7,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Assert;
 import org.junit.Before;

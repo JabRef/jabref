@@ -16,7 +16,6 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -26,6 +25,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;

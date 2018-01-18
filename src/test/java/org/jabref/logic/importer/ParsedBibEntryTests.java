@@ -2,8 +2,8 @@ package org.jabref.logic.importer;
 
 import java.util.Optional;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.Assert;

@@ -12,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
@@ -27,6 +26,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 

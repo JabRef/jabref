@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.help.HelpFile;
@@ -22,6 +21,7 @@ import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     public static final String NAME = "DOI";

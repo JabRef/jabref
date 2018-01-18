@@ -9,9 +9,9 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Optional;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.Assert;

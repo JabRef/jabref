@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Before;
 import org.junit.Test;

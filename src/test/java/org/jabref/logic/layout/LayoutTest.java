@@ -6,12 +6,12 @@ import java.io.StringReader;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Assert;
 import org.junit.Before;

@@ -8,10 +8,10 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Before;
 import org.junit.Test;

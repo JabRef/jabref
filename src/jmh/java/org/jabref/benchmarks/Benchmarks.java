@@ -7,7 +7,6 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.jabref.Globals;
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.StringSaveSession;
@@ -28,6 +27,7 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.openjdk.jmh.Main;

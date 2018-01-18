@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.importer.fileformat.BibTeXMLImporter;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -26,6 +25,7 @@ import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import org.jabref.logic.xmp.XMPPreferences;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Assert;
 import org.junit.Test;

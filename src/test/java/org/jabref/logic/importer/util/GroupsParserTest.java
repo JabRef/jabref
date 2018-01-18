@@ -6,7 +6,6 @@ import java.util.List;
 
 import javafx.scene.paint.Color;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.database.BibDatabase;
@@ -18,6 +17,7 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.TexGroup;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.Before;

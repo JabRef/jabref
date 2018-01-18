@@ -9,13 +9,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.auxparser.AuxParser;
 import org.jabref.model.auxparser.AuxParserResult;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.After;
 import org.junit.Before;

@@ -3,7 +3,6 @@ package org.jabref.logic.shared;
 import java.sql.SQLException;
 import java.util.Collection;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.model.Defaults;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -12,6 +11,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.DatabaseTest;
 
 import org.junit.jupiter.api.AfterEach;

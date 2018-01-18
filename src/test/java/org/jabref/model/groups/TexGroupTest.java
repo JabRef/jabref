@@ -3,11 +3,11 @@ package org.jabref.model.groups;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.auxparser.AuxParserTest;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Test;
 

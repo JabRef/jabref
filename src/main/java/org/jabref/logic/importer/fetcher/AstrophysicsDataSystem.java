@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
@@ -30,6 +29,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.helper.StringUtil;

@@ -7,10 +7,10 @@ import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.fxmisc.richtext.CodeArea;

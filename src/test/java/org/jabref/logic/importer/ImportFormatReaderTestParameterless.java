@@ -4,8 +4,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.xmp.XMPPreferences;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.Before;

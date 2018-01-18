@@ -12,12 +12,12 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Assert;
 import org.mockito.Answers;

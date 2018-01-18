@@ -8,8 +8,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.xmp.XMPPreferences;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Before;
 import org.junit.Test;

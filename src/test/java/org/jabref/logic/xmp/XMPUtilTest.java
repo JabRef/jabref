@@ -29,7 +29,6 @@ import java.util.TimeZone;
 import javax.xml.transform.TransformerException;
 
 import org.jabref.cli.XMPUtilMain;
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
@@ -40,6 +39,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.io.CharStreams;

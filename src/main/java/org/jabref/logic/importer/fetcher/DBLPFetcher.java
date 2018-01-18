@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Objects;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.help.HelpFile;
@@ -17,6 +16,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 

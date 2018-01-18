@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Scanner;
 
-import org.jabref.gui.util.DummyFileUpdateMonitor;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
@@ -36,6 +35,7 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.Before;
