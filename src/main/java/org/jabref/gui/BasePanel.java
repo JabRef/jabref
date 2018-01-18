@@ -157,7 +157,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     // The undo manager.
     private final UndoAction undoAction = new UndoAction();
     private final RedoAction redoAction = new RedoAction();
-    private final CountingUndoManager undoManager = new CountingUndoManager();
+    private final CountingUndoManager undoManager;
     private final List<BibEntry> previousEntries = new ArrayList<>();
     private final List<BibEntry> nextEntries = new ArrayList<>();
     // Keeps track of the string dialog if it is open.
@@ -202,6 +202,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         this.frame = Objects.requireNonNull(frame);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
+        this.undoManager = frame.getUndoManager();
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
