@@ -88,6 +88,7 @@ For more details refer to the [field mapping help page](http://help.jabref.org/e
 - We increased the relative size of the "abstract" field in the entry editor. [Feature request in the forum](http://discourse.jabref.org/t/entry-preview-in-version-4/827)
 - Crossreferenced entries are now used when a BibTex key is generated for an entry with empty fields. [#2811](https://github.com/JabRef/jabref/issues/2811)
 - We now set the `WM_CLASS` of the UI to org-jabref-JabRefMain to allow certain Un*x window managers to properly identify its windows
+- We added an option to convert entries in the biblatex format to BibTeX so that you can again collaborate with these nostalgic diehards. [Feature request in the forum](http://discourse.jabref.org/t/convert-back-from-biblatex-to-bib/)
 - We changed the default paths for the OpenOffice/LibreOffice binaries to the default path for LibreOffice
 - File annotation tab now removes newlines and hyphens before newlines from content and displays an empty String instead of N/A if no contents are found. [#3280](https://github.com/JabRef/jabref/issues/3280)
 - We moved the groups field from the "Other fields" tab to "General" (you may have to reset your editor preferences under Options > Set up general fields)
