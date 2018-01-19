@@ -15,16 +15,18 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.input.MouseButton;
 
+import org.jabref.Globals;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefIcon;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.ValueTableCellFactory;
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
@@ -40,11 +42,11 @@ class MainTableColumnFactory {
 
     private final ColumnPreferences preferences;
     private final ExternalFileTypes externalFileTypes;
-    private final BibDatabase database;
+    private final BibDatabaseContext database;
     private final CellFactory cellFactory;
     private final UndoManager undoManager;
 
-    public MainTableColumnFactory(BibDatabase database, ColumnPreferences preferences, ExternalFileTypes externalFileTypes, UndoManager undoManager) {
+    public MainTableColumnFactory(BibDatabaseContext database, ColumnPreferences preferences, ExternalFileTypes externalFileTypes, UndoManager undoManager) {
         this.database = Objects.requireNonNull(database);
         this.preferences = Objects.requireNonNull(preferences);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
@@ -96,7 +98,7 @@ class MainTableColumnFactory {
             // Stored column name will be used as header
             // There might be more than one field to display, e.g., "author/editor" or "date/year" - so split
             String[] fields = columnName.split(FieldName.FIELD_SEPARATOR);
-            StringTableColumn column = new StringTableColumn(columnName, Arrays.asList(fields), database);
+            StringTableColumn column = new StringTableColumn(columnName, Arrays.asList(fields), database.getDatabase());
             column.setPrefWidth(preferences.getPrefColumnWidth(columnName));
             columns.add(column);
         }
@@ -183,8 +185,34 @@ class MainTableColumnFactory {
         column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
                 new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
                         .withGraphic(this::createFileIcon)
+                        .withMenu(this::createFileMenu)
+                        .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
+                            if (event.getButton() == MouseButton.PRIMARY && linkedFiles.size() == 1) {
+                                // Only one linked file -> open directly
+                                LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFiles.get(0), entry.getEntry(), database, Globals.TASK_EXECUTOR);
+                                linkedFileViewModel.open();
+                            }
+                        })
                         .install(column);
         return column;
+    }
+
+    private ContextMenu createFileMenu(BibEntryTableViewModel entry, List<LinkedFile> linkedFiles) {
+        if (linkedFiles.size() <= 1) {
+            return null;
+        }
+
+        ContextMenu contextMenu = new ContextMenu();
+
+        for (LinkedFile linkedFile : linkedFiles) {
+            LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, entry.getEntry(), database, Globals.TASK_EXECUTOR);
+
+            MenuItem menuItem = new MenuItem(linkedFileViewModel.getDescriptionAndLink(), linkedFileViewModel.getTypeIcon().getGraphicNode());
+            menuItem.setOnAction(event -> linkedFileViewModel.open());
+            contextMenu.getItems().add(menuItem);
+        }
+
+        return contextMenu;
     }
 
     /**

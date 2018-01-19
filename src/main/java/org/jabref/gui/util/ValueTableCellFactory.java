@@ -100,9 +100,6 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                             setTooltip(new Tooltip(tooltipText));
                         }
                     }
-                    if (toOnMouseClickedEvent != null) {
-                        setOnMouseClicked(toOnMouseClickedEvent.apply(rowItem, item));
-                    }
 
                     if (contextMenuFactory != null) {
                         // We only create the context menu when really necessary
@@ -115,15 +112,21 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                         });
                     }
 
-                    if (menuFactory != null) {
-                        setOnMouseClicked(event -> {
+                    setOnMouseClicked(event -> {
+                        if (toOnMouseClickedEvent != null) {
+                            toOnMouseClickedEvent.apply(rowItem, item).handle(event);
+                        }
+
+                        if (menuFactory != null && !event.isConsumed()) {
                             if (event.getButton() == MouseButton.PRIMARY) {
                                 ContextMenu menu = menuFactory.apply(rowItem, item);
-                                menu.show(this, event.getScreenX(), event.getScreenY());
-                                event.consume();
+                                if (menu != null) {
+                                    menu.show(this, event.getScreenX(), event.getScreenY());
+                                    event.consume();
+                                }
                             }
-                        });
-                    }
+                        }
+                    });
                 }
             }
         };

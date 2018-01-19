@@ -23,7 +23,7 @@ import org.jabref.gui.renderer.GeneralRenderer;
 import org.jabref.gui.renderer.IncompleteRenderer;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.TypedBibEntry;
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -72,7 +72,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public MainTable(MainTableDataModel model, JabRefFrame frame,
-                     BasePanel panel, BibDatabase database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes) {
+                     BasePanel panel, BibDatabaseContext database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes) {
         super();
         this.model = model;
 
