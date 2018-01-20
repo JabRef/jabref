@@ -134,7 +134,7 @@ dependencies {
     compile 'javax.inject:javax.inject:1'
 
     // Cannot be updated to 9.*.* until Jabref works with Java 9
-    compile 'org.controlsfx:controlsfx:8.40.15-SNAPSHOT'
+    compile 'org.controlsfx:controlsfx:9.0.0'
 
     compile 'org.jsoup:jsoup:1.11.3'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
