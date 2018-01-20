@@ -12,8 +12,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -24,7 +24,7 @@ import org.json.JSONObject;
 public class Version {
 
     public static final String JABREF_DOWNLOAD_URL = "https://downloads.jabref.org";
-    private static final Log LOGGER = LogFactory.getLog(Version.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Version.class);
 
     private static final Version UNKNOWN_VERSION = new Version();
 

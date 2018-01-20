@@ -3,12 +3,12 @@ package org.jabref.logic.bst;
 import java.util.Locale;
 import java.util.Optional;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class BibtexCaseChanger {
 
-    private static final Log LOGGER = LogFactory.getLog(BibtexCaseChanger.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexCaseChanger.class);
 
     // stores whether the char before the current char was a colon
     private boolean prevColon = true;

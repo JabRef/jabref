@@ -17,8 +17,8 @@ import org.jabref.logic.util.FileType;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class handles user defined custom export formats. They are initially
@@ -34,7 +34,7 @@ public class CustomExportList {
     private static final int EXPORTER_FILENAME_INDEX = 1;
     private static final int EXPORTER_EXTENSION_INDEX = 2;
 
-    private static final Log LOGGER = LogFactory.getLog(CustomExportList.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomExportList.class);
     private final EventList<List<String>> list;
     private final SortedList<List<String>> sorted;
 

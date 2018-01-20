@@ -39,11 +39,11 @@ import org.jabref.model.entry.specialfields.SpecialFieldValue;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
-    private static final Log LOGGER = LogFactory.getLog(RightClickMenu.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RightClickMenu.class);
 
     private final BasePanel panel;
     private final JMenuItem groupAdd;

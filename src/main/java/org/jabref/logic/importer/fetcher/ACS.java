@@ -10,8 +10,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,7 +20,7 @@ import org.jsoup.nodes.Element;
  * FulltextFetcher implementation that attempts to find a PDF URL at ACS.
  */
 public class ACS implements FulltextFetcher {
-    private static final Log LOGGER = LogFactory.getLog(ACS.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ACS.class);
 
     private static final String SOURCE = "http://pubs.acs.org/doi/abs/%s";
 

@@ -56,12 +56,12 @@ import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConnectToSharedDatabaseDialog extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(ConnectToSharedDatabaseDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectToSharedDatabaseDialog.class);
 
     private final JabRefFrame frame;
 

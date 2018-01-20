@@ -18,12 +18,12 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class EntryChangeViewModel extends ChangeViewModel {
 
-    private static final Log LOGGER = LogFactory.getLog(EntryChangeViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntryChangeViewModel.class);
 
     public EntryChangeViewModel(BibEntry memEntry, BibEntry tmpEntry, BibEntry diskEntry) {
         super();

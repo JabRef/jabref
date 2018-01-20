@@ -10,12 +10,12 @@ import java.util.Objects;
 
 import org.jabref.model.FieldChange;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class SaveSession {
 
-    private static final Log LOGGER = LogFactory.getLog(SaveSession.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SaveSession.class);
 
     protected boolean backup;
     protected final Charset encoding;

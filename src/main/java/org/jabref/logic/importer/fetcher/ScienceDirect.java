@@ -15,8 +15,8 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,7 +30,7 @@ import org.jsoup.nodes.Element;
  * @see http://dev.elsevier.com/
  */
 public class ScienceDirect implements FulltextFetcher {
-    private static final Log LOGGER = LogFactory.getLog(ScienceDirect.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScienceDirect.class);
 
     private static final String API_URL = "http://api.elsevier.com/content/article/doi/";
     private static final String API_KEY = "fb82f2e692b3c72dafe5f4f1fa0ac00b";

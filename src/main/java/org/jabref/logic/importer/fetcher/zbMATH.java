@@ -17,15 +17,15 @@ import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.http.client.utils.URIBuilder;
 
 /**
  * Fetches data from the Zentralblatt Math (https://www.zbmath.org/)
  */
 public class zbMATH implements SearchBasedParserFetcher {
-    private static final Log LOGGER = LogFactory.getLog(zbMATH.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(zbMATH.class);
 
     private final ImportFormatPreferences preferences;
 

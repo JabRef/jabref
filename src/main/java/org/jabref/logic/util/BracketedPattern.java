@@ -25,8 +25,8 @@ import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The BracketedExpressionExpander provides methods to expand bracketed expressions,
@@ -36,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class BracketedPattern {
 
-    private static final Log LOGGER = LogFactory.getLog(BracketedPattern.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BracketedPattern.class);
 
     private static final String STARTING_CAPITAL_PATTERN = "[^A-Z]";
     private static final int CHARS_OF_FIRST = 5;

@@ -80,8 +80,8 @@ import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JabRefPreferences implements PreferencesService {
 
@@ -390,7 +390,7 @@ public class JabRefPreferences implements PreferencesService {
     // Telemetry collection
     private static final String COLLECT_TELEMETRY = "collectTelemetry";
     private static final String ALREADY_ASKED_TO_COLLECT_TELEMETRY = "askedCollectTelemetry";
-    private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
     private static final Class PREFS_BASE_CLASS = JabRefMain.class;
     private static final String DB_CONNECT_USERNAME = "dbConnectUsername";
     private static final String DB_CONNECT_DATABASE = "dbConnectDatabase";

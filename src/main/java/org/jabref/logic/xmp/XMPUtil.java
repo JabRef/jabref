@@ -34,8 +34,8 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.jempbox.impl.DateConverter;
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
@@ -60,7 +60,7 @@ import org.w3c.dom.Document;
  */
 public class XMPUtil {
 
-    private static final Log LOGGER = LogFactory.getLog(XMPUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XMPUtil.class);
 
     private XMPUtil() {
     }

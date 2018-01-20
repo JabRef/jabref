@@ -36,15 +36,15 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class IEEEXploreFetcher implements EntryFetcher {
 
-    private static final Log LOGGER = LogFactory.getLog(IEEEXploreFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IEEEXploreFetcher.class);
     private static final String URL_SEARCH = "http://ieeexplore.ieee.org/rest/search?reload=true";
     private static final String URL_BIBTEX_START = "http://ieeexplore.ieee.org/xpl/downloadCitations?reload=true&recordIds=";
     private static final String URL_BIBTEX_END = "&download-format=download-bibtex&x=0&y=0";

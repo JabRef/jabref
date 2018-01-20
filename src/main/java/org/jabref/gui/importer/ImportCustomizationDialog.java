@@ -42,15 +42,15 @@ import org.jabref.logic.util.FileType;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dialog to manage custom importers.
  */
 public class ImportCustomizationDialog extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(ImportCustomizationDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportCustomizationDialog.class);
 
     // Column widths for import customization dialog table:
     private static final int COL_0_WIDTH = 200;

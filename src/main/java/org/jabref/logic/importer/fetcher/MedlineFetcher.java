@@ -32,8 +32,8 @@ import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.http.client.utils.URIBuilder;
 
 /**
@@ -42,7 +42,7 @@ import org.apache.http.client.utils.URIBuilder;
  * See <a href="http://help.jabref.org/en/MedlineRIS">help.jabref.org</a> for a detailed documentation of the available fields.
  */
 public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher {
-    private static final Log LOGGER = LogFactory.getLog(MedlineFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MedlineFetcher.class);
 
     private static final int NUMBER_TO_FETCH = 50;
     private static final String ID_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";

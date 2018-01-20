@@ -22,15 +22,15 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The search query must be specified in an expression that is acceptable by the Search.g4 grammar.
  */
 public class GrammarBasedSearchRule implements SearchRule {
 
-    private static final Log LOGGER = LogFactory.getLog(GrammarBasedSearchRule.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GrammarBasedSearchRule.class);
 
     private final boolean caseSensitiveSearch;
     private final boolean regExpSearch;

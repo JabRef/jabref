@@ -32,8 +32,8 @@ import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This importer parses text format citations using the online API of FreeCite -
@@ -41,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class FreeCiteImporter extends Importer {
 
-    private static final Log LOGGER = LogFactory.getLog(FreeCiteImporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FreeCiteImporter.class);
 
     private final ImportFormatPreferences importFormatPreferences;
 

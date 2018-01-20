@@ -22,14 +22,14 @@ import org.jabref.logic.logging.LogMessages;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.core.LogEvent;
 import org.fxmisc.easybind.EasyBind;
 
 public class ErrorConsoleViewModel extends AbstractViewModel {
-    private static final Log LOGGER = LogFactory.getLog(ErrorConsoleViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorConsoleViewModel.class);
 
     private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     private final Date date = new Date();
@@ -118,7 +118,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
                     .setParameter("body", issueBody);
             JabRefDesktop.openBrowser(uriBuilder.build().toString());
         } catch (IOException | URISyntaxException e) {
-            LOGGER.error(e);
+            LOGGER.error("Problem opening url", e);
         }
     }
 }

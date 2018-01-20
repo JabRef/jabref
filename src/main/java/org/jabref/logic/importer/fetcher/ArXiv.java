@@ -35,8 +35,8 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.http.client.utils.URIBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -54,7 +54,7 @@ import org.xml.sax.SAXException;
  * <a herf="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
  */
 public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
-    private static final Log LOGGER = LogFactory.getLog(ArXiv.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArXiv.class);
 
     private static final String API_URL = "http://export.arxiv.org/api/query";
 

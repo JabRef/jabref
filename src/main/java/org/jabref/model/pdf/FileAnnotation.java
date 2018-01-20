@@ -6,13 +6,13 @@ import java.time.format.DateTimeParseException;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 
 public class FileAnnotation {
-    private static final Log LOGGER = LogFactory.getLog(FileAnnotation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotation.class);
 
     private final static int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
     private static final String DATE_TIME_STRING = "^D:\\d{14}$";

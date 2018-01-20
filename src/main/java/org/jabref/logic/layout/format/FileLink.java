@@ -8,8 +8,8 @@ import org.jabref.logic.layout.ParamLayoutFormatter;
 import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.LinkedFile;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Export formatter that handles the file link list of JabRef 2.3 and later, by
@@ -17,7 +17,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class FileLink implements ParamLayoutFormatter {
 
-    private static final Log LOGGER = LogFactory.getLog(FileLink.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileLink.class);
     private final FileLinkPreferences prefs;
     private String fileType;
 

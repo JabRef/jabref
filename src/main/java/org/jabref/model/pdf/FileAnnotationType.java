@@ -2,8 +2,8 @@ package org.jabref.model.pdf;
 
 import java.util.Locale;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 
 /**
@@ -26,7 +26,7 @@ public enum FileAnnotationType {
     UNKNOWN("Unknown", false),
     NONE("None", false);
 
-    private static final Log LOGGER = LogFactory.getLog(FileAnnotationType.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotationType.class);
 
     private final String name;
     private final boolean linkedFileAnnotationType;
