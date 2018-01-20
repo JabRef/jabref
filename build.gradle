@@ -136,7 +136,7 @@ dependencies {
     compile 'org.fxmisc.richtext:richtextfx:0.8.1'
 
     // Cannot be updated to 9.*.* until Jabref works with Java 9
-    compile 'org.controlsfx:controlsfx:8.40.15-SNAPSHOT'
+    compile 'org.controlsfx:controlsfx:9.0.0'
 
     compile 'org.jsoup:jsoup:1.11.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
