@@ -166,7 +166,7 @@ public class IconTheme {
 
         return jabrefLogos;
     }
-	
+
     public enum JabRefIcon {
 
         ADD(MaterialDesignIcon.PLUS_BOX),
@@ -260,12 +260,16 @@ public class IconTheme {
         KEY_BINDINGS(MaterialDesignIcon.KEYBOARD), /*css: keyboard */
         FIND_DUPLICATES(MaterialDesignIcon.CODE_EQUAL), /*css: code-equal */
         PULL(MaterialDesignIcon.SOURCE_PULL), /*source-pull*/
+        SUCCESS(MaterialDesignIcon.CHECK_CIRCLE),
+        WARNING(MaterialDesignIcon.ALERT),
+        ERROR(MaterialDesignIcon.ALERT_CIRCLE),
         OPEN_IN_NEW_WINDOW(MaterialDesignIcon.OPEN_IN_NEW), /*css: open-in-new */
         CASE_SENSITIVE(MaterialDesignIcon.ALPHABETICAL), /* css: mdi-alphabetical */
         REG_EX(MaterialDesignIcon.REGEX), /*css: mdi-regex */
         CONSOLE(MaterialDesignIcon.CONSOLE), /*css: console */
         FORUM(MaterialDesignIcon.FORUM), /* css: forum */
         FACEBOOK(MaterialDesignIcon.FACEBOOK), /* css: facebook */
+        TWITTER(MaterialDesignIcon.TWITTER), /* css: twitter */
         BLOG(MaterialDesignIcon.RSS), /* css: rss */
         GLOBAL_SEARCH(MaterialDesignIcon.EARTH), /* css: earth */
         DATE_PICKER(MaterialDesignIcon.CALENDAR), /* css: calendar */

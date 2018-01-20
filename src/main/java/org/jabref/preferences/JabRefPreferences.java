@@ -304,6 +304,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths";
     public static final String CLEANUP_UPGRADE_EXTERNAL_LINKS = "CleanUpUpgradeExternalLinks";
     public static final String CLEANUP_CONVERT_TO_BIBLATEX = "CleanUpConvertToBiblatex";
+    public static final String CLEANUP_CONVERT_TO_BIBTEX = "CleanUpConvertToBibtex";
     public static final String CLEANUP_FIX_FILE_LINKS = "CleanUpFixFileLinks";
     public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
     public static final String IMPORT_DEFAULT_PDF_IMPORT_STYLE = "importDefaultPDFimportStyle";
@@ -466,12 +467,12 @@ public class JabRefPreferences implements PreferencesService {
             defaults.put(WIN_LOOK_AND_FEEL, UIManager.getSystemLookAndFeelClassName());
             defaults.put(EMACS_PATH, "emacsclient");
         } else if (OS.WINDOWS) {
-            defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.looks.windows.WindowsLookAndFeel");
+            defaults.put(WIN_LOOK_AND_FEEL, "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
             defaults.put(EMACS_PATH, "emacsclient.exe");
         } else {
             // Linux
             defaults.put(FONT_FAMILY, "SansSerif");
-            defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
+            defaults.put(WIN_LOOK_AND_FEEL, "javax.swing.plaf.nimbus.NimbusLookAndFeel");
             defaults.put(EMACS_PATH, "emacsclient");
         }
 
@@ -583,7 +584,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(MERGE_ENTRIES_DIFF_MODE, 2);
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
-        defaults.put(VALIDATE_IN_ENTRY_EDITOR, Boolean.FALSE);
+        defaults.put(VALIDATE_IN_ENTRY_EDITOR, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
@@ -909,12 +910,14 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private static void insertDefaultCleanupPreset(Map<String, Object> storage) {
-        EnumSet<CleanupPreset.CleanupStep> deactivedJobs = EnumSet.of(
+        EnumSet<CleanupPreset.CleanupStep> deactivatedJobs = EnumSet.of(
                 CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
+                CleanupPreset.CleanupStep.MOVE_PDF,
                 CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
-                CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
+                CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX,
+                CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX);
 
-        CleanupPreset preset = new CleanupPreset(EnumSet.complementOf(deactivedJobs), Cleanups.DEFAULT_SAVE_ACTIONS);
+        CleanupPreset preset = new CleanupPreset(EnumSet.complementOf(deactivatedJobs), Cleanups.DEFAULT_SAVE_ACTIONS);
 
         storage.put(CLEANUP_DOI, preset.isCleanUpDOI());
         storage.put(CLEANUP_ISSN, preset.isCleanUpISSN());
@@ -924,6 +927,7 @@ public class JabRefPreferences implements PreferencesService {
         storage.put(CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS, preset.isRenamePdfOnlyRelativePaths());
         storage.put(CLEANUP_UPGRADE_EXTERNAL_LINKS, preset.isCleanUpUpgradeExternalLinks());
         storage.put(CLEANUP_CONVERT_TO_BIBLATEX, preset.isConvertToBiblatex());
+        storage.put(CLEANUP_CONVERT_TO_BIBTEX, preset.isConvertToBibtex());
         storage.put(CLEANUP_FIX_FILE_LINKS, preset.isFixFileLinks());
         storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().getAsStringList(OS.NEWLINE)));
     }
@@ -1208,7 +1212,7 @@ public class JabRefPreferences implements PreferencesService {
             if (!pattern.isDefaultValue(key)) {
                 // no default value
                 // the first entry in the array is the full pattern
-                // see org.jabref.logic.labelPattern.BibtexKeyPatternUtil.split(String)
+                // see org.jabref.logic.labelPattern.BibtexKeyGenerator.split(String)
                 pre.put(key, pattern.getValue(key).get(0));
             }
         }

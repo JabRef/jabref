@@ -18,7 +18,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -73,8 +73,8 @@ public class MrDLibImporter extends Importer {
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return FileExtensions.XML;
+    public FileType getFileType() {
+        return FileType.XML;
     }
 
     @Override
@@ -255,7 +255,4 @@ public class MrDLibImporter extends Importer {
         }
 
     }
-
-    ;
-
 }

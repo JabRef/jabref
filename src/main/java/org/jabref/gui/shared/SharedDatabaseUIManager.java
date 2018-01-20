@@ -15,26 +15,27 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DBMSConnection;
+import org.jabref.logic.shared.DBMSConnectionProperties;
+import org.jabref.logic.shared.DBMSSynchronizer;
+import org.jabref.logic.shared.event.ConnectionLostEvent;
+import org.jabref.logic.shared.event.SharedEntryNotPresentEvent;
+import org.jabref.logic.shared.event.UpdateRefusedEvent;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.exception.NotASharedDatabaseException;
+import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.database.DatabaseLocation;
-import org.jabref.shared.DBMSConnectionProperties;
-import org.jabref.shared.DBMSSynchronizer;
-import org.jabref.shared.event.ConnectionLostEvent;
-import org.jabref.shared.event.SharedEntryNotPresentEvent;
-import org.jabref.shared.event.UpdateRefusedEvent;
-import org.jabref.shared.exception.DatabaseNotSupportedException;
-import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.shared.exception.NotASharedDatabaseException;
-import org.jabref.shared.prefs.SharedDatabasePreferences;
+import org.jabref.model.database.shared.DatabaseNotSupportedException;
+import org.jabref.model.database.shared.DatabaseSynchronizer;
 
 import com.google.common.eventbus.Subscribe;
 
 public class SharedDatabaseUIManager {
 
     private final JabRefFrame jabRefFrame;
-    private DBMSSynchronizer dbmsSynchronizer;
+    private DatabaseSynchronizer dbmsSynchronizer;
 
     public SharedDatabaseUIManager(JabRefFrame jabRefFrame) {
         this.jabRefFrame = jabRefFrame;
@@ -80,7 +81,7 @@ public class SharedDatabaseUIManager {
     @Subscribe
     public void listen(SharedEntryNotPresentEvent event) {
         BasePanel panel = jabRefFrame.getCurrentBasePanel();
-        EntryEditor entryEditor = panel.getCurrentEditor();
+        EntryEditor entryEditor = panel.getEntryEditor();
 
         panel.getUndoManager().addEdit(new UndoableRemoveEntry(panel.getDatabase(), event.getBibEntry(), panel));
 
@@ -105,11 +106,12 @@ public class SharedDatabaseUIManager {
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
         JabRefFrame frame = JabRefGUI.getMainFrame();
         BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode), DatabaseLocation.SHARED,
-                Globals.prefs.getKeywordDelimiter(), Globals.prefs.getKeyPattern());
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode));
+        DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getKeyPattern());
+        bibDatabaseContext.convertToSharedDatabase(synchronizer);
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
-        dbmsSynchronizer.openSharedDatabase(dbmsConnectionProperties);
+        dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
         dbmsSynchronizer.registerListener(this);
         frame.output(Localization.lang("Connection to %0 server established.", dbmsConnectionProperties.getType().toString()));
         return frame.addTab(bibDatabaseContext, true);
@@ -130,14 +132,15 @@ public class SharedDatabaseUIManager {
 
         JabRefFrame frame = JabRefGUI.getMainFrame();
         BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode), DatabaseLocation.SHARED,
-                Globals.prefs.getKeywordDelimiter(), Globals.prefs.getKeyPattern());
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode));
+        DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getKeyPattern());
+        bibDatabaseContext.convertToSharedDatabase(synchronizer);
 
         bibDatabaseContext.getDatabase().setSharedDatabaseID(sharedDatabaseID);
         bibDatabaseContext.setDatabaseFile(parserResult.getDatabaseContext().getDatabaseFile().orElse(null));
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
-        dbmsSynchronizer.openSharedDatabase(dbmsConnectionProperties);
+        dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
         dbmsSynchronizer.registerListener(this);
         parserResult.setDatabaseContext(bibDatabaseContext);
         frame.output(Localization.lang("Connection to %0 server established.", dbmsConnectionProperties.getType().toString()));

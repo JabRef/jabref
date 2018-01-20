@@ -50,8 +50,8 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OOBibStyle;
@@ -660,14 +660,9 @@ public class OpenOfficePanel extends AbstractWorker {
             for (BibEntry entry : entries) {
                 if (!entry.getCiteKeyOptional().isPresent()) {
                     // Generate key
-                    BibtexKeyPatternUtil
-                            .makeAndSetLabel(
-                                    panel.getBibDatabaseContext().getMetaData().getCiteKeyPattern(prefs.getKeyPattern()),
-                                    panel.getDatabase(), entry,
-                            prefs);
-                    // Add undo change
-                    undoCompound.addEdit(
-                            new UndoableKeyChange(entry, null, entry.getCiteKeyOptional().get()));
+                    new BibtexKeyGenerator(panel.getBibDatabaseContext(), prefs)
+                            .generateAndSetKey(entry)
+                            .ifPresent(change -> undoCompound.addEdit(new UndoableKeyChange(change)));
                 }
             }
             undoCompound.end();

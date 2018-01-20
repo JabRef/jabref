@@ -132,7 +132,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.database.DatabaseLocation;
+import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
@@ -143,8 +143,6 @@ import org.jabref.preferences.LastFocusedTabPreferences;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import com.jgoodies.looks.HeaderStyle;
-import com.jgoodies.looks.Options;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
@@ -195,6 +193,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction jabrefFacebookAction = new OpenBrowserAction("https://www.facebook.com/JabRef/",
             "Facebook", Localization.lang("Opens JabRef's Facebook page"),
             IconTheme.JabRefIcon.FACEBOOK.getSmallIcon(), IconTheme.JabRefIcon.FACEBOOK.getIcon());
+    private final AbstractAction jabrefTwitterAction = new OpenBrowserAction("https://twitter.com/jabref_org",
+            "Twitter", Localization.lang("Opens JabRef's Twitter page"),
+            IconTheme.JabRefIcon.TWITTER.getSmallIcon(), IconTheme.JabRefIcon.TWITTER.getIcon());
     private final AbstractAction jabrefBlogAction = new OpenBrowserAction("https://blog.jabref.org/",
             Localization.menuTitle("Blog"), Localization.lang("Opens JabRef's blog"),
             IconTheme.JabRefIcon.BLOG.getSmallIcon(), IconTheme.JabRefIcon.BLOG.getIcon());
@@ -206,7 +207,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("See what has been changed in the JabRef versions"));
     private final AbstractAction forkMeOnGitHubAction = new OpenBrowserAction("https://github.com/JabRef/jabref",
             Localization.menuTitle("Fork me on GitHub"), Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcon.GITHUB.getSmallIcon(), IconTheme.JabRefIcon.GITHUB.getIcon());
-    private final AbstractAction donationAction = new OpenBrowserAction("https://github.com/JabRef/jabref/wiki/Donations",
+    private final AbstractAction donationAction = new OpenBrowserAction("https://donations.jabref.org",
             Localization.menuTitle("Donate to JabRef"), Localization.lang("Donate to JabRef"), IconTheme.JabRefIcon.DONATE.getSmallIcon(), IconTheme.JabRefIcon.DONATE.getIcon());
     private final AbstractAction openForumAction = new OpenBrowserAction("http://discourse.jabref.org/",
             Localization.menuTitle("Online help forum"), Localization.lang("Online help forum"), IconTheme.JabRefIcon.FORUM.getSmallIcon(), IconTheme.JabRefIcon.FORUM.getIcon());
@@ -895,7 +896,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void initLayout() {
-        tabbedPane.putClientProperty(Options.NO_CONTENT_BORDER_KEY, Boolean.TRUE);
 
         setProgressBarVisible(false);
 
@@ -1269,6 +1269,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         webMenu.add(jabrefWebPageAction);
         webMenu.add(jabrefBlogAction);
         webMenu.add(jabrefFacebookAction);
+        webMenu.add(jabrefTwitterAction);
         webMenu.addSeparator();
         webMenu.add(forkMeOnGitHubAction);
         webMenu.add(developmentVersionAction);
@@ -1307,7 +1308,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void createToolBar() {
-        tlb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         tlb.setBorder(null);
         tlb.setRollover(true);
 
@@ -1390,6 +1390,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
         tlb.add(donationAction);
         tlb.add(forkMeOnGitHubAction);
+        tlb.add(jabrefFacebookAction);
+        tlb.add(jabrefTwitterAction);
 
         createDisabledIconsForButtons(tlb);
     }

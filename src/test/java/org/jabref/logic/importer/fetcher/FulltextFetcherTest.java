@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
-import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 class FulltextFetcherTest {
 
     private static List<FulltextFetcher> fetcherProvider() {
-        return new FulltextFetchers(mock(ImportFormatPreferences.class)).getFetchers();
+        return WebFetchers.getFullTextFetchers(mock(ImportFormatPreferences.class));
     }
 
     @ParameterizedTest
