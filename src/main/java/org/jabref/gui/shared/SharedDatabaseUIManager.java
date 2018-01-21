@@ -12,6 +12,7 @@ import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.entryeditor.EntryEditor;
+import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;

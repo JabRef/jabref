@@ -14,13 +14,13 @@ import java.util.Optional;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PdfAnnotationImporter implements AnnotationImporter {
 

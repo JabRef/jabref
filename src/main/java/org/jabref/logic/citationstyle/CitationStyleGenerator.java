@@ -7,9 +7,9 @@ import java.util.List;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
+import org.jbibtex.TokenMgrException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.jbibtex.TokenMgrException;
 
 
 /**

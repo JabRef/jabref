@@ -44,13 +44,13 @@ import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.groups.AllEntriesGroup;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.fxmisc.easybind.EasyBind;
 import org.reactfx.util.FxTimer;
 import org.reactfx.util.Timer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GroupTreeController extends AbstractController<GroupTreeViewModel> {
 

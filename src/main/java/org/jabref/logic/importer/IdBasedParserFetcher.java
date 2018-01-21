@@ -13,9 +13,9 @@ import java.util.Optional;
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 
+import org.jsoup.helper.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.jsoup.helper.StringUtil;
 
 /**
  * Provides a convenient interface for ID-based fetcher, which follow the usual three-step procedure:

@@ -36,11 +36,11 @@ import org.jabref.preferences.JabRefPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.controlsfx.control.NotificationPane;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SourceTab extends EntryEditorTab {
 

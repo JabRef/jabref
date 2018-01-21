@@ -6,10 +6,10 @@ import java.time.format.DateTimeParseException;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileAnnotation {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotation.class);

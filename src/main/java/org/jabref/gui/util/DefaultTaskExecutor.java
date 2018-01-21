@@ -11,9 +11,9 @@ import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
+import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.fxmisc.easybind.EasyBind;
 
 /**
  * A very simple implementation of the {@link TaskExecutor} interface.
