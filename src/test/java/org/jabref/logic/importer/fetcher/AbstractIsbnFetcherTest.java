@@ -5,9 +5,10 @@ import java.util.Optional;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public abstract class AbstractIsbnFetcherTest {
 
@@ -34,20 +35,19 @@ public abstract class AbstractIsbnFetcherTest {
         assertEquals(Optional.empty(), fetchedEntry);
     }
 
-    @Test(expected = FetcherException.class)
-    public void searchByIdThrowsExceptionForShortInvalidISBN() throws FetcherException {
-        fetcher.performSearchById("123456789");
+    @Test
+    public void searchByIdThrowsExceptionForShortInvalidISBN() {
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("123456789"));
     }
 
-    @Test(expected = FetcherException.class)
-    public void searchByIdThrowsExceptionForLongInvalidISB() throws FetcherException {
-        fetcher.performSearchById("012345678910");
+    @Test
+    public void searchByIdThrowsExceptionForLongInvalidISB() {
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("012345678910"));
     }
 
-    @Test(expected = FetcherException.class)
-    public void searchByIdThrowsExceptionForInvalidISBN() throws FetcherException {
-        fetcher.performSearchById("jabref-4-ever");
+    @Test
+    public void searchByIdThrowsExceptionForInvalidISBN() {
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("jabref-4-ever"));
     }
-
 
 }
