@@ -29,12 +29,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class ImportFormats {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ImportFormats.class);
 
     private ImportFormats() {
     }

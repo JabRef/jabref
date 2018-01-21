@@ -20,7 +20,7 @@
 
 ### Log4j2
 
-* `+` Already defined
+* `+` Dependency already exists
 * `+` Java 9 support since version 2.10
 * `-` Direct dependency
 

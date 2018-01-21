@@ -18,14 +18,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
 import org.apache.http.client.utils.URIBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Fetches data from the Zentralblatt Math (https://www.zbmath.org/)
  */
 public class zbMATH implements SearchBasedParserFetcher {
-    private static final Logger LOGGER = LoggerFactory.getLogger(zbMATH.class);
 
     private final ImportFormatPreferences preferences;
 
