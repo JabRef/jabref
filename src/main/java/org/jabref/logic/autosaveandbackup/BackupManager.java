@@ -26,8 +26,8 @@ import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Backups the given bib database file from {@link BibDatabaseContext} on every {@link BibDatabaseContextChangedEvent}.
@@ -37,7 +37,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class BackupManager {
 
-    private static final Log LOGGER = LogFactory.getLog(BackupManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BackupManager.class);
 
     private static final String BACKUP_EXTENSION = ".sav";
 

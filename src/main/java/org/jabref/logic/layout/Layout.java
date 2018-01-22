@@ -8,15 +8,15 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Main class for formatting DOCUMENT ME!
  */
 public class Layout {
 
-    private static final Log LOGGER = LogFactory.getLog(Layout.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Layout.class);
 
     private final List<LayoutEntry> layoutEntries;
 

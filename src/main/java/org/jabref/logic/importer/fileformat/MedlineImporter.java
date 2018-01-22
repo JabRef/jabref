@@ -78,8 +78,8 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Joiner;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Importer for the Medline/Pubmed format.
@@ -89,7 +89,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MedlineImporter extends Importer implements Parser {
 
-    private static final Log LOGGER = LogFactory.getLog(MedlineImporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MedlineImporter.class);
     private static final String KEYWORD_SEPARATOR = "; ";
 
     private static final Locale ENGLISH = Locale.ENGLISH;

@@ -34,11 +34,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.metadata.MetaData;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ChangeScanner implements Runnable {
-    private static final Log LOGGER = LogFactory.getLog(ChangeScanner.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChangeScanner.class);
 
     private final File file;
     private final Path tempFile;

@@ -15,14 +15,14 @@ import java.util.function.Supplier;
 
 import org.jabref.logic.l10n.Localization;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProtectedTermsLoader {
 
     private static final Map<String, Supplier<String>> INTERNAL_LISTS = new HashMap<>();
 
-    private static final Log LOGGER = LogFactory.getLog(ProtectedTermsLoader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsLoader.class);
 
     private final List<ProtectedTermsList> mainList = new ArrayList<>();
 

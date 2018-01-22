@@ -24,12 +24,12 @@ import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExportToClipboardAction extends AbstractWorker {
 
-    private static final Log LOGGER = LogFactory.getLog(ExportToClipboardAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExportToClipboardAction.class);
 
     private final JabRefFrame frame;
 

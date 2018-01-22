@@ -42,8 +42,8 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for
@@ -54,7 +54,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SaveDatabaseAction extends AbstractWorker {
 
-    private static final Log LOGGER = LogFactory.getLog(SaveDatabaseAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);
 
     private final BasePanel panel;
     private final JabRefFrame frame;

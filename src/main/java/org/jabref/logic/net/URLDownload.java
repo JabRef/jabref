@@ -40,8 +40,8 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.util.FileHelper;
 
 import com.mashape.unirest.http.Unirest;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * URL download to a string.
@@ -58,7 +58,7 @@ public class URLDownload {
 
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0";
 
-    private static final Log LOGGER = LogFactory.getLog(URLDownload.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(URLDownload.class);
     private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
     private String postData = "";

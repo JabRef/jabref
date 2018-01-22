@@ -6,8 +6,8 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Every message is terminated with '\0'.
@@ -16,7 +16,7 @@ public class Protocol {
 
     public static final String IDENTIFIER = "jabref";
 
-    private static final Log LOGGER = LogFactory.getLog(Protocol.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Protocol.class);
 
     private final Socket socket;
     private final OutputStream out;

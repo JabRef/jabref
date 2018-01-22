@@ -23,8 +23,8 @@ import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for export formats based on templates.
@@ -33,7 +33,7 @@ public class TemplateExporter extends Exporter {
 
     private static final String LAYOUT_PREFIX = "/resource/layout/";
 
-    private static final Log LOGGER = LogFactory.getLog(TemplateExporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TemplateExporter.class);
     private final String lfFileName;
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
@@ -224,7 +224,7 @@ public class TemplateExporter extends Exporter {
             if (defLayout != null) {
                 missingFormatters.addAll(defLayout.getMissingFormatters());
                 if (!missingFormatters.isEmpty()) {
-                    LOGGER.warn(missingFormatters);
+                    LOGGER.warn("Missing formatters found ", missingFormatters);
                 }
             }
             Map<String, Layout> layouts = new HashMap<>();
@@ -285,7 +285,7 @@ public class TemplateExporter extends Exporter {
             if (!missingFormatters.isEmpty()) {
                 StringBuilder sb = new StringBuilder("The following formatters could not be found: ");
                 sb.append(String.join(", ", missingFormatters));
-                LOGGER.warn(sb);
+                LOGGER.warn("Formatters not found", sb);
             }
             saveSession.finalize(file);
         }

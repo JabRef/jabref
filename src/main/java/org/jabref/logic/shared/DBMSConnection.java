@@ -11,12 +11,12 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.database.shared.DatabaseConnection;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DBMSConnection implements DatabaseConnection {
 
-    private static final Log LOGGER = LogFactory.getLog(DBMSConnection.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DBMSConnection.class);
 
     private final Connection connection;
     private final DBMSConnectionProperties properties;

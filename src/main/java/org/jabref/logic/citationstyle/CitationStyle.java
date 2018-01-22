@@ -29,8 +29,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jabref.logic.util.FileType;
 
 import de.undercouch.citeproc.helper.CSLUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -45,7 +45,7 @@ import org.xml.sax.SAXException;
 public class CitationStyle {
 
     public static final String DEFAULT = "/ieee.csl";
-    private static final Log LOGGER = LogFactory.getLog(CitationStyle.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyle.class);
 
     private static final Pattern SNAPSHOT_NAME = Pattern.compile(".*styles-1\\.0\\.1-SNAPSHOT\\.jar");
 
