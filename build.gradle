@@ -364,6 +364,10 @@ task copyTestResources(type: Copy) {
 }
 processTestResources.dependsOn copyTestResources
 
+jacoco {
+    toolVersion = '0.8.0'
+}
+
 tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
 
@@ -391,7 +395,6 @@ afterEvaluate {
     def junitPlatformTest = tasks.junitPlatformTest
 
     jacoco {
-        toolVersion = '0.8.0'
         applyTo(junitPlatformTest)
     }
 
