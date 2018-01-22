@@ -23,8 +23,8 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -35,7 +35,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class MrDLibImporter extends Importer {
 
-    private static final Log LOGGER = LogFactory.getLog(MrDLibImporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibImporter.class);
     public ParserResult parserResult;
 
     @Override

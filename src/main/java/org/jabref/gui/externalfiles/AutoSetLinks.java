@@ -30,12 +30,12 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AutoSetLinks {
 
-    private static final Log LOGGER = LogFactory.getLog(AutoSetLinks.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutoSetLinks.class);
 
     private AutoSetLinks() {
     }
@@ -97,7 +97,7 @@ public class AutoSetLinks {
                 try {
                     linkedFiles = util.findAssociatedNotLinkedFiles(entry);
                 } catch (IOException e) {
-                    LOGGER.error(e);
+                    LOGGER.error("Problem finding files", e);
                 }
 
                 if (ce != null) {

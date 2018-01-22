@@ -81,11 +81,11 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class LayoutEntry {
-    private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LayoutEntry.class);
 
     private List<LayoutFormatter> option;
 

@@ -26,12 +26,12 @@ import org.jabref.preferences.JabRefPreferences;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class AppearancePrefsTab extends JPanel implements PrefsTab {
 
-    private static final Log LOGGER = LogFactory.getLog(AppearancePrefsTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppearancePrefsTab.class);
 
     private final JabRefPreferences prefs;
 

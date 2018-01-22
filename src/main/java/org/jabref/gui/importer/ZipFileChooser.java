@@ -30,15 +30,15 @@ import org.jabref.gui.JabRefDialog;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.l10n.Localization;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dialog to allow users to choose a file contained in a ZIP file.
  */
 class ZipFileChooser extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(ZipFileChooser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZipFileChooser.class);
 
 
     /**

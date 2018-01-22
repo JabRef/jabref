@@ -19,8 +19,8 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Static variables for graphics files and keyboard shortcuts.
@@ -45,7 +45,7 @@ public class GUIGlobals {
     public static final Color ENTRY_EDITOR_LABEL_COLOR = new Color(100, 100, 150); // Empty field, blue.
 
     static final Color INACTIVE_TABBED_COLOR = Color.black; // inactive Database
-    private static final Log LOGGER = LogFactory.getLog(GUIGlobals.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GUIGlobals.class);
     private static final Map<String, JLabel> TABLE_ICONS = new HashMap<>(); // Contains table icon mappings. Set up
     static final Color ACTIVE_TABBED_COLOR = ENTRY_EDITOR_LABEL_COLOR.darker(); // active Database (JTabbedPane)
 

@@ -11,8 +11,8 @@ import java.util.Set;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.logic.util.io.FileUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class used to handle safe storage to disk.
@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class FileSaveSession extends SaveSession {
 
-    private static final Log LOGGER = LogFactory.getLog(FileSaveSession.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileSaveSession.class);
 
     // Filenames.
     private static final String BACKUP_EXTENSION = ".bak";

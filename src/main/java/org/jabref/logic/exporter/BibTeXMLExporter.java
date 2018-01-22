@@ -41,8 +41,8 @@ import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Export format for the BibTeXML format.
@@ -51,7 +51,7 @@ public class BibTeXMLExporter extends Exporter {
 
     private static final String BIBTEXML_NAMESPACE_URI = "http://bibtexml.sf.net/";
     private static final Locale ENGLISH = Locale.ENGLISH;
-    private static final Log LOGGER = LogFactory.getLog(BibTeXMLExporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibTeXMLExporter.class);
     private JAXBContext context;
 
     public BibTeXMLExporter() {

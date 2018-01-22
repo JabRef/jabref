@@ -39,12 +39,12 @@ import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AppendDatabaseAction implements BaseAction {
 
-    private static final Log LOGGER = LogFactory.getLog(AppendDatabaseAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppendDatabaseAction.class);
 
     private final JabRefFrame frame;
     private final BasePanel panel;
@@ -102,7 +102,7 @@ public class AppendDatabaseAction implements BaseAction {
                         newGroups.setGroup(group);
                         group.add(appendedEntries);
                     } catch (IllegalArgumentException e) {
-                        LOGGER.error(e);
+                        LOGGER.error("Problem appending entries to group", e);
                     }
                 }
 

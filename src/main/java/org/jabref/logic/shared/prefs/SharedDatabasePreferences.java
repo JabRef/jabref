@@ -10,15 +10,15 @@ import org.jabref.JabRefMain;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.model.database.shared.DatabaseConnectionProperties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Stores and reads persistent data for {@link org.jabref.gui.shared.ConnectToSharedDatabaseDialog}.
  */
 public class SharedDatabasePreferences {
 
-    private static final Log LOGGER = LogFactory.getLog(SharedDatabasePreferences.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SharedDatabasePreferences.class);
 
     private static final String DEFAULT_NODE = "default";
     private static final String PARENT_NODE = "jabref-shared";

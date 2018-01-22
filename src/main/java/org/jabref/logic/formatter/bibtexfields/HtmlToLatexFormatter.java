@@ -10,12 +10,12 @@ import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import org.jabref.model.cleanup.Formatter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HtmlToLatexFormatter implements LayoutFormatter, Formatter {
 
-    private static final Log LOGGER = LogFactory.getLog(HtmlToLatexFormatter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HtmlToLatexFormatter.class);
 
     private static final int MAX_TAG_LENGTH = 100;
 

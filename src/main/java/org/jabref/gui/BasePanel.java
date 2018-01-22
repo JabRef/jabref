@@ -146,12 +146,12 @@ import org.jabref.preferences.PreviewPreferences;
 import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BasePanel extends JPanel implements ClipboardOwner {
 
-    private static final Log LOGGER = LogFactory.getLog(BasePanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BasePanel.class);
 
     // Divider size for BaseFrame split pane. 0 means non-resizable.
     private static final int SPLIT_PANE_DIVIDER_SIZE = 4;
