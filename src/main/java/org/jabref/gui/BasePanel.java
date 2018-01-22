@@ -1211,7 +1211,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private void createMainTable() {
         bibDatabaseContext.getDatabase().registerListener(SpecialFieldDatabaseChangeListener.getInstance());
 
-        mainTable = new MainTable(tableModel, frame, this, bibDatabaseContext.getDatabase(), preferences.getTablePreferences(), externalFileTypes);
+        mainTable = new MainTable(tableModel, frame, this, bibDatabaseContext.getDatabase(), preferences.getTablePreferences(), externalFileTypes, Globals.getKeyPrefs());
 
         mainTable.updateFont();
 

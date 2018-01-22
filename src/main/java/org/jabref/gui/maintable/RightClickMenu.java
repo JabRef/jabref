@@ -1,235 +1,179 @@
 package org.jabref.gui.maintable;
 
-import java.awt.event.ActionEvent;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.EntryMarker;
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.Actions;
-import org.jabref.gui.copyfiles.CopyFilesAction;
-import org.jabref.gui.filelist.FileListTableModel;
-import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.menus.ChangeEntryTypeMenu;
-import org.jabref.gui.mergeentries.FetchAndMergeEntry;
-import org.jabref.gui.specialfields.SpecialFieldMenuAction;
-import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.ActionsFX;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
-import org.jabref.gui.worker.MarkEntriesAction;
 import org.jabref.logic.citationstyle.CitationStyle;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
-import org.jabref.model.entry.specialfields.SpecialFieldValue;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
+public class RightClickMenu {
     private static final Log LOGGER = LogFactory.getLog(RightClickMenu.class);
 
-    private final BasePanel panel;
-    private final JMenuItem groupAdd;
-    private final JMenuItem groupRemove;
-    private final JMenuItem groupMoveTo;
+    public static ContextMenu create(BibEntryTableViewModel entry, KeyBindingRepository keyBindingRepository) {
+        ContextMenu contextMenu = new ContextMenu();
+        ActionFactory factory = new ActionFactory(keyBindingRepository);
 
-
-    public RightClickMenu(JabRefFrame frame, BasePanel panel) {
-        this.panel = panel;
-        JMenu typeMenu = new ChangeEntryTypeMenu(Globals.getKeyPrefs()).getChangeEntryTypeMenu(panel);
         // Are multiple entries selected?
-        boolean multiple = areMultipleEntriesSelected();
+        // boolean multiple = areMultipleEntriesSelected();
 
         // If only one entry is selected, get a reference to it for adapting the menu.
-        BibEntry be = null;
-        if (panel.getMainTable().getSelectedEntries().size() == 1) {
-            be = panel.getMainTable().getSelectedEntries().get(0);
-        }
+        // BibEntry be = null;
+        //if (panel.getMainTable().getSelectedEntries().size() == 1) {
+        //    be = panel.getMainTable().getSelectedEntries().get(0);
+        //}
 
-        addPopupMenuListener(this);
-
-        JMenu copySpecialMenu = new JMenu(Localization.lang("Copy") + "...");
-        copySpecialMenu.add(new GeneralAction(Actions.COPY_TITLE, Localization.lang("Copy title"), KeyBinding.COPY_TITLE));
-        copySpecialMenu.add(new GeneralAction(Actions.COPY_KEY, Localization.lang("Copy BibTeX key"), KeyBinding.COPY_BIBTEX_KEY));
-        copySpecialMenu.add(new GeneralAction(Actions.COPY_CITE_KEY, Localization.lang("Copy \\cite{BibTeX key}"), KeyBinding.COPY_CITE_BIBTEX_KEY));
-        copySpecialMenu.add(new GeneralAction(Actions.COPY_KEY_AND_TITLE, Localization.lang("Copy BibTeX key and title"), KeyBinding.COPY_BIBTEX_KEY_AND_TITLE));
-        copySpecialMenu.add(new GeneralAction(Actions.COPY_KEY_AND_LINK, Localization.lang("Copy BibTeX key and link"), KeyBinding.COPY_BIBTEX_KEY_AND_LINK));
+        Menu copySpecialMenu = factory.createMenu(ActionsFX.COPY_MORE);
+        copySpecialMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_TITLE));
+        copySpecialMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_KEY));
+        copySpecialMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_CITE_KEY));
+        copySpecialMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_KEY_AND_TITLE));
+        copySpecialMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_KEY_AND_LINK));
 
         // the submenu will behave dependent on what style is currently selected (citation/preview)
         PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
         String style = previewPreferences.getPreviewCycle().get(previewPreferences.getPreviewCyclePosition());
         if (CitationStyle.isCitationStyleFile(style)) {
-            copySpecialMenu.add(new GeneralAction(Actions.COPY_CITATION_HTML, Localization.menuTitle("Copy citation") + " (HTML)", KeyBinding.COPY_PREVIEW));
-            JMenu copyCitationMenu = new JMenu(Localization.menuTitle("Copy citation") + "...");
-            copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_TEXT, "Text"));
-            copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_RTF, "RTF"));
-            copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_ASCII_DOC, "AsciiDoc"));
-            copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_XSLFO, "XSL-FO"));
-            copySpecialMenu.add(copyCitationMenu);
+            copySpecialMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_CITATION_HTML));
+            Menu copyCitationMenu = factory.createMenu(ActionsFX.COPY_CITATION_MORE);
+            copyCitationMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_CITATION_TEXT));
+            copyCitationMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_CITATION_RTF));
+            copyCitationMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_CITATION_ASCII_DOC));
+            copyCitationMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_CITATION_XSLFO));
+            copySpecialMenu.getItems().add(copyCitationMenu);
         } else {
-            copySpecialMenu.add(new GeneralAction(Actions.COPY_CITATION_HTML, Localization.lang("Copy preview"), KeyBinding.COPY_PREVIEW));
+            copySpecialMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_CITATION_HTML));
         }
 
-        copySpecialMenu.add(new GeneralAction(Actions.EXPORT_TO_CLIPBOARD, Localization.lang("Export to clipboard"),
-                IconTheme.JabRefIcons.EXPORT_TO_CLIPBOARD.getSmallIcon()));
+        copySpecialMenu.getItems().add(factory.createMenuItem(ActionsFX.EXPORT_TO_CLIPBOARD));
 
-        add(new GeneralAction(Actions.COPY, Localization.lang("Copy"), IconTheme.JabRefIcons.COPY.getSmallIcon(), KeyBinding.COPY));
-        add(copySpecialMenu);
-        add(new GeneralAction(Actions.PASTE, Localization.lang("Paste"), IconTheme.JabRefIcons.PASTE.getSmallIcon(), KeyBinding.PASTE));
-        add(new GeneralAction(Actions.CUT, Localization.lang("Cut"), IconTheme.JabRefIcons.CUT.getSmallIcon(), KeyBinding.CUT));
-        add(new GeneralAction(Actions.DELETE, Localization.lang("Delete"), IconTheme.JabRefIcons.DELETE_ENTRY.getSmallIcon(), KeyBinding.DELETE_ENTRY));
-        GeneralAction printPreviewAction = new GeneralAction(Actions.PRINT_PREVIEW, Localization.lang("Print entry preview"), IconTheme.JabRefIcons.PRINTED.getSmallIcon());
-        printPreviewAction.setEnabled(!multiple);
-        add(printPreviewAction);
+        //add(factory.createMenuItem(ActionsFX.COPY));
+        contextMenu.getItems().add(copySpecialMenu);
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.PASTE));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.CUT));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.DELETE));
+        // TODO: Add somewhere else
+        // GeneralAction printPreviewAction = factory.createMenuItem(ActionsFX.PRINT_PREVIEW);
+        // printPreviewAction.setEnabled(!multiple);
+        // add(printPreviewAction);
 
-        addSeparator();
+        contextMenu.getItems().add(new SeparatorMenuItem());
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.SEND_AS_EMAIL));
+        contextMenu.getItems().add(new SeparatorMenuItem());
 
-        add(new GeneralAction(Actions.SEND_AS_EMAIL, Localization.lang("Send as email"), IconTheme.JabRefIcons.EMAIL.getSmallIcon()));
-        addSeparator();
-        add(new CopyFilesAction());
-
-        JMenu markSpecific = JabRefFrame.subMenu(Localization.menuTitle("Mark specific color"));
-        markSpecific.setIcon(IconTheme.JabRefIcons.MARK_ENTRIES.getSmallIcon());
-        for (int i = 0; i < EntryMarker.MAX_MARKING_LEVEL; i++) {
-            markSpecific.add(new MarkEntriesAction(frame, i).getMenuItem());
-        }
-
-        if (multiple) {
-            add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entries"), IconTheme.JabRefIcons.MARK_ENTRIES.getSmallIcon(), KeyBinding.MARK_ENTRIES));
-            add(markSpecific);
-            add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entries"), IconTheme.JabRefIcons.UNMARK_ENTRIES.getSmallIcon(), KeyBinding.UNMARK_ENTRIES));
-        } else if (be != null) {
-            Optional<String> marked = be.getField(FieldName.MARKED_INTERNAL);
-            // We have to check for "" too as the marked field may be empty
-            if ((!marked.isPresent()) || marked.get().isEmpty()) {
-                add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entry"), IconTheme.JabRefIcons.MARK_ENTRIES.getSmallIcon(), KeyBinding.MARK_ENTRIES));
-                add(markSpecific);
-            } else {
-                add(markSpecific);
-                add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entry"), IconTheme.JabRefIcons.UNMARK_ENTRIES.getSmallIcon(), KeyBinding.UNMARK_ENTRIES));
-            }
-        }
+        // TODO: Add somewhere else
+        // add(new CopyFilesAction());
 
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
-                JMenu rankingMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(rankingMenu, SpecialField.RANKING, frame);
-                add(rankingMenu);
+                Menu rankingMenu = createSpecialFieldMenu(SpecialField.RANKING);
+                contextMenu.getItems().add(rankingMenu);
             }
 
             // TODO: multiple handling for relevance and quality-assurance
             // if multiple values are selected ("if (multiple)"), two options (set / clear) should be offered
             // if one value is selected either set or clear should be offered
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
-                add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)), frame));
+                // TODO contextMenu.getItems().add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)), frame));
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
-                add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)), frame));
+                // TODO contextMenu.getItems().add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)), frame));
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
-                add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)), frame));
+                // TODO contextMenu.getItems().add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)), frame));
             }
 
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
-                JMenu priorityMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(priorityMenu, SpecialField.PRIORITY, frame);
-                add(priorityMenu);
+                Menu priorityMenu = createSpecialFieldMenu(SpecialField.PRIORITY);
+                contextMenu.getItems().add(priorityMenu);
             }
 
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
-                JMenu readStatusMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(readStatusMenu, SpecialField.READ_STATUS, frame);
-                add(readStatusMenu);
+                Menu readStatusMenu = createSpecialFieldMenu(SpecialField.READ_STATUS);
+                contextMenu.getItems().add(readStatusMenu);
             }
 
         }
 
-        addSeparator();
+        contextMenu.getItems().add(new SeparatorMenuItem());
 
-        GeneralAction openFolderAction = new GeneralAction(Actions.OPEN_FOLDER, Localization.lang("Open folder"),
-                KeyBinding.OPEN_FOLDER);
-        openFolderAction.setEnabled(isFieldSetForSelectedEntry(FieldName.FILE));
-        add(openFolderAction);
+        MenuItem openFolderAction = factory.createMenuItem(ActionsFX.OPEN_FOLDER);
+        // TODO: openFolderAction.setEnabled(isFieldSetForSelectedEntry(FieldName.FILE));
+        contextMenu.getItems().add(openFolderAction);
 
-        GeneralAction openFileAction = new GeneralAction(Actions.OPEN_EXTERNAL_FILE, Localization.lang("Open file"),
-                getFileIconForSelectedEntry(), KeyBinding.OPEN_FILE);
-        openFileAction.setEnabled(isFieldSetForSelectedEntry(FieldName.FILE));
-        add(openFileAction);
+        MenuItem openFileAction = factory.createMenuItem(ActionsFX.OPEN_EXTERNAL_FILE);
+        // TODO: openFileAction.setEnabled(isFieldSetForSelectedEntry(FieldName.FILE));
+        contextMenu.getItems().add(openFileAction);
 
-        GeneralAction openUrlAction = new GeneralAction(Actions.OPEN_URL, Localization.lang("Open URL or DOI"),
-                IconTheme.JabRefIcons.WWW.getSmallIcon(), KeyBinding.OPEN_URL_OR_DOI);
-        openUrlAction.setEnabled(isFieldSetForSelectedEntry(FieldName.URL) || isFieldSetForSelectedEntry(FieldName.DOI));
-        add(openUrlAction);
+        MenuItem openUrlAction = factory.createMenuItem(ActionsFX.OPEN_URL);
+        // TODO: openUrlAction.setEnabled(isFieldSetForSelectedEntry(FieldName.URL) || isFieldSetForSelectedEntry(FieldName.DOI));
+        contextMenu.getItems().add(openUrlAction);
 
-        addSeparator();
+        contextMenu.getItems().add(new SeparatorMenuItem());
 
-        add(typeMenu);
+        // TODO: JMenu typeMenu = new ChangeEntryTypeMenu(Globals.getKeyPrefs()).getChangeEntryTypeMenu(panel);
+        //contextMenu.getItems().add(typeMenu);
 
-        GeneralAction mergeFetchedEntryAction = new GeneralAction(Actions.MERGE_WITH_FETCHED_ENTRY,
-                Localization.lang("Get BibTeX data from %0", FetchAndMergeEntry.getDisplayNameOfSupportedFields()));
-        mergeFetchedEntryAction.setEnabled(isAnyFieldSetForSelectedEntry(FetchAndMergeEntry.SUPPORTED_FIELDS));
-        add(mergeFetchedEntryAction);
+        MenuItem mergeFetchedEntryAction = factory.createMenuItem(ActionsFX.MERGE_WITH_FETCHED_ENTRY);
+        // TODO FetchAndMergeEntry.getDisplayNameOfSupportedFields()));
+        // TODO mergeFetchedEntryAction.setEnabled(isAnyFieldSetForSelectedEntry(FetchAndMergeEntry.SUPPORTED_FIELDS));
+        contextMenu.getItems().add(mergeFetchedEntryAction);
 
-        add(frame.getMassSetField());
+        // TODO:
+        //contextMenu.getItems().add(frame.getMassSetField());
 
-        GeneralAction attachFileAction = new GeneralAction(Actions.ADD_FILE_LINK, Localization.lang("Attach file"),
-                IconTheme.JabRefIcons.ATTACH_FILE.getSmallIcon());
-        attachFileAction.setEnabled(!multiple);
-        add(attachFileAction);
+        MenuItem attachFileAction = factory.createMenuItem(ActionsFX.ADD_FILE_LINK);
+        // TODO: attachFileAction.setEnabled(!multiple);
+        contextMenu.getItems().add(attachFileAction);
 
-        add(frame.getManageKeywords());
+        // TODO:
+        //contextMenu.getItems().add(frame.getManageKeywords());
 
-        GeneralAction mergeEntriesAction = new GeneralAction(Actions.MERGE_ENTRIES,
-                Localization.lang("Merge entries") + "...", IconTheme.JabRefIcons.MERGE_ENTRIES.getSmallIcon());
-        mergeEntriesAction.setEnabled(areExactlyTwoEntriesSelected());
-        add(mergeEntriesAction);
+        MenuItem mergeEntriesAction = factory.createMenuItem(ActionsFX.MERGE_ENTRIES);
+        // TODO: mergeEntriesAction.setEnabled(areExactlyTwoEntriesSelected());
+        contextMenu.getItems().add(mergeEntriesAction);
 
-        addSeparator(); // for "add/move/remove to/from group" entries (appended here)
+        contextMenu.getItems().add(new SeparatorMenuItem()); // for "add/move/remove to/from group" entries (appended here)
 
-        groupAdd = new JMenuItem(new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group")));
-        add(groupAdd);
-        groupRemove = new JMenuItem(new GeneralAction(Actions.REMOVE_FROM_GROUP, Localization.lang("Remove from group")));
-        add(groupRemove);
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.ADD_TO_GROUP));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.REMOVE_FROM_GROUP));
 
-        groupMoveTo = add(new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group")));
-        add(groupMoveTo);
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.MOVE_TO_GROUP));
 
         // create disabledIcons for all menu entries
-        frame.createDisabledIconsForMenuEntries(this);
+        // TODO: frame.createDisabledIconsForMenuEntries(this);
+
+        return contextMenu;
     }
 
     /**
      * Remove all types from the menu.
      * Then cycle through all available values, and add them.
      */
-    public static void populateSpecialFieldMenu(JMenu menu, SpecialField field, JabRefFrame frame) {
+    public static Menu createSpecialFieldMenu(SpecialField field) {
+        Menu menu = new Menu();
+
         SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field);
         menu.setText(viewModel.getLocalization());
-        menu.setIcon(viewModel.getRepresentingIcon());
-        for (SpecialFieldValue val : field.getValues()) {
-            menu.add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(val), frame));
-        }
+        menu.setGraphic(viewModel.getIcon().getGraphicNode());
+        // TODO:
+        //for (SpecialFieldValue val : field.getValues()) {
+        //    menu.add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(val), frame));
+        //}
+        return menu;
     }
+/*
 
     private boolean areMultipleEntriesSelected() {
         return panel.getMainTable().getSelectedEntries().size() > 1;
@@ -238,10 +182,12 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     private boolean areExactlyTwoEntriesSelected() {
         return panel.getMainTable().getSelectedEntries().size() == 2;
     }
+*/
 
     /**
      * Set the dynamic contents of "Add to group ..." submenu.
      */
+    /*
     @Override
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
         boolean groupsPresent = panel.getBibDatabaseContext().getMetaData().getGroups().isPresent();
@@ -284,51 +230,5 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         }
         return IconTheme.JabRefIcons.FILE.getSmallIcon();
     }
-
-    class GeneralAction extends AbstractAction {
-
-        private final String command;
-
-        public GeneralAction(String command, String name) {
-            super(name);
-            this.command = command;
-        }
-
-        public GeneralAction(String command, String name, Icon icon) {
-            super(name, icon);
-            this.command = command;
-        }
-
-        public GeneralAction(String command, String name, KeyBinding key) {
-            super(name);
-            this.command = command;
-            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(key));
-        }
-
-        public GeneralAction(String command, String name, Icon icon, KeyBinding key) {
-            super(name, icon);
-            this.command = command;
-            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(key));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            try {
-                panel.runCommand(command);
-            } catch (Throwable ex) {
-                LOGGER.debug("Cannot execute command " + command + ".", ex);
-            }
-        }
-    }
-
-    public static ContextMenu create(BibEntryTableViewModel entry) {
-        ContextMenu contextMenu = new ContextMenu();
-
-        javafx.scene.control.MenuItem copy = new javafx.scene.control.MenuItem();
-        copy.setText(Localization.lang("Copy"));
-        copy.setGraphic(IconTheme.JabRefIcons.COPY.getGraphicNode());
-        contextMenu.getItems().add(copy);
-
-        return contextMenu;
-    }
+    */
 }

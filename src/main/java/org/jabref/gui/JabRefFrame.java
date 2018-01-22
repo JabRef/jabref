@@ -109,7 +109,6 @@ import org.jabref.gui.importer.fetcher.GeneralFetcher;
 import org.jabref.gui.journals.ManageJournalsAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingAction;
-import org.jabref.gui.maintable.RightClickMenu;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.openoffice.OpenOfficePanel;
@@ -1131,7 +1130,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             boolean menuitem = false;
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
                 rankSubMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(rankSubMenu, SpecialField.RANKING, this);
+                // TODO RightClickMenu.createSpecialFieldMenu(rankSubMenu, SpecialField.RANKING, this);
                 edit.add(rankSubMenu);
                 menuitem = true;
             }
@@ -1145,7 +1144,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
                 rankSubMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(rankSubMenu, SpecialField.PRIORITY, this);
+                // TODO RightClickMenu.createSpecialFieldMenu(rankSubMenu, SpecialField.PRIORITY, this);
                 edit.add(rankSubMenu);
                 menuitem = true;
             }
@@ -1155,7 +1154,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
                 rankSubMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(rankSubMenu, SpecialField.READ_STATUS, this);
+                // TODO RightClickMenu.createSpecialFieldMenu(rankSubMenu, SpecialField.READ_STATUS, this);
                 edit.add(rankSubMenu);
                 menuitem = true;
             }
