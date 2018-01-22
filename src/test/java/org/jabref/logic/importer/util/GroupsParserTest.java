@@ -104,7 +104,7 @@ public class GroupsParserTest {
     @Test
     public void fromStringParsesTexGroup() throws Exception {
         TexGroup expected = new TexGroup("myTexGroup", GroupHierarchyType.INDEPENDENT, Paths.get("path", "To", "File"), new DefaultAuxParser(new BibDatabase()), fileMonitor);
-        AbstractGroup parsed = GroupsParser.fromString("TexGroup:myTexGroup;0;path\\\\To\\\\File;1;;;;", ',', fileMonitor);
+        AbstractGroup parsed = GroupsParser.fromString("TexGroup:myTexGroup;0;path/To/File;1;;;;", ',', fileMonitor);
         assertEquals(expected, parsed);
     }
 

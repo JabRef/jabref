@@ -355,4 +355,13 @@ public class FileUtil {
         }
         return files;
     }
+
+    /**
+     * Creates a string representation of the given path that should work on all systems.
+     * This method should be used when a path needs to be stored in the bib file or preferences.
+     */
+    public static String toPortableString(Path path) {
+        return path.toString()
+                   .replace('\\', '/');
+    }
 }
