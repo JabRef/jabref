@@ -976,7 +976,7 @@ public class JabRefPreferences implements PreferencesService {
 
         // Entry editor tab 2: Review Field - used for research comments, etc.
         defaults.put(CUSTOM_TAB_FIELDS + "_def2", FieldName.REVIEW);
-        defaults.put(CUSTOM_TAB_NAME + "_def2", Localization.lang("Review"));
+        defaults.put(CUSTOM_TAB_NAME + "_def2", Localization.lang("Comments"));
 
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
     }
