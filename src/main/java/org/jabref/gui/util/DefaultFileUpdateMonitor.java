@@ -13,8 +13,8 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class monitors a set of files for changes. Upon detecting a change it notifies the registered {@link
@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
  * Implementation based on https://stackoverflow.com/questions/16251273/can-i-watch-for-single-file-change-with-watchservice-not-the-whole-directory
  */
 public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
-    private static final Log LOGGER = LogFactory.getLog(DefaultFileUpdateMonitor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFileUpdateMonitor.class);
 
     private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
     private WatchService watcher;

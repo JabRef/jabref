@@ -34,12 +34,12 @@ import org.jabref.logic.util.Version;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JabRefGUI {
-    private static final Log LOGGER = LogFactory.getLog(JabRefGUI.class);
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
     private static JabRefFrame mainFrame;
 
     private final List<ParserResult> bibDatabases;
@@ -47,7 +47,7 @@ public class JabRefGUI {
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
 
-    private String focusedFile;
+    private final String focusedFile;
 
     public JabRefGUI(List<ParserResult> argsDatabases, boolean isBlank) {
         this.bibDatabases = argsDatabases;

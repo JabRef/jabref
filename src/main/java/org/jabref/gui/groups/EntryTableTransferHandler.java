@@ -39,13 +39,13 @@ import org.jabref.model.util.FileHelper;
 import org.jabref.pdfimport.PdfImporter;
 import org.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EntryTableTransferHandler extends TransferHandler {
 
     private static final boolean DROP_ALLOWED = true;
-    private static final Log LOGGER = LogFactory.getLog(EntryTableTransferHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntryTableTransferHandler.class);
     private final MainTable entryTable;
     private final JabRefFrame frame;
     private final BasePanel panel;

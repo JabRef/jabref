@@ -18,8 +18,8 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * LaTeX Aux to BibTeX Parser
@@ -36,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
  * Nested AUX files: \@input{x}
  */
 public class DefaultAuxParser implements AuxParser {
-    private static final Log LOGGER = LogFactory.getLog(DefaultAuxParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAuxParser.class);
 
     private static final Pattern CITE_PATTERN = Pattern.compile("\\\\(citation|abx@aux@cite)\\{(.+)\\}");
     private static final Pattern INPUT_PATTERN = Pattern.compile("\\\\@input\\{(.+)\\}");

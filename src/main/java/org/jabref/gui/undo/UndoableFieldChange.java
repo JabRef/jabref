@@ -5,8 +5,8 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class represents a change in any field value. The relevant
@@ -14,7 +14,7 @@ import org.apache.commons.logging.LogFactory;
  * new value. Old/new values can be null.
  */
 public class UndoableFieldChange extends AbstractUndoableJabRefEdit {
-    private static final Log LOGGER = LogFactory.getLog(UndoableFieldChange.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UndoableFieldChange.class);
 
     private final BibEntry entry;
     private final String field;

@@ -16,11 +16,11 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DatabaseChangeMonitor implements FileUpdateListener {
-    private static final Log LOGGER = LogFactory.getLog(DatabaseChangeMonitor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseChangeMonitor.class);
 
     private final BibDatabaseContext database;
     private final FileUpdateMonitor fileMonitor;

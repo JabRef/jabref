@@ -138,7 +138,9 @@ dependencies {
     compile 'org.jsoup:jsoup:1.11.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
-    compile 'commons-logging:commons-logging:1.2'
+	// >1.8.0-beta is required for java 9 compatibility
+    compile 'org.slf4j:slf4j-api:1.8.0-beta0'
+    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.10.0'
     compile 'org.apache.logging.log4j:log4j-jcl:2.10.0'
     compile 'org.apache.logging.log4j:log4j-api:2.10.0'
     compile 'org.apache.logging.log4j:log4j-core:2.10.0'
@@ -167,7 +169,6 @@ dependencies {
     testCompile 'org.xmlunit:xmlunit-core:2.5.1'
     testCompile 'org.xmlunit:xmlunit-matchers:2.5.1'
     testCompile 'com.tngtech.archunit:archunit-junit:0.5.0'
-    testCompile 'org.slf4j:slf4j-jcl:1.7.25' // required by ArchUnit to enable logging over jcl
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit:4.0.+"
 

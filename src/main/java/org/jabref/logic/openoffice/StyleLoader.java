@@ -11,15 +11,15 @@ import java.util.Objects;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StyleLoader {
 
     public static final String DEFAULT_AUTHORYEAR_STYLE_PATH = "/resource/openoffice/default_authoryear.jstyle";
     public static final String DEFAULT_NUMERICAL_STYLE_PATH = "/resource/openoffice/default_numerical.jstyle";
 
-    private static final Log LOGGER = LogFactory.getLog(StyleLoader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StyleLoader.class);
 
     // All internal styles
     private final List<String> internalStyleFiles = Arrays.asList(DEFAULT_AUTHORYEAR_STYLE_PATH,

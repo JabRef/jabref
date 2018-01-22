@@ -8,14 +8,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JSONEntryParser {
 
-    private static final Log LOGGER = LogFactory.getLog(JSONEntryParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSONEntryParser.class);
 
     /**
      * Convert a JSONObject containing a bibJSON entry to a BibEntry

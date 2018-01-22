@@ -67,16 +67,19 @@ You can see the result in `build\resources\main\help\en\About.html` or when clic
 
 ### When making an architectural decision
 In case you add a library or do mayor code rewrites, we ask you to document your decision.
-Recommended reading: http://www.infoq.com/articles/sustainable-architectural-design-decisions
+Recommended reading: <https://adr.github.io/>.
 
-Template:
+We simply ask to create a new markdown file in `docs/adr` following the template presented at <https://adr.github.io/madr/>.
+
+In case you want to directly add a comment to a class, simply use following template (based on [sustainable architectural decisions](https://www.infoq.com/articles/sustainable-architectural-design-decisions)):
+
 ```
 In the context of <use case/user story u>,
 facing <concern c>
 we decided for <option o>
 and neglected <other options>,
 to achieve <system qualities/desired consequences>,
-accepting <downside d/undesired consequences>,
+accepting <downside / undesired consequences>,
 because <additional rationale>.
 ```
 

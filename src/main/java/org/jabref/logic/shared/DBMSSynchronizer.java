@@ -35,8 +35,8 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Synchronizes the shared or local databases with their opposite side.
@@ -44,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DBMSSynchronizer implements DatabaseSynchronizer {
 
-    private static final Log LOGGER = LogFactory.getLog(DBMSSynchronizer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DBMSSynchronizer.class);
 
     private DBMSProcessor dbmsProcessor;
     private String dbName;

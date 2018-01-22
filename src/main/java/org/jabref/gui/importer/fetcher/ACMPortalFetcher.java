@@ -42,12 +42,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ACMPortalFetcher implements PreviewEntryFetcher {
 
-    private static final Log LOGGER = LogFactory.getLog(ACMPortalFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ACMPortalFetcher.class);
 
     private static final String START_URL = "https://portal.acm.org/";
     private static final String SEARCH_URL_PART = "results.cfm?query=";

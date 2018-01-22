@@ -26,18 +26,18 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * FulltextFetcher implementation that attempts to find a PDF URL at GoogleScholar.
  */
 public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
-    private static final Log LOGGER = LogFactory.getLog(GoogleScholar.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoogleScholar.class);
 
     private static final Pattern LINK_TO_BIB_PATTERN = Pattern.compile("(https:\\/\\/scholar.googleusercontent.com\\/scholar.bib[^\"]*)");
 

@@ -14,12 +14,12 @@ import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OpenDatabase {
 
-    public static final Log LOGGER = LogFactory.getLog(OpenDatabase.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabase.class);
 
     private OpenDatabase() {
     }

@@ -37,15 +37,15 @@ import org.jabref.preferences.JabRefPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.controlsfx.control.NotificationPane;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SourceTab extends EntryEditorTab {
 
-    private static final Log LOGGER = LogFactory.getLog(SourceTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SourceTab.class);
     private final LatexFieldFormatterPreferences fieldFormatterPreferences;
     private final BibDatabaseMode mode;
     private final JabRefPreferences preferences;

@@ -89,8 +89,8 @@ import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for manipulating the Bibliography of the currently start document in OpenOffice.
@@ -110,7 +110,7 @@ class OOBibBase {
     private static final int AUTHORYEAR_INTEXT = 2;
     private static final int INVISIBLE_CIT = 3;
 
-    private static final Log LOGGER = LogFactory.getLog(OOBibBase.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OOBibBase.class);
     private XMultiServiceFactory mxDocFactory;
     private XTextDocument mxDoc;
     private XText text;
