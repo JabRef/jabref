@@ -1619,7 +1619,6 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     public void updateEntryEditorIfShowing() {
         if (mode == BasePanelMode.SHOWING_EDITOR) {
             BibEntry currentEntry = entryEditor.getEntry();
-            showAndEdit(null);
             showAndEdit(currentEntry);
         }
     }
@@ -2013,18 +2012,19 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 
             // Run the search operation:
             FileFinder fileFinder = FileFinders.constructFromConfiguration(Globals.prefs.getAutoLinkPreferences());
+            try {
             List<Path> files = fileFinder.findAssociatedFiles(entry, dirs, extensions);
-            if (!files.isEmpty()) {
-                Path file = files.get(0);
-                Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByFile(file);
-                if (type.isPresent()) {
-                    try {
+                if (!files.isEmpty()) {
+                    Path file = files.get(0);
+                    Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByFile(file);
+                    if (type.isPresent()) {
                         JabRefDesktop.openExternalFileAnyFormat(file, basePanel.getBibDatabaseContext(), type);
                         basePanel.output(Localization.lang("External viewer called") + '.');
-                    } catch (IOException ex) {
-                        basePanel.output(Localization.lang("Error") + ": " + ex.getMessage());
                     }
                 }
+            } catch (IOException ex) {
+                LOGGER.error("Problems with finding/or opening files ", ex);
+                basePanel.output(Localization.lang("Error") + ": " + ex.getMessage());
             }
         }
     }

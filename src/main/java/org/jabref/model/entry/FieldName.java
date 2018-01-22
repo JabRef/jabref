@@ -110,6 +110,7 @@ public class FieldName {
     public static final String SERIES = "series";
     public static final String SHORTAUTHOR = "shortauthor";
     public static final String SHORTEDITOR = "shorteditor";
+    public static final String SHORTTITLE = "shorttitle";
     public static final String SORTNAME = "sortname";
     public static final String SUBTITLE = "subtitle";
     public static final String TITLE = "title";

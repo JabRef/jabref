@@ -82,6 +82,7 @@ dependencies {
     compile 'org.apache.pdfbox:jempbox:1.8.13'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
+
     compile 'org.bouncycastle:bcprov-jdk15on:1.57'
 
     compile 'commons-cli:commons-cli:1.4'
@@ -122,6 +123,8 @@ dependencies {
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
     compile 'org.fxmisc.richtext:richtextfx:0.7-M5'
 
+    // Cannot be updated to 9.*.* until Jabref works with Java 9
+    compile 'org.controlsfx:controlsfx:8.40.15-SNAPSHOT'
 
     compile 'commons-logging:commons-logging:1.2'
 
@@ -141,6 +144,27 @@ dependencies {
     compile 'de.undercouch:citeproc-java:1.0.1'
 
     compile 'com.github.tomtung:latex2unicode_2.12:0.2.1'
+
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '1.0.9'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.9'
+
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.0-M1'
+    testCompile 'org.junit.jupiter:junit-jupiter-params:5.1.0-M1'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.1.0-M1'
+    testRuntime 'org.junit.vintage:junit-vintage-engine:5.1.0-M1'
+    testCompile 'org.junit.platform:junit-platform-launcher:1.1.0-M1'
+    testRuntime 'org.apache.logging.log4j:log4j-core:2.10.0'
+    testRuntime 'org.apache.logging.log4j:log4j-jul:2.10.0'
+    testCompile 'org.mockito:mockito-core:2.13.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.14.0'
+    testCompile 'org.assertj:assertj-swing-junit:3.8.0'
+    testCompile 'org.reflections:reflections:0.9.11'
+    testCompile 'org.xmlunit:xmlunit-core:2.5.1'
+    testCompile 'org.xmlunit:xmlunit-matchers:2.5.1'
+    testCompile 'com.tngtech.archunit:archunit-junit:0.5.0'
+    testCompile 'org.slf4j:slf4j-jcl:1.7.25' // required by ArchUnit to enable logging over jcl
+    testCompile "org.testfx:testfx-core:4.0.+"
+    testCompile "org.testfx:testfx-junit:4.0.+"
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '1.0.+'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.+'

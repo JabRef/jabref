@@ -65,7 +65,7 @@ public class CiteKeyBasedFileFinderTest {
     }
 
     @Test
-    public void findAssociatedFilesInSubDirectories() {
+    public void findAssociatedFilesInSubDirectories() throws Exception {
         List<String> extensions = Arrays.asList("jpg", "pdf");
         List<Path> dirs = Arrays.asList(graphicsDir, pdfsDir);
         FileFinder fileFinder = new CiteKeyBasedFileFinder(false);
@@ -96,7 +96,7 @@ public class CiteKeyBasedFileFinderTest {
     }
 
     @Test
-    public void findAssociatedFilesInNonExistingDirectoryFindsNothing() {
+    public void findAssociatedFilesInNonExistingDirectoryFindsNothing() throws Exception {
         List<String> extensions = Arrays.asList("jpg", "pdf");
         List<Path> dirs = Collections.singletonList(rootDir.resolve("asdfasdf/asdfasdf"));
         CiteKeyBasedFileFinder fileFinder = new CiteKeyBasedFileFinder(false);
