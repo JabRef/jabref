@@ -40,6 +40,7 @@ public class TemplateExporter extends Exporter {
     private final SavePreferences savePreferences;
     private Charset encoding; // If this value is set, it will be used to override the default encoding for the getCurrentBasePanel.
     private boolean customExport;
+    private boolean deleteBlankLines;
 
     /**
      * Initialize another export format based on templates stored in dir with
@@ -91,6 +92,25 @@ public class TemplateExporter extends Exporter {
      */
     public TemplateExporter(String consoleName, String lfFileName, String directory, FileType extension, LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
         this(extension.getDescription(), consoleName, lfFileName, directory, extension, layoutPreferences, savePreferences);
+    }
+
+    /**
+     * Initialize another export format based on templates stored in dir with
+     * layoutFile lfFilename.
+     * The display name is automatically derived from the FileType
+     *
+     *
+     * @param consoleName Name to call this format in the console.
+     * @param lfFileName  Name of the main layout file.
+     * @param directory   Directory in which to find the layout file.
+     * @param extension   Should contain the . (for instance .txt).
+     * @param layoutPreferences Preferences for layout
+     * @param savePreferences Preferences for saving
+     * @param deleteBlankLines If blank lines should be remove (default: false)
+     */
+    public TemplateExporter(String consoleName, String lfFileName, String directory, FileType extension, LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, boolean deleteBlankLines) {
+        this(extension.getDescription(), consoleName, lfFileName, directory, extension, layoutPreferences, savePreferences);
+        this.deleteBlankLines = deleteBlankLines;
     }
 
     /**
@@ -257,7 +277,11 @@ public class TemplateExporter extends Exporter {
 
                 // Write the entry
                 if (layout != null) {
-                    ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
+                    if (deleteBlankLines) {
+                        ps.write(layout.doLayout(entry, databaseContext.getDatabase()).replaceAll("(?m)^\\s", ""));
+                    } else {
+                        ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
+                    }
                 }
             }
 
