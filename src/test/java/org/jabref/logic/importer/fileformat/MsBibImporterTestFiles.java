@@ -28,11 +28,12 @@ public class MsBibImporterTestFiles {
     @Parameter
     public String fileName;
     public Path resourceDir;
-
+    private MsBibImporter testImporter;
 
     @Before
     public void setUp() throws Exception {
         resourceDir = Paths.get(MsBibImporterTestFiles.class.getResource("").toURI());
+        testImporter = new MsBibImporter();
     }
 
     @Parameters(name = "{0}")
@@ -45,9 +46,7 @@ public class MsBibImporterTestFiles {
 
     @Test
     public final void testIsRecognizedFormat() throws Exception {
-        MsBibImporter testImporter = new MsBibImporter();
         Path xmlFile = resourceDir.resolve(fileName);
-
         Assert.assertTrue(testImporter.isRecognizedFormat(xmlFile, StandardCharsets.UTF_8));
     }
 
@@ -55,8 +54,6 @@ public class MsBibImporterTestFiles {
     public void testImportEntries() throws Exception {
 
         String bibFileName = fileName.replace(".xml", ".bib");
-        MsBibImporter testImporter = new MsBibImporter();
-
         Path xmlFile = resourceDir.resolve(fileName);
 
         List<BibEntry> result = testImporter.importDatabase(xmlFile, StandardCharsets.UTF_8).getDatabase().getEntries();

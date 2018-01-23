@@ -3,8 +3,9 @@ package org.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridBagLayout;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -25,12 +26,12 @@ import org.jabref.preferences.JabRefPreferences;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class AppearancePrefsTab extends JPanel implements PrefsTab {
 
-    private static final Log LOGGER = LogFactory.getLog(AppearancePrefsTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppearancePrefsTab.class);
 
     private final JabRefPreferences prefs;
 
@@ -58,16 +59,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     static class LookAndFeel {
 
         public static Set<String> getAvailableLookAndFeels() {
-
-            Set<String> lookAndFeels = new HashSet<>();
-            lookAndFeels.add("com.jgoodies.looks.plastic.Plastic3DLookAndFeel");
-            lookAndFeels.add("com.jgoodies.looks.windows.WindowsLookAndFeel");
-
-            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                lookAndFeels.add(info.getClassName());
-            }
-
-            return lookAndFeels;
+            return Arrays.stream(UIManager.getInstalledLookAndFeels()).map(LookAndFeelInfo::getClassName).collect(Collectors.toSet());
         }
     }
 

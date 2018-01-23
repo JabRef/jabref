@@ -12,16 +12,17 @@ import java.util.prefs.Preferences;
 
 import org.jabref.Globals;
 import org.jabref.JabRefMain;
+import org.jabref.logic.util.OS;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PreferencesMigrations {
 
-    private static final Log LOGGER = LogFactory.getLog(PreferencesMigrations.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesMigrations.class);
 
     private PreferencesMigrations() {
     }
@@ -279,6 +280,23 @@ public class PreferencesMigrations {
             keyPattern.addBibtexKeyPattern(key, oldPatternPrefs.get(key, null));
         }
         prefs.putKeyPattern(keyPattern);
+    }
+
+    public static void upgradeObsoleteLookAndFeels() {
+        JabRefPreferences prefs = Globals.prefs;
+        String currentLandF = prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
+        if ("com.jgoodies.looks.windows.WindowsLookAndFeel".equals(currentLandF) ||
+                "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel".equals(currentLandF)) {
+            if (OS.WINDOWS) {
+                String windowsLandF = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+                prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, windowsLandF);
+                LOGGER.info("Switched from obsolete look and feel " + currentLandF + " to " + windowsLandF);
+            } else {
+                String nimbusLandF = "javax.swing.plaf.nimbus.NimbusLookAndFeel";
+                prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, nimbusLandF);
+                LOGGER.info("Switched from obsolete look and feel " + currentLandF + " to " + nimbusLandF);
+            }
+        }
     }
 
 }

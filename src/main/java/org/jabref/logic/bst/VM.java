@@ -25,8 +25,8 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -46,7 +46,7 @@ public class VM implements Warn {
 
     private static final Pattern ADD_PERIOD_PATTERN = Pattern.compile("([^\\.\\?\\!\\}\\s])(\\}|\\s)*$");
 
-    private static final Log LOGGER = LogFactory.getLog(VM.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VM.class);
 
     private List<BstEntry> entries;
 
@@ -500,7 +500,7 @@ public class VM implements Warn {
          */
         buildInFunctions.put("stack$", context -> {
             while (!stack.empty()) {
-                LOGGER.debug(stack.pop());
+                LOGGER.debug("Stack entry", stack.pop());
             }
         });
 
@@ -564,7 +564,7 @@ public class VM implements Warn {
         /**
          * Pops and prints the top of the stack to the log file. It's useful for debugging.
          */
-        buildInFunctions.put("top$", context -> LOGGER.debug(stack.pop()));
+        buildInFunctions.put("top$", context -> LOGGER.debug("Stack entry", stack.pop()));
 
         /**
          * Pushes the current entry's type (book, article, etc.), but pushes

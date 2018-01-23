@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
@@ -32,19 +31,16 @@ import org.jabref.gui.keyboard.KeyBinder;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.exporter.ExportFormat;
-import org.jabref.logic.exporter.ExportFormats;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.util.FileType;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.JabRefPreferencesFilter;
-import org.jabref.shared.prefs.SharedDatabasePreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined in
@@ -57,7 +53,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class PreferencesDialog extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(PreferencesDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesDialog.class);
 
     private final JPanel main;
 
@@ -163,8 +159,8 @@ public class PreferencesDialog extends JabRefDialog {
         importPreferences.addActionListener(e -> {
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileExtensions.XML)
-                    .withDefaultExtension(FileExtensions.XML)
+                    .addExtensionFilter(FileType.XML)
+                    .withDefaultExtension(FileType.XML)
                     .withInitialDirectory(getPrefsExportPath()).build();
             DialogService ds = new FXDialogService();
 
@@ -228,12 +224,8 @@ public class PreferencesDialog extends JabRefDialog {
 
     private void updateAfterPreferenceChanges() {
         setValues();
-        Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
-                Globals.journalAbbreviationLoader);
-        LayoutFormatterPreferences layoutPreferences = Globals.prefs
-                .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
-        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
-        ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
+
+        Globals.exportFactory = ExporterFactory.create(Globals.prefs, Globals.journalAbbreviationLoader);
 
         Globals.prefs.updateEntryEditorTabList();
     }
@@ -290,8 +282,8 @@ public class PreferencesDialog extends JabRefDialog {
         public void actionPerformed(ActionEvent e) {
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileExtensions.XML)
-                    .withDefaultExtension(FileExtensions.XML)
+                    .addExtensionFilter(FileType.XML)
+                    .withDefaultExtension(FileType.XML)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
             DialogService ds = new FXDialogService();
             Optional<Path> path = DefaultTaskExecutor

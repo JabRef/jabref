@@ -6,48 +6,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.importer.fetcher.ACS;
-import org.jabref.logic.importer.fetcher.ArXiv;
-import org.jabref.logic.importer.fetcher.DoiResolution;
-import org.jabref.logic.importer.fetcher.GoogleScholar;
-import org.jabref.logic.importer.fetcher.IEEE;
-import org.jabref.logic.importer.fetcher.ScienceDirect;
-import org.jabref.logic.importer.fetcher.SpringerLink;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for trying to resolve URLs to full-text PDF for articles.
  */
 public class FulltextFetchers {
-    private static final Log LOGGER = LogFactory.getLog(FulltextFetchers.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FulltextFetchers.class);
 
     private final List<FulltextFetcher> finders = new ArrayList<>();
 
     public FulltextFetchers(ImportFormatPreferences importFormatPreferences) {
-        // Ordering is important, authorities first!
-        // Publisher
-        finders.add(new DoiResolution());
-        finders.add(new ScienceDirect());
-        finders.add(new SpringerLink());
-        finders.add(new ACS());
-        finders.add(new ArXiv(importFormatPreferences));
-        finders.add(new IEEE());
-        // Meta search
-        finders.add(new GoogleScholar(importFormatPreferences));
+        this(WebFetchers.getFullTextFetchers(importFormatPreferences));
     }
 
-    public FulltextFetchers(List<FulltextFetcher> fetcher) {
+    FulltextFetchers(List<FulltextFetcher> fetcher) {
         finders.addAll(fetcher);
-    }
-
-    public List<FulltextFetcher> getFetchers() {
-        return finders;
     }
 
     public Optional<URL> findFullTextPDF(BibEntry entry) {

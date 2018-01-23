@@ -14,7 +14,6 @@ import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.FontUIResource;
-import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
@@ -29,21 +28,19 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.indexing.PdfIndexer;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
+import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.shared.exception.DatabaseNotSupportedException;
-import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.shared.exception.NotASharedDatabaseException;
 
-import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
-import com.jgoodies.looks.plastic.theme.SkyBluer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JabRefGUI {
-    private static final Log LOGGER = LogFactory.getLog(JabRefGUI.class);
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
     private static JabRefFrame mainFrame;
 
     private final List<ParserResult> bibDatabases;
@@ -52,7 +49,7 @@ public class JabRefGUI {
     private final List<ParserResult> toOpenTab = new ArrayList<>();
     private final PdfIndexer indexer;
 
-    private String focusedFile;
+    private final String focusedFile;
 
     public JabRefGUI(List<ParserResult> argsDatabases, boolean isBlank, PdfIndexer indexer) {
         this.bibDatabases = argsDatabases;
@@ -255,10 +252,7 @@ public class JabRefGUI {
             if (UIManager.getCrossPlatformLookAndFeelClassName().equals(lookFeel)
                     && !System.getProperty("java.runtime.name").contains("OpenJDK")) {
                 // try to avoid ending up with the ugly Metal L&F
-                Plastic3DLookAndFeel lnf = new Plastic3DLookAndFeel();
-                MetalLookAndFeel.setCurrentTheme(new SkyBluer());
-                com.jgoodies.looks.Options.setPopupDropShadowEnabled(true);
-                UIManager.setLookAndFeel(lnf);
+                UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
             } else {
                 try {
                     UIManager.setLookAndFeel(lookFeel);

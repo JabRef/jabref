@@ -32,8 +32,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
+
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -42,6 +44,7 @@ import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.TransferableBibtexEntry;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.filelist.FileListEntry;
@@ -72,8 +75,8 @@ import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dialog to display search results, potentially from more than one BasePanel, with
@@ -89,7 +92,7 @@ public class SearchResultFrame {
     private static final int URL_COL = 2;
     private static final int PAD = 3;
 
-    private static final Log LOGGER = LogFactory.getLog(SearchResultFrame.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchResultFrame.class);
 
     private final JabRefFrame frame;
     private JFrame searchResultFrame;
@@ -149,7 +152,9 @@ public class SearchResultFrame {
         entryTable.addMouseListener(new TableClickListener());
 
         contentPane.setTopComponent(sp);
-        contentPane.setBottomComponent(preview);
+
+        JFXPanel container = CustomJFXPanel.wrap(new Scene(preview));
+        contentPane.setBottomComponent(container);
 
         // Key bindings:
         AbstractAction closeAction = new AbstractAction() {
@@ -547,7 +552,6 @@ public class SearchResultFrame {
                 preview.setBasePanel(entryHome.get(entry));
                 preview.setDatabaseContext(entryHome.get(entry).getBibDatabaseContext());
                 contentPane.setDividerLocation(0.5f);
-                SwingUtilities.invokeLater(() -> preview.scrollRectToVisible(toRect));
             }
         }
     }

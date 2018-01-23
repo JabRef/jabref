@@ -108,6 +108,7 @@ public class MSBibConverter {
 
         entry.getField(FieldName.AUTHOR).ifPresent(authors -> result.authors = getAuthors(authors));
         entry.getField(FieldName.EDITOR).ifPresent(editors -> result.editors = getAuthors(editors));
+        entry.getField(FieldName.TRANSLATOR).ifPresent(translator -> result.translators = getAuthors(translator));
 
         return result;
     }

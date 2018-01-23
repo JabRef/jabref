@@ -16,6 +16,18 @@ public class Date {
 
     private final TemporalAccessor date;
 
+    public Date(int year, int month, int dayOfMonth) {
+        this(LocalDate.of(year, month, dayOfMonth));
+    }
+
+    public Date(int year, int month) {
+        this(YearMonth.of(year, month));
+    }
+
+    public Date(int year) {
+        this(Year.of(year));
+    }
+
     public Date(TemporalAccessor date) {
         this.date = date;
     }

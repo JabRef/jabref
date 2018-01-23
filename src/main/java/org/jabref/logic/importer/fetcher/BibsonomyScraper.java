@@ -10,8 +10,8 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Convenience class for getting BibTeX entries from the BibSonomy scraper,
@@ -22,7 +22,7 @@ public class BibsonomyScraper {
     private static final String BIBSONOMY_SCRAPER = "http://scraper.bibsonomy.org/service?url=";
     private static final String BIBSONOMY_SCRAPER_POST = "&format=bibtex";
 
-    private static final Log LOGGER = LogFactory.getLog(BibsonomyScraper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibsonomyScraper.class);
 
     private BibsonomyScraper() {
     }

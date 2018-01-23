@@ -5,8 +5,8 @@ import java.util.Objects;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.GroupSearchQuery;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This group matches entries by a complex search pattern, which might include conditions about the values of
@@ -14,7 +14,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SearchGroup extends AbstractGroup {
 
-    private static final Log LOGGER = LogFactory.getLog(SearchGroup.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchGroup.class);
     private final GroupSearchQuery query;
 
     public SearchGroup(String name, GroupHierarchyType context, String searchExpression, boolean caseSensitive,

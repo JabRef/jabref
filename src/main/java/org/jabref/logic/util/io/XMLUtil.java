@@ -14,8 +14,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -26,7 +26,7 @@ import org.w3c.dom.NodeList;
  * Currently used for debugging only
  */
 public class XMLUtil {
-    private static final Log LOGGER = LogFactory.getLog(XMLUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XMLUtil.class);
 
     private XMLUtil() {
     }

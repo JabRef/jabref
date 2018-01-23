@@ -9,8 +9,8 @@ import java.util.regex.Pattern;
 
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for working with Digital object identifiers (DOIs)
@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
  * @see https://en.wikipedia.org/wiki/Digital_object_identifier
  */
 public class DOI implements Identifier {
-    private static final Log LOGGER = LogFactory.getLog(DOI.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DOI.class);
 
     // DOI resolver
     private static final URI RESOLVER = URI.create("https://doi.org");
@@ -95,7 +95,7 @@ public class DOI implements Identifier {
      */
     public static Optional<DOI> parse(String doi) {
         try {
-            return Optional.ofNullable(new DOI(doi));
+            return Optional.of(new DOI(doi));
         } catch (IllegalArgumentException | NullPointerException e) {
             return Optional.empty();
         }

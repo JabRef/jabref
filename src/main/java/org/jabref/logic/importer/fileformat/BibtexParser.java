@@ -38,8 +38,8 @@ import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.MetaData;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for importing BibTeX-files.
@@ -58,7 +58,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class BibtexParser implements Parser {
 
-    private static final Log LOGGER = LogFactory.getLog(BibtexParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
     private static final Integer LOOKAHEAD = 64;
     private final FieldContentParser fieldContentParser;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
@@ -122,6 +122,10 @@ public class BibtexParser implements Parser {
 
     public List<BibEntry> parseEntries(String bibtexString) throws ParseException {
         return parseEntries(new StringReader(bibtexString));
+    }
+
+    public Optional<BibEntry> parseSingleEntry(String bibtexString) throws ParseException {
+        return parseEntries(bibtexString).stream().findFirst();
     }
 
     /**

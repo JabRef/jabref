@@ -77,7 +77,7 @@ import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.FreeCiteImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.EntryTypes;
@@ -89,8 +89,8 @@ import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * import from plain text => simple mark/copy/paste into bibtex entry
@@ -104,7 +104,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class TextInputDialog extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(TextInputDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TextInputDialog.class);
 
     private final JButton okButton = new JButton(Localization.lang("Accept"));
     private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
@@ -556,8 +556,8 @@ public class TextInputDialog extends JabRefDialog {
         public void actionPerformed(ActionEvent e) {
             try {
                 FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                        .addExtensionFilter(FileExtensions.TXT)
-                        .withDefaultExtension(FileExtensions.TXT)
+                        .addExtensionFilter(FileType.TXT)
+                        .withDefaultExtension(FileType.TXT)
                         .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
                 DialogService ds = new FXDialogService();
 
