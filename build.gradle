@@ -175,6 +175,9 @@ dependencies {
     checkstyle 'com.puppycrawl.tools:checkstyle:8.7'
 }
 
+jacoco {
+    toolVersion = '0.8.0'
+}
 dependencyUpdates {
     outputFormatter = "json"
 }
@@ -364,9 +367,6 @@ task copyTestResources(type: Copy) {
 }
 processTestResources.dependsOn copyTestResources
 
-jacoco {
-    toolVersion = '0.8.0'
-}
 
 tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
