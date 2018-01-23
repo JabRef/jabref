@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.commons.codec.Charsets;
@@ -41,7 +41,7 @@ public class MedlinePlainImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(FileExtensions.MEDLINE_PLAIN, importer.getExtensions());
+        assertEquals(FileType.MEDLINE_PLAIN, importer.getFileType());
     }
 
     @Test

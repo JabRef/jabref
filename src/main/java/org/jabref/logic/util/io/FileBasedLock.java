@@ -7,8 +7,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.Optional;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileBasedLock {
     /**
@@ -16,7 +16,7 @@ public class FileBasedLock {
      */
     public static final long LOCKFILE_CRITICAL_AGE = 60000;
 
-    private static final Log LOGGER = LogFactory.getLog(FileBasedLock.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileBasedLock.class);
     private static final String LOCKFILE_SUFFIX = ".lock";
 
     // default retry count for aquiring file lock

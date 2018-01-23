@@ -10,6 +10,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileUpdateMonitor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
@@ -48,6 +49,7 @@ public class Globals {
      * Manager for the state of the GUI.
      */
     public static StateManager stateManager = new StateManager();
+    public static ExporterFactory exportFactory;
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
     // Background tasks

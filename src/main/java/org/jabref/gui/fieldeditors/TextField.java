@@ -17,8 +17,8 @@ import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.util.component.JTextFieldWithPlaceholder;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of the FieldEditor backed by a JTextField. Used for single-line input, only BibTex key at the
@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class TextField extends JTextFieldWithPlaceholder implements FieldEditor {
 
-    private static final Log LOGGER = LogFactory.getLog(TextField.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TextField.class);
 
     private final String fieldName;
     private UndoManager undo;

@@ -11,12 +11,12 @@ import org.jabref.model.pdf.FileAnnotation;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileAnnotationCache {
 
-    private static final Log LOGGER = LogFactory.getLog(FileAnnotation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotation.class);
     //cache size in entries
     private final static int CACHE_SIZE = 10;
 

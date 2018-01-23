@@ -7,9 +7,9 @@ import java.util.List;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jbibtex.TokenMgrException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -18,7 +18,7 @@ import org.jbibtex.TokenMgrException;
  */
 public class CitationStyleGenerator {
 
-    private static final Log LOGGER = LogFactory.getLog(CitationStyleGenerator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyleGenerator.class);
     private static final CSLAdapter CSL_ADAPTER = new CSLAdapter();
 
     private CitationStyleGenerator() {
@@ -45,7 +45,7 @@ public class CitationStyleGenerator {
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
     protected static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat) {
-        return generateCitations(Collections.singletonList(entry), style, outputFormat).get(0);
+        return generateCitations(Collections.singletonList(entry), style, outputFormat).stream().findFirst().orElse("");
     }
 
     /**

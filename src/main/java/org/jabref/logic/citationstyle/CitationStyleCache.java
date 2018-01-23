@@ -30,7 +30,7 @@ public class CitationStyleCache {
     }
 
     public CitationStyleCache(BibDatabaseContext bibDatabaseContext, CitationStyle citationStyle) {
-        this.citationStyle = citationStyle;
+        this.citationStyle = Objects.requireNonNull(citationStyle);
         citationStyleCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<BibEntry, String>() {
             @Override
             public String load(BibEntry entry) {

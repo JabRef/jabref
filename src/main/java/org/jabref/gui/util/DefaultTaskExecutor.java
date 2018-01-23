@@ -4,16 +4,16 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.function.Consumer;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
-import org.jabref.gui.externalfiles.FileDownloadTask;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.fxmisc.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A very simple implementation of the {@link TaskExecutor} interface.
@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultTaskExecutor implements TaskExecutor {
 
-    private static final Log LOGGER = LogFactory.getLog(DefaultTaskExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTaskExecutor.class);
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(5);
 
@@ -33,7 +33,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
         try {
             return task.get();
         } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error(e);
+            LOGGER.error("Problem running in fx thread", e);
             return null;
         }
     }
@@ -43,13 +43,8 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     @Override
-    public <V> void execute(BackgroundTask<V> task) {
-        EXECUTOR.submit(getJavaFXTask(task));
-    }
-
-    @Override
-    public void execute(FileDownloadTask downloadTask) {
-        EXECUTOR.submit(downloadTask);
+    public <V> Future<?> execute(BackgroundTask<V> task) {
+        return EXECUTOR.submit(getJavaFXTask(task));
     }
 
     @Override
@@ -59,6 +54,10 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
         Task<V> javaTask = new Task<V>() {
+
+            {
+                EasyBind.subscribe(task.progressProperty(), progress -> updateProgress(progress.getWorkDone(), progress.getMax()));
+            }
 
             @Override
             public V call() throws Exception {

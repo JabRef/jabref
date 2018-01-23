@@ -11,7 +11,7 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 
 /**
  * This importer exists only to enable `--importToOpen someEntry.bib`
@@ -76,8 +76,8 @@ public class BibtexImporter extends Importer {
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return FileExtensions.BIBTEX_DB;
+    public FileType getFileType() {
+        return FileType.BIBTEX_DB;
     }
 
     @Override

@@ -9,12 +9,12 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.worker.LookupIdentifiersWorker;
 import org.jabref.logic.importer.IdFetcher;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LookupIdentifierAction extends MnemonicAwareAction {
 
-    private static final Log LOGGER = LogFactory.getLog(LookupIdentifierAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LookupIdentifierAction.class);
 
     private final JabRefFrame frame;
     private final IdFetcher fetcher;
@@ -32,7 +32,7 @@ public class LookupIdentifierAction extends MnemonicAwareAction {
         try {
             BasePanel.runWorker(new LookupIdentifiersWorker(frame, fetcher));
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error("Problem running ID Worker", e);
         }
     }
 }

@@ -26,11 +26,11 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.FileAnnotation;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileAnnotationTabViewModel extends AbstractViewModel {
-    private static final Log LOGGER = LogFactory.getLog(FileAnnotationTabViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotationTabViewModel.class);
 
     private final ListProperty<FileAnnotationViewModel> annotations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Path> files = new SimpleListProperty<>(FXCollections.observableArrayList());

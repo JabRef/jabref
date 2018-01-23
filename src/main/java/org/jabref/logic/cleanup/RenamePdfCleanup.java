@@ -23,12 +23,12 @@ import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RenamePdfCleanup implements CleanupJob {
 
-    private static final Log LOGGER = LogFactory.getLog(RenamePdfCleanup.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RenamePdfCleanup.class);
 
     private final BibDatabaseContext databaseContext;
     private final boolean onlyRelativePaths;

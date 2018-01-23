@@ -50,7 +50,6 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.search.SearchQueryHighlightObservable;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.SearchPreferences;
@@ -185,7 +184,7 @@ public class GlobalSearchBar extends JPanel {
 
         EasyBind.subscribe(searchField.textProperty(), searchText -> performSearch());
 
-        container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+        container = CustomJFXPanel.create();
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             Scene scene = new Scene(searchField);
             scene.getStylesheets().add(AbstractView.class.getResource("Main.css").toExternalForm());
@@ -360,10 +359,12 @@ public class GlobalSearchBar extends JPanel {
     }
 
     public void setAutoCompleter(AutoCompleteSuggestionProvider<Author> searchCompleter) {
-        AutoCompletionTextInputBinding.autoComplete(searchField,
-                searchCompleter,
-                new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
-                new AppendPersonNamesStrategy());
+        if (Globals.prefs.getAutoCompletePreferences().shouldAutoComplete()) {
+            AutoCompletionTextInputBinding.autoComplete(searchField,
+                    searchCompleter,
+                    new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
+                    new AppendPersonNamesStrategy());
+        }
     }
 
     public SearchQueryHighlightObservable getSearchQueryHighlightObservable() {

@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.scene.control.Tooltip;
 
 import org.jabref.Globals;
@@ -16,8 +18,8 @@ import org.jabref.model.entry.EntryType;
 
 public class OtherFieldsTab extends FieldsEditorTab {
 
-    public OtherFieldsTab(BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders) {
-        super(false, databaseContext, suggestionProviders);
+    public OtherFieldsTab(BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager) {
+        super(false, databaseContext, suggestionProviders, undoManager);
 
         setText(Localization.lang("Other fields"));
         setTooltip(new Tooltip(Localization.lang("Show remaining fields")));

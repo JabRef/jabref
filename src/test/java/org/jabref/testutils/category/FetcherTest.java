@@ -13,4 +13,5 @@ import org.junit.jupiter.api.Tag;
 @Inherited
 @Tag("FetcherTest")
 public @interface FetcherTest {
+    //empty
 }
