@@ -34,7 +34,16 @@ public class TemplateExporter extends Exporter {
 
     private static final String LAYOUT_PREFIX = "/resource/layout/";
 
+    /**
+     * A regular expression that matches blank lines
+     *
+     * ?m activates "multimode", which makes ^ match line starts/ends.
+     * \\s simply marks any whitespace character
+     */
+    private static final Pattern BLANK_LINE_MATCHER = Pattern.compile("(?m)^\\s");
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TemplateExporter.class);
+    
     private final String lfFileName;
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
@@ -42,14 +51,6 @@ public class TemplateExporter extends Exporter {
     private Charset encoding; // If this value is set, it will be used to override the default encoding for the getCurrentBasePanel.
     private boolean customExport;
     private boolean deleteBlankLines;
-    
-    /**
-     * A regular expression that matches blank lines
-     *
-     * ?m activates "multimode", which makes ^ match line starts/ends.
-     * \\s simply marks any whitespace character
-     */
-    private Pattern  blankLineMatcher = Pattern.compile("(?m)^\\s");
 
     /**
      * Initialize another export format based on templates stored in dir with
@@ -287,7 +288,7 @@ public class TemplateExporter extends Exporter {
                 // Write the entry
                 if (layout != null) {
                     if (deleteBlankLines) {
-                        String withoutBlankLines = blankLineMatcher.matcher(layout.doLayout(entry, databaseContext.getDatabase())).replaceAll("");
+                        String withoutBlankLines = BLANK_LINE_MATCHER.matcher(layout.doLayout(entry, databaseContext.getDatabase())).replaceAll("");
                         ps.write(withoutBlankLines);
                     } else {
                         ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
