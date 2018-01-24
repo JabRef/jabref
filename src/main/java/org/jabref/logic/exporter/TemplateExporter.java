@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import org.jabref.JabRefMain;
 import org.jabref.logic.layout.Layout;
@@ -33,13 +34,23 @@ public class TemplateExporter extends Exporter {
 
     private static final String LAYOUT_PREFIX = "/resource/layout/";
 
+    /**
+     * A regular expression that matches blank lines
+     *
+     * ?m activates "multimode", which makes ^ match line starts/ends.
+     * \\s simply marks any whitespace character
+     */
+    private static final Pattern BLANK_LINE_MATCHER = Pattern.compile("(?m)^\\s");
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TemplateExporter.class);
+    
     private final String lfFileName;
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
     private final SavePreferences savePreferences;
     private Charset encoding; // If this value is set, it will be used to override the default encoding for the getCurrentBasePanel.
     private boolean customExport;
+    private boolean deleteBlankLines;
 
     /**
      * Initialize another export format based on templates stored in dir with
@@ -91,6 +102,25 @@ public class TemplateExporter extends Exporter {
      */
     public TemplateExporter(String consoleName, String lfFileName, String directory, FileType extension, LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
         this(extension.getDescription(), consoleName, lfFileName, directory, extension, layoutPreferences, savePreferences);
+    }
+
+    /**
+     * Initialize another export format based on templates stored in dir with
+     * layoutFile lfFilename.
+     * The display name is automatically derived from the FileType
+     *
+     *
+     * @param consoleName Name to call this format in the console.
+     * @param lfFileName  Name of the main layout file.
+     * @param directory   Directory in which to find the layout file.
+     * @param extension   Should contain the . (for instance .txt).
+     * @param layoutPreferences Preferences for layout
+     * @param savePreferences Preferences for saving
+     * @param deleteBlankLines If blank lines should be remove (default: false)
+     */
+    public TemplateExporter(String consoleName, String lfFileName, String directory, FileType extension, LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, boolean deleteBlankLines) {
+        this(extension.getDescription(), consoleName, lfFileName, directory, extension, layoutPreferences, savePreferences);
+        this.deleteBlankLines = deleteBlankLines;
     }
 
     /**
@@ -257,7 +287,12 @@ public class TemplateExporter extends Exporter {
 
                 // Write the entry
                 if (layout != null) {
-                    ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
+                    if (deleteBlankLines) {
+                        String withoutBlankLines = BLANK_LINE_MATCHER.matcher(layout.doLayout(entry, databaseContext.getDatabase())).replaceAll("");
+                        ps.write(withoutBlankLines);
+                    } else {
+                        ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
+                    }
                 }
             }
 

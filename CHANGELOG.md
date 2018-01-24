@@ -20,6 +20,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We improved the export of the `address` and `location` field to the MS-Office XML fields. If the address field does not contain a comma, it is treated as single value and exported to the field `city`. [#1750, comment](https://github.com/JabRef/jabref/issues/1750#issuecomment-357539167) 
 For more details refer to the [field mapping help page](http://help.jabref.org/en/MsOfficeBibFieldMapping)
 - We added Facebook and Twitter icons in the toolbar to link to our [Facebook](https://www.facebook.com/JabRef/) and [Twitter](https://twitter.com/jabref_org) pages.
+- We no longer print empty lines when exporting an entry in RIS format [#3634](https://github.com/JabRef/jabref/issues/3634)
 
 ### Fixed
 - We fixed the missing dot in the name of an exported file. [#3576](https://github.com/JabRef/jabref/issues/3576)
