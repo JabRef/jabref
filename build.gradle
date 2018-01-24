@@ -100,10 +100,10 @@ dependencies {
 
     compile 'commons-cli:commons-cli:1.4'
 
-    compile 'org.openoffice:juh:4.1.2'
-    compile 'org.openoffice:jurt:4.1.2'
-    compile 'org.openoffice:ridl:4.1.2'
-    compile 'org.openoffice:unoil:4.1.2'
+    compile "org.libreoffice:juh:5.4.2"
+    compile "org.libreoffice:jurt:5.4.2"
+    compile "org.libreoffice:ridl:5.4.2"
+    compile "org.libreoffice:unoil:5.4.2"
 
     compile 'com.github.bkromhout:java-diff-utils:2.1.1'
     compile 'info.debatty:java-string-similarity:1.0.1'
@@ -138,7 +138,7 @@ dependencies {
     compile 'org.jsoup:jsoup:1.11.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
-	// >1.8.0-beta is required for java 9 compatibility
+    // >1.8.0-beta is required for java 9 compatibility
     compile 'org.slf4j:slf4j-api:1.8.0-beta0'
     compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.10.0'
     compile 'org.apache.logging.log4j:log4j-jcl:2.10.0'
