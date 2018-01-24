@@ -25,12 +25,12 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.groups.EntryTableTransferHandler;
 import org.jabref.model.util.FileHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class FileListEditorTransferHandler extends TransferHandler {
 
-    private static final Log LOGGER = LogFactory.getLog(FileListEditorTransferHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileListEditorTransferHandler.class);
 
     private final DataFlavor URL_FLAVOR;
     private final JabRefFrame frame;

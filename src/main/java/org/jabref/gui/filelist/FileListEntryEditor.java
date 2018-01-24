@@ -52,8 +52,8 @@ import org.jabref.preferences.JabRefPreferences;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class produces a dialog box for editing a single file link from a Bibtex entry.
@@ -68,7 +68,7 @@ public class FileListEntryEditor {
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
-    private static final Log LOGGER = LogFactory.getLog(FileListEntryEditor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileListEntryEditor.class);
     private final JTextField link = new JTextField();
     private final JTextField description = new JTextField();
     private final JButton ok = new JButton(Localization.lang("OK"));

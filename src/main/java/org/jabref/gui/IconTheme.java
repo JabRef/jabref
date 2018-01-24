@@ -33,8 +33,8 @@ import org.jabref.preferences.JabRefPreferences;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IconTheme {
 
@@ -45,7 +45,7 @@ public class IconTheme {
     public static final Color DEFAULT_DISABLED_COLOR = JabRefPreferences.getInstance().getColor(JabRefPreferences.ICON_DISABLED_COLOR);
     public static Font FONT;
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
-    private static final Log LOGGER = LogFactory.getLog(IconTheme.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IconTheme.class);
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(
             IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
 
@@ -269,6 +269,7 @@ public class IconTheme {
         CONSOLE(MaterialDesignIcon.CONSOLE), /*css: console */
         FORUM(MaterialDesignIcon.FORUM), /* css: forum */
         FACEBOOK(MaterialDesignIcon.FACEBOOK), /* css: facebook */
+        TWITTER(MaterialDesignIcon.TWITTER), /* css: twitter */
         BLOG(MaterialDesignIcon.RSS), /* css: rss */
         GLOBAL_SEARCH(MaterialDesignIcon.EARTH), /* css: earth */
         DATE_PICKER(MaterialDesignIcon.CALENDAR), /* css: calendar */

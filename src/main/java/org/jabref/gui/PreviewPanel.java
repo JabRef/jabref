@@ -34,15 +34,15 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Displays an BibEntry using the given layout format.
  */
 public class PreviewPanel extends ScrollPane implements SearchQueryHighlightListener, EntryContainer {
 
-    private static final Log LOGGER = LogFactory.getLog(PreviewPanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewPanel.class);
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;

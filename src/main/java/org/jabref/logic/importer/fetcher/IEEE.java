@@ -13,8 +13,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for finding PDF URLs for entries on IEEE
@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class IEEE implements FulltextFetcher {
 
-    private static final Log LOGGER = LogFactory.getLog(IEEE.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IEEE.class);
     private static final Pattern STAMP_PATTERN = Pattern.compile("(/stamp/stamp.jsp\\?t?p?=?&?arnumber=[0-9]+)");
     private static final Pattern PDF_PATTERN = Pattern
             .compile("\"(http://ieeexplore.ieee.org/ielx[0-9/]+\\.pdf[^\"]+)\"");

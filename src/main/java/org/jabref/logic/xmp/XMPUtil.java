@@ -34,8 +34,6 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.jempbox.impl.DateConverter;
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
@@ -52,6 +50,8 @@ import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.pdfbox.pdmodel.encryption.BadSecurityHandlerException;
 import org.apache.pdfbox.pdmodel.encryption.StandardDecryptionMaterial;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /**
@@ -60,7 +60,7 @@ import org.w3c.dom.Document;
  */
 public class XMPUtil {
 
-    private static final Log LOGGER = LogFactory.getLog(XMPUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XMPUtil.class);
 
     private XMPUtil() {
     }
@@ -636,7 +636,7 @@ public class XMPUtil {
                  *
                  * Bibtex-Fields used: year, month
                  */
-                entry.getPublicationDate()
+                entry.getFieldOrAlias(FieldName.DATE)
                         .ifPresent(publicationDate -> dcSchema.addSequenceValue("dc:date", publicationDate));
                 continue;
             }

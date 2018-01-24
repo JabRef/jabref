@@ -33,8 +33,8 @@ import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BibEntry implements Cloneable {
 
@@ -43,7 +43,7 @@ public class BibEntry implements Cloneable {
     public static final String KEY_FIELD = "bibtexkey";
     public static final String DEFAULT_TYPE = "misc";
     protected static final String ID_FIELD = "id";
-    private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
     private static final Pattern REMOVE_TRAILING_WHITESPACE = Pattern.compile("\\s+$");
     private final SharedBibEntryData sharedBibEntryData;
     /**
@@ -591,8 +591,8 @@ public class BibEntry implements Cloneable {
      *
      * @return will return the publication date of the entry or null if no year was found.
      */
-    public Optional<String> getPublicationDate() {
-        return getFieldOrAlias(FieldName.DATE);
+    public Optional<Date> getPublicationDate() {
+        return getFieldOrAlias(FieldName.DATE).flatMap(Date::parse);
     }
 
     public String getParsedSerialization() {
@@ -735,7 +735,7 @@ public class BibEntry implements Cloneable {
             this.eventBus.unregister(object);
         } catch (IllegalArgumentException e) {
             // occurs if the event source has not been registered, should not prevent shutdown
-            LOGGER.debug(e);
+            LOGGER.debug("Problem unregistering", e);
         }
     }
 

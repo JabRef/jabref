@@ -10,15 +10,15 @@ import org.jabref.logic.shared.security.Password;
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.database.shared.DatabaseConnectionProperties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Keeps all essential data for establishing a new connection to a DBMS using {@link DBMSConnection}.
  */
 public class DBMSConnectionProperties implements DatabaseConnectionProperties {
 
-    private static final Log LOGGER = LogFactory.getLog(DBMSConnectionProperties.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DBMSConnectionProperties.class);
 
     private DBMSType type;
     private String host;

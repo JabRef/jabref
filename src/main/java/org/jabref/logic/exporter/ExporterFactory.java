@@ -47,7 +47,7 @@ public class ExporterFactory {
         exporters.add(new TemplateExporter("iso690txt", "iso690", "iso690txt", FileType.ISO_690_TXT, layoutPreferences, savePreferences));
         exporters.add(new TemplateExporter("endnote", "EndNote", "endnote", FileType.ENDNOTE_TXT, layoutPreferences, savePreferences));
         exporters.add(new TemplateExporter("oocsv", "openoffice-csv", "openoffice", FileType.OO_LO, layoutPreferences, savePreferences));
-        exporters.add(new TemplateExporter("ris", "ris", "ris", FileType.RIS, layoutPreferences, savePreferences).withEncoding(StandardCharsets.UTF_8));
+        exporters.add(new TemplateExporter("ris", "ris", "ris", FileType.RIS, layoutPreferences, savePreferences, true).withEncoding(StandardCharsets.UTF_8));
         exporters.add(new TemplateExporter("misq", "misq", "misq", FileType.MIS_QUARTERLY, layoutPreferences, savePreferences));
         exporters.add(new BibTeXMLExporter());
         exporters.add(new OpenOfficeDocumentCreator());

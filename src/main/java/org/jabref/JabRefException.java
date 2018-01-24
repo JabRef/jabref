@@ -1,11 +1,11 @@
 package org.jabref;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JabRefException extends Exception {
 
-    private static final Log LOGGER = LogFactory.getLog(JabRefException.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefException.class);
     private String localizedMessage;
 
     public JabRefException(String message) {

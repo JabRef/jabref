@@ -29,12 +29,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class ImportFormats {
 
-    private static final Log LOGGER = LogFactory.getLog(ImportFormats.class);
 
     private ImportFormats() {
     }
@@ -75,7 +71,6 @@ public class ImportFormats {
                 FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                         .addExtensionFilter(allImports)
                         .addExtensionFilters(extensions)
-                        .withDefaultExtension(allImports)
                         .withInitialDirectory(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY))
                         .build();
                 DialogService dialogService = new FXDialogService();

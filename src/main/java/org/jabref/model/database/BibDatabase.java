@@ -35,14 +35,14 @@ import org.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A bibliography database.
  */
 public class BibDatabase {
-    private static final Log LOGGER = LogFactory.getLog(BibDatabase.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
     /**
      * State attributes
@@ -573,7 +573,7 @@ public class BibDatabase {
             this.eventBus.unregister(listener);
         } catch (IllegalArgumentException e) {
             // occurs if the event source has not been registered, should not prevent shutdown
-            LOGGER.debug(e);
+            LOGGER.debug("Problem unregistering", e);
         }
     }
 
