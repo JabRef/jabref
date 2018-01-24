@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import org.jabref.JabRefMain;
 import org.jabref.logic.layout.Layout;
@@ -41,6 +42,14 @@ public class TemplateExporter extends Exporter {
     private Charset encoding; // If this value is set, it will be used to override the default encoding for the getCurrentBasePanel.
     private boolean customExport;
     private boolean deleteBlankLines;
+    
+    /**
+     * A regular expression that matches blank lines
+     *
+     * ?m activates "multimode", which makes ^ match line starts/ends.
+     * \\s simply marks any whitespace character
+     */
+    private Pattern  blankLineMatcher = Pattern.compile("(?m)^\\s");
 
     /**
      * Initialize another export format based on templates stored in dir with
@@ -278,7 +287,8 @@ public class TemplateExporter extends Exporter {
                 // Write the entry
                 if (layout != null) {
                     if (deleteBlankLines) {
-                        ps.write(layout.doLayout(entry, databaseContext.getDatabase()).replaceAll("(?m)^\\s", ""));
+                        String withoutBlankLines = blankLineMatcher.matcher(layout.doLayout(entry, databaseContext.getDatabase())).replaceAll("");
+                        ps.write(withoutBlankLines);
                     } else {
                         ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
                     }
