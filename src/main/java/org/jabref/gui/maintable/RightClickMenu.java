@@ -58,7 +58,7 @@ public class RightClickMenu {
 
         copySpecialMenu.getItems().add(factory.createMenuItem(ActionsFX.EXPORT_TO_CLIPBOARD));
 
-        //add(factory.createMenuItem(ActionsFX.COPY));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY));
         contextMenu.getItems().add(copySpecialMenu);
         contextMenu.getItems().add(factory.createMenuItem(ActionsFX.PASTE));
         contextMenu.getItems().add(factory.createMenuItem(ActionsFX.CUT));

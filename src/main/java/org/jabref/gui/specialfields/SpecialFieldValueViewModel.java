@@ -7,6 +7,7 @@ import javax.swing.JLabel;
 
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefIcon;
+import org.jabref.gui.actions.Actions;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
 
@@ -154,41 +155,41 @@ public class SpecialFieldValueViewModel {
         }
     }
 
-    public String getActionName() {
+    public Actions getCommand() {
 
         switch (value) {
             case PRINTED:
-                return "togglePrinted";
+                return Actions.togglePrinted;
             case CLEAR_PRIORITY:
-                return "clearPriority";
+                return Actions.clearPriority;
             case PRIORITY_HIGH:
-                return "setPriority1";
+                return Actions.setPriority1;
             case PRIORITY_MEDIUM:
-                return "setPriority2";
+                return Actions.setPriority2;
             case PRIORITY_LOW:
-                return "setPriority3";
+                return Actions.setPriority3;
             case QUALITY_ASSURED:
-                return "toggleQualityAssured";
+                return Actions.toggleQualityAssured;
             case CLEAR_RANK:
-                return "clearRank";
+                return Actions.clearRank;
             case RANK_1:
-                return "setRank1";
+                return Actions.setRank1;
             case RANK_2:
-                return "setRank2";
+                return Actions.setRank2;
             case RANK_3:
-                return "setRank3";
+                return Actions.setRank3;
             case RANK_4:
-                return "setRank4";
+                return Actions.setRank4;
             case RANK_5:
-                return "setRank5";
+                return Actions.setRank5;
             case CLEAR_READ_STATUS:
-                return "clearReadStatus";
+                return Actions.clearReadStatus;
             case READ:
-                return "setReadStatusToRead";
+                return Actions.setReadStatusToRead;
             case SKIMMED:
-                return "setReadStatusToSkimmed";
+                return Actions.setReadStatusToSkimmed;
             case RELEVANT:
-                return "toggleRelevance";
+                return Actions.toggleRelevance;
             default:
                 throw new IllegalArgumentException("There is no action name for special field value " + value);
         }
