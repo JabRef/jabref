@@ -1,9 +1,6 @@
 package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
