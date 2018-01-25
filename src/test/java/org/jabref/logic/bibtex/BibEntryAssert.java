@@ -18,7 +18,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.mockito.Answers;
 
 import static org.mockito.Mockito.mock;
@@ -35,9 +35,9 @@ public class BibEntryAssert {
      */
     public static void assertEquals(Class<?> clazz, String resourceName, BibEntry entry)
             throws IOException {
-        Assert.assertNotNull(clazz);
-        Assert.assertNotNull(resourceName);
-        Assert.assertNotNull(entry);
+        Assertions.assertNotNull(clazz);
+        Assertions.assertNotNull(resourceName);
+        Assertions.assertNotNull(entry);
         try (InputStream shouldBeIs = clazz.getResourceAsStream(resourceName)) {
             BibEntryAssert.assertEquals(shouldBeIs, entry);
         }
@@ -53,9 +53,9 @@ public class BibEntryAssert {
      */
     public static void assertEquals(Class<?> clazz, String resourceName, List<BibEntry> asIsEntries)
             throws IOException {
-        Assert.assertNotNull(clazz);
-        Assert.assertNotNull(resourceName);
-        Assert.assertNotNull(asIsEntries);
+        Assertions.assertNotNull(clazz);
+        Assertions.assertNotNull(resourceName);
+        Assertions.assertNotNull(asIsEntries);
         try (InputStream shouldBeIs = clazz.getResourceAsStream(resourceName)) {
             BibEntryAssert.assertEquals(shouldBeIs, asIsEntries);
         }
@@ -67,8 +67,8 @@ public class BibEntryAssert {
             BibtexParser parser = new BibtexParser(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
             result = parser.parse(reader);
         }
-        Assert.assertNotNull(result);
-        Assert.assertFalse(result.isEmpty());
+        Assertions.assertNotNull(result);
+        Assertions.assertFalse(result.isEmpty());
         return result.getDatabase().getEntries();
     }
 
@@ -80,16 +80,16 @@ public class BibEntryAssert {
      */
     public static void assertEquals(InputStream expectedInputStream, List<BibEntry> actualEntries)
             throws IOException {
-        Assert.assertNotNull(expectedInputStream);
-        Assert.assertNotNull(actualEntries);
-        Assert.assertEquals(getListFromInputStream(expectedInputStream), actualEntries);
+        Assertions.assertNotNull(expectedInputStream);
+        Assertions.assertNotNull(actualEntries);
+        Assertions.assertEquals(getListFromInputStream(expectedInputStream), actualEntries);
     }
 
     public static void assertEquals(List<BibEntry> expectedEntries, InputStream actualInputStream)
             throws IOException {
-        Assert.assertNotNull(actualInputStream);
-        Assert.assertNotNull(expectedEntries);
-        Assert.assertEquals(expectedEntries, getListFromInputStream(actualInputStream));
+        Assertions.assertNotNull(actualInputStream);
+        Assertions.assertNotNull(expectedEntries);
+        Assertions.assertEquals(expectedEntries, getListFromInputStream(actualInputStream));
     }
 
     /**
@@ -132,7 +132,7 @@ public class BibEntryAssert {
             throws IOException {
         List<BibEntry> actualEntries = importer.importDatabase(fileToImport, StandardCharsets.UTF_8)
                 .getDatabase().getEntries();
-        Assert.assertEquals(expected, actualEntries);
+        Assertions.assertEquals(expected, actualEntries);
     }
 
     public static void assertEquals(List<BibEntry> expected, URL fileToImport, Importer importer)
