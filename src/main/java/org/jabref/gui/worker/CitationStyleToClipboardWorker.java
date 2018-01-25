@@ -26,8 +26,8 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreviewPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Copies the selected entries and formats them with the selected citation style (or preview), then it is copied to the clipboard.
@@ -35,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Void> {
 
-    private static final Log LOGGER = LogFactory.getLog(CitationStyleToClipboardWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyleToClipboardWorker.class);
 
     private final BasePanel basePanel;
     private final List<BibEntry> selectedEntries;

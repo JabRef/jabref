@@ -33,12 +33,12 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IntegrityCheckAction extends MnemonicAwareAction {
 
-    private static final Log LOGGER = LogFactory.getLog(IntegrityCheckAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IntegrityCheckAction.class);
     private static final String ELLIPSES = "...";
 
     private final JabRefFrame frame;

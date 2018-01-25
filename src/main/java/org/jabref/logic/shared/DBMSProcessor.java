@@ -22,8 +22,8 @@ import org.jabref.model.database.shared.DatabaseConnectionProperties;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryEventSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Processes all incoming or outgoing bib data to external SQL Database and manages its structure.
@@ -33,7 +33,7 @@ public abstract class DBMSProcessor {
     public static final String PROCESSOR_ID = UUID.randomUUID().toString();
 
 
-    protected static final Log LOGGER = LogFactory.getLog(DBMSProcessor.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(DBMSProcessor.class);
 
     protected final Connection connection;
 

@@ -21,12 +21,12 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.util.FileHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AutoSetFileLinksUtil {
 
-    private static final Log LOGGER = LogFactory.getLog(AutoSetLinks.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutoSetLinks.class);
     private List<Path> directories;
     private AutoLinkPreferences autoLinkPreferences;
     private ExternalFileTypes externalFileTypes;

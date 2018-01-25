@@ -27,8 +27,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -44,7 +44,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class OAI2Fetcher implements EntryFetcher {
 
-    private static final Log LOGGER = LogFactory.getLog(OAI2Fetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OAI2Fetcher.class);
     private static final String OAI2_ARXIV_PREFIXIDENTIFIER = "oai%3AarXiv.org%3A";
     private static final String OAI2_ARXIV_HOST = "export.arxiv.org";
     private static final String OAI2_ARXIV_SCRIPT = "oai2";

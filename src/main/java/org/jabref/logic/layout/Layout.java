@@ -8,15 +8,15 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Main class for formatting DOCUMENT ME!
  */
 public class Layout {
 
-    private static final Log LOGGER = LogFactory.getLog(Layout.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Layout.class);
 
     private final List<LayoutEntry> layoutEntries;
 
@@ -90,23 +90,21 @@ public class Layout {
      * recursive string references are resolved.
      */
     public String doLayout(BibEntry bibtex, BibDatabase database) {
-        StringBuilder sb = new StringBuilder(100);
+        StringBuilder builder = new StringBuilder(100);
 
         for (LayoutEntry layoutEntry : layoutEntries) {
             String fieldText = layoutEntry.doLayout(bibtex, database);
 
-            // 2005.05.05 M. Alver
             // The following change means we treat null fields as "". This is to fix the
-            // problem of whitespace disappearing after missing fields. Hoping there are
-            // no side effects.
+            // problem of whitespace disappearing after missing fields.
             if (fieldText == null) {
                 fieldText = "";
             }
 
-            sb.append(fieldText);
+            builder.append(fieldText);
         }
 
-        return sb.toString();
+        return builder.toString();
     }
 
     /**

@@ -59,8 +59,8 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.Joiner;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Importer for the MODS format.<br>
@@ -69,7 +69,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ModsImporter extends Importer implements Parser {
 
-    private static final Log LOGGER = LogFactory.getLog(ModsImporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModsImporter.class);
     private static final String KEYWORD_SEPARATOR = JabRefPreferences.getInstance().getImportFormatPreferences()
             .getKeywordSeparator() + " ";
 

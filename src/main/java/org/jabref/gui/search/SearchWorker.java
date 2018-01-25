@@ -16,8 +16,8 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
  */
 class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
 
-    private static final Log LOGGER = LogFactory.getLog(SearchWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchWorker.class);
 
     private final BasePanel basePanel;
     private final BibDatabase database;

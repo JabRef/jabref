@@ -22,12 +22,12 @@ import javafx.scene.input.KeyEvent;
 
 import org.jabref.logic.util.OS;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class KeyBindingRepository {
 
-    private static final Log LOGGER = LogFactory.getLog(KeyBindingRepository.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeyBindingRepository.class);
     /**
      * sorted by localization
      */

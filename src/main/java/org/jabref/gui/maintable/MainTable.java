@@ -59,8 +59,8 @@ import ca.odell.glazedlists.matchers.Matcher;
 import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MainTable extends JTable {
     private static GeneralRenderer defRenderer;
@@ -79,7 +79,7 @@ public class MainTable extends JTable {
 
     private static List<CompleteRenderer> markedNumberRenderers;
 
-    private static final Log LOGGER = LogFactory.getLog(MainTable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainTable.class);
     private final MainTableFormat tableFormat;
 
     private final BasePanel panel;

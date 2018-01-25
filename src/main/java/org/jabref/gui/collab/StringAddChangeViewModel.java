@@ -11,12 +11,12 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibtexString;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class StringAddChangeViewModel extends ChangeViewModel {
 
-    private static final Log LOGGER = LogFactory.getLog(StringAddChangeViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StringAddChangeViewModel.class);
 
     private final BibtexString string;
     private final InfoPane tp = new InfoPane();

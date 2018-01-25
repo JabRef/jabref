@@ -39,8 +39,8 @@ import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.JabRefPreferencesFilter;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined in
@@ -53,7 +53,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class PreferencesDialog extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(PreferencesDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesDialog.class);
 
     private final JPanel main;
 

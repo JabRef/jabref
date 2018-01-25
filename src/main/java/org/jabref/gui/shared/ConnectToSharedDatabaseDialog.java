@@ -50,18 +50,19 @@ import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
-import org.jabref.logic.util.FileType;import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.logic.util.FileType;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConnectToSharedDatabaseDialog extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(ConnectToSharedDatabaseDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectToSharedDatabaseDialog.class);
 
     private final JabRefFrame frame;
 

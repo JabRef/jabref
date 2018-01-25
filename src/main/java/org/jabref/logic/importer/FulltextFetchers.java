@@ -11,14 +11,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for trying to resolve URLs to full-text PDF for articles.
  */
 public class FulltextFetchers {
-    private static final Log LOGGER = LogFactory.getLog(FulltextFetchers.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FulltextFetchers.class);
 
     private final List<FulltextFetcher> finders = new ArrayList<>();
 
