@@ -1260,6 +1260,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tools.add(openUrl);
         tools.add(openConsole);
         tools.addSeparator();
+        tools.add(new CopyFilesAction());
+        tools.addSeparator();
         tools.add(abbreviateIso);
         tools.add(abbreviateMedline);
         tools.add(unabbreviate);

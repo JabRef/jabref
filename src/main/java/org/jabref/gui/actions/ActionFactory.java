@@ -7,6 +7,7 @@ import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
 
+import de.saxsys.mvvmfx.utils.commands.Command;
 import org.controlsfx.control.action.ActionUtils;
 
 /**
@@ -20,15 +21,25 @@ public class ActionFactory {
         this.keyBindingRepository = Objects.requireNonNull(keyBindingRepository);
     }
 
-    public MenuItem configureMenuItem(ActionsFX action, MenuItem menuItem) {
-        return ActionUtils.configureMenuItem(new JabRefAction(action, keyBindingRepository), menuItem);
+    public MenuItem configureMenuItem(ActionsFX action, Command command, MenuItem menuItem) {
+        return ActionUtils.configureMenuItem(new JabRefAction(action, command, keyBindingRepository), menuItem);
     }
 
-    public MenuItem createMenuItem(ActionsFX action) {
-        return ActionUtils.createMenuItem(new JabRefAction(action, keyBindingRepository));
+    public MenuItem createMenuItem(ActionsFX action, Command command) {
+        MenuItem menuItem = ActionUtils.createMenuItem(new JabRefAction(action, command, keyBindingRepository));
+
+        // For some reason the graphic is not set correctly, so let's fix this
+        menuItem.graphicProperty().unbind();
+        action.getIcon().ifPresent(icon -> menuItem.setGraphic(icon.getGraphicNode()));
+        return menuItem;
     }
 
     public Menu createMenu(ActionsFX action) {
-        return ActionUtils.createMenu(new JabRefAction(action, keyBindingRepository));
+        Menu menu = ActionUtils.createMenu(new JabRefAction(action, keyBindingRepository));
+
+        // For some reason the graphic is not set correctly, so let's fix this
+        menu.graphicProperty().unbind();
+        action.getIcon().ifPresent(icon -> menu.setGraphic(icon.getGraphicNode()));
+        return menu;
     }
 }
