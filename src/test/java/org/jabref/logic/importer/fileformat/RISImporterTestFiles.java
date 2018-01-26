@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,21 +9,22 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public class RISImporterTestFiles {
 
-    private static Stream<String> fileNames() {
-        return Stream.of("RisImporterTest1", "RisImporterTest3", "RisImporterTest4a", "RisImporterTest4b",
-                "RisImporterTest4c", "RisImporterTest5a", "RisImporterTest5b", "RisImporterTest6", "RisImporterTest7",
-                "RisImporterTestDoiAndJournalTitle", "RisImporterTestScopus", "RisImporterTestScience");
+    private static final String FILE_ENDING = ".ris";
+
+    private static Stream<String> fileNames() throws IOException {
+        Predicate<String> fileName = name -> name.startsWith("RisImporterTest") && name.endsWith(FILE_ENDING);
+        return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
     public void testIsRecognizedFormat(String fileName) throws IOException {
-        ImporterTestFiles.testIsRecognizedFormat(new RisImporter(), fileName, ".ris");
+        ImporterTestEngine.testIsRecognizedFormat(new RisImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
     public void testImportEntries(String fileName) throws IOException {
-        ImporterTestFiles.testImportEntries(new RisImporter(), fileName, ".ris");
+        ImporterTestEngine.testImportEntries(new RisImporter(), fileName, FILE_ENDING);
     }
 }
