@@ -211,19 +211,4 @@ public class RightClickMenu {
         }
         return false;
     }
-
-    /*
-    private Icon getFileIconForSelectedEntry() {
-        if (panel.getMainTable().getSelectedEntries().size() == 1) {
-            BibEntry entry = panel.getMainTable().getSelectedEntries().get(0);
-            if (entry.hasField(FieldName.FILE)) {
-                JLabel label = FileListTableModel.getFirstLabel(entry.getField(FieldName.FILE).get());
-                if (label != null) {
-                    return label.getIcon();
-                }
-            }
-        }
-        return IconTheme.JabRefIcons.FILE.getSmallIcon();
-    }
-    */
 }
