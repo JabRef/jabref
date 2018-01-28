@@ -170,6 +170,7 @@ public class MedlineFetcherTest {
         assertTrue(entryList.contains(bibEntrySari));
     }
 
+    @Test
     public void testInvalidSearchTermCauseIndexOutOfBoundsException() throws Exception {
         assertThrows(FetcherException.class, () -> fetcher.performSearchById("this.is.a.invalid.search.term.for.the.medline.fetcher"));
     }
