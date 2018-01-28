@@ -107,7 +107,7 @@ public class INSPIREFetcher implements EntryFetcher {
 
         try (INSPIREBibtexFilterReader reader = new INSPIREBibtexFilterReader(
                 new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
-            ParserResult pr = new BibtexParser(Globals.prefs.getImportFormatPreferences()).parse(reader);
+            ParserResult pr = new BibtexParser(Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor()).parse(reader);
             return pr.getDatabase();
         }
     }
