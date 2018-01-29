@@ -187,7 +187,7 @@ public class RightClickMenu {
     }
 
     private static Menu createSpecialFieldMenu(SpecialField field, ActionFactory factory, BasePanel panel) {
-        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field);
+        viewModel = new SpecialFieldViewModel(field);
         Menu menu = factory.createMenu(viewModel.getAction());
         for (SpecialFieldValue val : field.getValues()) {
             SpecialFieldValueViewModel specialField = new SpecialFieldValueViewModel(val);

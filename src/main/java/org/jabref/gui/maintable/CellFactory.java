@@ -3,6 +3,8 @@ package org.jabref.gui.maintable;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.scene.Node;
 
 import org.jabref.gui.IconTheme;
@@ -16,7 +18,7 @@ public class CellFactory {
 
     private final Map<String, Node> TABLE_ICONS = new HashMap<>();
 
-    public CellFactory(ExternalFileTypes externalFileTypes) {
+    public CellFactory(ExternalFileTypes externalFileTypes, UndoManager undoManager) {
         Node label;
         label = IconTheme.JabRefIcons.PDF_FILE.getGraphicNode();
         //label.setToo(Localization.lang("Open") + " PDF");
@@ -56,36 +58,36 @@ public class CellFactory {
             TABLE_ICONS.put(fileType.getName(), label);
         }
 
-        SpecialFieldViewModel relevanceViewModel = new SpecialFieldViewModel(SpecialField.RELEVANCE);
+        SpecialFieldViewModel relevanceViewModel = new SpecialFieldViewModel(SpecialField.RELEVANCE, undoManager);
         label = relevanceViewModel.getIcon().getGraphicNode();
         //label.setToolTipText(relevanceViewModel.getLocalization());
         TABLE_ICONS.put(SpecialField.RELEVANCE.getFieldName(), label);
 
-        SpecialFieldViewModel qualityViewModel = new SpecialFieldViewModel(SpecialField.QUALITY);
+        SpecialFieldViewModel qualityViewModel = new SpecialFieldViewModel(SpecialField.QUALITY, undoManager);
         label = qualityViewModel.getIcon().getGraphicNode();
         //label.setToolTipText(qualityViewModel.getLocalization());
         TABLE_ICONS.put(SpecialField.QUALITY.getFieldName(), label);
 
         // Ranking item in the menu uses one star
-        SpecialFieldViewModel rankViewModel = new SpecialFieldViewModel(SpecialField.RANKING);
+        SpecialFieldViewModel rankViewModel = new SpecialFieldViewModel(SpecialField.RANKING, undoManager);
         label = rankViewModel.getIcon().getGraphicNode();
         //label.setToolTipText(rankViewModel.getLocalization());
         TABLE_ICONS.put(SpecialField.RANKING.getFieldName(), label);
 
         // Priority icon used for the menu
-        SpecialFieldViewModel priorityViewModel = new SpecialFieldViewModel(SpecialField.PRIORITY);
+        SpecialFieldViewModel priorityViewModel = new SpecialFieldViewModel(SpecialField.PRIORITY, undoManager);
         label = priorityViewModel.getIcon().getGraphicNode();
         //label.setToolTipText(priorityViewModel.getLocalization());
         TABLE_ICONS.put(SpecialField.PRIORITY.getFieldName(), label);
 
         // Read icon used for menu
-        SpecialFieldViewModel readViewModel = new SpecialFieldViewModel(SpecialField.READ_STATUS);
+        SpecialFieldViewModel readViewModel = new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager);
         label = readViewModel.getIcon().getGraphicNode();
         //label.setToolTipText(readViewModel.getLocalization());
         TABLE_ICONS.put(SpecialField.READ_STATUS.getFieldName(), label);
 
         // Print icon used for menu
-        SpecialFieldViewModel printedViewModel = new SpecialFieldViewModel(SpecialField.PRINTED);
+        SpecialFieldViewModel printedViewModel = new SpecialFieldViewModel(SpecialField.PRINTED, undoManager);
         label = printedViewModel.getIcon().getGraphicNode();
         //label.setToolTipText(printedViewModel.getLocalization());
         TABLE_ICONS.put(SpecialField.PRINTED.getFieldName(), label);

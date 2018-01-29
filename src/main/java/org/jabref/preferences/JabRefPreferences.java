@@ -632,7 +632,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(FIELD_EDITOR_TEXT_COLOR, "0:0:0");
 
         // default icon colors
-        defaults.put(ICON_ENABLED_COLOR, "79:95:143");
+        defaults.put(ICON_ENABLED_COLOR, "0:0:0");
         defaults.put(ICON_DISABLED_COLOR, "200:200:200");
 
         defaults.put(INCOMPLETE_ENTRY_BACKGROUND, "250:175:175");
@@ -1292,7 +1292,11 @@ public class JabRefPreferences implements PreferencesService {
             try {
                 return this.getBoolean(key);
             } catch (ClassCastException e2) {
-                return this.getInt(key);
+                try {
+                    return this.getInt(key);
+                } catch (ClassCastException e3) {
+                    return this.getDouble(key);
+                }
             }
         }
     }

@@ -2,13 +2,16 @@ package org.jabref.gui;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.Icon;
 
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
+import org.jabref.gui.util.ColorUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
@@ -16,11 +19,11 @@ import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 
 public class InternalMaterialDesignIcon implements JabRefIcon {
     private final List<MaterialDesignIcon> icons;
-    private final Color color;
+    private Optional<Color> color;
     private final String unicode;
 
     public InternalMaterialDesignIcon(java.awt.Color color, MaterialDesignIcon... icons) {
-        this(toFX(color), Arrays.asList(icons));
+        this(ColorUtil.toFX(color), Arrays.asList(icons));
     }
 
     public InternalMaterialDesignIcon(Color color, MaterialDesignIcon... icons) {
@@ -28,45 +31,40 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
     }
 
     InternalMaterialDesignIcon(Color color, List<MaterialDesignIcon> icons) {
+        this(icons);
+        this.color = Optional.of(color);
+    }
+
+    public InternalMaterialDesignIcon(MaterialDesignIcon... icons) {
+        this(Arrays.asList(icons));
+    }
+
+    public InternalMaterialDesignIcon(List<MaterialDesignIcon> icons) {
         this.icons = icons;
-        this.color = color;
         this.unicode = icons.stream().map(MaterialDesignIcon::unicode).collect(Collectors.joining());
-    }
-
-    public static java.awt.Color toAWT(Color color) {
-        return new java.awt.Color((float) color.getRed(),
-                (float) color.getGreen(),
-                (float) color.getBlue(),
-                (float) color.getOpacity());
-    }
-
-    public static Color toFX(java.awt.Color awtColor) {
-        int r = awtColor.getRed();
-        int g = awtColor.getGreen();
-        int b = awtColor.getBlue();
-        int a = awtColor.getAlpha();
-        double opacity = a / 255.0;
-        return javafx.scene.paint.Color.rgb(r, g, b, opacity);
+        this.color = Optional.empty();
     }
 
     @Override
     public Icon getIcon() {
-        return new IconTheme.FontBasedIcon(this.unicode, toAWT(this.color));
+        return new IconTheme.FontBasedIcon(this.unicode, ColorUtil.toAWT(this.color.orElse(IconTheme.getDefaultColor())));
     }
 
     @Override
     public Icon getSmallIcon() {
-        return new IconTheme.FontBasedIcon(this.unicode, toAWT(this.color), JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL));
+        return new IconTheme.FontBasedIcon(this.unicode, ColorUtil.toAWT(this.color.orElse(IconTheme.getDefaultColor())), JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL));
     }
 
     @Override
     public Node getGraphicNode() {
-        return MaterialDesignIconFactory.get().createIcon(this.icons.get(0));
+        Text icon = MaterialDesignIconFactory.get().createIcon(icons.get(0));
+        color.ifPresent(color -> icon.setStyle(icon.getStyle() + String.format("-fx-fill: %s;", ColorUtil.toRGBCode(color))));
+        return icon;
     }
 
     @Override
     public JabRefIcon disabled() {
-        return new InternalMaterialDesignIcon(toFX(IconTheme.DEFAULT_DISABLED_COLOR), icons);
+        return new InternalMaterialDesignIcon(ColorUtil.toFX(IconTheme.DEFAULT_DISABLED_COLOR), icons);
     }
 
     public String getCode() {

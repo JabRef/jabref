@@ -148,7 +148,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     }
 
     private static Node createFileDisplay(LinkedFileViewModel linkedFile) {
-        Text icon = MaterialDesignIconFactory.get().createIcon(linkedFile.getTypeIcon());
+        Node icon = linkedFile.getTypeIcon().getGraphicNode();
         icon.setOnMouseClicked(event -> linkedFile.open());
         Text link = new Text(linkedFile.getLink());
         Text desc = new Text(linkedFile.getDescription());

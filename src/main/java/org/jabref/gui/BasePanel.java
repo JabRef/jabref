@@ -157,7 +157,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     // The undo manager.
     private final UndoAction undoAction = new UndoAction();
     private final RedoAction redoAction = new RedoAction();
-    private final CountingUndoManager undoManager = new CountingUndoManager();
+    private final CountingUndoManager undoManager;
     private final List<BibEntry> previousEntries = new ArrayList<>();
     private final List<BibEntry> nextEntries = new ArrayList<>();
     // Keeps track of the string dialog if it is open.
@@ -202,6 +202,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         this.frame = Objects.requireNonNull(frame);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
+        this.undoManager = frame.getUndoManager();
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
@@ -638,26 +639,26 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         // Note that we can't put the number of entries that have been reverted into the undoText as the concrete number cannot be injected
         actions.put(new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getCommand(),
-                new SpecialFieldViewModel(SpecialField.RELEVANCE).getSpecialFieldAction(
+                new SpecialFieldViewModel(SpecialField.RELEVANCE, undoManager).getSpecialFieldAction(
                         SpecialField.RELEVANCE.getValues().get(0), frame));
         actions.put(new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getCommand(),
-                new SpecialFieldViewModel(SpecialField.QUALITY)
+                new SpecialFieldViewModel(SpecialField.QUALITY, undoManager)
                         .getSpecialFieldAction(SpecialField.QUALITY.getValues().get(0), frame));
         actions.put(new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getCommand(),
-                new SpecialFieldViewModel(SpecialField.PRINTED).getSpecialFieldAction(
+                new SpecialFieldViewModel(SpecialField.PRINTED, undoManager).getSpecialFieldAction(
                         SpecialField.PRINTED.getValues().get(0), frame));
 
         for (SpecialFieldValue prio : SpecialField.PRIORITY.getValues()) {
             actions.put(new SpecialFieldValueViewModel(prio).getCommand(),
-                    new SpecialFieldViewModel(SpecialField.PRIORITY).getSpecialFieldAction(prio, this.frame));
+                    new SpecialFieldViewModel(SpecialField.PRIORITY, undoManager).getSpecialFieldAction(prio, this.frame));
         }
         for (SpecialFieldValue rank : SpecialField.RANKING.getValues()) {
             actions.put(new SpecialFieldValueViewModel(rank).getCommand(),
-                    new SpecialFieldViewModel(SpecialField.RANKING).getSpecialFieldAction(rank, this.frame));
+                    new SpecialFieldViewModel(SpecialField.RANKING, undoManager).getSpecialFieldAction(rank, this.frame));
         }
         for (SpecialFieldValue status : SpecialField.READ_STATUS.getValues()) {
             actions.put(new SpecialFieldValueViewModel(status).getCommand(),
-                    new SpecialFieldViewModel(SpecialField.READ_STATUS).getSpecialFieldAction(status, this.frame));
+                    new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager).getSpecialFieldAction(status, this.frame));
         }
 
         actions.put(Actions.TOGGLE_PREVIEW, (BaseAction) () -> {
@@ -1211,7 +1212,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private void createMainTable() {
         bibDatabaseContext.getDatabase().registerListener(SpecialFieldDatabaseChangeListener.getInstance());
 
-        mainTable = new MainTable(tableModel, frame, this, bibDatabaseContext.getDatabase(), preferences.getTablePreferences(), externalFileTypes, Globals.getKeyPrefs());
+        mainTable = new MainTable(tableModel, frame, this, bibDatabaseContext, preferences.getTablePreferences(), externalFileTypes, Globals.getKeyPrefs());
 
         mainTable.updateFont();
 

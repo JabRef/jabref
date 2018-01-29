@@ -120,6 +120,7 @@ import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.specialfields.SpecialFieldDropDown;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
+import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.WindowLocation;
 import org.jabref.gui.worker.MarkEntriesAction;
@@ -467,6 +468,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private OpenOfficePanel openOfficePanel;
     private GroupSidePane groupSidePane;
     private JMenu newSpec;
+    private final CountingUndoManager undoManager = new CountingUndoManager();
 
     public JabRefFrame() {
         init();
@@ -1970,6 +1972,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public GlobalSearchBar getGlobalSearchBar() {
         return globalSearchBar;
+    }
+
+    public CountingUndoManager getUndoManager() {
+        return undoManager;
     }
 
     private static class MyGlassPane extends JPanel {

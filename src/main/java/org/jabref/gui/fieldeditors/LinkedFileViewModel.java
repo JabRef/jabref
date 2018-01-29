@@ -24,6 +24,8 @@ import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefIcon;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -38,9 +40,8 @@ import org.jabref.logic.xmp.XMPUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.strings.StringUtil;
 
-import de.jensd.fx.glyphs.GlyphIcons;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -100,6 +101,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
         return linkedFile.getDescription();
     }
 
+    public String getDescriptionAndLink() {
+        if (StringUtil.isBlank(linkedFile.getDescription())) {
+            return linkedFile.getLink();
+        } else {
+            return linkedFile.getDescription() + " (" + linkedFile.getLink() + ")";
+        }
+    }
+
     public Optional<Path> findIn(List<Path> directories) {
         return linkedFile.findIn(directories);
     }
@@ -108,8 +117,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
      * TODO: Be a bit smarter and try to infer correct icon, for example using {@link
      * org.jabref.gui.externalfiletype.ExternalFileTypes#getExternalFileTypeByName(String)}
      */
-    public GlyphIcons getTypeIcon() {
-        return MaterialDesignIcon.FILE_PDF;
+    public JabRefIcon getTypeIcon() {
+        return IconTheme.JabRefIcons.PDF_FILE;
     }
 
     public void markAsAutomaticallyFound() {
@@ -131,9 +140,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void open() {
         try {
             Optional<ExternalFileType> type = ExternalFileTypes.getInstance().fromLinkedFile(linkedFile, true);
-            JabRefDesktop.openExternalFileAnyFormat(databaseContext, linkedFile.getLink(), type);
+            boolean successful = JabRefDesktop.openExternalFileAnyFormat(databaseContext, linkedFile.getLink(), type);
+            if (!successful) {
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("File not found"),
+                        Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+            }
         } catch (IOException e) {
-            LOGGER.warn("Cannot open selected file.", e);
+            dialogService.showErrorDialogAndWait(Localization.lang("Error opening file '%0'.", getLink()), e);
         }
     }
 

@@ -24,7 +24,7 @@ import org.jabref.gui.renderer.GeneralRenderer;
 import org.jabref.gui.renderer.IncompleteRenderer;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.TypedBibEntry;
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -73,11 +73,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public MainTable(MainTableDataModel model, JabRefFrame frame,
-                     BasePanel panel, BibDatabase database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
+                     BasePanel panel, BibDatabaseContext database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
         super();
         this.model = model;
 
-        this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes).createColumns());
+        this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager()).createColumns());
         this.setRowFactory(new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
                     if (event.getClickCount() == 2) {

@@ -27,6 +27,7 @@ import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import org.jabref.gui.util.ColorUtil;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -71,7 +72,7 @@ public class IconTheme {
     }
 
     public static javafx.scene.paint.Color getDefaultColor() {
-        return javafx.scene.paint.Color.rgb(DEFAULT_COLOR.getRed(), DEFAULT_COLOR.getGreen(), DEFAULT_COLOR.getBlue(), DEFAULT_COLOR.getAlpha() / 255.0);
+        return ColorUtil.toFX(DEFAULT_COLOR);
     }
 
     /**
@@ -277,7 +278,7 @@ public class IconTheme {
         private final JabRefIcon icon;
 
         JabRefIcons(MaterialDesignIcon... icons) {
-            this(IconTheme.DEFAULT_COLOR, icons);
+            icon = new InternalMaterialDesignIcon(icons);
         }
 
         JabRefIcons(Color color, MaterialDesignIcon... icons) {

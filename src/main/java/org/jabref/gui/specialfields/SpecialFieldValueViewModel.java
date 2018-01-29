@@ -1,6 +1,7 @@
 package org.jabref.gui.specialfields;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -13,6 +14,10 @@ import org.jabref.model.entry.specialfields.SpecialFieldValue;
 
 public class SpecialFieldValueViewModel {
 
+    public SpecialFieldValue getValue() {
+        return value;
+    }
+
     private final SpecialFieldValue value;
 
     public SpecialFieldValueViewModel(SpecialFieldValue value) {
@@ -22,16 +27,11 @@ public class SpecialFieldValueViewModel {
     }
 
     public Icon getSpecialFieldValueIcon() {
-        JabRefIcon icon = getIcon();
-        if (icon == null) {
-            return null;
-        } else {
-            return icon.getSmallIcon();
-        }
+        return getIcon().map(JabRefIcon::getSmallIcon).orElse(null);
     }
 
-    public JabRefIcon getIcon() {
-        return getAction().getIcon().orElse(null);
+    public Optional<JabRefIcon> getIcon() {
+        return getAction().getIcon();
     }
 
     public JLabel createSpecialFieldValueLabel() {
