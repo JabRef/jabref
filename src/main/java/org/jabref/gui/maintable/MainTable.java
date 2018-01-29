@@ -18,6 +18,7 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.EntryMarker;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.renderer.CompleteRenderer;
 import org.jabref.gui.renderer.GeneralRenderer;
 import org.jabref.gui.renderer.IncompleteRenderer;
@@ -72,7 +73,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public MainTable(MainTableDataModel model, JabRefFrame frame,
-                     BasePanel panel, BibDatabase database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes) {
+                     BasePanel panel, BibDatabase database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
         super();
         this.model = model;
 
@@ -83,7 +84,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         panel.showAndEdit(entry.getEntry());
                     }
                 })
-                .withContextMenu(RightClickMenu::create));
+                .withContextMenu(entry1 -> RightClickMenu.create(entry1, keyBindingRepository, panel, Globals.getKeyPrefs())));
         if (preferences.resizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
         }
