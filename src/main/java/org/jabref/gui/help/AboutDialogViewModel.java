@@ -17,8 +17,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AboutDialogViewModel extends AbstractViewModel {
 
@@ -30,7 +30,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private final String changelogUrl;
     private final String versionInfo;
     private final ReadOnlyStringWrapper environmentInfo = new ReadOnlyStringWrapper();
-    private final Log logger = LogFactory.getLog(AboutDialogViewModel.class);
+    private final Logger logger = LoggerFactory.getLogger(AboutDialogViewModel.class);
     private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper authors = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper developers = new ReadOnlyStringWrapper();

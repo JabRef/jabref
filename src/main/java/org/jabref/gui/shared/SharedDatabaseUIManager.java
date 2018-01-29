@@ -12,6 +12,7 @@ import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.entryeditor.EntryEditor;
+import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -107,7 +108,7 @@ public class SharedDatabaseUIManager {
         JabRefFrame frame = JabRefGUI.getMainFrame();
         BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode));
-        DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getKeyPattern());
+        DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getKeyPattern(), Globals.getFileUpdateMonitor());
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
@@ -133,7 +134,7 @@ public class SharedDatabaseUIManager {
         JabRefFrame frame = JabRefGUI.getMainFrame();
         BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode));
-        DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getKeyPattern());
+        DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getKeyPattern(), Globals.getFileUpdateMonitor());
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
 
         bibDatabaseContext.getDatabase().setSharedDatabaseID(sharedDatabaseID);

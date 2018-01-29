@@ -1,23 +1,25 @@
 package org.jabref.logic.auxparser;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.model.auxparser.AuxParser;
+import org.jabref.model.auxparser.AuxParserResult;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * LaTeX Aux to BibTeX Parser
@@ -33,53 +35,46 @@ import org.apache.commons.logging.LogFactory;
  * Biblatex citation: \abx@aux@cite{x,y,z}
  * Nested AUX files: \@input{x}
  */
-public class AuxParser {
-    private static final Log LOGGER = LogFactory.getLog(AuxParser.class);
+public class DefaultAuxParser implements AuxParser {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAuxParser.class);
 
     private static final Pattern CITE_PATTERN = Pattern.compile("\\\\(citation|abx@aux@cite)\\{(.+)\\}");
     private static final Pattern INPUT_PATTERN = Pattern.compile("\\\\@input\\{(.+)\\}");
 
-    private final String auxFile;
     private final BibDatabase masterDatabase;
 
     /**
      * Generates a database based on the given AUX file and BibTeX database
      *
-     * @param auxFile  Path to the LaTeX AUX file
      * @param database BibTeX database
      */
-    public AuxParser(String auxFile, BibDatabase database) {
-        this.auxFile = auxFile;
+    public DefaultAuxParser(BibDatabase database) {
         masterDatabase = database;
     }
 
-    /**
-     * Executes the parsing logic and returns a result containing all information and the generated BibDatabase.
-     *
-     * @return an AuxParserResult containing the generated BibDatabase and parsing statistics
-     */
-    public AuxParserResult parse() {
-        return parseAuxFile();
+    @Override
+    public AuxParserResult parse(Path auxFile) {
+        return parseAuxFile(auxFile);
     }
 
-    private AuxParserResult parseAuxFile() {
+    private AuxParserResult parseAuxFile(Path auxFile) {
         AuxParserResult result = new AuxParserResult(masterDatabase);
 
         // nested AUX files
-        List<String> fileList = new ArrayList<>(1);
+        List<Path> fileList = new ArrayList<>(1);
         fileList.add(auxFile);
 
         int fileIndex = 0;
 
         while (fileIndex < fileList.size()) {
-            String file = fileList.get(fileIndex);
+            Path file = fileList.get(fileIndex);
 
-            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            try (BufferedReader br = Files.newBufferedReader(file)) {
                 String line;
 
                 while ((line = br.readLine()) != null) {
                     matchCitation(result, line);
-                    matchNestedAux(result, fileList, line);
+                    matchNestedAux(auxFile, result, fileList, line);
                 }
             } catch (FileNotFoundException e) {
                 LOGGER.info("Cannot locate input file", e);
@@ -94,16 +89,18 @@ public class AuxParser {
         return result;
     }
 
-    private void matchNestedAux(AuxParserResult result, List<String> fileList, String line) {
+    private void matchNestedAux(Path baseAuxFile, AuxParserResult result, List<Path> fileList, String line) {
         Matcher inputMatch = INPUT_PATTERN.matcher(line);
 
         while (inputMatch.find()) {
             String inputString = inputMatch.group(1);
 
-            String inputFile = inputString;
-            Path rootPath = new File(auxFile).toPath().getParent();
+            Path inputFile;
+            Path rootPath = baseAuxFile.getParent();
             if (rootPath != null) {
-                inputFile = rootPath.resolve(inputString).toString();
+                inputFile = rootPath.resolve(inputString);
+            } else {
+                inputFile = Paths.get(inputString);
             }
 
             if (!fileList.contains(inputFile)) {

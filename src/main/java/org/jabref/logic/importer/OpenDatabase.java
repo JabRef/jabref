@@ -12,13 +12,14 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.FileUpdateMonitor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OpenDatabase {
 
-    public static final Log LOGGER = LogFactory.getLog(OpenDatabase.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabase.class);
 
     private OpenDatabase() {
     }
@@ -27,9 +28,10 @@ public class OpenDatabase {
      * Load database (bib-file)
      *
      * @param name Name of the BIB-file to open
+     * @param fileMonitor
      * @return ParserResult which never is null
      */
-    public static ParserResult loadDatabase(String name, ImportFormatPreferences importFormatPreferences) {
+    public static ParserResult loadDatabase(String name, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         File file = new File(name);
         LOGGER.info("Opening: " + name);
 
@@ -48,7 +50,7 @@ public class OpenDatabase {
                 return new ParserResult();
             }
 
-            ParserResult pr = OpenDatabase.loadDatabase(file, importFormatPreferences);
+            ParserResult pr = OpenDatabase.loadDatabase(file, importFormatPreferences, fileMonitor);
             pr.setFile(file);
             if (pr.hasWarnings()) {
                 for (String aWarn : pr.warnings()) {
@@ -67,9 +69,9 @@ public class OpenDatabase {
     /**
      * Opens a new database.
      */
-    public static ParserResult loadDatabase(File fileToOpen, ImportFormatPreferences importFormatPreferences)
+    public static ParserResult loadDatabase(File fileToOpen, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor)
             throws IOException {
-        ParserResult result = new BibtexImporter(importFormatPreferences).importDatabase(fileToOpen.toPath(),
+        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen.toPath(),
                 importFormatPreferences.getEncoding());
 
         if (importFormatPreferences.isKeywordSyncEnabled()) {

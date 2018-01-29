@@ -44,17 +44,17 @@ import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.groups.AllEntriesGroup;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.fxmisc.easybind.EasyBind;
 import org.reactfx.util.FxTimer;
 import org.reactfx.util.Timer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GroupTreeController extends AbstractController<GroupTreeViewModel> {
 
-    private static final Log LOGGER = LogFactory.getLog(GroupTreeController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeController.class);
 
     @FXML private TreeTableView<GroupNodeViewModel> groupTree;
     @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;

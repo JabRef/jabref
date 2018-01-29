@@ -32,15 +32,15 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author alver
  */
 public class OpenDocumentSpreadsheetCreator extends Exporter {
 
-    private static final Log LOGGER = LogFactory.getLog(OpenDocumentSpreadsheetCreator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenDocumentSpreadsheetCreator.class);
 
 
     /**

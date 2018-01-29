@@ -15,8 +15,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -27,7 +27,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
      * All single characters that we can use for extending a key to make it unique.
      */
     public static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
-    private static final Log LOGGER = LogFactory.getLog(BibtexKeyGenerator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexKeyGenerator.class);
     private static final String KEY_ILLEGAL_CHARACTERS = "{}(),\\\"#~^':`";
     private static final String KEY_UNWANTED_CHARACTERS = "{}(),\\\"";
     private final AbstractBibtexKeyPattern citeKeyPattern;

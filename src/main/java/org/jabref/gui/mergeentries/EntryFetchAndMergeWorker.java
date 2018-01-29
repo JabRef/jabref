@@ -13,12 +13,12 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EntryFetchAndMergeWorker extends SwingWorker<Optional<BibEntry>, Void> {
 
-    private static final Log LOGGER = LogFactory.getLog(EntryFetchAndMergeWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntryFetchAndMergeWorker.class);
 
     private final BasePanel panel;
     private final BibEntry entry;

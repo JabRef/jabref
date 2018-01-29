@@ -22,15 +22,15 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract class for pushing entries into different editors.
  */
 public abstract class AbstractPushToApplication implements PushToApplication {
 
-    private static final Log LOGGER = LogFactory.getLog(AbstractPushToApplication.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPushToApplication.class);
 
     protected boolean couldNotCall; // Set to true in case the command could not be executed, e.g., if the file is not found
     protected boolean couldNotConnect; // Set to true in case the tunnel to the program (if one is used) does not operate

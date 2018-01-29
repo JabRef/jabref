@@ -1,4 +1,4 @@
-package org.jabref.gui.util;
+package org.jabref.model.util;
 
 public interface FileUpdateListener {
 

@@ -14,14 +14,31 @@ import org.jabref.model.strings.StringUtil;
 /**
  * Converts the entry to biblatex format.
  */
-public class BiblatexCleanup implements CleanupJob {
+public class ConvertToBibtexCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
+
+        // Dates: get date and fill year and month
+        // If there already exists a non blank/empty value for the field, then it is not overwritten
+        entry.getPublicationDate().ifPresent(date -> {
+            if (StringUtil.isBlank(entry.getField(FieldName.YEAR))) {
+                date.getYear().flatMap(year -> entry.setField(FieldName.YEAR, year.toString())).ifPresent(changes::add);
+            }
+
+            if (StringUtil.isBlank(entry.getField(FieldName.MONTH))) {
+                date.getMonth().flatMap(month -> entry.setField(FieldName.MONTH, month.getJabRefFormat())).ifPresent(changes::add);
+            }
+
+            if (changes.size() > 0) {
+                entry.clearField(FieldName.DATE).ifPresent(changes::add);
+            }
+        });
+
         for (Map.Entry<String, String> alias : EntryConverter.FIELD_ALIASES_TEX_TO_LTX.entrySet()) {
-            String oldFieldName = alias.getKey();
-            String newFieldName = alias.getValue();
+            String oldFieldName = alias.getValue();
+            String newFieldName = alias.getKey();
             entry.getField(oldFieldName).ifPresent(oldValue -> {
                 if (!oldValue.isEmpty() && (!entry.getField(newFieldName).isPresent())) {
                     // There is content in the old field and no value in the new, so just copy
@@ -30,16 +47,6 @@ public class BiblatexCleanup implements CleanupJob {
                 }
             });
         }
-        // Dates: create date out of year and month, save it and delete old fields
-        // If there already exists a non blank/empty value for the field date, it is not overwritten
-        if (StringUtil.isBlank(entry.getField(FieldName.DATE))) {
-            entry.getFieldOrAlias(FieldName.DATE).ifPresent(newDate -> {
-                entry.setField(FieldName.DATE, newDate).ifPresent(changes::add);
-                entry.clearField(FieldName.YEAR).ifPresent(changes::add);
-                entry.clearField(FieldName.MONTH).ifPresent(changes::add);
-            });
-        }
         return changes;
     }
-
 }

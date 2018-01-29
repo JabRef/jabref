@@ -16,11 +16,11 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NewEntryAction extends MnemonicAwareAction {
-    private static final Log LOGGER = LogFactory.getLog(NewEntryAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryAction.class);
 
     private final JabRefFrame jabRefFrame;
     private String type; // The type of item to create.

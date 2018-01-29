@@ -15,8 +15,8 @@ import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.Identifier;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a convenient interface for {@link IdFetcher}, which follow the usual three-step procedure:
@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T> {
 
-    Log LOGGER = LogFactory.getLog(IdParserFetcher.class);
+    Logger LOGGER = LoggerFactory.getLogger(IdParserFetcher.class);
 
     /**
      * Constructs a URL based on the {@link BibEntry}.

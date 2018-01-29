@@ -22,12 +22,12 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.util.FileHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MoveFilesCleanup implements CleanupJob {
 
-    private static final Log LOGGER = LogFactory.getLog(MoveFilesCleanup.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MoveFilesCleanup.class);
     private final BibDatabaseContext databaseContext;
     private final FileDirectoryPreferences fileDirectoryPreferences;
 

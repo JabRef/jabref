@@ -16,15 +16,15 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DOAJFetcher implements EntryFetcher {
 
     private static final String SEARCH_URL = "https://doaj.org/api/v1/search/articles/";
-    private static final Log LOGGER = LogFactory.getLog(DOAJFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DOAJFetcher.class);
     private static final int MAX_PER_PAGE = 100;
     private boolean shouldContinue;
 

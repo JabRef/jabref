@@ -7,12 +7,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JournalAbbreviationLoader {
 
-    private static final Log LOGGER = LogFactory.getLog(JournalAbbreviationLoader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);
 
     // journal initialization
     private static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.txt";

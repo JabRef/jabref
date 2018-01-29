@@ -21,12 +21,12 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ClipBoardManager implements ClipboardOwner {
 
-    private static final Log LOGGER = LogFactory.getLog(ClipBoardManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClipBoardManager.class);
 
     private final Clipboard clipboard;
 
