@@ -7,6 +7,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -163,7 +164,10 @@ public class FileUtil {
             return false;
         }
         try {
-            return Files.copy(pathToSourceFile, pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING) != null;
+            // Preserve Hard Links with OpenOption defaults included for clarity
+            Files.write(pathToDestinationFile, Files.readAllBytes(pathToSourceFile),
+                    StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+            return true;
         } catch (IOException e) {
             LOGGER.error("Copying Files failed.", e);
             return false;
