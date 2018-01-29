@@ -18,12 +18,15 @@ import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.commons.codec.Charsets;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MedlinePlainImporterTest {
 
@@ -34,7 +37,7 @@ public class MedlinePlainImporterTest {
         return new BufferedReader(new StringReader(string));
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         importer = new MedlinePlainImporter();
     }
@@ -50,30 +53,30 @@ public class MedlinePlainImporterTest {
     }
 
     @Test
-    public void testIsRecognizedFormat() throws IOException, URISyntaxException {
+    public void testIsNotRecognizedFormat() throws IOException, URISyntaxException {
         List<String> list = Arrays.asList("CopacImporterTest1.txt", "CopacImporterTest2.txt", "IsiImporterTest1.isi",
                 "IsiImporterTestInspec.isi", "IsiImporterTestWOS.isi", "IsiImporterTestMedline.isi");
         for (String str : list) {
             Path file = Paths.get(MedlinePlainImporter.class.getResource(str).toURI());
-            Assert.assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
+            assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 
     @Test
-    public void testIsNotRecognizedFormat() throws Exception {
+    public void testIsRecognizedFormat() throws Exception {
         List<String> list = Arrays.asList("MedlinePlainImporterTestMultipleEntries.txt",
                 "MedlinePlainImporterTestCompleteEntry.txt", "MedlinePlainImporterTestMultiAbstract.txt",
                 "MedlinePlainImporterTestMultiTitle.txt", "MedlinePlainImporterTestDOI.txt",
                 "MedlinePlainImporterTestInproceeding.txt");
         for (String str : list) {
             Path file = Paths.get(MedlinePlainImporter.class.getResource(str).toURI());
-            Assert.assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
+            assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 
     @Test
     public void doesNotRecognizeEmptyFiles() throws IOException {
-        Assert.assertFalse(importer.isRecognizedFormat(readerForString("")));
+        assertFalse(importer.isRecognizedFormat(readerForString("")));
     }
 
     @Test
@@ -109,7 +112,7 @@ public class MedlinePlainImporterTest {
 
         testEntry = entries.get(3);
         assertEquals("techreport", testEntry.getType());
-        Assert.assertTrue(testEntry.getField("doi").isPresent());
+        assertTrue(testEntry.getField("doi").isPresent());
 
         testEntry = entries.get(4);
         assertEquals("inproceedings", testEntry.getType());
@@ -149,7 +152,7 @@ public class MedlinePlainImporterTest {
         Path file = Paths.get(MedlinePlainImporter.class.getResource(medlineFile).toURI());
         try (InputStream nis = MedlinePlainImporter.class.getResourceAsStream(bibtexFile)) {
             List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
-            Assert.assertNotNull(entries);
+            assertNotNull(entries);
             assertEquals(1, entries.size());
             BibEntryAssert.assertEquals(nis, entries.get(0));
         }
@@ -208,12 +211,14 @@ public class MedlinePlainImporterTest {
         assertEquals(Collections.emptyList(), entries);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testNullReader() throws IOException {
-        try (BufferedReader reader = null) {
-            importer.importDatabase(reader);
-        }
-        fail();
+        Executable fail = () -> {
+            try (BufferedReader reader = null) {
+                importer.importDatabase(reader);
+            }
+        };
+        assertThrows(NullPointerException.class, fail);
     }
 
     @Test
@@ -239,5 +244,4 @@ public class MedlinePlainImporterTest {
     public void testGetCLIId() {
         assertEquals("medlineplain", importer.getId());
     }
-
 }

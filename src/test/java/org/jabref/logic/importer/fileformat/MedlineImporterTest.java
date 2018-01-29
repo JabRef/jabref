@@ -11,13 +11,11 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.util.FileType;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Articles in the medline format can be downloaded from http://www.ncbi.nlm.nih.gov/pubmed/.
@@ -27,10 +25,7 @@ import static org.junit.Assert.assertEquals;
  * 4. Select 'File' as Destination and 'XML' as Format
  * 5. Press 'Create File' to download your search results in a medline xml file
  *
- * @author Daniel Mair/Bruehl
- *
  */
-@RunWith(MockitoJUnitRunner.class)
 public class MedlineImporterTest {
 
     private MedlineImporter importer;
@@ -46,7 +41,7 @@ public class MedlineImporterTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.importer = new MedlineImporter();
     }
@@ -77,7 +72,7 @@ public class MedlineImporterTest {
                 .collect(Collectors.toList());
 
         for (Path file : list) {
-            Assert.assertFalse(file.toString(), importer.isRecognizedFormat(file, Charset.defaultCharset()));
+            assertFalse(file.toString(), importer.isRecognizedFormat(file, Charset.defaultCharset()));
         }
     }
 }
