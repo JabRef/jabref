@@ -10,11 +10,11 @@ import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class MrDLibImporterTest {
 
@@ -22,7 +22,7 @@ public class MrDLibImporterTest {
     private BufferedReader inputMin;
     private BufferedReader inputMax;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         importer = new MrDLibImporter();
         String testMin = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><mr-dlib></mr-dlib>";
