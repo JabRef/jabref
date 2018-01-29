@@ -23,7 +23,7 @@ import org.testfx.framework.junit5.Start;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(ApplicationExtension.class)
-public class EntryEditorTest {
+public class SourceTabTest {
 
     private Stage stage;
     private Scene scene;
@@ -35,7 +35,7 @@ public class EntryEditorTest {
     public void onStart(Stage stage) {
         area = new CodeArea();
         area.appendText("some example\n text to go here\n across a couple of \n lines....");
-        sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), new LatexFieldFormatterPreferences(), mock(ImportFormatPreferences.class));
+        sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), new LatexFieldFormatterPreferences(), mock(ImportFormatPreferences.class), new DummyFileUpdateMonitor());
         pane = new TabPane(
                 new Tab("main area", area),
                 new Tab("other tab", new Label("some text")),
