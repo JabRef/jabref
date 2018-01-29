@@ -45,7 +45,7 @@ public class ExternalFileTypeEntryEditor {
     private final JTextField name = new JTextField();
     private final JTextField mimeType = new JTextField();
     private final JTextField application = new JTextField();
-    private final JLabel icon = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
+    private final JLabel icon = new JLabel(IconTheme.JabRefIcons.FILE.getSmallIcon());
     private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JRadioButton useDefault = new JRadioButton(Localization.lang("Default"));
@@ -218,7 +218,7 @@ public class ExternalFileTypeEntryEditor {
         extension.setText(entry.getExtension());
         mimeType.setText(entry.getMimeType());
         application.setText(entry.getOpenWithApplication());
-        icon.setIcon(entry.getIcon());
+        icon.setIcon(entry.getIcon().getSmallIcon());
         if (application.getText().isEmpty()) {
             useDefault.setSelected(true);
         } else {

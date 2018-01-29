@@ -19,7 +19,7 @@ public class OptionalFields2Tab extends FieldsEditorTab {
 
         setText(Localization.lang("Optional fields 2"));
         setTooltip(new Tooltip(Localization.lang("Show optional fields")));
-        setGraphic(IconTheme.JabRefIcon.OPTIONAL.getGraphicNode());
+        setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());
     }
 
     @Override

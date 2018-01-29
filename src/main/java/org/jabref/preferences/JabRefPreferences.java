@@ -31,7 +31,6 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
-import javax.swing.JTable;
 import javax.swing.UIManager;
 
 import org.jabref.JabRefException;
@@ -433,7 +432,7 @@ public class JabRefPreferences implements PreferencesService {
     private final Preferences prefs;
     private GlobalBibtexKeyPattern keyPattern;
     // Object containing info about customized entry editor tabs.
-    private EntryEditorTabList tabList;
+    private Map<String, List<String>> tabList;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -503,8 +502,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SIZE_X, 1024);
         defaults.put(SIZE_Y, 768);
         defaults.put(WINDOW_MAXIMISED, Boolean.FALSE);
-        defaults.put(AUTO_RESIZE_MODE, JTable.AUTO_RESIZE_ALL_COLUMNS);
-        defaults.put(ENTRY_EDITOR_HEIGHT, 400);
+        defaults.put(AUTO_RESIZE_MODE, Boolean.TRUE);
+        defaults.put(ENTRY_EDITOR_HEIGHT, 0.75);
         defaults.put(TABLE_COLOR_CODES_ON, Boolean.FALSE);
         defaults.put(TABLE_RESOLVED_COLOR_CODES_ON, Boolean.FALSE);
         defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
@@ -634,7 +633,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(FIELD_EDITOR_TEXT_COLOR, "0:0:0");
 
         // default icon colors
-        defaults.put(ICON_ENABLED_COLOR, "79:95:143");
+        defaults.put(ICON_ENABLED_COLOR, "0:0:0");
         defaults.put(ICON_DISABLED_COLOR, "200:200:200");
 
         defaults.put(INCOMPLETE_ENTRY_BACKGROUND, "250:175:175");
@@ -1019,6 +1018,10 @@ public class JabRefPreferences implements PreferencesService {
         return prefs.getInt(key, getIntDefault(key));
     }
 
+    public double getDouble(String key) {
+        return prefs.getDouble(key, getDoubleDefault(key));
+    }
+
     public int getIntDefault(String key) {
         if (key.equals(JabRefPreferences.MENU_FONT_SIZE)) {
             Integer menuFontSize = (Integer) defaults.get(key);
@@ -1032,6 +1035,10 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
+    private double getDoubleDefault(String key) {
+        return ((Number) defaults.get(key)).doubleValue();
+    }
+
     public void put(String key, String value) {
         prefs.put(key, value);
     }
@@ -1042,6 +1049,10 @@ public class JabRefPreferences implements PreferencesService {
 
     public void putInt(String key, int value) {
         prefs.putInt(key, value);
+    }
+
+    public void putDouble(String key, double value) {
+        prefs.putDouble(key, value);
     }
 
     public void remove(String key) {
@@ -1284,7 +1295,11 @@ public class JabRefPreferences implements PreferencesService {
             try {
                 return this.getBoolean(key);
             } catch (ClassCastException e2) {
-                return this.getInt(key);
+                try {
+                    return this.getInt(key);
+                } catch (ClassCastException e3) {
+                    return this.getDouble(key);
+                }
             }
         }
     }
@@ -1302,7 +1317,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    public EntryEditorTabList getEntryEditorTabList() {
+    public Map<String, List<String>> getEntryEditorTabList() {
         if (tabList == null) {
             updateEntryEditorTabList();
         }
@@ -1310,7 +1325,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void updateEntryEditorTabList() {
-        tabList = new EntryEditorTabList();
+        tabList = EntryEditorTabList.create(this);
     }
 
     /**
@@ -1458,7 +1473,7 @@ public class JabRefPreferences implements PreferencesService {
     public JabRefPreferences storePreviewPreferences(PreviewPreferences previewPreferences) {
         putInt(CYCLE_PREVIEW_POS, previewPreferences.getPreviewCyclePosition());
         putStringList(CYCLE_PREVIEW, previewPreferences.getPreviewCycle());
-        putInt(PREVIEW_PANEL_HEIGHT, previewPreferences.getPreviewPanelHeight());
+        putDouble(PREVIEW_PANEL_HEIGHT, previewPreferences.getPreviewPanelDividerPosition().doubleValue());
         put(PREVIEW_STYLE, previewPreferences.getPreviewStyle());
         putBoolean(PREVIEW_ENABLED, previewPreferences.isPreviewPanelEnabled());
         return this;
@@ -1467,7 +1482,7 @@ public class JabRefPreferences implements PreferencesService {
     public PreviewPreferences getPreviewPreferences() {
         int cyclePos = getInt(CYCLE_PREVIEW_POS);
         List<String> cycle = getStringList(CYCLE_PREVIEW);
-        int panelHeight = getInt(PREVIEW_PANEL_HEIGHT);
+        double panelHeight = getDouble(PREVIEW_PANEL_HEIGHT);
         String style = get(PREVIEW_STYLE);
         String styleDefault = (String) defaults.get(PREVIEW_STYLE);
         boolean enabled = getBoolean(PREVIEW_ENABLED);

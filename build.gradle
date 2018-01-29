@@ -128,6 +128,7 @@ dependencies {
     compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
     compile 'de.saxsys:mvvmfx-validation:1.7.0'
+    compile 'de.saxsys:mvvmfx:1.7.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.6'
     compile 'org.fxmisc.richtext:richtextfx:0.8.1'
@@ -170,7 +171,7 @@ dependencies {
     testCompile 'org.xmlunit:xmlunit-matchers:2.5.1'
     testCompile 'com.tngtech.archunit:archunit-junit:0.5.0'
     testCompile "org.testfx:testfx-core:4.0.+"
-    testCompile "org.testfx:testfx-junit:4.0.+"
+    testCompile "org.testfx:testfx-junit5:4.0.+"
 
     checkstyle 'com.puppycrawl.tools:checkstyle:8.7'
 }

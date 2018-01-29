@@ -32,7 +32,7 @@ public class SpecialFieldsUtils {
         List<FieldChange> fieldChanges = new ArrayList<>();
 
         UpdateField.updateField(entry, field.getFieldName(), value, nullFieldIfValueIsTheSame)
-                .ifPresent(fieldChange -> fieldChanges.add(fieldChange));
+                .ifPresent(fieldChanges::add);
         // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
         if (isKeywordSyncEnabled) {
             fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(field, entry, keywordDelimiter));
@@ -79,9 +79,7 @@ public class SpecialFieldsUtils {
         }
 
         UpdateField.updateNonDisplayableField(entry, field.getFieldName(), newValue.map(Keyword::toString).orElse(null))
-                .ifPresent(fieldChange -> {
-                    fieldChanges.add(fieldChange);
-                });
+                .ifPresent(fieldChanges::add);
         return fieldChanges;
     }
 

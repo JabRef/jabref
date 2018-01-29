@@ -21,7 +21,7 @@ public class ShowDocumentViewerAction extends MnemonicAwareAction {
 
     public ShowDocumentViewerAction() {
         this(Localization.menuTitle("Show document viewer"), Localization.lang("Show document viewer"),
-                IconTheme.JabRefIcon.PDF_FILE.getIcon());
+                IconTheme.JabRefIcons.PDF_FILE.getIcon());
     }
 
     @Override

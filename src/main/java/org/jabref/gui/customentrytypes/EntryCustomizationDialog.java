@@ -32,7 +32,6 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -315,7 +314,6 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
             }
         }
 
-        updateTables();
         CustomEntryTypesManager.saveCustomEntryTypes(Globals.prefs);
     }
 
@@ -356,13 +354,6 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
             filtered.forEach(entry -> EntryTypes.getType(entry.getType(), bibDatabaseMode).ifPresent(entry::setType));
         }
     }
-
-    private void updateTables() {
-        for (BasePanel basePanel : frame.getBasePanelList()) {
-            ((AbstractTableModel) basePanel.getMainTable().getModel()).fireTableDataChanged();
-        }
-    }
-
 
     // DEFAULT button pressed. Remember that this entry should be reset to default,
     // unless changes are made later.

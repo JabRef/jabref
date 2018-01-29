@@ -309,7 +309,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                     final BibEntry bibEntry = result.get();
                     if ((DuplicateCheck.containsDuplicate(frame.getCurrentBasePanel().getDatabase(), bibEntry, frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).isPresent())) {
                 		//If there are duplicates starts ImportInspectionDialog
-                        final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
+                        final BasePanel panel = frame.getCurrentBasePanel();
 
                         ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"), false);
                         diag.addEntry(bibEntry);

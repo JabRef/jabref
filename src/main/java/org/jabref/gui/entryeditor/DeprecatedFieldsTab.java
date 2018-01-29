@@ -19,7 +19,7 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
 
         setText(Localization.lang("Deprecated fields"));
         setTooltip(new Tooltip(Localization.lang("Show deprecated BibTeX fields")));
-        setGraphic(IconTheme.JabRefIcon.OPTIONAL.getGraphicNode());
+        setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());
     }
 
     @Override

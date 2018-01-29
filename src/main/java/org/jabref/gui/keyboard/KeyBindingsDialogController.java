@@ -11,7 +11,7 @@ import javafx.scene.control.TreeTableView;
 
 import org.jabref.gui.AbstractController;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefIcon;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.preferences.PreferencesService;
@@ -47,7 +47,7 @@ public class KeyBindingsDialogController extends AbstractController<KeyBindingsD
         actionColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().nameProperty());
         shortcutColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().shownBindingProperty());
         resetColumn.setCellFactory(new ViewModelTreeTableCellFactory<KeyBindingViewModel, String>()
-                .withGraphic(keyBinding -> keyBinding.getIcon().map(IconTheme.JabRefIcon::getGraphicNode).orElse(null))
+                .withGraphic(keyBinding -> keyBinding.getIcon().map(JabRefIcon::getGraphicNode).orElse(null))
                 .withOnMouseClickedEvent(keyBinding -> evt -> keyBinding.resetToDefault())
         );
     }

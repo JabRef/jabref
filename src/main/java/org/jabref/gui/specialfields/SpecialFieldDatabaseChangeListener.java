@@ -1,15 +1,6 @@
 package org.jabref.gui.specialfields;
 
-import java.util.List;
-
-import org.jabref.Globals;
-import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.specialfields.SpecialFieldsUtils;
-import org.jabref.model.FieldChange;
 import org.jabref.model.database.event.EntryAddedEvent;
-import org.jabref.model.entry.BibEntry;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -26,9 +17,12 @@ public class SpecialFieldDatabaseChangeListener {
 
     @Subscribe
     public void listen(EntryAddedEvent event) {
+        // TODO
+        /*
         if (!Globals.prefs.isKeywordSyncEnabled()) {
             return;
         }
+
 
         final BibEntry entry = event.getBibEntry();
         // NamedCompount code similar to SpecialFieldUpdateListener
@@ -40,5 +34,6 @@ public class SpecialFieldDatabaseChangeListener {
         // Don't insert the compound into the undoManager,
         // it would be added before the component which undoes the insertion of the entry and creates heavy problems
         // (which prohibits the undo the deleting multiple entries)
+        */
     }
 }

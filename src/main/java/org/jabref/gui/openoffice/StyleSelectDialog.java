@@ -93,8 +93,8 @@ class StyleSelectDialog {
     private final JMenuItem show = new JMenuItem(Localization.lang("View"));
     private final JMenuItem remove = new JMenuItem(Localization.lang("Remove"));
     private final JMenuItem reload = new JMenuItem(Localization.lang("Reload"));
-    private final JButton addButton = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
-    private final JButton removeButton = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
+    private final JButton addButton = new JButton(IconTheme.JabRefIcons.ADD_NOBOX.getIcon());
+    private final JButton removeButton = new JButton(IconTheme.JabRefIcons.REMOVE_NOBOX.getIcon());
     private PreviewPanel preview;
     private ActionListener removeAction;
 
@@ -139,7 +139,7 @@ class StyleSelectDialog {
 
         // Create a preview panel for previewing styles
         // Must be done before creating the table to avoid NPEs
-        preview = new PreviewPanel(null, null);
+        preview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences());
         // Use the test entry from the Preview settings tab in Preferences:
         preview.setEntry(prevEntry);
 

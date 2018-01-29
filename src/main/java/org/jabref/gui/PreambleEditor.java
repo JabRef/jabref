@@ -174,7 +174,7 @@ class PreambleEditor extends JabRefDialog {
     class UndoAction extends AbstractAction {
 
         public UndoAction() {
-            super("Undo", IconTheme.JabRefIcon.UNDO.getIcon());
+            super("Undo", IconTheme.JabRefIcons.UNDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Undo");
         }
 
@@ -187,7 +187,7 @@ class PreambleEditor extends JabRefDialog {
     class RedoAction extends AbstractAction {
 
         public RedoAction() {
-            super("Redo", IconTheme.JabRefIcon.REDO.getIcon());
+            super("Redo", IconTheme.JabRefIcons.REDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Redo");
         }
 

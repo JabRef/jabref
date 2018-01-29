@@ -20,7 +20,7 @@ public class NewDatabaseAction extends MnemonicAwareAction {
     private final BibDatabaseMode mode;
 
     public NewDatabaseAction(JabRefFrame jabRefFrame, BibDatabaseMode mode) {
-        super(IconTheme.JabRefIcon.NEW.getIcon());
+        super(IconTheme.JabRefIcons.NEW.getIcon());
         this.jabRefFrame = jabRefFrame;
         this.mode = mode;
         putValue(Action.NAME, Localization.menuTitle("New %0 library", mode.getFormattedName()));

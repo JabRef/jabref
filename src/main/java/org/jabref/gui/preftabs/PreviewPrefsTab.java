@@ -121,7 +121,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
         btnTest.addActionListener(event -> {
             try {
-                PreviewPanel testPane = new PreviewPanel(null, null);
+                PreviewPanel testPane = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences());
                 testPane.setFixedLayout(layout.getText());
                 testPane.setEntry(TestEntry.getTestEntry());
                 JFXPanel container = CustomJFXPanel.wrap(new Scene(testPane));
@@ -251,7 +251,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
         // update preview
         for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
-            basePanel.getPreviewPanel().updateLayout();
+            basePanel.getPreviewPanel().updateLayout(Globals.prefs.getPreviewPreferences());
         }
     }
 

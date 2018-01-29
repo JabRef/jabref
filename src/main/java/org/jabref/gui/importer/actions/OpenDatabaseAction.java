@@ -21,12 +21,14 @@ import javax.swing.SwingUtilities;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.BasePanelPreferences;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.gui.autosaveandbackup.BackupUIManager;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
@@ -71,7 +73,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     private final JabRefFrame frame;
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
-        super(IconTheme.JabRefIcon.OPEN.getIcon());
+        super(IconTheme.JabRefIcons.OPEN.getIcon());
         this.frame = frame;
         this.showDialog = showDialog;
         putValue(Action.NAME, Localization.menuTitle("Open library"));
@@ -89,7 +91,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result)) {
                 action.performAction(panel, result);
-                panel.frame().getTabbedPane().setSelectedComponent(panel);
+                panel.frame().showBasePanel(panel);
             }
         }
     }
@@ -148,7 +150,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // Check if any of the files are already open:
         for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext();) {
             Path file = iterator.next();
-            for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
+            for (int i = 0; i < frame.getTabbedPane().getTabs().size(); i++) {
                 BasePanel basePanel = frame.getBasePanelAt(i);
                 if ((basePanel.getBibDatabaseContext().getDatabasePath().isPresent())
                         && basePanel.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
@@ -183,7 +185,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         else if (toRaise != null) {
             frame.output(Localization.lang("File '%0' is already open.",
                     toRaise.getBibDatabaseContext().getDatabaseFile().get().getPath()));
-            frame.getTabbedPane().setSelectedComponent(toRaise);
+            frame.showBasePanel(toRaise);
         }
 
         frame.output(Localization.lang("Files opened") + ": " + (filesToOpen.size()));
@@ -270,7 +272,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     .execute(() -> ParserResultWarningDialog.showParserResultWarningDialog(result, frame));
         }
 
-        BasePanel basePanel = new BasePanel(frame, result.getDatabaseContext());
+        BasePanel basePanel = new BasePanel(frame, BasePanelPreferences.from(Globals.prefs), result.getDatabaseContext(), ExternalFileTypes.getInstance());
 
         // file is set to null inside the EventDispatcherThread
         SwingUtilities.invokeLater(() -> frame.addTab(basePanel, raisePanel));

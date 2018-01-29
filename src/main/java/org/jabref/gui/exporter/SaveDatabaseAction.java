@@ -204,7 +204,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             if (ex.specificEntry()) {
                 BibEntry entry = ex.getEntry();
                 // Error occured during processing of an entry. Highlight it!
-                panel.highlightEntry(entry);
+                panel.clearAndSelect(entry);
             } else {
                 LOGGER.error("A problem occured when trying to save the file", ex);
             }
@@ -286,7 +286,6 @@ public class SaveDatabaseAction extends AbstractWorker {
 
     public void save() throws Exception {
         runCommand();
-        frame.updateEnabledState();
     }
 
     public void saveAs() throws Exception {
@@ -355,7 +354,6 @@ public class SaveDatabaseAction extends AbstractWorker {
         }
 
         context.getDatabaseFile().ifPresent(presentFile -> frame.getFileHistory().newFile(presentFile.getPath()));
-        frame.updateEnabledState();
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {
