@@ -272,11 +272,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     .execute(() -> ParserResultWarningDialog.showParserResultWarningDialog(result, frame));
         }
 
-        BasePanel basePanel = new BasePanel(frame, BasePanelPreferences.from(Globals.prefs), result.getDatabaseContext(), ExternalFileTypes.getInstance());
-
-        // file is set to null inside the EventDispatcherThread
-        SwingUtilities.invokeLater(() -> frame.addTab(basePanel, raisePanel));
-
         if (Objects.nonNull(file)) {
             frame.output(Localization.lang("Opened library") + " '" + file.toString() + "' "
                     + Localization.lang("with")
@@ -284,7 +279,12 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     + database.getEntryCount() + " " + Localization.lang("entries") + ".");
         }
 
-        return basePanel;
+        return DefaultTaskExecutor.runInJavaFXThread(() -> {
+                    BasePanel basePanel = new BasePanel(frame, BasePanelPreferences.from(Globals.prefs), result.getDatabaseContext(), ExternalFileTypes.getInstance());
+                    frame.addTab(basePanel, raisePanel);
+                    return basePanel;
+                }
+        );
     }
 
 }
