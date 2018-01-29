@@ -7,18 +7,18 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class SilverPlatterImporterTestNotRecognized {
 
     public SilverPlatterImporter testImporter;
 
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         testImporter = new SilverPlatterImporter();
     }
@@ -29,9 +29,9 @@ public class SilverPlatterImporterTestNotRecognized {
                 "RisImporterTest1.ris", "InspecImportTest2.txt");
         for (String s : notAccept) {
             URL resource = SilverPlatterImporter.class.getResource(s);
-            assertNotNull("resource " + s + " must be available", resource);
+            assertNotNull(resource, "resource " + s + " must be available");
             Path file = Paths.get(resource.toURI());
-            Assert.assertFalse(testImporter.isRecognizedFormat(file, StandardCharsets.UTF_8));
+            assertFalse(testImporter.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 
