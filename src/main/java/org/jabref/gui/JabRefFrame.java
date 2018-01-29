@@ -109,7 +109,6 @@ import org.jabref.gui.importer.fetcher.GeneralFetcher;
 import org.jabref.gui.journals.ManageJournalsAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingAction;
-import org.jabref.gui.maintable.RightClickMenu;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.openoffice.OpenOfficePanel;
@@ -275,17 +274,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Globals.getKeyPrefs().getKey(KeyBinding.UNMARK_ENTRIES), IconTheme.JabRefIcons.UNMARK_ENTRIES.getIcon());
     private final AbstractAction unmarkAll = new GeneralAction(Actions.UNMARK_ALL, Localization.menuTitle("Unmark all"));
     private final AbstractAction toggleRelevance = new GeneralAction(
-            new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getActionName(),
+            new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getCommand(),
             new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getMenuString(),
             new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getToolTipText(),
             IconTheme.JabRefIcons.RELEVANCE.getIcon());
     private final AbstractAction toggleQualityAssured = new GeneralAction(
-            new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getActionName(),
+            new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getCommand(),
             new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getMenuString(),
             new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getToolTipText(),
             IconTheme.JabRefIcons.QUALITY_ASSURED.getIcon());
     private final AbstractAction togglePrinted = new GeneralAction(
-            new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getActionName(),
+            new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getCommand(),
             new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getMenuString(),
             new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getToolTipText(),
             IconTheme.JabRefIcons.PRINTED.getIcon());
@@ -428,7 +427,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final ManageKeywordsAction manageKeywords = new ManageKeywordsAction(this);
     private final JMenu lookupIdentifiers = JabRefFrame.subMenu(Localization.menuTitle("Look up document identifier..."));
     private final GeneralAction findUnlinkedFiles = new GeneralAction(
-            FindUnlinkedFilesDialog.ACTION_COMMAND,
+            Actions.findUnlinkedFiles,
             FindUnlinkedFilesDialog.ACTION_MENU_TITLE, FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION,
             Globals.getKeyPrefs().getKey(KeyBinding.FIND_UNLINKED_FILES)
     );
@@ -1133,7 +1132,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             boolean menuitem = false;
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
                 rankSubMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(rankSubMenu, SpecialField.RANKING, this);
+                // TODO RightClickMenu.createSpecialFieldMenu(rankSubMenu, SpecialField.RANKING, this);
                 edit.add(rankSubMenu);
                 menuitem = true;
             }
@@ -1147,7 +1146,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
                 rankSubMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(rankSubMenu, SpecialField.PRIORITY, this);
+                // TODO RightClickMenu.createSpecialFieldMenu(rankSubMenu, SpecialField.PRIORITY, this);
                 edit.add(rankSubMenu);
                 menuitem = true;
             }
@@ -1157,7 +1156,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
                 rankSubMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(rankSubMenu, SpecialField.READ_STATUS, this);
+                // TODO RightClickMenu.createSpecialFieldMenu(rankSubMenu, SpecialField.READ_STATUS, this);
                 edit.add(rankSubMenu);
                 menuitem = true;
             }
@@ -2039,27 +2038,27 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private class GeneralAction extends MnemonicAwareAction {
 
-        private final String command;
+        private final Actions command;
 
-        public GeneralAction(String command, String text) {
+        public GeneralAction(Actions command, String text) {
             this.command = command;
             putValue(Action.NAME, text);
         }
 
-        public GeneralAction(String command, String text, String description) {
+        public GeneralAction(Actions command, String text, String description) {
             this.command = command;
             putValue(Action.NAME, text);
             putValue(Action.SHORT_DESCRIPTION, description);
         }
 
-        public GeneralAction(String command, String text, Icon icon) {
+        public GeneralAction(Actions command, String text, Icon icon) {
             super(icon);
 
             this.command = command;
             putValue(Action.NAME, text);
         }
 
-        public GeneralAction(String command, String text, String description, Icon icon) {
+        public GeneralAction(Actions command, String text, String description, Icon icon) {
             super(icon);
 
             this.command = command;
@@ -2067,20 +2066,20 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             putValue(Action.SHORT_DESCRIPTION, description);
         }
 
-        public GeneralAction(String command, String text, KeyStroke key) {
+        public GeneralAction(Actions command, String text, KeyStroke key) {
             this.command = command;
             putValue(Action.NAME, text);
             putValue(Action.ACCELERATOR_KEY, key);
         }
 
-        public GeneralAction(String command, String text, String description, KeyStroke key) {
+        public GeneralAction(Actions command, String text, String description, KeyStroke key) {
             this.command = command;
             putValue(Action.NAME, text);
             putValue(Action.SHORT_DESCRIPTION, description);
             putValue(Action.ACCELERATOR_KEY, key);
         }
 
-        public GeneralAction(String command, String text, String description, KeyStroke key, Icon icon) {
+        public GeneralAction(Actions command, String text, String description, KeyStroke key, Icon icon) {
             super(icon);
 
             this.command = command;
@@ -2164,9 +2163,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      */
     private class EditAction extends MnemonicAwareAction {
 
-        private final String command;
+        private final Actions command;
 
-        public EditAction(String command, String menuTitle, String description, KeyStroke key, Icon icon) {
+        public EditAction(Actions command, String menuTitle, String description, KeyStroke key, Icon icon) {
             super(icon);
             this.command = command;
             putValue(Action.NAME, menuTitle);
@@ -2180,7 +2179,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             JComponent source = Globals.getFocusListener().getFocused();
             Action action = source.getActionMap().get(command);
             if (action != null) {
-                action.actionPerformed(new ActionEvent(source, 0, command));
+                action.actionPerformed(new ActionEvent(source, 0, command.name()));
             }
         }
     }

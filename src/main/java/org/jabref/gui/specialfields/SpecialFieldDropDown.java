@@ -11,6 +11,7 @@ import javax.swing.JPopupMenu;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.actions.Actions;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
@@ -66,7 +67,7 @@ public class SpecialFieldDropDown {
                     JMenuItem item = new JMenuItem(viewModel.getSpecialFieldValueIcon());
                     item.setText(viewModel.getMenuString());
                     item.setToolTipText(viewModel.getToolTipText());
-                    item.addActionListener(new PopupitemActionListener(frame.getCurrentBasePanel(), new SpecialFieldValueViewModel(val).getActionName()));
+                    item.addActionListener(new PopupitemActionListener(frame.getCurrentBasePanel(), new SpecialFieldValueViewModel(val).getCommand()));
                     item.setMargin(new Insets(0, 0, 0, 0));
                     popup.add(item);
                 }
@@ -77,10 +78,9 @@ public class SpecialFieldDropDown {
         private class PopupitemActionListener implements ActionListener {
 
             private final BasePanel panel;
-            private final String actionName;
+            private final Actions actionName;
 
-
-            public PopupitemActionListener(BasePanel panel, String actionName) {
+            public PopupitemActionListener(BasePanel panel, Actions actionName) {
                 this.panel = panel;
                 this.actionName = actionName;
             }

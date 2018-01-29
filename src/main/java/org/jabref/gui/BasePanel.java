@@ -161,7 +161,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private final List<BibEntry> previousEntries = new ArrayList<>();
     private final List<BibEntry> nextEntries = new ArrayList<>();
     // Keeps track of the string dialog if it is open.
-    private final Map<String, Object> actions = new HashMap<>();
+    private final Map<Actions, Object> actions = new HashMap<>();
     private final SidePaneManager sidePaneManager;
     private final PreviewPanel preview;
     private final BasePanelPreferences preferences;
@@ -396,7 +396,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             }
         });
 
-        actions.put(FindUnlinkedFilesDialog.ACTION_COMMAND, (BaseAction) () -> {
+        actions.put(Actions.findUnlinkedFiles, (BaseAction) () -> {
             final FindUnlinkedFilesDialog dialog = new FindUnlinkedFilesDialog(frame, frame, BasePanel.this);
             dialog.setLocationRelativeTo(frame);
             dialog.setVisible(true);
@@ -638,26 +638,26 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         });
 
         // Note that we can't put the number of entries that have been reverted into the undoText as the concrete number cannot be injected
-        actions.put(new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getActionName(),
+        actions.put(new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getCommand(),
                 new SpecialFieldViewModel(SpecialField.RELEVANCE, undoManager).getSpecialFieldAction(
                         SpecialField.RELEVANCE.getValues().get(0), frame));
-        actions.put(new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getActionName(),
+        actions.put(new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getCommand(),
                 new SpecialFieldViewModel(SpecialField.QUALITY, undoManager)
                         .getSpecialFieldAction(SpecialField.QUALITY.getValues().get(0), frame));
-        actions.put(new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getActionName(),
+        actions.put(new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getCommand(),
                 new SpecialFieldViewModel(SpecialField.PRINTED, undoManager).getSpecialFieldAction(
                         SpecialField.PRINTED.getValues().get(0), frame));
 
         for (SpecialFieldValue prio : SpecialField.PRIORITY.getValues()) {
-            actions.put(new SpecialFieldValueViewModel(prio).getActionName(),
+            actions.put(new SpecialFieldValueViewModel(prio).getCommand(),
                     new SpecialFieldViewModel(SpecialField.PRIORITY, undoManager).getSpecialFieldAction(prio, this.frame));
         }
         for (SpecialFieldValue rank : SpecialField.RANKING.getValues()) {
-            actions.put(new SpecialFieldValueViewModel(rank).getActionName(),
+            actions.put(new SpecialFieldValueViewModel(rank).getCommand(),
                     new SpecialFieldViewModel(SpecialField.RANKING, undoManager).getSpecialFieldAction(rank, this.frame));
         }
         for (SpecialFieldValue status : SpecialField.READ_STATUS.getValues()) {
-            actions.put(new SpecialFieldValueViewModel(status).getActionName(),
+            actions.put(new SpecialFieldValueViewModel(status).getCommand(),
                     new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager).getSpecialFieldAction(status, this.frame));
         }
 
@@ -999,15 +999,15 @@ public class BasePanel extends StackPane implements ClipboardOwner {
      * This method is called from JabRefFrame if a database specific action is requested by the user. Runs the command
      * if it is defined, or prints an error message to the standard error stream.
      *
-     * @param _command The name of the command to run.
+     * @param command The name of the command to run.
      */
-    public void runCommand(final String _command) {
-        if (!actions.containsKey(_command)) {
-            LOGGER.info("No action defined for '" + _command + '\'');
+    public void runCommand(final Actions command) {
+        if (!actions.containsKey(command)) {
+            LOGGER.info("No action defined for '" + command + '\'');
             return;
         }
 
-        Object o = actions.get(_command);
+        Object o = actions.get(command);
         try {
             if (o instanceof BaseAction) {
                 ((BaseAction) o).action();
@@ -1212,7 +1212,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private void createMainTable() {
         bibDatabaseContext.getDatabase().registerListener(SpecialFieldDatabaseChangeListener.getInstance());
 
-        mainTable = new MainTable(tableModel, frame, this, bibDatabaseContext, preferences.getTablePreferences(), externalFileTypes);
+        mainTable = new MainTable(tableModel, frame, this, bibDatabaseContext, preferences.getTablePreferences(), externalFileTypes, Globals.getKeyPrefs());
 
         mainTable.updateFont();
 

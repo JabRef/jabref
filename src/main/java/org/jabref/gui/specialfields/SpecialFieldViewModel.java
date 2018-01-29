@@ -11,6 +11,7 @@ import org.jabref.Globals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.JabRefIcon;
+import org.jabref.gui.actions.ActionsFX;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
@@ -43,57 +44,31 @@ public class SpecialFieldViewModel {
     }
 
     public Icon getRepresentingIcon() {
-        switch (field) {
-            case PRINTED:
-                return IconTheme.JabRefIcons.PRINTED.getSmallIcon();
-            case PRIORITY:
-                return IconTheme.JabRefIcons.PRIORITY.getSmallIcon();
-            case QUALITY:
-                return IconTheme.JabRefIcons.QUALITY.getSmallIcon();
-            case RANKING:
-                return IconTheme.JabRefIcons.RANKING.getIcon();
-            case READ_STATUS:
-                return IconTheme.JabRefIcons.READ_STATUS.getSmallIcon();
-            case RELEVANCE:
-                return IconTheme.JabRefIcons.RELEVANCE.getSmallIcon();
-            default:
-                throw new IllegalArgumentException("There is no icon mapping for special field " + field);
-        }
+        return getAction().getIcon().map(IconTheme.JabRefIcons::getSmallIcon).orElse(null);
     }
 
     public JabRefIcon getIcon() {
-        switch (field) {
-            case PRINTED:
-                return IconTheme.JabRefIcons.PRINTED;
-            case PRIORITY:
-                return IconTheme.JabRefIcons.PRIORITY;
-            case QUALITY:
-                return IconTheme.JabRefIcons.QUALITY;
-            case RANKING:
-                return IconTheme.JabRefIcons.RANKING;
-            case READ_STATUS:
-                return IconTheme.JabRefIcons.READ_STATUS;
-            case RELEVANCE:
-                return IconTheme.JabRefIcons.RELEVANCE;
-            default:
-                throw new IllegalArgumentException("There is no icon mapping for special field " + field);
-        }
+        return getAction().getIcon().orElse(null);
     }
 
     public String getLocalization() {
+        return getAction().getText();
+    }
+
+    public ActionsFX getAction() {
         switch (field) {
             case PRINTED:
-                return Localization.lang("Printed");
+                return ActionsFX.PRINTED;
             case PRIORITY:
-                return Localization.lang("Priority");
+                return ActionsFX.PRIORITY;
             case QUALITY:
-                return Localization.lang("Quality");
+                return ActionsFX.QUALITY;
             case RANKING:
-                return Localization.lang("Rank");
+                return ActionsFX.RANKING;
             case READ_STATUS:
-                return Localization.lang("Read status");
+                return ActionsFX.READ_STATUS;
             case RELEVANCE:
-                return Localization.lang("Relevance");
+                return ActionsFX.RELEVANCE;
             default:
                 throw new IllegalArgumentException("There is no icon mapping for special field " + field);
         }

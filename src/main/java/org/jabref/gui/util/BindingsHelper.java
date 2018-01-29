@@ -165,6 +165,15 @@ public class BindingsHelper {
                 updateB);
     }
 
+    public static ObservableValue<? extends Boolean> constantOf(boolean value) {
+        return new BooleanBinding() {
+            @Override
+            protected boolean computeValue() {
+                return value;
+            }
+        };
+    }
+
     private static class BidirectionalBinding<A, B> {
 
         private final ObservableValue<A> propertyA;
