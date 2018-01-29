@@ -14,10 +14,12 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,7 +28,7 @@ public class RepecNepImporterTest {
     private RepecNepImporter testImporter;
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
@@ -39,7 +41,7 @@ public class RepecNepImporterTest {
                 "RepecNepImporterTest3.txt");
         for (String s : accepted) {
             Path file = Paths.get(RepecNepImporter.class.getResource(s).toURI());
-            Assert.assertTrue(testImporter.isRecognizedFormat(file, StandardCharsets.UTF_8));
+            assertTrue(testImporter.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 
@@ -49,7 +51,7 @@ public class RepecNepImporterTest {
                 "CopacImporterTest2.txt", "IEEEImport1.txt");
         for (String s : notAccepted) {
             Path file = Paths.get(RepecNepImporter.class.getResource(s).toURI());
-            Assert.assertFalse(testImporter.isRecognizedFormat(file, StandardCharsets.UTF_8));
+            assertFalse(testImporter.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 
@@ -58,7 +60,7 @@ public class RepecNepImporterTest {
         Path file = Paths.get(RepecNepImporter.class.getResource("RepecNepImporterTest1.txt").toURI());
         try (InputStream bibIn = RepecNepImporter.class.getResourceAsStream("RepecNepImporterTest1.bib")) {
             List<BibEntry> entries = testImporter.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
-            Assert.assertEquals(1, entries.size());
+            assertEquals(1, entries.size());
             BibEntryAssert.assertEquals(bibIn, entries.get(0));
         }
     }
@@ -69,7 +71,7 @@ public class RepecNepImporterTest {
         try (InputStream bibIn = RepecNepImporter.class.getResourceAsStream("RepecNepImporterTest2.bib")) {
             List<BibEntry> entries = testImporter.importDatabase(file, StandardCharsets.UTF_8).getDatabase()
                     .getEntries();
-            Assert.assertEquals(1, entries.size());
+            assertEquals(1, entries.size());
             BibEntryAssert.assertEquals(bibIn, entries.get(0));
         }
     }
@@ -80,30 +82,29 @@ public class RepecNepImporterTest {
         try (InputStream bibIn = RepecNepImporter.class.getResourceAsStream("RepecNepImporterTest3.bib")) {
             List<BibEntry> entries = testImporter.importDatabase(file, StandardCharsets.UTF_8).getDatabase()
                     .getEntries();
-            Assert.assertEquals(1, entries.size());
+            assertEquals(1, entries.size());
             BibEntryAssert.assertEquals(bibIn, entries.get(0));
         }
     }
 
     @Test
     public final void testGetFormatName() {
-        Assert.assertEquals("REPEC New Economic Papers (NEP)", testImporter.getName());
-
+        assertEquals("REPEC New Economic Papers (NEP)", testImporter.getName());
     }
 
     @Test
     public final void testGetCliId() {
-        Assert.assertEquals("repecnep", testImporter.getId());
+        assertEquals("repecnep", testImporter.getId());
     }
 
     @Test
     public void testGetExtension() {
-        Assert.assertEquals(FileType.REPEC, testImporter.getFileType());
+        assertEquals(FileType.REPEC, testImporter.getFileType());
     }
 
     @Test
     public final void testGetDescription() {
-        Assert.assertEquals("Imports a New Economics Papers-Message from the REPEC-NEP Service.",
+        assertEquals("Imports a New Economics Papers-Message from the REPEC-NEP Service.",
                 testImporter.getDescription());
     }
 }
