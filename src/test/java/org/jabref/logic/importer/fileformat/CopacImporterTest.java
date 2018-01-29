@@ -13,9 +13,11 @@ import java.util.stream.Stream;
 import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class CopacImporterTest {
 
@@ -36,20 +38,20 @@ public class CopacImporterTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         importer = new CopacImporter();
     }
 
     @Test
     public void testsGetExtensions() {
-        Assert.assertEquals(FileType.COPAC, importer.getFileType());
+        assertEquals(FileType.COPAC, importer.getFileType());
 
     }
 
     @Test
     public void testGetDescription() {
-        Assert.assertEquals("Importer for COPAC format.", importer.getDescription());
+        assertEquals("Importer for COPAC format.", importer.getDescription());
     }
 
     @Test
@@ -58,7 +60,7 @@ public class CopacImporterTest {
                 .collect(Collectors.toList());
         for (String str : list) {
             Path file = Paths.get(CopacImporterTest.class.getResource(str).toURI());
-            Assert.assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
+            assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 
@@ -66,6 +68,6 @@ public class CopacImporterTest {
     public void testImportEmptyEntries() throws Exception {
         Path path = Paths.get(CopacImporterTest.class.getResource("Empty.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(path, StandardCharsets.UTF_8).getDatabase().getEntries();
-        Assert.assertEquals(Collections.emptyList(), entries);
+        assertEquals(Collections.emptyList(), entries);
     }
 }

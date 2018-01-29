@@ -5,17 +5,17 @@ import java.util.Arrays;
 
 import org.jabref.logic.importer.Importer;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CustomImporterTest {
 
     private CustomImporter importer;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         importer = asCustomImporter(new CopacImporter());
     }

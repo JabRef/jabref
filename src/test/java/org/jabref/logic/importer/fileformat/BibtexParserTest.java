@@ -38,14 +38,16 @@ import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrderConfig;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -58,17 +60,18 @@ public class BibtexParserTest {
     private BibtexParser parser;
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
         parser = new BibtexParser(importFormatPreferences);
     }
 
-    @SuppressWarnings("unused")
-    @Test(expected = NullPointerException.class)
+    @Test
     public void parseWithNullThrowsNullPointerException() throws Exception {
-        parser.parse(null);
+        Executable toBeTested = () -> parser.parse(null);
+
+        assertThrows(NullPointerException.class, toBeTested);
     }
 
     @Test

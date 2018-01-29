@@ -15,18 +15,18 @@ import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InspecImportTest {
 
     private InspecImporter importer;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.importer = new InspecImporter();
     }
