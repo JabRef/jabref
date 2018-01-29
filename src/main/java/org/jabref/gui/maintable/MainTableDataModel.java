@@ -6,6 +6,7 @@ import java.util.Optional;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 
 import org.jabref.Globals;
 import org.jabref.gui.util.BindingsHelper;
@@ -17,17 +18,20 @@ import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.JabRefPreferences;
 
 public class MainTableDataModel {
-    private final FilteredList<BibEntryTableViewModel> entriesFiltered;
+    private final SortedList<BibEntryTableViewModel> entries;
 
     public MainTableDataModel(BibDatabaseContext context) {
         ObservableList<BibEntry> allEntries = context.getDatabase().getEntries();
 
-        entriesFiltered = new FilteredList<>(
+        FilteredList<BibEntryTableViewModel> entriesFiltered = new FilteredList<>(
                 BindingsHelper.mapBacked(allEntries, BibEntryTableViewModel::new));
         entriesFiltered.predicateProperty().bind(
                 Bindings.createObjectBinding(() -> this::isMatched,
                         Globals.stateManager.activeGroupProperty(), Globals.stateManager.activeSearchQueryProperty())
         );
+
+        // We need to wrap the list since otherwise sorting in the table does not work
+        entries = new SortedList<>(entriesFiltered);
     }
 
     private boolean isMatched(BibEntryTableViewModel entry) {
@@ -61,7 +65,7 @@ public class MainTableDataModel {
         return Optional.of(searchRules);
     }
 
-    public ObservableList<BibEntryTableViewModel> getEntriesFiltered() {
-        return entriesFiltered;
+    public SortedList<BibEntryTableViewModel> getEntriesFiltered() {
+        return entries;
     }
 }

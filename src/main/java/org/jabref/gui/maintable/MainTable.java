@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.swing.JTable;
 
 import javafx.collections.ListChangeListener;
+import javafx.collections.transformation.SortedList;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableView;
@@ -85,7 +86,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
         }
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        this.setItems(model.getEntriesFiltered());
+
+        SortedList<BibEntryTableViewModel> entries = model.getEntriesFiltered();
+        this.setItems(entries);
+
+        // Enable sorting
+        entries.comparatorProperty().bind(this.comparatorProperty());
 
         // TODO: Cannot add focus listener as it is expecting an swing component
         //addFocusListener(Globals.getFocusListener());
