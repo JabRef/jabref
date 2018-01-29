@@ -14,13 +14,12 @@ import org.jabref.logic.util.FileType;
 import org.jabref.logic.xmp.XMPPreferences;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class PdfXmpImporterTest {
@@ -28,7 +27,7 @@ public class PdfXmpImporterTest {
     private PdfXmpImporter importer;
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         importer = new PdfXmpImporter(mock(XMPPreferences.class));
     }
@@ -52,7 +51,7 @@ public class PdfXmpImporterTest {
     public void importEncryptedFileReturnsError() throws URISyntaxException {
         Path file = Paths.get(PdfXmpImporterTest.class.getResource("/pdfs/encrypted.pdf").toURI());
         ParserResult result = importer.importDatabase(file, StandardCharsets.UTF_8);
-        Assert.assertTrue(result.hasWarnings());
+        assertTrue(result.hasWarnings());
     }
 
     @Test
