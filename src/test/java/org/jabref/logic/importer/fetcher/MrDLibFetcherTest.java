@@ -7,27 +7,25 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@Category(FetcherTest.class)
+@FetcherTest
 public class MrDLibFetcherTest {
 
     private MrDLibFetcher fetcher;
-    private BibEntry bibEntry;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         fetcher = new MrDLibFetcher("", "");
     }
 
     @Test
     public void testPerformSearch() throws FetcherException {
-        bibEntry = new BibEntry();
+        BibEntry bibEntry = new BibEntry();
         bibEntry.setField(FieldName.TITLE, "lernen");
         List<BibEntry> bibEntrys = fetcher.performSearch(bibEntry);
         assertFalse(bibEntrys.isEmpty());

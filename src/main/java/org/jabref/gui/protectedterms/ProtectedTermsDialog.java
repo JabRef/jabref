@@ -59,15 +59,15 @@ import org.jabref.preferences.JabRefPreferences;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class produces a dialog box for managing term list files.
  */
 public class ProtectedTermsDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(ProtectedTermsDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsDialog.class);
 
     private final JabRefFrame frame;
     private JDialog diag;

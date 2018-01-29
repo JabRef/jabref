@@ -28,13 +28,13 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     public static final DataFlavor FLAVOR;
-    private static final Log LOGGER = LogFactory.getLog(GroupTreeNodeViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeNodeViewModel.class);
     private static final Icon GROUP_REFINING_ICON = IconTheme.JabRefIcons.GROUP_REFINING.getSmallIcon();
     private static final Icon GROUP_INCLUDING_ICON = IconTheme.JabRefIcons.GROUP_INCLUDING.getSmallIcon();
     private static final Icon GROUP_REGULAR_ICON = null;

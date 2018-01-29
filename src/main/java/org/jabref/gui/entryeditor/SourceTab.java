@@ -33,26 +33,28 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.controlsfx.control.NotificationPane;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SourceTab extends EntryEditorTab {
 
-    private static final Log LOGGER = LogFactory.getLog(SourceTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SourceTab.class);
     private final LatexFieldFormatterPreferences fieldFormatterPreferences;
     private final BibDatabaseMode mode;
     private UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator(sourceIsValid);
     private final ImportFormatPreferences importFormatPreferences;
+    private FileUpdateMonitor fileMonitor;
 
-    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences) {
+    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.mode = bibDatabaseContext.getMode();
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
@@ -60,6 +62,7 @@ public class SourceTab extends EntryEditorTab {
         this.undoManager = undoManager;
         this.fieldFormatterPreferences = fieldFormatterPreferences;
         this.importFormatPreferences = importFormatPreferences;
+        this.fileMonitor = fileMonitor;
     }
 
     private static String getSourceString(BibEntry entry, BibDatabaseMode type, LatexFieldFormatterPreferences fieldFormatterPreferences) throws IOException {
@@ -118,7 +121,7 @@ public class SourceTab extends EntryEditorTab {
             return;
         }
 
-        BibtexParser bibtexParser = new BibtexParser(importFormatPreferences);
+        BibtexParser bibtexParser = new BibtexParser(importFormatPreferences, fileMonitor);
         try {
             ParserResult parserResult = bibtexParser.parse(new StringReader(text));
             BibDatabase database = parserResult.getDatabase();

@@ -20,8 +20,8 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CiteSeerXFetcher implements EntryFetcher {
 
@@ -42,7 +42,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
             .compile(CiteSeerXFetcher.BASE_PATTERN.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_year"));
     private static final Pattern ABSTRACT_PATTERN = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
 
-    private static final Log LOGGER = LogFactory.getLog(CiteSeerXFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CiteSeerXFetcher.class);
 
     private boolean stopFetching;
 

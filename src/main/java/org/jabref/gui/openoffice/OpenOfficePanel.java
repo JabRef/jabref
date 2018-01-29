@@ -74,8 +74,8 @@ import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This test panel can be opened by reflection from JabRef, passing the JabRefFrame as an
@@ -83,7 +83,7 @@ import org.apache.commons.logging.LogFactory;
  * between JabRef and OpenOffice.
  */
 public class OpenOfficePanel extends AbstractWorker {
-    private static final Log LOGGER = LogFactory.getLog(OpenOfficePanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficePanel.class);
 
     private OpenOfficeSidePanel sidePane;
     private JDialog diag;

@@ -35,12 +35,12 @@ import org.jabref.preferences.PreviewPreferences;
 import com.google.common.primitives.Ints;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.factories.Paddings;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
-    private static final Log LOGGER = LogFactory.getLog(PreviewPrefsTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewPrefsTab.class);
 
     private SwingWorker<List<CitationStyle>, Void> discoverCitationStyleWorker;
 

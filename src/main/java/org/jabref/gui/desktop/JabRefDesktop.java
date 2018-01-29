@@ -42,8 +42,8 @@ import org.jabref.model.entry.identifier.Eprint;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TODO: Replace by http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html
@@ -51,7 +51,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class JabRefDesktop {
 
-    private static final Log LOGGER = LogFactory.getLog(JabRefDesktop.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDesktop.class);
 
     private static final NativeDesktop NATIVE_DESKTOP = getNativeDesktop();
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");

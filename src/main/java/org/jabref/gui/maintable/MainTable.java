@@ -29,8 +29,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.matchers.Matcher;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MainTable extends TableView<BibEntryTableViewModel> {
     private static GeneralRenderer defRenderer;

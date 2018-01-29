@@ -48,14 +48,14 @@ import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // The action concerned with opening an existing database.
 
 public class OpenDatabaseAction extends MnemonicAwareAction {
 
-    public static final Log LOGGER = LogFactory.getLog(OpenDatabaseAction.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
     private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = new ArrayList<>();
@@ -235,7 +235,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
             ParserResult result;
             result = OpenDatabase.loadDatabase(fileToLoad.toString(),
-                    Globals.prefs.getImportFormatPreferences());
+                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
 
             if (result.getDatabase().isShared()) {
                 try {

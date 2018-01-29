@@ -138,14 +138,14 @@ import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.Subscription;
 
 public class BasePanel extends StackPane implements ClipboardOwner {
 
-    private static final Log LOGGER = LogFactory.getLog(BasePanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BasePanel.class);
 
     private final BibDatabaseContext bibDatabaseContext;
     private final MainTableDataModel tableModel;

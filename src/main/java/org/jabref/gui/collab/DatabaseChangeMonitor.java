@@ -10,17 +10,17 @@ import javax.swing.SwingUtilities;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.SidePaneManager;
-import org.jabref.gui.util.FileUpdateListener;
-import org.jabref.gui.util.FileUpdateMonitor;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.FileUpdateListener;
+import org.jabref.model.util.FileUpdateMonitor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DatabaseChangeMonitor implements FileUpdateListener {
-    private static final Log LOGGER = LogFactory.getLog(DatabaseChangeMonitor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseChangeMonitor.class);
 
     private final BibDatabaseContext database;
     private final FileUpdateMonitor fileMonitor;

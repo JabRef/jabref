@@ -13,8 +13,8 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides handling for messages and menu entries in the preferred language of the user.
@@ -37,7 +37,7 @@ public class Localization {
     static final String RESOURCE_PREFIX = "l10n/JabRef";
     static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
 
-    private static final Log LOGGER = LogFactory.getLog(Localization.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Localization.class);
 
     private static Locale locale;
     private static LocalizationBundle localizedMessages;

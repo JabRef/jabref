@@ -16,8 +16,8 @@ import org.jabref.model.database.event.CoarseChangeFilter;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Saves the given {@link BibDatabaseContext} on every {@link BibDatabaseContextChangedEvent} by posting a new {@link AutosaveEvent}.
@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AutosaveManager {
 
-    private static final Log LOGGER = LogFactory.getLog(AutosaveManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutosaveManager.class);
 
     private static Set<AutosaveManager> runningInstances = new HashSet<>();
 
@@ -94,7 +94,7 @@ public class AutosaveManager {
             eventBus.unregister(listener);
         } catch (IllegalArgumentException e) {
             // occurs if the event source has not been registered, should not prevent shutdown
-            LOGGER.debug(e);
+            LOGGER.debug("Proble, unregistering", e);
         }
     }
 }

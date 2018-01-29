@@ -10,11 +10,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibtexString;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class StringRemoveChangeViewModel extends ChangeViewModel {
-    private static final Log LOGGER = LogFactory.getLog(StringRemoveChangeViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StringRemoveChangeViewModel.class);
     private final BibtexString string;
 
     private final BibtexString inMem;

@@ -42,12 +42,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LinkedFileViewModel extends AbstractViewModel {
 
-    private static final Log LOGGER = LogFactory.getLog(LinkedFileViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileViewModel.class);
 
     private final LinkedFile linkedFile;
     private final BibDatabaseContext databaseContext;

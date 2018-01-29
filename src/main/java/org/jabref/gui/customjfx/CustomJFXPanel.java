@@ -12,8 +12,8 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.util.OS;
 
 import com.sun.javafx.embed.EmbeddedSceneInterface;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /***
  * WARNING: THIS IS A CUSTOM HACK TO PREVENT A BUG WITH ACCENTED CHARACTERS PRODUCING AN NPE IN LINUX </br>
@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CustomJFXPanel extends JFXPanel {
 
-    private static final Log LOGGER = LogFactory.getLog(CustomJFXPanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomJFXPanel.class);
     private Field scenePeerField = null;
 
     private CustomJFXPanel() {

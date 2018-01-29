@@ -20,15 +20,15 @@ import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * List event, mouse, key and focus listener for the main table that makes up the
  * most part of the BasePanel for a single BIB database.
  */
 public class MainTableSelectionListener implements ListEventListener<BibEntry>, MouseListener, KeyListener, FocusListener {
-    private static final Log LOGGER = LogFactory.getLog(MainTableSelectionListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainTableSelectionListener.class);
 
     private final MainTable table;
     private final BasePanel panel;

@@ -20,8 +20,8 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Sends the selected entry as email - by Oliver Kopp
@@ -35,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SendAsEMailAction extends AbstractWorker {
 
-    private static final Log LOGGER = LogFactory.getLog(SendAsEMailAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SendAsEMailAction.class);
     private final JabRefFrame frame;
     private String message;
 

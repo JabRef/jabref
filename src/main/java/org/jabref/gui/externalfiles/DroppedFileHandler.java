@@ -45,8 +45,8 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class holds the functionality of autolinking to a file that's dropped
@@ -62,7 +62,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DroppedFileHandler {
 
-    private static final Log LOGGER = LogFactory.getLog(DroppedFileHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DroppedFileHandler.class);
 
     private final JabRefFrame frame;
 

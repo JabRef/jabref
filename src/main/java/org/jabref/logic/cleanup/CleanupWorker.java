@@ -51,7 +51,10 @@ public class CleanupWorker {
         List<CleanupJob> jobs = new ArrayList<>();
 
         if (preset.isConvertToBiblatex()) {
-            jobs.add(new BiblatexCleanup());
+            jobs.add(new ConvertToBiblatexCleanup());
+        }
+        if (preset.isConvertToBibtex()) {
+            jobs.add(new ConvertToBibtexCleanup());
         }
         if (preset.getFormatterCleanups().isEnabled()) {
             jobs.addAll(preset.getFormatterCleanups().getConfiguredActions());

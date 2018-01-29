@@ -72,15 +72,15 @@ import ca.odell.glazedlists.swing.GlazedListsSwing;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class produces a dialog box for choosing a style file.
  */
 class StyleSelectDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(StyleSelectDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StyleSelectDialog.class);
 
     private final JabRefFrame frame;
     private EventList<OOBibStyle> styles;

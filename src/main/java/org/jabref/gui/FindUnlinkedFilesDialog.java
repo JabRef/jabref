@@ -82,8 +82,8 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * GUI Dialog for the feature "Find unlinked files".
@@ -98,7 +98,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
     public static final String ACTION_SHORT_DESCRIPTION = Localization
             .lang("Searches for unlinked PDF files on the file system");
 
-    private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FindUnlinkedFilesDialog.class);
     private static final String GLOBAL_PREFS_WORKING_DIRECTORY_KEY = "findUnlinkedFilesWD";
 
     private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";

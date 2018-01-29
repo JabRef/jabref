@@ -10,8 +10,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Static variables for graphics files and keyboard shortcuts.
@@ -35,7 +35,7 @@ public class GUIGlobals {
     //	Colors.
     public static final Color ENTRY_EDITOR_LABEL_COLOR = new Color(100, 100, 150); // Empty field, blue.
 
-    private static final Log LOGGER = LogFactory.getLog(GUIGlobals.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GUIGlobals.class);
 
     private GUIGlobals() {
     }

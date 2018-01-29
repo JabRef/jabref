@@ -13,15 +13,15 @@ import org.jabref.Globals;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages visibility of SideShowComponents in a given newly constructed
  * sidePane.
  */
 public class SidePaneManager {
-    private static final Log LOGGER = LogFactory.getLog(SidePaneManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SidePaneManager.class);
 
     private final JabRefFrame frame;
 

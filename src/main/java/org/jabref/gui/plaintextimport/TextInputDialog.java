@@ -89,8 +89,8 @@ import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * import from plain text => simple mark/copy/paste into bibtex entry
@@ -104,7 +104,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class TextInputDialog extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(TextInputDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TextInputDialog.class);
 
     private final JButton okButton = new JButton(Localization.lang("Accept"));
     private final JButton cancelButton = new JButton(Localization.lang("Cancel"));

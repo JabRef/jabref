@@ -16,12 +16,12 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class EntryDeleteChangeViewModel extends ChangeViewModel {
 
-    private static final Log LOGGER = LogFactory.getLog(EntryDeleteChangeViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntryDeleteChangeViewModel.class);
     private final BibEntry memEntry;
     private final BibEntry tmpEntry;
 

@@ -6,19 +6,18 @@ import java.util.Optional;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Category(FetcherTest.class)
+@FetcherTest
 public class CrossRefTest {
 
     private CrossRef fetcher;
     private BibEntry barrosEntry;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         fetcher = new CrossRef();
 

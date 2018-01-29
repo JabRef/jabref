@@ -51,12 +51,12 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.base.Throwables;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ArgumentProcessor {
 
-    private static final Log LOGGER = LogFactory.getLog(ArgumentProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
     private final JabRefCLI cli;
     private final List<ParserResult> parserResults;
     private final Mode startupMode;
@@ -130,7 +130,7 @@ public class ArgumentProcessor {
                 // * means "guess the format":
                 System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
 
-                ImportFormatReader.UnknownFormatImport importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file);
+                ImportFormatReader.UnknownFormatImport importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file, Globals.getFileUpdateMonitor());
 
                 System.out.println(Localization.lang("Format used") + ": " + importResult.format);
                 return Optional.of(importResult.parserResult);
@@ -308,7 +308,7 @@ public class ArgumentProcessor {
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
                 ParserResult pr = new ParserResult();
                 if (bibExtension) {
-                    pr = OpenDatabase.loadDatabase(aLeftOver, Globals.prefs.getImportFormatPreferences());
+                    pr = OpenDatabase.loadDatabase(aLeftOver, Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
                 }
 
                 if (!bibExtension || (pr.isEmpty())) {

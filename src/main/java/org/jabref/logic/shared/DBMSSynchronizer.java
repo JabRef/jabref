@@ -31,11 +31,12 @@ import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Synchronizes the shared or local databases with their opposite side.
@@ -43,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DBMSSynchronizer implements DatabaseSynchronizer {
 
-    private static final Log LOGGER = LogFactory.getLog(DBMSSynchronizer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DBMSSynchronizer.class);
 
     private DBMSProcessor dbmsProcessor;
     private String dbName;
@@ -54,12 +55,14 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private Connection currentConnection;
     private final Character keywordSeparator;
     private final GlobalBibtexKeyPattern globalCiteKeyPattern;
+    private FileUpdateMonitor fileMonitor;
 
     public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
-            GlobalBibtexKeyPattern globalCiteKeyPattern) {
+                            GlobalBibtexKeyPattern globalCiteKeyPattern, FileUpdateMonitor fileMonitor) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
+        this.fileMonitor = fileMonitor;
         this.eventBus = new EventBus();
         this.keywordSeparator = keywordSeparator;
         this.globalCiteKeyPattern = Objects.requireNonNull(globalCiteKeyPattern);
@@ -269,7 +272,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
         try {
             metaData.setEventPropagation(false);
-            MetaDataParser.parse(metaData, dbmsProcessor.getSharedMetaData(), keywordSeparator);
+            MetaDataParser parser = new MetaDataParser(fileMonitor);
+            parser.parse(metaData, dbmsProcessor.getSharedMetaData(), keywordSeparator);
             metaData.setEventPropagation(true);
         } catch (ParseException e) {
             LOGGER.error("Parse error", e);
