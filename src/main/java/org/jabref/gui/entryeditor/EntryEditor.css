@@ -66,3 +66,20 @@
 .tool-bar > .container > .separator {
     -fx-background-color: #5e5f5e;
 }
+
+.warning-icon {
+    -fx-fill: #ffb500;
+}
+
+.error-icon {
+    -fx-text-fill: #bb0613;
+    -fx-fill: #bb0613;
+}
+
+.tooltip-warning {
+    -fx-background-color: #d69600;
+}
+
+.tooltip-error {
+    -fx-background-color: #a80511;
+}

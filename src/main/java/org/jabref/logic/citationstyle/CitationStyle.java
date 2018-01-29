@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -123,6 +124,7 @@ public class CitationStyle {
 
     /**
      * Provides the default citation style which is currently IEEE
+     *
      * @return default citation style
      */
     public static CitationStyle getDefault() {
@@ -131,6 +133,7 @@ public class CitationStyle {
 
     /**
      * Provides the citation styles that come with JabRef.
+     *
      * @return list of available citation styles
      */
     public static List<CitationStyle> discoverCitationStyles() {
@@ -154,11 +157,12 @@ public class CitationStyle {
 
             try (FileSystem jarFs = FileSystems.newFileSystem(Paths.get(path), null)) {
 
-                List<Path> allStyles = Files.find(jarFs.getRootDirectories().iterator().next(), 1, (file, attr) -> file.toString().endsWith("csl")).collect(Collectors.toList());
-
-                for (Path style : allStyles) {
-                    CitationStyle.createCitationStyleFromFile(style.getFileName().toString())
-                            .ifPresent(STYLES::add);
+                try (Stream<Path> stylefileStream = Files.find(jarFs.getRootDirectories().iterator().next(), 1, (file, attr) -> file.toString().endsWith("csl"))) {
+                    for (Path style : stylefileStream.collect(Collectors.toList())) {
+                        CitationStyle.createCitationStyleFromFile(style.getFileName().toString()).ifPresent(STYLES::add);
+                    }
+                } catch (UncheckedIOException e) {
+                    throw new IOException(e);
                 }
             }
             return STYLES;
@@ -209,5 +213,4 @@ public class CitationStyle {
     public int hashCode() {
         return Objects.hash(source);
     }
-
 }

@@ -201,7 +201,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             IconTheme.getImage("about"), IconTheme.getImage("about"));
     private final AbstractAction jabrefFacebookAction = new OpenBrowserAction("https://www.facebook.com/JabRef/",
             "Facebook", Localization.lang("Opens JabRef's Facebook page"),
-            IconTheme.JabRefIcons.FACEBOOK.getSmallIcon(), IconTheme.JabRefIcons.FACEBOOK.getIcon());
+            IconTheme.JabRefIcons.FACEBOOK.getSmallIcon(), IconTheme.JabRefIcosn.FACEBOOK.getIcon());
+    private final AbstractAction jabrefTwitterAction = new OpenBrowserAction("https://twitter.com/jabref_org",
+            "Twitter", Localization.lang("Opens JabRef's Twitter page"),
+            IconTheme.JabRefIcons.TWITTER.getSmallIcon(), IconTheme.JabRefIcons.TWITTER.getIcon());
     private final AbstractAction jabrefBlogAction = new OpenBrowserAction("https://blog.jabref.org/",
             Localization.menuTitle("Blog"), Localization.lang("Opens JabRef's blog"),
             IconTheme.JabRefIcons.BLOG.getSmallIcon(), IconTheme.JabRefIcons.BLOG.getIcon());
@@ -213,7 +216,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("See what has been changed in the JabRef versions"));
     private final AbstractAction forkMeOnGitHubAction = new OpenBrowserAction("https://github.com/JabRef/jabref",
             Localization.menuTitle("Fork me on GitHub"), Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcons.GITHUB.getSmallIcon(), IconTheme.JabRefIcons.GITHUB.getIcon());
-    private final AbstractAction donationAction = new OpenBrowserAction("https://github.com/JabRef/jabref/wiki/Donations",
+    private final AbstractAction donationAction = new OpenBrowserAction("https://donations.jabref.org",
             Localization.menuTitle("Donate to JabRef"), Localization.lang("Donate to JabRef"), IconTheme.JabRefIcons.DONATE.getSmallIcon(), IconTheme.JabRefIcons.DONATE.getIcon());
     private final AbstractAction openForumAction = new OpenBrowserAction("http://discourse.jabref.org/",
             Localization.menuTitle("Online help forum"), Localization.lang("Online help forum"), IconTheme.JabRefIcons.FORUM.getSmallIcon(), IconTheme.JabRefIcons.FORUM.getIcon());
@@ -1291,6 +1294,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         webMenu.add(jabrefWebPageAction);
         webMenu.add(jabrefBlogAction);
         webMenu.add(jabrefFacebookAction);
+        webMenu.add(jabrefTwitterAction);
         webMenu.addSeparator();
         webMenu.add(forkMeOnGitHubAction);
         webMenu.add(developmentVersionAction);
@@ -1411,6 +1415,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
         tlb.add(donationAction);
         tlb.add(forkMeOnGitHubAction);
+        tlb.add(jabrefFacebookAction);
+        tlb.add(jabrefTwitterAction);
 
         createDisabledIconsForButtons(tlb);
     }

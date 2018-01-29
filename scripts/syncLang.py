@@ -314,7 +314,9 @@ class SyncLang:
             for line in main_lines:
                 key = main_keys.key_from_line(line)
                 if key is not None:
-                    other_lines_to_write.append(u"{key}={value}\n".format(key=key, value=keys[key]))
+                    # Do not write empty keys
+                    if keys[key] !=  "":
+                        other_lines_to_write.append(u"{key}={value}\n".format(key=key, value=keys[key]))
                 else:
                     other_lines_to_write.append(line)
 
