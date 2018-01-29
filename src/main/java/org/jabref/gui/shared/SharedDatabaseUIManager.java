@@ -61,7 +61,6 @@ public class SharedDatabaseUIManager {
         } else if (answer == 1) {
             connectionLostEvent.getBibDatabaseContext().convertToLocalDatabase();
             jabRefFrame.refreshTitleAndTabs();
-            jabRefFrame.updateEnabledState();
             jabRefFrame.output(Localization.lang("Working offline."));
         } else {
             jabRefFrame.closeCurrentTab();
@@ -91,7 +90,7 @@ public class SharedDatabaseUIManager {
                             + "\n" + Localization.lang("You can restore the entry using the \"Undo\" operation."),
                     Localization.lang("Shared entry is no longer present"), JOptionPane.INFORMATION_MESSAGE);
 
-            SwingUtilities.invokeLater(() -> panel.hideBottomComponent());
+            SwingUtilities.invokeLater(() -> panel.closeBottomPane());
         }
     }
 

@@ -93,7 +93,6 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
     /**
      * Keys to be used for referencing this Action.
      */
-    public static final String ACTION_COMMAND = "findUnlinkedFiles";
     public static final String ACTION_MENU_TITLE = Localization.menuTitle("Find unlinked files...");
 
     public static final String ACTION_SHORT_DESCRIPTION = Localization
@@ -987,7 +986,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
                 if (value instanceof EntryFromFileCreator) {
                     EntryFromFileCreator creator = (EntryFromFileCreator) value;
                     if (creator.getExternalFileType() != null) {
-                        label.setIcon(creator.getExternalFileType().getIcon());
+                        label.setIcon(creator.getExternalFileType().getIcon().getSmallIcon());
                     }
                 }
                 return label;

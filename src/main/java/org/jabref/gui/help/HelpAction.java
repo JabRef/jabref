@@ -41,7 +41,7 @@ public class HelpAction extends MnemonicAwareAction {
 
 
     public HelpAction(String title, String tooltip, HelpFile helpPage, KeyStroke key) {
-        this(title, tooltip, helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
+        this(title, tooltip, helpPage, IconTheme.JabRefIcons.HELP.getSmallIcon());
         putValue(Action.ACCELERATOR_KEY, key);
     }
 
@@ -53,7 +53,7 @@ public class HelpAction extends MnemonicAwareAction {
     }
 
     public HelpAction(String tooltip, HelpFile helpPage) {
-        this(Localization.lang("Help"), tooltip, helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
+        this(Localization.lang("Help"), tooltip, helpPage, IconTheme.JabRefIcons.HELP.getSmallIcon());
     }
 
     public HelpAction(HelpFile helpPage, Icon icon) {
@@ -61,7 +61,7 @@ public class HelpAction extends MnemonicAwareAction {
     }
 
     public HelpAction(HelpFile helpPage) {
-        this(Localization.lang("Help"), Localization.lang("Help"), helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
+        this(Localization.lang("Help"), Localization.lang("Help"), helpPage, IconTheme.JabRefIcons.HELP.getSmallIcon());
     }
 
     public JButton getHelpButton() {

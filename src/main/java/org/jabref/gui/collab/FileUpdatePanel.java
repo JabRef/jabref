@@ -25,7 +25,7 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
 
 
     public FileUpdatePanel(BasePanel panel, SidePaneManager manager, File file, ChangeScanner scanner) {
-        super(manager, IconTheme.JabRefIcon.SAVE.getIcon(), Localization.lang("File changed"));
+        super(manager, IconTheme.JabRefIcons.SAVE.getIcon(), Localization.lang("File changed"));
         close.setEnabled(false);
         this.panel = panel;
         this.manager = manager;

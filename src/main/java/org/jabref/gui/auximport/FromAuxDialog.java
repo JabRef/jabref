@@ -16,9 +16,10 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+
+import javafx.scene.control.TabPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -58,7 +59,7 @@ public class FromAuxDialog extends JabRefDialog {
     private JTextArea statusInfos;
 
     // all open databases from JabRefFrame
-    private final JTabbedPane parentTabbedPane;
+    private final TabPane parentTabbedPane;
 
     private boolean generatePressed;
 
@@ -66,7 +67,7 @@ public class FromAuxDialog extends JabRefDialog {
 
     private final JabRefFrame parentFrame;
 
-    public FromAuxDialog(JabRefFrame frame, String title, boolean modal, JTabbedPane viewedDBs) {
+    public FromAuxDialog(JabRefFrame frame, String title, boolean modal, TabPane viewedDBs) {
         super(frame, title, modal, FromAuxDialog.class);
 
         parentTabbedPane = viewedDBs;
@@ -143,10 +144,10 @@ public class FromAuxDialog extends JabRefDialog {
 
     private void initPanels() {
         // collect the names of all open databases
-        int len = parentTabbedPane.getTabCount();
+        int len = parentTabbedPane.getTabs().size();
         int toSelect = -1;
         for (int i = 0; i < len; i++) {
-            dbChooser.addItem(parentTabbedPane.getTitleAt(i));
+            dbChooser.addItem(parentTabbedPane.getTabs().get(i).getText());
             if (parentFrame.getBasePanelAt(i) == parentFrame.getCurrentBasePanel()) {
                 toSelect = i;
             }
@@ -200,7 +201,7 @@ public class FromAuxDialog extends JabRefDialog {
 
     private void parseActionPerformed() {
         parseButton.setEnabled(false);
-        BasePanel bp = (BasePanel) parentTabbedPane.getComponentAt(dbChooser.getSelectedIndex());
+        BasePanel bp = (BasePanel) parentTabbedPane.getTabs().get(dbChooser.getSelectedIndex()).getContent();
         notFoundList.removeAll();
         statusInfos.setText(null);
         BibDatabase refBase = bp.getDatabase();

@@ -133,7 +133,7 @@ public class PdfImporter {
                     if (dropRow >= 0) {
                         dfh.linkPdfToEntry(fileName, entryTable, dropRow);
                     } else {
-                        dfh.linkPdfToEntry(fileName, entryTable, entryTable.getSelectedRow());
+                        entryTable.getSelectedEntries().forEach(entry -> dfh.linkPdfToEntry(fileName, entry));
                     }
                     break;
                 default:
@@ -218,7 +218,7 @@ public class PdfImporter {
         DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
         dfh.linkPdfToEntry(fileName, entry);
 
-        SwingUtilities.invokeLater(() -> panel.highlightEntry(entry));
+        SwingUtilities.invokeLater(() -> panel.clearAndSelect(entry));
 
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
             panel.showAndEdit(entry);

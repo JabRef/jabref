@@ -3,6 +3,7 @@ package org.jabref.gui.entryeditor;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,8 +19,8 @@ import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 
-import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -35,7 +36,6 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.fxmisc.easybind.EasyBind;
 
@@ -65,16 +65,23 @@ public class EntryEditor extends BorderPane {
     @FXML private Button fetcherButton;
     private SourceTab sourceTab;
     @FXML private Label typeLabel;
+    private final EntryEditorPreferences preferences;
 
-    public EntryEditor(BasePanel panel) {
+    public EntryEditor(BasePanel panel, EntryEditorPreferences preferences) {
         this.panel = panel;
         this.bibDatabaseContext = panel.getBibDatabaseContext();
         this.undoManager = panel.getUndoManager();
+        this.preferences = Objects.requireNonNull(preferences);
 
         ControlHelper.loadFXMLForControl(this);
 
         getStylesheets().add(EntryEditor.class.getResource("EntryEditor.css").toExternalForm());
-        setStyle("-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
+        if (GUIGlobals.currentFont != null) {
+            setStyle(
+                    "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"
+                            + "text-area-foreground: " + convertToHex(GUIGlobals.editorTextColor) + ";"
+                            + "text-area-highlight: " + convertToHex(GUIGlobals.activeBackgroundColor) + ";");
+        }
 
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
             EntryEditorTab activeTab = (EntryEditorTab) tab;
@@ -92,8 +99,8 @@ public class EntryEditor extends BorderPane {
      * Set-up key bindings specific for the entry editor.
      */
     private void setupKeyBindings() {
-        tabbed.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
+        tabbed.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            Optional<KeyBinding> keyBinding = preferences.getKeyBindings().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
                     case ENTRY_EDITOR_NEXT_PANEL:
@@ -115,7 +122,7 @@ public class EntryEditor extends BorderPane {
                         event.consume();
                         break;
                     default:
-                        // Pass other keys to children
+                        // Pass other keys to parent
                 }
             }
         });
@@ -153,21 +160,20 @@ public class EntryEditor extends BorderPane {
         tabs.add(new DeprecatedFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager));
 
         // Other fields
-        tabs.add(new OtherFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager));
+        tabs.add(new OtherFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager, preferences.getCustomTabFieldNames()));
 
         // General fields from preferences
-        EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
-        for (int i = 0; i < tabList.getTabCount(); i++) {
-            tabs.add(new UserDefinedFieldsTab(tabList.getTabName(i), tabList.getTabFields(i), panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager));
+        for (Map.Entry<String, List<String>> tab : preferences.getEntryEditorTabList().entrySet()) {
+            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager));
         }
 
         // Special tabs
         tabs.add(new MathSciNetTab());
         tabs.add(new FileAnnotationTab(panel.getAnnotationCache()));
-        tabs.add(new RelatedArticlesTab(Globals.prefs));
+        tabs.add(new RelatedArticlesTab(preferences));
 
         // Source tab
-        sourceTab = new SourceTab(bibDatabaseContext, undoManager, Globals.prefs.getLatexFieldFormatterPreferences(), Globals.prefs);
+        sourceTab = new SourceTab(bibDatabaseContext, undoManager, preferences.getLatexFieldFormatterPreferences(), preferences.getImportFormatPreferences());
         tabs.add(sourceTab);
         return tabs;
     }
@@ -214,7 +220,7 @@ public class EntryEditor extends BorderPane {
 
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             recalculateVisibleTabs();
-            if (Globals.prefs.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE)) {
+            if (preferences.showSourceTabByDefault()) {
                 tabbed.getSelectionModel().select(sourceTab);
             }
 
@@ -232,14 +238,13 @@ public class EntryEditor extends BorderPane {
         typeLabel.setText(typedEntry.getTypeForDisplay());
 
         // Add type change menu
-        ContextMenu typeMenu = new ChangeEntryTypeMenu().getChangeEntryTypePopupMenu(entry, bibDatabaseContext, undoManager);
+        ContextMenu typeMenu = new ChangeEntryTypeMenu(preferences.getKeyBindings()).getChangeEntryTypePopupMenu(entry, bibDatabaseContext, undoManager);
         typeLabel.setOnMouseClicked(event -> typeMenu.show(typeLabel, Side.RIGHT, 0, 0));
         typeChangeButton.setOnMouseClicked(event -> typeMenu.show(typeChangeButton, Side.RIGHT, 0, 0));
 
         // Add menu for fetching bibliographic information
         ContextMenu fetcherMenu = new ContextMenu();
-        for (EntryBasedFetcher fetcher : WebFetchers
-                .getEntryBasedFetchers(Globals.prefs.getImportFormatPreferences())) {
+        for (EntryBasedFetcher fetcher : WebFetchers.getEntryBasedFetchers(preferences.getImportFormatPreferences())) {
             MenuItem fetcherMenuItem = new MenuItem(fetcher.getName());
             fetcherMenuItem.setOnAction(event -> new EntryFetchAndMergeWorker(panel, getEntry(), fetcher).execute());
             fetcherMenu.getItems().add(fetcherMenuItem);
@@ -263,5 +268,9 @@ public class EntryEditor extends BorderPane {
                 }
             }
         });
+    }
+
+    private String convertToHex(java.awt.Color color) {
+        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }
 }

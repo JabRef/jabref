@@ -13,7 +13,6 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
-import org.jabref.gui.entryeditor.EntryEditorTabList;
 import org.jabref.gui.importer.actions.GUIPostOpenAction;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -56,7 +55,6 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
      * GUIGlobals.FILE_FIELD.
      *
      * @param database The database to modify.
-     * @param fields   The fields to find links in.
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
     private static NamedCompound upgradePdfPsToFile(BibDatabase database) {
@@ -248,17 +246,13 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
     }
 
     private boolean showsFileInGenFields() {
-        boolean found = false;
-        EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
-        outer: for (int i = 0; i < tabList.getTabCount(); i++) {
-            List<String> fields = tabList.getTabFields(i);
+        for (List<String> fields : Globals.prefs.getEntryEditorTabList().values()) {
             for (String field : fields) {
                 if (field.equals(FieldName.FILE)) {
-                    found = true;
-                    break outer;
+                    return true;
                 }
             }
         }
-        return found;
+        return false;
     }
 }

@@ -132,26 +132,16 @@ public class JabRefDesktop {
      */
     public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext, String link,
             final Optional<ExternalFileType> type) throws IOException {
-        boolean httpLink = false;
 
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
-            httpLink = true;
+            openExternalFilePlatformIndependent(type, link);
+            return true;
         }
 
-        // For other platforms we'll try to find the file type:
-        Path file = null;
-        if (!httpLink) {
-            Optional<Path> tmp = FileHelper.expandFilename(databaseContext, link,
-                    Globals.prefs.getFileDirectoryPreferences());
-            if (tmp.isPresent()) {
-                file = tmp.get();
-            }
-        }
-
-        // Check if we have arrived at a file type, and either an http link or an existing file:
-        if (httpLink || ((file != null) && Files.exists(file) && (type.isPresent()))) {
+        Optional<Path> file = FileHelper.expandFilename(databaseContext, link, Globals.prefs.getFileDirectoryPreferences());
+        if (file.isPresent() && Files.exists(file.get()) && (type.isPresent())) {
             // Open the file:
-            String filePath = httpLink ? link : file.toString();
+            String filePath = file.get().toString();
             openExternalFilePlatformIndependent(type, filePath);
             return true;
         } else {
@@ -194,8 +184,7 @@ public class JabRefDesktop {
             return false;
         } else if (answer == JOptionPane.YES_OPTION) {
             // User wants to define the new file type. Show the dialog:
-            ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "", "new",
-                    IconTheme.JabRefIcon.FILE.getSmallIcon());
+            ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "", "new", IconTheme.JabRefIcons.FILE);
             ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(frame, newType);
             editor.setVisible(true);
             if (editor.okPressed()) {

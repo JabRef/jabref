@@ -24,8 +24,8 @@ import org.jabref.model.entry.BibEntry;
 public class AutoLinkFilesAction extends AbstractAction {
 
     public AutoLinkFilesAction() {
-        putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.AUTO_FILE_LINK.getSmallIcon());
-        putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.AUTO_FILE_LINK.getIcon());
+        putValue(Action.SMALL_ICON, IconTheme.JabRefIcons.AUTO_FILE_LINK.getSmallIcon());
+        putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcons.AUTO_FILE_LINK.getIcon());
         putValue(Action.NAME, Localization.lang("Automatically set file links"));
         putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.AUTOMATICALLY_LINK_FILES));
     }

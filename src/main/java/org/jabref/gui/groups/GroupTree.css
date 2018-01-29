@@ -76,20 +76,6 @@
     -fx-padding: 0.45em 0.2em 0.45em 0.2em;
 }
 
-.tree-table-row-cell:hover {
-    -fx-background-color: lightgrey;
-}
-
-.tree-table-row-cell:selected {
-    -fx-background-color: #6A9FCD;
-    -fx-text-fill: white;
-    -fx-fill: white;
-}
-
-.tree-table-row-cell:selected > .tree-table-cell > .icon {
-    -fx-fill: white;
-}
-
 .tree-table-row-cell:selected > .tree-table-cell > .tree-disclosure-node > .arrow {
     -fx-background-color: white;
 }

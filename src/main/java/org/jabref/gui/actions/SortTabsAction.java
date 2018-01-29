@@ -3,12 +3,9 @@ package org.jabref.gui.actions;
 import java.awt.event.ActionEvent;
 import java.util.Comparator;
 import java.util.Locale;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.swing.Action;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
 
@@ -27,17 +24,7 @@ public class SortTabsAction extends MnemonicAwareAction implements Comparator<St
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // Make a sorted Map that compares case-insensitively:
-        Map<String, BasePanel> map = new TreeMap<>(this);
-
-        for (BasePanel panel : frame.getBasePanelList()) {
-            map.put(panel.getTabTitle(), panel);
-        }
-
-        frame.getTabbedPane().removeAll();
-        for (Map.Entry<String, BasePanel> entry : map.entrySet()) {
-            frame.addTab(entry.getValue(), false);
-        }
+        frame.sortTabs();
     }
 
     @Override

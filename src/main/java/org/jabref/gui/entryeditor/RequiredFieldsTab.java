@@ -21,7 +21,7 @@ public class RequiredFieldsTab extends FieldsEditorTab {
 
         setText(Localization.lang("Required fields"));
         setTooltip(new Tooltip(Localization.lang("Show required fields")));
-        setGraphic(IconTheme.JabRefIcon.REQUIRED.getGraphicNode());
+        setGraphic(IconTheme.JabRefIcons.REQUIRED.getGraphicNode());
     }
 
     @Override

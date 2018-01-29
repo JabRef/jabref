@@ -27,7 +27,7 @@ public class SaveAllAction extends MnemonicAwareAction implements Runnable {
 
     /** Creates a new instance of SaveAllAction */
     public SaveAllAction(JabRefFrame frame) {
-        super(IconTheme.JabRefIcon.SAVE_ALL.getIcon());
+        super(IconTheme.JabRefIcons.SAVE_ALL.getIcon());
         this.frame = frame;
         putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.SAVE_ALL));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save all open libraries"));

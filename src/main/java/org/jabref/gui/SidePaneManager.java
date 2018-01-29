@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.swing.SwingUtilities;
-
 import org.jabref.Globals;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.preferences.JabRefPreferences;
@@ -40,8 +38,8 @@ public class SidePaneManager {
          * side pane components, we get rid of the annoying latency when
          * switching tabs:
          */
-        frame.getTabbedPane().addChangeListener(event -> SwingUtilities.invokeLater(
-                () -> setActiveBasePanel(SidePaneManager.this.frame.getCurrentBasePanel())));
+        //frame.getTabbedPane().addChangeListener(event -> SwingUtilities.invokeLater(
+        //        () -> setActiveBasePanel(SidePaneManager.this.frame.getCurrentBasePanel())));
         sidep = new SidePane();
         sidep.setVisible(false);
     }
@@ -105,7 +103,7 @@ public class SidePaneManager {
             hideComponent(component);
             if (frame.getCurrentBasePanel() != null) {
                 MainTable mainTable = frame.getCurrentBasePanel().getMainTable();
-                mainTable.setSelected(mainTable.getSelectedRow());
+                //mainTable.setSelected(mainTable.getSelectedRow());
                 mainTable.requestFocus();
             }
         }
