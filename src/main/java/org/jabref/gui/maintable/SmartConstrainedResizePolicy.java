@@ -10,8 +10,8 @@ import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This resize policy is almost the same as {@link TableView#CONSTRAINED_RESIZE_POLICY}
@@ -20,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFeatures, Boolean> {
 
-    private static final Log LOGGER = LogFactory.getLog(SmartConstrainedResizePolicy.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SmartConstrainedResizePolicy.class);
 
     @Override
     public Boolean call(TableView.ResizeFeatures prop) {

@@ -3,6 +3,7 @@ package org.jabref.gui.actions;
 import java.util.Optional;
 
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 
@@ -60,7 +61,7 @@ public enum ActionsFX {
     RELEVANT(Localization.lang("Toggle relevance"), IconTheme.JabRefIcons.RELEVANCE);
 
     private final String text;
-    private final Optional<IconTheme.JabRefIcons> icon;
+    private final Optional<JabRefIcon> icon;
     private final Optional<KeyBinding> keyBinding;
 
     ActionsFX(String text) {
@@ -87,7 +88,7 @@ public enum ActionsFX {
         this.icon = Optional.empty();
     }
 
-    public Optional<IconTheme.JabRefIcons> getIcon() {
+    public Optional<JabRefIcon> getIcon() {
         return icon;
     }
 

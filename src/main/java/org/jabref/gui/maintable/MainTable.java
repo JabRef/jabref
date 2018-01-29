@@ -29,8 +29,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.matchers.Matcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MainTable extends TableView<BibEntryTableViewModel> {
     private static GeneralRenderer defRenderer;
@@ -48,8 +46,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private static CompleteRenderer veryGrayedOutNumberRenderer;
 
     private static List<CompleteRenderer> markedNumberRenderers;
-
-    private static final Log LOGGER = LogFactory.getLog(MainTable.class);
 
     private final BasePanel panel;
     //private final boolean tableColorCodes;

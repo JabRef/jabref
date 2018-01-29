@@ -151,9 +151,9 @@ import org.jabref.preferences.LastFocusedTabPreferences;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.eventbus.Subscribe;
+import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.fxmisc.easybind.EasyBind;
 import osx.macadapter.MacAdapter;
 
 /**
@@ -201,7 +201,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             IconTheme.getImage("about"), IconTheme.getImage("about"));
     private final AbstractAction jabrefFacebookAction = new OpenBrowserAction("https://www.facebook.com/JabRef/",
             "Facebook", Localization.lang("Opens JabRef's Facebook page"),
-            IconTheme.JabRefIcons.FACEBOOK.getSmallIcon(), IconTheme.JabRefIcosn.FACEBOOK.getIcon());
+            IconTheme.JabRefIcons.FACEBOOK.getSmallIcon(), IconTheme.JabRefIcons.FACEBOOK.getIcon());
     private final AbstractAction jabrefTwitterAction = new OpenBrowserAction("https://twitter.com/jabref_org",
             "Twitter", Localization.lang("Opens JabRef's Twitter page"),
             IconTheme.JabRefIcons.TWITTER.getSmallIcon(), IconTheme.JabRefIcons.TWITTER.getIcon());

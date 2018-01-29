@@ -6,8 +6,8 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.util.BindingsHelper;
 
 import de.saxsys.mvvmfx.utils.commands.CommandBase;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This wraps the old Swing commands so that they fit into the new infrastructure.
@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class OldCommandWrapper extends CommandBase {
 
-    private static final Log LOGGER = LogFactory.getLog(OldCommandWrapper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OldCommandWrapper.class);
 
     private final Actions command;
     private final BasePanel panel;

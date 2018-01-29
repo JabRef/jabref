@@ -36,6 +36,7 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import org.fxmisc.easybind.EasyBind;
 
@@ -56,6 +57,7 @@ public class EntryEditor extends BorderPane {
     private final BasePanel panel;
     private final List<SearchQueryHighlightListener> searchListeners = new ArrayList<>();
     private final List<EntryEditorTab> tabs;
+    private final FileUpdateMonitor fileMonitor;
     /**
      * A reference to the entry this editor works on.
      */
@@ -67,11 +69,12 @@ public class EntryEditor extends BorderPane {
     @FXML private Label typeLabel;
     private final EntryEditorPreferences preferences;
 
-    public EntryEditor(BasePanel panel, EntryEditorPreferences preferences) {
+    public EntryEditor(BasePanel panel, EntryEditorPreferences preferences, FileUpdateMonitor fileMonitor) {
         this.panel = panel;
         this.bibDatabaseContext = panel.getBibDatabaseContext();
         this.undoManager = panel.getUndoManager();
         this.preferences = Objects.requireNonNull(preferences);
+        this.fileMonitor = fileMonitor;
 
         ControlHelper.loadFXMLForControl(this);
 
@@ -173,7 +176,7 @@ public class EntryEditor extends BorderPane {
         tabs.add(new RelatedArticlesTab(preferences));
 
         // Source tab
-        sourceTab = new SourceTab(bibDatabaseContext, undoManager, preferences.getLatexFieldFormatterPreferences(), preferences.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+        sourceTab = new SourceTab(bibDatabaseContext, undoManager, preferences.getLatexFieldFormatterPreferences(), preferences.getImportFormatPreferences(), fileMonitor);
         tabs.add(sourceTab);
         return tabs;
     }

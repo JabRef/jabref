@@ -8,12 +8,10 @@ import javax.swing.Icon;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.Globals;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.JabRefIcon;
 import org.jabref.gui.actions.ActionsFX;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
@@ -22,14 +20,13 @@ import org.jabref.model.entry.specialfields.SpecialFieldValue;
 
 public class SpecialFieldViewModel {
 
+    private final SpecialField field;
     private UndoManager undoManager;
 
     public SpecialFieldViewModel(SpecialField field, UndoManager undoManager) {
         this.field = Objects.requireNonNull(field);
         this.undoManager = Objects.requireNonNull(undoManager);
     }
-
-    private final SpecialField field;
 
     public SpecialField getField() {
         return field;
@@ -44,7 +41,7 @@ public class SpecialFieldViewModel {
     }
 
     public Icon getRepresentingIcon() {
-        return getAction().getIcon().map(IconTheme.JabRefIcons::getSmallIcon).orElse(null);
+        return getAction().getIcon().map(JabRefIcon::getSmallIcon).orElse(null);
     }
 
     public JabRefIcon getIcon() {

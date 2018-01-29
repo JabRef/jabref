@@ -28,11 +28,7 @@ import org.jabref.model.entry.specialfields.SpecialFieldValue;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class RightClickMenu {
-    private static final Log LOGGER = LogFactory.getLog(RightClickMenu.class);
 
     public static ContextMenu create(BibEntryTableViewModel entry, KeyBindingRepository keyBindingRepository, BasePanel panel, KeyBindingRepository keyBindings) {
         ContextMenu contextMenu = new ContextMenu();
@@ -187,7 +183,7 @@ public class RightClickMenu {
     }
 
     private static Menu createSpecialFieldMenu(SpecialField field, ActionFactory factory, BasePanel panel) {
-        viewModel = new SpecialFieldViewModel(field);
+        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field, panel.getUndoManager());
         Menu menu = factory.createMenu(viewModel.getAction());
         for (SpecialFieldValue val : field.getValues()) {
             SpecialFieldValueViewModel specialField = new SpecialFieldValueViewModel(val);
