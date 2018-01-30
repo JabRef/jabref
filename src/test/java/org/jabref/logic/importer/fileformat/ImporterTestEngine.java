@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
@@ -17,6 +18,9 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.Assertions;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ImporterTestEngine {
 
@@ -52,5 +56,11 @@ public class ImporterTestEngine {
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }
+    }
+
+    public static void testImportMalformedFiles(Importer importer, String fileName) throws IOException {
+        List<BibEntry> entries = importer.importDatabase(getPath(fileName), StandardCharsets.UTF_8).getDatabase()
+                .getEntries();
+        assertEquals(entries, new ArrayList<BibEntry>());
     }
 }
