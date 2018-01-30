@@ -15,7 +15,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
@@ -33,6 +32,7 @@ import org.jabref.Globals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.JabRefIcon;
 import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
@@ -258,7 +258,7 @@ public class ExternalFileTypeEditor extends JabRefDialog {
         public Component getTableCellRendererComponent(JTable tab, Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             lab.setText(null);
-            lab.setIcon((Icon) value);
+            lab.setIcon(((JabRefIcon) value).getIcon());
             return lab;
         }
     }
