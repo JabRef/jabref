@@ -11,6 +11,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,7 +47,7 @@ public class LayoutTest {
     }
 
     public static BibEntry bibtexString2BibtexEntry(String s) throws IOException {
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(s));
+        ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(new StringReader(s));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
         return c.iterator().next();

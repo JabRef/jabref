@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.util.BracketedPattern;
 import org.jabref.model.FieldChange;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -46,13 +45,13 @@ public class BibtexKeyGenerator extends BracketedPattern {
         this.bibtexKeyPatternPreferences = Objects.requireNonNull(bibtexKeyPatternPreferences);
     }
 
-    static String generateKey(BibEntry entry, String value) {
-        return generateKey(entry, value, new BibDatabase());
+    static String generateKey(BibEntry entry, String pattern) {
+        return generateKey(entry, pattern, new BibDatabase());
     }
 
-    static String generateKey(BibEntry entry, String value, BibDatabase database) {
+    static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
         GlobalBibtexKeyPattern keyPattern = new GlobalBibtexKeyPattern(Collections.emptyList());
-        keyPattern.setDefaultValue("[" + value + "]");
+        keyPattern.setDefaultValue("[" + pattern + "]");
         return new BibtexKeyGenerator(keyPattern, database, new BibtexKeyPatternPreferences("", "", false, true, true, keyPattern, ','))
                 .generateKey(entry);
     }

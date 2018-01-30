@@ -87,7 +87,7 @@ public class XMPUtilMain {
             } else if (args[0].endsWith(".bib")) {
                 // Read from BIB and write as XMP
                 try (FileReader fr = new FileReader(args[0])) {
-                    ParserResult result = new BibtexParser(importFormatPreferences).parse(fr);
+                    ParserResult result = new BibtexParser(importFormatPreferences, Globals.getFileUpdateMonitor()).parse(fr);
                     Collection<BibEntry> entries = result.getDatabase().getEntries();
 
                     if (entries.isEmpty()) {
@@ -114,7 +114,7 @@ public class XMPUtilMain {
             }
 
             if (args[0].endsWith(".bib") && args[1].endsWith(".pdf")) {
-                ParserResult result = new BibtexParser(importFormatPreferences).parse(new FileReader(args[0]));
+                ParserResult result = new BibtexParser(importFormatPreferences, Globals.getFileUpdateMonitor()).parse(new FileReader(args[0]));
 
                 Collection<BibEntry> entries = result.getDatabase().getEntries();
 
@@ -135,7 +135,7 @@ public class XMPUtilMain {
                 break;
             }
 
-            ParserResult result = new BibtexParser(importFormatPreferences).parse(new FileReader(args[1]));
+            ParserResult result = new BibtexParser(importFormatPreferences, Globals.getFileUpdateMonitor()).parse(new FileReader(args[1]));
 
             Optional<BibEntry> bibEntry = result.getDatabase().getEntryByKey(args[0]);
 
