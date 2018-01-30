@@ -45,8 +45,10 @@ public class IsbnFetcher extends AbstractIsbnFetcher {
         Optional<BibEntry> bibEntry = isbnViaEbookDeFetcher.performSearchById(identifier);
         // nothing found at ebook.de, try chimbori.com
         if (!bibEntry.isPresent()) {
+            LOGGER.debug("No entry found at ebook.de try chimbori.com");
             IsbnViaChimboriFetcher isbnViaChimboriFetcher = new IsbnViaChimboriFetcher(importFormatPreferences);
             bibEntry = isbnViaChimboriFetcher.performSearchById(identifier);
+
         }
 
         return bibEntry;
