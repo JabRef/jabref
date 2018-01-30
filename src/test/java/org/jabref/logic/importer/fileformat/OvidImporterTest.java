@@ -15,7 +15,7 @@ import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,7 +28,7 @@ public class OvidImporterTest {
     private OvidImporter importer;
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         importer = new OvidImporter();
     }
