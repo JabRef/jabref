@@ -99,6 +99,9 @@ class MainTableColumnFactory {
             // There might be more than one field to display, e.g., "author/editor" or "date/year" - so split
             String[] fields = columnName.split(FieldName.FIELD_SEPARATOR);
             StringTableColumn column = new StringTableColumn(columnName, Arrays.asList(fields), database.getDatabase());
+            new ValueTableCellFactory<BibEntryTableViewModel, String>()
+                    .withText(text -> text)
+                    .install(column);
             column.setPrefWidth(preferences.getPrefColumnWidth(columnName));
             columns.add(column);
         }

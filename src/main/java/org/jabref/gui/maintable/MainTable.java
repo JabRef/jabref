@@ -91,7 +91,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.setItems(entries);
 
         // Enable sorting
-        //entries.comparatorProperty().bind(this.comparatorProperty());
+        model.bindComparator(this.comparatorProperty());
 
         // TODO: Cannot add focus listener as it is expecting an swing component
         //addFocusListener(Globals.getFocusListener());

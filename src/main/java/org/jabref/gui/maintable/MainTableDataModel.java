@@ -1,12 +1,14 @@
 package org.jabref.gui.maintable;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
-import javafx.collections.FXCollections;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 
 import org.jabref.Globals;
 import org.jabref.gui.util.BindingsHelper;
@@ -18,20 +20,22 @@ import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.JabRefPreferences;
 
 public class MainTableDataModel {
-    private final ObservableList<BibEntryTableViewModel> entries;
+    private final FilteredList<BibEntryTableViewModel> entriesFiltered;
+    private final SortedList<BibEntryTableViewModel> entriesSorted;
 
     public MainTableDataModel(BibDatabaseContext context) {
         ObservableList<BibEntry> allEntries = context.getDatabase().getEntries();
 
-        FilteredList<BibEntryTableViewModel> entriesFiltered = new FilteredList<>(
-                BindingsHelper.mapBacked(allEntries, BibEntryTableViewModel::new));
+        ObservableList<BibEntryTableViewModel> entriesViewModel = BindingsHelper.mapBacked(allEntries, BibEntryTableViewModel::new);
+
+        entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
                 Bindings.createObjectBinding(() -> this::isMatched,
                         Globals.stateManager.activeGroupProperty(), Globals.stateManager.activeSearchQueryProperty())
         );
 
         // We need to wrap the list since otherwise sorting in the table does not work
-        entries = FXCollections.synchronizedObservableList(entriesFiltered);
+        entriesSorted = new SortedList<>(entriesViewModel);
     }
 
     private boolean isMatched(BibEntryTableViewModel entry) {
@@ -66,6 +70,10 @@ public class MainTableDataModel {
     }
 
     public ObservableList<BibEntryTableViewModel> getEntriesFiltered() {
-        return entries;
+        return entriesSorted;
+    }
+
+    public void bindComparator(ReadOnlyObjectProperty<Comparator<BibEntryTableViewModel>> comparator) {
+        entriesSorted.comparatorProperty().bind(comparator);
     }
 }

@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
 
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -89,6 +90,12 @@ public class StringTableColumn extends MainTableColumn<String> {
         if (bibtexFields.isEmpty()) {
             return null;
         }
+
+        ObjectBinding[] dependencies = bibtexFields.stream().map(entry::getField).toArray(ObjectBinding[]::new);
+        return Bindings.createStringBinding(() -> computeText(entry), dependencies);
+    }
+
+    private String computeText(BibEntryTableViewModel entry) {
         boolean isNameColumn = false;
 
         Optional<String> content = Optional.empty();
@@ -109,8 +116,7 @@ public class StringTableColumn extends MainTableColumn<String> {
         if (result != null && !bibtexFields.contains(BibEntry.KEY_FIELD)) {
             result = toUnicode.format(result).trim();
         }
-
-        return new SimpleStringProperty(result);
+        return result;
     }
 
     public Node getHeaderLabel() {
