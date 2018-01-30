@@ -987,4 +987,18 @@ public class BibtexKeyGeneratorTest {
         entry.setField("title", "Green Scheduling of `Whatever`");
         assertEquals("GreenSchedulingofWhatever", BibtexKeyGenerator.generateKey(entry, "title"));
     }
+
+    @Test
+    public void generateKeyWithOneModifier() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "The Interesting Title");
+        assertEquals("theinterestingtitle", BibtexKeyGenerator.generateKey(entry, "title:lower"));
+    }
+
+    @Test
+    public void generateKeyWithTwoModifiers() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "The Interesting Title");
+        assertEquals("theinterestingtitle", BibtexKeyGenerator.generateKey(entry, "title:lower:(_)"));
+    }
 }
