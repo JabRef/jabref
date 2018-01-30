@@ -222,6 +222,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
+        // ensure that all entry changes mark the panel as changed
+        this.bibDatabaseContext.getDatabase().registerListener(this);
 
         Optional<File> file = bibDatabaseContext.getDatabaseFile();
         if (file.isPresent()) {
@@ -2058,6 +2060,11 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             // IMO only used to update the status (found X entries)
             frame.getGlobalSearchBar().performSearch();
         }
+    }
+
+    @Subscribe
+    public void listen(EntryChangedEvent entryChangedEvent) {
+        this.markBaseChanged();
     }
 
     private class UndoAction implements BaseAction {
