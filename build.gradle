@@ -130,7 +130,7 @@ dependencies {
     compile 'de.saxsys:mvvmfx-validation:1.7.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.6'
-    compile 'org.fxmisc.richtext:richtextfx:0.8.1'
+    compile 'org.fxmisc.richtext:richtextfx:0.8.2'
 
     // Cannot be updated to 9.*.* until Jabref works with Java 9
     compile 'org.controlsfx:controlsfx:8.40.15-SNAPSHOT'
@@ -139,7 +139,7 @@ dependencies {
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
     // >1.8.0-beta is required for java 9 compatibility
-    compile 'org.slf4j:slf4j-api:1.8.0-beta0'
+    compile 'org.slf4j:slf4j-api:1.8.0-beta1'
     compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.10.0'
     compile 'org.apache.logging.log4j:log4j-jcl:2.10.0'
     compile 'org.apache.logging.log4j:log4j-api:2.10.0'
@@ -155,11 +155,11 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '1.0.9'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.9'
 
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.0-M1'
-    testCompile 'org.junit.jupiter:junit-jupiter-params:5.1.0-M1'
-    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.1.0-M1'
-    testRuntime 'org.junit.vintage:junit-vintage-engine:5.1.0-M1'
-    testCompile 'org.junit.platform:junit-platform-launcher:1.1.0-M1'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.0-M2'
+    testCompile 'org.junit.jupiter:junit-jupiter-params:5.1.0-M2'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.1.0-M2'
+    testRuntime 'org.junit.vintage:junit-vintage-engine:5.1.0-M2'
+    testCompile 'org.junit.platform:junit-platform-launcher:1.1.0-M2'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.10.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.10.0'
     testCompile 'org.mockito:mockito-core:2.13.0'
@@ -172,7 +172,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.7'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.8'
 }
 
 dependencyUpdates {
