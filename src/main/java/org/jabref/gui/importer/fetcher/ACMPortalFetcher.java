@@ -324,7 +324,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 String htmlCode = in.lines().filter(s -> !s.isEmpty()).collect(Collectors.joining());
                 String bibtexString = htmlCode.substring(htmlCode.indexOf(START_BIBTEX_ENTRY),
                         htmlCode.indexOf(END_BIBTEX_ENTRY_HTML));
-                items = new BibtexParser(Globals.prefs.getImportFormatPreferences()).parseEntries(bibtexString);
+                items = new BibtexParser(Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor()).parseEntries(bibtexString);
 
             } catch (IOException | ParseException e) {
                 LOGGER.info("Download of BibTeX information from ACM Portal failed.", e);

@@ -35,54 +35,54 @@ public class MSBibConverter {
         }
 
         // Duplicate: also added as BookTitle
-        entry.getField(FieldName.BOOKTITLE).ifPresent(booktitle -> result.conferenceName = booktitle);
-        entry.getField(FieldName.PAGES).ifPresent(pages -> result.pages = new PageNumbers(pages));
-        entry.getField(MSBIB_PREFIX + "accessed").ifPresent(accesed -> result.dateAccessed = accesed);
+        entry.getLatexFreeField(FieldName.BOOKTITLE).ifPresent(booktitle -> result.conferenceName = booktitle);
+        entry.getLatexFreeField(FieldName.PAGES).ifPresent(pages -> result.pages = new PageNumbers(pages));
+        entry.getLatexFreeField(MSBIB_PREFIX + "accessed").ifPresent(accesed -> result.dateAccessed = accesed);
 
         // TODO: currently this can never happen
         if ("SoundRecording".equals(msbibType)) {
-            result.albumTitle = entry.getField(FieldName.TITLE).orElse(null);
+            result.albumTitle = entry.getLatexFreeField(FieldName.TITLE).orElse(null);
         }
 
         // TODO: currently this can never happen
         if ("Interview".equals(msbibType)) {
-            result.broadcastTitle = entry.getField(FieldName.TITLE).orElse(null);
+            result.broadcastTitle = entry.getLatexFreeField(FieldName.TITLE).orElse(null);
         }
 
-        result.number = entry.getField(FieldName.NUMBER).orElse(null);
+        result.number = entry.getLatexFreeField(FieldName.NUMBER).orElse(null);
 
         if ("Patent".equalsIgnoreCase(entry.getType())) {
-            result.patentNumber = entry.getField(FieldName.NUMBER).orElse(null);
+            result.patentNumber = entry.getLatexFreeField(FieldName.NUMBER).orElse(null);
             result.number = null;
         }
 
-        result.day = entry.getFieldOrAlias(FieldName.DAY).orElse(null);
+        result.day = entry.getFieldOrAliasLatexFree(FieldName.DAY).orElse(null);
         result.month = entry.getMonth().map(Month::getNumber).map(Object::toString).orElse(null);
 
-        if (!entry.getField(FieldName.YEAR).isPresent()) {
-            result.year = entry.getFieldOrAlias(FieldName.YEAR).orElse(null);
+        if (!entry.getLatexFreeField(FieldName.YEAR).isPresent()) {
+            result.year = entry.getFieldOrAliasLatexFree(FieldName.YEAR).orElse(null);
         }
-        result.journalName = entry.getFieldOrAlias(FieldName.JOURNAL).orElse(null);
+        result.journalName = entry.getFieldOrAliasLatexFree(FieldName.JOURNAL).orElse(null);
 
         // Value must be converted
         //Currently only english is supported
-        entry.getField(FieldName.LANGUAGE)
+        entry.getLatexFreeField(FieldName.LANGUAGE)
                 .ifPresent(lang -> result.fields.put("LCID", String.valueOf(MSBibMapping.getLCID(lang))));
         StringBuilder sbNumber = new StringBuilder();
-        entry.getField(FieldName.ISBN).ifPresent(isbn -> sbNumber.append(" ISBN: " + isbn));
-        entry.getField(FieldName.ISSN).ifPresent(issn -> sbNumber.append(" ISSN: " + issn));
-        entry.getField("lccn").ifPresent(lccn -> sbNumber.append("LCCN: " + lccn));
-        entry.getField("mrnumber").ifPresent(mrnumber -> sbNumber.append(" MRN: " + mrnumber));
+        entry.getLatexFreeField(FieldName.ISBN).ifPresent(isbn -> sbNumber.append(" ISBN: " + isbn));
+        entry.getLatexFreeField(FieldName.ISSN).ifPresent(issn -> sbNumber.append(" ISSN: " + issn));
+        entry.getLatexFreeField("lccn").ifPresent(lccn -> sbNumber.append("LCCN: " + lccn));
+        entry.getLatexFreeField("mrnumber").ifPresent(mrnumber -> sbNumber.append(" MRN: " + mrnumber));
 
         result.standardNumber = sbNumber.toString();
         if (result.standardNumber.isEmpty()) {
             result.standardNumber = null;
         }
 
-        result.address = entry.getFieldOrAlias(FieldName.ADDRESS).orElse(null);
+        result.address = entry.getFieldOrAliasLatexFree(FieldName.ADDRESS).orElse(null);
 
-        if (entry.getField(FieldName.TYPE).isPresent()) {
-            result.thesisType = entry.getField(FieldName.TYPE).get();
+        if (entry.getLatexFreeField(FieldName.TYPE).isPresent()) {
+            result.thesisType = entry.getLatexFreeField(FieldName.TYPE).get();
 
         } else {
             if ("techreport".equalsIgnoreCase(entry.getType())) {
@@ -98,17 +98,17 @@ public class MSBibConverter {
 
         // TODO: currently this can never happen
         if (("InternetSite".equals(msbibType) || "DocumentFromInternetSite".equals(msbibType))) {
-            result.internetSiteTitle = entry.getField(FieldName.TITLE).orElse(null);
+            result.internetSiteTitle = entry.getLatexFreeField(FieldName.TITLE).orElse(null);
         }
 
         // TODO: currently only Misc can happen
         if ("ElectronicSource".equals(msbibType) || "Art".equals(msbibType) || "Misc".equals(msbibType)) {
-            result.publicationTitle = entry.getField(FieldName.TITLE).orElse(null);
+            result.publicationTitle = entry.getLatexFreeField(FieldName.TITLE).orElse(null);
         }
 
-        entry.getField(FieldName.AUTHOR).ifPresent(authors -> result.authors = getAuthors(authors));
-        entry.getField(FieldName.EDITOR).ifPresent(editors -> result.editors = getAuthors(editors));
-        entry.getField(FieldName.TRANSLATOR).ifPresent(translator -> result.translators = getAuthors(translator));
+        entry.getLatexFreeField(FieldName.AUTHOR).ifPresent(authors -> result.authors = getAuthors(authors));
+        entry.getLatexFreeField(FieldName.EDITOR).ifPresent(editors -> result.editors = getAuthors(editors));
+        entry.getLatexFreeField(FieldName.TRANSLATOR).ifPresent(translator -> result.translators = getAuthors(translator));
 
         return result;
     }

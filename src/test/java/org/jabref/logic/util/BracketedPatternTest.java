@@ -1,5 +1,6 @@
 package org.jabref.logic.util;
 
+import org.jabref.logic.bibtexkeypattern.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
@@ -9,7 +10,8 @@ import org.jabref.model.entry.FieldName;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class BracketedPatternTest {
     private BibEntry bibentry;

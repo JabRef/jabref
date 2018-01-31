@@ -6,6 +6,7 @@ import java.util.List;
 import javafx.scene.paint.Color;
 
 import org.jabref.logic.util.MetadataSerializationConfiguration;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.AutomaticGroup;
@@ -16,6 +17,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.TexGroup;
 import org.jabref.model.strings.StringUtil;
 
 public class GroupSerializer {
@@ -123,10 +125,27 @@ public class GroupSerializer {
         } else if (group instanceof AutomaticKeywordGroup) {
             return serializeAutomaticKeywordGroup((AutomaticKeywordGroup)group);
         } else if (group instanceof AutomaticPersonsGroup) {
-            return serializeAutomaticPersonsGroup((AutomaticPersonsGroup)group);
+            return serializeAutomaticPersonsGroup((AutomaticPersonsGroup) group);
+        } else if (group instanceof TexGroup) {
+            return serializeTexGroup((TexGroup) group);
         } else {
             throw new UnsupportedOperationException("Don't know how to serialize group" + group.getClass().getName());
         }
+    }
+
+    private String serializeTexGroup(TexGroup group) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(MetadataSerializationConfiguration.TEX_GROUP_ID);
+        sb.append(StringUtil.quote(group.getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        sb.append(group.getHierarchicalContext().ordinal());
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        sb.append(StringUtil.quote(FileUtil.toPortableString(group.getFilePath()), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+
+        appendGroupDetails(sb, group);
+
+        return sb.toString();
     }
 
     private String serializeAutomaticPersonsGroup(AutomaticPersonsGroup group) {

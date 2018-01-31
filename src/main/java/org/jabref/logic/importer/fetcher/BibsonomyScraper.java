@@ -9,6 +9,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ public class BibsonomyScraper {
 
             URL url = new URL(BibsonomyScraper.BIBSONOMY_SCRAPER + cleanURL + BibsonomyScraper.BIBSONOMY_SCRAPER_POST);
             String bibtex = new URLDownload(url).asString();
-            return BibtexParser.singleFromString(bibtex, importFormatPreferences);
+            return BibtexParser.singleFromString(bibtex, importFormatPreferences, new DummyFileUpdateMonitor());
         } catch (IOException ex) {
             LOGGER.warn("Could not download entry", ex);
             return Optional.empty();

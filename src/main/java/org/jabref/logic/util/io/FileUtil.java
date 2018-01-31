@@ -8,6 +8,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,10 +22,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.bibtexkeypattern.BracketedPattern;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
-import org.jabref.logic.util.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.OptionalUtil;
@@ -163,7 +164,10 @@ public class FileUtil {
             return false;
         }
         try {
-            return Files.copy(pathToSourceFile, pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING) != null;
+            // Preserve Hard Links with OpenOption defaults included for clarity
+            Files.write(pathToDestinationFile, Files.readAllBytes(pathToSourceFile),
+                    StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+            return true;
         } catch (IOException e) {
             LOGGER.error("Copying Files failed.", e);
             return false;
@@ -354,5 +358,14 @@ public class FileUtil {
             FileUtil.find(filename, dir).ifPresent(files::add);
         }
         return files;
+    }
+
+    /**
+     * Creates a string representation of the given path that should work on all systems.
+     * This method should be used when a path needs to be stored in the bib file or preferences.
+     */
+    public static String toPortableString(Path path) {
+        return path.toString()
+                   .replace('\\', '/');
     }
 }
