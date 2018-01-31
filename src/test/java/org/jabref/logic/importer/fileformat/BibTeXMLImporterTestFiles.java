@@ -18,8 +18,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public class BibTeXMLImporterTestFiles {
 
-    private static final Pattern PATTERN = Pattern.compile("\\D*[0123456789]");
-
     private static final String FILE_ENDING = ".xml";
 
     private static Stream<String> fileNames() throws IOException {
@@ -28,10 +26,21 @@ public class BibTeXMLImporterTestFiles {
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
+    private static Stream<String> nonBibTeXMLfileNames() throws IOException {
+        Predicate<String> fileName = name -> !name.startsWith("BibTeXMLImporterTest");
+        return ImporterTestEngine.getTestFiles(fileName).stream();
+    }
+
     @ParameterizedTest
     @MethodSource("fileNames")
     public void testIsRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(new BibTeXMLImporter(), fileName);
+    }
+
+    @ParameterizedTest
+    @MethodSource("nonBibTeXMLfileNames")
+    public void testIsNotRecognizedFormat(String fileName) throws IOException {
+        ImporterTestEngine.testIsNotRecognizedFormat(new BibTeXMLImporter(), fileName);
     }
 
     @ParameterizedTest
