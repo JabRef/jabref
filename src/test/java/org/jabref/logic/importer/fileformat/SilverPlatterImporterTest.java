@@ -25,9 +25,13 @@ public class SilverPlatterImporterTest {
         testImporter = new SilverPlatterImporter();
     }
 
-
     private static Stream<String> fileNames() throws IOException {
         Predicate<String> fileName = name -> name.startsWith("SilverPlatterImporterTest") && name.endsWith(FILE_ENDING);
+        return ImporterTestEngine.getTestFiles(fileName).stream();
+    }
+
+    private static Stream<String> invalidFileNames() throws IOException {
+        Predicate<String> fileName = name -> !name.startsWith("SilverPlatterImporterTest");
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
@@ -35,6 +39,12 @@ public class SilverPlatterImporterTest {
     @MethodSource("fileNames")
     public void testIsRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(testImporter, fileName);
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidFileNames")
+    public void testIsNotRecognizedFormat(String fileName) throws IOException {
+        ImporterTestEngine.testIsNotRecognizedFormat(testImporter, fileName);
     }
 
     @ParameterizedTest

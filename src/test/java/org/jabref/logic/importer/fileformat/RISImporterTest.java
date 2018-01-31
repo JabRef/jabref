@@ -18,7 +18,6 @@ public class RISImporterTest {
 
     private RisImporter importer;
 
-
     @BeforeEach
     public void setUp() {
         importer = new RisImporter();
