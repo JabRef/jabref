@@ -332,7 +332,7 @@ javadoc {
 junitPlatform {
     filters {
         tags {
-            exclude 'DatabaseTest', 'org.jabref.testutils.category.FetcherTest', 'org.jabref.testutils.category.GUITest'
+            exclude 'DatabaseTest', 'FetcherTest', 'GUITest', 'org.jabref.testutils.category.FetcherTest', 'org.jabref.testutils.category.GUITest'
         }
     }
 

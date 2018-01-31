@@ -5,15 +5,14 @@ import java.util.Optional;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Category(FetcherTest.class)
+@FetcherTest
 public class LibraryOfCongressTest {
 
-    private LibraryOfCongress fetcher = new LibraryOfCongress();
+    private final LibraryOfCongress fetcher = new LibraryOfCongress();
 
     @Test
     public void performSearchById() throws Exception {

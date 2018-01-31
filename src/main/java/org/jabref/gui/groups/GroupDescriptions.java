@@ -94,7 +94,6 @@ public class GroupDescriptions {
     }
 
     public static String getShortDescription(SearchGroup searchGroup, boolean showDynamic) {
-
         StringBuilder sb = new StringBuilder();
         sb.append("<b>");
         if (showDynamic) {

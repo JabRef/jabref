@@ -31,10 +31,11 @@ public class IsbnFetcherTest {
         bibEntry.setType(BiblatexEntryTypes.BOOK);
         bibEntry.setField("bibtexkey", "9780134685991");
         bibEntry.setField("title", "Effective Java");
-        bibEntry.setField("publisher", "Addison Wesley");
+        bibEntry.setField("publisher", "ADDISON WESLEY PUB CO INC");
+        bibEntry.setField("pagetotal", "416");
         bibEntry.setField("year", "2018");
         bibEntry.setField("author", "Bloch, Joshua");
-        bibEntry.setField("date", "2018-01-11");
+        bibEntry.setField("date", "2018-01-06");
         bibEntry.setField("ean", "9780134685991");
         bibEntry.setField("isbn", "0134685997");
         bibEntry.setField("url", "http://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html");

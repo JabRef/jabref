@@ -3,14 +3,15 @@ package org.jabref.logic.shared;
 import java.sql.SQLException;
 import java.util.Collection;
 
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.model.Defaults;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DBMSType;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.DatabaseTest;
 
 import org.junit.jupiter.api.AfterEach;
@@ -44,12 +45,12 @@ public class SynchronizationTestSimulator {
 
         GlobalBibtexKeyPattern pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
         clientContextA = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX));
-        DBMSSynchronizer synchronizerA = new DBMSSynchronizer(clientContextA, ',', pattern);
+        DBMSSynchronizer synchronizerA = new DBMSSynchronizer(clientContextA, ',', pattern, new DummyFileUpdateMonitor());
         clientContextA.convertToSharedDatabase(synchronizerA);
         clientContextA.getDBMSSynchronizer().openSharedDatabase(dbmsConnection);
 
         clientContextB = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX));
-        DBMSSynchronizer synchronizerB = new DBMSSynchronizer(clientContextA, ',', pattern);
+        DBMSSynchronizer synchronizerB = new DBMSSynchronizer(clientContextA, ',', pattern, new DummyFileUpdateMonitor());
         clientContextB.convertToSharedDatabase(synchronizerB);
         clientContextB.getDBMSSynchronizer().openSharedDatabase(dbmsConnection);
         eventListenerB = new SynchronizationTestEventListener();

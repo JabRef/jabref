@@ -37,6 +37,8 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,13 +60,13 @@ public class BibtexParserTest {
 
     private ImportFormatPreferences importFormatPreferences;
     private BibtexParser parser;
-
+    private FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
     @BeforeEach
     public void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        parser = new BibtexParser(importFormatPreferences);
+        parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
     }
 
     @Test
@@ -105,7 +107,7 @@ public class BibtexParserTest {
     public void singleFromStringRecognizesEntry() throws ParseException {
         Optional<BibEntry> parsed = BibtexParser.singleFromString(
                 "@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n",
-                importFormatPreferences);
+                importFormatPreferences, fileMonitor);
 
         BibEntry expected = new BibEntry();
         expected.setType("article");
@@ -120,7 +122,7 @@ public class BibtexParserTest {
         Optional<BibEntry> parsed = BibtexParser.singleFromString(
                 "@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n"
                         + "@inProceedings{foo," + "  author={Norton Bar}}",
-                importFormatPreferences);
+                importFormatPreferences, fileMonitor);
 
         assertTrue(parsed.get().getCiteKeyOptional().equals(Optional.of("canh05"))
                 || parsed.get().getCiteKeyOptional().equals(Optional.of("foo")));
@@ -128,13 +130,13 @@ public class BibtexParserTest {
 
     @Test
     public void singleFromStringReturnsEmptyFromEmptyString() throws ParseException {
-        Optional<BibEntry> parsed = BibtexParser.singleFromString("", importFormatPreferences);
+        Optional<BibEntry> parsed = BibtexParser.singleFromString("", importFormatPreferences, fileMonitor);
         assertEquals(Optional.empty(), parsed);
     }
 
     @Test
     public void singleFromStringReturnsEmptyIfNoEntryRecognized() throws ParseException {
-        Optional<BibEntry> parsed = BibtexParser.singleFromString("@@article@@{{{{{{}", importFormatPreferences);
+        Optional<BibEntry> parsed = BibtexParser.singleFromString("@@article@@{{{{{{}", importFormatPreferences, fileMonitor);
         assertEquals(Optional.empty(), parsed);
     }
 
@@ -286,7 +288,7 @@ public class BibtexParserTest {
     public void parseRecognizesEntryWithBigNumbers() throws IOException {
 
         ParserResult result = BibtexParser.parse(new StringReader("@article{canh05," + "isbn = 1234567890123456789,\n"
-                + "isbn2 = {1234567890123456789},\n" + "small = 1234,\n" + "}"), importFormatPreferences);
+                + "isbn2 = {1234567890123456789},\n" + "small = 1234,\n" + "}"), importFormatPreferences, fileMonitor);
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         BibEntry e = c.iterator().next();
@@ -367,7 +369,7 @@ public class BibtexParserTest {
         ParserResult result = BibtexParser.parse(
                 new StringReader("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
                         + "  title = {Title A}}\n" + "@inProceedings{foo," + "  author={Norton Bar}}"),
-                importFormatPreferences);
+                importFormatPreferences, fileMonitor);
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
         List<BibEntry> expected = new ArrayList<>();
@@ -486,7 +488,7 @@ public class BibtexParserTest {
                 + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)}," + "\n"
                 + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29}," + "\n"
                 + "  url = {http://james.howison.name/publications.html}" + "\n" + "}))"),
-                importFormatPreferences);
+                importFormatPreferences, fileMonitor);
         assertEquals(Optional.empty(), result.getMetaData().getEncoding());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
@@ -516,7 +518,7 @@ public class BibtexParserTest {
                         + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)}," + "\n"
                         + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29},"
                         + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}))"),
-                importFormatPreferences);
+                importFormatPreferences, fileMonitor);
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());
 
@@ -629,7 +631,7 @@ public class BibtexParserTest {
                         + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)}," + "\n"
                         + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29},"
                         + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}))"),
-                importFormatPreferences);
+                importFormatPreferences, fileMonitor);
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(0, c.size());
     }
@@ -649,7 +651,7 @@ public class BibtexParserTest {
         ParserResult result = BibtexParser
                 .parse(new StringReader("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
                         + "  title = {Title A}}\n" + "@inProceedings{canh05," + "  author={Norton Bar}}"),
-                        importFormatPreferences);
+                        importFormatPreferences, fileMonitor);
 
         List<String> duplicateKeys = result.getDuplicateKeys();
         assertEquals(1, duplicateKeys.size());
@@ -748,7 +750,7 @@ public class BibtexParserTest {
     @Test
     public void parseWarnsAboutUnmatchedContentInEntryWithoutComma() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket } too much}"),
-                importFormatPreferences);
+                importFormatPreferences, fileMonitor);
 
         List<BibEntry> entries = result.getDatabase().getEntries();
         assertEquals(Optional.of("author bracket #too##much#"), entries.get(0).getField("author"));
@@ -757,7 +759,7 @@ public class BibtexParserTest {
     @Test
     public void parseWarnsAboutUnmatchedContentInEntry() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket }, too much}"),
-                importFormatPreferences);
+                importFormatPreferences, fileMonitor);
 
         assertTrue("There should be warnings", result.hasWarnings());
 
@@ -844,7 +846,7 @@ public class BibtexParserTest {
         ParserResult result = BibtexParser.parse(
                 new StringReader(
                         "@article{test,author={author missing bracket}" + "@article{test,author={Ed von Test}}"),
-                importFormatPreferences);
+                importFormatPreferences, fileMonitor);
 
         assertTrue(result.hasWarnings());
 
@@ -998,7 +1000,7 @@ public class BibtexParserTest {
                         + "@book{bourdieu-2002-questions-sociologie, " + "	Address = {Paris}," + "	Author = bourdieu,"
                         + "	Isbn = 2707318256," + "	Publisher = {Minuit}," + "	Title = {Questions de sociologie},"
                         + "	Year = 2002" + "}"),
-                importFormatPreferences);
+                importFormatPreferences, fileMonitor);
 
         assertEquals(1, result.getDatabase().getStringCount());
         BibtexString s = result.getDatabase().getStringValues().iterator().next();
@@ -1172,7 +1174,7 @@ public class BibtexParserTest {
         when(importFormatPreferences.getFieldContentParserPreferences().getNonWrappableFields())
                 .thenReturn(Collections.singletonList("file"));
         ParserResult result = BibtexParser
-                .parse(new StringReader("@article{canh05,file = {ups  sala}}"), importFormatPreferences);
+                .parse(new StringReader("@article{canh05,file = {ups  sala}}"), importFormatPreferences, fileMonitor);
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         BibEntry e = c.iterator().next();
@@ -1182,7 +1184,7 @@ public class BibtexParserTest {
     @Test
     public void parsePreservesTabsInAbstractField() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader("@article{canh05,abstract = {ups  \tsala}}"),
-                importFormatPreferences);
+                importFormatPreferences, fileMonitor);
         Collection<BibEntry> c = result.getDatabase().getEntries();
         BibEntry e = c.iterator().next();
         assertEquals(Optional.of("ups  \tsala"), e.getField(FieldName.ABSTRACT));
@@ -1191,7 +1193,7 @@ public class BibtexParserTest {
     @Test
     public void parsePreservesNewlineInAbstractField() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader("@article{canh05,abstract = {ups \nsala}}"),
-                importFormatPreferences);
+                importFormatPreferences, fileMonitor);
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         BibEntry e = c.iterator().next();
@@ -1409,7 +1411,7 @@ public class BibtexParserTest {
         ParserResult result = BibtexParser.parse(
                 new StringReader(
                         "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}"),
-                importFormatPreferences);
+                importFormatPreferences, fileMonitor);
 
         Optional<SaveOrderConfig> saveOrderConfig = result.getMetaData().getSaveOrderConfig();
 
@@ -1422,7 +1424,7 @@ public class BibtexParserTest {
     public void integrationTestCustomKeyPattern() throws IOException {
         ParserResult result = BibtexParser
                 .parse(new StringReader("@comment{jabref-meta: keypattern_article:articleTest;}" + OS.NEWLINE
-                        + "@comment{jabref-meta: keypatterndefault:test;}"), importFormatPreferences);
+                        + "@comment{jabref-meta: keypatterndefault:test;}"), importFormatPreferences, fileMonitor);
 
         GlobalBibtexKeyPattern pattern = mock(GlobalBibtexKeyPattern.class);
         AbstractBibtexKeyPattern bibtexKeyPattern = result.getMetaData().getCiteKeyPattern(pattern);
@@ -1450,7 +1452,7 @@ public class BibtexParserTest {
                 + "@comment{jabref-meta: groupstree:" + OS.NEWLINE + "0 AllEntriesGroup:;" + OS.NEWLINE
                 + "1 KeywordGroup:Fréchet\\;0\\;keywords\\;FrechetSpace\\;0\\;1\\;;" + OS.NEWLINE
                 + "1 KeywordGroup:Invariant theory\\;0\\;keywords\\;GIT\\;0\\;0\\;;" + OS.NEWLINE
-                + "1 ExplicitGroup:TestGroup\\;0\\;Key1\\;Key2\\;;" + "}"), importFormatPreferences);
+                + "1 ExplicitGroup:TestGroup\\;0\\;Key1\\;Key2\\;;" + "}"), importFormatPreferences, fileMonitor);
 
         GroupTreeNode root = result.getMetaData().getGroups().get();
 
@@ -1477,7 +1479,7 @@ public class BibtexParserTest {
     @Test
     public void integrationTestContentSelectors() throws IOException {
         ParserResult result = BibtexParser.parse(
-                new StringReader("@Comment{jabref-meta: selector_status:approved;captured;received;status;}"), importFormatPreferences);
+                new StringReader("@Comment{jabref-meta: selector_status:approved;captured;received;status;}"), importFormatPreferences, fileMonitor);
 
         List<String> values = new ArrayList(4);
         values.add("approved");
@@ -1559,7 +1561,7 @@ public class BibtexParserTest {
         ParserResult result = BibtexParser.parse(
                 new StringReader("@comment{jabref-meta: fileDirectory:\\\\Literature\\\\;}"
                         + "@comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"),
-                importFormatPreferences);
+                importFormatPreferences, fileMonitor);
 
         assertEquals("\\Literature\\", result.getMetaData().getDefaultFileDirectory().get());
         assertEquals("D:\\Documents", result.getMetaData().getUserFileDirectory("defaultOwner-user").get());

@@ -16,6 +16,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 
@@ -61,7 +62,7 @@ public class zbMATH implements SearchBasedParserFetcher {
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(preferences);
+        return new BibtexParser(preferences, new DummyFileUpdateMonitor());
     }
 
     @Override
