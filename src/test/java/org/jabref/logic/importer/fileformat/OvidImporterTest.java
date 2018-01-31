@@ -6,10 +6,11 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.util.FileType;
@@ -17,16 +18,29 @@ import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OvidImporterTest {
 
     private OvidImporter importer;
 
+    private static final String FILE_ENDING = ".txt";
+
+    private static Stream<String> fileNames() throws IOException {
+        Predicate<String> fileName = name -> name.startsWith("OvidImporterTest")
+                && !name.contains("Invalid")
+                && name.endsWith(FILE_ENDING);
+        return ImporterTestEngine.getTestFiles(fileName).stream();
+    }
+
+    private static Stream<String> invalidFileNames() throws IOException {
+        Predicate<String> fileName = name -> !name.contains("OvidImporterTest");
+        return ImporterTestEngine.getTestFiles(fileName).stream();
+    }
 
     @BeforeEach
     public void setUp() {
@@ -53,27 +67,16 @@ public class OvidImporterTest {
         assertEquals("Imports an Ovid file.", importer.getDescription());
     }
 
-    @Test
-    public void testIsRecognizedFormatAccept() throws IOException, URISyntaxException {
-
-        List<String> list = Arrays.asList("OvidImporterTest1.txt", "OvidImporterTest3.txt", "OvidImporterTest4.txt",
-                "OvidImporterTest5.txt", "OvidImporterTest6.txt", "OvidImporterTest7.txt");
-
-        for (String str : list) {
-            Path file = Paths.get(OvidImporter.class.getResource(str).toURI());
-            assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
-        }
+    @ParameterizedTest
+    @MethodSource("fileNames")
+    public void testIsRecognizedFormatAccept(String fileName) throws IOException, URISyntaxException {
+        ImporterTestEngine.testIsRecognizedFormat(importer, fileName);
     }
 
-    @Test
-    public void testIsRecognizedFormatRejected() throws IOException, URISyntaxException {
-
-        List<String> list = Arrays.asList("Empty.txt", "OvidImporterTest2.txt");
-
-        for (String str : list) {
-            Path file = Paths.get(OvidImporter.class.getResource(str).toURI());
-            assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
-        }
+    @ParameterizedTest
+    @MethodSource("invalidFileNames")
+    public void testIsRecognizedFormatRejected(String fileName) throws IOException, URISyntaxException {
+        ImporterTestEngine.testIsNotRecognizedFormat(importer, fileName);
     }
 
     @Test
@@ -138,7 +141,7 @@ public class OvidImporterTest {
 
     @Test
     public void testImportEntries2() throws IOException, URISyntaxException {
-        Path file = Paths.get(OvidImporter.class.getResource("OvidImporterTest2.txt").toURI());
+        Path file = Paths.get(OvidImporter.class.getResource("OvidImporterTest2Invalid.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);
     }
