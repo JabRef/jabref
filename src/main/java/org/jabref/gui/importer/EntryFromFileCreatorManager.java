@@ -152,7 +152,7 @@ public final class EntryFromFileCreatorManager {
                     } else {
                         count++;
                         if (panel != null) {
-                            ce.addEdit(new UndoableInsertEntry(database, entry.get(), panel));
+                            ce.addEdit(new UndoableInsertEntry(database, entry.get()));
                         }
                     }
                 }

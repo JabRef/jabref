@@ -38,6 +38,8 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.stateManager;
         } else if (clazz == DefaultFileUpdateMonitor.class) {
             return Globals.getFileUpdateMonitor();
+        } else if (clazz == ClipBoardManager.class) {
+            return Globals.clipboardManager;
         } else {
             try {
                 return clazz.newInstance();

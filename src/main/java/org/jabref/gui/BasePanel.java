@@ -13,7 +13,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -179,7 +178,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private boolean baseChanged;
     private boolean nonUndoableChange;
     // Used to track whether the base has changed since last save.
-    private MainTable mainTable;
+    public MainTable mainTable;
     private BibEntry showing;
     // Variable to prevent erroneous update of back/forward histories at the time
     // when a Back or Forward operation is being processed:
@@ -353,11 +352,11 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 new SaveSelectedAction(SavePreferences.DatabaseSaveType.PLAIN_BIBTEX));
 
         // The action for copying selected entries.
-        actions.put(Actions.COPY, (BaseAction) this::copy);
+        actions.put(Actions.COPY, (BaseAction) mainTable::copy);
 
         actions.put(Actions.PRINT_PREVIEW, new PrintPreviewAction());
 
-        actions.put(Actions.CUT, (BaseAction) this::cut);
+        actions.put(Actions.CUT, (BaseAction) mainTable::cut);
 
         //when you modify this action be sure to adjust Actions.CUT,
         //they are the same except of the Localization, delete confirmation and Actions.COPY call
@@ -369,7 +368,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         //    This allows you to (a) paste entire bibtex entries from a text editor, web browser, etc
         //                       (b) copy and paste entries between multiple instances of JabRef (since
         //         only the text representation seems to get as far as the X clipboard, at least on my system)
-        actions.put(Actions.PASTE, (BaseAction) this::paste);
+        actions.put(Actions.PASTE, (BaseAction) mainTable::paste);
 
         actions.put(Actions.SELECT_ALL, (BaseAction) mainTable.getSelectionModel()::selectAll);
 
@@ -713,30 +712,13 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         new CitationStyleToClipboardWorker(this, outputFormat).execute();
     }
 
-    private void copy() {
-        List<BibEntry> bes = mainTable.getSelectedEntries();
-
-        if (!bes.isEmpty()) {
-            TransferableBibtexEntry trbe = new TransferableBibtexEntry(bes);
-            // ! look at ClipBoardManager
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(trbe, BasePanel.this);
-            output(formatOutputMessage(Localization.lang("Copied"), bes.size()));
-        }
-    }
-
-    private void cut() {
-        runCommand(Actions.COPY);
-        // cannot call runCommand(Actions.DELETE), b/c it will call delete(false) with the wrong parameter
-        delete(true);
-    }
-
     /**
      * Removes the selected entries from the database
      *
      * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as
      *            "deleted". If true the action will be localized as "cut"
      */
-    private void delete(boolean cut) {
+    public void delete(boolean cut) {
         delete(cut, mainTable.getSelectedEntries());
     }
 
@@ -788,54 +770,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
     public void delete(BibEntry entry) {
         delete(false, Collections.singletonList(entry));
-    }
-
-    private void paste() {
-        Collection<BibEntry> bes = new ClipBoardManager().extractBibEntriesFromClipboard();
-
-        // finally we paste in the entries (if any), which either came from TransferableBibtexEntries
-        // or were parsed from a string
-        if (!bes.isEmpty()) {
-
-            NamedCompound ce = new NamedCompound(
-                    (bes.size() > 1 ? Localization.lang("paste entries") : Localization.lang("paste entry")));
-
-            // Store the first inserted bibtexentry.
-            // bes[0] does not work as bes[0] is first clonded,
-            // then inserted.
-            // This entry is used to open up an entry editor
-            // for the first inserted entry.
-            BibEntry firstBE = null;
-
-            for (BibEntry be1 : bes) {
-
-                BibEntry be = (BibEntry) be1.clone();
-                if (firstBE == null) {
-                    firstBE = be;
-                }
-                UpdateField.setAutomaticFields(be, Globals.prefs.getUpdateFieldPreferences());
-
-                // We have to clone the
-                // entries, since the pasted
-                // entries must exist
-                // independently of the copied
-                // ones.
-                bibDatabaseContext.getDatabase().insertEntry(be);
-
-                ce.addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), be, BasePanel.this));
-            }
-            ce.end();
-            getUndoManager().addEdit(ce);
-            output(formatOutputMessage(Localization.lang("Pasted"), bes.size()));
-            markBaseChanged();
-
-            clearAndSelect(firstBE);
-            mainTable.requestFocus();
-
-            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
-                showAndEdit(firstBE);
-            }
-        }
     }
 
     private void copyTitle() {
@@ -1142,7 +1076,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 UpdateField.setAutomaticFields(list, true, true, Globals.prefs.getUpdateFieldPreferences());
 
                 // Create an UndoableInsertEntry object.
-                getUndoManager().addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), be, BasePanel.this));
+                getUndoManager().addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), be));
                 output(Localization.lang("Added new '%0' entry.", actualType.getName().toLowerCase(Locale.ROOT)));
 
                 // We are going to select the new entry. Before that, make sure that we are in
@@ -1182,7 +1116,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                     UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs.getUpdateFieldPreferences());
                 }
                 // Create an UndoableInsertEntry object.
-                getUndoManager().addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), bibEntry, BasePanel.this));
+                getUndoManager().addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), bibEntry));
                 output(Localization.lang("Added new '%0' entry.", bibEntry.getType()));
 
                 markBaseChanged(); // The database just changed.
@@ -1514,11 +1448,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
      * given focus afterwards.
      */
     public void clearAndSelect(final BibEntry bibEntry) {
-        mainTable.findEntry(bibEntry)
-                .ifPresent(entry -> {
-                    mainTable.getSelectionModel().clearSelection();
-                    mainTable.getSelectionModel().select(entry);
-                });
+        mainTable.clearAndSelect(bibEntry);
     }
 
     /**
@@ -1877,7 +1807,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         frame.getForwardAction().setEnabled(!nextEntries.isEmpty());
     }
 
-    private String formatOutputMessage(String start, int count) {
+    public String formatOutputMessage(String start, int count) {
         return String.format("%s %d %s.", start, count,
                 (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
     }
