@@ -138,7 +138,7 @@ dependencies {
     compile 'org.jsoup:jsoup:1.11.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
-	// >1.8.0-beta is required for java 9 compatibility
+    // >1.8.0-beta is required for java 9 compatibility
     compile 'org.slf4j:slf4j-api:1.8.0-beta0'
     compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.10.0'
     compile 'org.apache.logging.log4j:log4j-jcl:2.10.0'
@@ -230,7 +230,16 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject("http://dev.mysql.com/downloads/connector/j/ lists the version 5.* as last stable version.")
             }
         }
-
+        withModule("org.jacoco.agent") { ComponentSelection selection ->
+            if (selection.candidate.version.equals("0.8.0")) {
+                selection.reject("As a native plugin we cannot control the actual version of jacoco. This depenency should be hidden.")
+            }
+        }
+        withModule("org.jacoco.ant") { ComponentSelection selection ->
+            if (selection.candidate.version.equals("0.8.0")) {
+                selection.reject("As a native plugin we cannot control the actual version of jacoco. This depenency should be hidden.")
+            }
+        }
     }
 }
 
