@@ -155,7 +155,7 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '1.0.9'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.9'
 
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.0-2'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.0-M2'
     testCompile 'org.junit.jupiter:junit-jupiter-params:5.1.0-M2'
     testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.1.0-M2'
     testRuntime 'org.junit.vintage:junit-vintage-engine:5.1.0-M2'
