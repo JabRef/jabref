@@ -236,7 +236,7 @@ public class MedlinePlainImporterTest {
             BibEntry expectedEntry = new BibEntry();
             expectedEntry.setType("article");
             expectedEntry.setField("keywords", "Female");
-            
+
             assertEquals(Collections.singletonList(expectedEntry), actualEntries);
         }
     }
