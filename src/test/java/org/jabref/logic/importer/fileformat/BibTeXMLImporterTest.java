@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,34 +12,17 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.util.FileType;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@RunWith(MockitoJUnitRunner.class)
 public class BibTeXMLImporterTest {
 
     private BibTeXMLImporter importer;
 
-
-    /**
-     * Generates a List of all files in the package "/src/test/resources/org/jabref/logic/importer/fileformat"
-     *
-     * @return A list of Names
-     * @throws IOException
-     */
-    public List<Path> getTestFiles() throws Exception {
-        try (Stream<Path> stream = Files.list(Paths.get(BibTeXMLImporterTest.class.getResource("").toURI()))) {
-            return stream.filter(p -> !Files.isDirectory(p)).collect(Collectors.toList());
-        }
-
-    }
-
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         importer = new BibTeXMLImporter();
     }
@@ -64,13 +48,15 @@ public class BibTeXMLImporterTest {
     }
 
     @Test
-    public void testIsRecognizedFormatReject() throws Exception {
-        List<Path> list = getTestFiles().stream()
-                .filter(n -> !n.getFileName().toString().startsWith("BibTeXMLImporterTest"))
-                .collect(Collectors.toList());
+    public void testIsRecognizedFormatReject() throws IOException, URISyntaxException {
+        try (Stream<Path> stream = Files.list(Paths.get(BibTeXMLImporterTest.class.getResource("").toURI()))) {
+            List<Path> list = stream.filter(p -> !Files.isDirectory(p))
+                    .filter(n -> !n.getFileName().toString().startsWith("BibTeXMLImporterTest"))
+                    .collect(Collectors.toList());
 
-        for (Path file : list) {
-            assertFalse(file.toString(), importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
+            for (Path file : list) {
+                assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8), file.toString());
+            }
         }
     }
 }
