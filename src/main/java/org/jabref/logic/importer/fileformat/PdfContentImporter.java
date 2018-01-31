@@ -183,12 +183,7 @@ public class PdfContentImporter extends Importer {
 
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
-        String firstLine = input.readLine();
-        if (firstLine.startsWith("%PDF")) {
-            return true;
-        } else {
-            return false;
-        }
+        return input.readLine().startsWith("%PDF");
     }
 
     @Override

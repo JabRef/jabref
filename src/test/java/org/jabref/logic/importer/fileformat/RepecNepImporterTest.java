@@ -1,20 +1,11 @@
 package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.FileType;
-import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,12 +13,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class RepecNepImporterTest {
+
+    private static final String FILE_ENDING = ".txt";
 
     private RepecNepImporter testImporter;
 
@@ -37,8 +28,6 @@ public class RepecNepImporterTest {
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
         testImporter = new RepecNepImporter(importFormatPreferences);
     }
-
-    private static final String FILE_ENDING = ".txt";
 
     private static Stream<String> fileNames() throws IOException {
         Predicate<String> fileName = name -> name.startsWith("RepecNepImporter")
