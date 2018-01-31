@@ -35,10 +35,21 @@ public class MsBibImporterTestFiles {
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
+    private static Stream<String> invalidFileNames() throws IOException {
+        Predicate<String> fileName = name -> !name.contains("MsBib");
+        return ImporterTestEngine.getTestFiles(fileName).stream();
+    }
+
     @ParameterizedTest
     @MethodSource("fileNames")
     public void testIsRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(new MsBibImporter(), fileName);
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidFileNames")
+    public void testIsNotRecognizedFormat(String fileName) throws IOException {
+        ImporterTestEngine.testIsNotRecognizedFormat(new MsBibImporter(), fileName);
     }
 
     @ParameterizedTest

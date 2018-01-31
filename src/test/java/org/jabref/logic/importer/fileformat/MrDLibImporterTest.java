@@ -84,7 +84,7 @@ public class MrDLibImporterTest {
         ParserResult parserResult = importer.importDatabase(inputMin);
 
         List<BibEntry> resultList = parserResult.getDatabase().getEntries();
-        
+
         assertSame(0, resultList.size());
     }
 }
