@@ -43,6 +43,10 @@ public class ImporterTestEngine {
         Assertions.assertTrue(importer.isRecognizedFormat(getPath(fileName), StandardCharsets.UTF_8));
     }
 
+    public static void testIsNotRecognizedFormat(Importer importer, String fileName) throws IOException {
+        Assertions.assertFalse(importer.isRecognizedFormat(getPath(fileName), StandardCharsets.UTF_8));
+    }
+
     public static void testImportEntries(Importer importer, String fileName, String fileType) throws IOException {
         List<BibEntry> entries = importer.importDatabase(getPath(fileName), StandardCharsets.UTF_8).getDatabase()
                 .getEntries();

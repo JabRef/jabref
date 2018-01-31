@@ -1720,7 +1720,7 @@ public class BibtexParserTest {
     @Test
     public void parseYear() throws Exception {
         Optional<BibEntry> result = parser.parseSingleEntry("@ARTICLE{HipKro03, year = {2003} }");
-        
+
         assertEquals(new Date(2003), result.get().getPublicationDate().get());
     }
 }
