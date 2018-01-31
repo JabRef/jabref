@@ -21,7 +21,6 @@ public class PdfContentImporterTest {
 
     private PdfContentImporter importer;
 
-
     @BeforeEach
     public void setUp() {
         importer = new PdfContentImporter(mock(ImportFormatPreferences.class));
