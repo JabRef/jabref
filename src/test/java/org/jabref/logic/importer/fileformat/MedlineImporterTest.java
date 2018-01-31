@@ -1,20 +1,10 @@
 package org.jabref.logic.importer.fileformat;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.jabref.logic.util.FileType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -29,17 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MedlineImporterTest {
 
     private MedlineImporter importer;
-
-    /**
-     * Generates a List of all files in the package "/src/test/resources/org/jabref/logic/importer/fileformat"
-     * @return A list of Names
-     * @throws IOException
-     */
-    public List<Path> getTestFiles() throws Exception {
-        try (Stream<Path> stream = Files.list(Paths.get(MedlineImporterTest.class.getResource("").toURI()))) {
-            return stream.filter(p -> !Files.isDirectory(p)).collect(Collectors.toList());
-        }
-    }
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -66,13 +45,4 @@ public class MedlineImporterTest {
         assertEquals("Importer for the Medline format.", importer.getDescription());
     }
 
-    @Test
-    public void testIsRecognizedFormatReject() throws Exception {
-        List<Path> list = getTestFiles().stream().filter(n -> !n.getFileName().toString().startsWith("MedlineImporter"))
-                .collect(Collectors.toList());
-
-        for (Path file : list) {
-            assertFalse(file.toString(), importer.isRecognizedFormat(file, Charset.defaultCharset()));
-        }
-    }
 }

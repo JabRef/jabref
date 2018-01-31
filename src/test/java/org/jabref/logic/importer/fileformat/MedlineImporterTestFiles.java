@@ -19,10 +19,21 @@ public class MedlineImporterTestFiles {
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
+    private static Stream<String> invalidFileNames() throws IOException {
+        Predicate<String> fileName = name -> !name.startsWith("MedlineImporterTest");
+        return ImporterTestEngine.getTestFiles(fileName).stream();
+    }
+
     @ParameterizedTest
     @MethodSource("fileNames")
     public void testIsRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(new MedlineImporter(), fileName);
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidFileNames")
+    public void testIsNotRecognizedFormat(String fileName) throws IOException {
+        ImporterTestEngine.testIsNotRecognizedFormat(new MedlineImporter(), fileName);
     }
 
     @ParameterizedTest
