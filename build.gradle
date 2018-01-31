@@ -172,7 +172,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.7'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.8'
 }
 
 dependencyUpdates {
