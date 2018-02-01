@@ -115,7 +115,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         // Unknown format:
                         frame.output(Localization.lang("Importing in unknown format") + "...");
                         // This import method never throws an IOException:
-                        imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename));
+                        imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename, Globals.getFileUpdateMonitor()));
                     } else {
                         frame.output(Localization.lang("Importing in %0 format", importer.getName()) + "...");
                         // Specific importer:
@@ -172,7 +172,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     frame.output(
                             Localization.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
                 } else {
-                    final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
+                    final BasePanel panel = frame.getCurrentBasePanel();
 
                     ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"),
                             openInNew);

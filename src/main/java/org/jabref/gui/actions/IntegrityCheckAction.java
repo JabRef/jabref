@@ -10,21 +10,16 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.JabRefPreferences;
 
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IntegrityCheckAction extends MnemonicAwareAction {
 
-    private static final Log LOGGER = LogFactory.getLog(IntegrityCheckAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IntegrityCheckAction.class);
     private static final String ELLIPSES = "...";
 
     private final JabRefFrame frame;
@@ -40,8 +35,8 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
         IntegrityCheck check = new IntegrityCheck(frame.getCurrentBasePanel().getBibDatabaseContext(),
                 Globals.prefs.getFileDirectoryPreferences(),
                 Globals.prefs.getBibtexKeyPatternPreferences(),
-                Globals.journalAbbreviationLoader
-                        .getRepository(Globals.prefs.getJournalAbbreviationPreferences()));
+                Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
+                Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
 
         final JDialog integrityDialog = new JDialog((JFrame) null, true);
         integrityDialog.setUndecorated(true);
@@ -73,7 +68,7 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
         }
 
         if (messages.isEmpty()) {
-            JOptionPane.showMessageDialog(null, Localization.lang("No problems found."));
+            JOptionPane.showMessageDialog(frame, Localization.lang("No problems found."));
         } else {
             Map<String, Boolean> showMessage = new HashMap<>();
             // prepare data model

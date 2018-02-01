@@ -1,15 +1,22 @@
 package org.jabref.gui.specialfields;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
 
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefIcon;
+import org.jabref.gui.actions.Actions;
+import org.jabref.gui.actions.ActionsFX;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
 
 public class SpecialFieldValueViewModel {
+
+    public SpecialFieldValue getValue() {
+        return value;
+    }
 
     private final SpecialFieldValue value;
 
@@ -20,43 +27,11 @@ public class SpecialFieldValueViewModel {
     }
 
     public Icon getSpecialFieldValueIcon() {
+        return getIcon().map(JabRefIcon::getSmallIcon).orElse(null);
+    }
 
-        switch (value) {
-            case PRINTED:
-                return IconTheme.JabRefIcon.PRINTED.getSmallIcon();
-            case CLEAR_PRIORITY:
-                return null;
-            case PRIORITY_HIGH:
-                return IconTheme.JabRefIcon.PRIORITY_HIGH.getSmallIcon();
-            case PRIORITY_MEDIUM:
-                return IconTheme.JabRefIcon.PRIORITY_MEDIUM.getSmallIcon();
-            case PRIORITY_LOW:
-                return IconTheme.JabRefIcon.PRIORITY_LOW.getSmallIcon();
-            case QUALITY_ASSURED:
-                return IconTheme.JabRefIcon.QUALITY_ASSURED.getSmallIcon();
-            case CLEAR_RANK:
-                return null;
-            case RANK_1:
-                return IconTheme.JabRefIcon.RANK1.getSmallIcon();
-            case RANK_2:
-                return IconTheme.JabRefIcon.RANK2.getSmallIcon();
-            case RANK_3:
-                return IconTheme.JabRefIcon.RANK3.getSmallIcon();
-            case RANK_4:
-                return IconTheme.JabRefIcon.RANK4.getSmallIcon();
-            case RANK_5:
-                return IconTheme.JabRefIcon.RANK5.getSmallIcon();
-            case CLEAR_READ_STATUS:
-                return null;
-            case READ:
-                return IconTheme.JabRefIcon.READ_STATUS_READ.getSmallIcon();
-            case SKIMMED:
-                return IconTheme.JabRefIcon.READ_STATUS_SKIMMED.getSmallIcon();
-            case RELEVANT:
-                return IconTheme.JabRefIcon.RELEVANCE.getSmallIcon();
-            default:
-                throw new IllegalArgumentException("There is no icon mapping for special field value " + value);
-        }
+    public Optional<JabRefIcon> getIcon() {
+        return getAction().getIcon();
     }
 
     public JLabel createSpecialFieldValueLabel() {
@@ -66,43 +41,7 @@ public class SpecialFieldValueViewModel {
     }
 
     public String getMenuString() {
-
-        switch (value) {
-            case PRINTED:
-                return Localization.lang("Toggle print status");
-            case CLEAR_PRIORITY:
-                return Localization.lang("Clear priority");
-            case PRIORITY_HIGH:
-                return Localization.lang("Set priority to high");
-            case PRIORITY_MEDIUM:
-                return Localization.lang("Set priority to medium");
-            case PRIORITY_LOW:
-                return Localization.lang("Set priority to low");
-            case QUALITY_ASSURED:
-                return Localization.lang("Toggle quality assured");
-            case CLEAR_RANK:
-                return Localization.lang("Clear rank");
-            case RANK_1:
-                return "";
-            case RANK_2:
-                return "";
-            case RANK_3:
-                return "";
-            case RANK_4:
-                return "";
-            case RANK_5:
-                return "";
-            case CLEAR_READ_STATUS:
-                return Localization.lang("Clear read status");
-            case READ:
-                return Localization.lang("Set read status to read");
-            case SKIMMED:
-                return Localization.lang("Set read status to skimmed");
-            case RELEVANT:
-                return Localization.lang("Toggle relevance");
-            default:
-                throw new IllegalArgumentException("There is no tooltip localization for special field value " + value);
-        }
+        return getAction().getText();
     }
 
     public String getToolTipText() {
@@ -145,43 +84,81 @@ public class SpecialFieldValueViewModel {
         }
     }
 
-    public String getActionName() {
-
+    public Actions getCommand() {
         switch (value) {
             case PRINTED:
-                return "togglePrinted";
+                return Actions.togglePrinted;
             case CLEAR_PRIORITY:
-                return "clearPriority";
+                return Actions.clearPriority;
             case PRIORITY_HIGH:
-                return "setPriority1";
+                return Actions.setPriority1;
             case PRIORITY_MEDIUM:
-                return "setPriority2";
+                return Actions.setPriority2;
             case PRIORITY_LOW:
-                return "setPriority3";
+                return Actions.setPriority3;
             case QUALITY_ASSURED:
-                return "toggleQualityAssured";
+                return Actions.toggleQualityAssured;
             case CLEAR_RANK:
-                return "clearRank";
+                return Actions.clearRank;
             case RANK_1:
-                return "setRank1";
+                return Actions.setRank1;
             case RANK_2:
-                return "setRank2";
+                return Actions.setRank2;
             case RANK_3:
-                return "setRank3";
+                return Actions.setRank3;
             case RANK_4:
-                return "setRank4";
+                return Actions.setRank4;
             case RANK_5:
-                return "setRank5";
+                return Actions.setRank5;
             case CLEAR_READ_STATUS:
-                return "clearReadStatus";
+                return Actions.clearReadStatus;
             case READ:
-                return "setReadStatusToRead";
+                return Actions.setReadStatusToRead;
             case SKIMMED:
-                return "setReadStatusToSkimmed";
+                return Actions.setReadStatusToSkimmed;
             case RELEVANT:
-                return "toggleRelevance";
+                return Actions.toggleRelevance;
             default:
                 throw new IllegalArgumentException("There is no action name for special field value " + value);
+        }
+    }
+
+    public ActionsFX getAction() {
+        switch (value) {
+            case PRINTED:
+                return ActionsFX.TOGGLE_PRINTED;
+            case CLEAR_PRIORITY:
+                return ActionsFX.CLEAR_PRIORITY;
+            case PRIORITY_HIGH:
+                return ActionsFX.PRIORITY_HIGH;
+            case PRIORITY_MEDIUM:
+                return ActionsFX.PRIORITY_MEDIUM;
+            case PRIORITY_LOW:
+                return ActionsFX.PRIORITY_LOW;
+            case QUALITY_ASSURED:
+                return ActionsFX.QUALITY_ASSURED;
+            case CLEAR_RANK:
+                return ActionsFX.CLEAR_RANK;
+            case RANK_1:
+                return ActionsFX.RANK_1;
+            case RANK_2:
+                return ActionsFX.RANK_2;
+            case RANK_3:
+                return ActionsFX.RANK_3;
+            case RANK_4:
+                return ActionsFX.RANK_4;
+            case RANK_5:
+                return ActionsFX.RANK_5;
+            case CLEAR_READ_STATUS:
+                return ActionsFX.CLEAR_READ_STATUS;
+            case READ:
+                return ActionsFX.READ;
+            case SKIMMED:
+                return ActionsFX.SKIMMED;
+            case RELEVANT:
+                return ActionsFX.RELEVANT;
+            default:
+                throw new IllegalArgumentException("There is no tooltip localization for special field value " + value);
         }
     }
 }

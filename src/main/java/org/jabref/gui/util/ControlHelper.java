@@ -8,11 +8,11 @@ import javafx.scene.Parent;
 import org.jabref.gui.AbstractView;
 import org.jabref.logic.l10n.Localization;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ControlHelper {
-    private static final Log LOGGER = LogFactory.getLog(ControlHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ControlHelper.class);
 
     /**
      * Loads the FXML file associated to the passed control.
@@ -34,7 +34,7 @@ public class ControlHelper {
             // Add language resource
 
         } catch (IOException exception) {
-            LOGGER.error(exception);
+            LOGGER.error("Problem loading fxml for control", exception);
         }
     }
 }

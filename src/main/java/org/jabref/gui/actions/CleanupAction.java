@@ -1,5 +1,9 @@
 package org.jabref.gui.actions;
 
+import java.util.List;
+
+import javax.swing.JOptionPane;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
@@ -37,7 +41,7 @@ public class CleanupAction extends AbstractWorker {
     public CleanupAction(BasePanel panel, JabRefPreferences preferences) {
         this.panel = panel;
         this.frame = panel.frame();
-        this.preferences = Objects.requireNonNull(preferences);
+        this.preferences = preferences;
     }
 
     @Override

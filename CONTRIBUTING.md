@@ -6,6 +6,7 @@ Take a look at GitHub's excellent [help documentation] for a detailed explanatio
 We also have [code howtos](https://github.com/JabRef/jabref/wiki/Code-Howtos) and [guidelines for setting up a local workspace](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace).
 
 In case you have any question, do not hesitate to write one of our [JabRef developers](https://github.com/orgs/JabRef/teams/developers) an email.
+We should also be online at [gitter](https://gitter.im/JabRef/jabref).
 
 
 ## Formal requirements for a pull request
@@ -66,28 +67,44 @@ You can see the result in `build\resources\main\help\en\About.html` or when clic
 
 ### When making an architectural decision
 In case you add a library or do mayor code rewrites, we ask you to document your decision.
-Recommended reading: http://www.infoq.com/articles/sustainable-architectural-design-decisions
+Recommended reading: <https://adr.github.io/>.
 
-Template:
+We simply ask to create a new markdown file in `docs/adr` following the template presented at <https://adr.github.io/madr/>.
+
+In case you want to directly add a comment to a class, simply use following template (based on [sustainable architectural decisions](https://www.infoq.com/articles/sustainable-architectural-design-decisions)):
+
 ```
 In the context of <use case/user story u>,
 facing <concern c>
 we decided for <option o>
 and neglected <other options>,
 to achieve <system qualities/desired consequences>,
-accepting <downside d/undesired consequences>,
+accepting <downside / undesired consequences>,
 because <additional rationale>.
 ```
 
 
 ### When adding a new Localization.lang entry
 Add new `Localization.lang("KEY")` to Java file.
-Tests fail. In the test output a snippet is generated which must be added to the English translation file. There is also a snippet generated for the non-English files, but this is irrelevant.
-Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
-With `gradlew localizationUpdate` the "KEY" is added to the other translation files as well.
-Tests are green again.
+Tests fail. In the test output a snippet is generated which must be added to the English translation file.
 
-You can also directly run the specific test in your IDE. The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java`
+Example:
+
+```
+java.lang.AssertionError: DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE
+PASTE THESE INTO THE ENGLISH LANGUAGE FILE
+[
+Opens\ JabRef's\ Twitter\ page=Opens JabRef's Twitter page
+]
+Expected :[]
+Actual   :[Opens\ JabRef's\ Twitter\ page (src\main\java\org\jabref\gui\JabRefFrame.java LANG)]
+```
+
+Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`.
+[Crowdin](http://translate.jabref.org/) will automatically pick up the new string and add it to the other translations.
+
+You can also directly run the specific test in your IDE.
+The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java`
 Find more information in the [JabRef Wiki](https://github.com/JabRef/jabref/wiki/Code-Howtos#using-localization-correctly).
 
 

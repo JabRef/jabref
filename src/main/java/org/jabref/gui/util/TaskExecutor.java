@@ -1,8 +1,8 @@
 package org.jabref.gui.util;
 
-import javafx.concurrent.Task;
+import java.util.concurrent.Future;
 
-import org.jabref.gui.externalfiles.FileDownloadTask;
+import javafx.concurrent.Task;
 
 /**
  * An object that executes submitted {@link Task}s. This
@@ -13,19 +13,12 @@ import org.jabref.gui.externalfiles.FileDownloadTask;
 public interface TaskExecutor {
 
     /**
-     * Runs the given task.
+     * Runs the given task and returns a Future representing that task.
      *
-     * @param task the task to run
      * @param <V>  type of return value of the task
+     * @param task the task to run
      */
-    <V> void execute(BackgroundTask<V> task);
-
-    /**
-     * Runs the given download task.
-     *
-     * @param downloadTask the task to run
-     */
-    void execute(FileDownloadTask downloadTask);
+    <V> Future<?> execute(BackgroundTask<V> task);
 
     /**
      * Shutdown the task executor.

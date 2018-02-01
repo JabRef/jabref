@@ -153,7 +153,7 @@ public class InternalBibtexFields {
         }
 
         // some semi-standard fields
-        dummy = new BibtexSingleField(BibEntry.KEY_FIELD, true);
+        dummy = new BibtexSingleField(BibEntry.KEY_FIELD, true).withProperties(FieldProperty.KEY);
         dummy.setPrivate();
         add(dummy);
 
@@ -402,7 +402,7 @@ public class InternalBibtexFields {
         return Optional.empty();
     }
 
-    public static int getFieldLength(String name) {
+    public static Double getFieldLength(String name) {
         return InternalBibtexFields.getField(name)
                 .map(BibtexSingleField::getLength)
                 .orElse(BibtexSingleField.DEFAULT_FIELD_LENGTH);

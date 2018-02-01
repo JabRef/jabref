@@ -18,14 +18,30 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import javax.swing.BorderFactory;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+
+import org.jabref.Globals;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.worker.AbstractWorker;
+import org.jabref.logic.exporter.Exporter;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExportToClipboardAction extends AbstractWorker {
 
-    private static final Log LOGGER = LogFactory.getLog(ExportToClipboardAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExportToClipboardAction.class);
 
     private final JabRefFrame frame;
 
@@ -51,15 +67,11 @@ public class ExportToClipboardAction extends AbstractWorker {
             return;
         }
 
-        List<IExportFormat> exportFormats = new LinkedList<>(ExportFormats.getExportFormats().values());
-        Collections.sort(exportFormats, (e1, e2) -> e1.getDisplayName().compareTo(e2.getDisplayName()));
-        String[] exportFormatDisplayNames = new String[exportFormats.size()];
-        for (int i = 0; i < exportFormats.size(); i++) {
-            IExportFormat exportFormat = exportFormats.get(i);
-            exportFormatDisplayNames[i] = exportFormat.getDisplayName();
-        }
+        List<Exporter> exporters = Globals.exportFactory.getExporters();
+        exporters.sort(Comparator.comparing(Exporter::getDisplayName));
+        List<String> exportFormatDisplayNames = exporters.stream().map(Exporter::getDisplayName).collect(Collectors.toList());
 
-        JList<String> list = new JList<>(exportFormatDisplayNames);
+        JList<String> list = new JList<>(exportFormatDisplayNames.toArray(new String[exportFormatDisplayNames.size()]));
         list.setBorder(BorderFactory.createEtchedBorder());
         list.setSelectionInterval(0, 0);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -72,7 +84,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             return;
         }
 
-        IExportFormat format = exportFormats.get(list.getSelectedIndex());
+        Exporter exporter = exporters.get(list.getSelectedIndex());
 
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
@@ -89,7 +101,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             List<BibEntry> entries = panel.getSelectedEntries();
 
             // Write to file:
-            format.performExport(panel.getBibDatabaseContext(), tmp.getPath(),
+            exporter.export(panel.getBibDatabaseContext(), tmp.toPath(),
                     panel.getBibDatabaseContext().getMetaData().getEncoding()
                             .orElse(Globals.prefs.getDefaultEncoding()),
                     entries);

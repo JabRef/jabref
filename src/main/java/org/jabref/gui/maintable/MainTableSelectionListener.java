@@ -6,57 +6,29 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
 
-import javax.swing.Icon;
-import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
-import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelMode;
-import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.PreviewPanel;
-import org.jabref.gui.actions.CopyDoiUrlAction;
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditor;
-import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
-import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.filelist.FileListEntry;
-import org.jabref.gui.filelist.FileListTableModel;
-import org.jabref.gui.menus.RightClickMenu;
-import org.jabref.gui.specialfields.SpecialFieldMenuAction;
-import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
-import org.jabref.gui.specialfields.SpecialFieldViewModel;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.specialfields.SpecialField;
-import org.jabref.model.entry.specialfields.SpecialFieldValue;
-import org.jabref.preferences.PreviewPreferences;
 
+import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * List event, mouse, key and focus listener for the main table that makes up the
  * most part of the BasePanel for a single BIB database.
  */
 public class MainTableSelectionListener implements ListEventListener<BibEntry>, MouseListener, KeyListener, FocusListener {
-    private static final Log LOGGER = LogFactory.getLog(MainTableSelectionListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainTableSelectionListener.class);
 
     private final MainTable table;
     private final BasePanel panel;
@@ -67,7 +39,6 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     // key strokes cycle between all entries starting with the same letter:
     private final int[] lastPressed = new int[20];
     private PreviewPanel preview;
-    private boolean previewActive = Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled();
     private boolean workingOnPreview;
     private boolean enabled = true;
     private int lastPressedCount;
@@ -77,14 +48,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     public MainTableSelectionListener(BasePanel panel, MainTable table) {
         this.table = table;
         this.panel = panel;
-        this.tableRows = table.getTableModel().getTableRows();
-        PreviewPanel previewPanel = panel.getPreviewPanel();
-        if (previewPanel != null) {
-            preview = previewPanel;
-        } else {
-            preview = new PreviewPanel(panel.getBibDatabaseContext(), null, panel);
-            panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview);
-        }
+        this.tableRows = new BasicEventList<>();
+        preview = panel.getPreviewPanel();
     }
 
     public void setEnabled(boolean enabled) {
@@ -104,101 +69,58 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
 
         final BibEntry newSelected = selected.get(0);
         if ((panel.getMode() == BasePanelMode.SHOWING_EDITOR || panel.getMode() == BasePanelMode.WILL_SHOW_EDITOR)
-                && panel.getCurrentEditor() != null && newSelected == panel.getCurrentEditor().getEntry()) {
+                && panel.getEntryEditor() != null && newSelected == panel.getEntryEditor().getEntry()) {
             // entry already selected and currently editing it, do not steal the focus from the selected textfield
             return;
         }
 
         if (newSelected != null) {
+            // TODO: Update entry editor / preview on selection change
+            /*
             final BasePanelMode mode = panel.getMode(); // What is the panel already showing?
             if ((mode == BasePanelMode.WILL_SHOW_EDITOR) || (mode == BasePanelMode.SHOWING_EDITOR)) {
-                // An entry is currently being edited.
-                EntryEditor oldEditor = panel.getCurrentEditor();
-                String visName = null;
-                if (oldEditor != null) {
-                    visName = oldEditor.getVisibleTabName();
-                }
-                // Get a new editor for the entry to edit:
-                EntryEditor newEditor = panel.getEntryEditor(newSelected);
-
-                // Show the new editor unless it was already visible:
-                if (!Objects.equals(newEditor, oldEditor) || (mode != BasePanelMode.SHOWING_EDITOR)) {
-
-                    if (visName != null) {
-                        newEditor.setVisibleTab(visName);
-                    }
-                    panel.showEntryEditor(newEditor);
-                    SwingUtilities.invokeLater(() -> table.ensureVisible(table.getSelectedRow()));
-                } else {
-                    // if not used destroy the EntryEditor
-                    newEditor.setMovingToDifferentEntry();
-                }
-            } else {
+                panel.showAndEdit(newSelected);
+                SwingUtilities.invokeLater(() -> table.ensureVisible(table.getSelectedRow()));
+            } else if (panel.getMode() == BasePanelMode.SHOWING_NOTHING || panel.getMode() == BasePanelMode.SHOWING_PREVIEW) {
                 // Either nothing or a preview was shown. Update the preview.
-                if (previewActive) {
-                    updatePreview(newSelected, false);
-                }
+                updatePreview(newSelected);
             }
+            */
         }
     }
 
-    private void updatePreview(final BibEntry toShow, final boolean changedPreview) {
-        updatePreview(toShow, changedPreview, 0);
+    private void updatePreview(final BibEntry toShow) {
+        updatePreview(toShow, 0);
     }
 
-    private void updatePreview(final BibEntry toShow, final boolean changedPreview, int repeats) {
+    private void updatePreview(final BibEntry toShow, int repeats) {
         if (workingOnPreview) {
             if (repeats > 0) {
                 return; // We've already waited once. Give up on this selection.
             }
-            Timer t = new Timer(50, actionEvent -> updatePreview(toShow, changedPreview, 1));
+            Timer t = new Timer(50, actionEvent -> updatePreview(toShow, 1));
             t.setRepeats(false);
             t.start();
             return;
         }
+        /*
         EventList<BibEntry> list = table.getSelected();
         // Check if the entry to preview is still selected:
         if ((list.size() != 1) || (list.get(0) != toShow)) {
             return;
         }
-        final BasePanelMode mode = panel.getMode();
         workingOnPreview = true;
         SwingUtilities.invokeLater(() -> {
-            preview.setEntry(toShow);
-
-            // If nothing was already shown, set the preview and move the separator:
-            if (changedPreview || (mode == BasePanelMode.SHOWING_NOTHING)) {
-                panel.showPreview(preview);
-                panel.adjustSplitter();
-            }
+            panel.showPreview(toShow);
             workingOnPreview = false;
         });
-    }
-
-    public void editSignalled() {
-        if (table.getSelected().size() == 1) {
-            editSignalled(table.getSelected().get(0));
-        }
-    }
-
-    public void editSignalled(BibEntry entry) {
-        final BasePanelMode mode = panel.getMode();
-        if (mode != BasePanelMode.SHOWING_EDITOR) {
-            panel.showEntryEditor(panel.getEntryEditor(entry));
-        }
-        panel.getCurrentEditor().requestFocus();
+        */
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        // First find the column and row on which the user has clicked.
-        final int col = table.columnAtPoint(e.getPoint());
-        final int row = table.rowAtPoint(e.getPoint());
-
-        // get the MainTableColumn which is currently visible at col
-        int modelIndex = table.getColumnModel().getColumn(col).getModelIndex();
-        MainTableColumn modelColumn = table.getMainTableColumn(modelIndex);
-
+        // TODO: Right-click menu for special columns
+        /*
         // Check if the user has right-clicked. If so, open the right-click menu.
         if (e.isPopupTrigger() || (e.getButton() == MouseEvent.BUTTON3)) {
             if ((modelColumn == null) || !modelColumn.isIconColumn()) {
@@ -209,6 +131,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 showIconRightClickMenu(e, row, modelColumn);
             }
         }
+        */
     }
 
     @Override
@@ -218,14 +141,14 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
+        /*
         // First find the column on which the user has clicked.
         final int row = table.rowAtPoint(e.getPoint());
 
         // A double click on an entry should open the entry's editor.
         if (e.getClickCount() == 2) {
             BibEntry toShow = tableRows.get(row);
-            editSignalled(toShow);
+            panel.showAndEdit(toShow);
             return;
         }
 
@@ -310,6 +233,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     .ifPresent(crossref -> panel.getDatabase().getEntryByKey(crossref).ifPresent(entry -> panel.highlightEntry(entry)));
         }
         panel.frame().updateEnabledState();
+        */
     }
 
     /**
@@ -320,6 +244,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
      * @param columnName the name of the specialfield column
      */
     private void handleSpecialFieldLeftClick(MouseEvent e, String columnName) {
+        /*
         if ((e.getClickCount() == 1)) {
             SpecialField.getSpecialFieldInstanceFromFieldName(columnName).ifPresent(field -> {
                 // special field found
@@ -335,6 +260,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 }
             });
         }
+        */
     }
 
     /**
@@ -344,12 +270,14 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
      * @param row The row where the event occurred.
      */
     private void processPopupTrigger(MouseEvent e, int row) {
+        /*
         int selRow = table.getSelectedRow();
         if ((selRow == -1) || !table.isRowSelected(table.rowAtPoint(e.getPoint()))) {
             table.setRowSelectionInterval(row, row);
         }
         RightClickMenu rightClickMenu = new RightClickMenu(JabRefGUI.getMainFrame(), panel);
         rightClickMenu.show(table, e.getX(), e.getY());
+        */
     }
 
     /**
@@ -366,6 +294,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         JPopupMenu menu = new JPopupMenu();
         boolean showDefaultPopup = true;
 
+        /*
         // See if this is a simple file link field, or if it is a file-list
         // field that can specify a list of links:
         if (!column.getBibtexFields().isEmpty()) {
@@ -419,17 +348,19 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 menu.show(table, e.getX(), e.getY());
             }
         }
+        */
     }
 
     public void entryEditorClosing(EntryEditor editor) {
-        preview.setEntry(editor.getEntry());
-        if (previewActive) {
-            panel.showPreview(preview);
+        /*
+        if (Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled()) {
+            panel.showPreview(editor.getEntry());
         } else {
             panel.hideBottomComponent();
+            panel.adjustSplitter();
         }
-        panel.adjustSplitter();
         table.requestFocus();
+        */
     }
 
     @Override
@@ -442,40 +373,6 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         // Do nothing
     }
 
-    public void setPreviewActive(boolean enabled) {
-        previewActive = enabled;
-        if (previewActive) {
-            if (!table.getSelected().isEmpty()) {
-                updatePreview(table.getSelected().get(0), false);
-            }
-        } else {
-            panel.hideBottomComponent();
-        }
-    }
-
-    public void nextPreviewStyle() {
-        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() + 1);
-    }
-
-    public void previousPreviewStyle() {
-        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() - 1);
-    }
-
-    private void cyclePreview(int newPosition) {
-        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
-                .getBuilder()
-                .withPreviewCyclePosition(newPosition)
-                .build();
-        Globals.prefs.storePreviewPreferences(previewPreferences);
-
-        preview.updateLayout();
-        preview.update();
-        panel.showPreview(preview);
-        if (!table.getSelected().isEmpty()) {
-            updatePreview(table.getSelected().get(0), true);
-        }
-    }
-
     /**
      * Receive key event on the main table. If the key is a letter or a digit,
      * we should select the first entry in the table which starts with the given
@@ -484,6 +381,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
      */
     @Override
     public void keyTyped(KeyEvent e) {
+        /*
         if ((!e.isActionKey()) && Character.isLetterOrDigit(e.getKeyChar())
                 && (e.getModifiers() == 0)) {
             long time = System.currentTimeMillis();
@@ -532,6 +430,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             lastPressedCount = 0;
         }
         panel.frame().updateEnabledState();
+        */
     }
 
     @Override

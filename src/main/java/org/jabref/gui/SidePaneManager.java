@@ -1,21 +1,27 @@
 package org.jabref.gui;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.jabref.Globals;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.preferences.JabRefPreferences;
 
-import javax.swing.*;
-import java.util.*;
-import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages visibility of SideShowComponents in a given newly constructed
  * sidePane.
  */
 public class SidePaneManager {
-    private static final Log LOGGER = LogFactory.getLog(SidePaneManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SidePaneManager.class);
 
     private final JabRefFrame frame;
 
@@ -32,8 +38,8 @@ public class SidePaneManager {
          * side pane components, we get rid of the annoying latency when
          * switching tabs:
          */
-        frame.getTabbedPane().addChangeListener(event -> SwingUtilities.invokeLater(
-                () -> setActiveBasePanel(SidePaneManager.this.frame.getCurrentBasePanel())));
+        //frame.getTabbedPane().addChangeListener(event -> SwingUtilities.invokeLater(
+        //        () -> setActiveBasePanel(SidePaneManager.this.frame.getCurrentBasePanel())));
         sidep = new SidePane();
         sidep.setVisible(false);
     }
@@ -97,7 +103,7 @@ public class SidePaneManager {
             hideComponent(component);
             if (frame.getCurrentBasePanel() != null) {
                 MainTable mainTable = frame.getCurrentBasePanel().getMainTable();
-                mainTable.setSelected(mainTable.getSelectedRow());
+                //mainTable.setSelected(mainTable.getSelectedRow());
                 mainTable.requestFocus();
             }
         }

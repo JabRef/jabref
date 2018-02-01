@@ -16,6 +16,15 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.help.NewVersionDialog;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.Version;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 /**
  * This worker checks if there is a new version of JabRef available.
  * If there is it will display a Dialog to the User offering him multiple Options to proceed
@@ -25,7 +34,7 @@ import java.util.concurrent.ExecutionException;
  */
 public class VersionWorker extends SwingWorker<List<Version>, Void> {
 
-    private static final Log LOGGER = LogFactory.getLog(VersionWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VersionWorker.class);
 
     private final JabRefFrame mainFrame;
 

@@ -6,7 +6,7 @@ import java.io.StringReader;
 import java.util.List;
 
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
@@ -44,7 +44,7 @@ public class MrDLibImporterTest {
 
     @Test
     public void testGetFileExtention() {
-        assertEquals(FileExtensions.XML, importer.getExtensions());
+        assertEquals(FileType.XML, importer.getFileType());
     }
 
     @Test

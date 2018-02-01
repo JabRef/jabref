@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -21,7 +23,6 @@ import javafx.scene.layout.RowConstraints;
 
 import org.jabref.Globals;
 import org.jabref.gui.FXDialogService;
-import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
@@ -46,11 +47,14 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
     private FieldEditorFX activeField;
     private final BibDatabaseContext databaseContext;
+    private UndoManager undoManager;
+    private Collection<String> fields;
 
-    public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders) {
+    public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager) {
         this.isCompressed = compressed;
         this.databaseContext = databaseContext;
         this.suggestionProviders = suggestionProviders;
+        this.undoManager = undoManager;
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -61,21 +65,24 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         gridPane.addColumn(columnIndex, nodes.toArray(Node[]::new));
     }
 
-    private String convertToHex(java.awt.Color color) {
-        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
-    }
+    private Region setupPanel(BibEntry entry, boolean compressed, SuggestionProviders suggestionProviders, UndoManager undoManager) {
+        // The preferences might be not initialized in tests -> return empty node
+        // TODO: Replace this ugly workaround by proper injection propagation
+        if (Globals.prefs == null) {
+            return new Region();
+        }
 
-    private Region setupPanel(BibEntry entry, boolean compressed, SuggestionProviders suggestionProviders) {
         editors.clear();
-        List<Label> labels = new ArrayList<>();
 
         EntryType entryType = EntryTypes.getTypeOrDefault(entry.getType(), databaseContext.getMode());
-        Collection<String> fields = determineFieldsToShow(entry, entryType);
+        fields = determineFieldsToShow(entry, entryType);
+
+        List<Label> labels = new ArrayList<>();
         for (String fieldName : fields) {
             FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.TASK_EXECUTOR, new FXDialogService(),
                     Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs,
                     databaseContext, entry.getType(),
-                    suggestionProviders);
+                    suggestionProviders, undoManager);
             fieldEditor.bindToEntry(entry);
 
             editors.put(fieldName, fieldEditor);
@@ -118,16 +125,8 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
             gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);
 
-            setRegularRowLayout(gridPane, fields, rows);
+            setRegularRowLayout(gridPane, rows);
         }
-
-        if (GUIGlobals.currentFont != null) {
-            gridPane.setStyle(
-                    "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"
-                            + "text-area-foreground: " + convertToHex(GUIGlobals.editorTextColor) + ";"
-                            + "text-area-highlight: " + convertToHex(GUIGlobals.activeBackgroundColor) + ";");
-        }
-        gridPane.getStylesheets().add("org/jabref/gui/entryeditor/EntryEditor.css");
 
         // Warp everything in a scroll-pane
         ScrollPane scrollPane = new ScrollPane();
@@ -139,7 +138,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         return scrollPane;
     }
 
-    private void setRegularRowLayout(GridPane gridPane, Collection<String> fields, int rows) {
+    private void setRegularRowLayout(GridPane gridPane, int rows) {
         List<RowConstraints> constraints = new ArrayList<>(rows);
         for (String field : fields) {
             RowConstraints rowExpand = new RowConstraints();
@@ -217,9 +216,13 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        Region panel = setupPanel(entry, isCompressed, suggestionProviders);
+        Region panel = setupPanel(entry, isCompressed, suggestionProviders, undoManager);
         setContent(panel);
     }
 
     protected abstract Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType);
+
+    public Collection<String> getShownFields() {
+        return fields;
+    }
 }

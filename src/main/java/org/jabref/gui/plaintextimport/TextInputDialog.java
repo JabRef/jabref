@@ -15,29 +15,16 @@ import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.FreeCiteImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.entry.*;
 import org.jabref.preferences.JabRefPreferences;
 
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.text.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * import from plain text => simple mark/copy/paste into bibtex entry
@@ -51,7 +38,7 @@ import java.util.Optional;
  */
 public class TextInputDialog extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(TextInputDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TextInputDialog.class);
 
     private final JButton okButton = new JButton(Localization.lang("Accept"));
     private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
@@ -473,7 +460,7 @@ public class TextInputDialog extends JabRefDialog {
 
         public PasteAction() {
             super(Localization.lang("Paste"), Localization.lang("Paste from clipboard"),
-                    IconTheme.JabRefIcon.PASTE.getIcon());
+                    IconTheme.JabRefIcons.PASTE.getIcon());
         }
 
         @Override
@@ -496,15 +483,15 @@ public class TextInputDialog extends JabRefDialog {
     private class LoadAction extends BasicAction {
 
         public LoadAction() {
-            super(Localization.lang("Open"), Localization.lang("Open file"), IconTheme.JabRefIcon.OPEN.getIcon());
+            super(Localization.lang("Open"), Localization.lang("Open file"), IconTheme.JabRefIcons.OPEN.getIcon());
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                        .addExtensionFilter(FileExtensions.TXT)
-                        .withDefaultExtension(FileExtensions.TXT)
+                        .addExtensionFilter(FileType.TXT)
+                        .withDefaultExtension(FileType.TXT)
                         .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
                 DialogService ds = new FXDialogService();
 
@@ -531,7 +518,7 @@ public class TextInputDialog extends JabRefDialog {
     private class ClearAction extends BasicAction {
 
         public ClearAction() {
-            super(Localization.lang("Clear"), Localization.lang("Clear inputarea"), IconTheme.JabRefIcon.NEW.getIcon());
+            super(Localization.lang("Clear"), Localization.lang("Clear inputarea"), IconTheme.JabRefIcons.NEW.getIcon());
         }
 
         @Override
@@ -573,8 +560,8 @@ public class TextInputDialog extends JabRefDialog {
 
         private final Font baseFont;
         private final Font usedFont;
-        private final Icon okIcon = IconTheme.JabRefIcon.PLAIN_TEXT_IMPORT_DONE.getSmallIcon();
-        private final Icon needIcon = IconTheme.JabRefIcon.PLAIN_TEXT_IMPORT_TODO.getSmallIcon();
+        private final Icon okIcon = IconTheme.JabRefIcons.PLAIN_TEXT_IMPORT_DONE.getSmallIcon();
+        private final Icon needIcon = IconTheme.JabRefIcons.PLAIN_TEXT_IMPORT_TODO.getSmallIcon();
         private final Color requiredColor = Globals.prefs.getColor(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND);
         private final Color optionalColor = Globals.prefs.getColor(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND);
 

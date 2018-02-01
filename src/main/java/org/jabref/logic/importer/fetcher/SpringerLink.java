@@ -14,9 +14,9 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * FulltextFetcher implementation that attempts to find a PDF URL at SpringerLink.
@@ -24,7 +24,7 @@ import org.json.JSONObject;
  * Uses Springer API, see @link{https://dev.springer.com}
  */
 public class SpringerLink implements FulltextFetcher {
-    private static final Log LOGGER = LogFactory.getLog(SpringerLink.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringerLink.class);
 
     private static final String API_URL = "http://api.springer.com/meta/v1/json";
     private static final String API_KEY = "b0c7151179b3d9c1119cf325bca8460d";

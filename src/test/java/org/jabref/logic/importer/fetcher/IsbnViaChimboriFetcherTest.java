@@ -8,19 +8,18 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 
-@Category(FetcherTest.class)
+@FetcherTest
 public class IsbnViaChimboriFetcherTest extends AbstractIsbnFetcherTest {
 
-    @Before
+    @BeforeEach
     public void setUp() {
         bibEntry = new BibEntry();
         bibEntry.setType(BiblatexEntryTypes.BOOK);
@@ -54,6 +53,15 @@ public class IsbnViaChimboriFetcherTest extends AbstractIsbnFetcherTest {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0321356683");
         bibEntry.setField("bibtexkey", "0321356683");
         bibEntry.setField("isbn", "0321356683");
+        assertEquals(Optional.of(bibEntry), fetchedEntry);
+    }
+
+    @Test
+    @Override
+    public void searchByIdSuccessfulWithLongISBN() throws FetcherException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9780321356680");
+        bibEntry.setField("bibtexkey", "9780321356680");
+        bibEntry.setField("isbn", "9780321356680");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 

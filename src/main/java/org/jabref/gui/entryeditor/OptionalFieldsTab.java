@@ -2,6 +2,8 @@ package org.jabref.gui.entryeditor;
 
 import java.util.Collection;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.IconTheme;
@@ -12,12 +14,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
 
 public class OptionalFieldsTab extends FieldsEditorTab {
-    public OptionalFieldsTab(BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders) {
-        super(true, databaseContext, suggestionProviders);
+    public OptionalFieldsTab(BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager) {
+        super(true, databaseContext, suggestionProviders, undoManager);
 
         setText(Localization.lang("Optional fields"));
         setTooltip(new Tooltip(Localization.lang("Show optional fields")));
-        setGraphic(IconTheme.JabRefIcon.OPTIONAL.getGraphicNode());
+        setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());
     }
 
     @Override

@@ -1,12 +1,31 @@
 package org.jabref.gui;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.layout.Sizes;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
 import org.jabref.Globals;
-import org.jabref.gui.entryeditor.EntryEditorTabList;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
@@ -103,7 +122,7 @@ public class GenFieldsCustomizer extends JabRefDialog {
                         Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            String testString = BibtexKeyPatternUtil.checkLegalKey(parts[1],
+            String testString = BibtexKeyGenerator.cleanKey(parts[1],
                     Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
             if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
                 // Report error and exit.
@@ -127,11 +146,10 @@ public class GenFieldsCustomizer extends JabRefDialog {
     private void setFieldsText() {
         StringBuilder sb = new StringBuilder();
 
-        EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
-        for (int i = 0; i < tabList.getTabCount(); i++) {
-            sb.append(tabList.getTabName(i));
+        for (Map.Entry<String, List<String>> tab : Globals.prefs.getEntryEditorTabList().entrySet()) {
+            sb.append(tab.getKey());
             sb.append(':');
-            sb.append(String.join(";", tabList.getTabFields(i)));
+            sb.append(String.join(";", tab.getValue()));
             sb.append('\n');
         }
 

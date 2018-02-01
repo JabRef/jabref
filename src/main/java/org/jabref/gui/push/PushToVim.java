@@ -12,14 +12,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
-import javax.swing.*;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PushToVim extends AbstractPushToApplication implements PushToApplication {
 
-    private static final Log LOGGER = LogFactory.getLog(PushToVim.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PushToVim.class);
 
     private final JTextField vimServer = new JTextField(30);
 

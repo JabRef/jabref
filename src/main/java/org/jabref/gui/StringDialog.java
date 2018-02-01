@@ -173,7 +173,7 @@ class StringDialog extends JabRefDialog {
 
 
         public SaveDatabaseAction(StringDialog parent) {
-            super("Save library", IconTheme.JabRefIcon.SAVE.getIcon());
+            super("Save library", IconTheme.JabRefIcons.SAVE.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save library"));
             this.parent = parent;
         }
@@ -319,7 +319,7 @@ class StringDialog extends JabRefDialog {
 
 
         public NewStringAction(StringDialog parent) {
-            super("New string", IconTheme.JabRefIcon.ADD.getIcon());
+            super("New string", IconTheme.JabRefIcons.ADD.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("New string"));
             this.parent = parent;
         }
@@ -368,7 +368,7 @@ class StringDialog extends JabRefDialog {
 
 
         public RemoveStringAction(StringDialog parent) {
-            super("Remove selected strings", IconTheme.JabRefIcon.REMOVE.getIcon());
+            super("Remove selected strings", IconTheme.JabRefIcons.REMOVE.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Remove selected strings"));
             this.parent = parent;
         }
@@ -413,7 +413,7 @@ class StringDialog extends JabRefDialog {
     class UndoAction extends AbstractAction {
 
         public UndoAction() {
-            super("Undo", IconTheme.JabRefIcon.UNDO.getIcon());
+            super("Undo", IconTheme.JabRefIcons.UNDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Undo"));
         }
 
@@ -426,7 +426,7 @@ class StringDialog extends JabRefDialog {
     class RedoAction extends AbstractAction {
 
         public RedoAction() {
-            super("Redo", IconTheme.JabRefIcon.REDO.getIcon());
+            super("Redo", IconTheme.JabRefIcons.REDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Redo"));
         }
 

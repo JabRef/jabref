@@ -13,15 +13,15 @@ import org.jabref.gui.BasePanel;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  */
 public class TransferableFileLinkSelection implements Transferable {
 
-    private static final Log LOGGER = LogFactory.getLog(TransferableFileLinkSelection.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransferableFileLinkSelection.class);
 
     private final List<Path> fileList = new ArrayList<>();
 

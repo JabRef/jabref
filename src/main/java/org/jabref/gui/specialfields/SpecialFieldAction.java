@@ -14,12 +14,12 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.specialfields.SpecialField;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SpecialFieldAction implements BaseAction {
 
-    private static final Log LOGGER = LogFactory.getLog(SpecialFieldAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpecialFieldAction.class);
     private final JabRefFrame frame;
     private final SpecialField specialField;
     private final String value;
@@ -83,7 +83,7 @@ public class SpecialFieldAction implements BaseAction {
     private String getTextDone(SpecialField field, String... params) {
         Objects.requireNonNull(params);
 
-        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field);
+        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field, frame.getCurrentBasePanel().getUndoManager());
 
         if (field.isSingleValueField() && (params.length == 1) && (params[0] != null)) {
             // Single value fields can be toggled only

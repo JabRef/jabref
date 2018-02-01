@@ -186,8 +186,7 @@ public class SynchronizeFileField extends AbstractWorker {
                                 // User doesn't want to handle this unknown link type.
                             } else if (answer == JOptionPane.YES_OPTION) {
                                 // User wants to define the new file type. Show the dialog:
-                                ExternalFileType newType = new ExternalFileType(flEntry.getType().get().getName(), "", "",
-                                        "", "new", IconTheme.JabRefIcon.FILE.getSmallIcon());
+                                ExternalFileType newType = new ExternalFileType(flEntry.getType().get().getName(), "", "", "", "new", IconTheme.JabRefIcons.FILE);
                                 ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor((JFrame) null, newType);
                                 editor.setVisible(true);
                                 if (editor.okPressed()) {
@@ -197,7 +196,6 @@ public class SynchronizeFileField extends AbstractWorker {
                                     fileTypes.add(newType);
                                     Collections.sort(fileTypes);
                                     ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);
-                                    panel.getMainTable().repaint();
                                 }
                             } else {
                                 // User wants to change the type of this link.

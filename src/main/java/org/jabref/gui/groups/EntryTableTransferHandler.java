@@ -39,13 +39,13 @@ import org.jabref.model.util.FileHelper;
 import org.jabref.pdfimport.PdfImporter;
 import org.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EntryTableTransferHandler extends TransferHandler {
 
     private static final boolean DROP_ALLOWED = true;
-    private static final Log LOGGER = LogFactory.getLog(EntryTableTransferHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntryTableTransferHandler.class);
     private final MainTable entryTable;
     private final JabRefFrame frame;
     private final BasePanel panel;
@@ -172,12 +172,15 @@ public class EntryTableTransferHandler extends TransferHandler {
     @Override
     public void exportAsDrag(JComponent comp, InputEvent e, int action) {
         if (e instanceof MouseEvent) {
+            // TODO: Reimplement drag & drop
+            /*
             int columnIndex = entryTable.columnAtPoint(((MouseEvent) e).getPoint());
             int modelIndex = entryTable.getColumnModel().getColumn(columnIndex).getModelIndex();
             if (entryTable.isFileColumn(modelIndex)) {
                 LOGGER.info("Dragging file");
                 draggingFile = true;
             }
+            */
         }
         super.exportAsDrag(comp, e, DnDConstants.ACTION_LINK);
     }

@@ -15,20 +15,15 @@ import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.util.*;
-import java.util.List;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ContentSelectorDialog extends JabRefDialog {
 
     private static final String WORD_FIRSTLINE_TEXT = Localization.lang("<select word>");
     private static final String FIELD_FIRST_LINE = Localization.lang("<field name>");
-    private static final Log LOGGER = LogFactory.getLog(ContentSelectorDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContentSelectorDialog.class);
     private final GridBagLayout gbl = new GridBagLayout();
     private final GridBagConstraints con = new GridBagConstraints();
     private final JPanel fieldPan = new JPanel();

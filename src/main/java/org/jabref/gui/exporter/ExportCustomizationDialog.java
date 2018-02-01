@@ -1,8 +1,25 @@
 package org.jabref.gui.exporter;
 
-import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.swing.DefaultEventTableModel;
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.table.TableColumnModel;
+
 import org.jabref.Globals;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -60,8 +77,7 @@ public class ExportCustomizationDialog extends JabRefDialog {
             CustomExportDialog ecd = new CustomExportDialog(frame);
             ecd.setVisible(true);
             if (ecd.okPressed()) {
-                List<String> newFormat = Arrays.asList(ecd.name(), ecd.layoutFile(), ecd.extension());
-                Globals.prefs.customExports.addFormat(newFormat,
+                Globals.prefs.customExports.addFormat(ecd.name(), ecd.layoutFile(), ecd.extension(),
                         Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
                         SavePreferences.loadForExportFromPreferences(Globals.prefs));
                 Globals.prefs.customExports.store(Globals.prefs);

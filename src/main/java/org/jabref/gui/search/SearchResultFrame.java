@@ -32,8 +32,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
+
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -42,6 +44,7 @@ import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.TransferableBibtexEntry;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.filelist.FileListEntry;
@@ -72,8 +75,8 @@ import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dialog to display search results, potentially from more than one BasePanel, with
@@ -89,12 +92,12 @@ public class SearchResultFrame {
     private static final int URL_COL = 2;
     private static final int PAD = 3;
 
-    private static final Log LOGGER = LogFactory.getLog(SearchResultFrame.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchResultFrame.class);
 
     private final JabRefFrame frame;
     private JFrame searchResultFrame;
-    private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
-    private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
+    private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcons.FILE.getSmallIcon());
+    private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcons.WWW.getSmallIcon());
 
     private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
@@ -125,7 +128,7 @@ public class SearchResultFrame {
         searchResultFrame.setTitle(title);
         searchResultFrame.setIconImages(IconTheme.getLogoSet());
 
-        preview = new PreviewPanel(null, null);
+        preview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences());
 
         sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, FieldName.AUTHOR));
         model = (DefaultEventTableModel<BibEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,
@@ -149,7 +152,9 @@ public class SearchResultFrame {
         entryTable.addMouseListener(new TableClickListener());
 
         contentPane.setTopComponent(sp);
-        contentPane.setBottomComponent(preview);
+
+        JFXPanel container = CustomJFXPanel.wrap(new Scene(preview));
+        contentPane.setBottomComponent(container);
 
         // Key bindings:
         AbstractAction closeAction = new AbstractAction() {
@@ -357,13 +362,13 @@ public class SearchResultFrame {
                     cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
                     break;
                 case DATABASE_COL: {
-                    int width = InternalBibtexFields.getFieldLength(FieldName.AUTHOR);
-                    cm.getColumn(i).setPreferredWidth(width);
+                    Double width = InternalBibtexFields.getFieldLength(FieldName.AUTHOR);
+                    cm.getColumn(i).setPreferredWidth(width.intValue());
                     break;
                 }
                 default: {
-                    int width = InternalBibtexFields.getFieldLength(FIELDS[i - PAD]);
-                    cm.getColumn(i).setPreferredWidth(width);
+                    Double width = InternalBibtexFields.getFieldLength(FIELDS[i - PAD]);
+                    cm.getColumn(i).setPreferredWidth(width.intValue());
                     break;
                 }
             }
@@ -401,7 +406,7 @@ public class SearchResultFrame {
         BasePanel basePanel = entryHome.get(entry);
         frame.showBasePanel(basePanel);
         basePanel.requestFocus();
-        basePanel.highlightEntry(entry);
+        basePanel.clearAndSelect(entry);
     }
 
     public void dispose() {
@@ -516,7 +521,7 @@ public class SearchResultFrame {
                         description = flEntry.getLink();
                     }
                     menu.add(new ExternalFileMenuItem(p.frame(), entry, description, flEntry.getLink(),
-                            flEntry.getType().get().getIcon(), p.getBibDatabaseContext(), flEntry.getType()));
+                            flEntry.getType().get().getIcon().getSmallIcon(), p.getBibDatabaseContext(), flEntry.getType()));
                     count++;
                 }
 
@@ -547,7 +552,6 @@ public class SearchResultFrame {
                 preview.setBasePanel(entryHome.get(entry));
                 preview.setDatabaseContext(entryHome.get(entry).getBibDatabaseContext());
                 contentPane.setDividerLocation(0.5f);
-                SwingUtilities.invokeLater(() -> preview.scrollRectToVisible(toRect));
             }
         }
     }
@@ -587,9 +591,9 @@ public class SearchResultFrame {
                         fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
                         if (tmpModel.getRowCount() > 0) {
                             if (tmpModel.getEntry(0).getType().isPresent()) {
-                                fileLabel.setIcon(tmpModel.getEntry(0).getType().get().getIcon());
+                                fileLabel.setIcon(tmpModel.getEntry(0).getType().get().getIcon().getSmallIcon());
                             } else {
-                                fileLabel.setIcon(IconTheme.JabRefIcon.FILE.getSmallIcon());
+                                fileLabel.setIcon(IconTheme.JabRefIcons.FILE.getSmallIcon());
                             }
                         }
                         return fileLabel;

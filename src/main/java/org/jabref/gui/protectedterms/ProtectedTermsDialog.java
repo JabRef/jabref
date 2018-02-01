@@ -18,32 +18,23 @@ import org.jabref.gui.util.WindowLocation;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Objects;
-import java.util.Optional;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class produces a dialog box for managing term list files.
  */
 public class ProtectedTermsDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(ProtectedTermsDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsDialog.class);
 
     private final JabRefFrame frame;
     private JDialog diag;
@@ -55,9 +46,9 @@ public class ProtectedTermsDialog {
     private final JMenuItem remove = new JMenuItem(Localization.lang("Remove"));
     private final JMenuItem reload = new JMenuItem(Localization.lang("Reload"));
     private final JMenuItem enabled = new JCheckBoxMenuItem(Localization.lang("Enabled"));
-    private final JButton loadButton = new JButton(IconTheme.JabRefIcon.OPEN.getIcon());
-    private final JButton removeButton = new JButton(IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
-    private final JButton newButton = new JButton(IconTheme.JabRefIcon.NEW.getIcon());
+    private final JButton loadButton = new JButton(IconTheme.JabRefIcons.OPEN.getIcon());
+    private final JButton removeButton = new JButton(IconTheme.JabRefIcons.DELETE_ENTRY.getIcon());
+    private final JButton newButton = new JButton(IconTheme.JabRefIcons.NEW.getIcon());
     private ActionListener removeAction;
 
     private final JButton ok = new JButton(Localization.lang("OK"));
@@ -407,8 +398,8 @@ public class ProtectedTermsDialog {
 
             JButton browse = new JButton(Localization.lang("Browse"));
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileExtensions.TERMS)
-                    .withDefaultExtension(FileExtensions.TERMS)
+                    .addExtensionFilter(FileType.TERMS)
+                    .withDefaultExtension(FileType.TERMS)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
             DialogService ds = new FXDialogService();
 

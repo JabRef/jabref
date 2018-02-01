@@ -1,19 +1,20 @@
 package org.jabref;
 
-import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
-import com.jgoodies.looks.plastic.theme.SkyBluer;
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef;
-import com.sun.jna.platform.win32.WinUser;
-import javafx.application.Platform;
-import javafx.scene.Scene;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.awt.Frame;
+import java.io.File;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.swing.JOptionPane;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.plaf.FontUIResource;
+
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
@@ -26,25 +27,21 @@ import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
+import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.shared.exception.DatabaseNotSupportedException;
-import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.shared.exception.NotASharedDatabaseException;
 
-import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import java.io.File;
-import java.sql.SQLException;
-import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.sun.jna.platform.win32.WinUser.GWL_STYLE;
 
 public class JabRefGUI {
-    private static final Log LOGGER = LogFactory.getLog(JabRefGUI.class);
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
     private static JabRefFrame mainFrame;
 
     private final List<ParserResult> bibDatabases;
@@ -52,7 +49,7 @@ public class JabRefGUI {
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
 
-    private String focusedFile;
+    private final String focusedFile;
 
     public JabRefGUI(Stage mainStage, List<ParserResult> argsDatabases, boolean isBlank) {
         this.bibDatabases = argsDatabases;
@@ -247,7 +244,7 @@ public class JabRefGUI {
             }
 
             ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,
-                    Globals.prefs.getImportFormatPreferences());
+                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
 
             if (parsedDatabase.isEmpty()) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
@@ -290,10 +287,7 @@ public class JabRefGUI {
             if (UIManager.getCrossPlatformLookAndFeelClassName().equals(lookFeel)
                     && !System.getProperty("java.runtime.name").contains("OpenJDK")) {
                 // try to avoid ending up with the ugly Metal L&F
-                Plastic3DLookAndFeel lnf = new Plastic3DLookAndFeel();
-                MetalLookAndFeel.setCurrentTheme(new SkyBluer());
-                com.jgoodies.looks.Options.setPopupDropShadowEnabled(true);
-                UIManager.setLookAndFeel(lnf);
+                UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
             } else {
                 try {
                     UIManager.setLookAndFeel(lookFeel);

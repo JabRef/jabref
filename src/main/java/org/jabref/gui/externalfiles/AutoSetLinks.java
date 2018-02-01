@@ -3,6 +3,8 @@ package org.jabref.gui.externalfiles;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +30,12 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class AutoSetLinks {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutoSetLinks.class);
 
     private AutoSetLinks() {
     }
@@ -82,11 +89,16 @@ public class AutoSetLinks {
 
         Runnable r = () -> {
             boolean foundAny = false;
-            AutoSetFileLinksUtil util = new AutoSetFileLinksUtil();
+            AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
 
             for (BibEntry entry : entries) {
 
-                List<LinkedFile> linkedFiles = util.findassociatedNotLinkedFiles(entry, databaseContext, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
+                List<LinkedFile> linkedFiles = new ArrayList<>();
+                try {
+                    linkedFiles = util.findAssociatedNotLinkedFiles(entry);
+                } catch (IOException e) {
+                    LOGGER.error("Problem finding files", e);
+                }
 
                 if (ce != null) {
                     for (LinkedFile linkedFile : linkedFiles) {

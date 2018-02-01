@@ -11,12 +11,10 @@ import javax.swing.JPopupMenu;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.actions.Actions;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
-
-import com.jgoodies.looks.HeaderStyle;
-import com.jgoodies.looks.Options;
 
 public class SpecialFieldDropDown {
 
@@ -25,7 +23,7 @@ public class SpecialFieldDropDown {
 
     public static JButton generateSpecialFieldButtonWithDropDown(SpecialField field, JabRefFrame frame) {
         Dimension buttonDim = new Dimension(23, 23);
-        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field);
+        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field, frame.getUndoManager());
         JButton button = new JButton(viewModel.getRepresentingIcon());
         button.setToolTipText(viewModel.getLocalization());
         button.setPreferredSize(buttonDim);
@@ -40,7 +38,6 @@ public class SpecialFieldDropDown {
         button.setSize(buttonDim);
         button.setMinimumSize(buttonDim);
         button.setMaximumSize(buttonDim);
-        button.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         button.addActionListener(new MenuButtonActionListener(field, frame, button, buttonDim));
         return button;
     }
@@ -70,7 +67,7 @@ public class SpecialFieldDropDown {
                     JMenuItem item = new JMenuItem(viewModel.getSpecialFieldValueIcon());
                     item.setText(viewModel.getMenuString());
                     item.setToolTipText(viewModel.getToolTipText());
-                    item.addActionListener(new PopupitemActionListener(frame.getCurrentBasePanel(), new SpecialFieldValueViewModel(val).getActionName()));
+                    item.addActionListener(new PopupitemActionListener(frame.getCurrentBasePanel(), new SpecialFieldValueViewModel(val).getCommand()));
                     item.setMargin(new Insets(0, 0, 0, 0));
                     popup.add(item);
                 }
@@ -81,10 +78,9 @@ public class SpecialFieldDropDown {
         private class PopupitemActionListener implements ActionListener {
 
             private final BasePanel panel;
-            private final String actionName;
+            private final Actions actionName;
 
-
-            public PopupitemActionListener(BasePanel panel, String actionName) {
+            public PopupitemActionListener(BasePanel panel, Actions actionName) {
                 this.panel = panel;
                 this.actionName = actionName;
             }

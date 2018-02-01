@@ -53,9 +53,9 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
     }
 
     private void setButtonStyles() {
-        addJournalFileButton.setGraphic(IconTheme.JabRefIcon.OPEN.getGraphicNode());
-        addNewJournalFileButton.setGraphic(IconTheme.JabRefIcon.NEW.getGraphicNode());
-        removeJournalAbbreviationsButton.setGraphic(IconTheme.JabRefIcon.CLOSE.getGraphicNode());
+        addJournalFileButton.setGraphic(IconTheme.JabRefIcons.OPEN.getGraphicNode());
+        addNewJournalFileButton.setGraphic(IconTheme.JabRefIcons.NEW.getGraphicNode());
+        removeJournalAbbreviationsButton.setGraphic(IconTheme.JabRefIcons.CLOSE.getGraphicNode());
     }
 
     private void setUpTable() {
@@ -73,10 +73,10 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
         journalTableEditColumn.setCellFactory(new ValueTableCellFactory<AbbreviationViewModel, Boolean>().
                 withGraphic(isPseudoAbbreviation -> {
                     if (isPseudoAbbreviation) {
-                        return IconTheme.JabRefIcon.ADD.getGraphicNode();
+                        return IconTheme.JabRefIcons.ADD.getGraphicNode();
                     } else {
                         return viewModel.isAbbreviationEditableAndRemovable() ?
-                                IconTheme.JabRefIcon.EDIT.getGraphicNode() : null;
+                                IconTheme.JabRefIcons.EDIT.getGraphicNode() : null;
                     }
                 }).
                 withOnMouseClickedEvent(isPseudoAbbreviation -> {
@@ -93,7 +93,7 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
         journalTableDeleteColumn.setCellFactory(new ValueTableCellFactory<AbbreviationViewModel, Boolean>().
                 withGraphic(isPseudoAbbreviation -> {
                     if (!isPseudoAbbreviation && viewModel.isAbbreviationEditableAndRemovable()) {
-                        return IconTheme.JabRefIcon.DELETE_ENTRY.getGraphicNode();
+                        return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
                     } else {
                         return null;
                     }

@@ -20,17 +20,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.metadata.MetaData;
 
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ChangeScanner implements Runnable {
-    private static final Log LOGGER = LogFactory.getLog(ChangeScanner.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChangeScanner.class);
 
     private final File file;
     private final Path tempFile;
@@ -114,11 +108,11 @@ public class ChangeScanner implements Runnable {
 
             // Parse the temporary file.
             ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
-            ParserResult result = OpenDatabase.loadDatabase(tempFile.toFile(), importFormatPreferences);
+            ParserResult result = OpenDatabase.loadDatabase(tempFile.toFile(), importFormatPreferences, Globals.getFileUpdateMonitor());
             databaseInTemp = result.getDatabaseContext();
 
             // Parse the modified file.
-            result = OpenDatabase.loadDatabase(file, importFormatPreferences);
+            result = OpenDatabase.loadDatabase(file, importFormatPreferences, Globals.getFileUpdateMonitor());
             BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
 
             // Start looking at changes.

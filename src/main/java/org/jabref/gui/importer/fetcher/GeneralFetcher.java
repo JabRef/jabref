@@ -36,7 +36,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
 
     public GeneralFetcher(JabRefFrame frame, SidePaneManager sidePaneManager) {
-        super(sidePaneManager, IconTheme.JabRefIcon.WWW.getSmallIcon(), Localization.lang("Web search"));
+        super(sidePaneManager, IconTheme.JabRefIcons.WWW.getSmallIcon(), Localization.lang("Web search"));
         this.frame = frame;
         List<EntryFetcher> fetchers = new EntryFetchers(Globals.journalAbbreviationLoader).getEntryFetchers();
         EntryFetcher[] fetcherArray = fetchers.toArray(new EntryFetcher[fetchers.size()]);
@@ -80,7 +80,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         action = new ToggleAction(Localization.lang("Web search"),
                 Localization.lang("Toggle web search interface"),
                 Globals.getKeyPrefs().getKey(KeyBinding.WEB_SEARCH),
-                IconTheme.JabRefIcon.WWW);
+                IconTheme.JabRefIcons.WWW);
 
         helpBut.setMargin(new Insets(0, 0, 0, 0));
         tf.setPreferredSize(new Dimension(1, tf.getPreferredSize().height));

@@ -4,9 +4,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import org.jabref.gui.*;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.BasePanelPreferences;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.gui.autosaveandbackup.BackupUIManager;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
@@ -16,31 +22,24 @@ import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.exception.NotASharedDatabaseException;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.migrations.FileLinksUpgradeWarning;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.shared.exception.DatabaseNotSupportedException;
-import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.shared.exception.NotASharedDatabaseException;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.FileTime;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // The action concerned with opening an existing database.
 
 public class OpenDatabaseAction extends MnemonicAwareAction {
 
-    public static final Log LOGGER = LogFactory.getLog(OpenDatabaseAction.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
     private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = new ArrayList<>();
@@ -58,7 +57,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     private final JabRefFrame frame;
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
-        super(IconTheme.JabRefIcon.OPEN.getIcon());
+        super(IconTheme.JabRefIcons.OPEN.getIcon());
         this.frame = frame;
         this.showDialog = showDialog;
         putValue(Action.NAME, Localization.menuTitle("Open library"));
@@ -76,7 +75,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result)) {
                 action.performAction(panel, result);
-                panel.frame().getTabbedPane().setSelectedComponent(panel);
+                panel.frame().showBasePanel(panel);
             }
         }
     }
@@ -89,8 +88,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
             DialogService ds = new FXDialogService();
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileExtensions.BIBTEX_DB)
-                    .withDefaultExtension(FileExtensions.BIBTEX_DB)
+                    .addExtensionFilter(FileType.BIBTEX_DB)
+                    .withDefaultExtension(FileType.BIBTEX_DB)
                     .withInitialDirectory(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)))
                     .build();
 
@@ -135,7 +134,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // Check if any of the files are already open:
         for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext();) {
             Path file = iterator.next();
-            for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
+            for (int i = 0; i < frame.getTabbedPane().getTabs().size(); i++) {
                 BasePanel basePanel = frame.getBasePanelAt(i);
                 if ((basePanel.getBibDatabaseContext().getDatabasePath().isPresent())
                         && basePanel.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
@@ -170,7 +169,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         else if (toRaise != null) {
             frame.output(Localization.lang("File '%0' is already open.",
                     toRaise.getBibDatabaseContext().getDatabaseFile().get().getPath()));
-            frame.getTabbedPane().setSelectedComponent(toRaise);
+            frame.showBasePanel(toRaise);
         }
 
         frame.output(Localization.lang("Files opened") + ": " + (filesToOpen.size()));
@@ -220,7 +219,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
             ParserResult result;
             result = OpenDatabase.loadDatabase(fileToLoad.toString(),
-                    Globals.prefs.getImportFormatPreferences());
+                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
 
             if (result.getDatabase().isShared()) {
                 try {
@@ -257,11 +256,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     .execute(() -> ParserResultWarningDialog.showParserResultWarningDialog(result, frame));
         }
 
-        BasePanel basePanel = new BasePanel(frame, result.getDatabaseContext());
-
-        // file is set to null inside the EventDispatcherThread
-        SwingUtilities.invokeLater(() -> frame.addTab(basePanel, raisePanel));
-
         if (Objects.nonNull(file)) {
             frame.output(Localization.lang("Opened library") + " '" + file.toString() + "' "
                     + Localization.lang("with")
@@ -269,7 +263,12 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     + database.getEntryCount() + " " + Localization.lang("entries") + ".");
         }
 
-        return basePanel;
+        return DefaultTaskExecutor.runInJavaFXThread(() -> {
+                    BasePanel basePanel = new BasePanel(frame, BasePanelPreferences.from(Globals.prefs), result.getDatabaseContext(), ExternalFileTypes.getInstance());
+                    frame.addTab(basePanel, raisePanel);
+                    return basePanel;
+                }
+        );
     }
 
 }

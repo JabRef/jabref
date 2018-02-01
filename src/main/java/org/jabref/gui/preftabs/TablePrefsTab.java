@@ -13,7 +13,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
@@ -208,8 +207,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        autoResizeMode
-        .setSelected(prefs.getInt(JabRefPreferences.AUTO_RESIZE_MODE) == JTable.AUTO_RESIZE_ALL_COLUMNS);
+        autoResizeMode.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_RESIZE_MODE));
 
         priField.setText(prefs.get(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD));
         secField.setText(prefs.get(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD));
@@ -267,8 +265,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.NAMES_LAST_ONLY, lastNamesOnly.isSelected());
         prefs.putBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES, abbrNames.isSelected());
 
-        prefs.putInt(JabRefPreferences.AUTO_RESIZE_MODE,
-                autoResizeMode.isSelected() ? JTable.AUTO_RESIZE_ALL_COLUMNS : JTable.AUTO_RESIZE_OFF);
+        prefs.putBoolean(JabRefPreferences.AUTO_RESIZE_MODE, autoResizeMode.isSelected());
         prefs.putBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING, priDesc.isSelected());
         prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, secDesc.isSelected());
         prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, terDesc.isSelected());

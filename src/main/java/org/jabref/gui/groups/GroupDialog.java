@@ -1,9 +1,34 @@
 package org.jabref.gui.groups;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemListener;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.event.CaretListener;
+
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -17,11 +42,22 @@ import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.TooltipTextUtil;
+import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Keyword;
-import org.jabref.model.groups.*;
+import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AutomaticKeywordGroup;
+import org.jabref.model.groups.AutomaticPersonsGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.RegexKeywordGroup;
+import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.TexGroup;
+import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -44,6 +80,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
     private static final int INDEX_KEYWORD_GROUP = 1;
     private static final int INDEX_SEARCH_GROUP = 2;
     private static final int INDEX_AUTO_GROUP = 3;
+    private static final int INDEX_TEX_GROUP = 4;
     private static final int TEXTFIELD_LENGTH = 30;
     // for all types
     private final JTextField nameField = new JTextField(GroupDialog.TEXTFIELD_LENGTH);
@@ -55,6 +92,8 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
             Localization.lang("Dynamically group entries by a free-form search expression"));
     private final JRadioButton autoRadioButton = new JRadioButton(
             Localization.lang("Automatically create groups"));
+    private final JRadioButton texRadioButton = new JRadioButton(
+            Localization.lang("Group containing entries cited in a given TeX file"));
     private final JRadioButton independentButton = new JRadioButton(
             Localization.lang("Independent group: When selected, view only this group's entries"));
     private final JRadioButton intersectionButton = new JRadioButton(
@@ -83,6 +122,8 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
     private final JRadioButton autoGroupPersonsOption = new JRadioButton(
             Localization.lang("Generate groups for author last names"));
     private final JTextField autoGroupPersonsField = new JTextField(60);
+    // for TexGroup
+    private final JTextField texGroupFilePath = new JTextField(60);
 
     // for all types
     private final JButton okButton = new JButton(Localization.lang("OK"));
@@ -121,6 +162,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
         groupType.add(keywordsRadioButton);
         groupType.add(searchRadioButton);
         groupType.add(autoRadioButton);
+        groupType.add(texRadioButton);
         ButtonGroup groupHierarchy = new ButtonGroup();
         groupHierarchy.add(independentButton);
         groupHierarchy.add(intersectionButton);
@@ -183,6 +225,13 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
         autoGroupKeywordsHierarchicalDeliminator.setText(Keyword.DEFAULT_HIERARCHICAL_DELIMITER.toString());
         autoGroupPersonsField.setText(FieldName.AUTHOR);
 
+        // ... for tex group
+        FormLayout layoutTG = new FormLayout("right:pref, 4dlu, fill:1dlu:grow");
+        DefaultFormBuilder builderTG = new DefaultFormBuilder(layoutTG);
+        builderTG.append(Localization.lang("Aux file"));
+        builderTG.append(texGroupFilePath);
+        optionsPanel.add(builderTG.getPanel(), String.valueOf(GroupDialog.INDEX_TEX_GROUP));
+
         // ... for buttons panel
         FormLayout layoutBP = new FormLayout("pref, 4dlu, pref", "p");
         layoutBP.setColumnGroups(new int[][] {{1, 3}});
@@ -197,7 +246,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
         // create layout
         FormLayout layoutAll = new FormLayout(
                 "right:pref, 4dlu, fill:600px, 4dlu, fill:pref",
-                "p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 0dlu, p, 0dlu, p, 0dlu, p, 3dlu, p, 3dlu, p, "
+                "p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 0dlu, p, 0dlu, p, 0dlu, p, 0dlu, p, 3dlu, p, 3dlu, p, "
                         + "0dlu, p, 0dlu, p, 3dlu, p, 3dlu, "
                         + "p, 3dlu, p, 3dlu, top:80dlu, 9dlu, p, 9dlu, p");
 
@@ -231,6 +280,9 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
         builderAll.nextLine();
         builderAll.nextLine();
         builderAll.append(autoRadioButton, 5);
+        builderAll.nextLine();
+        builderAll.nextLine();
+        builderAll.append(texRadioButton, 5);
         builderAll.nextLine();
         builderAll.nextLine();
         builderAll.appendSeparator(Localization.lang("Hierarchical context"));
@@ -287,6 +339,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
         keywordsRadioButton.addItemListener(radioButtonItemListener);
         searchRadioButton.addItemListener(radioButtonItemListener);
         autoRadioButton.addItemListener(radioButtonItemListener);
+        texRadioButton.addItemListener(radioButtonItemListener);
 
         Action cancelAction = new AbstractAction() {
 
@@ -366,6 +419,9 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
                         resultingGroup = new AutomaticPersonsGroup(groupName, getContext(),
                                 autoGroupPersonsField.getText().trim());
                     }
+                } else if (texRadioButton.isSelected()) {
+                    resultingGroup = new TexGroup(groupName, getContext(),
+                            Paths.get(texGroupFilePath.getText().trim()), new DefaultAuxParser(new BibDatabase()), Globals.getFileUpdateMonitor());
                 }
                 try {
                     resultingGroup.setColor(Color.valueOf(colorField.getText()));
@@ -376,7 +432,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
                 resultingGroup.setIconName(iconField.getText());
 
                 dispose();
-            } catch (IllegalArgumentException exception) {
+            } catch (IllegalArgumentException | IOException exception) {
                 jabrefFrame.showMessage(exception.getLocalizedMessage());
             }
         });
@@ -446,6 +502,12 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
                     AutomaticPersonsGroup group = (AutomaticPersonsGroup) editedGroup;
                     autoGroupPersonsField.setText(group.getField());
                 }
+            } else if (editedGroup.getClass() == TexGroup.class) {
+                texRadioButton.setSelected(true);
+                setContext(editedGroup.getHierarchicalContext());
+
+                TexGroup group = (TexGroup) editedGroup;
+                texGroupFilePath.setText(group.getFilePath().toString());
             }
         }
     }
@@ -501,6 +563,8 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
             optionsLayout.show(optionsPanel, String.valueOf(GroupDialog.INDEX_SEARCH_GROUP));
         } else if (autoRadioButton.isSelected()) {
             optionsLayout.show(optionsPanel, String.valueOf(GroupDialog.INDEX_AUTO_GROUP));
+        } else if (texRadioButton.isSelected()) {
+            optionsLayout.show(optionsPanel, String.valueOf(GroupDialog.INDEX_TEX_GROUP));
         }
     }
 

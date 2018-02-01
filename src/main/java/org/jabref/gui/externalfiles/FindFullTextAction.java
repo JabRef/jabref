@@ -13,23 +13,15 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import javax.swing.*;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
  */
 public class FindFullTextAction extends AbstractWorker {
 
-    private static final Log LOGGER = LogFactory.getLog(FindFullTextAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FindFullTextAction.class);
 
     private static final int WARNING_LIMIT = 5; // The minimum number of selected entries to ask the user for confirmation
 

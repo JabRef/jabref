@@ -1,5 +1,11 @@
 package org.jabref;
 
+import java.net.Authenticator;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
@@ -7,13 +13,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.remote.JabRefMessageHandler;
-import org.jabref.logic.exporter.ExportFormat;
-import org.jabref.logic.exporter.ExportFormats;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -29,16 +32,15 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
-import javax.swing.*;
-import java.net.Authenticator;
-import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JabRef MainClass
  */
 public class JabRefMain extends Application {
 
-    private static final Log LOGGER = LogFactory.getLog(JabRefMain.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefMain.class);
     private static String[] arguments;
 
     public static void main(String[] args) {
@@ -73,6 +75,10 @@ public class JabRefMain extends Application {
                             buildInfo.getMinRequiredJavaVersion()
                     )
             );
+
+            versionError.append("\n");
+            versionError.append(Localization.lang("Your Java Runtime Environment is located at %0.", checker.getJavaInstallationDirectory()));
+
             if (!buildInfo.isAllowJava9()) {
                 versionError.append("\n");
                 versionError.append(Localization.lang("Note that currently, JabRef does not run with Java 9."));
@@ -119,6 +125,7 @@ public class JabRefMain extends Application {
         PreferencesMigrations.upgradeStoredCustomEntryTypes();
         PreferencesMigrations.upgradeKeyBindingsToJavaFX();
         PreferencesMigrations.addCrossRefRelatedFieldsForAutoComplete();
+        PreferencesMigrations.upgradeObsoleteLookAndFeels();
 
         // Update handling of special fields based on preferences
         InternalBibtexFields
@@ -133,15 +140,10 @@ public class JabRefMain extends Application {
 
         /* Build list of Import and Export formats */
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
-                Globals.prefs.getXMPPreferences());
+                Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
         EntryTypes.loadCustomEntryTypes(preferences.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
-        Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
-                Globals.journalAbbreviationLoader);
-        LayoutFormatterPreferences layoutPreferences = Globals.prefs
-                .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
-        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
-        ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
+        Globals.exportFactory = ExporterFactory.create(Globals.prefs, Globals.journalAbbreviationLoader);
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());

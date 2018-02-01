@@ -2,10 +2,10 @@ package org.jabref.gui.externalfiletype;
 
 import java.util.Objects;
 
-import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefIcon;
 
 /**
  * This class defines a type of external files that can be linked to from JabRef.
@@ -19,11 +19,11 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     private String openWith;
     private String iconName;
     private String mimeType;
-    private Icon icon;
+    private JabRefIcon icon;
     private final JLabel label = new JLabel();
 
     public ExternalFileType(String name, String extension, String mimeType,
-                            String openWith, String iconName, Icon icon) {
+                            String openWith, String iconName, JabRefIcon icon) {
         label.setText(null);
         this.name = name;
         label.setToolTipText(this.name);
@@ -52,7 +52,6 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         String openWith;
         String mimeType;
         String iconName;
-        Icon icon;
 
         if (val.length == 4) {
             // Up to version 2.4b the mime type is not included:
@@ -67,7 +66,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         }
 
         // set icon to default first
-        icon = IconTheme.JabRefIcon.FILE.getSmallIcon();
+        JabRefIcon icon = IconTheme.JabRefIcons.FILE;
 
         // check whether there is another icon defined for this file type
         for (ExternalFileType fileType : ExternalFileTypes.getDefaultExternalFileTypes()) {
@@ -171,13 +170,13 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         return iconName;
     }
 
-    public Icon getIcon() {
+    public JabRefIcon getIcon() {
         return icon;
     }
 
-    public void setIcon(Icon icon) {
+    public void setIcon(JabRefIcon icon) {
         this.icon = icon;
-        label.setIcon(this.icon);
+        label.setIcon(this.icon.getSmallIcon());
     }
 
     @Override

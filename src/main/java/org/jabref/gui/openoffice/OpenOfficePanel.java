@@ -1,43 +1,7 @@
 package org.jabref.gui.openoffice;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import com.sun.star.beans.*;
-import com.sun.star.comp.helper.BootstrapException;
-import com.sun.star.container.NoSuchElementException;
-import com.sun.star.lang.WrappedTargetException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.jabref.Globals;
-import org.jabref.gui.*;
-import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableKeyChange;
-import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.worker.AbstractWorker;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
-import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.openoffice.OOBibStyle;
-import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.StyleLoader;
-import org.jabref.logic.openoffice.UndefinedParagraphFormatException;
-import org.jabref.logic.util.OS;
-import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.Defaults;
-import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -52,13 +16,68 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JTextField;
+
+import org.jabref.Globals;
+import org.jabref.gui.*;
+import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.UndoableKeyChange;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.worker.AbstractWorker;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.openoffice.OOBibStyle;
+import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.StyleLoader;
+import org.jabref.logic.openoffice.UndefinedParagraphFormatException;
+import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.Defaults;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import com.sun.star.beans.IllegalTypeException;
+import com.sun.star.beans.NotRemoveableException;
+import com.sun.star.beans.PropertyExistException;
+import com.sun.star.beans.PropertyVetoException;
+import com.sun.star.beans.UnknownPropertyException;
+import com.sun.star.comp.helper.BootstrapException;
+import com.sun.star.container.NoSuchElementException;
+import com.sun.star.lang.WrappedTargetException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This test panel can be opened by reflection from JabRef, passing the JabRefFrame as an
  * argument to the start() method. It displays buttons for testing interaction functions
  * between JabRef and OpenOffice.
  */
 public class OpenOfficePanel extends AbstractWorker {
-    private static final Log LOGGER = LogFactory.getLog(OpenOfficePanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficePanel.class);
 
     private OpenOfficeSidePanel sidePane;
     private JDialog diag;
@@ -87,7 +106,7 @@ public class OpenOfficePanel extends AbstractWorker {
     private final StyleLoader loader;
 
     public OpenOfficePanel(JabRefFrame jabRefFrame, SidePaneManager spManager) {
-        Icon connectImage = IconTheme.JabRefIcon.CONNECT_OPEN_OFFICE.getSmallIcon();
+        Icon connectImage = IconTheme.JabRefIcons.CONNECT_OPEN_OFFICE.getSmallIcon();
 
         connect = new JButton(connectImage);
         manualConnect = new JButton(connectImage);
@@ -96,10 +115,10 @@ public class OpenOfficePanel extends AbstractWorker {
         connect.setPreferredSize(new Dimension(24, 24));
         manualConnect.setPreferredSize(new Dimension(24, 24));
 
-        selectDocument = new JButton(IconTheme.JabRefIcon.OPEN.getSmallIcon());
+        selectDocument = new JButton(IconTheme.JabRefIcons.OPEN.getSmallIcon());
         selectDocument.setToolTipText(Localization.lang("Select Writer document"));
         selectDocument.setPreferredSize(new Dimension(24, 24));
-        update = new JButton(IconTheme.JabRefIcon.REFRESH.getSmallIcon());
+        update = new JButton(IconTheme.JabRefIcons.REFRESH.getSmallIcon());
         update.setToolTipText(Localization.lang("Sync OpenOffice/LibreOffice bibliography"));
         update.setPreferredSize(new Dimension(24, 24));
         preferences = new OpenOfficePreferences(Globals.prefs);
@@ -277,9 +296,11 @@ public class OpenOfficePanel extends AbstractWorker {
         content.setLayout(new BorderLayout());
         content.add(mainBuilder.getPanel(), BorderLayout.CENTER);
 
+        /*
         frame.getTabbedPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(Globals.getKeyPrefs().getKey(KeyBinding.REFRESH_OO), "Refresh OO");
         frame.getTabbedPane().getActionMap().put("Refresh OO", updateAction);
+        */
 
     }
 
@@ -632,14 +653,9 @@ public class OpenOfficePanel extends AbstractWorker {
             for (BibEntry entry : entries) {
                 if (!entry.getCiteKeyOptional().isPresent()) {
                     // Generate key
-                    BibtexKeyPatternUtil
-                            .makeAndSetLabel(
-                                    panel.getBibDatabaseContext().getMetaData().getCiteKeyPattern(prefs.getKeyPattern()),
-                                    panel.getDatabase(), entry,
-                            prefs);
-                    // Add undo change
-                    undoCompound.addEdit(
-                            new UndoableKeyChange(entry, null, entry.getCiteKeyOptional().get()));
+                    new BibtexKeyGenerator(panel.getBibDatabaseContext(), prefs)
+                            .generateAndSetKey(entry)
+                            .ifPresent(change -> undoCompound.addEdit(new UndoableKeyChange(change)));
                 }
             }
             undoCompound.end();

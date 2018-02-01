@@ -23,6 +23,35 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
+
+import org.jabref.Globals;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefDialog;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.JabRefIcon;
+import org.jabref.gui.actions.MnemonicAwareAction;
+import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.logic.l10n.Localization;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonStackBuilder;
+
 /**
  * Editor for external file types.
  */
@@ -36,9 +65,9 @@ public class ExternalFileTypeEditor extends JabRefDialog {
     private FileTypeTableModel tableModel;
     private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
-    private final JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
-    private final JButton remove = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
-    private final JButton edit = new JButton(IconTheme.JabRefIcon.EDIT.getIcon());
+    private final JButton add = new JButton(IconTheme.JabRefIcons.ADD_NOBOX.getIcon());
+    private final JButton remove = new JButton(IconTheme.JabRefIcons.REMOVE_NOBOX.getIcon());
+    private final JButton edit = new JButton(IconTheme.JabRefIcons.EDIT.getIcon());
     private final JButton toDefaults = new JButton(Localization.lang("Default"));
     private final EditListener editListener = new EditListener();
 
@@ -108,7 +137,7 @@ public class ExternalFileTypeEditor extends JabRefDialog {
         add.addActionListener(e -> {
             // Generate a new file type:
             ExternalFileType type = new ExternalFileType("", "", "", "", "new",
-                    IconTheme.JabRefIcon.FILE.getSmallIcon());
+                    IconTheme.JabRefIcons.FILE);
             // Show the file type editor:
             getEditor(type).setVisible(true);
             if (entryEditor.okPressed()) {
@@ -241,7 +270,7 @@ public class ExternalFileTypeEditor extends JabRefDialog {
         public Component getTableCellRendererComponent(JTable tab, Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             lab.setText(null);
-            lab.setIcon((Icon) value);
+            lab.setIcon(((JabRefIcon) value).getIcon());
             return lab;
         }
     }
@@ -355,9 +384,6 @@ public class ExternalFileTypeEditor extends JabRefDialog {
             }
             editor.setValues();
             editor.setVisible(true);
-            if ((frame != null) && (frame.getCurrentBasePanel() != null)) {
-                frame.getCurrentBasePanel().getMainTable().repaint();
-            }
         }
     }
 

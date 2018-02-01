@@ -4,8 +4,8 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.shared.DBMSSynchronizer;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -16,15 +16,15 @@ import java.awt.event.WindowEvent;
 public class MergeSharedEntryDialog {
 
     private final JabRefFrame jabRefFrame;
-    private final DBMSSynchronizer dbmsSynchronizer;
+    private final DatabaseSynchronizer dbmsSynchronizer;
     private final BibEntry localBibEntry;
     private final BibEntry sharedBibEntry;
     private final JDialog mergeDialog;
     private final MergeEntries mergeEntries;
 
 
-    public MergeSharedEntryDialog(JabRefFrame jabRefFrame, DBMSSynchronizer dbmsSynchronizer, BibEntry localBibEntry,
-            BibEntry sharedBibEntry, BibDatabaseMode bibDatabaseMode) {
+    public MergeSharedEntryDialog(JabRefFrame jabRefFrame, DatabaseSynchronizer dbmsSynchronizer, BibEntry localBibEntry,
+                                  BibEntry sharedBibEntry, BibDatabaseMode bibDatabaseMode) {
         this.jabRefFrame = jabRefFrame;
         this.dbmsSynchronizer = dbmsSynchronizer;
         this.localBibEntry = localBibEntry;

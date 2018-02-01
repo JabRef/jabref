@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public class PushToApplicationButton implements ActionListener {
 
-    private static final Icon ARROW_ICON = IconTheme.JabRefIcon.DOWN.getSmallIcon();
+    private static final Icon ARROW_ICON = IconTheme.JabRefIcons.DOWN.getSmallIcon();
     private final JabRefFrame frame;
     private final List<PushToApplication> pushActions;
     private JPanel comp;

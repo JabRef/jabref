@@ -7,7 +7,7 @@ import org.jabref.Globals;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.bibtex.DuplicateCheck;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -17,16 +17,9 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.*;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dialog that prompts the user to choose a type for an entry.
@@ -34,7 +27,7 @@ import java.util.concurrent.ExecutionException;
  */
 public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
-    private static final Log LOGGER = LogFactory.getLog(EntryTypeDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntryTypeDialog.class);
     private static final int COLUMN = 3;
     private final JabRefFrame frame;
     private final CancelAction cancelAction = new CancelAction();
@@ -289,7 +282,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                     final BibEntry bibEntry = result.get();
                     if ((DuplicateCheck.containsDuplicate(frame.getCurrentBasePanel().getDatabase(), bibEntry, frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).isPresent())) {
                 		//If there are duplicates starts ImportInspectionDialog
-                        final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
+                        final BasePanel panel = frame.getCurrentBasePanel();
 
                         ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"), false);
                         diag.addEntry(bibEntry);
@@ -298,7 +291,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                         diag.toFront();
                     } else {
                 		// Regenerate CiteKey of imported BibEntry
-                        BibtexKeyPatternUtil.makeAndSetLabel(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern(), frame.getCurrentBasePanel().getDatabase(), bibEntry, Globals.prefs.getBibtexKeyPatternPreferences());
+                        new BibtexKeyGenerator(frame.getCurrentBasePanel().getBibDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(bibEntry);
                         // Update Timestamps
                         if (Globals.prefs.getTimestampPreferences().includeCreatedTimestamp()) {
                             bibEntry.setField(Globals.prefs.getTimestampPreferences().getTimestampField(), Globals.prefs.getTimestampPreferences().now());

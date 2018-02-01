@@ -9,11 +9,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileHelper;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The menu item used in the popup menu for opening external resources associated
@@ -21,7 +18,7 @@ import java.util.Optional;
  * to process the request if the user clicks this menu item.
  */
 public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
-    private static final Log LOGGER = LogFactory.getLog(ExternalFileMenuItem.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalFileMenuItem.class);
 
     private final BibEntry entry;
     private final String link;

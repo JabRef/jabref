@@ -52,7 +52,7 @@ public class ErrorConsoleController extends AbstractController<ErrorConsoleViewM
                 messagesListView.scrollTo(size - 1);
             }
         }));
-        descriptionLabel.setGraphic(IconTheme.JabRefIcon.CONSOLE.getGraphicNode());
+        descriptionLabel.setGraphic(IconTheme.JabRefIcons.CONSOLE.getGraphicNode());
     }
 
     private Callback<ListView<LogEventViewModel>, ListCell<LogEventViewModel>> createCellFactory() {

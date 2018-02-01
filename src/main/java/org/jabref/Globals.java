@@ -7,14 +7,16 @@ import java.util.UUID;
 import org.jabref.gui.GlobalFocusListener;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.util.FileUpdateMonitor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.StandardSystemProperty;
@@ -48,11 +50,12 @@ public class Globals {
      * Manager for the state of the GUI.
      */
     public static StateManager stateManager = new StateManager();
+    public static ExporterFactory exportFactory;
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
     // Background tasks
     private static GlobalFocusListener focusListener;
-    private static FileUpdateMonitor fileUpdateMonitor;
+    private static DefaultFileUpdateMonitor fileUpdateMonitor;
     private static TelemetryClient telemetryClient;
 
     private Globals() {
@@ -71,7 +74,7 @@ public class Globals {
     public static void startBackgroundTasks() {
         Globals.focusListener = new GlobalFocusListener();
 
-        Globals.fileUpdateMonitor = new FileUpdateMonitor();
+        Globals.fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
 
         if (Globals.prefs.shouldCollectTelemetry()) {

@@ -17,15 +17,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Reads abbreviation files (property files using NAME = ABBREVIATION as a format) into a list of Abbreviations.
  */
 public class AbbreviationParser {
 
-    private static final Log LOGGER = LogFactory.getLog(AbbreviationParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbbreviationParser.class);
 
     private final Set<Abbreviation> abbreviations = new HashSet<>(5000);
 

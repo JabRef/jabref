@@ -4,12 +4,16 @@ import java.awt.event.InputMethodEvent;
 import java.lang.reflect.Field;
 
 import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
 
+import org.jabref.gui.AbstractView;
 import org.jabref.gui.customjfx.support.InputMethodSupport;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.logic.util.OS;
 
 import com.sun.javafx.embed.EmbeddedSceneInterface;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /***
  * WARNING: THIS IS A CUSTOM HACK TO PREVENT A BUG WITH ACCENTED CHARACTERS PRODUCING AN NPE IN LINUX </br>
@@ -18,10 +22,10 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CustomJFXPanel extends JFXPanel {
 
-    private static final Log LOGGER = LogFactory.getLog(CustomJFXPanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomJFXPanel.class);
     private Field scenePeerField = null;
 
-    public CustomJFXPanel() {
+    private CustomJFXPanel() {
         super();
         try {
             scenePeerField = this.getClass().getSuperclass().getDeclaredField("scenePeer");
@@ -30,6 +34,17 @@ public class CustomJFXPanel extends JFXPanel {
             LOGGER.error("Could not access scenePeer Field", e);
 
         }
+    }
+
+    public static JFXPanel create() {
+        return OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+    }
+
+    public static JFXPanel wrap(Scene scene) {
+        JFXPanel container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+        scene.getStylesheets().add(AbstractView.class.getResource("Main.css").toExternalForm());
+        DefaultTaskExecutor.runInJavaFXThread(() -> container.setScene(scene));
+        return container;
     }
 
     @Override

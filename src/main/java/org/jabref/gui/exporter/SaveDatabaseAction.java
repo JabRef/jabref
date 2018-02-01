@@ -21,22 +21,19 @@ import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.exporter.*;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.DatabaseLocation;
 import org.jabref.model.database.event.ChangePropagation;
+import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.shared.DBMSConnectionProperties;
-import org.jabref.shared.prefs.SharedDatabasePreferences;
 
-import javax.swing.*;
-import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
-import java.nio.file.Path;
-import java.util.Optional;
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for
@@ -47,7 +44,7 @@ import java.util.Optional;
  */
 public class SaveDatabaseAction extends AbstractWorker {
 
-    private static final Log LOGGER = LogFactory.getLog(SaveDatabaseAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);
 
     private final BasePanel panel;
     private final JabRefFrame frame;
@@ -197,7 +194,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             if (ex.specificEntry()) {
                 BibEntry entry = ex.getEntry();
                 // Error occured during processing of an entry. Highlight it!
-                panel.highlightEntry(entry);
+                panel.clearAndSelect(entry);
             } else {
                 LOGGER.error("A problem occured when trying to save the file", ex);
             }
@@ -279,15 +276,14 @@ public class SaveDatabaseAction extends AbstractWorker {
 
     public void save() throws Exception {
         runCommand();
-        frame.updateEnabledState();
     }
 
     public void saveAs() throws Exception {
         // configure file dialog
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileExtensions.BIBTEX_DB)
-                .withDefaultExtension(FileExtensions.BIBTEX_DB)
+                .addExtensionFilter(FileType.BIBTEX_DB)
+                .withDefaultExtension(FileType.BIBTEX_DB)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
         DialogService ds = new FXDialogService();
 
@@ -310,10 +306,9 @@ public class SaveDatabaseAction extends AbstractWorker {
 
         if (context.getLocation() == DatabaseLocation.SHARED) {
             // Save all properties dependent on the ID. This makes it possible to restore them.
-            DBMSConnectionProperties properties = context.getDBMSSynchronizer().getDBProcessor()
-                    .getDBMSConnectionProperties();
             new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID())
-                    .putAllDBMSConnectionProperties(properties);
+                    .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
+
         }
 
         context.setDatabaseFile(file);
@@ -349,7 +344,6 @@ public class SaveDatabaseAction extends AbstractWorker {
         }
 
         context.getDatabaseFile().ifPresent(presentFile -> frame.getFileHistory().newFile(presentFile.getPath()));
-        frame.updateEnabledState();
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {

@@ -1,6 +1,38 @@
 package org.jabref.gui.customentrytypes;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefDialog;
@@ -293,7 +325,6 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
             }
         }
 
-        updateTables();
         CustomEntryTypesManager.saveCustomEntryTypes(Globals.prefs);
     }
 
@@ -334,13 +365,6 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
             filtered.forEach(entry -> EntryTypes.getType(entry.getType(), bibDatabaseMode).ifPresent(entry::setType));
         }
     }
-
-    private void updateTables() {
-        for (BasePanel basePanel : frame.getBasePanelList()) {
-            ((AbstractTableModel) basePanel.getMainTable().getModel()).fireTableDataChanged();
-        }
-    }
-
 
     // DEFAULT button pressed. Remember that this entry should be reset to default,
     // unless changes are made later.

@@ -26,14 +26,8 @@ import org.jabref.model.entry.identifier.Eprint;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
-import javax.swing.*;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TODO: Replace by http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html
@@ -41,7 +35,7 @@ import java.util.regex.Pattern;
  */
 public class JabRefDesktop {
 
-    private static final Log LOGGER = LogFactory.getLog(JabRefDesktop.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDesktop.class);
 
     private static final NativeDesktop NATIVE_DESKTOP = getNativeDesktop();
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
@@ -122,26 +116,16 @@ public class JabRefDesktop {
      */
     public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext, String link,
             final Optional<ExternalFileType> type) throws IOException {
-        boolean httpLink = false;
 
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
-            httpLink = true;
+            openExternalFilePlatformIndependent(type, link);
+            return true;
         }
 
-        // For other platforms we'll try to find the file type:
-        Path file = null;
-        if (!httpLink) {
-            Optional<Path> tmp = FileHelper.expandFilename(databaseContext, link,
-                    Globals.prefs.getFileDirectoryPreferences());
-            if (tmp.isPresent()) {
-                file = tmp.get();
-            }
-        }
-
-        // Check if we have arrived at a file type, and either an http link or an existing file:
-        if (httpLink || ((file != null) && Files.exists(file) && (type.isPresent()))) {
+        Optional<Path> file = FileHelper.expandFilename(databaseContext, link, Globals.prefs.getFileDirectoryPreferences());
+        if (file.isPresent() && Files.exists(file.get()) && (type.isPresent())) {
             // Open the file:
-            String filePath = httpLink ? link : file.toString();
+            String filePath = file.get().toString();
             openExternalFilePlatformIndependent(type, filePath);
             return true;
         } else {
@@ -184,8 +168,7 @@ public class JabRefDesktop {
             return false;
         } else if (answer == JOptionPane.YES_OPTION) {
             // User wants to define the new file type. Show the dialog:
-            ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "", "new",
-                    IconTheme.JabRefIcon.FILE.getSmallIcon());
+            ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "", "new", IconTheme.JabRefIcons.FILE);
             ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor((JFrame) null, newType);
             editor.setVisible(true);
             if (editor.okPressed()) {
@@ -325,7 +308,7 @@ public class JabRefDesktop {
                     LOGGER.error("Open console", exception);
 
                     JOptionPane.showMessageDialog(null,
-                            Localization.lang("Error_occured_while_executing_the_command_\"%0\".", commandLoggingText),
+                            Localization.lang("Error occured while executing the command \"%0\".", commandLoggingText),
                             Localization.lang("Open console") + " - " + Localization.lang("Error"),
                             JOptionPane.ERROR_MESSAGE);
                     JabRefGUI.getMainFrame().output(null);

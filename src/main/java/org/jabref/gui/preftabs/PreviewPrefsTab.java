@@ -3,6 +3,7 @@ package org.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -18,10 +19,14 @@ import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
 
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.PreviewPanel;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TestEntry;
@@ -30,12 +35,12 @@ import org.jabref.preferences.PreviewPreferences;
 import com.google.common.primitives.Ints;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.factories.Paddings;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
-    private static final Log LOGGER = LogFactory.getLog(PreviewPrefsTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewPrefsTab.class);
 
     private SwingWorker<List<CitationStyle>, Void> discoverCitationStyleWorker;
 
@@ -116,10 +121,12 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
         btnTest.addActionListener(event -> {
             try {
-                PreviewPanel testPane = new PreviewPanel(null, TestEntry.getTestEntry(), null)
-                        .setFixedLayout(layout.getText());
-                testPane.setPreferredSize(new Dimension(800, 350));
-                JOptionPane.showMessageDialog(PreviewPrefsTab.this, new JScrollPane(testPane), Localization.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
+                PreviewPanel testPane = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences());
+                testPane.setFixedLayout(layout.getText());
+                testPane.setEntry(TestEntry.getTestEntry());
+                JFXPanel container = CustomJFXPanel.wrap(new Scene(testPane));
+                container.setPreferredSize(new Dimension(800, 350));
+                JOptionPane.showMessageDialog(PreviewPrefsTab.this, container, Localization.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
             } catch (StringIndexOutOfBoundsException exception) {
                 LOGGER.warn("Parsing error.", exception);
                 JOptionPane.showMessageDialog(null,
@@ -208,8 +215,8 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 }
                 try {
                     get().stream()
-                            .filter(style -> !previewPreferences.getPreviewCycle().contains(style.getFilepath()))
-                            .sorted((style0, style1) -> style0.getTitle().compareTo(style1.getTitle()))
+                            .filter(style -> !previewPreferences.getPreviewCycle().contains(style.getFilePath()))
+                            .sorted(Comparator.comparing(CitationStyle::getTitle))
                             .forEach(availableModel::addElement);
 
                     btnRight.setEnabled(!availableModel.isEmpty());
@@ -230,7 +237,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         while (elements.hasMoreElements()) {
             Object obj = elements.nextElement();
             if (obj instanceof CitationStyle) {
-                styles.add(((CitationStyle) obj).getFilepath());
+                styles.add(((CitationStyle) obj).getFilePath());
             } else if (obj instanceof String) {
                 styles.add("Preview");
             }
@@ -244,7 +251,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
         // update preview
         for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
-            basePanel.getPreviewPanel().updateLayout();
+            basePanel.getPreviewPanel().updateLayout(Globals.prefs.getPreviewPreferences());
         }
     }
 

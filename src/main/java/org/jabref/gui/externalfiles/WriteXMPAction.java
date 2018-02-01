@@ -4,6 +4,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefDialog;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.l10n.Localization;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 public class WriteXMPAction extends AbstractWorker {
 
     private final BasePanel panel;
+    private final JabRefFrame frame;
 
     private Collection<BibEntry> entries;
 
@@ -45,6 +47,7 @@ public class WriteXMPAction extends AbstractWorker {
 
     public WriteXMPAction(BasePanel panel) {
         this.panel = panel;
+        this.frame = panel.frame();
     }
 
     @Override
@@ -60,7 +63,7 @@ public class WriteXMPAction extends AbstractWorker {
 
             if (entries.isEmpty()) {
 
-                JOptionPane.showMessageDialog(panel,
+                JOptionPane.showMessageDialog(frame,
                         Localization.lang("This operation requires one or more entries to be selected."),
                         Localization.lang("Write XMP-metadata"), JOptionPane.ERROR_MESSAGE);
                 goOn = false;
@@ -68,7 +71,7 @@ public class WriteXMPAction extends AbstractWorker {
 
             } else {
 
-                int response = JOptionPane.showConfirmDialog(panel, Localization.lang("Write XMP-metadata for all PDFs in current library?"),
+                int response = JOptionPane.showConfirmDialog(frame, Localization.lang("Write XMP-metadata for all PDFs in current library?"),
                         Localization.lang("Write XMP-metadata"), JOptionPane.YES_NO_CANCEL_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
 
@@ -201,8 +204,6 @@ public class WriteXMPAction extends AbstractWorker {
             Dimension d = progressArea.getPreferredSize();
             d.height += scrollPane.getHorizontalScrollBar().getHeight() + 15;
             d.width += scrollPane.getVerticalScrollBar().getWidth() + 15;
-
-            panel.setSize(d);
 
             progressArea.setBackground(Color.WHITE);
             progressArea.setEditable(false);

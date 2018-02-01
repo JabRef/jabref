@@ -11,20 +11,18 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.strings.StringUtil;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.HashMap;
-import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NewEntryAction extends MnemonicAwareAction {
-    private static final Log LOGGER = LogFactory.getLog(NewEntryAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryAction.class);
 
     private final JabRefFrame jabRefFrame;
     private String type; // The type of item to create.
 
     public NewEntryAction(JabRefFrame jabRefFrame, KeyStroke key) {
         // This action leads to a dialog asking for entry type.
-        super(IconTheme.JabRefIcon.ADD_ENTRY.getIcon());
+        super(IconTheme.JabRefIcons.ADD_ENTRY.getIcon());
         this.jabRefFrame = jabRefFrame;
         putValue(Action.NAME, Localization.menuTitle("New entry") + "...");
         putValue(Action.ACCELERATOR_KEY, key);

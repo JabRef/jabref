@@ -24,7 +24,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -39,12 +39,12 @@ import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AppendDatabaseAction implements BaseAction {
 
-    private static final Log LOGGER = LogFactory.getLog(AppendDatabaseAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppendDatabaseAction.class);
 
     private final JabRefFrame frame;
     private final BasePanel panel;
@@ -102,7 +102,7 @@ public class AppendDatabaseAction implements BaseAction {
                         newGroups.setGroup(group);
                         group.add(appendedEntries);
                     } catch (IllegalArgumentException e) {
-                        LOGGER.error(e);
+                        LOGGER.error("Problem appending entries to group", e);
                     }
                 }
 
@@ -147,12 +147,12 @@ public class AppendDatabaseAction implements BaseAction {
     public void action() {
         filesToOpen.clear();
         final MergeDialog dialog = new MergeDialog(frame, Localization.lang("Append library"), true);
-        dialog.setLocationRelativeTo(panel);
+        dialog.setLocationRelativeTo(frame);
         dialog.setVisible(true);
         if (dialog.isOkPressed()) {
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .withDefaultExtension(FileExtensions.BIBTEX_DB)
+                    .withDefaultExtension(FileType.BIBTEX_DB)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                     .build();
             DialogService dialogService = new FXDialogService();
@@ -181,13 +181,13 @@ public class AppendDatabaseAction implements BaseAction {
                 Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent().toString());
                 // Should this be done _after_ we know it was successfully opened?
                 ParserResult parserResult = OpenDatabase.loadDatabase(file.toFile(),
-                        Globals.prefs.getImportFormatPreferences());
+                        Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
                 AppendDatabaseAction.mergeFromBibtex(panel, parserResult, importEntries, importStrings, importGroups,
                         importSelectorWords);
                 panel.output(Localization.lang("Imported from library") + " '" + file + "'");
             } catch (IOException | KeyCollisionException ex) {
                 LOGGER.warn("Could not open database", ex);
-                JOptionPane.showMessageDialog(panel, ex.getMessage(), Localization.lang("Open library"),
+                JOptionPane.showMessageDialog(frame, ex.getMessage(), Localization.lang("Open library"),
                         JOptionPane.ERROR_MESSAGE);
             }
         }
