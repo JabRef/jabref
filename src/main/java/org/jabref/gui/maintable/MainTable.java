@@ -12,7 +12,10 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.input.MouseDragEvent;
+import javafx.scene.input.MouseEvent;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -75,13 +78,16 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.model = model;
 
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager()).createColumns());
-        this.setRowFactory(new ViewModelTableRowFactory<BibEntryTableViewModel>()
+        new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
                     if (event.getClickCount() == 2) {
                         panel.showAndEdit(entry.getEntry());
                     }
                 })
-                .withContextMenu(entry1 -> RightClickMenu.create(entry1, keyBindingRepository, panel, Globals.getKeyPrefs())));
+                .withContextMenu(entry1 -> RightClickMenu.create(entry1, keyBindingRepository, panel, Globals.getKeyPrefs()))
+                .setOnDragDetected(this::handleOnDragDetected)
+                .setOnMouseDragEntered(this::handleOnDragEntered)
+                .install(this);
         if (preferences.resizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
         }
@@ -186,6 +192,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 panel.selectLastEntry();
             }
         });*/
+    }
+
+    private void handleOnDragEntered(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel entry, MouseDragEvent event) {
+        // Support the following gesture to select entries: click on one row -> hold mouse button -> move over other rows
+        // We need to select all items between the starting row and the row where the user currently hovers the mouse over
+        // It is not enough to just select the currently hovered row since then sometimes rows are not marked selected if the user moves to fast
+        TableRow<BibEntryTableViewModel> sourceRow = (TableRow<BibEntryTableViewModel>) event.getGestureSource();
+        getSelectionModel().selectRange(sourceRow.getIndex(), row.getIndex());
+    }
+
+    private void handleOnDragDetected(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel entry, MouseEvent event) {
+        // Start drag'n'drop
+        row.startFullDrag();
     }
 
     public void addSelectionListener(ListChangeListener<? super BibEntryTableViewModel> listener) {
