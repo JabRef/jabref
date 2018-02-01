@@ -182,9 +182,8 @@ public class PdfContentImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
-        return false;
+    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+        return input.readLine().startsWith("%PDF");
     }
 
     @Override
