@@ -16,10 +16,9 @@ import javax.swing.plaf.FontUIResource;
 
 import javafx.application.Platform;
 import javafx.scene.Scene;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import org.jabref.gui.AbstractView;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
@@ -155,39 +154,11 @@ public class JabRefGUI {
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
 
-        TextArea ta = new TextArea("output\n");
-        VBox root = new VBox(5, ta);
-        Scene scene = new Scene(root, 800, 200);
+        Scene scene = new Scene(JabRefGUI.mainFrame, 800, 200);
+        scene.getStylesheets().add(AbstractView.class.getResource("Main.css").toExternalForm());
         mainStage.setTitle("Find this window");
         mainStage.setScene(scene);
         mainStage.show();
-
-        /*
-        //gets this window (stage)
-        long lhwnd = com.sun.glass.ui.Window.getWindows().get(0).getNativeWindow();
-        Pointer lpVoid = new Pointer(lhwnd);
-        //gets the foreground (focused) window
-        final User32 user32 = User32.INSTANCE;
-        char[] windowText = new char[512];
-        WinDef.HWND hwnd = user32.GetForegroundWindow();
-        //see what the title is
-        user32.GetWindowText(hwnd, windowText, 512);
-        //user32.GetWindowText(new HWND(lpVoid), windowText, 512);//to use the hwnd from stage
-        String text = (Native.toString(windowText));
-        //see if it's the same pointer
-        ta.appendText("HWND java:" + lpVoid + " HWND user32:" + hwnd + " text:" + text + "\n");
-        //change the window style if it's the right title
-        if (text.equals(mainStage.getTitle())) {
-            //the style to change
-            int WS_DLGFRAME = 0x00400000;//s/b long I think
-            //not the same constant here??
-            ta.appendText("windows api:" + WS_DLGFRAME + " JNA: " + WinUser.SM_CXDLGFRAME);
-            int oldStyle = user32.GetWindowLong(hwnd, GWL_STYLE);
-            int newStyle = oldStyle & ~0x00400000; //bitwise not WS_DLGFRAME means remove the style
-            newStyle = newStyle & ~0x00040000;//WS_THICKFRAME
-            user32.SetWindowLong(hwnd, GWL_STYLE, newStyle);
-        }
-        */
 
         mainStage.setOnCloseRequest(event -> {
             mainFrame.quit();
@@ -227,7 +198,7 @@ public class JabRefGUI {
         LOGGER.debug("Finished adding panels");
 
         if (!bibDatabases.isEmpty()) {
-            JabRefGUI.getMainFrame().getCurrentBasePanel().getMainTable().requestFocus();
+            //JabRefGUI.getMainFrame().getCurrentBasePanel().getMainTable().requestFocus();
         }
     }
 

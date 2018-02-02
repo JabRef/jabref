@@ -930,6 +930,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             swingSidePane.setContent(sidePaneManager.getPanel());
         });
         splitPane.getItems().addAll(swingSidePane, tabbedPane);
+        setCenter(splitPane);
 
         UIManager.put("TabbedPane.contentBorderInsets", new Insets(0, 0, 0, 0));
         sidePaneManager.updateView();
@@ -1609,11 +1610,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
     public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
-        return DefaultTaskExecutor.runInJavaFXThread(() -> {
-            BasePanel bp = new BasePanel(this, BasePanelPreferences.from(Globals.prefs), databaseContext, ExternalFileTypes.getInstance());
-            addTab(bp, raisePanel);
-            return bp;
-        });
+
+        BasePanel bp = new BasePanel(this, BasePanelPreferences.from(Globals.prefs), databaseContext, ExternalFileTypes.getInstance());
+        addTab(bp, raisePanel);
+        return bp;
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {
