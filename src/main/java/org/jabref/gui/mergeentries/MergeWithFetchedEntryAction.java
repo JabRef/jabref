@@ -1,12 +1,12 @@
 package org.jabref.gui.mergeentries;
 
+import javax.swing.JOptionPane;
+
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.actions.BaseAction;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-
-import javax.swing.*;
 
 public class MergeWithFetchedEntryAction implements BaseAction {
 

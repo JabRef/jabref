@@ -1,15 +1,19 @@
 package org.jabref.gui.push;
 
+import java.awt.event.ActionEvent;
+import java.util.List;
+import java.util.Optional;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * An Action class representing the process of invoking a PushToApplication operation.

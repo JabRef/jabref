@@ -1,19 +1,7 @@
 package org.jabref.gui.externalfiletype;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.ButtonStackBuilder;
-import org.jabref.Globals;
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefDialog;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.MnemonicAwareAction;
-import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.logic.l10n.Localization;
-
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;

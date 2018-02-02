@@ -1,10 +1,12 @@
 package org.jabref.gui.autosaveandbackup;
 
+import java.nio.file.Path;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.l10n.Localization;
-
-import javax.swing.*;
-import java.nio.file.Path;
 
 /**
  * Stores all user dialogs related to {@link BackupManager}.

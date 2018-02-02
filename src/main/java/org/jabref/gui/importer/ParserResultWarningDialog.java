@@ -1,13 +1,16 @@
 package org.jabref.gui.importer;
 
+import java.awt.Dimension;
+import java.util.List;
+import java.util.Objects;
+
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Class for generating a dialog showing warnings from ParserResult

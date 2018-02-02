@@ -20,10 +20,6 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-import javax.swing.*;
-import java.util.List;
-import java.util.Objects;
-
 public class CleanupAction extends AbstractWorker {
 
     private final BasePanel panel;

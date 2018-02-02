@@ -1,6 +1,19 @@
 package org.jabref.gui.bibtexkeypattern;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.WindowConstants;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefDialog;
@@ -10,10 +23,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.metadata.MetaData;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowEvent;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class BibtexKeyPatternDialog extends JabRefDialog {
 

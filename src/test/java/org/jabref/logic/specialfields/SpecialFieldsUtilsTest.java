@@ -6,11 +6,11 @@ import java.util.Optional;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
-
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.specialfields.SpecialField;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

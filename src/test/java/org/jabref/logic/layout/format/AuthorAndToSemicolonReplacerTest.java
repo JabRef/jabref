@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.jabref.logic.layout.LayoutFormatter;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

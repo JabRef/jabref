@@ -1,17 +1,20 @@
 package org.jabref.gui.menus;
 
-import org.jabref.JabRefExecutorService;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileHistory;
-import org.jabref.preferences.JabRefPreferences;
-
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+
+import org.jabref.JabRefExecutorService;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileHistory;
+import org.jabref.preferences.JabRefPreferences;
 
 public class FileHistoryMenu extends JMenu implements ActionListener {
 

@@ -11,8 +11,6 @@ import java.util.Optional;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelMode;

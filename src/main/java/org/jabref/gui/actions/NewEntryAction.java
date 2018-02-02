@@ -7,8 +7,6 @@ import java.util.Map;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.gui.EntryTypeDialog;
 import org.jabref.gui.IconTheme;

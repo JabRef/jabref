@@ -26,9 +26,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -41,7 +38,11 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.*;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BiblatexEntryTypes;
+import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.IEEETranEntryTypes;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.slf4j.Logger;

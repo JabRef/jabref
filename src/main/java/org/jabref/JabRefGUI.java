@@ -1,8 +1,6 @@
 package org.jabref;
 
-import java.awt.Frame;
 import java.io.File;
-import java.lang.annotation.Native;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,7 +39,6 @@ import org.jabref.logic.util.Version;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.sun.star.awt.Pointer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

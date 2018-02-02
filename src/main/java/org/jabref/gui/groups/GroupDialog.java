@@ -20,6 +20,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -33,6 +34,7 @@ import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.Dialog;
@@ -60,15 +62,6 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
-
-import javax.swing.*;
-import javax.swing.event.CaretListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemListener;
-import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;

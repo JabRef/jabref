@@ -1,5 +1,19 @@
 package org.jabref.gui.importer.actions;
 
+import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.customentrytypes.CustomEntryTypesManager;
@@ -9,12 +23,6 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.EntryType;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This action checks whether any new custom entry types were loaded from this

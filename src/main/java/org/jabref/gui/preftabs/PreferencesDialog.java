@@ -23,7 +23,11 @@ import javax.swing.ListSelectionModel;
 
 import org.jabref.Globals;
 import org.jabref.JabRefException;
-import org.jabref.gui.*;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
+import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.JabRefDialog;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinder;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.util.DefaultTaskExecutor;

@@ -28,9 +28,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;

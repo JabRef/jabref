@@ -1,13 +1,5 @@
 package org.jabref.gui.worker;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.help.NewVersionDialog;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.Version;
-
-import javax.swing.*;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +7,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.help.NewVersionDialog;

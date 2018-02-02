@@ -1,10 +1,16 @@
 package org.jabref.gui.mergeentries;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.RowSpec;
+import java.awt.event.ActionEvent;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JSeparator;
+
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.undo.NamedCompound;
@@ -16,11 +22,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
 
 /**
  * Dialog for merging Bibtex entry with fetched data

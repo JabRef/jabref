@@ -24,6 +24,7 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -46,19 +47,6 @@ import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.strings.StringUtil;
-
-import javax.swing.*;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 

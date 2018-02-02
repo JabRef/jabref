@@ -1,7 +1,14 @@
 package org.jabref.migrations;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
@@ -21,8 +28,8 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
-import javax.swing.*;
-import java.util.List;
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * This class defines the warning that can be offered when opening a pre-2.3

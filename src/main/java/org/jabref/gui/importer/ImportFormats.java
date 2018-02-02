@@ -14,8 +14,7 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 
 import javafx.stage.FileChooser;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;

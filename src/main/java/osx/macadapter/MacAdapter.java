@@ -1,14 +1,22 @@
 package osx.macadapter;
 
-import com.apple.eawt.*;
+import java.io.File;
+import java.util.List;
+
+import org.jabref.gui.JabRefFrame;
+
+import com.apple.eawt.AboutHandler;
+import com.apple.eawt.AppEvent;
 import com.apple.eawt.AppEvent.AboutEvent;
 import com.apple.eawt.AppEvent.OpenFilesEvent;
 import com.apple.eawt.AppEvent.PreferencesEvent;
 import com.apple.eawt.AppEvent.QuitEvent;
-import org.jabref.gui.JabRefFrame;
-
-import java.io.File;
-import java.util.List;
+import com.apple.eawt.AppReOpenedListener;
+import com.apple.eawt.Application;
+import com.apple.eawt.OpenFilesHandler;
+import com.apple.eawt.PreferencesHandler;
+import com.apple.eawt.QuitHandler;
+import com.apple.eawt.QuitResponse;
 
 public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler, OpenFilesHandler, AppReOpenedListener {
 

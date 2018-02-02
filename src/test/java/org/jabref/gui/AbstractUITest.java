@@ -1,5 +1,15 @@
 package org.jabref.gui;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.jabref.JabRefMain;
+import org.jabref.testutils.category.GUITest;
+
 import org.assertj.swing.fixture.AbstractWindowFixture;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.fixture.JFileChooserFixture;
@@ -7,17 +17,8 @@ import org.assertj.swing.fixture.JTableFixture;
 import org.assertj.swing.image.ScreenshotTaker;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.assertj.swing.timing.Pause;
-import org.jabref.JabRefMain;
-import org.jabref.testutils.category.GUITest;
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.assertj.swing.launcher.ApplicationLauncher.application;
 
