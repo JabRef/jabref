@@ -568,7 +568,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         actions.put(Actions.PLAIN_TEXT_IMPORT, (BaseAction) () -> {
             // get Type of new entry
             EntryTypeDialog etd = new EntryTypeDialog(frame);
-            etd.setLocationRelativeTo(frame);
             etd.setVisible(true);
             EntryType tp = etd.getChoice();
             if (tp == null) {
@@ -577,7 +576,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
             BibEntry bibEntry = new BibEntry(tp.getName());
             TextInputDialog tidialog = new TextInputDialog(frame, bibEntry);
-            tidialog.setLocationRelativeTo(frame);
             tidialog.setVisible(true);
 
             if (tidialog.okPressed()) {

@@ -63,7 +63,7 @@ public class WriteXMPAction extends AbstractWorker {
 
             if (entries.isEmpty()) {
 
-                JOptionPane.showMessageDialog(frame,
+                JOptionPane.showMessageDialog(null,
                         Localization.lang("This operation requires one or more entries to be selected."),
                         Localization.lang("Write XMP-metadata"), JOptionPane.ERROR_MESSAGE);
                 goOn = false;
@@ -71,7 +71,7 @@ public class WriteXMPAction extends AbstractWorker {
 
             } else {
 
-                int response = JOptionPane.showConfirmDialog(frame, Localization.lang("Write XMP-metadata for all PDFs in current library?"),
+                int response = JOptionPane.showConfirmDialog(null, Localization.lang("Write XMP-metadata for all PDFs in current library?"),
                         Localization.lang("Write XMP-metadata"), JOptionPane.YES_NO_CANCEL_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
 

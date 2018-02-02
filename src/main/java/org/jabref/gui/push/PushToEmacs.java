@@ -1,5 +1,14 @@
 package org.jabref.gui.push;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+import javax.swing.Icon;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;

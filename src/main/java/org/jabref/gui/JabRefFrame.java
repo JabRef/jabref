@@ -62,10 +62,14 @@ import javax.swing.WindowConstants;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.embed.swing.JFXPanel;
+import javafx.embed.swing.SwingNode;
 import javafx.scene.Scene;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
@@ -898,8 +902,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         toolbarPanel.add(globalSearchBar);
         //getContentPane().add(toolbarPanel, BorderLayout.PAGE_START);
 
-        splitPane.setDividerSize(2);
-        splitPane.setBorder(null);
         JFXPanel tabbedPaneContainer = CustomJFXPanel.wrap(new Scene(tabbedPane));
         // TODO: Remove this hack as soon as toolbar is implemented in JavaFX and these events are no longer captured globally
         tabbedPaneContainer.addKeyListener(new KeyAdapter() {
@@ -924,25 +926,17 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             }
         });
 
-        splitPane.setRightComponent(tabbedPaneContainer);
-        splitPane.setLeftComponent(sidePaneManager.getPanel());
-        getContentPane().add(splitPane, BorderLayout.CENTER);
-
         StackPane header = new StackPane();
         header.setId("header");
         header.setPrefHeight(50);
         header.setStyle("-fx-background-color: #4d4674; -fx-text-fill: white;");
         setTop(header);
 
-        SwingNode swingTabbedPane = new SwingNode();
         SwingNode swingSidePane = new SwingNode();
         SwingUtilities.invokeLater(() -> {
-            swingTabbedPane.setContent(tabbedPane);
             swingSidePane.setContent(sidePaneManager.getPanel());
         });
-        StackPane centerPane = new StackPane();
-        centerPane.getChildren().addAll(swingTabbedPane, new Button("test"));
-        splitPane.getItems().addAll(swingSidePane, swingTabbedPane);
+        splitPane.getItems().addAll(swingSidePane, tabbedPane);
 
         UIManager.put("TabbedPane.contentBorderInsets", new Insets(0, 0, 0, 0));
         sidePaneManager.updateView();

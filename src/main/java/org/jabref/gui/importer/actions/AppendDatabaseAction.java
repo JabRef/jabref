@@ -147,7 +147,6 @@ public class AppendDatabaseAction implements BaseAction {
     public void action() {
         filesToOpen.clear();
         final MergeDialog dialog = new MergeDialog(frame, Localization.lang("Append library"), true);
-        dialog.setLocationRelativeTo(frame);
         dialog.setVisible(true);
         if (dialog.isOkPressed()) {
 
@@ -187,7 +186,7 @@ public class AppendDatabaseAction implements BaseAction {
                 panel.output(Localization.lang("Imported from library") + " '" + file + "'");
             } catch (IOException | KeyCollisionException ex) {
                 LOGGER.warn("Could not open database", ex);
-                JOptionPane.showMessageDialog(frame, ex.getMessage(), Localization.lang("Open library"),
+                JOptionPane.showMessageDialog(null, ex.getMessage(), Localization.lang("Open library"),
                         JOptionPane.ERROR_MESSAGE);
             }
         }

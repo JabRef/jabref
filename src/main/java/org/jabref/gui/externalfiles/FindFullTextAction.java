@@ -1,5 +1,16 @@
 package org.jabref.gui.externalfiles;
 
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.swing.JOptionPane;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
@@ -69,7 +80,7 @@ public class FindFullTextAction extends AbstractWorker {
     @Override
     public void update() {
         List<Optional<URL>> remove = new ArrayList<>();
-        for (Entry<Optional<URL>, BibEntry> download : downloads.entrySet()) {
+        for (Map.Entry<Optional<URL>, BibEntry> download : downloads.entrySet()) {
             BibEntry entry = download.getValue();
             Optional<URL> result = download.getKey();
             if (result.isPresent()) {

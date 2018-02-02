@@ -60,6 +60,8 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+
 public class EntryCustomizationDialog extends JabRefDialog implements ListSelectionListener {
 
     protected GridBagLayout gbl = new GridBagLayout();

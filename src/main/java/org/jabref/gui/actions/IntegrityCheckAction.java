@@ -1,5 +1,29 @@
 package org.jabref.gui.actions;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
+import javax.swing.SwingWorker;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
@@ -68,7 +92,7 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
         }
 
         if (messages.isEmpty()) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("No problems found."));
+            JOptionPane.showMessageDialog(null, Localization.lang("No problems found."));
         } else {
             Map<String, Boolean> showMessage = new HashMap<>();
             // prepare data model

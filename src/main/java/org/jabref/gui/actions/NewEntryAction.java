@@ -1,5 +1,12 @@
 package org.jabref.gui.actions;
 
+import java.awt.event.ActionEvent;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.Action;
+import javax.swing.KeyStroke;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;

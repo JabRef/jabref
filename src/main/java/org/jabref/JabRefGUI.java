@@ -2,6 +2,7 @@ package org.jabref;
 
 import java.awt.Frame;
 import java.io.File;
+import java.lang.annotation.Native;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +15,12 @@ import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.FontUIResource;
+
+import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
@@ -34,10 +41,10 @@ import org.jabref.logic.util.Version;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.sun.star.awt.Pointer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.sun.jna.platform.win32.WinUser.GWL_STYLE;
 
 public class JabRefGUI {
 
@@ -158,6 +165,7 @@ public class JabRefGUI {
         mainStage.setScene(scene);
         mainStage.show();
 
+        /*
         //gets this window (stage)
         long lhwnd = com.sun.glass.ui.Window.getWindows().get(0).getNativeWindow();
         Pointer lpVoid = new Pointer(lhwnd);
@@ -182,6 +190,7 @@ public class JabRefGUI {
             newStyle = newStyle & ~0x00040000;//WS_THICKFRAME
             user32.SetWindowLong(hwnd, GWL_STYLE, newStyle);
         }
+        */
 
         mainStage.setOnCloseRequest(event -> {
             mainFrame.quit();

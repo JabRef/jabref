@@ -35,6 +35,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.Locale;
 
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.layout.Sizes;
+
 public class GenFieldsCustomizer extends JabRefDialog {
 
     private final JPanel buttons = new JPanel();

@@ -6,8 +6,6 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.worker.AbstractWorker;
-import org.jabref.logic.exporter.ExportFormats;
-import org.jabref.logic.exporter.IExportFormat;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 

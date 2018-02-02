@@ -41,6 +41,10 @@ import java.awt.event.ActionEvent;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+
 /**
  * A wizard dialog for generating a new sub database from existing TeX AUX file
  */

@@ -83,7 +83,7 @@ public class ImportFormats {
 
             private void doImport(Path file, SortedSet<Importer> importers, FileChooser.ExtensionFilter selectedExtensionFilter) {
                 if (!Files.exists(file)) {
-                    JOptionPane.showMessageDialog(frame,
+                    JOptionPane.showMessageDialog(null,
                             Localization.lang("File not found") + ": '" + file.getFileName() + "'.",
                             Localization.lang("Import"), JOptionPane.ERROR_MESSAGE);
                     return;
