@@ -23,6 +23,8 @@ For more details refer to the [field mapping help page](http://help.jabref.org/e
 - We added Facebook and Twitter icons in the toolbar to link to our [Facebook](https://www.facebook.com/JabRef/) and [Twitter](https://twitter.com/jabref_org) pages.
 - We no longer print empty lines when exporting an entry in RIS format [#3634](https://github.com/JabRef/jabref/issues/3634)
 - We improved file saving so that hard links are now preserved when a save is performed [#2633](https://github.com/JabRef/jabref/issues/2633)
+- We changed the default dialog option when removing a [file link](http://help.jabref.org/en/FileLinks#adding-external-links-to-an-entry) from an entry.
+The new default removes the linked file from the entry instead of deleting the file from disk. [#3679](https://github.com/JabRef/jabref/issues/3679)
 
 ### Fixed
 - We fixed the missing dot in the name of an exported file. [#3576](https://github.com/JabRef/jabref/issues/3576)
