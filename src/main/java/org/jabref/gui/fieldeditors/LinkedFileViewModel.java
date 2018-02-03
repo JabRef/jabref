@@ -44,6 +44,8 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static javafx.scene.control.ButtonBar.ButtonData;
+
 public class LinkedFileViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileViewModel.class);
@@ -274,7 +276,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public boolean delete() {
         Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
-        ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"));
+        ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"), ButtonData.YES);
 
         if (file.isPresent()) {
             ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
