@@ -237,3 +237,39 @@
     -fx-background: -fx-selection-bar;
     -fx-table-cell-border-color: transparent;
 }
+
+.scroll-pane,
+.split-pane {
+    -fx-background-insets: 0, 0;
+    -fx-padding: 0;
+}
+
+.text-input {
+    -fx-background-color: #cacbca, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+}
+
+.text-input:focused {
+    -fx-background-color: -fx-active-background, -fx-control-inner-background;
+    -fx-background-insets: 0, 2;
+}
+
+.text-area {
+    -fx-background-color: white;
+}
+
+.text-area .content {
+    -fx-background-color: #cacbca, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-padding: 0.333333em 0.583em 0.333333em 0.583em;
+}
+
+.text-area:focused .content {
+    -fx-background-color: -fx-active-background, -fx-control-inner-background;
+    -fx-background-insets: 0, 2;
+}
+
+.date-picker > .text-field:focused {
+    -fx-background-color: -fx-active-background, -fx-control-inner-background;
+    -fx-background-insets: 0, 2;
+}
