@@ -304,7 +304,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         } else {
             LOGGER.warn("Could not find file " + linkedFile.getLink());
         }
-        return true;
+        return false;
     }
 
     public void edit() {

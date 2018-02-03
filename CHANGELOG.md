@@ -32,6 +32,7 @@ The new default removes the linked file from the entry instead of deleting the f
 - We fixed and extended the RIS import functionality to cover more fields. [#3634](https://github.com/JabRef/jabref/issues/3634) [#2607](https://github.com/JabRef/jabref/issues/2607)
 - Chaining modifiers in BibTeX key pattern now works as described in the documentation. [#3648](https://github.com/JabRef/jabref/issues/3648)
 - We fixed an issue where not all bibtex/biblatex fields would be exported as latex-free to MS-Office XML [koppor#284](https://github.com/koppor/jabref/issues/284)
+- We fixed an issue where linked files would be deleted from bibliography entries despite choosing the "Cancel" option in the dialog menu.
 
 ### Removed
 - We removed the [Look and Feels from JGoodies](http://www.jgoodies.com/freeware/libraries/looks/), because the open source version is not compatible with Java 9.
