@@ -71,7 +71,6 @@ public class Globals {
         return keyBindingRepository;
     }
 
-
     // Background tasks
     public static void startBackgroundTasks() {
         Globals.focusListener = new GlobalFocusListener();

@@ -4,16 +4,9 @@ import org.jabref.model.database.event.EntryAddedEvent;
 
 import com.google.common.eventbus.Subscribe;
 
-public class SpecialFieldDatabaseChangeListener {
+public enum SpecialFieldDatabaseChangeListener {
 
-    private static SpecialFieldDatabaseChangeListener INSTANCE;
-
-    public static SpecialFieldDatabaseChangeListener getInstance() {
-        if (SpecialFieldDatabaseChangeListener.INSTANCE == null) {
-            SpecialFieldDatabaseChangeListener.INSTANCE = new SpecialFieldDatabaseChangeListener();
-        }
-        return SpecialFieldDatabaseChangeListener.INSTANCE;
-    }
+    INSTANCE;
 
     @Subscribe
     public void listen(EntryAddedEvent event) {

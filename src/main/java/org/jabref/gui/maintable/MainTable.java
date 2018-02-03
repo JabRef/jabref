@@ -75,7 +75,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final MainTableDataModel model;
 
     public MainTable(MainTableDataModel model, JabRefFrame frame,
-                     BasePanel panel, BibDatabaseContext database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
+            BasePanel panel, BibDatabaseContext database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
         super();
         this.model = model;
         this.database = Objects.requireNonNull(database);
@@ -121,12 +121,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // TODO: Tooltip for column header
         /*
         @Override
-    public String getToolTipText(MouseEvent event) {
+        public String getToolTipText(MouseEvent event) {
         int index = columnModel.getColumnIndexAtX(event.getX());
         int realIndex = columnModel.getColumn(index).getModelIndex();
         MainTableColumn column = tableFormat.getTableColumn(realIndex);
         return column.getDisplayName();
-    }
+        }
          */
 
         // TODO: store column widths
@@ -427,7 +427,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 int index = -1;
 
                 // TODO where is this prefix set?
-//                if (!sortFields[i].startsWith(MainTableFormat.ICON_COLUMN_PREFIX))
+        //                if (!sortFields[i].startsWith(MainTableFormat.ICON_COLUMN_PREFIX))
                 if (sortFields[i].startsWith("iconcol:")) {
                     for (int j = 0; j < tableFormat.getColumnCount(); j++) {
                         if (sortFields[i].equals(tableFormat.getColumnName(j))) {
@@ -472,9 +472,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, false);
             }
         });
-*/
+        */
     }
-/*
+    /*
     // TODO: Reenable background coloring of fields (required/optional/...)
     private CellRendererMode getCellStatus(int row, int col, boolean checkResolved) {
         try {
@@ -551,13 +551,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         */
     }
 
-
     public static void updateRenderers() {
 
         MainTable.defRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND),
                 Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
-        Color sel = MainTable.defRenderer.getTableCellRendererComponent
-                (new JTable(), "", true, false, 0, 0).getBackground();
+        Color sel = MainTable.defRenderer.getTableCellRendererComponent(new JTable(), "", true, false, 0, 0).getBackground();
         MainTable.reqRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND), Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
         MainTable.optRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND), Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
         MainTable.resolvedRenderer = new GeneralRenderer(

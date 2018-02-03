@@ -1146,7 +1146,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     }
 
     private void createMainTable() {
-        bibDatabaseContext.getDatabase().registerListener(SpecialFieldDatabaseChangeListener.getInstance());
+        bibDatabaseContext.getDatabase().registerListener(SpecialFieldDatabaseChangeListener.INSTANCE);
 
         mainTable = new MainTable(tableModel, frame, this, bibDatabaseContext, preferences.getTablePreferences(), externalFileTypes, Globals.getKeyPrefs());
 
@@ -1907,7 +1907,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             // Run the search operation:
             FileFinder fileFinder = FileFinders.constructFromConfiguration(Globals.prefs.getAutoLinkPreferences());
             try {
-            List<Path> files = fileFinder.findAssociatedFiles(entry, dirs, extensions);
+                List<Path> files = fileFinder.findAssociatedFiles(entry, dirs, extensions);
                 if (!files.isEmpty()) {
                     Path file = files.get(0);
                     Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByFile(file);
