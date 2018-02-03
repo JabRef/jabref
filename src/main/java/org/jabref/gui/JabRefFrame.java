@@ -66,6 +66,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Pane;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
@@ -151,6 +152,8 @@ import org.jabref.preferences.LastFocusedTabPreferences;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.eventbus.Subscribe;
+import org.eclipse.fx.ui.controls.tabpane.DndTabPane;
+import org.eclipse.fx.ui.controls.tabpane.DndTabPaneFactory;
 import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -459,7 +462,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private PreferencesDialog prefsDialog;
     // The sidepane manager takes care of populating the sidepane.
     private SidePaneManager sidePaneManager;
-    private final TabPane tabbedPane = new TabPane();
+    private TabPane tabbedPane;
     private final AbstractAction exportAll = ExportAction.getExportAction(this, false);
     private final AbstractAction exportSelected = ExportAction.getExportAction(this, true);
     /* References to the toggle buttons in the toolbar */
@@ -922,7 +925,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         splitPane.setDividerSize(2);
         splitPane.setBorder(null);
-        JFXPanel tabbedPaneContainer = CustomJFXPanel.wrap(new Scene(tabbedPane));
+
+        Pane containerPane = DndTabPaneFactory.createDefaultDnDPane(DndTabPaneFactory.FeedbackType.MARKER, null);
+        tabbedPane = (DndTabPane) containerPane.getChildren().get(0);
+        JFXPanel tabbedPaneContainer = CustomJFXPanel.wrap(new Scene(containerPane));
         // TODO: Remove this hack as soon as toolbar is implemented in JavaFX and these events are no longer captured globally
         tabbedPaneContainer.addKeyListener(new KeyAdapter() {
             @Override
