@@ -50,6 +50,9 @@ public class Globals {
     /**
      * Manager for the state of the GUI.
      */
+
+    public static ClipBoardManager clipboardManager = new ClipBoardManager();
+
     public static StateManager stateManager = new StateManager();
     public static ExporterFactory exportFactory;
     // Key binding preferences
@@ -58,7 +61,6 @@ public class Globals {
     private static GlobalFocusListener focusListener;
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
     private static TelemetryClient telemetryClient;
-    public static ClipBoardManager clipboardManager = new ClipBoardManager();
 
     private Globals() {
     }

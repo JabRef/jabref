@@ -166,10 +166,11 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private final BasePanelPreferences preferences;
     private final ExternalFileTypes externalFileTypes;
 
+    private final EntryEditor entryEditor;
+    private MainTable mainTable;
     // To contain instantiated entry editors. This is to save time
     // As most enums, this must not be null
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
-    private final EntryEditor entryEditor;
     private SplitPane splitPane;
     private boolean saving;
 
@@ -178,7 +179,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private boolean baseChanged;
     private boolean nonUndoableChange;
     // Used to track whether the base has changed since last save.
-    public MainTable mainTable;
     private BibEntry showing;
     // Variable to prevent erroneous update of back/forward histories at the time
     // when a Back or Forward operation is being processed:
