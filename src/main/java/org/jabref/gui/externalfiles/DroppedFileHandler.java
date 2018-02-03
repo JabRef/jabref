@@ -304,7 +304,7 @@ public class DroppedFileHandler {
             for (BibEntry aXmpEntriesInFile : xmpEntriesInFile) {
 
                 aXmpEntriesInFile.setId(IdGenerator.next());
-                edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), aXmpEntriesInFile, panel));
+                edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), aXmpEntriesInFile));
                 panel.getDatabase().insertEntry(aXmpEntriesInFile);
                 doLink(aXmpEntriesInFile, fileType, destFilename, true, edits);
 

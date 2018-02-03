@@ -78,7 +78,7 @@ public class AppendDatabaseAction implements BaseAction {
                 database.insertEntry(entry);
                 appendedEntries.add(entry);
                 originalEntries.add(originalEntry);
-                ce.addEdit(new UndoableInsertEntry(database, entry, panel));
+                ce.addEdit(new UndoableInsertEntry(database, entry));
             }
         }
 

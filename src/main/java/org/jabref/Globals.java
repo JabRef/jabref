@@ -4,6 +4,7 @@ import java.awt.Toolkit;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.GlobalFocusListener;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -57,6 +58,7 @@ public class Globals {
     private static GlobalFocusListener focusListener;
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
     private static TelemetryClient telemetryClient;
+    public static ClipBoardManager clipboardManager = new ClipBoardManager();
 
     private Globals() {
     }
