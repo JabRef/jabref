@@ -143,6 +143,33 @@ public class DuplicateCheckTest {
     }
 
     @Test
+    public void twoInbooksWithDifferentChaptersAreNotDuplicates() {
+        final String title = "Alice in Wonderland";
+        final String author = "Charles Lutwidge Dodgson";
+        final String language = "English";
+        final String publisher = "Macmillan";
+        final String year = "1865";
+
+        final BibEntry editionOne = new BibEntry(BibtexEntryTypes.INBOOK.getName());
+        editionOne.setField(FieldName.TITLE, title);
+        editionOne.setField(FieldName.AUTHOR, author);
+        editionOne.setField(FieldName.CHAPTER, "Chapter One – Down the Rabbit Hole");
+        editionOne.setField(FieldName.LANGUAGE, language);
+        editionOne.setField(FieldName.PUBLISHER, publisher);
+        editionOne.setField(FieldName.YEAR, year);
+
+        BibEntry editionTwo = new BibEntry(BibtexEntryTypes.INBOOK.getName());
+        editionTwo.setField(FieldName.TITLE, title);
+        editionTwo.setField(FieldName.AUTHOR, author);
+        editionTwo.setField(FieldName.CHAPTER, "Chapter Two – The Pool of Tears");
+        editionTwo.setField(FieldName.LANGUAGE, language);
+        editionTwo.setField(FieldName.PUBLISHER, publisher);
+        editionTwo.setField(FieldName.YEAR, year);
+
+        assertFalse(DuplicateCheck.isDuplicate(editionOne, editionTwo, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
     public void twoBooksWithDifferentEditionsAreNotDuplicates() {
         BibEntry editionOne = new BibEntry(BibtexEntryTypes.BOOK.getName());
         editionOne.setField(FieldName.TITLE, "Effective Java");

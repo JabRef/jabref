@@ -78,6 +78,10 @@ public class DuplicateCheck {
             return false;
         }
 
+        if (haveDifferentChaptersOfTheSameBook(one, two)) {
+            return false;
+        }
+
         EntryType type = EntryTypes.getTypeOrDefault(one.getType(), bibDatabaseMode);
         // The check if they have the same required fields:
         Collection<String> var = type.getRequiredFieldsFlat();
@@ -118,6 +122,13 @@ public class DuplicateCheck {
             }
         }
         return false;
+    }
+
+    private static boolean haveDifferentChaptersOfTheSameBook(final BibEntry one, final BibEntry two) {
+        return compareSingleField(FieldName.AUTHOR, one, two) == EQUAL &&
+                compareSingleField(FieldName.TITLE, one, two) == EQUAL &&
+                compareSingleField(FieldName.CHAPTER, one, two) == NOT_EQUAL;
+
     }
 
     private static double[] compareFieldSet(Collection<String> fields, BibEntry one, BibEntry two) {
