@@ -56,15 +56,21 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final BooleanProperty downloadOngoing = new SimpleBooleanProperty(false);
     private final BooleanProperty isAutomaticallyFound = new SimpleBooleanProperty(false);
     private final BooleanProperty canWriteXMPMetadata = new SimpleBooleanProperty(false);
-    private final DialogService dialogService = new FXDialogService();
+    private final DialogService dialogService;
     private final BibEntry entry;
     private final TaskExecutor taskExecutor;
 
     public LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
+        this(linkedFile, entry, databaseContext, taskExecutor, new FXDialogService());
+    }
+
+    protected LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext,
+                                  TaskExecutor taskExecutor, DialogService dialogService) {
         this.linkedFile = linkedFile;
         this.databaseContext = databaseContext;
         this.entry = entry;
         this.taskExecutor = taskExecutor;
+        this.dialogService = dialogService;
 
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(100)));
         canWriteXMPMetadata.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
