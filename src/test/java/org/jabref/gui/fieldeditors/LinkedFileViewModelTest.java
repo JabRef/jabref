@@ -48,16 +48,12 @@ public class LinkedFileViewModelTest {
     }
 
     @Test
-    public void deleteFilePathNotPresent() {
+    public void deleteWhenFilePathNotPresentReturnsFalse() {
         // Making this a spy, so we can inject an empty optional without digging into the implementation
-        linkedFile = spy(new LinkedFile("", "", ""));
-        doReturn(Optional.empty()).when(linkedFile).findIn(
-                any(BibDatabaseContext.class), any(FileDirectoryPreferences.class)
-        );
+        linkedFile = spy(new LinkedFile("", "nonexistent file", ""));
+        doReturn(Optional.empty()).when(linkedFile).findIn(any(BibDatabaseContext.class), any(FileDirectoryPreferences.class));
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(
-                linkedFile, entry, databaseContext, taskExecutor, dialogService
-        );
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService);
         boolean removed = viewModel.delete();
 
         assertFalse(removed);
@@ -65,7 +61,7 @@ public class LinkedFileViewModelTest {
     }
 
     @Test
-    public void deleteDialogRemoveFromEntry() throws IOException {
+    public void deleteWhenRemoveChosenReturnsTrue() throws IOException {
         File tempFile = tempFolder.newFile();
         linkedFile = new LinkedFile("", tempFile.getAbsolutePath(), "");
         when(dialogService.showCustomButtonDialogAndWait(
@@ -77,9 +73,7 @@ public class LinkedFileViewModelTest {
                 any(ButtonType.class)
         )).thenAnswer(invocation -> Optional.of(invocation.getArgument(3))); // first vararg - remove button
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(
-                linkedFile, entry, databaseContext, taskExecutor, dialogService
-        );
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService);
         boolean removed = viewModel.delete();
 
         assertTrue(removed);
@@ -87,7 +81,7 @@ public class LinkedFileViewModelTest {
     }
 
     @Test
-    public void deleteDialogDeleteFromEntry() throws IOException {
+    public void deleteWhenDeleteChosenReturnsTrueAndDeletesFile() throws IOException {
         File tempFile = tempFolder.newFile();
         linkedFile = new LinkedFile("", tempFile.getAbsolutePath(), "");
         when(dialogService.showCustomButtonDialogAndWait(
@@ -99,9 +93,7 @@ public class LinkedFileViewModelTest {
                 any(ButtonType.class)
         )).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(
-                linkedFile, entry, databaseContext, taskExecutor, dialogService
-        );
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService);
         boolean removed = viewModel.delete();
 
         assertTrue(removed);
@@ -110,7 +102,7 @@ public class LinkedFileViewModelTest {
 
 
     @Test
-    public void deleteDialogDeleteFromEntryException() throws IOException {
+    public void deleteWhenDeleteChosenAndFileMissingReturnsFalse() throws IOException {
         linkedFile = new LinkedFile("", "!!nonexistent file!!", "");
         when(dialogService.showCustomButtonDialogAndWait(
                 any(AlertType.class),
@@ -121,9 +113,7 @@ public class LinkedFileViewModelTest {
                 any(ButtonType.class)
         )).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(
-                linkedFile, entry, databaseContext, taskExecutor, dialogService
-        );
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService);
         boolean removed = viewModel.delete();
 
         verify(dialogService).showErrorDialogAndWait(anyString(), anyString());
@@ -131,7 +121,7 @@ public class LinkedFileViewModelTest {
     }
 
     @Test
-    public void deleteDialogCanceled() throws IOException {
+    public void deleteWhenDialogCancelledReturnsFalse() throws IOException {
         File tempFile = tempFolder.newFile();
         linkedFile = new LinkedFile("desc", tempFile.getAbsolutePath(), "pdf");
         when(dialogService.showCustomButtonDialogAndWait(
@@ -143,9 +133,7 @@ public class LinkedFileViewModelTest {
                 any(ButtonType.class)
         )).thenAnswer(invocation -> Optional.of(invocation.getArgument(5))); // third vararg - cancel button
 
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(
-                linkedFile, entry, databaseContext, taskExecutor, dialogService
-        );
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService);
         boolean removed = viewModel.delete();
 
         assertFalse(removed);
