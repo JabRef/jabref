@@ -52,6 +52,11 @@
      * A dark gray for borders
      */
     -fx-border: #868786;
+
+    /*
+     * A light gray for background for active items in list like elements such as menus, lists, trees, and tables.
+     */
+    -fx-selection-bar: #e5e5e5;
 }
 
 .hyperlink {
@@ -124,6 +129,24 @@
 
 .flatButtonNoSpaceTop {
     -fx-padding: -0.1em 0.5em 0.5em 0.5em;
+}
+
+.menu-bar {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+.menu-bar > .container > .menu-button > .label {
+    -fx-padding: 0.41777em 0.41777em 0.41777em 0.41777em; /* 5 5 5 5 */
+}
+
+.menu-bar > .menu {
+    -fx-padding: 0.0em 0.666667em 0.0em 0.666667em; /* 0 8 0 8 */
+}
+
+.menu-item {
+    -fx-padding: 0.5em 0.41777em 0.5em 0.41777em; /* 6 5 6 5 */
 }
 
 .tab-pane {

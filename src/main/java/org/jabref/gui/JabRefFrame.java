@@ -55,16 +55,19 @@ import javafx.collections.ListChangeListener;
 import javafx.embed.swing.JFXPanel;
 import javafx.embed.swing.SwingNode;
 import javafx.scene.Scene;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.Actions;
+import org.jabref.gui.actions.ActionsFX;
 import org.jabref.gui.actions.AutoLinkFilesAction;
 import org.jabref.gui.actions.ConnectToSharedDatabaseAction;
 import org.jabref.gui.actions.ErrorConsoleAction;
@@ -168,6 +171,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final ToolBar tlb = new ToolBar();
     private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this);
     private final JMenuBar mb = new JMenuBar();
+    private final MenuBar menu = new MenuBar();
     private final JLabel statusLine = new JLabel("", SwingConstants.LEFT);
     private final JLabel statusLabel = new JLabel(
             Localization.lang("Status")
@@ -887,7 +891,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         pushExternalButton = new PushToApplicationButton(this, pushApplications.getApplications());
         fillMenu();
         createToolBar();
-        //setJMenuBar(mb);
+        setTop(menu);
         //getContentPane().setLayout(new BorderLayout());
 
         JPanel toolbarPanel = new JPanel(new WrapLayout(FlowLayout.LEFT));
@@ -918,12 +922,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 }
             }
         });
-
-        StackPane header = new StackPane();
-        header.setId("header");
-        header.setPrefHeight(50);
-        header.setStyle("-fx-background-color: #4d4674; -fx-text-fill: white;");
-        setTop(header);
 
         SwingNode swingSidePane = new SwingNode();
         SwingUtilities.invokeLater(() -> {
@@ -1041,6 +1039,19 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     }
 
     private void fillMenu() {
+        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+
+        Menu fileMenu = new Menu(Localization.menuTitle("File"));
+        Menu editMenu = new Menu(Localization.menuTitle("Edit"));
+
+        fileMenu.getItems().addAll(
+                factory.createMenuItem(ActionsFX.ADD_FILE_LINK, null),
+                factory.createMenuItem(ActionsFX.READ, null),
+                factory.createMenuItem(ActionsFX.RANKING, null)
+        );
+
+        menu.getMenus().addAll(fileMenu, editMenu);
+
         mb.setBorder(null);
         JMenu file = JabRefFrame.subMenu(Localization.menuTitle("File"));
         JMenu edit = JabRefFrame.subMenu(Localization.menuTitle("Edit"));
