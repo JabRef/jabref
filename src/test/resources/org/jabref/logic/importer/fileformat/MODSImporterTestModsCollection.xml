@@ -3,7 +3,8 @@
 <modsCollection xmlns="http://www.loc.gov/mods/v3">
 	<mods ID="Mock++2003">
 		<titleInfo>
-			<title>A new microcosm to investigate oxygen dynamics at the sea ice water interface</title>
+			<title>A new microcosm to investigate oxygen dynamics at the sea ice
+				water interface</title>
 		</titleInfo>
 		<name type="personal">
 			<namePart type="family">Mock</namePart>
@@ -97,7 +98,8 @@
 		<typeOfResource>text</typeOfResource>
 		<location>
 			<url>http://int-res.com/abstracts/ame/v30/n2/p197-205.html</url>
-			<physicalLocation>Indiana University, Bloomington. University Archives P07803</physicalLocation>
+			<physicalLocation>Indiana University, Bloomington. University
+				Archives P07803</physicalLocation>
 		</location>
 		<identifier type="uri">http://int-res.com/abstracts/ame/v30/n2/p197-205.html</identifier>
 		<identifier type="citekey">Mock++2003</identifier>
@@ -136,7 +138,8 @@
 	</mods>
 	<mods ID="Schewe+Soltwedel2003">
 		<titleInfo>
-			<title>Benthic response to ice-edge-induced particle flux in the Arctic Ocean</title>
+			<title>Benthic response to ice-edge-induced particle flux in the
+				Arctic Ocean</title>
 		</titleInfo>
 		<name type="personal">
 			<namePart type="family">Schewe</namePart>
@@ -194,7 +197,8 @@
 	</mods>
 	<mods ID="Thomas+Dieckmann2003">
 		<titleInfo>
-			<title>Sea ice - an introduction to its physics, chemistry, biology and geology</title>
+			<title>Sea ice - an introduction to its physics, chemistry, biology
+				and geology</title>
 		</titleInfo>
 		<name type="personal">
 			<namePart type="family">Thomas</namePart>

@@ -5,6 +5,6 @@
         "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 
 <suppressions>
-    <suppress checks="[a-zA-Z0-9]*" files="[\\/]gen[\\/]" />
-    <suppress checks="[a-zA-Z0-9]*" files="[\\/]test[\\/]" />
+	<suppress checks="[a-zA-Z0-9]*" files="[\\/]gen[\\/]" />
+	<suppress checks="[a-zA-Z0-9]*" files="[\\/]test[\\/]" />
 </suppressions>
