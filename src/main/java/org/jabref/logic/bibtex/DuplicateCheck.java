@@ -78,7 +78,7 @@ public class DuplicateCheck {
             return false;
         }
 
-        if (haveDifferentChaptersOfTheSameBook(one, two)) {
+        if (haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {
             return false;
         }
 
@@ -124,10 +124,11 @@ public class DuplicateCheck {
         return false;
     }
 
-    private static boolean haveDifferentChaptersOfTheSameBook(final BibEntry one, final BibEntry two) {
+    private static boolean haveDifferentChaptersOrPagesOfTheSameBook(final BibEntry one, final BibEntry two) {
         return compareSingleField(FieldName.AUTHOR, one, two) == EQUAL &&
                 compareSingleField(FieldName.TITLE, one, two) == EQUAL &&
-                compareSingleField(FieldName.CHAPTER, one, two) == NOT_EQUAL;
+                (compareSingleField(FieldName.CHAPTER, one, two) == NOT_EQUAL ||
+                        compareSingleField(FieldName.PAGES, one, two) == NOT_EQUAL);
 
     }
 
@@ -201,6 +202,10 @@ public class DuplicateCheck {
         } else {
             stringOne = stringOne.toLowerCase(Locale.ROOT);
             stringTwo = stringTwo.toLowerCase(Locale.ROOT);
+            if (FieldName.CHAPTER.equals(field)) {
+                stringOne = stringOne.replaceAll("chapter", "").trim();
+                stringTwo = stringTwo.replaceAll("chapter", "").trim();
+            }
             double similarity = DuplicateCheck.correlateByWords(stringOne, stringTwo);
             if (similarity > 0.8) {
                 return EQUAL;
