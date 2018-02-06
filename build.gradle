@@ -178,6 +178,7 @@ dependencies {
 jacoco {
     toolVersion = '0.8.0'
 }
+
 dependencyUpdates {
     outputFormatter = "json"
 }
@@ -232,12 +233,12 @@ dependencyUpdates.resolutionStrategy = {
         }
         withModule("org.jacoco.agent") { ComponentSelection selection ->
             if (selection.candidate.version.equals("0.8.0")) {
-                selection.reject("As a native plugin we cannot control the actual version of jacoco. This depenency should be hidden.")
+                selection.reject("As a native plugin we cannot control the actual version of jacoco. This dependency should be hidden.")
             }
         }
         withModule("org.jacoco.ant") { ComponentSelection selection ->
             if (selection.candidate.version.equals("0.8.0")) {
-                selection.reject("As a native plugin we cannot control the actual version of jacoco. This depenency should be hidden.")
+                selection.reject("As a native plugin we cannot control the actual version of jacoco. This dependency should be hidden.")
             }
         }
     }
