@@ -2,7 +2,6 @@ package org.jabref.gui.filelist;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -35,23 +34,14 @@ public class FileListDialogViewModel extends AbstractViewModel {
     private final StringProperty descriptionProperty = new SimpleStringProperty("");
     private final ListProperty<ExternalFileType> externalfilesTypes = new SimpleListProperty<>(FXCollections.emptyObservableList());
     private final ObjectProperty<ExternalFileType> selectedExternalFileType = new SimpleObjectProperty<>();
-    private final BibDatabaseContext bibDatabaseContext;
+    private final BibDatabaseContext database;
     private final DialogService dialogService;
 
-    private boolean okPressed;
-    private final EnumSet<FileListDialogOptions> dialogOptions;
+    private final LinkedFile linkedFile;
 
-    public boolean isOkPressed() {
-        return okPressed;
-    }
-
-    public void setOkPressed() {
-        okPressed = true;
-    }
-
-    public FileListDialogViewModel(BibDatabaseContext bibDatabaseContext, DialogService dialogService, EnumSet<FileListDialogOptions> dialogOptions) {
-        this.dialogOptions = dialogOptions;
-        this.bibDatabaseContext = bibDatabaseContext;
+    public FileListDialogViewModel(LinkedFile linkedFile, BibDatabaseContext database, DialogService dialogService) {
+        this.linkedFile = linkedFile;
+        this.database = database;
         this.dialogService = dialogService;
         externalfilesTypes.set(FXCollections.observableArrayList(ExternalFileTypes.getInstance().getExternalFileTypeSelection()));
     }
@@ -71,10 +61,10 @@ public class FileListDialogViewModel extends AbstractViewModel {
         }
     }
 
-    public void browseFileDialog() {
+    public void openBrowseDialog() {
         String fileText = linkProperty().get();
 
-        Optional<Path> file = FileHelper.expandFilename(bibDatabaseContext, fileText,
+        Optional<Path> file = FileHelper.expandFilename(database, fileText,
                 Globals.prefs.getFileDirectoryPreferences());
 
         Path workingDir = file.orElse(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)));
@@ -83,23 +73,17 @@ public class FileListDialogViewModel extends AbstractViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(workingDir)
                 .withInitialFileName(fileName).build();
-        Optional<Path> path;
-
-        if (dialogOptions.contains(FileListDialogOptions.SHOW_SAVE_BUTTON)) {
-            path = dialogService.showFileSaveDialog(fileDialogConfiguration);
-        } else {
-            path = dialogService.showFileOpenDialog(fileDialogConfiguration);
-        }
-        path.ifPresent(newFile -> {
+        dialogService.showFileOpenDialog(fileDialogConfiguration)
+                .ifPresent(path -> {
             // Store the directory for next time:
-            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, newFile.toString());
+                    Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, path.toString());
 
             // If the file is below the file directory, make the path relative:
-            List<Path> fileDirectories = bibDatabaseContext
+                    List<Path> fileDirectories = database
                     .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
-            newFile = FileUtil.shortenFileName(newFile, fileDirectories);
+                    path = FileUtil.shortenFileName(path, fileDirectories);
 
-            linkProperty().set(newFile.toString());
+                    linkProperty().set(path.toString());
             checkExtension();
         });
     }

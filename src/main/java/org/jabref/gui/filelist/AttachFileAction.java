@@ -1,9 +1,8 @@
 package org.jabref.gui.filelist;
 
-import javafx.application.Platform;
-
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.actions.BaseAction;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -23,14 +22,10 @@ public class AttachFileAction implements BaseAction {
             return;
         }
         BibEntry entry = panel.getSelectedEntries().get(0);
-        LinkedFile flEntry = new LinkedFile("", "", "");
+        LinkedFile linkedFile = new LinkedFile("", "", "");
+        LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(linkedFile);
 
-        FileListDialogView dlg = new FileListDialogView(FileListDialogOptions.SHOW_OPEN_BUTTON);
-
-        Platform.runLater(() -> {
-            dlg.show();
-
-        });
+        DefaultTaskExecutor.runInJavaFXThread((Runnable) dialog::showAndWait);
         //
 
         /*   FileListEntryEditor editor = new FileListEntryEditor(flEntry, false, true,
