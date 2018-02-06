@@ -28,19 +28,19 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dialog for creating or modifying custom exports.
  */
 class CustomExportDialog extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(CustomExportDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomExportDialog.class);
 
     private final JTextField name = new JTextField(60);
     private final JTextField layoutFile = new JTextField(60);
@@ -95,8 +95,8 @@ class CustomExportDialog extends JabRefDialog {
         JButton browse = new JButton(Localization.lang("Browse"));
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileExtensions.LAYOUT)
-                .withDefaultExtension(FileExtensions.LAYOUT)
+                .addExtensionFilter(FileType.LAYOUT)
+                .withDefaultExtension(FileType.LAYOUT)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY)).build();
         DialogService ds = new FXDialogService();
         browse.addActionListener(

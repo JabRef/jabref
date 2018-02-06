@@ -8,31 +8,30 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-@Category(FetcherTest.class)
+@FetcherTest
 public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
 
-    @Before
+    @BeforeEach
     public void setUp() {
         bibEntry = new BibEntry();
         bibEntry.setType(BiblatexEntryTypes.BOOK);
-        bibEntry.setField("bibtexkey", "9780321356680");
+        bibEntry.setField("bibtexkey", "9780134685991");
         bibEntry.setField("title", "Effective Java");
-        bibEntry.setField("publisher", "Addison Wesley");
-        bibEntry.setField("year", "2008");
+        bibEntry.setField("publisher", "ADDISON WESLEY PUB CO INC");
+        bibEntry.setField("pagetotal", "416");
+        bibEntry.setField("year", "2018");
         bibEntry.setField("author", "Bloch, Joshua");
-        bibEntry.setField("date", "2008-05-08");
-        bibEntry.setField("ean", "9780321356680");
-        bibEntry.setField("isbn", "0321356683");
-        bibEntry.setField("pagetotal", "384");
-        bibEntry.setField("url", "http://www.ebook.de/de/product/6441328/joshua_bloch_effective_java.html");
+        bibEntry.setField("date", "2018-01-06");
+        bibEntry.setField("ean", "9780134685991");
+        bibEntry.setField("isbn", "0134685997");
+        bibEntry.setField("url", "http://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html");
 
         fetcher = new IsbnViaEbookDeFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
@@ -52,7 +51,14 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
     @Test
     @Override
     public void searchByIdSuccessfulWithShortISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0321356683");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0134685997");
+        assertEquals(Optional.of(bibEntry), fetchedEntry);
+    }
+
+    @Test
+    @Override
+    public void searchByIdSuccessfulWithLongISBN() throws FetcherException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0134685997");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
@@ -63,7 +69,7 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setType(BiblatexEntryTypes.BOOK);
         bibEntry.setField("bibtexkey", "9783642434730");
         bibEntry.setField("title", "Fundamentals of Business Process Management");
-        bibEntry.setField("publisher", "Springer");
+        bibEntry.setField("publisher", "Springer Berlin Heidelberg");
         bibEntry.setField("year", "2015");
         bibEntry.setField("author", "Dumas, Marlon and Rosa, Marcello La and Mendling, Jan and Reijers, Hajo A.");
         bibEntry.setField("date", "2015-04-12");

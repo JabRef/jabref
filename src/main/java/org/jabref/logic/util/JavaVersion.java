@@ -73,4 +73,8 @@ public class JavaVersion {
     public String getJavaVersion() {
         return JAVA_VERSION;
     }
+
+    public String getJavaInstallationDirectory() {
+        return System.getProperty("java.home");
+    }
 }

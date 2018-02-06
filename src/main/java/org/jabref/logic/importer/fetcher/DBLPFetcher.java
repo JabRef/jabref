@@ -16,6 +16,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 
@@ -32,7 +33,6 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
 
     public DBLPFetcher(ImportFormatPreferences importFormatPreferences) {
         Objects.requireNonNull(importFormatPreferences);
-
         this.importFormatPreferences = importFormatPreferences;
     }
 
@@ -50,7 +50,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(importFormatPreferences);
+        return new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
     }
 
     @Override

@@ -36,24 +36,24 @@ import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.exception.NotASharedDatabaseException;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.migrations.FileLinksUpgradeWarning;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.shared.exception.DatabaseNotSupportedException;
-import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.shared.exception.NotASharedDatabaseException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // The action concerned with opening an existing database.
 
 public class OpenDatabaseAction extends MnemonicAwareAction {
 
-    public static final Log LOGGER = LogFactory.getLog(OpenDatabaseAction.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
     private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = new ArrayList<>();
@@ -102,8 +102,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
             DialogService ds = new FXDialogService();
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileExtensions.BIBTEX_DB)
-                    .withDefaultExtension(FileExtensions.BIBTEX_DB)
+                    .addExtensionFilter(FileType.BIBTEX_DB)
+                    .withDefaultExtension(FileType.BIBTEX_DB)
                     .withInitialDirectory(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)))
                     .build();
 
@@ -233,7 +233,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
             ParserResult result;
             result = OpenDatabase.loadDatabase(fileToLoad.toString(),
-                    Globals.prefs.getImportFormatPreferences());
+                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
 
             if (result.getDatabase().isShared()) {
                 try {

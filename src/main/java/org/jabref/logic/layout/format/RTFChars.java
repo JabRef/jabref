@@ -5,8 +5,8 @@ import org.jabref.logic.layout.StringInt;
 import org.jabref.logic.util.strings.RtfCharMap;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Transform a LaTeX-String to RTF.
@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RTFChars implements LayoutFormatter {
 
-    private static final Log LOGGER = LogFactory.getLog(LayoutFormatter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LayoutFormatter.class);
 
     private static final RtfCharMap RTF_CHARS = new RtfCharMap();
 

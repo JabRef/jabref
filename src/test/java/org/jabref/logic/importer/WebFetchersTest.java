@@ -9,11 +9,11 @@ import org.jabref.logic.importer.fetcher.IsbnViaChimboriFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class WebFetchersTest {
@@ -21,7 +21,7 @@ public class WebFetchersTest {
     Reflections reflections = new Reflections("org.jabref");
     ImportFormatPreferences importFormatPreferences;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         importFormatPreferences = mock(ImportFormatPreferences.class);
     }
@@ -51,11 +51,19 @@ public class WebFetchersTest {
 
     @Test
     public void getSearchBasedFetchersReturnsAllFetcherDerivingFromSearchBasedFetcher() throws Exception {
-        List<SearchBasedFetcher> idFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences);
+        List<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences);
 
         Set<Class<? extends SearchBasedFetcher>> expected = reflections.getSubTypesOf(SearchBasedFetcher.class);
         expected.remove(SearchBasedParserFetcher.class);
-        assertEquals(expected, getClasses(idFetchers));
+        assertEquals(expected, getClasses(searchBasedFetchers));
+    }
+
+    @Test
+    public void getFullTextFetchersReturnsAllFetcherDerivingFromFullTextFetcher() throws Exception {
+        List<FulltextFetcher> fullTextFetchers = WebFetchers.getFullTextFetchers(importFormatPreferences);
+
+        Set<Class<? extends FulltextFetcher>> expected = reflections.getSubTypesOf(FulltextFetcher.class);
+        assertEquals(expected, getClasses(fullTextFetchers));
     }
 
     @Test

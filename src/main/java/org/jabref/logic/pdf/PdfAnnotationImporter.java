@@ -14,17 +14,17 @@ import java.util.Optional;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PdfAnnotationImporter implements AnnotationImporter {
 
-    private static final Log LOGGER = LogFactory.getLog(PdfAnnotationImporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PdfAnnotationImporter.class);
 
     /**
      * Imports the comments from a pdf specified by its path

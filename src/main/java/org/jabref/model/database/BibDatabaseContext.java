@@ -11,13 +11,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.model.Defaults;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.event.CoarseChangeFilter;
+import org.jabref.model.database.shared.DatabaseLocation;
+import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.shared.DBMSSynchronizer;
 
 /**
  * Represents everything related to a BIB file. <p> The entries are stored in BibDatabase, the other data in MetaData
@@ -32,7 +32,7 @@ public class BibDatabaseContext {
      * The file where this database was last saved to.
      */
     private File file;
-    private DBMSSynchronizer dbmsSynchronizer;
+    private DatabaseSynchronizer dbmsSynchronizer;
     private CoarseChangeFilter dbmsListener;
     private DatabaseLocation location;
 
@@ -80,14 +80,6 @@ public class BibDatabaseContext {
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, File file) {
         this(database, metaData, file, new Defaults());
-    }
-
-    public BibDatabaseContext(Defaults defaults, DatabaseLocation location, Character keywordSeparator,
-                              GlobalBibtexKeyPattern globalCiteKeyPattern) {
-        this(new BibDatabase(), new MetaData(), defaults);
-        if (location == DatabaseLocation.SHARED) {
-            convertToSharedDatabase(keywordSeparator, globalCiteKeyPattern);
-        }
     }
 
     public BibDatabaseMode getMode() {
@@ -252,7 +244,7 @@ public class BibDatabaseContext {
         return dir;
     }
 
-    public DBMSSynchronizer getDBMSSynchronizer() {
+    public DatabaseSynchronizer getDBMSSynchronizer() {
         return this.dbmsSynchronizer;
     }
 
@@ -264,8 +256,9 @@ public class BibDatabaseContext {
         return this.location;
     }
 
-    public void convertToSharedDatabase(Character keywordSeparator, GlobalBibtexKeyPattern globalCiteKeyPattern) {
-        this.dbmsSynchronizer = new DBMSSynchronizer(this, keywordSeparator, globalCiteKeyPattern);
+    public void convertToSharedDatabase(DatabaseSynchronizer dmbsSynchronizer) {
+        this.dbmsSynchronizer = dmbsSynchronizer;
+
         this.dbmsListener = new CoarseChangeFilter(this);
         dbmsListener.registerListener(dbmsSynchronizer);
 

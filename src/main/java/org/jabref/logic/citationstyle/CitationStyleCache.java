@@ -22,7 +22,7 @@ public class CitationStyleCache {
     private static final int CACHE_SIZE = 1024;
 
     private CitationStyle citationStyle;
-    private LoadingCache<BibEntry, String> citationStyleCache;
+    private final LoadingCache<BibEntry, String> citationStyleCache;
 
 
     public CitationStyleCache(BibDatabaseContext bibDatabaseContext) {
@@ -30,10 +30,10 @@ public class CitationStyleCache {
     }
 
     public CitationStyleCache(BibDatabaseContext bibDatabaseContext, CitationStyle citationStyle) {
-        this.citationStyle = citationStyle;
+        this.citationStyle = Objects.requireNonNull(citationStyle);
         citationStyleCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<BibEntry, String>() {
             @Override
-            public String load(BibEntry entry) throws Exception {
+            public String load(BibEntry entry) {
                 return CitationStyleGenerator.generateCitation(entry, getCitationStyle().getSource(), CitationStyleOutputFormat.HTML);
             }
         });

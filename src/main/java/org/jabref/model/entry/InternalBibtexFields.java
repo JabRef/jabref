@@ -153,7 +153,7 @@ public class InternalBibtexFields {
         }
 
         // some semi-standard fields
-        dummy = new BibtexSingleField(BibEntry.KEY_FIELD, true);
+        dummy = new BibtexSingleField(BibEntry.KEY_FIELD, true).withProperties(FieldProperty.KEY);
         dummy.setPrivate();
         add(dummy);
 

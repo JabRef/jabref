@@ -4,19 +4,19 @@ import java.util.function.Function;
 
 import org.jabref.Globals;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.util.FileUpdateMonitor;
+import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.injection.PresenterFactory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultInjector implements PresenterFactory {
 
-    private static final Log LOGGER = LogFactory.getLog(DefaultInjector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultInjector.class);
 
     /**
      * This method takes care of creating dependencies.
@@ -36,7 +36,7 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.journalAbbreviationLoader;
         } else if (clazz == StateManager.class) {
             return Globals.stateManager;
-        } else if (clazz == FileUpdateMonitor.class) {
+        } else if (clazz == DefaultFileUpdateMonitor.class) {
             return Globals.getFileUpdateMonitor();
         } else {
             try {

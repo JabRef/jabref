@@ -263,12 +263,12 @@ public class FileUtilTest {
 
     @Test
     public void getFileNameWithSimpleString() {
-        assertEquals("test", FileUtil.getFileName("test.pdf"));
+        assertEquals("test", FileUtil.getBaseName("test.pdf"));
     }
 
     @Test
     public void getFileNameWithMultipleDotsString() {
-        assertEquals("te.st", FileUtil.getFileName("te.st.PdF  "));
+        assertEquals("te.st", FileUtil.getBaseName("te.st.PdF  "));
     }
 
     @Test
