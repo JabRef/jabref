@@ -38,19 +38,19 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dialog to manage custom importers.
  */
 public class ImportCustomizationDialog extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(ImportCustomizationDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportCustomizationDialog.class);
 
     // Column widths for import customization dialog table:
     private static final int COL_0_WIDTH = 200;
@@ -83,8 +83,8 @@ public class ImportCustomizationDialog extends JabRefDialog {
         addFromFolderButton.addActionListener(e -> {
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileExtensions.CLASS)
-                    .withDefaultExtension(FileExtensions.JAR)
+                    .addExtensionFilter(FileType.CLASS)
+                    .withDefaultExtension(FileType.JAR)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
             DialogService ds = new FXDialogService();
 
@@ -118,8 +118,8 @@ public class ImportCustomizationDialog extends JabRefDialog {
         JButton addFromJarButton = new JButton(Localization.lang("Add from JAR"));
         addFromJarButton.addActionListener(e -> {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilters(EnumSet.of(FileExtensions.ZIP, FileExtensions.JAR))
-                    .withDefaultExtension(FileExtensions.JAR)
+                    .addExtensionFilters(EnumSet.of(FileType.ZIP, FileType.JAR))
+                    .withDefaultExtension(FileType.JAR)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
             DialogService ds = new FXDialogService();
 
@@ -170,7 +170,7 @@ public class ImportCustomizationDialog extends JabRefDialog {
                 Globals.prefs.customImports
                         .remove(((ImportTableModel) customImporterTable.getModel()).getImporter(row));
                 Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
-                        Globals.prefs.getXMPPreferences());
+                        Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
                 customImporterTable.revalidate();
                 customImporterTable.repaint();
             }
@@ -261,7 +261,7 @@ public class ImportCustomizationDialog extends JabRefDialog {
     public void addOrReplaceImporter(CustomImporter importer) {
         Globals.prefs.customImports.replaceImporter(importer);
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
-                Globals.prefs.getXMPPreferences());
+                Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
         ((ImportTableModel) customImporterTable.getModel()).fireTableDataChanged();
     }
 

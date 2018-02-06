@@ -48,8 +48,8 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Oscar Gustafsson
@@ -59,7 +59,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class MergeEntries {
 
-    private static final Log LOGGER = LogFactory.getLog(MergeEntries.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MergeEntries.class);
 
 
     private static final String MARGIN = "10px";

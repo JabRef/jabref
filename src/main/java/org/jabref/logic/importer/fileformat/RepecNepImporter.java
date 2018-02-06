@@ -11,13 +11,13 @@ import java.util.Objects;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Imports a New Economics Papers-Message from the REPEC-NEP Service.
@@ -141,7 +141,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RepecNepImporter extends Importer {
 
-    private static final Log LOGGER = LogFactory.getLog(RepecNepImporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RepecNepImporter.class);
 
     private static final Collection<String> RECOGNIZED_FIELDS = Arrays.asList("Keywords", "JEL", "Date", "URL", "By");
     private final ImportFormatPreferences importFormatPreferences;
@@ -166,8 +166,8 @@ public class RepecNepImporter extends Importer {
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return FileExtensions.REPEC;
+    public FileType getFileType() {
+        return FileType.REPEC;
     }
 
     @Override

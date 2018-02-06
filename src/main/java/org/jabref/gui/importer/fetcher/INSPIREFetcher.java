@@ -22,8 +22,8 @@ import org.jabref.logic.importer.util.INSPIREBibtexFilterReader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -41,7 +41,7 @@ public class INSPIREFetcher implements EntryFetcher {
 
     private static final String INSPIRE_HOST = "inspirehep.net";
 
-    private static final Log LOGGER = LogFactory.getLog(INSPIREFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(INSPIREFetcher.class);
     /**
      * Construct the query URL
      *
@@ -107,7 +107,7 @@ public class INSPIREFetcher implements EntryFetcher {
 
         try (INSPIREBibtexFilterReader reader = new INSPIREBibtexFilterReader(
                 new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
-            ParserResult pr = new BibtexParser(Globals.prefs.getImportFormatPreferences()).parse(reader);
+            ParserResult pr = new BibtexParser(Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor()).parse(reader);
             return pr.getDatabase();
         }
     }

@@ -3,12 +3,14 @@ package org.jabref;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Test;
 
@@ -33,7 +35,7 @@ public class TestIconsProperties {
                 properties.entrySet().isEmpty());
 
         // check that each key references an existing file
-        for(Map.Entry<Object, Object> entry : properties.entrySet()) {
+        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
             String name = entry.getKey().toString();
             String value = entry.getValue().toString();
 
@@ -42,14 +44,15 @@ public class TestIconsProperties {
 
         // check that each image in the folder is referenced by a key
         List<String> imagesReferencedFromProperties = new ArrayList<>();
-        for(Map.Entry<Object, Object> entry : properties.entrySet()) {
+        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
             imagesReferencedFromProperties.add(entry.getValue().toString());
         }
 
-        List<String> fileNamesInFolder = Files.list(Paths.get(folder)).map(p -> p.getFileName().toString()).collect(Collectors.toList());
-        fileNamesInFolder.removeAll(imagesReferencedFromProperties);
+        try (Stream<Path> pathStream = Files.list(Paths.get(folder))) {
+            List<String> fileNamesInFolder = pathStream.map(p -> p.getFileName().toString()).collect(Collectors.toList());
+            fileNamesInFolder.removeAll(imagesReferencedFromProperties);
 
-        assertEquals("Images are in the folder that are unused", "[red.png]", fileNamesInFolder.toString());
+            assertEquals("Images are in the folder that are unused", "[red.png]", fileNamesInFolder.toString());
+        }
     }
-
 }

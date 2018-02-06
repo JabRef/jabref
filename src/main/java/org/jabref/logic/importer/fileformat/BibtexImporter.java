@@ -11,7 +11,8 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
+import org.jabref.model.util.FileUpdateMonitor;
 
 /**
  * This importer exists only to enable `--importToOpen someEntry.bib`
@@ -25,10 +26,11 @@ public class BibtexImporter extends Importer {
     private static final String SIGNATURE = "This file was created with JabRef";
 
     private final ImportFormatPreferences importFormatPreferences;
+    private FileUpdateMonitor fileMonitor;
 
-
-    public BibtexImporter(ImportFormatPreferences importFormatPreferences) {
+    public BibtexImporter(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = importFormatPreferences;
+        this.fileMonitor = fileMonitor;
     }
     /**
      * @return true as we have no effective way to decide whether a file is in bibtex format or not. See
@@ -67,7 +69,7 @@ public class BibtexImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        return new BibtexParser(importFormatPreferences).parse(reader);
+        return new BibtexParser(importFormatPreferences, fileMonitor).parse(reader);
     }
 
     @Override
@@ -76,8 +78,8 @@ public class BibtexImporter extends Importer {
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return FileExtensions.BIBTEX_DB;
+    public FileType getFileType() {
+        return FileType.BIBTEX_DB;
     }
 
     @Override

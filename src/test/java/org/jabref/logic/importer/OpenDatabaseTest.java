@@ -11,6 +11,8 @@ import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,7 +31,7 @@ public class OpenDatabaseTest {
     private final File bibHeader;
     private final File bibHeaderAndSignature;
     private final File bibEncodingWithoutNewline;
-
+    private FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
     public OpenDatabaseTest() throws URISyntaxException {
         bibNoHeader = Paths.get(OpenDatabaseTest.class.getResource("headerless.bib").toURI()).toFile();
@@ -49,33 +51,33 @@ public class OpenDatabaseTest {
 
     @Test
     public void useFallbackEncodingIfNoHeader() throws IOException {
-        ParserResult result = OpenDatabase.loadDatabase(bibNoHeader, importFormatPreferences);
+        ParserResult result = OpenDatabase.loadDatabase(bibNoHeader, importFormatPreferences, fileMonitor);
         Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 
     @Test
     public void useFallbackEncodingIfUnknownHeader() throws IOException {
-        ParserResult result = OpenDatabase.loadDatabase(bibWrongHeader, importFormatPreferences);
+        ParserResult result = OpenDatabase.loadDatabase(bibWrongHeader, importFormatPreferences, fileMonitor);
         Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 
     @Test
     public void useSpecifiedEncoding() throws IOException {
         ParserResult result = OpenDatabase.loadDatabase(bibHeader,
-                importFormatPreferences.withEncoding(StandardCharsets.US_ASCII));
+                importFormatPreferences.withEncoding(StandardCharsets.US_ASCII), fileMonitor);
         Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 
     @Test
     public void useSpecifiedEncodingWithSignature() throws IOException {
         ParserResult result = OpenDatabase.loadDatabase(bibHeaderAndSignature,
-                importFormatPreferences.withEncoding(StandardCharsets.US_ASCII));
+                importFormatPreferences.withEncoding(StandardCharsets.US_ASCII), fileMonitor);
         Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 
     @Test
     public void entriesAreParsedNoHeader() throws IOException {
-        ParserResult result = OpenDatabase.loadDatabase(bibNoHeader, importFormatPreferences);
+        ParserResult result = OpenDatabase.loadDatabase(bibNoHeader, importFormatPreferences, fileMonitor);
         BibDatabase db = result.getDatabase();
 
         // Entry
@@ -85,7 +87,7 @@ public class OpenDatabaseTest {
 
     @Test
     public void entriesAreParsedHeader() throws IOException {
-        ParserResult result = OpenDatabase.loadDatabase(bibHeader, importFormatPreferences);
+        ParserResult result = OpenDatabase.loadDatabase(bibHeader, importFormatPreferences, fileMonitor);
         BibDatabase db = result.getDatabase();
 
         // Entry
@@ -95,7 +97,7 @@ public class OpenDatabaseTest {
 
     @Test
     public void entriesAreParsedHeaderAndSignature() throws IOException {
-        ParserResult result = OpenDatabase.loadDatabase(bibHeaderAndSignature, importFormatPreferences);
+        ParserResult result = OpenDatabase.loadDatabase(bibHeaderAndSignature, importFormatPreferences, fileMonitor);
         BibDatabase db = result.getDatabase();
 
         // Entry
@@ -108,7 +110,7 @@ public class OpenDatabaseTest {
      */
     @Test
     public void correctlyParseEncodingWithoutNewline() throws IOException {
-        ParserResult result = OpenDatabase.loadDatabase(bibEncodingWithoutNewline, importFormatPreferences);
+        ParserResult result = OpenDatabase.loadDatabase(bibEncodingWithoutNewline, importFormatPreferences, fileMonitor);
         Assert.assertEquals(StandardCharsets.US_ASCII, result.getMetaData().getEncoding().get());
 
         BibDatabase db = result.getDatabase();

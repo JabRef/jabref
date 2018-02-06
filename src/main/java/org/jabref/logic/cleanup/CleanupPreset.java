@@ -60,6 +60,9 @@ public class CleanupPreset {
         if (preferences.getBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX)) {
             activeJobs.add(CleanupStep.CONVERT_TO_BIBLATEX);
         }
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBTEX)) {
+            activeJobs.add(CleanupStep.CONVERT_TO_BIBTEX);
+        }
         if (preferences.getBoolean(JabRefPreferences.CLEANUP_FIX_FILE_LINKS)) {
             activeJobs.add(CleanupStep.FIX_FILE_LINKS);
         }
@@ -102,6 +105,10 @@ public class CleanupPreset {
         return isActive(CleanupStep.CONVERT_TO_BIBLATEX);
     }
 
+    public boolean isConvertToBibtex() {
+        return isActive(CleanupStep.CONVERT_TO_BIBTEX);
+    }
+
     public boolean isRenamePdfOnlyRelativePaths() {
         return isActive(CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
     }
@@ -117,6 +124,7 @@ public class CleanupPreset {
         preferences.putBoolean(JabRefPreferences.CLEANUP_UPGRADE_EXTERNAL_LINKS,
                 isActive(CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
         preferences.putBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX, isActive(CleanupStep.CONVERT_TO_BIBLATEX));
+        preferences.putBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBTEX, isActive(CleanupStep.CONVERT_TO_BIBTEX));
         preferences.putBoolean(JabRefPreferences.CLEANUP_FIX_FILE_LINKS, isActive(CleanupStep.FIX_FILE_LINKS));
 
         preferences.putStringList(JabRefPreferences.CLEANUP_FORMATTERS, formatterCleanups.getAsStringList(OS.NEWLINE));
@@ -146,6 +154,10 @@ public class CleanupPreset {
          * Converts to biblatex format
          */
         CONVERT_TO_BIBLATEX,
+        /**
+         * Converts to bibtex format
+         */
+        CONVERT_TO_BIBTEX,
         MOVE_PDF,
         FIX_FILE_LINKS,
         CLEAN_UP_ISSN

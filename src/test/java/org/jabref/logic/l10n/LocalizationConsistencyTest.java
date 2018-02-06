@@ -48,28 +48,6 @@ public class LocalizationConsistencyTest {
     }
 
     @Test
-    public void nonEnglishFilesMustHaveSubsetOfKeys() {
-        for (String bundle : Arrays.asList("JabRef", "Menu")) {
-            Set<String> englishKeys = LocalizationParser
-                    .getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, "en"));
-
-            List<String> nonEnglishLanguages = Languages.LANGUAGES.values().stream().filter(l -> !"en".equals(l))
-                    .collect(Collectors.toList());
-            for (String lang : nonEnglishLanguages) {
-                Set<String> nonEnglishKeys = LocalizationParser
-                        .getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, lang));
-
-                // we do not check for missing keys as Crowdin adds them automatically
-
-                List<String> obsolete = new ArrayList<>(nonEnglishKeys);
-                obsolete.removeAll(englishKeys);
-
-                assertEquals("Obsolete keys of " + lang, Collections.emptyList(), obsolete);
-            }
-        }
-    }
-
-    @Test
     public void ensureNoDuplicates() {
         for (String bundle : Arrays.asList("JabRef", "Menu")) {
             for (String lang : Languages.LANGUAGES.values()) {
@@ -138,8 +116,7 @@ public class LocalizationConsistencyTest {
                 .distinct().collect(Collectors.toList());
 
         assertEquals("DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
-                        "1. PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n" +
-                        "2. EXECUTE: gradlew localizationUpdate\n" +
+                        "PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n" +
                         missingKeys.parallelStream()
                                 .map(key -> String.format("\n%s=%s\n", key.getKey(), key.getKey().replaceAll("\\\\ ", " ")))
                                 .collect(Collectors.toList()),
@@ -151,8 +128,7 @@ public class LocalizationConsistencyTest {
         Set<LocalizationEntry> missingKeys = LocalizationParser.find(LocalizationBundleForTest.MENU);
 
         assertEquals("DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH MENU FILE\n" +
-                        "1. PASTE THESE INTO THE ENGLISH MENU FILE\n" +
-                        "2. EXECUTE: gradlew localizationUpdate\n" +
+                        "PASTE THESE INTO THE ENGLISH MENU FILE\n" +
                         missingKeys.parallelStream()
                                 .map(key -> String.format("%s=%s", key.getKey(), key.getKey()))
                                 .collect(Collectors.toList()),
@@ -165,8 +141,7 @@ public class LocalizationConsistencyTest {
 
         assertEquals("Obsolete keys found in language properties file: " + obsoleteKeys + "\n" +
                         "1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
-                        "2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE\n" +
-                        "3. EXECUTE: gradlew localizationUpdate\n",
+                        "2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE\n",
                 Collections.<String>emptySet(), obsoleteKeys);
     }
 
@@ -176,8 +151,7 @@ public class LocalizationConsistencyTest {
 
         assertEquals("Obsolete keys found in the menu properties file: " + obsoleteKeys + "\n" +
                         "1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
-                        "2. REMOVE THESE FROM THE ENGLISH MENU FILE\n" +
-                        "3. EXECUTE: gradlew localizationUpdate\n",
+                        "2. REMOVE THESE FROM THE ENGLISH MENU FILE\n",
                 Collections.<String>emptySet(), obsoleteKeys);
     }
 

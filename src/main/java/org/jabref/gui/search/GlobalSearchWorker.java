@@ -15,12 +15,12 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class GlobalSearchWorker extends SwingWorker<Map<BasePanel, List<BibEntry>>, Void> {
 
-    private static final Log LOGGER = LogFactory.getLog(GlobalSearchWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchWorker.class);
 
     private final JabRefFrame frame;
     private final SearchQuery searchQuery;

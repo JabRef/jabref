@@ -9,7 +9,6 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.swing.Icon;
@@ -47,15 +46,15 @@ import org.jabref.model.entry.specialfields.SpecialFieldValue;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * List event, mouse, key and focus listener for the main table that makes up the
  * most part of the BasePanel for a single BIB database.
  */
 public class MainTableSelectionListener implements ListEventListener<BibEntry>, MouseListener, KeyListener, FocusListener {
-    private static final Log LOGGER = LogFactory.getLog(MainTableSelectionListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainTableSelectionListener.class);
 
     private final MainTable table;
     private final BasePanel panel;
@@ -96,7 +95,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
 
         final BibEntry newSelected = selected.get(0);
         if ((panel.getMode() == BasePanelMode.SHOWING_EDITOR || panel.getMode() == BasePanelMode.WILL_SHOW_EDITOR)
-                && panel.getCurrentEditor() != null && newSelected == panel.getCurrentEditor().getEntry()) {
+                && panel.getEntryEditor() != null && newSelected == panel.getEntryEditor().getEntry()) {
             // entry already selected and currently editing it, do not steal the focus from the selected textfield
             return;
         }
@@ -104,27 +103,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         if (newSelected != null) {
             final BasePanelMode mode = panel.getMode(); // What is the panel already showing?
             if ((mode == BasePanelMode.WILL_SHOW_EDITOR) || (mode == BasePanelMode.SHOWING_EDITOR)) {
-                // An entry is currently being edited.
-                EntryEditor oldEditor = panel.getCurrentEditor();
-                String visName = null;
-                if (oldEditor != null) {
-                    visName = oldEditor.getVisibleTabName();
-                }
-                // Get a new editor for the entry to edit:
-                EntryEditor newEditor = panel.getEntryEditor(newSelected);
-
-                // Show the new editor unless it was already visible:
-                if (!Objects.equals(newEditor, oldEditor) || (mode != BasePanelMode.SHOWING_EDITOR)) {
-
-                    if (visName != null) {
-                        newEditor.setVisibleTab(visName);
-                    }
-                    panel.showEntryEditor(newEditor);
-                    SwingUtilities.invokeLater(() -> table.ensureVisible(table.getSelectedRow()));
-                } else {
-                    // if not used destroy the EntryEditor
-                    newEditor.setMovingToDifferentEntry();
-                }
+                panel.showAndEdit(newSelected);
+                SwingUtilities.invokeLater(() -> table.ensureVisible(table.getSelectedRow()));
             } else if (panel.getMode() == BasePanelMode.SHOWING_NOTHING || panel.getMode() == BasePanelMode.SHOWING_PREVIEW) {
                 // Either nothing or a preview was shown. Update the preview.
                 updatePreview(newSelected);
@@ -165,11 +145,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     }
 
     public void editSignalled(BibEntry entry) {
-        final BasePanelMode mode = panel.getMode();
-        if (mode != BasePanelMode.SHOWING_EDITOR) {
-            panel.showEntryEditor(panel.getEntryEditor(entry));
-        }
-        panel.getCurrentEditor().requestFocus();
+        panel.showAndEdit(entry);
     }
 
     @Override

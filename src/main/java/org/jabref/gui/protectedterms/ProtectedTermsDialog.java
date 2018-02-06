@@ -51,7 +51,7 @@ import org.jabref.gui.util.WindowLocation;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
@@ -59,15 +59,15 @@ import org.jabref.preferences.JabRefPreferences;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class produces a dialog box for managing term list files.
  */
 public class ProtectedTermsDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(ProtectedTermsDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsDialog.class);
 
     private final JabRefFrame frame;
     private JDialog diag;
@@ -431,8 +431,8 @@ public class ProtectedTermsDialog {
 
             JButton browse = new JButton(Localization.lang("Browse"));
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileExtensions.TERMS)
-                    .withDefaultExtension(FileExtensions.TERMS)
+                    .addExtensionFilter(FileType.TERMS)
+                    .withDefaultExtension(FileType.TERMS)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
             DialogService ds = new FXDialogService();
 

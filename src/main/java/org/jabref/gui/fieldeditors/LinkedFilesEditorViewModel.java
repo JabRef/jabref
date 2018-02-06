@@ -44,12 +44,12 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
-    private static final Log LOGGER = LogFactory.getLog(LinkedFilesEditorViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFilesEditorViewModel.class);
 
     private final ListProperty<LinkedFileViewModel> files = new SimpleListProperty<>(FXCollections.observableArrayList(LinkedFileViewModel::getObservables));
     private final BooleanProperty fulltextLookupInProgress = new SimpleBooleanProperty(false);
@@ -98,7 +98,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
 
         LinkedFile linkedFile = fromFile(file, fileDirectories);
-        return new LinkedFileViewModel(linkedFile, entry, databaseContext);
+        return new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor);
 
     }
 
@@ -112,7 +112,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     private List<LinkedFileViewModel> parseToFileViewModel(String stringValue) {
         return FileFieldParser.parse(stringValue).stream()
-                .map(linkedFile -> new LinkedFileViewModel(linkedFile, entry, databaseContext))
+                .map(linkedFile -> new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor))
                 .collect(Collectors.toList());
     }
 
@@ -136,7 +136,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(
                 newFile -> {
                     LinkedFile newLinkedFile = fromFile(newFile, fileDirectories);
-                    files.add(new LinkedFileViewModel(newLinkedFile, entry, databaseContext));
+                    files.add(new LinkedFileViewModel(newLinkedFile, entry, databaseContext, taskExecutor));
                 });
     }
 
@@ -159,11 +159,15 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         List<LinkedFileViewModel> result = new ArrayList<>();
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
-        List<LinkedFile> linkedFiles = util.findAssociatedNotLinkedFiles(entry);
-        for (LinkedFile linkedFile : linkedFiles) {
-            LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(linkedFile, entry, databaseContext);
-            newLinkedFile.markAsAutomaticallyFound();
-            result.add(newLinkedFile);
+        try {
+            List<LinkedFile> linkedFiles = util.findAssociatedNotLinkedFiles(entry);
+            for (LinkedFile linkedFile : linkedFiles) {
+                LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor);
+                newLinkedFile.markAsAutomaticallyFound();
+                result.add(newLinkedFile);
+            }
+        } catch (IOException e) {
+            dialogService.showErrorDialogAndWait("Error accessing the file system", e);
         }
 
         return result;
@@ -209,16 +213,17 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         Path destination = constructSuggestedPath(suggestedType, fileDirectories);
 
         LinkedFileViewModel temporaryDownloadFile = new LinkedFileViewModel(
-                new LinkedFile("", url, suggestedTypeName), entry, databaseContext);
+                new LinkedFile("", url, suggestedTypeName), entry, databaseContext, taskExecutor);
         files.add(temporaryDownloadFile);
-        FileDownloadTask downloadTask = new FileDownloadTask(url, destination);
-        temporaryDownloadFile.downloadProgressProperty().bind(downloadTask.progressProperty());
-        downloadTask.setOnSucceeded(event -> {
-            files.remove(temporaryDownloadFile);
-            LinkedFile newLinkedFile = fromFile(destination, fileDirectories);
-            files.add(new LinkedFileViewModel(newLinkedFile, entry, databaseContext));
-        });
-        downloadTask.setOnFailed(event -> dialogService.showErrorDialogAndWait("", downloadTask.getException()));
+        BackgroundTask<Void> downloadTask = new FileDownloadTask(url, destination)
+                .onSuccess(event -> {
+                    files.remove(temporaryDownloadFile);
+                    LinkedFile newLinkedFile = fromFile(destination, fileDirectories);
+                    files.add(new LinkedFileViewModel(newLinkedFile, entry, databaseContext, taskExecutor));
+                })
+                .onFailure(ex -> dialogService.showErrorDialogAndWait("", ex));
+
+        temporaryDownloadFile.downloadProgressProperty().bind(downloadTask.workDoneProperty());
         taskExecutor.execute(downloadTask);
     }
 

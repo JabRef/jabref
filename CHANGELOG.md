@@ -12,10 +12,30 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- We now show a small notification icon in the entry editor when we detect data inconsistency or other problems. [#3145](https://github.com/JabRef/jabref/issues/3145)
+- We added [oaDOI](https://oadoi.org/) as a fulltext provider, so that JabRef is now able to provide fulltexts for more than 90 million open-access articles.
+- We changed one default of [Cleanup entries dialog](http://help.jabref.org/en/CleanupEntries): Per default, the PDF are not moved to the default file directory anymore. [#3619](https://github.com/JabRef/jabref/issues/3619)
+- We added a new type of group that shows all items referenced in a given LaTeX file (actually the generated AUX file). [#1664](https://github.com/JabRef/jabref/issues/1664)
+- We added the export of the `translator` field to the according MS-Office XML field. [#1750, comment](https://github.com/JabRef/jabref/issues/1750#issuecomment-357350986)
+- We changed the import of the MS-Office XML fields `bookauthor` and `translator`. Both are now imported to their corresponding bibtex/biblatex fields.
+- We improved the export of the `address` and `location` field to the MS-Office XML fields. If the address field does not contain a comma, it is treated as single value and exported to the field `city`. [#1750, comment](https://github.com/JabRef/jabref/issues/1750#issuecomment-357539167) 
+For more details refer to the [field mapping help page](http://help.jabref.org/en/MsOfficeBibFieldMapping)
+- We added Facebook and Twitter icons in the toolbar to link to our [Facebook](https://www.facebook.com/JabRef/) and [Twitter](https://twitter.com/jabref_org) pages.
+- We no longer print empty lines when exporting an entry in RIS format [#3634](https://github.com/JabRef/jabref/issues/3634)
+- We improved file saving so that hard links are now preserved when a save is performed [#2633](https://github.com/JabRef/jabref/issues/2633)
+- We changed the default dialog option when removing a [file link](http://help.jabref.org/en/FileLinks#adding-external-links-to-an-entry) from an entry.
+The new default removes the linked file from the entry instead of deleting the file from disk. [#3679](https://github.com/JabRef/jabref/issues/3679)
 
 ### Fixed
+- We fixed the missing dot in the name of an exported file. [#3576](https://github.com/JabRef/jabref/issues/3576)
+- Autocompletion in the search bar can now be disabled via the preferences. [#3598](https://github.com/JabRef/jabref/issues/3598)
+- We fixed and extended the RIS import functionality to cover more fields. [#3634](https://github.com/JabRef/jabref/issues/3634) [#2607](https://github.com/JabRef/jabref/issues/2607)
+- Chaining modifiers in BibTeX key pattern now works as described in the documentation. [#3648](https://github.com/JabRef/jabref/issues/3648)
+- We fixed an issue where not all bibtex/biblatex fields would be exported as latex-free to MS-Office XML [koppor#284](https://github.com/koppor/jabref/issues/284)
+- We fixed an issue where linked files would be deleted from bibliography entries despite choosing the "Cancel" option in the dialog menu.
 
 ### Removed
+- We removed the [Look and Feels from JGoodies](http://www.jgoodies.com/freeware/libraries/looks/), because the open source version is not compatible with Java 9.
 
 
 
@@ -68,7 +88,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [4.1] - 2017-12-23
 
 ### Changed
-- We added bracketed expresion support for file search patterns, import file name patterns and file directory patters, in addition to bibtexkey patterns.
+- We added bracketed expression support for file search patterns, import file name patterns and file directory patters, in addition to bibtexkey patterns.
 - We added support for `[entrytype]` bracketed expression.
 - Updated French translation
 - We improved the handling of abstracts in the "Astrophysics Data System" fetcher. [#2471](https://github.com/JabRef/jabref/issues/2471)
@@ -77,6 +97,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We increased the relative size of the "abstract" field in the entry editor. [Feature request in the forum](http://discourse.jabref.org/t/entry-preview-in-version-4/827)
 - Crossreferenced entries are now used when a BibTex key is generated for an entry with empty fields. [#2811](https://github.com/JabRef/jabref/issues/2811)
 - We now set the `WM_CLASS` of the UI to org-jabref-JabRefMain to allow certain Un*x window managers to properly identify its windows
+- We added an option to convert entries in the biblatex format to BibTeX so that you can again collaborate with these nostalgic diehards. [Feature request in the forum](http://discourse.jabref.org/t/convert-back-from-biblatex-to-bib/)
 - We changed the default paths for the OpenOffice/LibreOffice binaries to the default path for LibreOffice
 - File annotation tab now removes newlines and hyphens before newlines from content and displays an empty String instead of N/A if no contents are found. [#3280](https://github.com/JabRef/jabref/issues/3280)
 - We moved the groups field from the "Other fields" tab to "General" (you may have to reset your editor preferences under Options > Set up general fields)
@@ -111,7 +132,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue where the same Java Look and Feel would be listed more than once in the Preferences. [#3391](https://github.com/JabRef/jabref/issues/3391)
  - We fixed an issue where errors in citation styles triggered an exception when opening the preferences dialog. [#3389](https://github.com/JabRef/jabref/issues/3389)
  - We fixed an issue where entries were displayed twice after insertion into a shared database. [#3164](https://github.com/JabRef/jabref/issues/3164)
- - We improved the auto link algorithm so that files starting with a similar key are no longer found (e.g, `Einstein1902` vs `Einstein1902a`). [#3472](https://github.com/JabRef/jabref/issues/3472) 
+ - We improved the auto link algorithm so that files starting with a similar key are no longer found (e.g, `Einstein1902` vs `Einstein1902a`). [#3472](https://github.com/JabRef/jabref/issues/3472)
  - We fixed an issue where special fields (such as `printed`) could not be cleared when syncing special fields via the keywords. [#3432](https://github.com/JabRef/jabref/issues/3432)
  - We fixed an issue where the tooltip of the global search bar showed html tags instead of formatting the text. [#3381](https://github.com/JabRef/jabref/issues/3381)
  - We fixed an issue where timestamps were not updated for changed entries. [#2810](https://github.com/JabRef/jabref/issues/2810)
@@ -124,6 +145,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue where fetched entries from the ACM fetcher could not be imported. [#3500](https://github.com/JabRef/jabref/issues/3500)
  - We fixed an issue where custom data in combobox fields in the entry editor was not saved. [#3538](https://github.com/JabRef/jabref/issues/3538)
  - We fixed an issue where automatically found files were not added with a relative paths when the bib file is in the same directory as the files. [#3476](https://github.com/JabRef/jabref/issues/3476)
+ - We improved the key generator to remove certain illegal characters such as colons or apostrophes. [#3359](https://github.com/JabRef/jabref/issues/3359)
 
 
 ## [4.0] - 2017-10-04

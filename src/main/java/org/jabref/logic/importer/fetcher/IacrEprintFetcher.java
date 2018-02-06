@@ -25,16 +25,17 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IacrEprintFetcher implements IdBasedFetcher {
 
     public static final String NAME = "IACR eprints";
 
-    private static final Log LOGGER = LogFactory.getLog(IacrEprintFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IacrEprintFetcher.class);
     private static final Pattern DATE_FROM_WEBSITE_AFTER_2000_PATTERN = Pattern.compile("[a-z ]+(\\d{1,2} [A-Za-z][a-z]{2} \\d{4})");
     private static final DateTimeFormatter DATE_FORMAT_WEBSITE_AFTER_2000 = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.US);
     private static final Pattern DATE_FROM_WEBSITE_BEFORE_2000_PATTERN = Pattern.compile("[A-Za-z ]+? ([A-Za-z][a-z]{2,10} \\d{1,2}(th|st|nd|rd)?, \\d{4})\\.?");
@@ -77,7 +78,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         String actualEntry = getRequiredValueBetween("<PRE>", "</PRE>", bibtexCitationHtml);
 
         try {
-            return BibtexParser.singleFromString(actualEntry, prefs);
+            return BibtexParser.singleFromString(actualEntry, prefs, new DummyFileUpdateMonitor());
         } catch (ParseException e) {
             throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"), e);
         }

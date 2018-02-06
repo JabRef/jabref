@@ -17,6 +17,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,7 +43,7 @@ public class BibTeXMLExporterTestFiles {
     public BibDatabaseContext databaseContext;
     public Charset charset;
     public File tempFile;
-    public BibTeXMLExportFormat bibtexmlExportFormat;
+    public BibTeXMLExporter bibtexmlExportFormat;
     public BibtexImporter testImporter;
 
     @Parameter
@@ -65,9 +66,9 @@ public class BibTeXMLExporterTestFiles {
         resourceDir = Paths.get(BibTeXMLExporterTestFiles.class.getResource("").toURI());
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
-        bibtexmlExportFormat = new BibTeXMLExportFormat();
+        bibtexmlExportFormat = new BibTeXMLExporter();
         tempFile = testFolder.newFile();
-        testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
     }
 
     @Test
@@ -79,7 +80,7 @@ public class BibTeXMLExporterTestFiles {
         List<BibEntry> entries = testImporter.importDatabase(importFile, StandardCharsets.UTF_8).getDatabase()
                 .getEntries();
 
-        bibtexmlExportFormat.performExport(databaseContext, tempFile.getPath(), charset, entries);
+        bibtexmlExportFormat.export(databaseContext, tempFile.toPath(), charset, entries);
 
         Builder control = Input.from(Files.newInputStream(resourceDir.resolve(xmlFileName)));
         Builder test = Input.from(Files.newInputStream(Paths.get(tempFilename)));

@@ -23,7 +23,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
-import org.jabref.logic.exporter.ExportFormats;
+import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;
@@ -34,15 +34,15 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Displays an BibEntry using the given layout format.
  */
 public class PreviewPanel extends ScrollPane implements SearchQueryHighlightListener, EntryContainer {
 
-    private static final Log LOGGER = LogFactory.getLog(PreviewPanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewPanel.class);
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
@@ -167,11 +167,11 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         if (CitationStyle.isCitationStyleFile(style)) {
             if (basePanel.isPresent()) {
                 layout = Optional.empty();
-                CitationStyle citationStyle = CitationStyle.createCitationStyleFromFile(style);
-                if (citationStyle != null) {
+                CitationStyle.createCitationStyleFromFile(style)
+                        .ifPresent(citationStyle -> {
                     basePanel.get().getCitationStyleCache().setCitationStyle(citationStyle);
                     basePanel.get().output(Localization.lang("Preview style changed to: %0", citationStyle.getTitle()));
-                }
+                        });
             }
         } else {
             updatePreviewLayout(previewPreferences.getPreviewStyle());
@@ -225,7 +225,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     }
 
     public void update() {
-        ExportFormats.entryNumber = 1; // Set entry number in case that is included in the preview layout.
+        ExporterFactory.entryNumber = 1; // Set entry number in case that is included in the preview layout.
 
         if (citationStyleFuture.isPresent()) {
             citationStyleFuture.get().cancel(true);

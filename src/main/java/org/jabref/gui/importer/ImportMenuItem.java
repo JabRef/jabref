@@ -121,7 +121,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         // Unknown format:
                         frame.output(Localization.lang("Importing in unknown format") + "...");
                         // This import method never throws an IOException:
-                        imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename));
+                        imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename, Globals.getFileUpdateMonitor()));
                     } else {
                         frame.output(Localization.lang("Importing in %0 format", importer.getName()) + "...");
                         // Specific importer:

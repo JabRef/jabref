@@ -66,7 +66,6 @@ import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.AutoLinkFilesAction;
 import org.jabref.gui.actions.ConnectToSharedDatabaseAction;
-import org.jabref.gui.actions.DisconnectFromSharelatexAction;
 import org.jabref.gui.actions.ErrorConsoleAction;
 import org.jabref.gui.actions.IntegrityCheckAction;
 import org.jabref.gui.actions.LookupIdentifierAction;
@@ -78,9 +77,7 @@ import org.jabref.gui.actions.NewEntryAction;
 import org.jabref.gui.actions.NewSubDatabaseAction;
 import org.jabref.gui.actions.OpenBrowserAction;
 import org.jabref.gui.actions.SearchForUpdateAction;
-import org.jabref.gui.actions.SendChangesToShareLatexAction;
 import org.jabref.gui.actions.SortTabsAction;
-import org.jabref.gui.actions.SynchronizeWithShareLatexAction;
 import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
 import org.jabref.gui.copyfiles.CopyFilesAction;
@@ -135,7 +132,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.database.DatabaseLocation;
+import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
@@ -146,18 +143,15 @@ import org.jabref.preferences.LastFocusedTabPreferences;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import com.jgoodies.looks.HeaderStyle;
-import com.jgoodies.looks.Options;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import osx.macadapter.MacAdapter;
 
 /**
  * The main window of the application.
  */
 public class JabRefFrame extends JFrame implements OutputPrinter {
-
-    private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
 
     // Frame titles.
     private static final String FRAME_TITLE = "JabRef";
@@ -174,12 +168,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final JLabel statusLine = new JLabel("", SwingConstants.LEFT);
     private final JLabel statusLabel = new JLabel(
             Localization.lang("Status")
-                    + ':',
-            SwingConstants.LEFT);
+                    + ':', SwingConstants.LEFT);
     private final JProgressBar progressBar = new JProgressBar();
     private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
     private final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
     private final EditModeAction editModeAction = new EditModeAction();
+
 
     // Here we instantiate menu/toolbar actions. Actions regarding
     // the currently open database are defined as a GeneralAction
@@ -199,6 +193,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction jabrefFacebookAction = new OpenBrowserAction("https://www.facebook.com/JabRef/",
             "Facebook", Localization.lang("Opens JabRef's Facebook page"),
             IconTheme.JabRefIcon.FACEBOOK.getSmallIcon(), IconTheme.JabRefIcon.FACEBOOK.getIcon());
+    private final AbstractAction jabrefTwitterAction = new OpenBrowserAction("https://twitter.com/jabref_org",
+            "Twitter", Localization.lang("Opens JabRef's Twitter page"),
+            IconTheme.JabRefIcon.TWITTER.getSmallIcon(), IconTheme.JabRefIcon.TWITTER.getIcon());
     private final AbstractAction jabrefBlogAction = new OpenBrowserAction("https://blog.jabref.org/",
             Localization.menuTitle("Blog"), Localization.lang("Opens JabRef's blog"),
             IconTheme.JabRefIcon.BLOG.getSmallIcon(), IconTheme.JabRefIcon.BLOG.getIcon());
@@ -210,7 +207,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("See what has been changed in the JabRef versions"));
     private final AbstractAction forkMeOnGitHubAction = new OpenBrowserAction("https://github.com/JabRef/jabref",
             Localization.menuTitle("Fork me on GitHub"), Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcon.GITHUB.getSmallIcon(), IconTheme.JabRefIcon.GITHUB.getIcon());
-    private final AbstractAction donationAction = new OpenBrowserAction("https://github.com/JabRef/jabref/wiki/Donations",
+    private final AbstractAction donationAction = new OpenBrowserAction("https://donations.jabref.org",
             Localization.menuTitle("Donate to JabRef"), Localization.lang("Donate to JabRef"), IconTheme.JabRefIcon.DONATE.getSmallIcon(), IconTheme.JabRefIcon.DONATE.getIcon());
     private final AbstractAction openForumAction = new OpenBrowserAction("http://discourse.jabref.org/",
             Localization.menuTitle("Online help forum"), Localization.lang("Online help forum"), IconTheme.JabRefIcon.FORUM.getSmallIcon(), IconTheme.JabRefIcon.FORUM.getIcon());
@@ -396,10 +393,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Globals.getKeyPrefs().getKey(KeyBinding.UNABBREVIATE));
     private final AbstractAction exportLinkedFiles = new CopyFilesAction();
     private final AbstractAction manageJournals = new ManageJournalsAction();
-    private final AbstractAction synchronizeWithSharelatex = new SynchronizeWithShareLatexAction();
-    private final AbstractAction sendChangesToShareLatex = new SendChangesToShareLatexAction();
-    private final AbstractAction disconnectFromSharelatex = new DisconnectFromSharelatexAction();
-
     private final AbstractAction databaseProperties = new DatabasePropertiesAction();
     private final AbstractAction bibtexKeyPattern = new BibtexKeyPatternAction();
     private final AbstractAction errorConsole = new ErrorConsoleAction();
@@ -430,7 +423,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final GeneralAction findUnlinkedFiles = new GeneralAction(
             FindUnlinkedFilesDialog.ACTION_COMMAND,
             FindUnlinkedFilesDialog.ACTION_MENU_TITLE, FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION,
-            Globals.getKeyPrefs().getKey(KeyBinding.FIND_UNLINKED_FILES));
+            Globals.getKeyPrefs().getKey(KeyBinding.FIND_UNLINKED_FILES)
+    );
     private final AutoLinkFilesAction autoLinkFile = new AutoLinkFilesAction();
     // The action for adding a new entry of unspecified type.
     private final NewEntryAction newEntryAction = new NewEntryAction(this, Globals.getKeyPrefs().getKey(KeyBinding.NEW_ENTRY));
@@ -621,7 +615,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
             // Poor-mans binding to global state
             // We need to invoke this in the JavaFX thread as all the listeners sit there
-            Platform.runLater(() -> Globals.stateManager.activeDatabaseProperty().setValue(Optional.of(currentBasePanel.getBibDatabaseContext())));
+            Platform.runLater(() ->
+                    Globals.stateManager.activeDatabaseProperty().setValue(Optional.of(currentBasePanel.getBibDatabaseContext()))
+            );
             if (new SearchPreferences(Globals.prefs).isGlobalSearch()) {
                 globalSearchBar.performSearch();
             } else {
@@ -657,7 +653,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             try {
                 new MacAdapter().registerMacEvents(this);
             } catch (Exception e) {
-                LOGGER.fatal("Could not interface with Mac OS X methods.", e);
+                LOGGER.error("Could not interface with Mac OS X methods.", e);
             }
         }
 
@@ -720,7 +716,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             String changeFlag = panel.isModified() && !isAutosaveEnabled ? "*" : "";
             String databaseFile = panel.getBibDatabaseContext().getDatabaseFile().map(File::getPath)
                     .orElse(GUIGlobals.UNTITLED_TITLE);
-            setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
+                setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
         } else if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
             setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBMSSynchronizer().getDBName() + " ["
                     + Localization.lang("shared") + "]" + modeInfo);
@@ -900,7 +896,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void initLayout() {
-        tabbedPane.putClientProperty(Options.NO_CONTENT_BORDER_KEY, Boolean.TRUE);
 
         setProgressBarVisible(false);
 
@@ -1070,10 +1065,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         file.addSeparator();
         file.add(connectToSharedDatabaseAction);
         file.add(pullChangesFromSharedDatabase);
-        file.addSeparator();
-        file.add(synchronizeWithSharelatex);
-        file.add(sendChangesToShareLatex);
-        file.add(disconnectFromSharelatex);
 
         file.addSeparator();
         file.add(databaseProperties);
@@ -1278,6 +1269,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         webMenu.add(jabrefWebPageAction);
         webMenu.add(jabrefBlogAction);
         webMenu.add(jabrefFacebookAction);
+        webMenu.add(jabrefTwitterAction);
         webMenu.addSeparator();
         webMenu.add(forkMeOnGitHubAction);
         webMenu.add(developmentVersionAction);
@@ -1316,7 +1308,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void createToolBar() {
-        tlb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         tlb.setBorder(null);
         tlb.setRollover(true);
 
@@ -1350,7 +1341,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addAction(cleanupEntries);
         tlb.addAction(mergeEntries);
         tlb.addAction(pullChangesFromSharedDatabase);
-        tlb.addAction(synchronizeWithSharelatex);
         tlb.addAction(openConsole);
 
         tlb.addSeparator();
@@ -1400,6 +1390,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
         tlb.add(donationAction);
         tlb.add(forkMeOnGitHubAction);
+        tlb.add(jabrefFacebookAction);
+        tlb.add(jabrefTwitterAction);
 
         createDisabledIconsForButtons(tlb);
     }
@@ -1601,7 +1593,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         Map<String, String> properties = new HashMap<>();
         Map<String, Double> measurements = new HashMap<>();
-        measurements.put("NumberOfEntries", (double) basePanel.getDatabaseContext().getDatabase().getEntryCount());
+        measurements.put("NumberOfEntries", (double)basePanel.getDatabaseContext().getDatabase().getEntryCount());
 
         Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("OpenNewDatabase", properties, measurements));
     }
@@ -1917,14 +1909,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         return back;
     }
 
-    public AbstractAction getSynchronizeWithSharelatexAction() {
-        return synchronizeWithSharelatex;
-    }
-
-    public AbstractAction getDisconnectFromSharelatexAction() {
-        return disconnectFromSharelatex;
-    }
-
     public AbstractAction getNextPreviewStyleAction() {
         return nextPreviewStyle;
     }
@@ -1954,7 +1938,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private static class MyGlassPane extends JPanel {
-
         public MyGlassPane() {
             addKeyListener(new KeyAdapter() {
                 // Nothing
@@ -2115,7 +2098,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         private final boolean next;
 
         public ChangeTabAction(boolean next) {
-            putValue(Action.NAME, next ? Localization.menuTitle("Next tab") : Localization.menuTitle("Previous tab"));
+            putValue(Action.NAME, next ? Localization.menuTitle("Next tab") :
+                    Localization.menuTitle("Previous tab"));
             this.next = next;
             putValue(Action.ACCELERATOR_KEY,
                     next ? Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB) : Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB));
@@ -2152,8 +2136,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             putValue(Action.SHORT_DESCRIPTION, description);
         }
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
+        @Override public void actionPerformed(ActionEvent e) {
 
             LOGGER.debug(Globals.getFocusListener().getFocused().toString());
             JComponent source = Globals.getFocusListener().getFocused();

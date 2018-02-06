@@ -19,7 +19,7 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.logic.xmp.XMPUtil;
 import org.jabref.model.entry.BibEntry;
@@ -182,9 +182,8 @@ public class PdfContentImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
-        return false;
+    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+        return input.readLine().startsWith("%PDF");
     }
 
     @Override
@@ -595,8 +594,8 @@ public class PdfContentImporter extends Importer {
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return FileExtensions.PDF_CONTENT;
+    public FileType getFileType() {
+        return FileType.PDF_CONTENT;
     }
 
     @Override

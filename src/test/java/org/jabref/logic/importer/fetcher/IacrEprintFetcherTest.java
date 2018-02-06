@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -71,12 +72,12 @@ public class IacrEprintFetcherTest {
         delgado2017.setField("bibtexkey", "cryptoeprint:2017:1095");
         delgado2017.setField(FieldName.ABSTRACT, "dummy");
         delgado2017.setField(FieldName.AUTHOR, "Sergi Delgado-Segura and Cristina Pérez-Solà and Guillermo Navarro-Arribas and Jordi Herrera-Joancomartí");
-        delgado2017.setField(FieldName.DATE, "2017-11-10");
+        delgado2017.setField(FieldName.DATE, "2018-01-19");
         delgado2017.setField(FieldName.HOWPUBLISHED, "Cryptology ePrint Archive, Report 2017/1095");
         delgado2017.setField(FieldName.NOTE, "\\url{https://eprint.iacr.org/2017/1095}");
         delgado2017.setField(FieldName.TITLE, "Analysis of the Bitcoin UTXO set");
-        delgado2017.setField(FieldName.URL, "https://eprint.iacr.org/2017/1095/20171110:183926");
-        delgado2017.setField(FieldName.VERSION, "20171110:183926");
+        delgado2017.setField(FieldName.URL, "https://eprint.iacr.org/2017/1095/20180119:113352");
+        delgado2017.setField(FieldName.VERSION, "20180119:113352");
         delgado2017.setField(FieldName.YEAR, "2017");
     }
 

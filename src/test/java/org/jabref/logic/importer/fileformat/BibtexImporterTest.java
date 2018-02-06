@@ -9,15 +9,16 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -33,9 +34,9 @@ public class BibtexImporterTest {
     private BibtexImporter importer;
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        importer = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        importer = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
     }
 
     @Test
@@ -112,7 +113,7 @@ public class BibtexImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(FileExtensions.BIBTEX_DB, importer.getExtensions());
+        assertEquals(FileType.BIBTEX_DB, importer.getFileType());
     }
 
     @Test

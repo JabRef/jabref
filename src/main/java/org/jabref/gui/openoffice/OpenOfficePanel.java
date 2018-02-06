@@ -50,8 +50,8 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OOBibStyle;
@@ -76,8 +76,8 @@ import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This test panel can be opened by reflection from JabRef, passing the JabRefFrame as an
@@ -85,7 +85,7 @@ import org.apache.commons.logging.LogFactory;
  * between JabRef and OpenOffice.
  */
 public class OpenOfficePanel extends AbstractWorker {
-    private static final Log LOGGER = LogFactory.getLog(OpenOfficePanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficePanel.class);
 
     private OpenOfficeSidePanel sidePane;
     private JDialog diag;
@@ -660,14 +660,9 @@ public class OpenOfficePanel extends AbstractWorker {
             for (BibEntry entry : entries) {
                 if (!entry.getCiteKeyOptional().isPresent()) {
                     // Generate key
-                    BibtexKeyPatternUtil
-                            .makeAndSetLabel(
-                                    panel.getBibDatabaseContext().getMetaData().getCiteKeyPattern(prefs.getKeyPattern()),
-                                    panel.getDatabase(), entry,
-                            prefs);
-                    // Add undo change
-                    undoCompound.addEdit(
-                            new UndoableKeyChange(entry, null, entry.getCiteKeyOptional().get()));
+                    new BibtexKeyGenerator(panel.getBibDatabaseContext(), prefs)
+                            .generateAndSetKey(entry)
+                            .ifPresent(change -> undoCompound.addEdit(new UndoableKeyChange(change)));
                 }
             }
             undoCompound.end();

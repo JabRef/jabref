@@ -6,10 +6,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import org.jabref.gui.externalfiles.FileDownloadTask;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link TaskExecutor} that runs every task on the current thread, i.e. in a sequential order. This
@@ -18,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CurrentThreadTaskExecutor implements TaskExecutor {
 
-    private static final Log LOGGER = LogFactory.getLog(CurrentThreadTaskExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CurrentThreadTaskExecutor.class);
 
     /**
      * Executes the task on the current thread. The code is essentially taken from {@link
@@ -46,11 +44,6 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
             }
             return new FailedFuture(exception);
         }
-    }
-
-    @Override
-    public void execute(FileDownloadTask downloadTask) {
-        downloadTask.run();
     }
 
     @Override

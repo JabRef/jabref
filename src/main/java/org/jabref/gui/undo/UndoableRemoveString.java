@@ -7,12 +7,12 @@ import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UndoableRemoveString extends AbstractUndoableJabRefEdit {
 
-    private static final Log LOGGER = LogFactory.getLog(UndoableRemoveString.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UndoableRemoveString.class);
     private final BibDatabase base;
     private final BibtexString string;
 

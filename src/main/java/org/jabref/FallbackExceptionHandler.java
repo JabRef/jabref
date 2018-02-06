@@ -1,14 +1,14 @@
 package org.jabref;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Catch and log any unhandled exceptions.
  */
 public class FallbackExceptionHandler implements Thread.UncaughtExceptionHandler {
 
-    private static final Log LOGGER = LogFactory.getLog(FallbackExceptionHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FallbackExceptionHandler.class);
 
     public static void installExceptionHandler() {
         Thread.setDefaultUncaughtExceptionHandler(new FallbackExceptionHandler());

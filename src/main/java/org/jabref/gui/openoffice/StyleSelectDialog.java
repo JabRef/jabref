@@ -54,7 +54,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -72,15 +72,15 @@ import ca.odell.glazedlists.swing.GlazedListsSwing;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class produces a dialog box for choosing a style file.
  */
 class StyleSelectDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(StyleSelectDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StyleSelectDialog.class);
 
     private final JabRefFrame frame;
     private EventList<OOBibStyle> styles;
@@ -471,8 +471,8 @@ class StyleSelectDialog {
 
             JButton browse = new JButton(Localization.lang("Browse"));
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileExtensions.JSTYLE)
-                    .withDefaultExtension(FileExtensions.JSTYLE)
+                    .addExtensionFilter(FileType.JSTYLE)
+                    .withDefaultExtension(FileType.JSTYLE)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
             DialogService ds = new FXDialogService();
 

@@ -6,12 +6,12 @@ import java.net.Socket;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.remote.shared.Protocol;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RemoteListenerClient {
 
-    private static final Log LOGGER = LogFactory.getLog(RemoteListenerClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteListenerClient.class);
 
     private static final int TIMEOUT = 2000;
 
