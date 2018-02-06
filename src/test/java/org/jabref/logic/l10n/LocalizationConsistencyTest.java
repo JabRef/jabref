@@ -24,7 +24,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class LocalizationConsistencyTest {
@@ -45,29 +44,6 @@ public class LocalizationConsistencyTest {
             }
             Assert.assertEquals("There are some localization files that are not present in org.jabref.logic.l10n.Languages or vice versa!",
                     Collections.<String>emptySet(), Sets.symmetricDifference(new HashSet<>(Languages.LANGUAGES.values()), localizationFiles));
-        }
-    }
-
-    @Test
-    public void allFilesMustHaveSameKeys() {
-        for (String bundle : Arrays.asList("JabRef", "Menu")) {
-            Set<String> englishKeys = LocalizationParser
-                    .getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, "en"));
-
-            List<String> nonEnglishLanguages = Languages.LANGUAGES.values().stream().filter(l -> !"en".equals(l))
-                    .collect(Collectors.toList());
-            for (String lang : nonEnglishLanguages) {
-                Set<String> nonEnglishKeys = LocalizationParser
-                        .getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, lang));
-
-                List<String> missing = new ArrayList<>(englishKeys);
-                missing.removeAll(nonEnglishKeys);
-                List<String> obsolete = new ArrayList<>(nonEnglishKeys);
-                obsolete.removeAll(englishKeys);
-
-                assertEquals("Missing keys of " + lang, Collections.emptyList(), missing);
-                assertEquals("Obsolete keys of " + lang, Collections.emptyList(), obsolete);
-            }
         }
     }
 
@@ -140,10 +116,9 @@ public class LocalizationConsistencyTest {
                 .distinct().collect(Collectors.toList());
 
         assertEquals("DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
-                        "1. PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n" +
-                        "2. EXECUTE: gradlew localizationUpdate\n" +
+                        "PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n" +
                         missingKeys.parallelStream()
-                                .map(key -> String.format("\n%s=%s\n", key.getKey(), key.getKey()))
+                                .map(key -> String.format("\n%s=%s\n", key.getKey(), key.getKey().replaceAll("\\\\ ", " ")))
                                 .collect(Collectors.toList()),
                 Collections.<LocalizationEntry>emptyList(), missingKeys);
     }
@@ -153,8 +128,7 @@ public class LocalizationConsistencyTest {
         Set<LocalizationEntry> missingKeys = LocalizationParser.find(LocalizationBundleForTest.MENU);
 
         assertEquals("DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH MENU FILE\n" +
-                        "1. PASTE THESE INTO THE ENGLISH MENU FILE\n" +
-                        "2. EXECUTE: gradlew localizationUpdate\n" +
+                        "PASTE THESE INTO THE ENGLISH MENU FILE\n" +
                         missingKeys.parallelStream()
                                 .map(key -> String.format("%s=%s", key.getKey(), key.getKey()))
                                 .collect(Collectors.toList()),
@@ -167,8 +141,7 @@ public class LocalizationConsistencyTest {
 
         assertEquals("Obsolete keys found in language properties file: " + obsoleteKeys + "\n" +
                         "1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
-                        "2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE\n" +
-                        "3. EXECUTE: gradlew localizationUpdate\n",
+                        "2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE\n",
                 Collections.<String>emptySet(), obsoleteKeys);
     }
 
@@ -178,8 +151,7 @@ public class LocalizationConsistencyTest {
 
         assertEquals("Obsolete keys found in the menu properties file: " + obsoleteKeys + "\n" +
                         "1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
-                        "2. REMOVE THESE FROM THE ENGLISH MENU FILE\n" +
-                        "3. EXECUTE: gradlew localizationUpdate\n",
+                        "2. REMOVE THESE FROM THE ENGLISH MENU FILE\n",
                 Collections.<String>emptySet(), obsoleteKeys);
     }
 
@@ -199,23 +171,6 @@ public class LocalizationConsistencyTest {
         for (LocalizationEntry e : keys) {
             assertTrue("Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey(),
                     e.getKey().startsWith("\"") || e.getKey().endsWith("\""));
-        }
-    }
-
-    @Test
-    public void localizationTestForInvalidStrings() {
-        for (String bundle : Arrays.asList("JabRef", "Menu")) {
-            for (String lang : Languages.LANGUAGES.values()) {
-                String propertyFilePath = String.format("/l10n/%s_%s.properties", bundle, lang);
-
-                // find any spaces
-                for (Map.Entry<Object, Object> entry : LocalizationParser.getProperties(propertyFilePath).entrySet()) {
-                    assertFalse("Found an invalid character in the '" + lang + "' localization of '" + bundle +
-                            "': The key of " + entry.getKey().toString() + "=" + entry.getValue() + " contains a space!", entry.getKey().toString().contains(" "));
-                    assertFalse("Found an invalid character in the '" + lang + "' localization of '" + bundle +
-                            "': The value of " + entry.getKey().toString() + "=" + entry.getValue() + " contains a space!", entry.getValue().toString().contains(" "));
-                }
-            }
         }
     }
 

@@ -12,26 +12,24 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
-import org.jabref.support.DevEnvironment;
+import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Category(FetcherTest.class)
-public class GoogleScholarTest {
+@FetcherTest
+class GoogleScholarTest {
 
     private GoogleScholar finder;
     private BibEntry entry;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(
                 mock(FieldContentParserPreferences.class));
@@ -39,45 +37,28 @@ public class GoogleScholarTest {
         entry = new BibEntry();
     }
 
-    @Test(expected = NullPointerException.class)
-    public void rejectNullParameter() throws IOException, FetcherException {
-        finder.findFullText(null);
-        Assert.fail();
-    }
-
     @Test
-    public void requiresEntryTitle() throws IOException, FetcherException {
-        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
-    }
-
-    @Test
-    public void linkFound() throws IOException, FetcherException {
-        // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
+    @DisabledOnCIServer("CI server is blocked by Google")
+    void linkFound() throws IOException, FetcherException {
         entry.setField("title", "Towards Application Portability in Platform as a Service");
 
-        Assert.assertEquals(
+        assertEquals(
                 Optional.of(new URL("https://www.uni-bamberg.de/fileadmin/uni/fakultaeten/wiai_lehrstuehle/praktische_informatik/Dateien/Publikationen/sose14-towards-application-portability-in-paas.pdf")),
                 finder.findFullText(entry)
         );
     }
 
     @Test
-    public void noLinkFound() throws IOException, FetcherException {
-        // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
+    @DisabledOnCIServer("CI server is blocked by Google")
+    void noLinkFound() throws IOException, FetcherException {
         entry.setField("title", "Pro WF: Windows Workflow in NET 3.5");
 
-        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
+        assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
-    public void findSingleEntry() throws FetcherException {
-        // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
+    @DisabledOnCIServer("CI server is blocked by Google")
+    void findSingleEntry() throws FetcherException {
         entry.setType(BibtexEntryTypes.INPROCEEDINGS.getName());
         entry.setCiteKey("geiger2013detecting");
         entry.setField(FieldName.TITLE, "Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models.");
@@ -88,16 +69,14 @@ public class GoogleScholarTest {
 
         List<BibEntry> foundEntries = finder.performSearch("info:RExzBa3OlkQJ:scholar.google.com");
 
-        Assert.assertEquals(Collections.singletonList(entry), foundEntries);
+        assertEquals(Collections.singletonList(entry), foundEntries);
     }
 
     @Test
-    public void find20Entries() throws FetcherException {
-        // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
+    @DisabledOnCIServer("CI server is blocked by Google")
+    void find20Entries() throws FetcherException {
         List<BibEntry> foundEntries = finder.performSearch("random test string");
 
-        Assert.assertEquals(20, foundEntries.size());
+        assertEquals(20, foundEntries.size());
     }
 }

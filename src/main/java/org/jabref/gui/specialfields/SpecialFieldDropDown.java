@@ -15,9 +15,6 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
 
-import com.jgoodies.looks.HeaderStyle;
-import com.jgoodies.looks.Options;
-
 public class SpecialFieldDropDown {
 
     private SpecialFieldDropDown() {
@@ -40,7 +37,6 @@ public class SpecialFieldDropDown {
         button.setSize(buttonDim);
         button.setMinimumSize(buttonDim);
         button.setMaximumSize(buttonDim);
-        button.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         button.addActionListener(new MenuButtonActionListener(field, frame, button, buttonDim));
         return button;
     }

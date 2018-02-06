@@ -1,6 +1,5 @@
 package org.jabref.logic.exporter;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -17,6 +16,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -41,8 +41,8 @@ public class MSBibExportFormatTestFiles {
 
     public BibDatabaseContext databaseContext;
     public Charset charset;
-    public File tempFile;
-    public MSBibExportFormat msBibExportFormat;
+    public Path tempFile;
+    public MSBibExporter msBibExportFormat;
     public BibtexImporter testImporter;
 
     @Parameter
@@ -66,24 +66,23 @@ public class MSBibExportFormatTestFiles {
         resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("").toURI());
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
-        msBibExportFormat = new MSBibExportFormat();
-        tempFile = testFolder.newFile();
-        testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        msBibExportFormat = new MSBibExporter();
+        tempFile = testFolder.newFile().toPath();
+        testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
     }
 
     @Test
     public final void testPerformExport() throws IOException, SaveException {
         String xmlFileName = filename.replace(".bib", ".xml");
         Path importFile = resourceDir.resolve(filename);
-        String tempFilename = tempFile.getCanonicalPath();
 
         List<BibEntry> entries = testImporter.importDatabase(importFile, StandardCharsets.UTF_8).getDatabase()
                 .getEntries();
 
-        msBibExportFormat.performExport(databaseContext, tempFile.getPath(), charset, entries);
+        msBibExportFormat.export(databaseContext, tempFile, charset, entries);
 
         Builder control = Input.from(Files.newInputStream(resourceDir.resolve(xmlFileName)));
-        Builder test = Input.from(Files.newInputStream(Paths.get(tempFilename)));
+        Builder test = Input.from(Files.newInputStream(tempFile));
 
         assertThat(test, CompareMatcher.isSimilarTo(control)
                 .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());

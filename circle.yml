@@ -8,9 +8,10 @@ dependencies:
   pre:
     # update locally with:
     # openssl aes-256-cbc -e -in ./buildres/jabref-cert-2016.p12 -out jabref-cert-2016.p12.enc -k {PASSWORD}
-    - openssl aes-256-cbc -d -in ./buildres/jabref-cert-2016.p12.enc -out ./buildres/jabref-cert-2016.p12 -k $CERTIFICATE
+    #- openssl aes-256-cbc -d -in ./buildres/jabref-cert-2016.p12.enc -out ./buildres/jabref-cert-2016.p12 -k $CERTIFICATE
     - scripts/prepare-install4j.sh
-    - install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY --win-keystore-password $CERTIFICATE_PW --mac-keystore-password $CERTIFICATE_PW
+    - install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY 
+    #--win-keystore-password $CERTIFICATE_PW --mac-keystore-password $CERTIFICATE_PW
   override:
     # We do this to decrease build time by using CircleCI's cache. See https://discuss.circleci.com/t/effective-caching-for-gradle/540 for a longer motivation.
     - ./gradlew compileJava
@@ -35,6 +36,7 @@ deployment:
       - ./gradlew -Pinstall4jDir="install4j7" clean release --stacktrace
       # upload at all circumstances
       - scripts/upload-to-builds.jabref.org.sh
+      - ./gradlew dependencyUpdates -Drevision=release -DoutputFormatter=json -DoutputDir=build/releases
   development:
      # match all branches; this is executed, if "release" is not matched - see https://circleci.com/docs/configuration/
     branch: /.*/

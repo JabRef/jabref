@@ -5,14 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-import javafx.concurrent.Task;
-
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.net.ProgressInputStream;
 import org.jabref.logic.net.URLDownload;
 
 import org.fxmisc.easybind.EasyBind;
 
-public class FileDownloadTask extends Task<Void> {
+public class FileDownloadTask extends BackgroundTask<Void> {
 
     private final URL source;
     private final Path destination;

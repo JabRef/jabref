@@ -30,7 +30,7 @@ import org.jabref.Globals;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.bibtex.DuplicateCheck;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -45,8 +45,8 @@ import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.IEEETranEntryTypes;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dialog that prompts the user to choose a type for an entry.
@@ -54,7 +54,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
-    private static final Log LOGGER = LogFactory.getLog(EntryTypeDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntryTypeDialog.class);
     private static final int COLUMN = 3;
     private final JabRefFrame frame;
     private final CancelAction cancelAction = new CancelAction();
@@ -288,6 +288,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                 generateButton.setText(Localization.lang("Searching..."));
             });
             searchID = idTextField.getText().trim();
+            searchID = searchID.replaceAll(" ", "");
             fetcher = WebFetchers.getIdBasedFetchers(Globals.prefs.getImportFormatPreferences()).get(comboBox.getSelectedIndex());
             if (!searchID.isEmpty()) {
                 try {
@@ -319,7 +320,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                         diag.toFront();
                     } else {
                 		// Regenerate CiteKey of imported BibEntry
-                        BibtexKeyPatternUtil.makeAndSetLabel(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern(), frame.getCurrentBasePanel().getDatabase(), bibEntry, Globals.prefs.getBibtexKeyPatternPreferences());
+                        new BibtexKeyGenerator(frame.getCurrentBasePanel().getBibDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(bibEntry);
                         // Update Timestamps
                         if (Globals.prefs.getTimestampPreferences().includeCreatedTimestamp()) {
                             bibEntry.setField(Globals.prefs.getTimestampPreferences().getTimestampField(), Globals.prefs.getTimestampPreferences().now());

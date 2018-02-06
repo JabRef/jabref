@@ -22,11 +22,11 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
 import org.jabref.gui.AbstractController;
-import org.jabref.gui.util.FileUpdateMonitor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import org.fxmisc.easybind.EasyBind;
 

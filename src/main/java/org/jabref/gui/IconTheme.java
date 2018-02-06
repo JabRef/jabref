@@ -33,8 +33,8 @@ import org.jabref.preferences.JabRefPreferences;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IconTheme {
 
@@ -45,7 +45,7 @@ public class IconTheme {
     public static final Color DEFAULT_DISABLED_COLOR = JabRefPreferences.getInstance().getColor(JabRefPreferences.ICON_DISABLED_COLOR);
     public static Font FONT;
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
-    private static final Log LOGGER = LogFactory.getLog(IconTheme.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IconTheme.class);
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(
             IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
 
@@ -166,7 +166,7 @@ public class IconTheme {
 
         return jabrefLogos;
     }
-	
+
     public enum JabRefIcon {
 
         ADD(MaterialDesignIcon.PLUS_BOX),
@@ -260,12 +260,16 @@ public class IconTheme {
         KEY_BINDINGS(MaterialDesignIcon.KEYBOARD), /*css: keyboard */
         FIND_DUPLICATES(MaterialDesignIcon.CODE_EQUAL), /*css: code-equal */
         PULL(MaterialDesignIcon.SOURCE_PULL), /*source-pull*/
+        SUCCESS(MaterialDesignIcon.CHECK_CIRCLE),
+        WARNING(MaterialDesignIcon.ALERT),
+        ERROR(MaterialDesignIcon.ALERT_CIRCLE),
         OPEN_IN_NEW_WINDOW(MaterialDesignIcon.OPEN_IN_NEW), /*css: open-in-new */
         CASE_SENSITIVE(MaterialDesignIcon.ALPHABETICAL), /* css: mdi-alphabetical */
         REG_EX(MaterialDesignIcon.REGEX), /*css: mdi-regex */
         CONSOLE(MaterialDesignIcon.CONSOLE), /*css: console */
         FORUM(MaterialDesignIcon.FORUM), /* css: forum */
         FACEBOOK(MaterialDesignIcon.FACEBOOK), /* css: facebook */
+        TWITTER(MaterialDesignIcon.TWITTER), /* css: twitter */
         BLOG(MaterialDesignIcon.RSS), /* css: rss */
         GLOBAL_SEARCH(MaterialDesignIcon.EARTH), /* css: earth */
         DATE_PICKER(MaterialDesignIcon.CALENDAR), /* css: calendar */

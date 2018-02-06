@@ -20,15 +20,15 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is responible to get the recommendations from MDL
  */
 public class MrDLibFetcher implements EntryBasedFetcher {
-    private static final Log LOGGER = LogFactory.getLog(MrDLibFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibFetcher.class);
 
     private static final String NAME = "MDL_FETCHER";
     private final String LANGUAGE;

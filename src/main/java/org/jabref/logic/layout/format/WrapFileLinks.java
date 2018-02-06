@@ -12,9 +12,6 @@ import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * This formatter iterates over all file links, or all file links of a specified
  * type, outputting a format string given as the first argument. The format string
@@ -79,7 +76,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
-    private static final Log LOGGER = LogFactory.getLog(WrapFileLinks.class);
     private static final int STRING = 0;
     private static final int ITERATION_COUNT = 1;
     private static final int FILE_PATH = 2;
@@ -103,7 +99,6 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     private final FileLinkPreferences prefs;
     private String fileType;
     private List<FormatEntry> format;
-
 
     public WrapFileLinks(FileLinkPreferences fileLinkPreferences) {
         this.prefs = fileLinkPreferences;
@@ -193,52 +188,52 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
                 for (FormatEntry entry : format) {
                     switch (entry.getType()) {
-                    case STRING:
-                        sb.append(entry.getString());
-                        break;
-                    case ITERATION_COUNT:
-                        sb.append(piv);
-                        break;
-                    case FILE_PATH:
-                        List<String> dirs;
-                        // We need to resolve the file directory from the database's metadata,
-                        // but that is not available from a formatter. Therefore, as an
-                        // ugly hack, the export routine has set a global variable before
-                        // starting the export, which contains the database's file directory:
-                        if ((prefs.getFileDirForDatabase() == null) || prefs.getFileDirForDatabase().isEmpty()) {
-                            dirs = prefs.getGeneratedDirForDatabase();
-                        } else {
-                            dirs = prefs.getFileDirForDatabase();
-                        }
+                        case STRING:
+                            sb.append(entry.getString());
+                            break;
+                        case ITERATION_COUNT:
+                            sb.append(piv);
+                            break;
+                        case FILE_PATH:
+                            List<String> dirs;
+                            // We need to resolve the file directory from the database's metadata,
+                            // but that is not available from a formatter. Therefore, as an
+                            // ugly hack, the export routine has set a global variable before
+                            // starting the export, which contains the database's file directory:
+                            if ((prefs.getFileDirForDatabase() == null) || prefs.getFileDirForDatabase().isEmpty()) {
+                                dirs = prefs.getGeneratedDirForDatabase();
+                            } else {
+                                dirs = prefs.getFileDirForDatabase();
+                            }
 
-                        String pathString = flEntry.findIn(dirs.stream().map(Paths::get).collect(Collectors.toList()))
-                                .map(path -> path.toAbsolutePath().toString())
-                                .orElse(flEntry.getLink());
+                            String pathString = flEntry.findIn(dirs.stream().map(Paths::get).collect(Collectors.toList()))
+                                    .map(path -> path.toAbsolutePath().toString())
+                                    .orElse(flEntry.getLink());
 
-                        sb.append(replaceStrings(pathString));
-                        break;
-                    case RELATIVE_FILE_PATH:
+                            sb.append(replaceStrings(pathString));
+                            break;
+                        case RELATIVE_FILE_PATH:
 
-                        /*
-                         * Stumbled over this while investigating
-                         *
-                         * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
-                         */
-                        sb.append(replaceStrings(flEntry.getLink()));//f.toURI().toString();
+                            /*
+                             * Stumbled over this while investigating
+                             *
+                             * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
+                             */
+                            sb.append(replaceStrings(flEntry.getLink()));//f.toURI().toString();
 
-                        break;
-                    case FILE_EXTENSION:
-                        FileHelper.getFileExtension(flEntry.getLink())
-                                .ifPresent(extension -> sb.append(replaceStrings(extension)));
-                        break;
-                    case FILE_TYPE:
-                        sb.append(replaceStrings(flEntry.getFileType()));
-                        break;
-                    case FILE_DESCRIPTION:
-                        sb.append(replaceStrings(flEntry.getDescription()));
-                        break;
-                    default:
-                        break;
+                            break;
+                        case FILE_EXTENSION:
+                            FileHelper.getFileExtension(flEntry.getLink())
+                                    .ifPresent(extension -> sb.append(replaceStrings(extension)));
+                            break;
+                        case FILE_TYPE:
+                            sb.append(replaceStrings(flEntry.getFileType()));
+                            break;
+                        case FILE_DESCRIPTION:
+                            sb.append(replaceStrings(flEntry.getDescription()));
+                            break;
+                        default:
+                            break;
                     }
                 }
 
@@ -271,7 +266,6 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
         private final int type;
         private String string;
-
 
         public FormatEntry(int type) {
             this.type = type;

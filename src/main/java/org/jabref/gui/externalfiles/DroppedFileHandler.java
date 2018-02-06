@@ -32,6 +32,7 @@ import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XMPUtil;
@@ -44,8 +45,8 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class holds the functionality of autolinking to a file that's dropped
@@ -61,7 +62,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DroppedFileHandler {
 
-    private static final Log LOGGER = LogFactory.getLog(DroppedFileHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DroppedFileHandler.class);
 
     private final JabRefFrame frame;
 
@@ -449,7 +450,11 @@ public class DroppedFileHandler {
         tm.addEntry(tm.getRowCount(), new FileListEntry("", filename, fileType));
         String newValue = tm.getStringRepresentation();
         UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE, oldValue.orElse(null), newValue);
-        entry.setField(FieldName.FILE, newValue);
+
+        // make sure that the update runs in the Java FX thread to avoid exception in listeners
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            entry.setField(FieldName.FILE, newValue);
+        });
 
         if (edits == null) {
             panel.getUndoManager().addEdit(edit);

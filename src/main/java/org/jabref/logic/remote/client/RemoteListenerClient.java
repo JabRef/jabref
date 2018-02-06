@@ -6,12 +6,12 @@ import java.net.Socket;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.remote.shared.Protocol;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RemoteListenerClient {
 
-    private static final Log LOGGER = LogFactory.getLog(RemoteListenerClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteListenerClient.class);
 
     private static final int TIMEOUT = 2000;
 
@@ -35,8 +35,8 @@ public class RemoteListenerClient {
 
                 if (!Protocol.IDENTIFIER.equals(identifier)) {
                     String port = String.valueOf(remoteServerPort);
-                    String error = Localization.lang("Cannot use port %0 for remote operation; another application may be using it. Try specifying another port.", port);
-                    System.out.println(error);
+                    String errorMessage = Localization.lang("Cannot use port %0 for remote operation; another application may be using it. Try specifying another port.", port);
+                    LOGGER.error(errorMessage);
                     return false;
                 }
                 protocol.sendMessage(String.join("\n", args));

@@ -92,7 +92,11 @@ public abstract class AbstractGroup implements SearchMatcher {
     }
 
     public void setDescription(String description) {
-        this.description = Optional.of(description);
+        if (StringUtil.isBlank(description)) {
+            this.description = Optional.empty();
+        } else {
+            this.description = Optional.of(description);
+        }
     }
 
     public Optional<String> getIconName() {
