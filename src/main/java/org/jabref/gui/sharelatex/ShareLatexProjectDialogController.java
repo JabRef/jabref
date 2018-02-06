@@ -12,6 +12,7 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 
 import org.jabref.gui.AbstractController;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.sharelatex.ShareLatexManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
@@ -32,10 +33,11 @@ public class ShareLatexProjectDialogController extends AbstractController<ShareL
     @Inject private ShareLatexManager manager;
     @Inject private StateManager stateManager;
     @Inject private PreferencesService preferences;
+    @Inject private DefaultFileUpdateMonitor fileMonitor;
 
     @FXML
     private void initialize() {
-        viewModel = new ShareLatexProjectDialogViewModel(stateManager, manager, preferences.getImportFormatPreferences());
+        viewModel = new ShareLatexProjectDialogViewModel(stateManager, manager, preferences.getImportFormatPreferences(), fileMonitor);
         try {
             viewModel.addProjects(manager.getProjects());
         } catch (IOException e) {
@@ -68,7 +70,7 @@ public class ShareLatexProjectDialogController extends AbstractController<ShareL
         if (projects.isPresent() && stateManager.getActiveDatabase().isPresent()) {
             String projectID = projects.get().getProjectId();
             BibDatabaseContext database = stateManager.getActiveDatabase().get();
-            manager.startWebSocketHandler(projectID, database, preferences.getImportFormatPreferences());
+            manager.startWebSocketHandler(projectID, database, preferences.getImportFormatPreferences(), fileMonitor);
         }
 
         getStage().close();

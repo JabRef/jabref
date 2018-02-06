@@ -19,6 +19,7 @@ import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.sharelatex.ShareLatexManager;
 import org.jabref.logic.sharelatex.events.ShareLatexEntryMessageEvent;
 import org.jabref.model.sharelatex.ShareLatexProject;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
@@ -33,9 +34,12 @@ public class ShareLatexProjectDialogViewModel extends AbstractViewModel {
             FXCollections.observableArrayList());
     private final ImportFormatPreferences prefs;
 
-    public ShareLatexProjectDialogViewModel(StateManager stateManager, ShareLatexManager manager, ImportFormatPreferences prefs) {
+    private final FileUpdateMonitor fileMonitor;
+
+    public ShareLatexProjectDialogViewModel(StateManager stateManager, ShareLatexManager manager, ImportFormatPreferences prefs, FileUpdateMonitor fileMonitor) {
         this.stateManager = stateManager;
         this.prefs = prefs;
+        this.fileMonitor = fileMonitor;
         manager.registerListener(this);
 
     }
@@ -55,7 +59,7 @@ public class ShareLatexProjectDialogViewModel extends AbstractViewModel {
         Path actualDbPath = stateManager.getActiveDatabase().get().getDatabasePath().get();
 
         try {
-            ParserResult result = new BibtexImporter(prefs).importDatabase(event.getNewDatabaseContent());
+            ParserResult result = new BibtexImporter(prefs, fileMonitor).importDatabase(event.getNewDatabaseContent());
 
         } catch (IOException e1) {
             // TODO Auto-generated catch block

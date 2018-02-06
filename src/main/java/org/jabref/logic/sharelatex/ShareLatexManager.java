@@ -14,6 +14,7 @@ import org.jabref.logic.exporter.StringSaveSession;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.sharelatex.ShareLatexProject;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,11 +38,11 @@ public class ShareLatexManager {
         return Collections.emptyList();
     }
 
-    public void startWebSocketHandler(String projectID, BibDatabaseContext database, ImportFormatPreferences preferences) {
+    public void startWebSocketHandler(String projectID, BibDatabaseContext database, ImportFormatPreferences preferences, FileUpdateMonitor fileMonitor) {
         JabRefExecutorService.INSTANCE.executeAndWait(() -> {
 
             try {
-                connector.startWebsocketListener(projectID, database, preferences);
+                connector.startWebsocketListener(projectID, database, preferences, fileMonitor);
             } catch (URISyntaxException e) {
                 LOGGER.error(e);
             }

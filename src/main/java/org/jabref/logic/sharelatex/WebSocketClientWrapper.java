@@ -17,6 +17,7 @@ import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler.Whole;
 import javax.websocket.Session;
 
+import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -25,6 +26,7 @@ import org.jabref.logic.sharelatex.events.ShareLatexEntryMessageEvent;
 import org.jabref.logic.sharelatex.events.ShareLatexErrorMessageEvent;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -54,14 +56,17 @@ public class WebSocketClientWrapper {
 
     private String serverOrigin;
     private Map<String, String> cookies;
+    private FileUpdateMonitor fileMonitor;
 
     public WebSocketClientWrapper() {
         this.eventBus.register(this);
     }
 
-    public void setImportFormatPrefs(ImportFormatPreferences prefs) {
+    public void setImportFormatPrefs(ImportFormatPreferences prefs, FileUpdateMonitor fileMonitor) {
         this.prefs = prefs;
+        this.fileMonitor = fileMonitor;
     }
+
 
     public void createAndConnect(URI webSocketchannelUri, String projectId, BibDatabaseContext database) {
 
@@ -249,7 +254,7 @@ public class WebSocketClientWrapper {
 
                 String bibtexString = parser.getBibTexStringFromJsonMessage(message);
                 setBibTexString(bibtexString);
-                List<BibEntry> entries = parser.parseBibEntryFromJsonMessageString(message, prefs);
+                List<BibEntry> entries = parser.parseBibEntryFromJsonMessageString(message, prefs, fileMonitor);
 
                 LOGGER.debug("Got new entries");
                 setLeftDoc(false);

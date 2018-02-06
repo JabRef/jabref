@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -111,7 +112,7 @@ public class SharelatexConnector {
         return Optional.empty();
     }
 
-    public void startWebsocketListener(String projectId, BibDatabaseContext database, ImportFormatPreferences prefs)
+    public void startWebsocketListener(String projectId, BibDatabaseContext database, ImportFormatPreferences prefs, FileUpdateMonitor fileMonitor)
             throws URISyntaxException {
         long millis = System.currentTimeMillis();
         System.out.println(millis);
@@ -129,7 +130,7 @@ public class SharelatexConnector {
 
             URI webSocketchannelUri = new URIBuilder(socketioUrl + "/websocket/" + channel).setScheme(scheme).build();
             System.out.println("WebSocketChannelUrl " + webSocketchannelUri);
-            client.setImportFormatPrefs(prefs);
+            client.setImportFormatPrefs(prefs, fileMonitor);
             client.setServerNameOrigin(server);
             client.setCookies(loginCookies);
             client.createAndConnect(webSocketchannelUri, projectId, database);

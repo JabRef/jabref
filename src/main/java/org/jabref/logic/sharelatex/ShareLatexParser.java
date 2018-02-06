@@ -12,6 +12,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.sharelatex.ShareLatexProject;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -30,9 +31,9 @@ public class ShareLatexParser {
         return array.get(2).getAsInt();
     }
 
-    public List<BibEntry> parseBibEntryFromJsonMessageString(String message, ImportFormatPreferences prefs)
+    public List<BibEntry> parseBibEntryFromJsonMessageString(String message, ImportFormatPreferences prefs, FileUpdateMonitor fileMonitor)
             throws ParseException {
-        return parseBibEntryFromJsonArray(parseFirstPartOfMessageAsArray(message), prefs);
+        return parseBibEntryFromJsonArray(parseFirstPartOfMessageAsArray(message), prefs, fileMonitor);
     }
 
     public String getBibTexStringFromJsonMessage(String message) {
@@ -129,11 +130,11 @@ public class ShareLatexParser {
 
     }
 
-    private List<BibEntry> parseBibEntryFromJsonArray(JsonArray arr, ImportFormatPreferences prefs)
+    private List<BibEntry> parseBibEntryFromJsonArray(JsonArray arr, ImportFormatPreferences prefs, FileUpdateMonitor fileMonitor)
             throws ParseException {
 
         String bibtexString = getBibTexStringFromJsonArray(arr);
-        BibtexParser parser = new BibtexParser(prefs);
+        BibtexParser parser = new BibtexParser(prefs, fileMonitor);
         return parser.parseEntries(bibtexString);
     }
 

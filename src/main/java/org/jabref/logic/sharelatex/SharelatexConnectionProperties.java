@@ -3,7 +3,7 @@ package org.jabref.logic.sharelatex;
 import java.security.GeneralSecurityException;
 import java.util.Objects;
 
-import org.jabref.shared.security.Password;
+import org.jabref.logic.shared.security.Password;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
