@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.jabref.JabRefExecutorService;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
+import org.jabref.logic.exporter.FileSaveSession;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.StringSaveSession;
@@ -22,6 +23,9 @@ import org.apache.commons.logging.LogFactory;
 public class ShareLatexManager {
 
     private static final Log LOGGER = LogFactory.getLog(ShareLatexManager.class);
+    private static final SavePreferences preferences = new SavePreferences().withEncoding(StandardCharsets.UTF_8).withSaveInOriginalOrder(true);
+    private final BibtexDatabaseWriter<StringSaveSession> stringdbWriter = new BibtexDatabaseWriter<>(StringSaveSession::new);
+    private final BibtexDatabaseWriter<FileSaveSession> fileWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
 
     private final SharelatexConnector connector = new SharelatexConnector();
     private final ShareLatexParser parser = new ShareLatexParser();
@@ -53,9 +57,9 @@ public class ShareLatexManager {
 
     public void sendNewDatabaseContent(BibDatabaseContext database) {
         try {
-            BibtexDatabaseWriter<StringSaveSession> databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new);
-            SavePreferences preferences = new SavePreferences().withEncoding(StandardCharsets.UTF_8).withSaveInOriginalOrder(true);
-            StringSaveSession saveSession = databaseWriter.saveDatabase(database, preferences);
+            fileWriter.saveDatabase(database, preferences);
+
+            StringSaveSession saveSession = stringdbWriter.saveDatabase(database, preferences);
             String updatedcontent = saveSession.getStringValue().replace("\r\n", "\n");
 
             connector.sendNewDatabaseContent(updatedcontent);

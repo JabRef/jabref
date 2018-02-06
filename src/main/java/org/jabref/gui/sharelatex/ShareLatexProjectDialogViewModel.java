@@ -63,7 +63,7 @@ public class ShareLatexProjectDialogViewModel extends AbstractViewModel {
 
         } catch (IOException e1) {
             // TODO Auto-generated catch block
-            e1.printStackTrace();
+
         }
 
         try (BufferedWriter writer = Files.newBufferedWriter(actualDbPath, StandardCharsets.UTF_8)) {
