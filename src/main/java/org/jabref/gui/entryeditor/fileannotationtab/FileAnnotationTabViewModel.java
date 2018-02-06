@@ -36,7 +36,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
     private final ListProperty<FileAnnotationViewModel> annotations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Path> files = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<FileAnnotationViewModel> currentAnnotation = new SimpleObjectProperty<>();
-    private ReadOnlyBooleanProperty annotationEmpty;
+    private final ReadOnlyBooleanProperty annotationEmpty = annotations.emptyProperty();
 
     private final FileAnnotationCache cache;
     private final BibEntry entry;
@@ -49,11 +49,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         this.cache = cache;
         this.entry = entry;
         this.fileMonitor = fileMonitor;
-        initialize();
-    }
-
-    private void initialize() {
-        fileAnnotations = cache.getFromCache(entry);
+        fileAnnotations = this.cache.getFromCache(this.entry);
         files.setAll(fileAnnotations.keySet());
     }
 
@@ -90,7 +86,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
                 .map(FileAnnotationViewModel::new)
                 .collect(Collectors.toList());
         annotations.setAll(newAnnotations);
-        annotationEmpty = annotations.emptyProperty();
+
         try {
             fileMonitor.addListenerForFile(currentFile, fileListener);
         } catch (IOException e) {
@@ -103,7 +99,8 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             // Remove annotations for the current entry and reinitialize annotation/cache
             cache.remove(entry);
-            initialize();
+            fileAnnotations = cache.getFromCache(entry);
+            files.setAll(fileAnnotations.keySet());
 
             // Pretend that we just switched to the current file in order to refresh the display
             notifyNewSelectedFile(currentFile);
