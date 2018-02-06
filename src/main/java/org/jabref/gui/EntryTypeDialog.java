@@ -288,6 +288,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                 generateButton.setText(Localization.lang("Searching..."));
             });
             searchID = idTextField.getText().trim();
+            searchID = searchID.replaceAll(" ", "");
             fetcher = WebFetchers.getIdBasedFetchers(Globals.prefs.getImportFormatPreferences()).get(comboBox.getSelectedIndex());
             if (!searchID.isEmpty()) {
                 try {
