@@ -79,8 +79,9 @@ public class XMPUtilTest {
 
     private XMPPreferences xmpPreferences;
 
-
     private ImportFormatPreferences importFormatPreferences;
+
+    private BibtexParser parser;
 
     /**
      * Wrap bibtex-data (<bibtex:author>...) into an rdf:Description.
@@ -248,6 +249,8 @@ public class XMPUtilTest {
         when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(false);
 
         when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
+
+        parser = new BibtexParser(importFormatPreferences, fileMonitor);
     }
 
     /**
@@ -446,13 +449,12 @@ public class XMPUtilTest {
      */
     @Test
     public void testReadWriteXMP() throws IOException, TransformerException {
-        ParserResult result = BibtexParser.parse(new StringReader(
+        ParserResult result = parser.parse(new StringReader(
                 "@article{canh05," + "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.}," + "\n"
                         + "  title = {Effective work practices for floss development: A model and propositions}," + "\n"
                         + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)}," + "\n"
                         + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29},"
-                        + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"),
-                importFormatPreferences, fileMonitor);
+                        + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"));
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
@@ -724,13 +726,12 @@ public class XMPUtilTest {
      */
     @Test
     public void testXMLEscape() throws Exception {
-        ParserResult result = BibtexParser.parse(new StringReader(
+        ParserResult result = parser.parse(new StringReader(
                 "@article{canh05," + "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.}," + "\n"
                         + "  title = {</bibtex:title> \" bla \" '' '' && &  for floss development: A model and propositions},"
                         + "\n" + "  booktitle = {<randomXML>}," + "\n" + "  year = {2005}," + "\n"
                         + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29}," + "\n"
-                        + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"),
-                importFormatPreferences, fileMonitor);
+                        + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"));
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
@@ -774,10 +775,9 @@ public class XMPUtilTest {
     @Test
     public void testXMPreadString() throws Exception {
 
-        ParserResult result = BibtexParser
+        ParserResult result = parser
                 .parse(new StringReader("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
-                        + "  title = {Title A}}\n" + "@inProceedings{foo," + "  author={Norton Bar}}"),
-                        importFormatPreferences, fileMonitor);
+                        + "  title = {Title A}}\n" + "@inProceedings{foo," + "  author={Norton Bar}}"));
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(2, c.size());
@@ -1045,13 +1045,12 @@ public class XMPUtilTest {
     @Test
     public void testReadRawXMP() throws IOException, TransformerException {
 
-        ParserResult result = BibtexParser.parse(new StringReader(
+        ParserResult result = parser.parse(new StringReader(
                 "@article{canh05," + "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},\n"
                         + "  title = {Effective work practices for floss development: A model and propositions},\n"
                         + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)},\n"
                         + "  year = {2005},\n" + "  owner = {oezbek},\n" + "  timestamp = {2006.05.29},\n"
-                        + "  url = {http://james.howison.name/publications.html}}"),
-                importFormatPreferences, fileMonitor);
+                        + "  url = {http://james.howison.name/publications.html}}"));
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
@@ -1285,15 +1284,14 @@ public class XMPUtilTest {
      */
     @Test
     public void testResolveStrings() throws IOException, TransformerException {
-        ParserResult original = BibtexParser
+        ParserResult original = parser
                 .parse(new StringReader("@string{ crow = \"Crowston, K.\"}\n" + "@string{ anna = \"Annabi, H.\"}\n"
                         + "@string{ howi = \"Howison, J.\"}\n" + "@string{ masa = \"Masango, C.\"}\n"
                         + "@article{canh05," + "  author = {#crow# and #anna# and #howi# and #masa#}," + "\n"
                         + "  title = {Effective work practices for floss development: A model and propositions}," + "\n"
                         + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)}," + "\n"
                         + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29},"
-                        + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"),
-                        importFormatPreferences, fileMonitor);
+                        + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"));
 
         Collection<BibEntry> c = original.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
