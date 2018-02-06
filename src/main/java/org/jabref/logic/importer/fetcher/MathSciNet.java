@@ -26,6 +26,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 
@@ -92,7 +93,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
                     Collectors.joining(OS.NEWLINE));
 
             List<BibEntry> entries = new ArrayList<>();
-            BibtexParser bibtexParser = new BibtexParser(preferences);
+            BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
             Pattern pattern = Pattern.compile("<pre>(?s)(.*)</pre>");
             Matcher matcher = pattern.matcher(response);
             while (matcher.find()) {

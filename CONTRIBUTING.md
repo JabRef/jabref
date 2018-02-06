@@ -66,7 +66,7 @@ You can see the result in `build\resources\main\help\en\About.html` or when clic
 
 
 ### When making an architectural decision
-In case you add a library or do mayor code rewrites, we ask you to document your decision.
+In case you add a library or do major code rewrites, we ask you to document your decision.
 Recommended reading: <https://adr.github.io/>.
 
 We simply ask to create a new markdown file in `docs/adr` following the template presented at <https://adr.github.io/madr/>.

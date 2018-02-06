@@ -17,8 +17,11 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Assertions;
 import org.mockito.Answers;
 
 import static org.mockito.Mockito.mock;
@@ -35,9 +38,9 @@ public class BibEntryAssert {
      */
     public static void assertEquals(Class<?> clazz, String resourceName, BibEntry entry)
             throws IOException {
-        Assert.assertNotNull(clazz);
-        Assert.assertNotNull(resourceName);
-        Assert.assertNotNull(entry);
+        assertNotNull(clazz);
+        assertNotNull(resourceName);
+        assertNotNull(entry);
         try (InputStream shouldBeIs = clazz.getResourceAsStream(resourceName)) {
             BibEntryAssert.assertEquals(shouldBeIs, entry);
         }
@@ -53,9 +56,9 @@ public class BibEntryAssert {
      */
     public static void assertEquals(Class<?> clazz, String resourceName, List<BibEntry> asIsEntries)
             throws IOException {
-        Assert.assertNotNull(clazz);
-        Assert.assertNotNull(resourceName);
-        Assert.assertNotNull(asIsEntries);
+        assertNotNull(clazz);
+        assertNotNull(resourceName);
+        assertNotNull(asIsEntries);
         try (InputStream shouldBeIs = clazz.getResourceAsStream(resourceName)) {
             BibEntryAssert.assertEquals(shouldBeIs, asIsEntries);
         }
@@ -64,11 +67,11 @@ public class BibEntryAssert {
     private static List<BibEntry> getListFromInputStream(InputStream is) throws IOException {
         ParserResult result;
         try (Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-            BibtexParser parser = new BibtexParser(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+            BibtexParser parser = new BibtexParser(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
             result = parser.parse(reader);
         }
-        Assert.assertNotNull(result);
-        Assert.assertFalse(result.isEmpty());
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
         return result.getDatabase().getEntries();
     }
 
@@ -80,16 +83,18 @@ public class BibEntryAssert {
      */
     public static void assertEquals(InputStream expectedInputStream, List<BibEntry> actualEntries)
             throws IOException {
-        Assert.assertNotNull(expectedInputStream);
-        Assert.assertNotNull(actualEntries);
-        Assert.assertEquals(getListFromInputStream(expectedInputStream), actualEntries);
+        assertNotNull(expectedInputStream);
+        assertNotNull(actualEntries);
+        // explicit reference of Assertions is needed here to disambiguate from the methods defined by this class
+        Assertions.assertEquals(getListFromInputStream(expectedInputStream), actualEntries);
     }
 
     public static void assertEquals(List<BibEntry> expectedEntries, InputStream actualInputStream)
             throws IOException {
-        Assert.assertNotNull(actualInputStream);
-        Assert.assertNotNull(expectedEntries);
-        Assert.assertEquals(expectedEntries, getListFromInputStream(actualInputStream));
+        assertNotNull(actualInputStream);
+        assertNotNull(expectedEntries);
+        // explicit reference of Assertions is needed here to disambiguate from the methods defined by this class
+        Assertions.assertEquals(expectedEntries, getListFromInputStream(actualInputStream));
     }
 
     /**
@@ -132,7 +137,8 @@ public class BibEntryAssert {
             throws IOException {
         List<BibEntry> actualEntries = importer.importDatabase(fileToImport, StandardCharsets.UTF_8)
                 .getDatabase().getEntries();
-        Assert.assertEquals(expected, actualEntries);
+        // explicit reference of Assertions is needed here to disambiguate from the methods defined by this class
+        Assertions.assertEquals(expected, actualEntries);
     }
 
     public static void assertEquals(List<BibEntry> expected, URL fileToImport, Importer importer)

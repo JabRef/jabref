@@ -11,21 +11,20 @@ import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Category(FetcherTest.class)
+@FetcherTest
 public class DBLPFetcherTest {
 
     private DBLPFetcher dblpFetcher;
     private BibEntry entry;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getFieldContentParserPreferences())
@@ -54,7 +53,7 @@ public class DBLPFetcherTest {
         String query = "Process Engine Benchmarking with Betsy in the Context of {ISO/IEC} Quality Standards";
         List<BibEntry> result = dblpFetcher.performSearch(query);
 
-        Assert.assertEquals(Collections.singletonList(entry), result);
+        assertEquals(Collections.singletonList(entry), result);
     }
 
     @Test
@@ -62,7 +61,7 @@ public class DBLPFetcherTest {
         String query = "geiger harrer betsy$ softw.trends"; //-wirtz Negative operators do no longer work,  see issue https://github.com/JabRef/jabref/issues/2890
         List<BibEntry> result = dblpFetcher.performSearch(query);
 
-        Assert.assertEquals(Collections.singletonList(entry), result);
+        assertEquals(Collections.singletonList(entry), result);
     }
 
 }

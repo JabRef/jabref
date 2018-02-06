@@ -170,7 +170,7 @@ public class ImportCustomizationDialog extends JabRefDialog {
                 Globals.prefs.customImports
                         .remove(((ImportTableModel) customImporterTable.getModel()).getImporter(row));
                 Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
-                        Globals.prefs.getXMPPreferences());
+                        Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
                 customImporterTable.revalidate();
                 customImporterTable.repaint();
             }
@@ -261,7 +261,7 @@ public class ImportCustomizationDialog extends JabRefDialog {
     public void addOrReplaceImporter(CustomImporter importer) {
         Globals.prefs.customImports.replaceImporter(importer);
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
-                Globals.prefs.getXMPPreferences());
+                Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
         ((ImportTableModel) customImporterTable.getModel()).fireTableDataChanged();
     }
 

@@ -10,11 +10,11 @@ import javax.swing.SwingUtilities;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.SidePaneManager;
-import org.jabref.gui.util.FileUpdateListener;
-import org.jabref.gui.util.FileUpdateMonitor;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.FileUpdateListener;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
