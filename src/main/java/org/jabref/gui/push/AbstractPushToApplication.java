@@ -71,9 +71,11 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         try {
             if (OS.OS_X) {
                 String[] commands = getCommandLine(keyString);
-                Runtime.getRuntime().exec("open -a " + commands[0] + " -n --args " + commands[1] + " " + commands[2]);
+                ProcessBuilder processBuilder = new ProcessBuilder("open -a " + commands[0] + " -n --args " + commands[1] + " " + commands[2]);
+                processBuilder.start();
             } else {
-                Runtime.getRuntime().exec(getCommandLine(keyString));
+                ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
+                processBuilder.start();
             }
         }
 
