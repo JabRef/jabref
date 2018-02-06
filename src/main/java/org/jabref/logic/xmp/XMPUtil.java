@@ -1033,7 +1033,7 @@ public class XMPUtil {
         try (InputStream inputStream = Files.newInputStream(path, StandardOpenOption.READ)) {
             return hasMetadata(inputStream, xmpPreferences);
         } catch (IOException e) {
-            LOGGER.error("XMP reading failed", e);
+            // happens if no metadata is found, no reason to log the exception
             return false;
         }
     }
@@ -1056,7 +1056,7 @@ public class XMPUtil {
             LOGGER.info("Encryption not supported by XMPUtil");
             return false;
         } catch (IOException e) {
-            LOGGER.error("XMP reading failed", e);
+            // happens if no metadata is found, no reason to log the exception
             return false;
         }
     }
