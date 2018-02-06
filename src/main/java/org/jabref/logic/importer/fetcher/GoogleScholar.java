@@ -73,7 +73,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
             // Check results for PDF link
             // TODO: link always on first result or none?
             for (int i = 0; i < NUM_RESULTS; i++) {
-                Elements link = doc.select(String.format("#gs_ggsW%s a", i));
+                Elements link = doc.select(String.format("div[data-rp=%S] div.gs_or_ggsm a", i));
 
                 if (link.first() != null) {
                     String s = link.first().attr("href");
