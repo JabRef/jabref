@@ -175,6 +175,10 @@ dependencies {
     checkstyle 'com.puppycrawl.tools:checkstyle:8.8'
 }
 
+jacoco {
+    toolVersion = '0.8.0'
+}
+
 dependencyUpdates {
     outputFormatter = "json"
 }
@@ -227,7 +231,16 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject("http://dev.mysql.com/downloads/connector/j/ lists the version 5.* as last stable version.")
             }
         }
-
+        withModule("org.jacoco.agent") { ComponentSelection selection ->
+            if (selection.candidate.version.equals("0.8.0")) {
+                selection.reject("As a native plugin we cannot control the actual version of jacoco. This dependency should be hidden.")
+            }
+        }
+        withModule("org.jacoco.ant") { ComponentSelection selection ->
+            if (selection.candidate.version.equals("0.8.0")) {
+                selection.reject("As a native plugin we cannot control the actual version of jacoco. This dependency should be hidden.")
+            }
+        }
     }
 }
 
@@ -391,7 +404,6 @@ afterEvaluate {
     def junitPlatformTest = tasks.junitPlatformTest
 
     jacoco {
-        toolVersion = '0.8.0'
         applyTo(junitPlatformTest)
     }
 
