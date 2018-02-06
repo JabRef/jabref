@@ -18,7 +18,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added a new type of group that shows all items referenced in a given LaTeX file (actually the generated AUX file). [#1664](https://github.com/JabRef/jabref/issues/1664)
 - We added the export of the `translator` field to the according MS-Office XML field. [#1750, comment](https://github.com/JabRef/jabref/issues/1750#issuecomment-357350986)
 - We changed the import of the MS-Office XML fields `bookauthor` and `translator`. Both are now imported to their corresponding bibtex/biblatex fields.
-- We improved the export of the `address` and `location` field to the MS-Office XML fields. If the address field does not contain a comma, it is treated as single value and exported to the field `city`. [#1750, comment](https://github.com/JabRef/jabref/issues/1750#issuecomment-357539167) 
+- We improved the export of the `address` and `location` field to the MS-Office XML fields. If the address field does not contain a comma, it is treated as single value and exported to the field `city`. [#1750, comment](https://github.com/JabRef/jabref/issues/1750#issuecomment-357539167)
 For more details refer to the [field mapping help page](http://help.jabref.org/en/MsOfficeBibFieldMapping)
 - We added Facebook and Twitter icons in the toolbar to link to our [Facebook](https://www.facebook.com/JabRef/) and [Twitter](https://twitter.com/jabref_org) pages.
 - We no longer print empty lines when exporting an entry in RIS format [#3634](https://github.com/JabRef/jabref/issues/3634)
@@ -29,6 +29,7 @@ The new default removes the linked file from the entry instead of deleting the f
 ### Fixed
 - We fixed the missing dot in the name of an exported file. [#3576](https://github.com/JabRef/jabref/issues/3576)
 - Autocompletion in the search bar can now be disabled via the preferences. [#3598](https://github.com/JabRef/jabref/issues/3598)
+- We fixed an issue where odd linked files could not be selected in the entry editor. [#3639](https://github.com/JabRef/jabref/issues/3639)
 - We fixed and extended the RIS import functionality to cover more fields. [#3634](https://github.com/JabRef/jabref/issues/3634) [#2607](https://github.com/JabRef/jabref/issues/2607)
 - Chaining modifiers in BibTeX key pattern now works as described in the documentation. [#3648](https://github.com/JabRef/jabref/issues/3648)
 - We fixed an issue where not all bibtex/biblatex fields would be exported as latex-free to MS-Office XML [koppor#284](https://github.com/koppor/jabref/issues/284)
