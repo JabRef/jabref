@@ -154,7 +154,7 @@ tasks.eclipse.doFirst {
         org.eclipse.jdt.core.formatter.alignment_for_parameters_in_constructor_declaration=16
         org.eclipse.jdt.core.formatter.alignment_for_parameters_in_method_declaration=16
         org.eclipse.jdt.core.formatter.alignment_for_resources_in_try=88
-        org.eclipse.jdt.core.formatter.alignment_for_selector_in_method_invocation=16
+        org.eclipse.jdt.core.formatter.alignment_for_selector_in_method_invocation=80
         org.eclipse.jdt.core.formatter.alignment_for_superclass_in_type_declaration=16
         org.eclipse.jdt.core.formatter.alignment_for_superinterfaces_in_enum_declaration=0
         org.eclipse.jdt.core.formatter.alignment_for_superinterfaces_in_type_declaration=16
