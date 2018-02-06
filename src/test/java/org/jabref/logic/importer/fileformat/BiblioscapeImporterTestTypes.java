@@ -4,50 +4,38 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
 public class BiblioscapeImporterTestTypes {
 
-    private BiblioscapeImporter bsImporter;
-
-    @Parameter(value = 0)
-    public String biblioscapeType;
-
-    @Parameter(value = 1)
-    public String expectedBibType;
-
-
-    @Parameters
-    public static Collection<String[]> types() {
-        return Arrays.asList(new String[][] {{"journal", "article"}, {"book section", "inbook"}, {"book", "book"},
-                {"conference", "inproceedings"}, {"proceedings", "inproceedings"}, {"report", "techreport"},
-                {"master thesis", "mastersthesis"}, {"thesis", "phdthesis"}, {"master", "misc"}});
+    private static Stream<String[]> types() {
+        return Arrays.stream(new String[][] {
+                {"journal", "article"},
+                {"book section", "inbook"},
+                {"book", "book"},
+                {"conference", "inproceedings"},
+                {"proceedings", "inproceedings"},
+                {"report", "techreport"},
+                {"master thesis", "mastersthesis"},
+                {"thesis", "phdthesis"},
+                {"master", "misc"}});
     }
 
-    @Before
-    public void setUp() throws Exception {
-        bsImporter = new BiblioscapeImporter();
-    }
-
-    @Test
-    public void importConvertsToCorrectBibType() throws IOException {
+    @ParameterizedTest
+    @MethodSource("types")
+    public void importConvertsToCorrectBibType(String biblioscapeType, String bibtexType) throws IOException {
         String bsInput = "--AU-- Baklouti, F.\n" + "--YP-- 1999\n" + "--KW-- Cells; Rna; Isoforms\n" + "--TI-- Blood\n"
                 + "--RT-- " + biblioscapeType + "\n" + "------";
 
-        List<BibEntry> bibEntries = bsImporter.importDatabase(new BufferedReader(new StringReader(bsInput)))
+        List<BibEntry> bibEntries = new BiblioscapeImporter().importDatabase(new BufferedReader(new StringReader(bsInput)))
                 .getDatabase().getEntries();
 
         BibEntry entry = new BibEntry();
@@ -55,8 +43,8 @@ public class BiblioscapeImporterTestTypes {
         entry.setField("keywords", "Cells; Rna; Isoforms");
         entry.setField("title", "Blood");
         entry.setField("year", "1999");
-        entry.setType(expectedBibType);
+        entry.setType(bibtexType);
 
-        Assert.assertEquals(Collections.singletonList(entry), bibEntries);
+        Assertions.assertEquals(Collections.singletonList(entry), bibEntries);
     }
 }

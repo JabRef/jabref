@@ -4,51 +4,55 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class InspecImportTest {
+public class InspecImporterTest {
 
     private InspecImporter importer;
 
-    @Before
+    private static final String FILE_ENDING = ".txt";
+
+    @BeforeEach
     public void setUp() throws Exception {
         this.importer = new InspecImporter();
     }
 
-    @Test
-    public void testIsRecognizedFormatAccept() throws IOException, URISyntaxException {
-        List<String> testList = Arrays.asList("InspecImportTest.txt", "InspecImportTest2.txt");
-        for (String str : testList) {
-            Path file = Paths.get(InspecImportTest.class.getResource(str).toURI());
-            assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
-        }
+    private static Stream<String> fileNames() throws IOException {
+        Predicate<String> fileName = name -> name.startsWith("InspecImportTest")
+                && !name.contains("False")
+                && name.endsWith(FILE_ENDING);
+        return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
-    @Test
-    public void testIsRecognizedFormatReject() throws IOException, URISyntaxException {
-        List<String> testList = Arrays.asList("CopacImporterTest1.txt", "CopacImporterTest2.txt",
-                "IEEEImport1.txt", "IsiImporterTest1.isi", "IsiImporterTestInspec.isi", "IsiImporterTestWOS.isi",
-                "IsiImporterTestMedline.isi", "RisImporterTest1.ris", "InspecImportTestFalse.txt");
-        for (String str : testList) {
-            Path file = Paths.get(InspecImportTest.class.getResource(str).toURI());
-            assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
-        }
+    private static Stream<String> nonInspecfileNames() throws IOException {
+        Predicate<String> fileName = name -> !name.startsWith("InspecImportTest");
+        return ImporterTestEngine.getTestFiles(fileName).stream();
+    }
+
+    @ParameterizedTest
+    @MethodSource("fileNames")
+    public void testIsRecognizedFormatAccept(String fileName) throws IOException {
+        ImporterTestEngine.testIsRecognizedFormat(importer, fileName);
+    }
+
+    @ParameterizedTest
+    @MethodSource("nonInspecfileNames")
+    public void testIsRecognizedFormatReject(String fileName) throws IOException {
+        ImporterTestEngine.testIsNotRecognizedFormat(importer, fileName);
     }
 
     @Test
@@ -66,7 +70,7 @@ public class InspecImportTest {
         expectedEntry.setField("volume", "19");
 
         BibEntryAssert.assertEquals(Collections.singletonList(expectedEntry),
-                InspecImportTest.class.getResource("InspecImportTest2.txt"), importer);
+                InspecImporterTest.class.getResource("InspecImportTest2.txt"), importer);
     }
 
     @Test
