@@ -6,8 +6,10 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class URLDownloadTest {
 
@@ -15,15 +17,14 @@ public class URLDownloadTest {
     public void testStringDownloadWithSetEncoding() throws IOException {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
-        Assert.assertTrue("google.com should contain google", dl.asString().contains("Google"));
+        assertTrue(dl.asString().contains("Google"), "google.com should contain google");
     }
 
     @Test
     public void testStringDownload() throws IOException {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
-        Assert.assertTrue("google.com should contain google",
-                dl.asString(StandardCharsets.UTF_8).contains("Google"));
+        assertTrue(dl.asString(StandardCharsets.UTF_8).contains("Google"), "google.com should contain google");
     }
 
     @Test
@@ -32,7 +33,7 @@ public class URLDownloadTest {
         try {
             URLDownload dl = new URLDownload(new URL("http://www.google.com"));
             dl.toFile(destination.toPath());
-            Assert.assertTrue("file must exist", destination.exists());
+            assertTrue(destination.exists(), "file must exist");
         } finally {
             // cleanup
             if (!destination.delete()) {
@@ -45,7 +46,7 @@ public class URLDownloadTest {
     public void testDetermineMimeType() throws IOException {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
-        Assert.assertTrue(dl.getMimeType().startsWith("text/html"));
+        assertTrue(dl.getMimeType().startsWith("text/html"));
     }
 
     @Test
@@ -53,7 +54,7 @@ public class URLDownloadTest {
         URLDownload google = new URLDownload(new URL("http://www.google.com"));
 
         String path = google.toTemporaryFile().toString();
-        Assert.assertTrue(path, path.endsWith(".tmp"));
+        assertTrue(path.endsWith(".tmp"), path);
     }
 
     @Test
@@ -61,7 +62,7 @@ public class URLDownloadTest {
         URLDownload google = new URLDownload(new URL("https://github.com/JabRef/jabref/blob/master/LICENSE.md"));
 
         String path = google.toTemporaryFile().toString();
-        Assert.assertTrue(path, path.contains("LICENSE") && path.endsWith(".md"));
+        assertTrue(path.contains("LICENSE") && path.endsWith(".md"), path);
     }
 
     @Test
@@ -69,7 +70,7 @@ public class URLDownloadTest {
         URLDownload ftp = new URLDownload(new URL("ftp://ftp.informatik.uni-stuttgart.de/pub/library/ncstrl.ustuttgart_fi/INPROC-2016-15/INPROC-2016-15.pdf"));
 
         Path path = ftp.toTemporaryFile();
-        Assert.assertNotNull(path);
+        assertNotNull(path);
     }
 
     @Test
@@ -77,7 +78,7 @@ public class URLDownloadTest {
         URLDownload ftp = new URLDownload(new URL("http://www.jabref.org"));
 
         Path path = ftp.toTemporaryFile();
-        Assert.assertNotNull(path);
+        assertNotNull(path);
     }
 
     @Test
@@ -85,7 +86,7 @@ public class URLDownloadTest {
         URLDownload ftp = new URLDownload(new URL("https://www.jabref.org"));
 
         Path path = ftp.toTemporaryFile();
-        Assert.assertNotNull(path);
+        assertNotNull(path);
     }
 
 }

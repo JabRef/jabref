@@ -38,11 +38,12 @@ import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 public class BibtexDatabaseWriterTest {
@@ -52,9 +53,9 @@ public class BibtexDatabaseWriterTest {
     private MetaData metaData;
     private BibDatabaseContext bibtexContext;
     private ImportFormatPreferences importFormatPreferences;
-    private FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
+    private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // Write to a string instead of to a file
         databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new);
@@ -65,19 +66,17 @@ public class BibtexDatabaseWriterTest {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void writeWithNullContextThrowsException() throws Exception {
-        databaseWriter.savePartOfDatabase(null, Collections.emptyList(), new SavePreferences());
+        assertThrows(NullPointerException.class, () -> databaseWriter.savePartOfDatabase(null, Collections.emptyList(), new SavePreferences()));
     }
 
-    @Test(expected = NullPointerException.class)
     public void writeWithNullEntriesThrowsException() throws Exception {
-        databaseWriter.savePartOfDatabase(bibtexContext, null, new SavePreferences());
+        assertThrows(NullPointerException.class, () -> databaseWriter.savePartOfDatabase(bibtexContext, null, new SavePreferences()));
     }
 
-    @Test(expected = NullPointerException.class)
     public void writeWithNullPreferencesThrowsException() throws Exception {
-        databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), null);
+        assertThrows(NullPointerException.class, () -> databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), null));
     }
 
     @Test

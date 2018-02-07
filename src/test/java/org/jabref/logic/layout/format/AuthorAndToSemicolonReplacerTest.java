@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.jabref.logic.layout.LayoutFormatter;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -36,6 +36,6 @@ public class AuthorAndToSemicolonReplacerTest {
     public void testFormat() {
         LayoutFormatter a = new AuthorAndToSemicolonReplacer();
 
-        Assert.assertEquals(expected, a.format(input));
+        assertEquals(expected, a.format(input));
     }
 }

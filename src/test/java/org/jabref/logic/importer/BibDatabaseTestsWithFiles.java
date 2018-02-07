@@ -9,8 +9,8 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
@@ -20,7 +20,7 @@ public class BibDatabaseTestsWithFiles {
 
     private ImportFormatPreferences importFormatPreferences;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }

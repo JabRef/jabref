@@ -19,7 +19,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;

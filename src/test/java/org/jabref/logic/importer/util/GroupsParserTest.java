@@ -20,15 +20,16 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class GroupsParserTest {
     private FileUpdateMonitor fileMonitor;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         fileMonitor = new DummyFileUpdateMonitor();
     }
@@ -56,9 +57,8 @@ public class GroupsParserTest {
         assertEquals(expected, parsed);
     }
 
-    @Test(expected = ParseException.class)
     public void fromStringThrowsParseExceptionForNotEscapedGroupName() throws Exception {
-        GroupsParser.fromString("ExplicitGroup:slit\\\\;0\\;mertsch_slit2_2007\\;;", ',', fileMonitor);
+        assertThrows(ParseException.class, () -> GroupsParser.fromString("ExplicitGroup:slit\\\\;0\\;mertsch_slit2_2007\\;;", ',', fileMonitor));
     }
 
     @Test
@@ -122,8 +122,7 @@ public class GroupsParserTest {
         assertEquals(expected, parsed);
     }
 
-    @Test(expected = ParseException.class)
     public void fromStringUnknownGroupThrowsException() throws Exception {
-        GroupsParser.fromString("0 UnknownGroup:myUnknownGroup;0;;1;;;;", ',', fileMonitor);
+        assertThrows(ParseException.class, () -> GroupsParser.fromString("0 UnknownGroup:myUnknownGroup;0;;1;;;;", ',', fileMonitor));
     }
 }

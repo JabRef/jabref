@@ -37,7 +37,7 @@ public class MainArchitectureTests {
 
     private final String firstPackage;
     private final String secondPackage;
-    private Map<String, List<String>> exceptions;
+    private final Map<String, List<String>> exceptions;
 
     public MainArchitectureTests(String firstPackage, String secondPackage) {
         this.firstPackage = firstPackage;

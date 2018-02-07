@@ -1,6 +1,6 @@
 package org.jabref.model.database.event;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertNotNull;
 

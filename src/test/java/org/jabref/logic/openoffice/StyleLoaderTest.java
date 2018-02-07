@@ -11,14 +11,14 @@ import java.util.List;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 import org.mockito.Answers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -40,22 +40,17 @@ public class StyleLoaderTest {
 
     }
 
-    @Test(expected = NullPointerException.class)
     public void throwNPEWithNullPreferences() {
-        loader = new StyleLoader(null, layoutPreferences, mock(Charset.class));
-        fail();
+        assertThrows(NullPointerException.class, () -> loader = new StyleLoader(null, layoutPreferences, mock(Charset.class)));
+
     }
 
-    @Test(expected = NullPointerException.class)
     public void throwNPEWithNullLayoutPreferences() {
-        loader = new StyleLoader(mock(OpenOfficePreferences.class), null, mock(Charset.class));
-        fail();
+        assertThrows(NullPointerException.class, () -> loader = new StyleLoader(mock(OpenOfficePreferences.class), null, mock(Charset.class)));
     }
 
-    @Test(expected = NullPointerException.class)
     public void throwNPEWithNullCharset() {
-        loader = new StyleLoader(mock(OpenOfficePreferences.class), layoutPreferences, null);
-        fail();
+        assertThrows(NullPointerException.class, () -> loader = new StyleLoader(mock(OpenOfficePreferences.class), layoutPreferences, null));
     }
 
     @Test
@@ -125,7 +120,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    @Ignore("This tests the preferences that are mocked away")
+    @Disabled("This tests the preferences that are mocked away")
     public void testInitalizeWithOneExternalFileRemoveStyleUpdatesPreferences() throws URISyntaxException {
         String filename = Paths.get(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                 .toFile().getPath();
@@ -157,11 +152,11 @@ public class StyleLoaderTest {
         assertEquals(beforeAdding + 1, loader.getStyles().size());
     }
 
-    @Test(expected = NullPointerException.class)
+
     public void testAddNullStyleThrowsNPE() {
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
-        loader.addStyleIfValid(null);
-        fail();
+        assertThrows(NullPointerException.class, () -> loader.addStyleIfValid(null));
+
     }
 
     @Test
@@ -186,7 +181,7 @@ public class StyleLoaderTest {
     }
 
     @Test
-    @Ignore("This tests the preferences that are mocked away")
+    @Disabled("This tests the preferences that are mocked away")
     public void testGtDefaultUsedStyleWhenIncorrect() {
         when(preferences.getCurrentStyle()).thenReturn("ljlkjlkjnljnvdlsjniuhwelfhuewfhlkuewhfuwhelu");
         loader = new StyleLoader(preferences, layoutPreferences, encoding);

@@ -6,35 +6,36 @@ import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class BibEntryTest {
 
     private BibEntry entry;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         entry = new BibEntry();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         entry = null;
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void notOverrideReservedFields() {
-        entry.setField(BibEntry.ID_FIELD, "somevalue");
+        assertThrows(IllegalArgumentException.class, () -> entry.setField(BibEntry.ID_FIELD, "somevalue"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void notClearReservedFields() {
-        entry.clearField(BibEntry.ID_FIELD);
+        assertThrows(IllegalArgumentException.class, () -> entry.clearField(BibEntry.ID_FIELD));
     }
 
     @Test

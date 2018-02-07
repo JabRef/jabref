@@ -17,32 +17,28 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.GUITest;
 
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-@Category(GUITest.class)
+@GUITest
 public class EntryFromFileCreatorManagerTest {
-
-    // Needed to initialize ExternalFileTypes
-    @Before
-    public void setUp() {
-
-    }
 
     @Test
     public void testGetCreator() {
         EntryFromFileCreatorManager manager = new EntryFromFileCreatorManager();
         EntryFromFileCreator creator = manager.getEntryCreator(ImportDataTest.NOT_EXISTING_PDF);
-        Assert.assertNull(creator);
+        assertNull(creator);
 
         creator = manager.getEntryCreator(ImportDataTest.FILE_IN_DATABASE);
-        Assert.assertNotNull(creator);
-        Assert.assertTrue(creator.accept(ImportDataTest.FILE_IN_DATABASE));
+        assertNotNull(creator);
+        assertTrue(creator.accept(ImportDataTest.FILE_IN_DATABASE));
     }
 
     @Test
@@ -64,7 +60,7 @@ public class EntryFromFileCreatorManagerTest {
             /**
              * One file doesn't exist, so adding it as an entry should lead to an error message.
              */
-            Assert.assertEquals(1, errors.size());
+            assertEquals(1, errors.size());
 
             boolean file1Found = false;
             boolean file2Found = false;
@@ -78,8 +74,8 @@ public class EntryFromFileCreatorManagerTest {
                 }
             }
 
-            Assert.assertTrue(file1Found);
-            Assert.assertFalse(file2Found);
+            assertTrue(file1Found);
+            assertFalse(file2Found);
         }
     }
 

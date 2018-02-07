@@ -3,10 +3,11 @@ package org.jabref.logic.l10n;
 import java.util.Locale;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LanguagesTest {
 
@@ -47,8 +48,7 @@ public class LanguagesTest {
         assertEquals(Optional.empty(), Languages.convertToSupportedLocale("language_country_variant"));
     }
 
-    @Test(expected = NullPointerException.class)
     public void convertToKnownLocaleNull() {
-        Languages.convertToSupportedLocale(null);
+        assertThrows(NullPointerException.class, () -> Languages.convertToSupportedLocale(null));
     }
 }
