@@ -2,17 +2,20 @@ package org.jabref.gui.fieldeditors;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,6 +48,10 @@ public class LinkedFileViewModelTest {
         databaseContext = new BibDatabaseContext();
         taskExecutor = mock(TaskExecutor.class);
         dialogService = mock(DialogService.class);
+        Globals.prefs = mock(JabRefPreferences.class);
+        when(Globals.prefs.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
+        FileDirectoryPreferences fileDirectoryPreferences = mock(FileDirectoryPreferences.class);
+        when(Globals.prefs.getFileDirectoryPreferences()).thenReturn(fileDirectoryPreferences);
     }
 
     @Test
