@@ -1,2 +1,2 @@
 rootProject.name = "JabRef"
-include 'org.jabref.model', 'org.jabref.gui'
+include 'org.jabref.model', 'org.jabref.logic', 'org.jabref.gui'

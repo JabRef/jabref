@@ -1,5 +1,5 @@
 # no generated files in version control
-src/main/gen/
+**/src/main/gen/
 
 # private data
 /buildres/jabref-cert-2016.p12
