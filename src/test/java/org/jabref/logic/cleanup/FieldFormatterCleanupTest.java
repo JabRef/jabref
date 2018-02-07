@@ -1,6 +1,5 @@
 package org.jabref.logic.cleanup;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,15 +9,15 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FieldFormatterCleanupTest {
 
     private BibEntry entry;
-    private Map <String, String> fieldMap;
+    private Map<String, String> fieldMap;
 
     @BeforeEach
     public void setUp() {
