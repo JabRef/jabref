@@ -30,6 +30,7 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.menus.RightClickMenu;
@@ -38,6 +39,7 @@ import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
@@ -343,9 +345,16 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                         if ((description == null) || (description.trim().isEmpty())) {
                             description = flEntry.getLink();
                         }
+
+                        Optional<ExternalFileType> fileType = flEntry.getType();
+
+                        // file type might be unknown
+                        if (!fileType.isPresent()) {
+                            String fileExtension = FileUtil.getFileExtension(flEntry.getLink()).orElse("");
+                            fileType = Optional.of(new UnknownExternalFileType(fileExtension.toUpperCase(), fileExtension));
+                        }
                         menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry.getLink(),
-                                flEntry.getType().get().getIcon(), panel.getBibDatabaseContext(),
-                                flEntry.getType()));
+                                fileType.get().getIcon(), panel.getBibDatabaseContext(), fileType));
                         showDefaultPopup = false;
                     }
                 } else {

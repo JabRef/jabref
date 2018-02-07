@@ -76,13 +76,13 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
                 Elements link = doc.select(String.format("div[data-rp=%S] div.gs_or_ggsm a", i));
 
                 if (link.first() != null) {
-                    String s = link.first().attr("href");
+                    String target = link.first().attr("href");
                     // link present?
-                    if (!"".equals(s)) {
+                    if (!"".equals(target) && new URLDownload(target).isPdf()) {
                         // TODO: check title inside pdf + length?
                         // TODO: report error function needed?! query -> result
-                        LOGGER.info("Fulltext PDF found @ Google: " + s);
-                        pdfLink = Optional.of(new URL(s));
+                        LOGGER.info("Fulltext PDF found @ Google: " + target);
+                        pdfLink = Optional.of(new URL(target));
                         break;
                     }
                 }

@@ -42,6 +42,20 @@ public class GroupsParserTest {
         assertEquals(expected, parsed);
     }
 
+    @Test
+    public void KeywordDelimiterThatNeedsToBeEscaped() throws Exception {
+        AutomaticGroup expected = new AutomaticKeywordGroup("group1", GroupHierarchyType.INDEPENDENT, "keywords", ';', '>');
+        AbstractGroup parsed = GroupsParser.fromString("AutomaticKeywordGroup:group1;0;keywords;\\;;>;1;;;;;", ';', fileMonitor);
+        assertEquals(expected, parsed);
+    }
+
+    @Test
+    public void HierarchicalDelimiterThatNeedsToBeEscaped() throws Exception {
+        AutomaticGroup expected = new AutomaticKeywordGroup("group1", GroupHierarchyType.INDEPENDENT, "keywords", ',', ';');
+        AbstractGroup parsed = GroupsParser.fromString("AutomaticKeywordGroup:group1;0;keywords;,;\\;;1;;;;;", ';', fileMonitor);
+        assertEquals(expected, parsed);
+    }
+
     @Test(expected = ParseException.class)
     public void fromStringThrowsParseExceptionForNotEscapedGroupName() throws Exception {
         GroupsParser.fromString("ExplicitGroup:slit\\\\;0\\;mertsch_slit2_2007\\;;", ',', fileMonitor);

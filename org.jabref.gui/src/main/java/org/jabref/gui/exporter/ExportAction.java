@@ -99,7 +99,7 @@ public class ExportAction {
 
                     // Make sure we remember which filter was used, to set
                     // the default for next time:
-                Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, format.getId());
+                Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, format.getDescription());
                 Globals.prefs.put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, file.getParent().getFileName().toString());
 
                     final List<BibEntry> finEntries = entries;
