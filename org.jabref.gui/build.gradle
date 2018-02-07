@@ -39,6 +39,17 @@ mainClassName = "org.jabref.JabRefMain"
 ext.minRequiredJavaVersion = "1.8.0_144"
 ext.allowJava9 = false
 
+sourceSets {
+    main {
+        java {
+            srcDirs = ["src/main/java"]
+        }
+        resources {
+            srcDirs = ["src/main/java", "src/main/resources"]
+        }
+    }
+}
+
 dependencies {
     compile project(':org.jabref.model')
     compile project(':org.jabref.logic')
