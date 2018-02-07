@@ -281,8 +281,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
-    public boolean delete() {
-        FileDirectoryPreferences prefs = Globals.prefs.getFileDirectoryPreferences();
+    public boolean delete(FileDirectoryPreferences prefs) {
         Optional<Path> file = linkedFile.findIn(databaseContext, prefs);
 
         if (!file.isPresent()) {
