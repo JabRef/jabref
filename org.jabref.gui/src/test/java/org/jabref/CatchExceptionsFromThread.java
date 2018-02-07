@@ -1,5 +1,7 @@
 package org.jabref;
 
+import org.jabref.logic.FallbackExceptionHandler;
+
 import org.junit.rules.ExternalResource;
 
 /**
