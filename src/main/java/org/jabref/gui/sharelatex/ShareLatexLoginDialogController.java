@@ -16,7 +16,6 @@ import org.jabref.gui.FXDialog;
 import org.jabref.gui.FXDialogService;
 import org.jabref.logic.sharelatex.ShareLatexManager;
 import org.jabref.logic.sharelatex.SharelatexConnectionProperties;
-import org.jabref.logic.sharelatex.ShareLatexPreferences;
 
 public class ShareLatexLoginDialogController extends AbstractController<ShareLatexLoginDialogViewModel> {
 
@@ -56,6 +55,7 @@ public class ShareLatexLoginDialogController extends AbstractController<ShareLat
                 props.setPassword(tbPassword.getText());
 
                 manager.setConnectionProperties(props);
+
 
                 ShareLatexProjectDialogView dlgprojects = new ShareLatexProjectDialogView();
                 dlgprojects.show();
