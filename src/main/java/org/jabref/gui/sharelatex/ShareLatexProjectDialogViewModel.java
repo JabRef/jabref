@@ -67,9 +67,11 @@ public class ShareLatexProjectDialogViewModel extends AbstractViewModel {
             ParserResult result = new BibtexImporter(prefs, fileMonitor).importDatabase(event.getNewDatabaseContent());
 
             ShareLatexParser parser = new ShareLatexParser();
-            Optional<BibEntry> entry = parser.getEntryFromPosition(result, 633);
-            System.out.println(entry); //Emtpy => Add 
+            if (event.getPosition() > 0) {
+                Optional<BibEntry> entry = parser.getEntryFromPosition(result, event.getPosition());
 
+                System.out.println(entry); //Emtpy => Add
+            }
         } catch (IOException e1) {
             // TODO Auto-generated catch block
 
