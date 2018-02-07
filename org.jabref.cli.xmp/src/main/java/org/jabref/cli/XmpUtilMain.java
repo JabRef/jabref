@@ -6,29 +6,33 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import javax.xml.transform.TransformerException;
 
-import org.jabref.Globals;
 import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
+import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.xmp.XMPPreferences;
 import org.jabref.logic.xmp.XMPUtil;
+import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
 
-public class XMPUtilMain {
+public class XmpUtilMain {
 
-    private XMPUtilMain() {
+    private XmpUtilMain() {
     }
 
     /**
@@ -56,27 +60,27 @@ public class XMPUtilMain {
      *             If the given BibEntry is malformed.
      */
     public static void main(String[] args) throws IOException, TransformerException {
-
-        // Don't forget to initialize the preferences
-        if (Globals.prefs == null) {
-            Globals.prefs = JabRefPreferences.getInstance();
-        }
-
-        XMPPreferences xmpPreferences = Globals.prefs.getXMPPreferences();
-        ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
+        final ImportFormatPreferences importFormatPreferences = new ImportFormatPreferences(
+                Collections.emptySet(),
+                StandardCharsets.UTF_8,
+                ',',
+                new BibtexKeyPatternPreferences("", "", false, true, true, GlobalBibtexKeyPattern.fromPattern("[auth][year]"), ','),
+                new FieldContentParserPreferences(),
+                false);
+        final BibtexParser bibtexParser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        final XMPPreferences xmpPreferences = new XMPPreferences(false, Collections.emptyList(), ';');
 
         switch (args.length) {
         case 0:
             usage();
             break;
         case 1:
-
             if (args[0].endsWith(".pdf")) {
                 // Read from pdf and write as BibTex
                 List<BibEntry> l = XMPUtil.readXMP(new File(args[0]), xmpPreferences);
 
                 BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
-                        new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()), false);
+                        new LatexFieldFormatter(new LatexFieldFormatterPreferences()), false);
 
                 for (BibEntry entry : l) {
                     StringWriter sw = new StringWriter();
@@ -87,7 +91,7 @@ public class XMPUtilMain {
             } else if (args[0].endsWith(".bib")) {
                 // Read from BIB and write as XMP
                 try (FileReader fr = new FileReader(args[0])) {
-                    ParserResult result = new BibtexParser(importFormatPreferences, Globals.getFileUpdateMonitor()).parse(fr);
+                    ParserResult result = bibtexParser.parse(fr);
                     Collection<BibEntry> entries = result.getDatabase().getEntries();
 
                     if (entries.isEmpty()) {
@@ -114,7 +118,7 @@ public class XMPUtilMain {
             }
 
             if (args[0].endsWith(".bib") && args[1].endsWith(".pdf")) {
-                ParserResult result = new BibtexParser(importFormatPreferences, Globals.getFileUpdateMonitor()).parse(new FileReader(args[0]));
+                ParserResult result = bibtexParser.parse(new FileReader(args[0]));
 
                 Collection<BibEntry> entries = result.getDatabase().getEntries();
 
@@ -135,7 +139,7 @@ public class XMPUtilMain {
                 break;
             }
 
-            ParserResult result = new BibtexParser(importFormatPreferences, Globals.getFileUpdateMonitor()).parse(new FileReader(args[1]));
+            ParserResult result = bibtexParser.parse(new FileReader(args[1]));
 
             Optional<BibEntry> bibEntry = result.getDatabase().getEntryByKey(args[0]);
 
@@ -155,8 +159,6 @@ public class XMPUtilMain {
 
     /**
      * Print usage information for the command line tool xmpUtil.
-     *
-     * @see XMPUtilMain#main(String[])
      */
     private static void usage() {
         System.out.println("Read or write XMP-metadata from or to pdf file.");
