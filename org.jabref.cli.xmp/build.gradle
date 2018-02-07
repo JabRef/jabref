@@ -62,8 +62,6 @@ dependencies {
     testCompile 'com.tngtech.archunit:archunit:0.5.0'
     testCompile 'org.xmlunit:xmlunit-core:2.5.1'
     testCompile 'org.xmlunit:xmlunit-matchers:2.5.1'
-
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.8'
 }
 
 dependencyUpdates {
@@ -166,16 +164,6 @@ afterEvaluate {
         }
     }
 }
-
-// Code quality tasks
-checkstyle {
-    // do not use other packages for checkstyle, excluding gen(erated) sources
-    checkstyleMain.source = "src/main/java"
-    toolVersion = '8.5'
-}
-
-checkstyleMain.shouldRunAfter test
-checkstyleTest.shouldRunAfter test
 
 modernizer {
     // We have more than 20 issues, which are not fixed yet. Nevertheless, we produce the modernizer output.

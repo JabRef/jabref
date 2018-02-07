@@ -119,8 +119,6 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit:4.0.+"
     testCompile 'com.tngtech.archunit:archunit:0.5.0'
-
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.8'
 }
 
 dependencyUpdates {
@@ -304,16 +302,6 @@ afterEvaluate {
         }
     }
 }
-
-// Code quality tasks
-checkstyle {
-    // do not use other packages for checkstyle, excluding gen(erated) sources
-    checkstyleMain.source = "src/main/java"
-    toolVersion = '8.5'
-}
-
-checkstyleMain.shouldRunAfter test
-checkstyleTest.shouldRunAfter test
 
 modernizer {
     // We have more than 20 issues, which are not fixed yet. Nevertheless, we produce the modernizer output.

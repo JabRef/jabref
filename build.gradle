@@ -17,12 +17,16 @@ plugins {
 }
 
 subprojects {
+
+}
+
+allprojects {
     apply plugin: 'java'
     apply plugin: 'checkstyle'
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-    
+
     group = "org.jabref"
     version = "4.2-dev"
 
@@ -33,10 +37,22 @@ subprojects {
             url 'https://oss.sonatype.org/content/groups/public'
         }
     }
-}
 
-allprojects {
     // linter for gradle - documentation: https://github.com/nebula-plugins/gradle-lint-plugin/wiki
     apply plugin: 'nebula.lint'
     gradleLint.rules = ['all-dependency']
+
+    dependencies {
+        checkstyle 'com.puppycrawl.tools:checkstyle:8.8'
+    }
+
+    // Code quality tasks
+    checkstyle {
+        // do not use other packages for checkstyle, excluding gen(erated) sources
+        checkstyleMain.source = "src/main/java"
+        toolVersion = '8.5'
+    }
+
+    checkstyleMain.shouldRunAfter test
+    checkstyleTest.shouldRunAfter test
 }
