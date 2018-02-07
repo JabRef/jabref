@@ -27,6 +27,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.ExporterFactoryFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -67,7 +68,7 @@ public class ExportAction {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                Globals.exportFactory = ExporterFactory.create(Globals.prefs, Globals.journalAbbreviationLoader);
+                Globals.exportFactory = ExporterFactoryFactory.create(Globals.prefs, Globals.journalAbbreviationLoader);
                 FileDialogConfiguration fileDialogConfiguration = ExportAction.createExportFileChooser(Globals.exportFactory, Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
                 DialogService dialogService = new FXDialogService();
                 DefaultTaskExecutor.runInJavaFXThread(() ->

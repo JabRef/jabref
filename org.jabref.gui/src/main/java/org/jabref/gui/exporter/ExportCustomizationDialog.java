@@ -34,6 +34,8 @@ import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
+import static org.jabref.preferences.SavePreferencesFactory.loadForExportFromPreferences;
+
 /**
  * <p>Title: </p>
  * <p>Description: </p>
@@ -75,7 +77,7 @@ public class ExportCustomizationDialog extends JabRefDialog {
             if (ecd.okPressed()) {
                 Globals.prefs.customExports.addFormat(ecd.name(), ecd.layoutFile(), ecd.extension(),
                         Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
-                        SavePreferences.loadForExportFromPreferences(Globals.prefs));
+                        loadForExportFromPreferences(Globals.prefs));
                 Globals.prefs.customExports.store(Globals.prefs);
             }
         });
@@ -111,7 +113,7 @@ public class ExportCustomizationDialog extends JabRefDialog {
             }
             LayoutFormatterPreferences layoutPreferences = Globals.prefs
                     .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
-            SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+            SavePreferences savePreferences = loadForExportFromPreferences(Globals.prefs);
             for (List<String> list : entries) {
                 Globals.prefs.customExports.remove(list, layoutPreferences, savePreferences);
             }

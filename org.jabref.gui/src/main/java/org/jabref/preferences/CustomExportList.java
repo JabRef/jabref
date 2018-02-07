@@ -70,7 +70,7 @@ public class CustomExportList {
         int i = 0;
         List<String> s;
         LayoutFormatterPreferences layoutPreferences = prefs.getLayoutFormatterPreferences(loader);
-        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(prefs);
+        SavePreferences savePreferences = SavePreferencesFactory.loadForExportFromPreferences(prefs);
         while (!((s = prefs.getStringList(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i)).isEmpty())) {
             Optional<TemplateExporter> format = createFormat(s.get(EXPORTER_NAME_INDEX), s.get(EXPORTER_FILENAME_INDEX), s.get(EXPORTER_EXTENSION_INDEX), layoutPreferences, savePreferences);
             if (format.isPresent()) {
