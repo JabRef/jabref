@@ -33,19 +33,6 @@ public class XMPSchemaBibtexTest {
     @Mock
     private ImportFormatPreferences prefs;
 
-    public void assertEqualsBibtexEntry(BibEntry e, BibEntry x) {
-        Assert.assertNotNull(e);
-        Assert.assertNotNull(x);
-        Assert.assertEquals(e.getCiteKeyOptional(), x.getCiteKeyOptional());
-        Assert.assertEquals(e.getType(), x.getType());
-
-        Assert.assertEquals(e.getFieldNames().size(), x.getFieldNames().size());
-
-        for (String name : e.getFieldNames()) {
-            Assert.assertEquals(e.getField(name), x.getField(name));
-        }
-    }
-
     @Test
     public void testXMPSchemaBibtexXMPMetadata() throws IOException {
 
@@ -254,7 +241,7 @@ public class XMPSchemaBibtexTest {
 
         BibEntry e2 = bibtex.getBibtexEntry();
 
-        assertEqualsBibtexEntry(e, e2);
+        Assert.assertEquals(e, e2);
     }
 
     @Test
