@@ -324,7 +324,7 @@ public class EntryTableTransferHandler extends TransferHandler {
      */
     private void loadOrImportFiles(List<String> fileNames, int dropRow) {
 
-        OpenDatabaseAction openAction = new OpenDatabaseAction(frame, false);
+        OpenDatabaseAction openAction = new OpenDatabaseAction(frame);
         List<String> notBibFiles = new ArrayList<>();
         List<String> bibFiles = new ArrayList<>();
         for (String fileName : fileNames) {

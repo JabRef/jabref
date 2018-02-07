@@ -16,6 +16,7 @@ class JabRefAction extends Action {
               .ifPresent(icon -> setGraphic(icon.getGraphicNode()));
         action.getKeyBinding()
               .ifPresent(keyBinding -> setAccelerator(keyBindingRepository.getKeyCombination(keyBinding)));
+        setLongText(action.getDescription());
     }
 
     public JabRefAction(ActionsFX action, Command command, KeyBindingRepository keyBindingRepository) {

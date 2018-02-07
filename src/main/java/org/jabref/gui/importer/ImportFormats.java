@@ -1,6 +1,5 @@
 package org.jabref.gui.importer;
 
-import java.awt.event.ActionEvent;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -9,8 +8,6 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JOptionPane;
 
 import javafx.stage.FileChooser;
@@ -19,8 +16,7 @@ import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.MnemonicAwareAction;
-import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
@@ -29,10 +25,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.preferences.JabRefPreferences;
 
-public class ImportFormats {
+import de.saxsys.mvvmfx.utils.commands.CommandBase;
 
+public class ImportFormats extends SimpleCommand {
 
-    private ImportFormats() {
+    public ImportFormats() {
     }
 
     /**
@@ -42,27 +39,11 @@ public class ImportFormats {
      *  into the currently open one.
      * @return The action.
      */
-    public static AbstractAction getImportAction(JabRefFrame frame, boolean openInNew) {
+    public static CommandBase getImportAction(JabRefFrame frame, boolean openInNew) {
 
-        class ImportAction extends MnemonicAwareAction {
-
-            private final boolean newDatabase;
-
-            public ImportAction(boolean newDatabase) {
-                this.newDatabase = newDatabase;
-
-                if (newDatabase) {
-                    putValue(Action.NAME, Localization.menuTitle("Import into new library"));
-                    putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.IMPORT_INTO_NEW_DATABASE));
-                } else {
-                    putValue(Action.NAME, Localization.menuTitle("Import into current library"));
-                    putValue(Action.ACCELERATOR_KEY,
-                            Globals.getKeyPrefs().getKey(KeyBinding.IMPORT_INTO_CURRENT_DATABASE));
-                }
-            }
-
+        return new SimpleCommand() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void execute() {
                 SortedSet<Importer> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
                 List<FileType> extensions = importers.stream().map(Importer::getFileType)
                         .collect(Collectors.toList());
@@ -88,13 +69,11 @@ public class ImportFormats {
                     return;
                 }
                 Optional<Importer> format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
-                ImportMenuItem importMenu = new ImportMenuItem(frame, newDatabase, format.orElse(null));
+                ImportMenuItem importMenu = new ImportMenuItem(frame, openInNew, format.orElse(null));
                 importMenu.automatedImport(Collections.singletonList(file.toString()));
                 // Set last working dir for import
                 Globals.prefs.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, file.getParent().toString());
             }
-        }
-
-        return new ImportAction(openInNew);
+        };
     }
 }

@@ -36,7 +36,6 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -79,6 +78,7 @@ import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.gui.actions.NewDatabaseAction;
 import org.jabref.gui.actions.NewEntryAction;
 import org.jabref.gui.actions.NewSubDatabaseAction;
+import org.jabref.gui.actions.OldDatabaseCommandWrapper;
 import org.jabref.gui.actions.OpenBrowserAction;
 import org.jabref.gui.actions.SearchForUpdateAction;
 import org.jabref.gui.actions.SortTabsAction;
@@ -116,7 +116,6 @@ import org.jabref.gui.protectedterms.ProtectedTermsDialog;
 import org.jabref.gui.push.PushToApplicationButton;
 import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.search.GlobalSearchBar;
-import org.jabref.gui.specialfields.SpecialFieldDropDown;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -170,15 +169,13 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final IntegrityCheckAction checkIntegrity = new IntegrityCheckAction(this);
     private final ToolBar tlb = new ToolBar();
     private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this);
-    private final JMenuBar mb = new JMenuBar();
-    private final MenuBar menu = new MenuBar();
     private final JLabel statusLine = new JLabel("", SwingConstants.LEFT);
     private final JLabel statusLabel = new JLabel(
             Localization.lang("Status")
                     + ':', SwingConstants.LEFT);
     private final JProgressBar progressBar = new JProgressBar();
     private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
-    private final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
+    private final OpenDatabaseAction open = new OpenDatabaseAction(this);
     private final EditModeAction editModeAction = new EditModeAction();
 
 
@@ -190,8 +187,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     // for the name and message strings.
     private final AbstractAction quit = new CloseAction();
     private final AbstractAction keyBindingAction = new KeyBindingAction();
-    private final AbstractAction newBibtexDatabaseAction = new NewDatabaseAction(this, BibDatabaseMode.BIBTEX);
-    private final AbstractAction newBiblatexDatabaseAction = new NewDatabaseAction(this, BibDatabaseMode.BIBLATEX);
     private final AbstractAction connectToSharedDatabaseAction = new ConnectToSharedDatabaseAction(this);
     private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
     private final AbstractAction jabrefWebPageAction = new OpenBrowserAction("https://jabref.org",
@@ -227,17 +222,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final AbstractAction focusTable = new GeneralAction(Actions.FOCUS_TABLE,
             Localization.menuTitle("Focus entry table"),
             Localization.lang("Move the keyboard focus to the entry table"), Globals.getKeyPrefs().getKey(KeyBinding.FOCUS_ENTRY_TABLE));
-    private final AbstractAction save = new GeneralAction(Actions.SAVE, Localization.menuTitle("Save library"),
-            Localization.lang("Save library"), Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), IconTheme.JabRefIcons.SAVE.getIcon());
-    private final AbstractAction saveAs = new GeneralAction(Actions.SAVE_AS,
-            Localization.menuTitle("Save library as..."), Localization.lang("Save library as..."),
-            Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE_AS));
-    private final AbstractAction saveAll = new SaveAllAction(JabRefFrame.this);
-    private final AbstractAction saveSelectedAs = new GeneralAction(Actions.SAVE_SELECTED_AS,
-            Localization.menuTitle("Save selected as..."), Localization.lang("Save selected as..."));
-    private final AbstractAction saveSelectedAsPlain = new GeneralAction(Actions.SAVE_SELECTED_AS_PLAIN,
-            Localization.menuTitle("Save selected as plain BibTeX..."),
-            Localization.lang("Save selected as plain BibTeX..."));
     private final AbstractAction importCurrent = ImportFormats.getImportAction(this, false);
     private final AbstractAction importNew = ImportFormats.getImportAction(this, true);
     private final AbstractAction sortTabs = new SortTabsAction(this);
@@ -308,9 +292,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final AbstractAction copyKeyAndLink = new GeneralAction(Actions.COPY_KEY_AND_LINK,
             Localization.menuTitle("Copy BibTeX key and link"),
             Globals.getKeyPrefs().getKey(KeyBinding.COPY_BIBTEX_KEY_AND_LINK));
-    private final AbstractAction mergeDatabaseAction = new GeneralAction(Actions.MERGE_DATABASE,
-            Localization.menuTitle("Append library"),
-            Localization.lang("Append contents from a BibTeX library into the currently viewed library"));
     private final AbstractAction selectAll = new GeneralAction(Actions.SELECT_ALL, Localization.menuTitle("Select all"),
             Globals.getKeyPrefs().getKey(KeyBinding.SELECT_ALL));
     private final AbstractAction replaceAll = new GeneralAction(Actions.REPLACE_ALL,
@@ -889,9 +870,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         pushApplications = new PushToApplications();
         pushExternalButton = new PushToApplicationButton(this, pushApplications.getApplications());
-        fillMenu();
-        createToolBar();
-        setTop(menu);
+        //createToolBar();
+        setTop(createMenu());
         //getContentPane().setLayout(new BorderLayout());
 
         JPanel toolbarPanel = new JPanel(new WrapLayout(FlowLayout.LEFT));
@@ -963,7 +943,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         // TODO:
         //tabbedPane.setTransferHandler(xfer);
         tlb.setTransferHandler(xfer);
-        mb.setTransferHandler(xfer);
+        // TODO: mb.setTransferHandler(xfer);
         sidePaneManager.getPanel().setTransferHandler(xfer);
     }
 
@@ -1038,61 +1018,56 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         });
     }
 
-    private void fillMenu() {
+    private MenuBar createMenu() {
         ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
 
-        Menu fileMenu = new Menu(Localization.menuTitle("File"));
-        Menu editMenu = new Menu(Localization.menuTitle("Edit"));
-
-        fileMenu.getItems().addAll(
-                factory.createMenuItem(ActionsFX.ADD_FILE_LINK, null),
-                factory.createMenuItem(ActionsFX.READ, null),
-                factory.createMenuItem(ActionsFX.RANKING, null)
-        );
-
-        menu.getMenus().addAll(fileMenu, editMenu);
-
-        mb.setBorder(null);
-        JMenu file = JabRefFrame.subMenu(Localization.menuTitle("File"));
-        JMenu edit = JabRefFrame.subMenu(Localization.menuTitle("Edit"));
-        JMenu search = JabRefFrame.subMenu(Localization.menuTitle("Search"));
-        JMenu groups = JabRefFrame.subMenu(Localization.menuTitle("Groups"));
-        JMenu bibtex = JabRefFrame.subMenu("&BibTeX");
-        JMenu quality = JabRefFrame.subMenu(Localization.menuTitle("Quality"));
-        JMenu view = JabRefFrame.subMenu(Localization.menuTitle("View"));
-        JMenu tools = JabRefFrame.subMenu(Localization.menuTitle("Tools"));
-        JMenu options = JabRefFrame.subMenu(Localization.menuTitle("Options"));
+        Menu file = new Menu(Localization.menuTitle("File"));
+        Menu edit = new Menu(Localization.menuTitle("Edit"));
+        Menu library = new Menu(Localization.menuTitle("Library"));
+        Menu quality = new Menu(Localization.menuTitle("Quality"));
+        Menu view = new Menu(Localization.menuTitle("View"));
+        Menu tools = new Menu(Localization.menuTitle("Tools"));
+        Menu options = new Menu(Localization.menuTitle("Options"));
         newSpec = JabRefFrame.subMenu(Localization.menuTitle("New entry by type..."));
-        JMenu helpMenu = JabRefFrame.subMenu(Localization.menuTitle("Help"));
+        Menu help = new Menu(Localization.menuTitle("Help"));
 
-        file.add(newBibtexDatabaseAction);
-        file.add(newBiblatexDatabaseAction);
-        file.add(getOpenDatabaseAction());
-        file.add(mergeDatabaseAction);
-        file.add(save);
-        file.add(saveAs);
-        file.add(saveAll);
-        file.add(saveSelectedAs);
-        file.add(saveSelectedAsPlain);
-        file.addSeparator();
-        file.add(importNew);
-        file.add(importCurrent);
-        file.add(exportAll);
-        file.add(exportSelected);
-        file.add(exportLinkedFiles);
-        file.addSeparator();
-        file.add(connectToSharedDatabaseAction);
-        file.add(pullChangesFromSharedDatabase);
+        file.getItems().addAll(
+                factory.createMenuItem(ActionsFX.NEW_LIBRARY_BIBTEX, new NewDatabaseAction(this, BibDatabaseMode.BIBTEX)),
+                factory.createMenuItem(ActionsFX.NEW_LIBRARY_BIBLATEX, new NewDatabaseAction(this, BibDatabaseMode.BIBLATEX)),
+                factory.createMenuItem(ActionsFX.OPEN_LIBRARY, getOpenDatabaseAction()),
+                factory.createMenuItem(ActionsFX.save, new OldDatabaseCommandWrapper(Actions.SAVE, this, Globals.stateManager)),
+                factory.createMenuItem(ActionsFX.saveAs, new OldDatabaseCommandWrapper(Actions.SAVE_AS, this, Globals.stateManager)),
+                factory.createMenuItem(ActionsFX.saveAll, new SaveAllAction(this),
 
-        file.addSeparator();
-        file.add(databaseProperties);
-        file.add(editModeAction);
-        file.addSeparator();
+                        factory.createMenuItem(ActionsFX.mergeDatabaseAction, new OldDatabaseCommandWrapper(Actions.MERGE_DATABASE, this, Globals.stateManager)), // TODO: merge with import
+                        factory.createMenuItem(ActionsFX.saveSelectedAsPlain, new OldDatabaseCommandWrapper(Actions.SAVE_SELECTED_AS_PLAIN, this, Globals.stateManager)),
+                        factory.createMenuItem(ActionsFX.importNew, new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
+                        factory.createMenuItem(ActionsFX.importCurrent, new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
+                        factory.createMenuItem(ActionsFX., new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
+                        factory.createMenuItem(ActionsFX., new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
+                        factory.createMenuItem(ActionsFX., new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
 
-        file.add(fileHistory);
-        file.addSeparator();
-        file.add(closeDatabaseAction);
-        file.add(quit);
+                        file.add(importNew),
+                        file.add(importCurrent),
+                        file.add(exportAll),
+                        file.add(exportSelected),
+                        file.add(exportLinkedFiles),
+                        file.addSeparator(),
+                        file.add(connectToSharedDatabaseAction),
+                        file.add(pullChangesFromSharedDatabase),
+
+                        file.addSeparator(),
+                        file.add(databaseProperties),
+                        file.add(editModeAction),
+                        file.addSeparator(),
+
+                        file.add(fileHistory),
+                        file.addSeparator(),
+                        file.add(closeDatabaseAction),
+                        file.add(quit)
+                );
+
+
         mb.add(file);
 
         edit.add(undo);
@@ -1210,23 +1185,23 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         mb.add(view);
 
-        bibtex.add(newEntryAction);
+        library.add(newEntryAction);
 
         for (NewEntryAction a : newSpecificEntryAction) {
             newSpec.add(a);
         }
-        bibtex.add(newSpec);
+        library.add(newSpec);
 
-        bibtex.add(plainTextImport);
-        bibtex.addSeparator();
-        bibtex.add(editEntry);
-        bibtex.add(editPreamble);
-        bibtex.add(editStrings);
-        bibtex.addSeparator();
-        bibtex.add(customizeAction);
-        bibtex.addSeparator();
-        bibtex.add(deleteEntry);
-        mb.add(bibtex);
+        library.add(plainTextImport);
+        library.addSeparator();
+        library.add(editEntry);
+        library.add(editPreamble);
+        library.add(editStrings);
+        library.addSeparator();
+        library.add(customizeAction);
+        library.addSeparator();
+        library.add(deleteEntry);
+        mb.add(library);
 
         quality.add(dupliCheck);
         quality.add(mergeEntries);
@@ -1277,12 +1252,12 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         options.add(manageSelectors);
         mb.add(options);
 
-        helpMenu.add(help);
-        helpMenu.add(openForumAction);
-        helpMenu.addSeparator();
-        helpMenu.add(errorConsole);
-        helpMenu.addSeparator();
-        helpMenu.add(new SearchForUpdateAction());
+        help.add(this.help);
+        help.add(openForumAction);
+        help.addSeparator();
+        help.add(errorConsole);
+        help.addSeparator();
+        help.add(new SearchForUpdateAction());
         JMenu webMenu = JabRefFrame.subMenu(Localization.menuTitle("JabRef resources"));
         webMenu.add(jabrefWebPageAction);
         webMenu.add(jabrefBlogAction);
@@ -1294,11 +1269,15 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         webMenu.add(changeLogAction);
         webMenu.addSeparator();
         webMenu.add(donationAction);
-        helpMenu.add(webMenu);
-        helpMenu.add(about);
-        mb.add(helpMenu);
+        help.add(webMenu);
+        help.add(about);
+        mb.add(help);
 
         createDisabledIconsForMenuEntries(mb);
+
+        MenuBar menu = new MenuBar();
+        menu.getMenus().addAll(fileMenu, editMenu);
+        return menu;
     }
 
     public void addParserResult(ParserResult pr, boolean focusPanel) {
@@ -1325,6 +1304,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
     }
 
+    /*
     private void createToolBar() {
         tlb.setBorder(null);
         tlb.setRollover(true);
@@ -1413,6 +1393,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         createDisabledIconsForButtons(tlb);
     }
+    */
 
     /**
      * displays the String on the Status Line visible on the bottom of the JabRef mainframe

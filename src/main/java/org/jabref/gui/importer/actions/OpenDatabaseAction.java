@@ -1,6 +1,5 @@
 package org.jabref.gui.importer.actions;
 
-import java.awt.event.ActionEvent;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,7 +13,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -24,13 +22,11 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelPreferences;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.MnemonicAwareAction;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupUIManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.ParserResultWarningDialog;
-import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -45,7 +41,6 @@ import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.migrations.FileLinksUpgradeWarning;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -53,7 +48,7 @@ import org.slf4j.LoggerFactory;
 
 // The action concerned with opening an existing database.
 
-public class OpenDatabaseAction extends MnemonicAwareAction {
+public class OpenDatabaseAction extends SimpleCommand {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
     // List of actions that may need to be called after opening the file. Such as
@@ -69,16 +64,10 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
     }
 
-    private final boolean showDialog;
     private final JabRefFrame frame;
 
-    public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
-        super(IconTheme.JabRefIcons.OPEN.getIcon());
+    public OpenDatabaseAction(JabRefFrame frame) {
         this.frame = frame;
-        this.showDialog = showDialog;
-        putValue(Action.NAME, Localization.menuTitle("Open library"));
-        putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.OPEN_DATABASE));
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Open BibTeX library"));
     }
 
     /**
@@ -97,25 +86,19 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void execute() {
         List<Path> filesToOpen = new ArrayList<>();
 
-        if (showDialog) {
+        DialogService ds = new FXDialogService();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(FileType.BIBTEX_DB)
+                .withDefaultExtension(FileType.BIBTEX_DB)
+                .withInitialDirectory(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)))
+                .build();
 
-            DialogService ds = new FXDialogService();
-            FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileType.BIBTEX_DB)
-                    .withDefaultExtension(FileType.BIBTEX_DB)
-                    .withInitialDirectory(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)))
-                    .build();
-
-            List<Path> chosenFiles = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> ds.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));
-            filesToOpen.addAll(chosenFiles);
-        } else {
-            LOGGER.info(Action.NAME + " " + e.getActionCommand());
-            filesToOpen.add(Paths.get(StringUtil.getCorrectFileName(e.getActionCommand(), "bib")));
-        }
+        List<Path> chosenFiles = DefaultTaskExecutor
+                .runInJavaFXThread(() -> ds.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));
+        filesToOpen.addAll(chosenFiles);
 
         openFiles(filesToOpen, true);
     }

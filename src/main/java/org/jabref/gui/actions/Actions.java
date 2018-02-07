@@ -55,7 +55,6 @@ public enum Actions {
     RESOLVE_DUPLICATE_KEYS,
     SAVE,
     SAVE_AS,
-    SAVE_SELECTED_AS,
     SAVE_SELECTED_AS_PLAIN,
     SEARCH,
     GLOBAL_SEARCH,

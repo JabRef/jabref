@@ -2,10 +2,16 @@ package org.jabref.gui.actions;
 
 import java.util.Optional;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+
+import org.jabref.Globals;
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseMode;
 
 public enum ActionsFX {
 
@@ -58,34 +64,78 @@ public enum ActionsFX {
     READ(Localization.lang("Set read status to read"), IconTheme.JabRefIcons.READ_STATUS_READ),
     SKIMMED(Localization.lang("Set read status to skimmed"), IconTheme.JabRefIcons.READ_STATUS_SKIMMED),
     RELEVANCE(Localization.lang("Relevance"), IconTheme.JabRefIcons.RELEVANCE),
-    RELEVANT(Localization.lang("Toggle relevance"), IconTheme.JabRefIcons.RELEVANCE);
+    RELEVANT(Localization.lang("Toggle relevance"), IconTheme.JabRefIcons.RELEVANCE),
+    NEW_LIBRARY_BIBTEX(Localization.menuTitle("New %0 library", BibDatabaseMode.BIBTEX.getFormattedName()), IconTheme.JabRefIcons.NEW),
+    NEW_LIBRARY_BIBLATEX(Localization.menuTitle("New %0 library", BibDatabaseMode.BIBLATEX.getFormattedName()), IconTheme.JabRefIcons.NEW),
+    OPEN_LIBRARY(Localization.menuTitle("Open library"), IconTheme.JabRefIcons.OPEN, KeyBinding.OPEN_DATABASE),
+    mergeDatabaseAction(Localization.menuTitle("Append library"), Localization.lang("Append contents from a BibTeX library into the currently viewed library")),
+    save(Localization.menuTitle("Save library"), IconTheme.JabRefIcons.SAVE, KeyBinding.SAVE_DATABASE),
+    private final AbstractAction saveAs = new JabRefFrame.GeneralAction(Actions.SAVE_AS,
+            Localization.menuTitle("Save library as..."), Localization.lang("Save library as..."),
+            Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE_AS));
+    private final AbstractAction saveSelectedAsPlain = new JabRefFrame.GeneralAction(Actions.SAVE_SELECTED_AS_PLAIN,
+            Localization.menuTitle("Save selected as plain BibTeX..."),
+            Localization.lang("Save selected as plain BibTeX..."));)
+    private final String description;.
+
+    saveAll(super(IconTheme.JabRefIcons.SAVE_ALL.getIcon())
+
+    putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs())
+
+    getKey(KeyBinding.SAVE_ALL)))
+
+    putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save all open libraries")
+
+    putValue(Action.NAME, Localization.menuTitle("Save all"))
+
+    importNew(putValue(Action.NAME, Localization.menuTitle("Import into new library").
+
+    putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs()))
+
+    getKey(KeyBinding.IMPORT_INTO_NEW_DATABASE))
+
+    importCurrent(putValue(Action.NAME, Localization.menuTitle("Import into current library").
+
+    putValue(Action.ACCELERATOR_KEY,
+             Globals.getKeyPrefs()))
+
 
     private final String text;
+
+    getKey(KeyBinding.IMPORT_INTO_CURRENT_DATABASE)
     private final Optional<JabRefIcon> icon;
     private final Optional<KeyBinding> keyBinding;
 
     ActionsFX(String text) {
-        this.text = text;
-        this.icon = Optional.empty();
-        this.keyBinding = Optional.empty();
+        this("", "");
     }
 
     ActionsFX(String text, IconTheme.JabRefIcons icon) {
         this.text = text;
+        this.description = "";
         this.icon = Optional.of(icon);
         this.keyBinding = Optional.empty();
     }
 
     ActionsFX(String text, IconTheme.JabRefIcons icon, KeyBinding keyBinding) {
         this.text = text;
+        this.description = "";
         this.icon = Optional.of(icon);
         this.keyBinding = Optional.of(keyBinding);
     }
 
     ActionsFX(String text, KeyBinding keyBinding) {
         this.text = text;
+        this.description = "";
         this.keyBinding = Optional.of(keyBinding);
         this.icon = Optional.empty();
+    }
+
+    ActionsFX(String text, String description) {
+        this.text = text;
+        this.description = description;
+        this.icon = Optional.empty();
+        this.keyBinding = Optional.empty();
     }
 
     public Optional<JabRefIcon> getIcon() {
@@ -98,5 +148,9 @@ public enum ActionsFX {
 
     public String getText() {
         return text;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }
