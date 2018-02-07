@@ -71,7 +71,10 @@ dependencies {
     compile 'com.google.guava:guava:24.0-jre'
 
     // JavaFX stuff
-    compile 'com.airhacks:afterburner.fx:1.7.0'
+
+    // compile 'com.airhacks:afterburner.fx:1.7.0' -- currently JabRef's fork - therefore, we have to include the indirect dependency:
+    compile group: 'javax.inject', name: 'javax.inject', version:'1'
+
     compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
     compile 'de.jensd:fontawesomefx-commons:8.15'
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
