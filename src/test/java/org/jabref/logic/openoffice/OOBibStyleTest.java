@@ -1,6 +1,5 @@
 package org.jabref.logic.openoffice;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jabref.JabRefMain;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -59,11 +57,8 @@ public class OOBibStyleTest {
 
     @Test
     public void testAuthorYearAsFile() throws URISyntaxException, IOException {
-
-        File defFile = Paths.get(JabRefMain.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                .toFile();
-
-        OOBibStyle style = new OOBibStyle(defFile, layoutFormatterPreferences, StandardCharsets.UTF_8);
+        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences);
         assertTrue(style.isValid());
         assertFalse(style.isFromResource());
         assertFalse(style.isBibtexKeyCiteMarkers());
