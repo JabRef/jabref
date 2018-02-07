@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
+import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.AbstractController;
 import org.jabref.gui.DialogService;
@@ -15,7 +16,7 @@ import org.jabref.gui.FXDialog;
 import org.jabref.gui.FXDialogService;
 import org.jabref.logic.sharelatex.ShareLatexManager;
 import org.jabref.logic.sharelatex.SharelatexConnectionProperties;
-import org.jabref.logic.sharelatex.SharelatexPreferences;
+import org.jabref.logic.sharelatex.ShareLatexPreferences;
 
 public class ShareLatexLoginDialogController extends AbstractController<ShareLatexLoginDialogViewModel> {
 
@@ -49,7 +50,7 @@ public class ShareLatexLoginDialogController extends AbstractController<ShareLat
             } else {
                 //TODO: Wait until pdf + injection stuff gets merged
 
-                props = new SharelatexConnectionProperties(new SharelatexPreferences("default"));
+                props = new SharelatexConnectionProperties(Globals.prefs.getShareLatexPreferences());
                 props.setUrl(tbAddress.getText());
                 props.setUser(tbUsername.getText());
                 props.setPassword(tbPassword.getText());

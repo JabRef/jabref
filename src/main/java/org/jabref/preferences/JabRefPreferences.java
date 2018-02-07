@@ -64,6 +64,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
+import org.jabref.logic.sharelatex.ShareLatexPreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.Version;
@@ -242,6 +243,15 @@ public class JabRefPreferences implements PreferencesService {
     public static final String TIME_STAMP_FIELD = "timeStampField";
     public static final String TIME_STAMP_FORMAT = "timeStampFormat";
     public static final String OVERWRITE_TIME_STAMP = "overwriteTimeStamp";
+
+    // Sharelatex preferences
+    public static final String DEFAULT_NODE = "default";
+    public static final String PARENT_NODE = "jabref-sharelatex";
+    public static final String SHARELATEX_URL = "sharelatexUrl";
+    public static final String SHARELATEX_USER = "sharelatexUser";
+    public static final String SHARELATEX_PASSWORD = "sharelatexPassword";
+    public static final String SHARELATEX_REMEMBER_PASSWORD = "sharelatexRememberPassword";
+    public static final String SHARELATEX_PROJECT = "sharelatexProject";
 
     public static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
     public static final String UNMARK_ALL_ENTRIES_BEFORE_IMPORTING = "unmarkAllEntriesBeforeImporting";
@@ -1421,6 +1431,26 @@ public class JabRefPreferences implements PreferencesService {
 
     public TimestampPreferences getTimestampPreferences() {
         return new TimestampPreferences(getBoolean(USE_TIME_STAMP), getBoolean(UPDATE_TIMESTAMP), get(TIME_STAMP_FIELD), get(TIME_STAMP_FORMAT), getBoolean(OVERWRITE_TIME_STAMP));
+    }
+
+    public ShareLatexPreferences getShareLatexPreferences() {
+        return new ShareLatexPreferences(get(DEFAULT_NODE), get(PARENT_NODE), get(SHARELATEX_USER), get(SHARELATEX_URL), get(SHARELATEX_PASSWORD), getBoolean(SHARELATEX_REMEMBER_PASSWORD), get(SHARELATEX_PROJECT));
+    }
+
+    public void storeShareLatexPreferences(ShareLatexPreferences sharelatexPreferences) {
+        put(JabRefPreferences.DEFAULT_NODE, sharelatexPreferences.getDefaultNode());
+        put(JabRefPreferences.PARENT_NODE, sharelatexPreferences.getParentNode());
+        sharelatexPreferences.getUser().ifPresent(
+                user -> put(JabRefPreferences.SHARELATEX_USER, user)
+        );
+        put(JabRefPreferences.SHARELATEX_URL, sharelatexPreferences.getSharelatexUrl());
+        sharelatexPreferences.getPassword().ifPresent(
+                password -> put(JabRefPreferences.SHARELATEX_PASSWORD, password)
+        );
+        putBoolean(JabRefPreferences.SHARELATEX_REMEMBER_PASSWORD, sharelatexPreferences.getShareLatexRememberPassword());
+        sharelatexPreferences.getDefaultProject().ifPresent(
+                project -> put(JabRefPreferences.SHARELATEX_PROJECT, project)
+        );
     }
 
     public LayoutFormatterPreferences getLayoutFormatterPreferences(

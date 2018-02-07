@@ -21,7 +21,7 @@ public class SharelatexConnectionProperties {
         // no data
     }
 
-    public SharelatexConnectionProperties(SharelatexPreferences prefs) {
+    public SharelatexConnectionProperties(ShareLatexPreferences prefs) {
         setFromPreferences(prefs);
     }
 
@@ -71,7 +71,7 @@ public class SharelatexConnectionProperties {
                 && Objects.nonNull(project);
     }
 
-    private void setFromPreferences(SharelatexPreferences prefs) {
+    private void setFromPreferences(ShareLatexPreferences prefs) {
 
         this.url = prefs.getSharelatexUrl();
         prefs.getDefaultProject().ifPresent(proj -> this.project = proj);
