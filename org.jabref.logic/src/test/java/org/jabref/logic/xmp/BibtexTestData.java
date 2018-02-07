@@ -1,4 +1,4 @@
-package org.jabref;
+package org.jabref.logic.xmp;
 
 import java.io.IOException;
 import java.io.StringReader;
