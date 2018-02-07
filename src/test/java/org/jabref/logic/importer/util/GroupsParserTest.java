@@ -43,9 +43,16 @@ public class GroupsParserTest {
     }
 
     @Test
-    public void DelimiterThatNeedsToBeEscaped() throws Exception {
+    public void KeywordDelimiterThatNeedsToBeEscaped() throws Exception {
         AutomaticGroup expected = new AutomaticKeywordGroup("group1", GroupHierarchyType.INDEPENDENT, "keywords", ';', '>');
         AbstractGroup parsed = GroupsParser.fromString("AutomaticKeywordGroup:group1;0;keywords;\\;;>;1;;;;;", ';', fileMonitor);
+        assertEquals(expected, parsed);
+    }
+
+    @Test
+    public void HierarchicalDelimiterThatNeedsToBeEscaped() throws Exception {
+        AutomaticGroup expected = new AutomaticKeywordGroup("group1", GroupHierarchyType.INDEPENDENT, "keywords", ',', ';');
+        AbstractGroup parsed = GroupsParser.fromString("AutomaticKeywordGroup:group1;0;keywords;,;\\;;1;;;;;", ';', fileMonitor);
         assertEquals(expected, parsed);
     }
 
