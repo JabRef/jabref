@@ -4,11 +4,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.sharelatex.ShareLatexProject;
@@ -64,7 +66,6 @@ public class ShareLatexParser {
                 if (name.endsWith(".bib")) {
                     return id;
                 }
-
             }
         }
         return "";
@@ -96,14 +97,11 @@ public class ShareLatexParser {
                 doc.setOperation("d");
 
                 docsWithChanges.add(doc);
-
             } else if (d.operation == Operation.EQUAL) {
                 pos += d.text.length();
             }
-
         }
         return docsWithChanges;
-
     }
 
     public List<ShareLatexProject> getProjectFromJson(JsonObject json) {
@@ -127,7 +125,6 @@ public class ShareLatexParser {
             }
         }
         return projects;
-
     }
 
     private List<BibEntry> parseBibEntryFromJsonArray(JsonArray arr, ImportFormatPreferences prefs, FileUpdateMonitor fileMonitor)
@@ -163,8 +160,8 @@ public class ShareLatexParser {
     }
 
     /**
-     * Fixes wrongly encoded UTF-8 strings which were encoded into ISO-8859-1
-     * Workaround for server side bug
+     * Fixes wrongly encoded UTF-8 strings which were encoded into ISO-8859-1 Workaround for server side bug
+     *
      * @param wrongEncoded The wrongly encoded string
      * @return The correct UTF-8 string
      */
@@ -173,4 +170,23 @@ public class ShareLatexParser {
         return new String(str.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
+    public Optional<BibEntry> getEntryFromPosition(ParserResult result, int position) {
+        Objects.requireNonNull(result);
+        if (position < 1) {
+            throw new IllegalArgumentException("Position must be positive");
+        }
+
+        int currentStartPos = 0;
+        for (BibEntry entry : result.getDatabase().getEntries()) {
+            int endPos = currentStartPos + entry.getParsedSerialization().length();
+            boolean isInRange = currentStartPos <= position && position <= endPos;
+            if (isInRange) {
+                return Optional.of(entry);
+            } else {
+                currentStartPos = endPos;
+            }
+        }
+
+        return Optional.empty();
+    }
 }
