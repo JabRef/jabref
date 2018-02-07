@@ -45,6 +45,7 @@ public class WebSocketClientWrapper {
     private String oldContent;
     private int version;
     private int commandCounter;
+    private int position;
     private ImportFormatPreferences prefs;
     private String docId;
     private String projectId;
@@ -259,7 +260,7 @@ public class WebSocketClientWrapper {
                 LOGGER.debug("Got new entries");
                 setLeftDoc(false);
 
-                eventBus.post(new ShareLatexEntryMessageEvent(entries, bibtexString, 0));
+                eventBus.post(new ShareLatexEntryMessageEvent(entries, bibtexString, position));
                 eventBus.post(new ShareLatexContinueMessageEvent());
 
             }
@@ -267,7 +268,7 @@ public class WebSocketClientWrapper {
             if (message.contains("otUpdateApplied")) {
                 LOGGER.debug("We got an update " + message);
 
-                parser.getPositionFromBibtexJsonUpdateMessage(message);
+                position = parser.getPositionFromBibtexJsonUpdateMessage(message);
                 leaveDocument(docId);
                 setLeftDoc(true);
             }
