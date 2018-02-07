@@ -31,10 +31,10 @@ import org.jabref.gui.keyboard.KeyBinder;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.FileType;
+import org.jabref.preferences.ExporterFactoryFactory;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.JabRefPreferencesFilter;
 
@@ -225,7 +225,7 @@ public class PreferencesDialog extends JabRefDialog {
     private void updateAfterPreferenceChanges() {
         setValues();
 
-        Globals.exportFactory = ExporterFactory.create(Globals.prefs, Globals.journalAbbreviationLoader);
+        Globals.exportFactory = ExporterFactoryFactory.create(Globals.prefs, Globals.journalAbbreviationLoader);
 
         Globals.prefs.updateEntryEditorTabList();
     }

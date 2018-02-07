@@ -19,7 +19,7 @@ public class OpenOfficeSidePanel extends SidePaneComponent {
         super(sidePaneManager, icon, title);
         this.preferences = preferences;
         sidePaneManager.register(this);
-        if (preferences.showPanel()) {
+        if (preferences.getShowPanel()) {
             manager.show(OpenOfficeSidePanel.class);
         }
 
