@@ -72,6 +72,7 @@ import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.CustomEntryType;
@@ -1559,6 +1560,62 @@ public class JabRefPreferences implements PreferencesService {
     public CleanupPreferences getCleanupPreferences(JournalAbbreviationLoader journalAbbreviationLoader) {
         return new CleanupPreferences(get(IMPORT_FILENAMEPATTERN), get(IMPORT_FILEDIRPATTERN),
                 getLayoutFormatterPreferences(journalAbbreviationLoader), getFileDirectoryPreferences());
+    }
+
+    public CleanupPreset getCleanupPreset() {
+        Set<CleanupPreset.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreset.CleanupStep.class);
+
+        if (this.getBoolean(JabRefPreferences.CLEANUP_DOI)) {
+            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_ISSN)) {
+            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_ISSN);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_MOVE_PDF)) {
+            activeJobs.add(CleanupPreset.CleanupStep.MOVE_PDF);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_MAKE_PATHS_RELATIVE)) {
+            activeJobs.add(CleanupPreset.CleanupStep.MAKE_PATHS_RELATIVE);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_RENAME_PDF)) {
+            activeJobs.add(CleanupPreset.CleanupStep.RENAME_PDF);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS)) {
+            activeJobs.add(CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_UPGRADE_EXTERNAL_LINKS)) {
+            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX)) {
+            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBTEX)) {
+            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_FIX_FILE_LINKS)) {
+            activeJobs.add(CleanupPreset.CleanupStep.FIX_FILE_LINKS);
+        }
+
+        FieldFormatterCleanups formatterCleanups = Cleanups.parse(
+                this.getStringList(JabRefPreferences.CLEANUP_FORMATTERS));
+
+        return new CleanupPreset(activeJobs, formatterCleanups);
+    }
+
+    public void setCleanupPreset(CleanupPreset cleanupPreset) {
+        this.putBoolean(JabRefPreferences.CLEANUP_DOI, cleanupPreset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_DOI));
+        this.putBoolean(JabRefPreferences.CLEANUP_ISSN, cleanupPreset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_ISSN));
+        this.putBoolean(JabRefPreferences.CLEANUP_MOVE_PDF, cleanupPreset.isActive(CleanupPreset.CleanupStep.MOVE_PDF));
+        this.putBoolean(JabRefPreferences.CLEANUP_MAKE_PATHS_RELATIVE, cleanupPreset.isActive(CleanupPreset.CleanupStep.MAKE_PATHS_RELATIVE));
+        this.putBoolean(JabRefPreferences.CLEANUP_RENAME_PDF, cleanupPreset.isActive(CleanupPreset.CleanupStep.RENAME_PDF));
+        this.putBoolean(JabRefPreferences.CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS,
+                cleanupPreset.isActive(CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS));
+        this.putBoolean(JabRefPreferences.CLEANUP_UPGRADE_EXTERNAL_LINKS,
+                cleanupPreset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
+        this.putBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX, cleanupPreset.isActive(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX));
+        this.putBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBTEX, cleanupPreset.isActive(CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX));
+        this.putBoolean(JabRefPreferences.CLEANUP_FIX_FILE_LINKS, cleanupPreset.isActive(CleanupPreset.CleanupStep.FIX_FILE_LINKS));
+        this.putStringList(JabRefPreferences.CLEANUP_FORMATTERS, cleanupPreset.getFormatterCleanups().getAsStringList(OS.NEWLINE));
     }
 
     public RemotePreferences getRemotePreferences() {
