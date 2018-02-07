@@ -33,7 +33,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.SavePreferencesFactory;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,7 +105,7 @@ public class ChangeScanner implements Runnable {
     private void storeTempDatabase() {
         JabRefExecutorService.INSTANCE.execute(() -> {
             try {
-                SavePreferences prefs = SavePreferencesFactory.loadForSaveFromPreferences(Globals.prefs).withMakeBackup(false)
+                SavePreferences prefs = JabRefPreferences.loadForSaveFromPreferences(Globals.prefs).withMakeBackup(false)
                         .withEncoding(panel.getBibDatabaseContext().getMetaData().getEncoding()
                                 .orElse(Globals.prefs.getDefaultEncoding()));
 

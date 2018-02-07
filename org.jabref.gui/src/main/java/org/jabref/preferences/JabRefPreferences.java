@@ -49,6 +49,7 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.Cleanups;
+import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
@@ -1414,6 +1415,41 @@ public class JabRefPreferences implements PreferencesService {
         return new ImportFormatPreferences(customImports, getDefaultEncoding(), getKeywordDelimiter(),
                 getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(),
                 isKeywordSyncEnabled());
+    }
+
+    public static SavePreferences loadForExportFromPreferences(JabRefPreferences preferences) {
+        Boolean saveInOriginalOrder = preferences.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
+        SaveOrderConfig saveOrder = null;
+        if (!saveInOriginalOrder) {
+            if (preferences.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
+                saveOrder = preferences.loadExportSaveOrder();
+            } else {
+                saveOrder = preferences.loadTableSaveOrder();
+            }
+        }
+        Charset encoding = preferences.getDefaultEncoding();
+        Boolean makeBackup = preferences.getBoolean(JabRefPreferences.BACKUP);
+        SavePreferences.DatabaseSaveType saveType = SavePreferences.DatabaseSaveType.ALL;
+        Boolean takeMetadataSaveOrderInAccount = false;
+        Boolean reformatFile = preferences.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
+        LatexFieldFormatterPreferences latexFieldFormatterPreferences = preferences.getLatexFieldFormatterPreferences();
+        GlobalBibtexKeyPattern globalCiteKeyPattern =  preferences.getKeyPattern();
+        return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
+                takeMetadataSaveOrderInAccount, reformatFile, latexFieldFormatterPreferences, globalCiteKeyPattern);
+    }
+
+    public static SavePreferences loadForSaveFromPreferences(JabRefPreferences preferences) {
+        Boolean saveInOriginalOrder = false;
+        SaveOrderConfig saveOrder = null;
+        Charset encoding = preferences.getDefaultEncoding();
+        Boolean makeBackup = preferences.getBoolean(JabRefPreferences.BACKUP);
+        SavePreferences.DatabaseSaveType saveType = SavePreferences.DatabaseSaveType.ALL;
+        Boolean takeMetadataSaveOrderInAccount = true;
+        Boolean reformatFile = preferences.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
+        LatexFieldFormatterPreferences latexFieldFormatterPreferences = preferences.getLatexFieldFormatterPreferences();
+        GlobalBibtexKeyPattern globalCiteKeyPattern =  preferences.getKeyPattern();
+        return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
+                takeMetadataSaveOrderInAccount, reformatFile, latexFieldFormatterPreferences, globalCiteKeyPattern);
     }
 
     public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {

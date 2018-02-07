@@ -34,7 +34,7 @@ import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
-import static org.jabref.preferences.SavePreferencesFactory.loadForExportFromPreferences;
+import static org.jabref.preferences.JabRefPreferences.loadForExportFromPreferences;
 
 /**
  * <p>Title: </p>
