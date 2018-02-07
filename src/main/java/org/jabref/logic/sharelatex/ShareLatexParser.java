@@ -14,8 +14,11 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.sharelatex.ShareLatexProject;
+import org.jabref.model.sharelatex.SharelatexOtAppliedMessage;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -27,25 +30,31 @@ import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation;
 public class ShareLatexParser {
 
     private final JsonParser parser = new JsonParser();
+    private final Gson gson = new GsonBuilder().create();
 
     public int getVersionFromBibTexJsonString(String content) {
         JsonArray array = parseFirstPartOfMessageAsArray(content);
         return array.get(2).getAsInt();
     }
 
+    public SharelatexOtAppliedMessage getOtAppliedMessage(String content) {
+        String strs = content.substring(content.indexOf("{"), content.length());
+        SharelatexOtAppliedMessage message = gson.fromJson(strs, SharelatexOtAppliedMessage.class);
+        return message;
+    }
+
     public int getPositionFromBibtexJsonUpdateMessage(String content) {
 
-        String json = content.substring(content.indexOf("{"), content.length());
-        JsonObject obj = parser.parse(json).getAsJsonObject();
-        JsonArray array = obj.get("args").getAsJsonArray();
+        String strs = content.substring(content.indexOf("{"), content.length());
 
-        obj = array.get(0).getAsJsonObject();
-        array = obj.get("op").getAsJsonArray();
-        obj = array.get(0).getAsJsonObject();
-
-        return obj.get("p").getAsInt();
+        SharelatexOtAppliedMessage message = gson.fromJson(strs, SharelatexOtAppliedMessage.class);
+        return message.getArgs().get(0).getOp().get(0).getPosition();
 
         //   5:::{"name":"otUpdateApplied","args":[{"doc":"5a797ca3b42d76683b3ea200","op":[{"p":633,"d":"A. Viterbi"}],"v":71,"meta":{"source":"x3f_9gg_sYE1IC9v_oTa","user_id":"5a797c98b42d76683b3ea1fc","ts":1517997414640}}]}
+    }
+
+    private JsonObject getFirstEntryOfArrayAsJsonObject(JsonObject obj, String arrName) {
+        return obj.get(arrName).getAsJsonArray().get(0).getAsJsonObject();
     }
 
     public List<BibEntry> parseBibEntryFromJsonMessageString(String message, ImportFormatPreferences prefs, FileUpdateMonitor fileMonitor)

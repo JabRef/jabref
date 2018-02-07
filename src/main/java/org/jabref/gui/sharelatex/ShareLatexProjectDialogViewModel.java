@@ -71,6 +71,7 @@ public class ShareLatexProjectDialogViewModel extends AbstractViewModel {
                 Optional<BibEntry> entry = parser.getEntryFromPosition(result, event.getPosition());
 
                 System.out.println(entry); //Emtpy => Add
+                System.out.println("Changed chars: " + event.getChars());
             }
         } catch (IOException e1) {
             // TODO Auto-generated catch block

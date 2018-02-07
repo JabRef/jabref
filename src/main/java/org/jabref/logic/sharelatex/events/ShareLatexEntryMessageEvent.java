@@ -4,18 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.sharelatex.SharelatexOtAppliedMessage;
 
 public class ShareLatexEntryMessageEvent {
 
     private List<BibEntry> entries = new ArrayList<>();
 
     private final String database;
-    private final int position;
+    private final SharelatexOtAppliedMessage message;
 
-    public ShareLatexEntryMessageEvent(List<BibEntry> entries, String database, int position) {
+    public ShareLatexEntryMessageEvent(List<BibEntry> entries, String database, SharelatexOtAppliedMessage message) {
         this.entries = entries;
         this.database = database;
-        this.position = position;
+        this.message = message;
     }
 
     public List<BibEntry> getEntries() {
@@ -27,7 +28,17 @@ public class ShareLatexEntryMessageEvent {
     }
 
     public int getPosition() {
-        return this.position;
+        if (!this.message.getArgs().isEmpty()) {
+            return this.message.getArgs().get(0).getOp().get(0).getPosition();
+        }
+        return 0;
+    }
+
+    public String getChars() {
+        if (!this.message.getArgs().isEmpty()) {
+            return this.message.getArgs().get(0).getOp().get(0).getChars();
+        }
+        return "";
     }
 
 }

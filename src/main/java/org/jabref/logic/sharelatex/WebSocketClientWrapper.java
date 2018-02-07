@@ -25,6 +25,7 @@ import org.jabref.logic.sharelatex.events.ShareLatexEntryMessageEvent;
 import org.jabref.logic.sharelatex.events.ShareLatexErrorMessageEvent;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.sharelatex.SharelatexOtAppliedMessage;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.eventbus.EventBus;
@@ -50,6 +51,7 @@ public class WebSocketClientWrapper {
     private String docId;
     private String projectId;
     private String databaseName;
+    private SharelatexOtAppliedMessage otAppliedMessage = new SharelatexOtAppliedMessage();
     private final EventBus eventBus = new EventBus("SharelatexEventBus");
     private boolean leftDoc = false;
     private boolean errorReceived = false;
@@ -260,7 +262,7 @@ public class WebSocketClientWrapper {
                 LOGGER.debug("Got new entries");
                 setLeftDoc(false);
 
-                eventBus.post(new ShareLatexEntryMessageEvent(entries, bibtexString, position));
+                eventBus.post(new ShareLatexEntryMessageEvent(entries, bibtexString, otAppliedMessage));
                 eventBus.post(new ShareLatexContinueMessageEvent());
 
             }
@@ -268,7 +270,7 @@ public class WebSocketClientWrapper {
             if (message.contains("otUpdateApplied")) {
                 LOGGER.debug("We got an update " + message);
 
-                position = parser.getPositionFromBibtexJsonUpdateMessage(message);
+                otAppliedMessage = parser.getOtAppliedMessage(message);
                 leaveDocument(docId);
                 setLeftDoc(true);
             }
