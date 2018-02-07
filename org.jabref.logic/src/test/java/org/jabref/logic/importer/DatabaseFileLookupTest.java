@@ -1,8 +1,10 @@
 package org.jabref.logic.importer;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.Collection;
 
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -17,11 +19,11 @@ import org.mockito.Answers;
 
 import static org.mockito.Mockito.mock;
 
-/**
- * @author Nosh&Dan
- * @version 09.11.2008 | 21:06:17
- */
 public class DatabaseFileLookupTest {
+
+    private static final File UNLINKED_FILES_TEST_BIB = Paths
+            .get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestBib.bib").toFile();
+
 
     private BibDatabase database;
     private Collection<BibEntry> entries;
@@ -32,7 +34,7 @@ public class DatabaseFileLookupTest {
 
     @Before
     public void setUp() throws Exception {
-        try (FileInputStream stream = new FileInputStream(ImportDataTest.UNLINKED_FILES_TEST_BIB);
+        try (FileInputStream stream = new FileInputStream(UNLINKED_FILES_TEST_BIB);
                 InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             ParserResult result = new BibtexParser(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).parse(reader);
             database = result.getDatabase();

@@ -6,10 +6,6 @@ import java.nio.file.Paths;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * @author Nosh&Dan
- * @version 09.11.2008 | 19:41:40
- */
 public class ImportDataTest {
 
     public static final File FILE_IN_DATABASE = Paths
@@ -22,9 +18,6 @@ public class ImportDataTest {
     public static final File NOT_EXISTING_FOLDER = Paths.get("notexistingfolder").toFile();
     public static final File NOT_EXISTING_PDF = Paths
             .get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/null.pdf").toFile();
-    public static final File UNLINKED_FILES_TEST_BIB = Paths
-            .get("src/test/resources/org/jabref/util/unlinkedFilesTestBib.bib").toFile();
-
 
     /**
      * Tests the testing environment.
