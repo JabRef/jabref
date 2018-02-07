@@ -391,6 +391,7 @@ public class GlobalSearchBar extends JPanel {
             currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
             searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
         }
+        SearchTextField.switchSearchColor(searchField, grammarBasedSearch);
         Tooltip tooltip = new Tooltip();
         tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         tooltip.setGraphic(description);
