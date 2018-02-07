@@ -38,6 +38,7 @@ import org.jabref.logic.xmp.XMPUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.metadata.FileDirectoryPreferences;
 
 import de.jensd.fx.glyphs.GlyphIcons;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
@@ -281,7 +282,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public boolean delete() {
-        Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
+        FileDirectoryPreferences prefs = Globals.prefs.getFileDirectoryPreferences();
+        Optional<Path> file = linkedFile.findIn(databaseContext, prefs);
 
         if (!file.isPresent()) {
             LOGGER.warn("Could not find file " + linkedFile.getLink());
