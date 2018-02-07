@@ -16,6 +16,8 @@ public class DuplicateCheckTest {
 
     private BibEntry simpleArticle;
     private BibEntry unrelatedArticle;
+    private BibEntry simpleInbook;
+    private BibEntry simpleIncollection;
 
     @Before
     public void setUp() {
@@ -27,6 +29,19 @@ public class DuplicateCheckTest {
                 .withField(FieldName.AUTHOR, "Completely Different")
                 .withField(FieldName.TITLE, "Holy Moly Uffdada und Trallalla")
                 .withField(FieldName.YEAR, "1992");
+        simpleInbook = new BibEntry(BibtexEntryTypes.INBOOK.getName())
+                .withField(FieldName.TITLE, "Alice in Wonderland")
+                .withField(FieldName.AUTHOR, "Charles Lutwidge Dodgson")
+                .withField(FieldName.CHAPTER, "Chapter One – Down the Rabbit Hole")
+                .withField(FieldName.LANGUAGE, "English")
+                .withField(FieldName.PUBLISHER, "Macmillan")
+                .withField(FieldName.YEAR, "1865");
+        simpleIncollection = new BibEntry(BibtexEntryTypes.INCOLLECTION.getName())
+                .withField(FieldName.TITLE, "Innovation and Intellectual Property Rights")
+                .withField(FieldName.AUTHOR, "Ove Grandstrand")
+                .withField(FieldName.BOOKTITLE, "The Oxford Handbook of Innovation")
+                .withField(FieldName.PUBLISHER, "Oxford University Press")
+                .withField(FieldName.YEAR, "2004");
     }
 
     @Test
@@ -140,6 +155,51 @@ public class DuplicateCheckTest {
         duplicateWithDifferentType.setType(BibtexEntryTypes.INCOLLECTION);
 
         assertTrue(DuplicateCheck.isDuplicate(simpleArticle, duplicateWithDifferentType, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    public void twoInbooksWithDifferentChaptersAreNotDuplicates() {
+        twoEntriesWithDifferentSpecificFieldsAreNotDuplicates(simpleInbook, FieldName.CHAPTER,
+                "Chapter One – Down the Rabbit Hole",
+                "Chapter Two – The Pool of Tears");
+    }
+
+    @Test
+    public void twoInbooksWithDifferentPagesAreNotDuplicates() {
+        twoEntriesWithDifferentSpecificFieldsAreNotDuplicates(simpleInbook, FieldName.PAGES, "1-20", "21-40");
+    }
+
+    @Test
+    public void twoIncollectionsWithDifferentChaptersAreNotDuplicates() {
+        twoEntriesWithDifferentSpecificFieldsAreNotDuplicates(simpleIncollection, FieldName.CHAPTER, "10", "9");
+    }
+
+    @Test
+    public void twoIncollectionsWithDifferentPagesAreNotDuplicates() {
+        twoEntriesWithDifferentSpecificFieldsAreNotDuplicates(simpleIncollection, FieldName.PAGES, "1-20", "21-40");
+    }
+
+    private void twoEntriesWithDifferentSpecificFieldsAreNotDuplicates(final BibEntry cloneable,
+                                                                       final String fieldType,
+                                                                       final String firstValue,
+                                                                       final String secondValue) {
+        final BibEntry entry1 = (BibEntry) cloneable.clone();
+        entry1.setField(fieldType, firstValue);
+
+        final BibEntry entry2 = (BibEntry) cloneable.clone();
+        entry2.setField(fieldType, secondValue);
+
+        assertFalse(DuplicateCheck.isDuplicate(entry1, entry2, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    public void inbookWithoutChapterCouldBeDuplicateOfInbookWithChapter() {
+        final BibEntry inbook1 = (BibEntry) simpleInbook.clone();
+        final BibEntry inbook2 = (BibEntry) simpleInbook.clone();
+        inbook2.setField(FieldName.CHAPTER, "");
+
+        assertTrue(DuplicateCheck.isDuplicate(inbook1, inbook2, BibDatabaseMode.BIBTEX));
+        assertTrue(DuplicateCheck.isDuplicate(inbook2, inbook1, BibDatabaseMode.BIBTEX));
     }
 
     @Test
