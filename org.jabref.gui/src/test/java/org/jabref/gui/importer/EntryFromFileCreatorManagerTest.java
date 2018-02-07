@@ -5,7 +5,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -17,20 +19,44 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Answers;
 
 import static org.mockito.Mockito.mock;
 
 @Category(GUITest.class)
 public class EntryFromFileCreatorManagerTest {
 
-    // Needed to initialize ExternalFileTypes
-    @Before
-    public void setUp() {
+    private static final File UNLINKED_FILES_TEST_BIB = Paths
+            .get("src/test/resources/org/jabref/gui/importer/unlinkedFilesTestBib.bib").toFile();
 
+    private BibDatabase database;
+    private Collection<BibEntry> entries;
+
+    private BibEntry entry1;
+    private BibEntry entry2;
+
+    /**
+     * Tests the prerequisites of this test-class itself.
+     */
+    @Test
+    public void testTestDatabase() throws IOException {
+        try (FileInputStream stream = new FileInputStream(UNLINKED_FILES_TEST_BIB);
+             InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+            ParserResult result = new BibtexParser(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).parse(reader);
+            database = result.getDatabase();
+            entries = database.getEntries();
+
+            entry1 = database.getEntryByKey("entry1").get();
+            entry2 = database.getEntryByKey("entry2").get();
+        }
+
+        Assert.assertEquals(2, database.getEntryCount());
+        Assert.assertEquals(2, entries.size());
+        Assert.assertNotNull(entry1);
+        Assert.assertNotNull(entry2);
     }
 
     @Test
@@ -47,8 +73,8 @@ public class EntryFromFileCreatorManagerTest {
     @Test
     @Ignore
     public void testAddEntrysFromFiles() throws IOException {
-        try (FileInputStream stream = new FileInputStream(ImportDataTest.UNLINKED_FILES_TEST_BIB);
-                InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+        try (FileInputStream stream = new FileInputStream(UNLINKED_FILES_TEST_BIB);
+             InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             ParserResult result = new BibtexParser(mock(ImportFormatPreferences.class), new DummyFileUpdateMonitor()).parse(reader);
             BibDatabase database = result.getDatabase();
 
@@ -81,5 +107,4 @@ public class EntryFromFileCreatorManagerTest {
             Assert.assertFalse(file2Found);
         }
     }
-
 }
