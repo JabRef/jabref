@@ -168,6 +168,12 @@ public class XMPUtil {
                     }
                 }
             }
+            if (result.isEmpty()) {
+                // If we did not find any XMP metadata, search for non XMP metadata
+                PDDocumentInformation documentInformation = document.getDocumentInformation();
+                Optional<BibEntry> entry = XMPUtil.getBibtexEntryFromDocumentInformation(documentInformation);
+                entry.ifPresent(result::add);
+            }
         }
 
         // return empty list, if no metadata was found
