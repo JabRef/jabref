@@ -79,19 +79,6 @@ public class BibtexParser implements Parser {
     }
 
     /**
-     * Shortcut usage to create a Parser and read the input.
-     *
-     * @param in the Reader to read from
-     * @param fileMonitor
-     * @throws IOException
-     * @deprecated inline this method
-     */
-    @Deprecated
-    public static ParserResult parse(Reader in, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) throws IOException {
-        return new BibtexParser(importFormatPreferences, fileMonitor).parse(in);
-    }
-
-    /**
      * Parses BibtexEntries from the given string and returns one entry found (or null if none found)
      * <p>
      * It is undetermined which entry is returned, so use this in case you know there is only one entry in the string.

@@ -8,6 +8,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -16,67 +17,67 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <?import org.controlsfx.control.MasterDetailPane?>
-<ScrollPane xmlns:fx="http://javafx.com/fxml/1" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER"
-            styleClass="fileAnnotationTab" xmlns="http://javafx.com/javafx/8.0.112"
-            fx:controller="org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTabController">
+
+<ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="fileAnnotationTab" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTabController">
     <MasterDetailPane dividerPosition="0.6">
         <masterNode>
             <BorderPane>
                 <padding>
-                    <Insets top="5" right="5" bottom="5" left="5"/>
+                    <Insets bottom="5" left="5" right="5" top="5" />
                 </padding>
                 <top>
                     <HBox alignment="BASELINE_LEFT">
-                        <Label text="%Filename" prefWidth="70.0" alignment="BASELINE_LEFT"/>
-                        <ComboBox fx:id="files" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                        <Label alignment="BASELINE_LEFT" prefWidth="70.0" text="%Filename" />
+                        <ComboBox fx:id="files" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
                     </HBox>
                 </top>
                 <center>
-                    <ListView fx:id="annotationList"/>
+                    <ListView fx:id="annotationList" />
                 </center>
             </BorderPane>
         </masterNode>
         <detailNode>
-            <GridPane>
+            <GridPane fx:id="grid">
                 <padding>
-                    <Insets top="5" right="5" bottom="5" left="10"/>
+                    <Insets bottom="5" left="10" right="5" top="5" />
                 </padding>
                 <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" prefWidth="70.0"/>
-                    <ColumnConstraints hgrow="ALWAYS" minWidth="10.0"/>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="20.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="10.0" />
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="40.0" prefWidth="40.0" />
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" valignment="TOP"/>
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                    <RowConstraints minHeight="10.0" prefHeight="100.0" vgrow="ALWAYS"/>
-                    <RowConstraints minHeight="10.0" prefHeight="100.0" vgrow="ALWAYS"/>
+                    <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="100.0" vgrow="ALWAYS" />
+                    <RowConstraints maxHeight="-Infinity" minHeight="20.0" prefHeight="40.0" vgrow="ALWAYS" />
+               <RowConstraints />
+               <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="10.0" />
                 </rowConstraints>
-                <Label text="%Author" minHeight="35.0" prefHeight="30.0" GridPane.columnIndex="0" GridPane.rowIndex="1"
-                       alignment="TOP_LEFT"/>
-                <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
-                    <Label fx:id="author"/>
-                    <Pane HBox.hgrow="ALWAYS"/>
+                <Label text="%Marking" GridPane.columnIndex="1" GridPane.valignment="BOTTOM">
+               <padding>
+                  <Insets bottom="3.0" />
+               </padding></Label>
+                <TextArea fx:id="marking" editable="false" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label text="%Content" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
+               <padding>
+                  <Insets bottom="5.0" />
+               </padding></Label>
+                <TextArea fx:id="content" editable="false" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                <HBox GridPane.columnIndex="2" GridPane.rowIndex="1">
+                    <Label fx:id="author" />
+                    <Pane HBox.hgrow="ALWAYS" />
                     <Button onAction="#copy" styleClass="flatButton">
                         <graphic>
-                            <MaterialDesignIconView glyphName="CONTENT_COPY"/>
+                            <MaterialDesignIconView glyphName="CONTENT_COPY">
+                        <cursor>
+                           <Cursor fx:constant="HAND" />
+                        </cursor></MaterialDesignIconView>
                         </graphic>
                         <tooltip>
-                            <Tooltip text="%Copy to clipboard"/>
+                            <Tooltip text="%Copy to clipboard" />
                         </tooltip>
                     </Button>
                 </HBox>
-                <Label text="%Page" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                <Label fx:id="page" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                <Label text="%Date" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                <Label fx:id="date" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-                <Label text="%Content" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-                <TextArea fx:id="content" GridPane.columnIndex="1" GridPane.rowIndex="4" editable="false"
-                          wrapText="true"/>
-                <Label text="%Marking" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
-                <TextArea fx:id="marking" GridPane.columnIndex="1" GridPane.rowIndex="5" editable="false"
-                          wrapText="true"/>
             </GridPane>
         </detailNode>
     </MasterDetailPane>

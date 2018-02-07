@@ -1,7 +1,6 @@
 package org.jabref.gui.exporter;
 
 import java.awt.event.ActionEvent;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -82,14 +81,6 @@ public class ExportAction {
                     FileUtil.addExtension(file, selectedExtension);
                     }
 
-                if (Files.exists(file)) {
-                        // Warn that the file exists:
-                        if (JOptionPane.showConfirmDialog(frame,
-                                Localization.lang("'%0' exists. Overwrite file?", file.getFileName().toString()),
-                                Localization.lang("Export"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
-                            return;
-                        }
-                    }
                 final Exporter format = FileFilterConverter.getExporter(selectedExtensionFilter, exporters).orElseThrow(() -> new IllegalStateException("User didn't selected a file type for the extension"));
                     List<BibEntry> entries;
                     if (selectedOnly) {
