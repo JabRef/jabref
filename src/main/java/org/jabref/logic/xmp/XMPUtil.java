@@ -535,7 +535,6 @@ public class XMPUtil {
             }
         }
 
-
         dcSchema.setFormat("application/pdf");
 
         // Bibtex-Fields used: entrytype, Field: 'dc:type'
