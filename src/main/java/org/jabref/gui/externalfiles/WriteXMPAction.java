@@ -133,7 +133,7 @@ public class WriteXMPAction extends AbstractWorker {
                 for (Path file : files) {
                     if (Files.exists(file)) {
                         try {
-                            XMPUtil.writeXMP(file.toFile(), entry, database, Globals.prefs.getXMPPreferences());
+                            XMPUtil.writeXMP(file, entry, database, Globals.prefs.getXMPPreferences());
                             SwingUtilities.invokeLater(
                                     () -> optDiag.getProgressArea().append("  " + Localization.lang("OK") + ".\n"));
                             entriesChanged++;
