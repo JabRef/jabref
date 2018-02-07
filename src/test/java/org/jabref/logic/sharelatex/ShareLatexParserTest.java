@@ -8,9 +8,9 @@ import org.jabref.model.sharelatex.ShareLatexProject;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ShareLatexParserTest {
 
@@ -71,6 +71,15 @@ public class ShareLatexParserTest {
         String expected = "5909edb0f31ff96200ef58df";
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetPositionFromUpdateMessage() {
+        String document = "5:::{\"name\":\"otUpdateApplied\",\"args\":[{\"doc\":\"5a797ca3b42d76683b3ea200\",\"op\":[{\"p\":633,\"d\":\"A. Viterbi\"}],\"v\":71,\"meta\":{\"source\":\"x3f_9gg_sYE1IC9v_oTa\",\"user_id\":\"5a797c98b42d76683b3ea1fc\",\"ts\":1517997414640}}]}";
+        ShareLatexParser parser = new ShareLatexParser();
+        int actual = parser.getPositionFromBibtexJsonUpdateMessage(document);
+        assertEquals(633, actual);
+
     }
 
     @Test

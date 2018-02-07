@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleListProperty;
@@ -17,7 +18,9 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.sharelatex.ShareLatexManager;
+import org.jabref.logic.sharelatex.ShareLatexParser;
 import org.jabref.logic.sharelatex.events.ShareLatexEntryMessageEvent;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.sharelatex.ShareLatexProject;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -30,6 +33,7 @@ public class ShareLatexProjectDialogViewModel extends AbstractViewModel {
     private static final Log LOGGER = LogFactory.getLog(ShareLatexProjectDialogViewModel.class);
 
     private final StateManager stateManager;
+    private final ShareLatexManager manager;
     private final SimpleListProperty<ShareLatexProjectViewModel> projects = new SimpleListProperty<>(
             FXCollections.observableArrayList());
     private final ImportFormatPreferences prefs;
@@ -41,6 +45,7 @@ public class ShareLatexProjectDialogViewModel extends AbstractViewModel {
         this.prefs = prefs;
         this.fileMonitor = fileMonitor;
         manager.registerListener(this);
+        this.manager = manager;
 
     }
 
@@ -60,6 +65,10 @@ public class ShareLatexProjectDialogViewModel extends AbstractViewModel {
 
         try {
             ParserResult result = new BibtexImporter(prefs, fileMonitor).importDatabase(event.getNewDatabaseContent());
+
+            ShareLatexParser parser = new ShareLatexParser();
+            Optional<BibEntry> entry = parser.getEntryFromPosition(result, 633);
+            System.out.println(entry); //Emtpy => Add 
 
         } catch (IOException e1) {
             // TODO Auto-generated catch block

@@ -33,6 +33,21 @@ public class ShareLatexParser {
         return array.get(2).getAsInt();
     }
 
+    public int getPositionFromBibtexJsonUpdateMessage(String content) {
+
+        String json = content.substring(content.indexOf("{"), content.length());
+        JsonObject obj = parser.parse(json).getAsJsonObject();
+        JsonArray array = obj.get("args").getAsJsonArray();
+
+        obj = array.get(0).getAsJsonObject();
+        array = obj.get("op").getAsJsonArray();
+        obj = array.get(0).getAsJsonObject();
+
+        return obj.get("p").getAsInt();
+
+        //   5:::{"name":"otUpdateApplied","args":[{"doc":"5a797ca3b42d76683b3ea200","op":[{"p":633,"d":"A. Viterbi"}],"v":71,"meta":{"source":"x3f_9gg_sYE1IC9v_oTa","user_id":"5a797c98b42d76683b3ea1fc","ts":1517997414640}}]}
+    }
+
     public List<BibEntry> parseBibEntryFromJsonMessageString(String message, ImportFormatPreferences prefs, FileUpdateMonitor fileMonitor)
             throws ParseException {
         return parseBibEntryFromJsonArray(parseFirstPartOfMessageAsArray(message), prefs, fileMonitor);
@@ -53,8 +68,13 @@ public class ShareLatexParser {
         JsonObject obj = parseFirstPartOfMessageAsArray(json).get(1).getAsJsonObject();
         JsonArray arr = obj.get("rootFolder").getAsJsonArray();
 
-        Optional<JsonArray> docs = arr.get(0).getAsJsonObject().entrySet().stream()
-                .filter(entry -> entry.getKey().equals("docs")).map(v -> v.getValue().getAsJsonArray()).findFirst();
+        Optional<JsonArray> docs = arr.get(0)
+                .getAsJsonObject()
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().equals("docs"))
+                .map(v -> v.getValue().getAsJsonArray())
+                .findFirst();
 
         if (docs.isPresent()) {
 
@@ -179,7 +199,7 @@ public class ShareLatexParser {
         int currentStartPos = 0;
         for (BibEntry entry : result.getDatabase().getEntries()) {
             int endPos = currentStartPos + entry.getParsedSerialization().length();
-            boolean isInRange = currentStartPos <= position && position <= endPos;
+            boolean isInRange = (currentStartPos <= position) && (position <= endPos);
             if (isInRange) {
                 return Optional.of(entry);
             } else {

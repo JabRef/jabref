@@ -17,7 +17,6 @@ import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler.Whole;
 import javax.websocket.Session;
 
-import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -67,15 +66,16 @@ public class WebSocketClientWrapper {
         this.fileMonitor = fileMonitor;
     }
 
-
     public void createAndConnect(URI webSocketchannelUri, String projectId, BibDatabaseContext database) {
 
         try {
             this.projectId = projectId;
 
             ClientEndpointConfig.Configurator configurator = new MyCustomClientEndpointConfigurator(serverOrigin, cookies);
-            final ClientEndpointConfig cec = ClientEndpointConfig.Builder.create().extensions(Arrays.asList(new PerMessageDeflateExtension()))
-                    .configurator(configurator).build();
+            final ClientEndpointConfig cec = ClientEndpointConfig.Builder.create()
+                    .extensions(Arrays.asList(new PerMessageDeflateExtension()))
+                    .configurator(configurator)
+                    .build();
             final CountDownLatch messageLatch = new CountDownLatch(1);
 
             ClientManager client = ClientManager.createClient();
@@ -259,14 +259,15 @@ public class WebSocketClientWrapper {
                 LOGGER.debug("Got new entries");
                 setLeftDoc(false);
 
-                eventBus.post(new ShareLatexEntryMessageEvent(entries, bibtexString));
+                eventBus.post(new ShareLatexEntryMessageEvent(entries, bibtexString, 0));
                 eventBus.post(new ShareLatexContinueMessageEvent());
 
             }
 
             if (message.contains("otUpdateApplied")) {
-                LOGGER.debug("We got an update");
+                LOGGER.debug("We got an update " + message);
 
+                parser.getPositionFromBibtexJsonUpdateMessage(message);
                 leaveDocument(docId);
                 setLeftDoc(true);
             }

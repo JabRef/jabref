@@ -48,6 +48,7 @@ public class ShareLatexLoginDialogController extends AbstractController<ShareLat
                 dlg.showAndWait();
             } else {
                 //TODO: Wait until pdf + injection stuff gets merged
+
                 props = new SharelatexConnectionProperties(new SharelatexPreferences("default"));
                 props.setUrl(tbAddress.getText());
                 props.setUser(tbUsername.getText());

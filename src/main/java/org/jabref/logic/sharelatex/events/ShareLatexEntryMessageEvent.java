@@ -10,10 +10,12 @@ public class ShareLatexEntryMessageEvent {
     private List<BibEntry> entries = new ArrayList<>();
 
     private final String database;
+    private final int position;
 
-    public ShareLatexEntryMessageEvent(List<BibEntry> entries, String database) {
+    public ShareLatexEntryMessageEvent(List<BibEntry> entries, String database, int position) {
         this.entries = entries;
         this.database = database;
+        this.position = position;
     }
 
     public List<BibEntry> getEntries() {
@@ -22,6 +24,10 @@ public class ShareLatexEntryMessageEvent {
 
     public String getNewDatabaseContent() {
         return this.database;
+    }
+
+    public int getPosition() {
+        return this.position;
     }
 
 }
