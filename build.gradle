@@ -14,6 +14,8 @@ buildscript {
 plugins {
     id 'nebula.lint' version '8.3.1'
     id 'nebula.info' version '3.6.0'
+
+    id "com.simonharrer.modernizer" version '1.5.0-1'
 }
 
 subprojects {
@@ -55,4 +57,10 @@ allprojects {
 
     checkstyleMain.shouldRunAfter test
     checkstyleTest.shouldRunAfter test
+
+    modernizer {
+        // We have more than 20 issues, which are not fixed yet. Nevertheless, we produce the modernizer output.
+        // See https://github.com/andrewgaul/modernizer-maven-plugin for more information on modernizer
+        failOnViolations = false
+    }
 }

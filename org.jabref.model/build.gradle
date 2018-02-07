@@ -3,7 +3,6 @@ import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
-    id "com.simonharrer.modernizer" version '1.5.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.3'
     id 'net.ltgt.errorprone' version '0.0.13'
     id 'com.github.ben-manes.versions' version '0.17.0'
@@ -217,12 +216,6 @@ afterEvaluate {
             html.enabled true
         }
     }
-}
-
-modernizer {
-    // We have more than 20 issues, which are not fixed yet. Nevertheless, we produce the modernizer output.
-    // See https://github.com/andrewgaul/modernizer-maven-plugin for more information on modernizer
-    failOnViolations = false
 }
 
 /*
