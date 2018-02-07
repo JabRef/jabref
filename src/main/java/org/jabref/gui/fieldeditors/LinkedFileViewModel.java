@@ -282,35 +282,36 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public boolean delete() {
         Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
+
+        if (!file.isPresent()) {
+            LOGGER.warn("Could not find file " + linkedFile.getLink());
+            return true;
+        }
+
         ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"), ButtonData.YES);
+        ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
+        Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
+                Localization.lang("Delete '%0'", file.get().toString()),
+                Localization.lang("Delete the selected file permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk."),
+                removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
 
-        if (file.isPresent()) {
-            ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
-            Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
-                    Localization.lang("Delete '%0'", file.get().toString()),
-                    Localization.lang("Delete the selected file permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk."),
-                    removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
+        if (buttonType.isPresent()) {
+            if (buttonType.get().equals(removeFromEntry)) {
+                return true;
+            }
 
-            if (buttonType.isPresent()) {
-                if (buttonType.get().equals(removeFromEntry)) {
+            if (buttonType.get().equals(deleteFromEntry)) {
+
+                try {
+                    Files.delete(file.get());
                     return true;
-                }
-                if (buttonType.get().equals(deleteFromEntry)) {
-
-                    try {
-                        Files.delete(file.get());
-                        return true;
-                    } catch (IOException ex) {
-                        dialogService.showErrorDialogAndWait(
-                                Localization.lang("Cannot delete file"),
-                                Localization.lang("File permission error"));
-                        LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
-                        return false;
-                    }
+                } catch (IOException ex) {
+                    dialogService.showErrorDialogAndWait(
+                            Localization.lang("Cannot delete file"),
+                            Localization.lang("File permission error"));
+                    LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
                 }
             }
-        } else {
-            LOGGER.warn("Could not find file " + linkedFile.getLink());
         }
         return false;
     }
