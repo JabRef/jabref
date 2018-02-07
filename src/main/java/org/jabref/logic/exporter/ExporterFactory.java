@@ -8,10 +8,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.FileType;
-import org.jabref.preferences.JabRefPreferences;
 
 public class ExporterFactory {
 
@@ -59,13 +57,6 @@ public class ExporterFactory {
         exporters.addAll(customFormats.values());
 
         return new ExporterFactory(exporters);
-    }
-
-    public static ExporterFactory create(JabRefPreferences preferences, JournalAbbreviationLoader abbreviationLoader) {
-        Map<String, TemplateExporter> customFormats = preferences.customExports.getCustomExportFormats(preferences, abbreviationLoader);
-        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(abbreviationLoader);
-        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(preferences);
-        return create(customFormats, layoutPreferences, savePreferences);
     }
 
     /**

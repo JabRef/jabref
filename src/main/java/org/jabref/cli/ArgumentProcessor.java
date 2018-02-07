@@ -48,6 +48,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.SavePreferencesFactory;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.base.Throwables;
@@ -363,7 +364,7 @@ public class ArgumentProcessor {
 
                 try {
                     System.out.println(Localization.lang("Saving") + ": " + subName);
-                    SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
+                    SavePreferences prefs = SavePreferencesFactory.loadForSaveFromPreferences(Globals.prefs);
                     BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
                     Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
                     SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults), prefs);
@@ -402,7 +403,7 @@ public class ArgumentProcessor {
                 if (!pr.isInvalid()) {
                     try {
                         System.out.println(Localization.lang("Saving") + ": " + data[0]);
-                        SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
+                        SavePreferences prefs = SavePreferencesFactory.loadForSaveFromPreferences(Globals.prefs);
                         Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
                         BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
                                 FileSaveSession::new);
@@ -470,7 +471,7 @@ public class ArgumentProcessor {
                     Globals.journalAbbreviationLoader);
             LayoutFormatterPreferences layoutPreferences = Globals.prefs
                     .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
-            SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+            SavePreferences savePreferences = SavePreferencesFactory.loadForExportFromPreferences(Globals.prefs);
             Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences);
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
