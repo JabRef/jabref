@@ -1,4 +1,4 @@
-package org.jabref.logic.importer;
+package org.jabref.gui.importer;
 
 import java.io.File;
 import java.nio.file.Paths;

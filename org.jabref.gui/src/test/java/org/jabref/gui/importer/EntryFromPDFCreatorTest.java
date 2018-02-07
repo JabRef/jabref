@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.jabref.JabRefGUI;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.logic.importer.ImportDataTest;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.testutils.category.GUITest;
 
