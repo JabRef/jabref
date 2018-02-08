@@ -2,7 +2,6 @@ package org.jabref.gui.fieldeditors;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import javafx.scene.control.Alert.AlertType;
@@ -48,8 +47,8 @@ public class LinkedFileViewModelTest {
         databaseContext = new BibDatabaseContext();
         taskExecutor = mock(TaskExecutor.class);
         dialogService = mock(DialogService.class);
+
         Globals.prefs = mock(JabRefPreferences.class);
-        when(Globals.prefs.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         FileDirectoryPreferences fileDirectoryPreferences = mock(FileDirectoryPreferences.class);
         when(Globals.prefs.getFileDirectoryPreferences()).thenReturn(fileDirectoryPreferences);
     }
