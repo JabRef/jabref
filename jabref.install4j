@@ -608,7 +608,7 @@ return console.askOkCancel(message, true);
                       </void>
                       <void property="macIconFile">
                         <object class="com.install4j.api.beans.ExternalFile">
-                          <string>./icons/jabref.icns</string>
+                          <string>./buildres/jabref.icns</string>
                         </object>
                       </void>
                       <void property="macRole">
@@ -622,7 +622,7 @@ return console.askOkCancel(message, true);
                       </void>
                       <void property="windowsIconFile">
                         <object class="com.install4j.api.beans.ExternalFile">
-                          <string>./icons/jabref.ico</string>
+                          <string>./buildres/jabref.ico</string>
                         </object>
                       </void>
                     </object>
