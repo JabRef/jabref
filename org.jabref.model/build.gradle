@@ -1,5 +1,3 @@
-import org.gradle.internal.os.OperatingSystem
-
 sourceSets {
     main {
         java {

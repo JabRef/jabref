@@ -1,5 +1,3 @@
-import org.gradle.internal.os.OperatingSystem
-
 apply from: 'xjc.gradle'
 
 sourceSets {

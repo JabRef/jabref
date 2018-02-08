@@ -1,5 +1,3 @@
-import org.gradle.internal.os.OperatingSystem
-
 dependencies {
     compile project(':org.jabref.model')
     compile project(':org.jabref.logic')
