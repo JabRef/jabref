@@ -6,8 +6,8 @@ import java.util.Collections;
 
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.jabref.gui.autocompleter.AutoCompleterUtil.getRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -89,13 +89,12 @@ public class FieldValueSuggestionProviderTest {
         assertEquals(Arrays.asList("testValue"), result);
     }
 
-    @Test(expected = NullPointerException.class)
     public void completeNullThrowsException() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
         autoCompleter.indexEntry(entry);
 
-        autoCompleter.call(getRequest((null)));
+        assertThrows(NullPointerException.class, () -> autoCompleter.call(getRequest(null)));
     }
 
     @Test

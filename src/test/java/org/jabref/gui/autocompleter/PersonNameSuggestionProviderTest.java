@@ -7,7 +7,7 @@ import java.util.Collections;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.jabref.gui.autocompleter.AutoCompleterUtil.getRequest;
@@ -24,7 +24,7 @@ public class PersonNameSuggestionProviderTest {
         assertThrows(NullPointerException.class, () -> new PersonNameSuggestionProvider((String) null));
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         autoCompleter = new PersonNameSuggestionProvider("field");
 

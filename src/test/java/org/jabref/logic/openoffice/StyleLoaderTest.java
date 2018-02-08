@@ -10,9 +10,9 @@ import java.util.List;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,7 +32,7 @@ public class StyleLoaderTest {
     private Charset encoding;
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         preferences = mock(OpenOfficePreferences.class, Answers.RETURNS_DEEP_STUBS);
         layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);

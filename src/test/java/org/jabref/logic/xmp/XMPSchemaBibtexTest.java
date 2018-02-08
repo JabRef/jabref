@@ -17,7 +17,8 @@ import org.jabref.model.entry.BibEntry;
 
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -32,7 +33,8 @@ public class XMPSchemaBibtexTest {
 
     private ImportFormatPreferences prefs;
 
-    public void setUp() {
+    @BeforeEach
+    public void setup() {
         prefs = mock(ImportFormatPreferences.class);
     }
 
