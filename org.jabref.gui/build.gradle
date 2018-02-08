@@ -22,6 +22,10 @@ plugins {
 apply plugin: 'application'
 apply plugin: 'install4j'
 
+jacoco {
+    toolVersion = '0.8.0'
+}
+
 project.ext.threeDotVersion = "4.1.0.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 mainClassName = "org.jabref.JabRefMain"
@@ -242,7 +246,6 @@ afterEvaluate {
     def junitPlatformTest = tasks.junitPlatformTest
 
     jacoco {
-        toolVersion = '0.8.0'
         applyTo(junitPlatformTest)
     }
 

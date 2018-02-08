@@ -15,6 +15,10 @@ configurations {
     antlr4
 }
 
+jacoco {
+    toolVersion = '0.8.0'
+}
+
 dependencies {
     compile 'commons-logging:commons-logging:1.2'
     compile 'org.apache.commons:commons-lang3:3.6'
@@ -142,7 +146,6 @@ afterEvaluate {
     def junitPlatformTest = tasks.junitPlatformTest
 
     jacoco {
-        toolVersion = '0.8.0'
         applyTo(junitPlatformTest)
     }
 
