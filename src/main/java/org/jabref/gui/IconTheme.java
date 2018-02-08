@@ -167,6 +167,19 @@ public class IconTheme {
         return jabrefLogos;
     }
 
+    public static List<Image> getLogoSetFX() {
+        List<Image> jabrefLogos = new ArrayList<>();
+        jabrefLogos.add(new Image(getIconUrl("jabrefIcon16").toString()));
+        jabrefLogos.add(new Image(getIconUrl("jabrefIcon20").toString()));
+        jabrefLogos.add(new Image(getIconUrl("jabrefIcon32").toString()));
+        jabrefLogos.add(new Image(getIconUrl("jabrefIcon40").toString()));
+        jabrefLogos.add(new Image(getIconUrl("jabrefIcon48").toString()));
+        jabrefLogos.add(new Image(getIconUrl("jabrefIcon64").toString()));
+        jabrefLogos.add(new Image(getIconUrl("jabrefIcon128").toString()));
+
+        return jabrefLogos;
+    }
+
     public enum JabRefIcons implements JabRefIcon {
 
         ADD(MaterialDesignIcon.PLUS_BOX),

@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import org.jabref.gui.AbstractView;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.autosaveandbackup.BackupUIManager;
 import org.jabref.gui.importer.ParserResultWarningDialog;
@@ -149,14 +150,13 @@ public class JabRefGUI {
         // state. This needs to be set after the window has been made visible, so we
         // do it here:
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-            //JabRefGUI.getMainFrame().setExtendedState(Frame.MAXIMIZED_BOTH);
+            mainStage.setMaximized(true);
         }
 
-        mainStage.setTitle(JabRefFrame.FRAME_TITLE);
-
-        Scene scene = new Scene(JabRefGUI.mainFrame, 800, 200);
+        Scene scene = new Scene(JabRefGUI.mainFrame, 800, 800);
         scene.getStylesheets().add(AbstractView.class.getResource("Main.css").toExternalForm());
-        mainStage.setTitle("Find this window");
+        mainStage.setTitle(JabRefFrame.FRAME_TITLE);
+        mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
         mainStage.setScene(scene);
         mainStage.show();
 
@@ -196,10 +196,6 @@ public class JabRefGUI {
         }
 
         LOGGER.debug("Finished adding panels");
-
-        if (!bibDatabases.isEmpty()) {
-            //JabRefGUI.getMainFrame().getCurrentBasePanel().getMainTable().requestFocus();
-        }
     }
 
     private void openLastEditedDatabases() {
