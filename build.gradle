@@ -100,4 +100,21 @@ allprojects {
             }
         }
     }
+
+    compileJava {
+        options.encoding = 'UTF-8'
+        options.compilerArgs << "-Xlint:none"
+    }
+
+    compileTestJava {
+        options.encoding = 'UTF-8'
+    }
+
+    javadoc {
+        options {
+            encoding = 'UTF-8'
+            version = true
+            author = true
+        }
+    }
 }

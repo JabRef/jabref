@@ -50,23 +50,6 @@ dependencies {
     testCompile 'org.xmlunit:xmlunit-matchers:2.5.1'
 }
 
-compileJava {
-    options.encoding = 'UTF-8'
-    options.compilerArgs << "-Xlint:none"
-}
-
-compileTestJava {
-    options.encoding = 'UTF-8'
-}
-
-javadoc {
-    options {
-        encoding = 'UTF-8'
-        version = true
-        author = true
-    }
-}
-
 // Test tasks
 junitPlatform {
     logManager 'org.apache.logging.log4j.jul.LogManager'

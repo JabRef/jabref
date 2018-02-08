@@ -103,23 +103,7 @@ task generateSearchGrammarSource(type: JavaExec) {
     args = ["-o", destinationDir, "-visitor", "-no-listener", "-package", "org.jabref.search", antlrSource]
 }
 
-compileJava {
-    options.encoding = 'UTF-8'
-    options.compilerArgs << "-Xlint:none"
-}
 compileJava.dependsOn "generateSource"
-
-compileTestJava {
-    options.encoding = 'UTF-8'
-}
-
-javadoc {
-    options {
-        encoding = 'UTF-8'
-        version = true
-        author = true
-    }
-}
 
 // Test tasks
 junitPlatform {
