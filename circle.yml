@@ -46,4 +46,4 @@ deployment:
 
 general:
   artifacts:
-    - "org.jabref.gui/build/releases"
+    - "build/releases"
