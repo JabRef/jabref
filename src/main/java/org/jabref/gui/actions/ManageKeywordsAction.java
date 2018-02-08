@@ -49,7 +49,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * An Action for launching keyword managing dialog
  *
  */
-public class ManageKeywordsAction extends MnemonicAwareAction {
+public class ManageKeywordsAction extends SimpleCommand {
 
     private final JabRefFrame frame;
     private final KeywordList sortedKeywordsOfAllEntriesBeforeUpdateByUser = new KeywordList();
@@ -61,7 +61,6 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
 
     public ManageKeywordsAction(JabRefFrame frame) {
-        putValue(Action.NAME, Localization.menuTitle("Manage keywords"));
         this.frame = frame;
     }
 
@@ -241,7 +240,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void execute() {
         BasePanel bp = frame.getCurrentBasePanel();
         if (bp == null) {
             return;

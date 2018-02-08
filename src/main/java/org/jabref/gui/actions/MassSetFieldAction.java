@@ -46,7 +46,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * * Input field name
  * * Either set field, or clear field.
  */
-public class MassSetFieldAction extends MnemonicAwareAction {
+public class MassSetFieldAction extends SimpleCommand {
 
     private final JabRefFrame frame;
     private JDialog diag;
@@ -65,7 +65,6 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
 
     public MassSetFieldAction(JabRefFrame frame) {
-        putValue(Action.NAME, Localization.menuTitle("Set/clear/append/rename fields") + "...");
         this.frame = frame;
     }
 
@@ -208,7 +207,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void execute() {
         BasePanel bp = frame.getCurrentBasePanel();
         if (bp == null) {
             return;

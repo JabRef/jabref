@@ -211,28 +211,17 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             Localization.menuTitle("Focus entry table"),
             Localization.lang("Move the keyboard focus to the entry table"), Globals.getKeyPrefs().getKey(KeyBinding.FOCUS_ENTRY_TABLE));
     private final AbstractAction sortTabs = new SortTabsAction(this);
-    private final AbstractAction undo = new GeneralAction(Actions.UNDO, Localization.menuTitle("Undo"),
-            Localization.lang("Undo"), Globals.getKeyPrefs().getKey(KeyBinding.UNDO), IconTheme.JabRefIcons.UNDO.getIcon());
-    private final AbstractAction redo = new GeneralAction(Actions.REDO, Localization.menuTitle("Redo"),
-            Localization.lang("Redo"), Globals.getKeyPrefs().getKey(KeyBinding.REDO), IconTheme.JabRefIcons.REDO.getIcon());
     private final AbstractAction forward = new GeneralAction(Actions.FORWARD, Localization.menuTitle("Forward"),
             Localization.lang("Forward"), Globals.getKeyPrefs().getKey(KeyBinding.FORWARD), IconTheme.JabRefIcons.RIGHT.getIcon());
     private final AbstractAction back = new GeneralAction(Actions.BACK, Localization.menuTitle("Back"),
             Localization.lang("Back"), Globals.getKeyPrefs().getKey(KeyBinding.BACK), IconTheme.JabRefIcons.LEFT.getIcon());
     private final AbstractAction deleteEntry = new GeneralAction(Actions.DELETE, Localization.menuTitle("Delete entry"),
             Localization.lang("Delete entry"), Globals.getKeyPrefs().getKey(KeyBinding.DELETE_ENTRY), IconTheme.JabRefIcons.DELETE_ENTRY.getIcon());
-    private final AbstractAction copy = new EditAction(Actions.COPY, Localization.menuTitle("Copy"),
-            Localization.lang("Copy"), Globals.getKeyPrefs().getKey(KeyBinding.COPY), IconTheme.JabRefIcons.COPY.getIcon());
-    private final AbstractAction paste = new EditAction(Actions.PASTE, Localization.menuTitle("Paste"),
-            Localization.lang("Paste"), Globals.getKeyPrefs().getKey(KeyBinding.PASTE), IconTheme.JabRefIcons.PASTE.getIcon());
-    private final AbstractAction cut = new EditAction(Actions.CUT, Localization.menuTitle("Cut"),
-            Localization.lang("Cut"), Globals.getKeyPrefs().getKey(KeyBinding.CUT), IconTheme.JabRefIcons.CUT.getIcon());
     private final AbstractAction openConsole = new GeneralAction(Actions.OPEN_CONSOLE,
             Localization.menuTitle("Open terminal here"),
             Localization.lang("Open terminal here"),
             Globals.getKeyPrefs().getKey(KeyBinding.OPEN_CONSOLE),
             IconTheme.JabRefIcons.CONSOLE.getIcon());
-
     private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, Localization.menuTitle("Mark entries"),
             Localization.lang("Mark entries"), Globals.getKeyPrefs().getKey(KeyBinding.MARK_ENTRIES), IconTheme.JabRefIcons.MARK_ENTRIES.getIcon());
     private final JMenu markSpecific = JabRefFrame.subMenu(Localization.menuTitle("Mark specific color"));
@@ -259,25 +248,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             Localization.lang("Search"), Globals.getKeyPrefs().getKey(KeyBinding.SEARCH), IconTheme.JabRefIcons.SEARCH.getIcon());
     private final AbstractAction manageSelectors = new GeneralAction(Actions.MANAGE_SELECTORS,
             Localization.menuTitle("Manage content selectors"));
-    private final AbstractAction copyPreview = new GeneralAction(Actions.COPY_CITATION_HTML, Localization.lang("Copy preview"),
-            Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW));
-    private final AbstractAction copyTitle = new GeneralAction(Actions.COPY_TITLE, Localization.menuTitle("Copy title"),
-            Globals.getKeyPrefs().getKey(KeyBinding.COPY_TITLE));
-    private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, Localization.menuTitle("Copy BibTeX key"),
-            Globals.getKeyPrefs().getKey(KeyBinding.COPY_BIBTEX_KEY));
-    private final AbstractAction copyCiteKey = new GeneralAction(Actions.COPY_CITE_KEY, Localization.menuTitle(
-            "Copy \\cite{BibTeX key}"),
-            Globals.getKeyPrefs().getKey(KeyBinding.COPY_CITE_BIBTEX_KEY));
-    private final AbstractAction copyKeyAndTitle = new GeneralAction(Actions.COPY_KEY_AND_TITLE,
-            Localization.menuTitle("Copy BibTeX key and title"),
-            Globals.getKeyPrefs().getKey(KeyBinding.COPY_BIBTEX_KEY_AND_TITLE));
-    private final AbstractAction copyKeyAndLink = new GeneralAction(Actions.COPY_KEY_AND_LINK,
-            Localization.menuTitle("Copy BibTeX key and link"),
-            Globals.getKeyPrefs().getKey(KeyBinding.COPY_BIBTEX_KEY_AND_LINK));
-    private final AbstractAction selectAll = new GeneralAction(Actions.SELECT_ALL, Localization.menuTitle("Select all"),
-            Globals.getKeyPrefs().getKey(KeyBinding.SELECT_ALL));
-    private final AbstractAction replaceAll = new GeneralAction(Actions.REPLACE_ALL,
-            Localization.menuTitle("Replace string") + ELLIPSES, Globals.getKeyPrefs().getKey(KeyBinding.REPLACE_STRING));
+
     private final AbstractAction editPreamble = new GeneralAction(Actions.EDIT_PREAMBLE,
             Localization.menuTitle("Edit preamble"),
             Localization.lang("Edit preamble"));
@@ -344,9 +315,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final AbstractAction customExpAction = new CustomizeExportsAction();
     private final AbstractAction customImpAction = new CustomizeImportsAction();
     private final AbstractAction customFileTypesAction = ExternalFileTypeEditor.getAction(this);
-    private final AbstractAction exportToClipboard = new GeneralAction(Actions.EXPORT_TO_CLIPBOARD,
-            Localization.menuTitle("Export selected entries to clipboard"),
-            IconTheme.JabRefIcons.EXPORT_TO_CLIPBOARD.getIcon());
     private final AbstractAction autoSetFile = new GeneralAction(Actions.AUTO_SET_FILE,
             Localization.lang("Synchronize file links") + ELLIPSES,
             Globals.getKeyPrefs().getKey(KeyBinding.SYNCHRONIZE_FILES));
@@ -385,10 +353,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             Localization.menuTitle("Resolve duplicate BibTeX keys"),
             Localization.lang("Find and remove duplicate BibTeX keys"),
             Globals.getKeyPrefs().getKey(KeyBinding.RESOLVE_DUPLICATE_BIBTEX_KEYS));
-    private final AbstractAction sendAsEmail = new GeneralAction(Actions.SEND_AS_EMAIL,
-            Localization.lang("Send as email"), IconTheme.JabRefIcons.EMAIL.getIcon());
-    private final MassSetFieldAction massSetField = new MassSetFieldAction(this);
-    private final ManageKeywordsAction manageKeywords = new ManageKeywordsAction(this);
+
     private final JMenu lookupIdentifiers = JabRefFrame.subMenu(Localization.menuTitle("Look up document identifier..."));
     private final GeneralAction findUnlinkedFiles = new GeneralAction(
             Actions.findUnlinkedFiles,
@@ -676,6 +641,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         sidePaneManager = new SidePaneManager(this);
 
         groupSidePane = new GroupSidePane(this, sidePaneManager);
+        if (prefs.getBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE)) {
+            sidePaneManager.register(groupSidePane);
+            sidePaneManager.show(GroupSidePane.class);
+        }
         openOfficePanel = new OpenOfficePanel(this, sidePaneManager);
         generalFetcher = new GeneralFetcher(this, sidePaneManager);
 
@@ -1040,30 +1009,33 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(ActionsFX.quit, new CloseAction())
         );
 
+        edit.getItems().addAll(
+                factory.createMenuItem(ActionsFX.undo, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
+                factory.createMenuItem(ActionsFX.redo, new OldDatabaseCommandWrapper(Actions.REDO, this, Globals.stateManager)),
+
+                new SeparatorMenuItem(),
+
+                factory.createMenuItem(ActionsFX.CUT, new EditAction(Actions.CUT)),
+                factory.createMenuItem(ActionsFX.COPY, new EditAction(Actions.COPY)),
+                factory.createSubMenu(ActionsFX.COPY_MORE,
+                        factory.createMenuItem(ActionsFX.COPY_TITLE, new OldDatabaseCommandWrapper(Actions.COPY_TITLE, this, Globals.stateManager)),
+                        factory.createMenuItem(ActionsFX.COPY_KEY, new OldDatabaseCommandWrapper(Actions.COPY_KEY, this, Globals.stateManager)),
+                        factory.createMenuItem(ActionsFX.COPY_CITE_KEY, new OldDatabaseCommandWrapper(Actions.COPY_CITE_KEY, this, Globals.stateManager)),
+                        factory.createMenuItem(ActionsFX.COPY_KEY_AND_TITLE, new OldDatabaseCommandWrapper(Actions.COPY_KEY_AND_TITLE, this, Globals.stateManager)),
+                        factory.createMenuItem(ActionsFX.COPY_KEY_AND_LINK, new OldDatabaseCommandWrapper(Actions.COPY_KEY_AND_LINK, this, Globals.stateManager)),
+                        factory.createMenuItem(ActionsFX.COPY_CITATION_PREVIEW, new OldDatabaseCommandWrapper(Actions.COPY_CITATION_HTML, this, Globals.stateManager)),
+                        factory.createMenuItem(ActionsFX.EXPORT_SELECTED_TO_CLIPBOARD, new OldDatabaseCommandWrapper(Actions.EXPORT_TO_CLIPBOARD, this, Globals.stateManager))
+                ),
+
+                factory.createMenuItem(ActionsFX.PASTE, new EditAction(Actions.PASTE)),
+
+                new SeparatorMenuItem(),
+
+                factory.createMenuItem(ActionsFX.sendAsEmail, new OldDatabaseCommandWrapper(Actions.SEND_AS_EMAIL, this, Globals.stateManager)),
+
+                new SeparatorMenuItem()
+        );
         /*
-        factory.createMenuItem(ActionsFX., new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
-
-        edit.add(undo);
-        edit.add(redo);
-
-        edit.addSeparator();
-
-        edit.add(cut);
-        edit.add(copy);
-        edit.add(paste);
-
-        edit.addSeparator();
-
-        edit.add(copyTitle);
-        edit.add(copyKey);
-        edit.add(copyCiteKey);
-        edit.add(copyKeyAndTitle);
-        edit.add(copyKeyAndLink);
-        edit.add(copyPreview);
-        edit.add(exportToClipboard);
-        edit.add(sendAsEmail);
-
-        edit.addSeparator();
         edit.add(mark);
         for (int i = 0; i < EntryMarker.MAX_MARKING_LEVEL; i++) {
             markSpecific.add(new MarkEntriesAction(this, i).getMenuItem());
@@ -1072,6 +1044,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         edit.add(unmark);
         edit.add(unmarkAll);
         edit.addSeparator();
+        */
+        /* TODO
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
             boolean menuitem = false;
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
@@ -1108,15 +1082,18 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 edit.addSeparator();
             }
         }
+        */
 
-        edit.add(getManageKeywords());
-        edit.add(getMassSetField());
-        edit.addSeparator();
-        edit.add(selectAll);
-        mb.add(edit);
+        //factory.createMenuItem(ActionsFX., new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
 
+        edit.getItems().addAll(
+                factory.createMenuItem(ActionsFX.manageKeywords, new ManageKeywordsAction(this)),
+                factory.createMenuItem(ActionsFX.replaceAll, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, Globals.stateManager)),
+                factory.createMenuItem(ActionsFX.massSetField, new MassSetFieldAction(this))
+        );
+
+        /*
         search.add(normalSearch);
-        search.add(replaceAll);
         search.addSeparator();
         search.add(new JCheckBoxMenuItem(generalFetcher.getToggleAction()));
         if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
@@ -1126,10 +1103,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         mb.add(search);
 
         groups.add(new JCheckBoxMenuItem(groupSidePane.getToggleAction()));
-        if (prefs.getBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE)) {
-            sidePaneManager.register(groupSidePane);
-            sidePaneManager.show(GroupSidePane.class);
-        }
 
         groups.addSeparator();
         groups.add(addToGroup);
@@ -1892,14 +1865,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         removeTab(getCurrentBasePanel());
     }
 
-    public ManageKeywordsAction getManageKeywords() {
-        return manageKeywords;
-    }
-
-    public MassSetFieldAction getMassSetField() {
-        return massSetField;
-    }
-
     public OpenDatabaseAction getOpenDatabaseAction() {
         return new OpenDatabaseAction(this);
     }
@@ -2090,20 +2055,16 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
      * kept track of by Globals.focusListener, and we call the action stored under the
      * relevant name in its action map.
      */
-    private class EditAction extends MnemonicAwareAction {
+    private class EditAction extends SimpleCommand {
 
         private final Actions command;
 
-        public EditAction(Actions command, String menuTitle, String description, KeyStroke key, Icon icon) {
-            super(icon);
+        public EditAction(Actions command) {
             this.command = command;
-            putValue(Action.NAME, menuTitle);
-            putValue(Action.ACCELERATOR_KEY, key);
-            putValue(Action.SHORT_DESCRIPTION, description);
         }
 
-        @Override public void actionPerformed(ActionEvent e) {
-
+        @Override
+        public void execute() {
             LOGGER.debug(Globals.getFocusListener().getFocused().toString());
             JComponent source = Globals.getFocusListener().getFocused();
             Action action = source.getActionMap().get(command);
@@ -2358,12 +2319,14 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
 
         private void updateTexts(UndoChangeEvent event) {
+            /* TODO
             SwingUtilities.invokeLater(() -> {
                 undo.putValue(Action.SHORT_DESCRIPTION, event.getUndoDescription());
                 undo.setEnabled(event.isCanUndo());
                 redo.putValue(Action.SHORT_DESCRIPTION, event.getRedoDescription());
                 redo.setEnabled(event.isCanRedo());
             });
+            */
         }
     }
 }

@@ -24,6 +24,7 @@ public enum ActionsFX {
     COPY_CITATION_XSLFO("XSL-FO"),
     COPY_CITATION_PREVIEW(Localization.lang("Copy preview"), KeyBinding.COPY_PREVIEW),
     EXPORT_TO_CLIPBOARD(Localization.lang("Export to clipboard"), IconTheme.JabRefIcons.EXPORT_TO_CLIPBOARD),
+    EXPORT_SELECTED_TO_CLIPBOARD(Localization.menuTitle("Export selected entries to clipboard"), IconTheme.JabRefIcons.EXPORT_TO_CLIPBOARD),
     COPY(Localization.lang("Copy"), IconTheme.JabRefIcons.COPY, KeyBinding.COPY),
     PASTE(Localization.lang("Paste"), IconTheme.JabRefIcons.PASTE, KeyBinding.PASTE),
     CUT(Localization.lang("Cut"), IconTheme.JabRefIcons.CUT, KeyBinding.CUT),
@@ -76,7 +77,13 @@ public enum ActionsFX {
     connectToSharedDatabaseAction(Localization.lang("Connect to shared database")),
     pullChangesFromSharedDatabase(Localization.menuTitle("Pull changes from shared database"), IconTheme.JabRefIcons.PULL, KeyBinding.PULL_CHANGES_FROM_SHARED_DATABASE),
     closeDatabaseAction(Localization.menuTitle("Close library"), Localization.lang("Close the current library"), IconTheme.JabRefIcons.CLOSE, KeyBinding.CLOSE_DATABASE),
-    quit(Localization.menuTitle("Quit"), Localization.lang("Quit JabRef"), IconTheme.JabRefIcons.CLOSE_JABREF, KeyBinding.QUIT_JABREF);
+    quit(Localization.menuTitle("Quit"), Localization.lang("Quit JabRef"), IconTheme.JabRefIcons.CLOSE_JABREF, KeyBinding.QUIT_JABREF),
+    undo(Localization.lang("Undo"), IconTheme.JabRefIcons.UNDO, KeyBinding.UNDO),
+    redo(Localization.lang("Redo"), IconTheme.JabRefIcons.REDO, KeyBinding.REDO),
+    sendAsEmail(Localization.lang("Send as email"), IconTheme.JabRefIcons.EMAIL),
+    replaceAll(Localization.menuTitle("Replace string"), KeyBinding.REPLACE_STRING),
+    manageKeywords(Localization.menuTitle("Manage keywords")),
+    massSetField(Localization.menuTitle("Set/clear/append/rename fields"));
 
     private final String text;
     private final String description;
