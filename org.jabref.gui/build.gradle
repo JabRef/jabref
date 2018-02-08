@@ -303,10 +303,10 @@ task releaseJar(dependsOn: "shadowJar") {
     description "Creates a Jar release."
     doLast {
         copy {
-            from("$buildDir/libs/JabRef-${project.version}-fat.jar")
-            into("$buildDir/releases")
+            from("build/libs/org.jabref.gui-${project.version}-fat.jar")
+            into("build/releases")
             rename { String fileName ->
-                fileName.replace('-fat', '')
+                fileName.replace('-fat', '').replace('org.jabref.gui', 'JabRef')
             }
         }
         // set executable with read permissions (first true) and for all (false)
