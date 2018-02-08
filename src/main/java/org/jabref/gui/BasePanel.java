@@ -87,6 +87,7 @@ import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.component.CheckBoxMessage;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.gui.worker.CallBack;
@@ -106,6 +107,7 @@ import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
@@ -347,10 +349,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         actions.put(Actions.SAVE_AS, (BaseAction) saveAction::saveAs);
 
-        actions.put(Actions.SAVE_SELECTED_AS, new SaveSelectedAction(SavePreferences.DatabaseSaveType.ALL));
-
-        actions.put(Actions.SAVE_SELECTED_AS_PLAIN,
-                new SaveSelectedAction(SavePreferences.DatabaseSaveType.PLAIN_BIBTEX));
+        actions.put(Actions.SAVE_SELECTED_AS_PLAIN, new SaveSelectedAction(SavePreferences.DatabaseSaveType.PLAIN_BIBTEX));
 
         // The action for copying selected entries.
         actions.put(Actions.COPY, (BaseAction) this::copy);
@@ -2163,6 +2162,35 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         public void action() throws Exception {
             showPreview();
             preview.print();
+        }
+    }
+
+    private class SaveSelectedAction implements BaseAction {
+
+        private final SavePreferences.DatabaseSaveType saveType;
+
+        public SaveSelectedAction(SavePreferences.DatabaseSaveType saveType) {
+            this.saveType = saveType;
+        }
+
+        @Override
+        public void action() throws SaveException {
+            FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                    .withDefaultExtension(FileType.BIBTEX_DB)
+                    .addExtensionFilter(FileType.BIBTEX_DB)
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+
+            DialogService ds = new FXDialogService();
+
+            Optional<Path> chosenFile = DefaultTaskExecutor
+                    .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
+
+            if (chosenFile.isPresent()) {
+                Path path = chosenFile.get();
+                saveDatabase(path.toFile(), true, Globals.prefs.getDefaultEncoding(), saveType);
+                frame.getFileHistory().newFile(path.toString());
+                frame.output(Localization.lang("Saved selected to '%0'.", path.toString()));
+            }
         }
     }
 }

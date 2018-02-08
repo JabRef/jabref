@@ -42,4 +42,10 @@ public class ActionFactory {
         action.getIcon().ifPresent(icon -> menu.setGraphic(icon.getGraphicNode()));
         return menu;
     }
+
+    public Menu createSubMenu(ActionsFX action, MenuItem... children) {
+        Menu menu = createMenu(action);
+        menu.getItems().addAll(children);
+        return menu;
+    }
 }

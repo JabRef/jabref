@@ -96,8 +96,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 .withInitialDirectory(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)))
                 .build();
 
-        List<Path> chosenFiles = DefaultTaskExecutor
-                .runInJavaFXThread(() -> ds.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));
+        List<Path> chosenFiles = ds.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
         filesToOpen.addAll(chosenFiles);
 
         openFiles(filesToOpen, true);

@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,7 +29,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -56,6 +53,7 @@ import javafx.embed.swing.SwingNode;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -68,10 +66,9 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.ActionsFX;
 import org.jabref.gui.actions.AutoLinkFilesAction;
-import org.jabref.gui.actions.ConnectToSharedDatabaseAction;
+import org.jabref.gui.actions.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.actions.ErrorConsoleAction;
 import org.jabref.gui.actions.IntegrityCheckAction;
-import org.jabref.gui.actions.LookupIdentifierAction;
 import org.jabref.gui.actions.ManageKeywordsAction;
 import org.jabref.gui.actions.MassSetFieldAction;
 import org.jabref.gui.actions.MnemonicAwareAction;
@@ -80,7 +77,7 @@ import org.jabref.gui.actions.NewEntryAction;
 import org.jabref.gui.actions.NewSubDatabaseAction;
 import org.jabref.gui.actions.OldDatabaseCommandWrapper;
 import org.jabref.gui.actions.OpenBrowserAction;
-import org.jabref.gui.actions.SearchForUpdateAction;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.SortTabsAction;
 import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
@@ -89,7 +86,7 @@ import org.jabref.gui.customentrytypes.EntryCustomizationDialog;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
-import org.jabref.gui.exporter.ExportAction;
+import org.jabref.gui.exporter.ExportCommand;
 import org.jabref.gui.exporter.ExportCustomizationDialog;
 import org.jabref.gui.exporter.SaveAllAction;
 import org.jabref.gui.exporter.SaveDatabaseAction;
@@ -99,8 +96,8 @@ import org.jabref.gui.groups.EntryTableTransferHandler;
 import org.jabref.gui.groups.GroupSidePane;
 import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.ImportCustomizationDialog;
-import org.jabref.gui.importer.ImportFormats;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.importer.fetcher.GeneralFetcher;
@@ -110,7 +107,6 @@ import org.jabref.gui.keyboard.KeyBindingAction;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.openoffice.OpenOfficePanel;
-import org.jabref.gui.openoffice.OpenOfficeSidePanel;
 import org.jabref.gui.preftabs.PreferencesDialog;
 import org.jabref.gui.protectedterms.ProtectedTermsDialog;
 import org.jabref.gui.push.PushToApplicationButton;
@@ -119,14 +115,11 @@ import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.worker.MarkEntriesAction;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.undo.AddUndoableActionEvent;
@@ -175,9 +168,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                     + ':', SwingConstants.LEFT);
     private final JProgressBar progressBar = new JProgressBar();
     private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
-    private final OpenDatabaseAction open = new OpenDatabaseAction(this);
-    private final EditModeAction editModeAction = new EditModeAction();
-
 
     // Here we instantiate menu/toolbar actions. Actions regarding
     // the currently open database are defined as a GeneralAction
@@ -185,9 +175,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     // BasePanel's runCommand() method to be called with that command.
     // Note: GeneralAction's constructor automatically gets translations
     // for the name and message strings.
-    private final AbstractAction quit = new CloseAction();
     private final AbstractAction keyBindingAction = new KeyBindingAction();
-    private final AbstractAction connectToSharedDatabaseAction = new ConnectToSharedDatabaseAction(this);
     private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
     private final AbstractAction jabrefWebPageAction = new OpenBrowserAction("https://jabref.org",
             Localization.menuTitle("Website"), Localization.lang("Opens JabRef's website"),
@@ -222,8 +210,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final AbstractAction focusTable = new GeneralAction(Actions.FOCUS_TABLE,
             Localization.menuTitle("Focus entry table"),
             Localization.lang("Move the keyboard focus to the entry table"), Globals.getKeyPrefs().getKey(KeyBinding.FOCUS_ENTRY_TABLE));
-    private final AbstractAction importCurrent = ImportFormats.getImportAction(this, false);
-    private final AbstractAction importNew = ImportFormats.getImportAction(this, true);
     private final AbstractAction sortTabs = new SortTabsAction(this);
     private final AbstractAction undo = new GeneralAction(Actions.UNDO, Localization.menuTitle("Undo"),
             Localization.lang("Undo"), Globals.getKeyPrefs().getKey(KeyBinding.UNDO), IconTheme.JabRefIcons.UNDO.getIcon());
@@ -246,11 +232,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             Localization.lang("Open terminal here"),
             Globals.getKeyPrefs().getKey(KeyBinding.OPEN_CONSOLE),
             IconTheme.JabRefIcons.CONSOLE.getIcon());
-    private final AbstractAction pullChangesFromSharedDatabase = new GeneralAction(Actions.PULL_CHANGES_FROM_SHARED_DATABASE,
-            Localization.menuTitle("Pull changes from shared database"),
-            Localization.lang("Pull changes from shared database"),
-            Globals.getKeyPrefs().getKey(KeyBinding.PULL_CHANGES_FROM_SHARED_DATABASE),
-            IconTheme.JabRefIcons.PULL.getIcon());
+
     private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, Localization.menuTitle("Mark entries"),
             Localization.lang("Mark entries"), Globals.getKeyPrefs().getKey(KeyBinding.MARK_ENTRIES), IconTheme.JabRefIcons.MARK_ENTRIES.getIcon());
     private final JMenu markSpecific = JabRefFrame.subMenu(Localization.menuTitle("Mark specific color"));
@@ -418,7 +400,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final NewEntryAction newEntryAction = new NewEntryAction(this, Globals.getKeyPrefs().getKey(KeyBinding.NEW_ENTRY));
     private final List<NewEntryAction> newSpecificEntryAction = getNewEntryActions();
     // The action for closing the current database and leaving the window open.
-    private final CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction();
     private final CloseAllDatabasesAction closeAllDatabasesAction = new CloseAllDatabasesAction();
     private final CloseOtherDatabasesAction closeOtherDatabasesAction = new CloseOtherDatabasesAction();
     // The action for opening the preferences dialog.
@@ -439,8 +420,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     // The sidepane manager takes care of populating the sidepane.
     private SidePaneManager sidePaneManager;
     private final TabPane tabbedPane = new TabPane();
-    private final AbstractAction exportAll = ExportAction.getExportAction(this, false);
-    private final AbstractAction exportSelected = ExportAction.getExportAction(this, true);
     /* References to the toggle buttons in the toolbar */
     private JToggleButton previewToggle;
     private JMenu rankSubMenu;
@@ -525,7 +504,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         JMenuItem close = new JMenuItem(Localization.lang("Close"));
         JMenuItem closeOthers = new JMenuItem(Localization.lang("Close others"));
         JMenuItem closeAll = new JMenuItem(Localization.lang("Close all"));
-        close.addActionListener(closeDatabaseAction);
+        //close.addActionListener(closeDatabaseAction);
         closeOthers.addActionListener(closeOtherDatabasesAction);
         closeAll.addActionListener(closeAllDatabasesAction);
         popupMenu.add(close);
@@ -601,14 +580,13 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
             currentBasePanel.getPreviewPanel().updateLayout(Globals.prefs.getPreviewPreferences());
 
-            groupSidePane.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
-            previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
-            generalFetcher.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GeneralFetcher.class));
-            openOfficePanel.getToggleAction().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
+            // groupSidePane.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
+            //previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
+            //generalFetcher.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GeneralFetcher.class));
+            //openOfficePanel.getToggleAction().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
             // TODO: Can't notify focus listener since it is expecting a swing component
             //Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
             setWindowTitle();
-            editModeAction.initName();
             // Update search autocompleter with information for the correct database:
             currentBasePanel.updateSearchManager();
             // Set correct enabled state for Back and Forward actions:
@@ -1028,7 +1006,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         Menu view = new Menu(Localization.menuTitle("View"));
         Menu tools = new Menu(Localization.menuTitle("Tools"));
         Menu options = new Menu(Localization.menuTitle("Options"));
-        newSpec = JabRefFrame.subMenu(Localization.menuTitle("New entry by type..."));
         Menu help = new Menu(Localization.menuTitle("Help"));
 
         file.getItems().addAll(
@@ -1037,38 +1014,34 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(ActionsFX.OPEN_LIBRARY, getOpenDatabaseAction()),
                 factory.createMenuItem(ActionsFX.save, new OldDatabaseCommandWrapper(Actions.SAVE, this, Globals.stateManager)),
                 factory.createMenuItem(ActionsFX.saveAs, new OldDatabaseCommandWrapper(Actions.SAVE_AS, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.saveAll, new SaveAllAction(this),
+                factory.createMenuItem(ActionsFX.saveAll, new SaveAllAction(this)),
 
+                factory.createSubMenu(ActionsFX.import_export,
                         factory.createMenuItem(ActionsFX.mergeDatabaseAction, new OldDatabaseCommandWrapper(Actions.MERGE_DATABASE, this, Globals.stateManager)), // TODO: merge with import
-                        factory.createMenuItem(ActionsFX.saveSelectedAsPlain, new OldDatabaseCommandWrapper(Actions.SAVE_SELECTED_AS_PLAIN, this, Globals.stateManager)),
-                        factory.createMenuItem(ActionsFX.importNew, new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
-                        factory.createMenuItem(ActionsFX.importCurrent, new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
-                        factory.createMenuItem(ActionsFX., new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
-                        factory.createMenuItem(ActionsFX., new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
-                        factory.createMenuItem(ActionsFX., new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
+                        factory.createMenuItem(ActionsFX.importCurrent, new ImportCommand(this, true)),
+                        factory.createMenuItem(ActionsFX.importNew, new ImportCommand(this, false)),
+                        factory.createMenuItem(ActionsFX.exportAll, new ExportCommand(this, false)),
+                        factory.createMenuItem(ActionsFX.exportSelected, new ExportCommand(this, true)),
+                        factory.createMenuItem(ActionsFX.saveSelectedAsPlain, new OldDatabaseCommandWrapper(Actions.SAVE_SELECTED_AS_PLAIN, this, Globals.stateManager))
+                ),
 
-                        file.add(importNew),
-                        file.add(importCurrent),
-                        file.add(exportAll),
-                        file.add(exportSelected),
-                        file.add(exportLinkedFiles),
-                        file.addSeparator(),
-                        file.add(connectToSharedDatabaseAction),
-                        file.add(pullChangesFromSharedDatabase),
+                new SeparatorMenuItem(),
 
-                        file.addSeparator(),
-                        file.add(databaseProperties),
-                        file.add(editModeAction),
-                        file.addSeparator(),
+                factory.createMenuItem(ActionsFX.connectToSharedDatabaseAction, new ConnectToSharedDatabaseCommand(this)),
+                factory.createMenuItem(ActionsFX.pullChangesFromSharedDatabase, new OldDatabaseCommandWrapper(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, this, Globals.stateManager)),
 
-                        file.add(fileHistory),
-                        file.addSeparator(),
-                        file.add(closeDatabaseAction),
-                        file.add(quit)
-                );
+                new SeparatorMenuItem(),
 
+                fileHistory,
 
-        mb.add(file);
+                new SeparatorMenuItem(),
+
+                factory.createMenuItem(ActionsFX.closeDatabaseAction, new CloseDatabaseAction()),
+                factory.createMenuItem(ActionsFX.quit, new CloseAction())
+        );
+
+        /*
+        factory.createMenuItem(ActionsFX., new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
 
         edit.add(undo);
         edit.add(redo);
@@ -1201,6 +1174,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         library.add(customizeAction);
         library.addSeparator();
         library.add(deleteEntry);
+        library.add(databaseProperties),
+        newSpec = JabRefFrame.subMenu(Localization.menuTitle("New entry by type..."));
         mb.add(library);
 
         quality.add(dupliCheck);
@@ -1233,6 +1208,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         tools.add(openUrl);
         tools.add(openConsole);
         tools.addSeparator();
+        file.add(exportLinkedFiles),
+
         tools.add(abbreviateIso);
         tools.add(abbreviateMedline);
         tools.add(unabbreviate);
@@ -1274,9 +1251,19 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         mb.add(help);
 
         createDisabledIconsForMenuEntries(mb);
+        */
 
         MenuBar menu = new MenuBar();
-        menu.getMenus().addAll(fileMenu, editMenu);
+        menu.getMenus().addAll(
+                file,
+                edit,
+                library,
+                quality,
+                view,
+                tools,
+                options,
+                help
+        );
         return menu;
     }
 
@@ -1406,9 +1393,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     }
 
     private void initActions() {
+        /*
         openDatabaseOnlyActions.clear();
         openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save, copyPreview,
-                saveAs, saveSelectedAs, saveSelectedAsPlain, editModeAction, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
+                saveAs, saveSelectedAs, saveSelectedAsPlain, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
                 unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, copyKeyAndLink, editPreamble, editStrings,
                 groupSidePane.getToggleAction(), makeKeyAction, normalSearch, generalFetcher.getToggleAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
                 sendAsEmail, downloadFullText, lookupIdentifiers, writeXmpAction, openOfficePanel.getToggleAction(), findUnlinkedFiles, addToGroup, removeFromGroup,
@@ -1447,6 +1435,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         atLeastOneEntryActions.addAll(Arrays.asList(downloadFullText, lookupIdentifiers, exportLinkedFiles));
 
         tabbedPane.getTabs().addListener(this::updateEnabledState);
+        */
     }
 
     /**
@@ -1912,7 +1901,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     }
 
     public OpenDatabaseAction getOpenDatabaseAction() {
-        return open;
+        return new OpenDatabaseAction(this);
     }
 
     public String getStatusLineText() {
@@ -1979,41 +1968,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         @Override
         public boolean isOpaque() {
             return false;
-        }
-    }
-
-    private class EditModeAction extends AbstractAction {
-
-        public EditModeAction() {
-            initName();
-        }
-
-        public void initName() {
-            if (JabRefFrame.this.getCurrentBasePanel() == null) {
-                putValue(Action.NAME, Localization.menuTitle("Switch to %0 mode", "BibTeX/biblatex"));
-            } else {
-                BibDatabaseMode mode = JabRefFrame.this.getCurrentBasePanel().getBibDatabaseContext().getMode();
-                String modeName = mode.getOppositeMode().getFormattedName();
-                putValue(Action.NAME, Localization.menuTitle("Switch to %0 mode", modeName));
-            }
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent evt) {
-            if (JabRefFrame.this.getCurrentBasePanel() == null) {
-                return;
-            }
-
-            BibDatabaseMode newMode = JabRefFrame.this.getCurrentBasePanel().getBibDatabaseContext().getMode()
-                    .getOppositeMode();
-            JabRefFrame.this.getCurrentBasePanel().getBibDatabaseContext().setMode(newMode);
-            JabRefFrame.this.refreshTitleAndTabs();
-
-            initName();
-
-            // update all elements in current base panel
-            JabRefFrame.this.getCurrentBasePanel().closeBottomPane();
-            JabRefFrame.this.getCurrentBasePanel().updateEntryEditorIfShowing();
         }
     }
 
@@ -2086,16 +2040,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     /**
      * The action concerned with closing the window.
      */
-    private class CloseAction extends MnemonicAwareAction {
-
-        public CloseAction() {
-            putValue(Action.NAME, Localization.menuTitle("Quit"));
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Quit JabRef"));
-            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.QUIT_JABREF));
-        }
+    private class CloseAction extends SimpleCommand {
 
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void execute() {
             quit();
             Platform.exit();
         }
@@ -2332,17 +2280,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
     }
 
-    private class CloseDatabaseAction extends MnemonicAwareAction {
-
-        public CloseDatabaseAction() {
-            super(IconTheme.JabRefIcons.CLOSE.getSmallIcon());
-            putValue(Action.NAME, Localization.menuTitle("Close library"));
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current library"));
-            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DATABASE));
-        }
+    private class CloseDatabaseAction extends SimpleCommand {
 
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void execute() {
             closeTab(getCurrentBasePanel());
         }
     }
