@@ -75,6 +75,7 @@ public class BibEntrySuggestionProviderTest {
         assertEquals(Collections.singletonList(entry), result);
     }
 
+    @Test
     public void completeNullThrowsException() {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("testKey");

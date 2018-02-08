@@ -17,7 +17,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.GUITest;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,7 +42,7 @@ public class EntryFromFileCreatorManagerTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void testAddEntrysFromFiles() throws IOException {
         try (FileInputStream stream = new FileInputStream(ImportDataTest.UNLINKED_FILES_TEST_BIB);
                 InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
@@ -78,5 +78,4 @@ public class EntryFromFileCreatorManagerTest {
             assertFalse(file2Found);
         }
     }
-
 }

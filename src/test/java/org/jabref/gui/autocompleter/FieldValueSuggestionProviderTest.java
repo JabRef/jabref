@@ -22,6 +22,7 @@ public class FieldValueSuggestionProviderTest {
         autoCompleter = new FieldValueSuggestionProvider("field");
     }
 
+    @Test
     public void initAutoCompleterWithNullFieldThrowsException() {
         assertThrows(NullPointerException.class, () -> new FieldValueSuggestionProvider(null));
     }
@@ -89,6 +90,7 @@ public class FieldValueSuggestionProviderTest {
         assertEquals(Arrays.asList("testValue"), result);
     }
 
+    @Test
     public void completeNullThrowsException() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");

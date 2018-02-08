@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.jabref.model.metadata.FileDirectoryPreferences;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,7 +23,7 @@ public class BibDatabaseContextTest {
     // FileDirectoryPreferences) incocation:
     private FileDirectoryPreferences fileDirPrefs;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         fileDirPrefs = mock(FileDirectoryPreferences.class);
         currentWorkingDir = Paths.get(System.getProperty("user.dir"));

@@ -89,6 +89,7 @@ public class PersonNameSuggestionProviderTest {
         assertEquals(Collections.singletonList(vassilisKostakos), result);
     }
 
+    @Test
     public void completeNullThrowsException() {
         assertThrows(NullPointerException.class, () -> autoCompleter.call(getRequest((null))));
     }

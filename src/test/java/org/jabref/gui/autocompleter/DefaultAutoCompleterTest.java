@@ -89,6 +89,7 @@ public class DefaultAutoCompleterTest {
         assertEquals(Arrays.asList("testValue"), result);
     }
 
+    @Test
     public void completeNullThrowsException() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
