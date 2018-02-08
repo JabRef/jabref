@@ -33,7 +33,7 @@ if [ "snapshot" != "$branch" ] ; then
 fi
 
 # only upload JabRef*, not md5sums, updates.xml, etc.
-command="${command}mput build/releases/JabRef*\n"
+command="${command}mput org.jabref.gui/build/releases/JabRef*\n"
 
 # create symlink ...--latest.jar to latest version
 command="${command}symlink ${jarname} /www/${branch}/JabRef--${branch}--latest.jar\n"
