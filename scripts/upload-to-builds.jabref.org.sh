@@ -8,13 +8,13 @@ branch="snapshot"
 
 # simple solution to treat first file matching a pattern
 # hint by http://unix.stackexchange.com/a/156207/18033
-for buildfile in org.jabref.gui/build/releases/*--snapshot--*; do
+for buildfile in build/releases/*--snapshot--*; do
   # the last "--" part is the branch name
   branch=`echo $buildfile | sed "sX.*--\(.*\)--.*X\1X"`
   break;
 done
 
-for buildfile in org.jabref.gui/build/releases/*--snapshot--*.jar; do
+for buildfile in build/releases/*--snapshot--*.jar; do
   # remove build/releases/ from the filename
   jarname=`echo $buildfile | sed "sXbuild/releases/XX"`
   break;
@@ -33,7 +33,7 @@ if [ "snapshot" != "$branch" ] ; then
 fi
 
 # only upload JabRef*, not md5sums, updates.xml, etc.
-command="${command}mput org.jabref.gui/build/releases/JabRef*\n"
+command="${command}mput build/releases/JabRef*\n"
 
 # create symlink ...--latest.jar to latest version
 command="${command}symlink ${jarname} /www/${branch}/JabRef--${branch}--latest.jar\n"

@@ -19,9 +19,54 @@ plugins {
     id 'nebula.lint' version '8.3.1'
     id 'nebula.info' version '3.6.0'
 
+    id 'com.install4j.gradle' version '7.0.4'
+
     id 'me.champeau.gradle.jmh' version '0.4.3'
     id 'net.ltgt.errorprone' version '0.0.13'
     id 'com.github.ben-manes.versions' version '0.17.0'
+}
+
+apply plugin: 'install4j'
+
+group = "org.jabref"
+version = "4.2-dev"
+project.ext.threeDotVersion = "4.1.0.1"
+project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (org.gradle.internal.os.OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j7' : 'install4j7')
+
+/*
+ * Set releaseVersion to VERSION--snapshot--DATE--GIT_HASH
+ */
+def releaseVersion
+if (project.hasProperty('dev')) {
+    String command = "git log --pretty=format:%cd--%h -n 1 --date=short"
+    String commitInfo = ""
+    if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+        commitInfo = "cmd /c $command".execute().in.text
+    } else {
+        commitInfo = command.execute().in.text
+    }
+
+    // determine branch
+    command = "git symbolic-ref -q --short HEAD"
+    String branchName = ""
+    if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+        branchName = "cmd /c $command".execute().in.text
+    } else {
+        branchName = command.execute().in.text
+    }
+    // A newline is returned. Remove it. (trim())
+    // In the context of github, the branch name could be something like "pull/277"
+    // "/" is an illegal character. To be safe, all illegal filename characters are replaced by "_"
+    // http://stackoverflow.com/a/15075907/873282 describes the used pattern.
+    branchName = branchName.trim().replaceAll("[^a-zA-Z0-9.-]", "_")
+
+    // hack string
+    // first the date (%cd), then the branch name, and finally the commit id (%h)
+    String infoString = commitInfo.substring(0, 10) + "--" + branchName + "--" + commitInfo.substring(12)
+
+    releaseVersion = project.version + "--snapshot--" + infoString
+} else {
+    releaseVersion = project.version
 }
 
 // enable buildscan providing insights to our build (speed, ...)
@@ -175,4 +220,52 @@ allprojects {
             author = true
         }
     }
+}
+
+install4j {
+    installDir = file(project.ext.install4jDir)
+}
+
+// has to be defined AFTER 'dev' things to have the correct releaseVersion
+task releaseJar(dependsOn: ":org.jabref.gui:shadowJar") {
+    group = 'JabRef - Release'
+    description "Creates a Jar release."
+    doLast {
+        copy {
+            from("org.jabref.gui/build/libs/org.jabref.gui-${project.version}-fat.jar")
+            into("$buildDir/releases")
+            rename { String fileName -> "JabRef-${releaseVersion}.jar" }
+        }
+        // set executable with read permissions (first true) and for all (false)
+        file("$buildDir/releases/JabRef-${releaseVersion}.jar").setExecutable(true, false)
+    }
+}
+
+// has to be defined AFTER 'dev' things to have the correct releaseVersion
+task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
+    projectFile = file('jabref.install4j')
+    release = releaseVersion
+    winKeystorePassword = System.getenv('CERTIFICATE_PW')
+    macKeystorePassword = System.getenv('CERTIFICATE_PW')
+    variables = [
+            versionFourDots: project.ext.threeDotVersion,
+            buildFileName  : jar.archiveName,
+            version        : releaseVersion
+    ]
+
+    doLast {
+        copy {
+            from "build/install4j"
+            into "build/releases"
+        }
+    }
+}
+
+task release(dependsOn: "media") {
+    group = 'JabRef - Release'
+    description 'Creates a release for all target platforms.'
+}
+
+task snapJar(dependsOn: "releaseJar", type: Delete) {
+    delete fileTree(dir: "$buildDir/releases/", exclude: "JabRef-${releaseVersion}.jar")
 }
