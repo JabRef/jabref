@@ -64,6 +64,8 @@ public class DOITest {
         Assert.assertEquals("10.1006/jmbi.1998.2354", new DOI("http://doi.org/10.1006/jmbi.1998.2354").getDOI());
         // https
         Assert.assertEquals("10.1006/jmbi.1998.2354", new DOI("https://doi.org/10.1006/jmbi.1998.2354").getDOI());
+        // https with % divider
+        Assert.assertEquals("10.2307/1990888", new DOI("https://dx.doi.org/10.2307%2F1990888").getDOI());
         // other domains
         Assert.assertEquals("10.1145/1294928.1294933", new DOI("http://doi.acm.org/10.1145/1294928.1294933").getDOI());
         Assert.assertEquals("10.1145/1294928.1294933", new DOI("http://doi.acm.net/10.1145/1294928.1294933").getDOI());

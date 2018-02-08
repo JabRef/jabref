@@ -2,22 +2,22 @@ package org.jabref.preferences;
 
 import java.io.File;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LastFocusedTabPreferencesTest {
 
     private static String previousValue;
 
-    @BeforeClass
+    @BeforeAll
     public static void savePreferenceLastFocus() {
         previousValue = JabRefPreferences.getInstance().get(JabRefPreferences.LAST_FOCUSED);
     }
 
-    @AfterClass
+    @AfterAll
     public static void restorePreferenceLastFocus() {
         if (previousValue != null) {
             JabRefPreferences.getInstance().put(JabRefPreferences.LAST_FOCUSED, previousValue);
