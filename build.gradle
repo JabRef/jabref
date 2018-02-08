@@ -29,14 +29,14 @@ plugins {
 apply plugin: 'install4j'
 
 group = "org.jabref"
-version = "4.2-dev"
+String plainVersion = "4.2-dev"
 project.ext.threeDotVersion = "4.1.0.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (org.gradle.internal.os.OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j7' : 'install4j7')
 
 /*
- * Set releaseVersion to VERSION--snapshot--DATE--GIT_HASH
+ * Set vrsion to VERSION--snapshot--DATE--GIT_HASH
  */
-def releaseVersion
+String versionAppendix
 if (project.hasProperty('dev')) {
     String command = "git log --pretty=format:%cd--%h -n 1 --date=short"
     String commitInfo = ""
@@ -64,10 +64,11 @@ if (project.hasProperty('dev')) {
     // first the date (%cd), then the branch name, and finally the commit id (%h)
     String infoString = commitInfo.substring(0, 10) + "--" + branchName + "--" + commitInfo.substring(12)
 
-    releaseVersion = project.version + "--snapshot--" + infoString
+    versionAppendix = "--snapshot--" + infoString
 } else {
-    releaseVersion = project.version
+    versionAppendix = ""
 }
+version = plainVersion + versionAppendix
 
 // enable buildscan providing insights to our build (speed, ...)
 // see https://gradle.com/build-scans for more information
@@ -85,9 +86,6 @@ allprojects {
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-
-    group = "org.jabref"
-    version = "4.2-dev"
 
     repositories {
         mavenLocal()
@@ -226,7 +224,7 @@ install4j {
     installDir = file(project.ext.install4jDir)
 }
 
-// has to be defined AFTER 'dev' things to have the correct releaseVersion
+// has to be defined AFTER 'dev' things to have the correct project.version
 task releaseJar(dependsOn: ":org.jabref.gui:shadowJar") {
     group = 'JabRef - Release'
     description "Creates a Jar release."
@@ -234,23 +232,23 @@ task releaseJar(dependsOn: ":org.jabref.gui:shadowJar") {
         copy {
             from("org.jabref.gui/build/libs/org.jabref.gui-${project.version}-fat.jar")
             into("$buildDir/releases")
-            rename { String fileName -> "JabRef-${releaseVersion}.jar" }
+            rename { String fileName -> "JabRef-${project.version}.jar" }
         }
         // set executable with read permissions (first true) and for all (false)
-        file("$buildDir/releases/JabRef-${releaseVersion}.jar").setExecutable(true, false)
+        file("$buildDir/releases/JabRef-${project.version}.jar").setExecutable(true, false)
     }
 }
 
-// has to be defined AFTER 'dev' things to have the correct releaseVersion
+// has to be defined AFTER 'dev' things to have the correct project.version
 task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
     projectFile = file('jabref.install4j')
-    release = releaseVersion
+    release = project.version
     winKeystorePassword = System.getenv('CERTIFICATE_PW')
     macKeystorePassword = System.getenv('CERTIFICATE_PW')
     variables = [
             versionFourDots: project.ext.threeDotVersion,
             buildFileName  : jar.archiveName,
-            version        : releaseVersion
+            version        : project.version
     ]
 
     doLast {
@@ -261,11 +259,11 @@ task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
     }
 }
 
-task release(dependsOn: "media") {
+task release(dependsOn: ["media", "releaseJar"]) {
     group = 'JabRef - Release'
     description 'Creates a release for all target platforms.'
 }
 
 task snapJar(dependsOn: "releaseJar", type: Delete) {
-    delete fileTree(dir: "$buildDir/releases/", exclude: "JabRef-${releaseVersion}.jar")
+    delete fileTree(dir: "$buildDir/releases/", exclude: "JabRef-${project.version}.jar")
 }
