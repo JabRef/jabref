@@ -28,10 +28,12 @@ public class EprintTest {
         assertEquals("0706.0001v1", new Eprint("  0706.0001v1 ").getEprint());
     }
 
+    @Test
     public void rejectEmbeddedEprint() {
         assertThrows(IllegalArgumentException.class, () -> new Eprint("other stuff 0706.0001v1 end"));
     }
 
+    @Test
     public void rejectInvalidEprint() {
         assertThrows(IllegalArgumentException.class, () -> new Eprint("https://thisisnouri"));
     }

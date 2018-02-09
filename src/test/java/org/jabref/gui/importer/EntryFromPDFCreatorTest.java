@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.jabref.JabRefGUI;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.logic.importer.ImportDataTest;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.testutils.category.GUITest;
@@ -12,6 +13,7 @@ import org.jabref.testutils.category.GUITest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -23,10 +25,12 @@ public class EntryFromPDFCreatorTest {
 
     private EntryFromPDFCreator entryCreator;
 
+
     @BeforeEach
     public void setUp() {
         // Needed to initialize ExternalFileTypes
-        entryCreator = new EntryFromPDFCreator();
+        entryCreator = new EntryFromPDFCreator(mock(ExternalFileTypes.class, Answers.RETURNS_DEEP_STUBS));
+
         // Needed for PdfImporter - still not enough
         JabRefGUI.setMainFrame(mock(JabRefFrame.class));
     }
