@@ -55,7 +55,6 @@ public class RegexFormatterTest {
     @Test
     public void escapedBracesAreNotReplacedAndProtectionStillWorks() {
         String regexInput = "(\" \",\"-\")";
-        formatter.setRegex(regexInput);
         assertEquals("replace-spaces-{not these ones},-these-ones,-and-\\{-these-ones\\}", formatter.format("replace spaces {not these ones}, these ones, and \\{ these ones\\}"));
     }
 
@@ -63,5 +62,6 @@ public class RegexFormatterTest {
     public void formatExample() {
         assertEquals("Please-replace-the-spaces", formatter.format(formatter.getExampleInput()));
     }
+
 
 }

@@ -34,8 +34,8 @@ import static org.mockito.Mockito.when;
 @GUITest
 public class EntryFromFileCreatorManagerTest {
 
-    ImportFormatPreferences prefs = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-    ExternalFileTypes externalFileTypes;
+    private final ImportFormatPreferences prefs = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+    private ExternalFileTypes externalFileTypes;
 
     @BeforeEach
     public void setUp() {

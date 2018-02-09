@@ -25,7 +25,6 @@ public class EntryFromPDFCreatorTest {
 
     private EntryFromPDFCreator entryCreator;
 
-
     @BeforeEach
     public void setUp() {
         // Needed to initialize ExternalFileTypes
