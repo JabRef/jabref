@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -16,11 +15,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
 public class MainArchitectureTests {
 
     public static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.Globals";
@@ -35,17 +34,13 @@ public class MainArchitectureTests {
     private static final String EXCEPTION_PACKAGE_JAVA_FX_BEANS = "javafx.beans";
     private static final String EXCEPTION_CLASS_JAVA_FX_COLOR = "javafx.scene.paint.Color";
 
-    private final String firstPackage;
-    private final String secondPackage;
-    private final Map<String, List<String>> exceptions;
+    private static Map<String, List<String>> exceptions;
 
-    public MainArchitectureTests(String firstPackage, String secondPackage) {
-        this.firstPackage = firstPackage;
-        this.secondPackage = secondPackage;
-
+    @BeforeAll
+    public static void setUp() {
+        exceptions = new HashMap<>();
         // Add exceptions for the architectural test here
         // Note that bending the architectural constraints should not be done inconsiderately
-        exceptions = new HashMap<>();
 
         List<String> logicExceptions = new ArrayList<>(4);
         logicExceptions.add(EXCEPTION_PACKAGE_JAVA_AWT_GEOM);
@@ -63,32 +58,29 @@ public class MainArchitectureTests {
         exceptions.put(PACKAGE_ORG_JABREF_MODEL, modelExceptions);
     }
 
+    public static Stream<Arguments> getPackages() {
 
-    @Parameterized.Parameters(name = "{index} -- is {0} independent of {1}?")
-    public static Iterable<Object[]> data() {
-        return Arrays.asList(
-                new Object[][]{
-                        {PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVA_AWT},
-                        {PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVAX_SWING},
-                        {PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVA_FX},
-                        {PACKAGE_ORG_JABREF_LOGIC, PACKAGE_ORG_JABREF_GUI},
-                        {PACKAGE_ORG_JABREF_LOGIC, CLASS_ORG_JABREF_GLOBALS},
+        return Stream.of(
+                Arguments.of(PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVA_AWT),
+                Arguments.of(PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVAX_SWING),
+                Arguments.of(PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVA_FX),
+                Arguments.of(PACKAGE_ORG_JABREF_LOGIC, PACKAGE_ORG_JABREF_GUI),
+                Arguments.of(PACKAGE_ORG_JABREF_LOGIC, CLASS_ORG_JABREF_GLOBALS),
 
-                        {PACKAGE_ORG_JABREF_MODEL, PACKAGE_JAVA_AWT},
-                        {PACKAGE_ORG_JABREF_MODEL, PACKAGE_JAVAX_SWING},
-                        {PACKAGE_ORG_JABREF_MODEL, PACKAGE_JAVA_FX},
-                        {PACKAGE_ORG_JABREF_MODEL, PACKAGE_ORG_JABREF_GUI},
-                        {PACKAGE_ORG_JABREF_MODEL, PACKAGE_ORG_JABREF_LOGIC},
-                        {PACKAGE_ORG_JABREF_MODEL, CLASS_ORG_JABREF_GLOBALS}
-                }
-        );
+                Arguments.of(PACKAGE_ORG_JABREF_MODEL, PACKAGE_JAVA_AWT),
+                Arguments.of(PACKAGE_ORG_JABREF_MODEL, PACKAGE_JAVAX_SWING),
+                Arguments.of(PACKAGE_ORG_JABREF_MODEL, PACKAGE_JAVA_FX),
+                Arguments.of(PACKAGE_ORG_JABREF_MODEL, PACKAGE_ORG_JABREF_GUI),
+                Arguments.of(PACKAGE_ORG_JABREF_MODEL, PACKAGE_ORG_JABREF_LOGIC),
+                Arguments.of(PACKAGE_ORG_JABREF_MODEL, CLASS_ORG_JABREF_GLOBALS));
     }
 
-    @Test
-    public void firstPackageIsIndependentOfSecondPackage() throws IOException {
-        Predicate<String> isExceptionPackage = (s) ->
-                s.startsWith("import " + secondPackage)
-                        && exceptions.getOrDefault(firstPackage, Collections.emptyList()).stream()
+    @ParameterizedTest(name = "{index} -- is {0} independent of {1}?")
+    @MethodSource("getPackages")
+    public void firstPackageIsIndependentOfSecondPackage(String firstPackage, String secondPackage) throws IOException {
+        Predicate<String> isExceptionPackage = (s) -> s.startsWith("import " + secondPackage)
+                && exceptions.getOrDefault(firstPackage, Collections.emptyList())
+                        .stream()
                         .noneMatch(exception -> s.startsWith("import " + exception));
 
         Predicate<String> isPackage = (s) -> s.startsWith("package " + firstPackage);
@@ -109,7 +101,8 @@ public class MainArchitectureTests {
                         } catch (IOException e) {
                             return false;
                         }
-                    }).collect(Collectors.toList());
+                    })
+                    .collect(Collectors.toList());
 
             Assert.assertEquals("The following classes are not allowed to depend on " + secondPackage,
                     Collections.emptyList(), files);

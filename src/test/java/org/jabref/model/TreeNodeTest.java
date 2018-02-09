@@ -26,6 +26,7 @@ public class TreeNodeTest {
         subscriber = mock(Consumer.class);
     }
 
+    @Test
     public void constructorChecksThatClassImplementsCorrectInterface() {
         assertThrows(UnsupportedOperationException.class, () -> new WrongTreeNodeImplementation());
 

@@ -17,6 +17,7 @@ public class DefaultAutoCompleterTest {
 
     private WordSuggestionProvider autoCompleter;
 
+    @Test
     public void initAutoCompleterWithNullFieldThrowsException() {
         assertThrows(NullPointerException.class, () -> new WordSuggestionProvider(null));
     }

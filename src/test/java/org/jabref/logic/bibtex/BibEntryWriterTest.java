@@ -419,7 +419,8 @@ public class BibEntryWriterTest {
         assertEquals(expected, actual);
     }
 
-    public void writeThrowsErrorIfFieldContainsUnbalancedBraces() throws IOException {
+    @Test
+    public void writeThrowsErrorIfFieldContainsUnbalancedBraces() {
         StringWriter stringWriter = new StringWriter();
 
         BibEntry entry = new BibEntry("article");
