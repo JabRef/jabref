@@ -60,7 +60,7 @@ public class ExternalFileTypeEditor extends JabRefDialog {
     private final EditListener editListener = new EditListener();
 
 
-    private ExternalFileTypeEditor(JFrame frame) {
+    public ExternalFileTypeEditor(JFrame frame) {
         super(frame, Localization.lang("Manage external file types"), true, ExternalFileTypeEditor.class);
         this.frame = frame;
         init();

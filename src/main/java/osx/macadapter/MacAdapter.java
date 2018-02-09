@@ -73,7 +73,7 @@ public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler
             return;
         }
 
-        parentFrame.showPreferencesDialog();
+        //  parentFrame.showPreferencesDialog();
     }
 
     @Override
