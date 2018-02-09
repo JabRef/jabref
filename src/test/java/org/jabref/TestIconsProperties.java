@@ -31,14 +31,14 @@ public class TestIconsProperties {
         try (Reader reader = Files.newBufferedReader(Paths.get(iconsPropertiesPath))) {
             properties.load(reader);
         }
-        assertFalse(properties.entrySet().isEmpty(), () -> "There must be loaded properties after loading " + iconsPropertiesPath);
+        assertFalse(properties.entrySet().isEmpty(), "There must be loaded properties after loading " + iconsPropertiesPath);
 
         // check that each key references an existing file
         for (Map.Entry<Object, Object> entry : properties.entrySet()) {
             String name = entry.getKey().toString();
             String value = entry.getValue().toString();
 
-            assertTrue(Files.exists(Paths.get(folder, value)), () -> "Referenced image (" + name + " --> " + value + " does not exist in folder " + folder);
+            assertTrue(Files.exists(Paths.get(folder, value)), "Referenced image (" + name + " --> " + value + " does not exist in folder " + folder);
         }
 
         // check that each image in the folder is referenced by a key

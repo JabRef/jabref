@@ -47,6 +47,7 @@ public class ImportFormatReaderTestParameterless {
 
     }
 
+    @Test
     public void importFromFileWithUnknownFormatThrowsException() throws Exception {
         assertThrows(NullPointerException.class, () -> reader.importFromFile("someunknownformat", Paths.get("somepath")));
     }

@@ -71,10 +71,12 @@ public class BibtexDatabaseWriterTest {
         assertThrows(NullPointerException.class, () -> databaseWriter.savePartOfDatabase(null, Collections.emptyList(), new SavePreferences()));
     }
 
+    @Test
     public void writeWithNullEntriesThrowsException() throws Exception {
         assertThrows(NullPointerException.class, () -> databaseWriter.savePartOfDatabase(bibtexContext, null, new SavePreferences()));
     }
 
+    @Test
     public void writeWithNullPreferencesThrowsException() throws Exception {
         assertThrows(NullPointerException.class, () -> databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), null));
     }

@@ -48,6 +48,7 @@ public class LanguagesTest {
         assertEquals(Optional.empty(), Languages.convertToSupportedLocale("language_country_variant"));
     }
 
+    @Test
     public void convertToKnownLocaleNull() {
         assertThrows(NullPointerException.class, () -> Languages.convertToSupportedLocale(null));
     }

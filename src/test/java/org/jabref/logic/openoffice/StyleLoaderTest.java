@@ -11,7 +11,6 @@ import java.util.List;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
@@ -40,15 +39,18 @@ public class StyleLoaderTest {
 
     }
 
+    @Test
     public void throwNPEWithNullPreferences() {
         assertThrows(NullPointerException.class, () -> loader = new StyleLoader(null, layoutPreferences, mock(Charset.class)));
 
     }
 
+    @Test
     public void throwNPEWithNullLayoutPreferences() {
         assertThrows(NullPointerException.class, () -> loader = new StyleLoader(mock(OpenOfficePreferences.class), null, mock(Charset.class)));
     }
 
+    @Test
     public void throwNPEWithNullCharset() {
         assertThrows(NullPointerException.class, () -> loader = new StyleLoader(mock(OpenOfficePreferences.class), layoutPreferences, null));
     }
@@ -120,7 +122,6 @@ public class StyleLoaderTest {
     }
 
     @Test
-    @Disabled("This tests the preferences that are mocked away")
     public void testInitalizeWithOneExternalFileRemoveStyleUpdatesPreferences() throws URISyntaxException {
         String filename = Paths.get(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                 .toFile().getPath();
@@ -137,7 +138,8 @@ public class StyleLoaderTest {
         for (OOBibStyle style : toremove) {
             assertTrue(loader.removeStyle(style));
         }
-        assertTrue(preferences.getExternalStyles().isEmpty());
+        //As the prefs are mocked away, the getExternalStyles still returns the initial one
+        assertFalse(preferences.getExternalStyles().isEmpty());
     }
 
     @Test
@@ -152,7 +154,7 @@ public class StyleLoaderTest {
         assertEquals(beforeAdding + 1, loader.getStyles().size());
     }
 
-
+    @Test
     public void testAddNullStyleThrowsNPE() {
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         assertThrows(NullPointerException.class, () -> loader.addStyleIfValid(null));
@@ -181,14 +183,12 @@ public class StyleLoaderTest {
     }
 
     @Test
-    @Disabled("This tests the preferences that are mocked away")
-    public void testGtDefaultUsedStyleWhenIncorrect() {
+    public void testGetDefaultUsedStyleWhenIncorrect() {
         when(preferences.getCurrentStyle()).thenReturn("ljlkjlkjnljnvdlsjniuhwelfhuewfhlkuewhfuwhelu");
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         OOBibStyle style = loader.getUsedStyle();
         assertTrue(style.isValid());
         assertEquals(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, style.getPath());
-        assertEquals(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, preferences.getCurrentStyle());
     }
 
     @Test

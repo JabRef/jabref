@@ -57,6 +57,7 @@ public class GroupsParserTest {
         assertEquals(expected, parsed);
     }
 
+    @Test
     public void fromStringThrowsParseExceptionForNotEscapedGroupName() throws Exception {
         assertThrows(ParseException.class, () -> GroupsParser.fromString("ExplicitGroup:slit\\\\;0\\;mertsch_slit2_2007\\;;", ',', fileMonitor));
     }
@@ -122,6 +123,7 @@ public class GroupsParserTest {
         assertEquals(expected, parsed);
     }
 
+    @Test
     public void fromStringUnknownGroupThrowsException() throws Exception {
         assertThrows(ParseException.class, () -> GroupsParser.fromString("0 UnknownGroup:myUnknownGroup;0;;1;;;;", ',', fileMonitor));
     }

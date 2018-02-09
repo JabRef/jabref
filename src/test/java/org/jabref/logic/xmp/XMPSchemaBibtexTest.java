@@ -34,7 +34,7 @@ public class XMPSchemaBibtexTest {
     private ImportFormatPreferences prefs;
 
     @BeforeEach
-    public void setup() {
+    public void setUp() {
         prefs = mock(ImportFormatPreferences.class);
     }
 

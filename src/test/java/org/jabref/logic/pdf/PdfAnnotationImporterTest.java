@@ -103,7 +103,6 @@ public class PdfAnnotationImporterTest {
     }
 
     @Test
-
     public void strikeoutWithNoteMinimal() {
         final FileAnnotation expectedLinkedAnnotation = new FileAnnotation("lynyus", LocalDateTime.of(2017, 6, 1, 13, 2, 3), 1,
                 "striked out", FileAnnotationType.STRIKEOUT, Optional.empty());
