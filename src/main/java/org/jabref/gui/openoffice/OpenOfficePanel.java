@@ -37,8 +37,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.SidePaneComponent;
-import org.jabref.gui.SidePaneManager;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
@@ -78,14 +76,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This test panel can be opened by reflection from JabRef, passing the JabRefFrame as an
- * argument to the start() method. It displays buttons for testing interaction functions
- * between JabRef and OpenOffice.
+ * Pane to manage the interaction between JabRef and OpenOffice.
  */
 public class OpenOfficePanel extends AbstractWorker {
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficePanel.class);
 
-    private OpenOfficeSidePanel sidePane;
+    private JPanel content;
+
+    public OpenOfficePanel(JabRefFrame jabRefFrame) {
+        Icon connectImage = IconTheme.JabRefIcons.CONNECT_OPEN_OFFICE.getSmallIcon();
+
+        connect = new JButton(connectImage);
+        manualConnect = new JButton(connectImage);
+        connect.setToolTipText(Localization.lang("Connect"));
+        manualConnect.setToolTipText(Localization.lang("Manual connect"));
+        connect.setPreferredSize(new Dimension(24, 24));
+        manualConnect.setPreferredSize(new Dimension(24, 24));
+
+        selectDocument = new JButton(IconTheme.JabRefIcons.OPEN.getSmallIcon());
+        selectDocument.setToolTipText(Localization.lang("Select Writer document"));
+        selectDocument.setPreferredSize(new Dimension(24, 24));
+        update = new JButton(IconTheme.JabRefIcons.REFRESH.getSmallIcon());
+        update.setToolTipText(Localization.lang("Sync OpenOffice/LibreOffice bibliography"));
+        update.setPreferredSize(new Dimension(24, 24));
+        preferences = new OpenOfficePreferences(Globals.prefs);
+        loader = new StyleLoader(preferences,
+                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
+                Globals.prefs.getDefaultEncoding());
+
+        this.frame = jabRefFrame;
+        initPanel();
+    }
     private JDialog diag;
     private final JButton connect;
     private final JButton manualConnect;
@@ -111,31 +132,8 @@ public class OpenOfficePanel extends AbstractWorker {
     private final OpenOfficePreferences preferences;
     private final StyleLoader loader;
 
-    public OpenOfficePanel(JabRefFrame jabRefFrame, SidePaneManager spManager) {
-        Icon connectImage = IconTheme.JabRefIcons.CONNECT_OPEN_OFFICE.getSmallIcon();
-
-        connect = new JButton(connectImage);
-        manualConnect = new JButton(connectImage);
-        connect.setToolTipText(Localization.lang("Connect"));
-        manualConnect.setToolTipText(Localization.lang("Manual connect"));
-        connect.setPreferredSize(new Dimension(24, 24));
-        manualConnect.setPreferredSize(new Dimension(24, 24));
-
-        selectDocument = new JButton(IconTheme.JabRefIcons.OPEN.getSmallIcon());
-        selectDocument.setToolTipText(Localization.lang("Select Writer document"));
-        selectDocument.setPreferredSize(new Dimension(24, 24));
-        update = new JButton(IconTheme.JabRefIcons.REFRESH.getSmallIcon());
-        update.setToolTipText(Localization.lang("Sync OpenOffice/LibreOffice bibliography"));
-        update.setPreferredSize(new Dimension(24, 24));
-        preferences = new OpenOfficePreferences(Globals.prefs);
-        loader = new StyleLoader(preferences,
-                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
-                Globals.prefs.getDefaultEncoding());
-
-        this.frame = jabRefFrame;
-        sidePane = new OpenOfficeSidePanel(spManager, IconTheme.getImage("openoffice"), "OpenOffice/LibreOffice", preferences);
-        initPanel();
-        spManager.register(sidePane);
+    public JPanel getContent() {
+        return content;
     }
 
     private void initPanel() {
@@ -297,8 +295,7 @@ public class OpenOfficePanel extends AbstractWorker {
         mainBuilder.add(exportCitations).xy(1, 9);
         mainBuilder.add(settingsB).xy(1, 10);
 
-        JPanel content = new JPanel();
-        sidePane.setContentContainer(content);
+        content = new JPanel();
         content.setLayout(new BorderLayout());
         content.add(mainBuilder.getPanel(), BorderLayout.CENTER);
 
@@ -747,9 +744,4 @@ public class OpenOfficePanel extends AbstractWorker {
         menu.add(clearConnectionSettings);
         menu.show(settingsB, 0, settingsB.getHeight());
     }
-
-    public SidePaneComponent.ToggleAction getToggleAction() {
-        return sidePane.getToggleAction();
-    }
-
 }

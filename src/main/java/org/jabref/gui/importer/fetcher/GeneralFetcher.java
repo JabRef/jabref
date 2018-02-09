@@ -19,16 +19,21 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import javafx.embed.swing.SwingNode;
+import javafx.scene.Node;
+import javafx.scene.layout.Priority;
+
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.SidePaneComponent;
 import org.jabref.gui.SidePaneManager;
+import org.jabref.gui.SidePaneType;
+import org.jabref.gui.actions.ActionsFX;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.FetcherPreviewDialog;
 import org.jabref.gui.importer.ImportInspectionDialog;
-import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
@@ -41,14 +46,27 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     private final JPanel optionsPanel = new JPanel(optionsCards);
     private final JPanel optPanel = new JPanel(new BorderLayout());
 
-    private final ToggleAction action;
     private final JabRefFrame frame;
+    private final JabRefPreferences preferences;
     private EntryFetcher activeFetcher;
 
-
-    public GeneralFetcher(JabRefFrame frame, SidePaneManager sidePaneManager) {
-        super(sidePaneManager, IconTheme.JabRefIcons.WWW.getSmallIcon(), Localization.lang("Web search"));
+    public GeneralFetcher(SidePaneManager sidePaneManager, JabRefPreferences preferences, JabRefFrame frame) {
+        super(sidePaneManager, IconTheme.JabRefIcons.WWW, Localization.lang("Web search"));
         this.frame = frame;
+        this.preferences = preferences;
+    }
+
+    private JTextField getTextField() {
+        return tf;
+    }
+
+    @Override
+    public ActionsFX getToggleAction() {
+        return ActionsFX.toggleWebSearch;
+    }
+
+    @Override
+    protected Node createContentPane() {
         List<EntryFetcher> fetchers = new EntryFetchers(Globals.journalAbbreviationLoader).getEntryFetchers();
         EntryFetcher[] fetcherArray = fetchers.toArray(new EntryFetcher[fetchers.size()]);
         Arrays.sort(fetcherArray, new EntryFetcherComparator());
@@ -58,7 +76,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             choices[i] = fetcherArray[i].getTitle();
         }
         JComboBox<String> fetcherChoice = new JComboBox<>(choices);
-        int defaultFetcher = Globals.prefs.getInt(JabRefPreferences.SELECTED_FETCHER_INDEX);
+        int defaultFetcher = preferences.getInt(JabRefPreferences.SELECTED_FETCHER_INDEX);
         if (defaultFetcher >= fetcherArray.length) {
             defaultFetcher = 0;
         }
@@ -73,7 +91,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
         fetcherChoice.addActionListener(actionEvent -> {
             activeFetcher = fetcherArray[fetcherChoice.getSelectedIndex()];
-            Globals.prefs.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, fetcherChoice.getSelectedIndex());
+            preferences.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, fetcherChoice.getSelectedIndex());
             if (activeFetcher.getHelpPage() == null) {
                 helpBut.setEnabled(false);
             } else {
@@ -85,13 +103,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             if (activeFetcher.getOptionsPanel() != null) {
                 optPanel.add(activeFetcher.getOptionsPanel(), BorderLayout.CENTER);
             }
-            revalidate();
         });
-
-        action = new ToggleAction(Localization.lang("Web search"),
-                Localization.lang("Toggle web search interface"),
-                Globals.getKeyPrefs().getKey(KeyBinding.WEB_SEARCH),
-                IconTheme.JabRefIcons.WWW);
 
         helpBut.setMargin(new Insets(0, 0, 0, 0));
         tf.setPreferredSize(new Dimension(1, tf.getPreferredSize().height));
@@ -145,18 +157,18 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         main.add(optPanel);
 
         main.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        add(main, BorderLayout.CENTER);
+        //add(main, BorderLayout.CENTER);
         go.addActionListener(this);
         tf.addActionListener(this);
-    }
 
-    private JTextField getTextField() {
-        return tf;
+        SwingNode swingNode = new SwingNode();
+        SwingUtilities.invokeLater(() -> swingNode.setContent(main));
+        return swingNode;
     }
 
     @Override
-    public ToggleAction getToggleAction() {
-        return action;
+    public SidePaneType getType() {
+        return SidePaneType.WEB_SEARCH;
     }
 
     @Override
@@ -220,26 +232,18 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     }
 
     @Override
-    public void grabFocus() {
-        getTextField().grabFocus();
+    public void beforeClosing() {
+        preferences.putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.FALSE);
     }
 
     @Override
-    public void componentClosing() {
-        super.componentClosing();
-        getToggleAction().setSelected(false);
-        Globals.prefs.putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.FALSE);
+    public void afterOpening() {
+        preferences.putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.TRUE);
     }
 
     @Override
-    public void componentOpening() {
-        super.componentOpening();
-        Globals.prefs.putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.TRUE);
-    }
-
-    @Override
-    public int getRescalingWeight() {
-        return 0;
+    public Priority getResizePolicy() {
+        return Priority.NEVER;
     }
 
     private static class EntryFetcherComparator implements Comparator<EntryFetcher> {

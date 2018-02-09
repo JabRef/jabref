@@ -100,7 +100,7 @@ public class JabRefGUI {
         GUIGlobals.init();
 
         LOGGER.debug("Initializing frame");
-        JabRefGUI.mainFrame = new JabRefFrame();
+        JabRefGUI.mainFrame = new JabRefFrame(mainStage);
 
         // Add all bibDatabases databases to the frame:
         boolean first = false;

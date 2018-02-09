@@ -34,9 +34,9 @@
     -fx-accented-background: #dadad8;
 
     /*
-     * A dark gray as background
+     * A darker gray as background
      */
-    -fx-dark-background: #757575;
+    -fx-dark-background: #aaaaaa;
 
     /*
      * A strong white as background
@@ -259,4 +259,8 @@
 .tree-table-row-cell:filled > .tree-table-cell:selected {
     -fx-background: -fx-selection-bar;
     -fx-table-cell-border-color: transparent;
+}
+
+.sidePaneComponentHeader {
+    -fx-background-color: -fx-dark-background;
 }

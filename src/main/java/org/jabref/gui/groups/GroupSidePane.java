@@ -1,92 +1,55 @@
 package org.jabref.gui.groups;
 
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
+import javafx.scene.Node;
+import javafx.scene.layout.Priority;
 
-import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.SidePaneComponent;
 import org.jabref.gui.SidePaneManager;
-import org.jabref.gui.customjfx.CustomJFXPanel;
-import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.SidePaneType;
+import org.jabref.gui.actions.ActionsFX;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
 /**
  * The groups side pane.
- * This class is just a Swing wrapper around the JavaFX implementation {@link GroupTreeView}.
  */
 public class GroupSidePane extends SidePaneComponent {
 
-    protected final JabRefFrame frame;
-    private final ToggleAction toggleAction;
+    private final JabRefPreferences preferences;
 
-    /**
-     * The first element for each group defines which field to use for the quicksearch. The next two define the name and
-     * regexp for the group.
-     */
-    public GroupSidePane(JabRefFrame frame, SidePaneManager manager) {
-        super(manager, IconTheme.JabRefIcons.TOGGLE_GROUPS.getIcon(), Localization.lang("Groups"));
-
-        toggleAction = new ToggleAction(Localization.menuTitle("Toggle groups interface"),
-                Localization.lang("Toggle groups interface"),
-                Globals.getKeyPrefs().getKey(KeyBinding.TOGGLE_GROUPS_INTERFACE),
-                IconTheme.JabRefIcons.TOGGLE_GROUPS);
-
-        this.frame = frame;
-
-        JFXPanel groupsPane = CustomJFXPanel.create();
-
-        add(groupsPane);
-        // Execute on JavaFX Application Thread
-        Platform.runLater(() -> {
-            StackPane root = new StackPane();
-            root.getChildren().addAll(new GroupTreeView().getView());
-            Scene scene = new Scene(root);
-            groupsPane.setScene(scene);
-        });
+    public GroupSidePane(SidePaneManager manager, JabRefPreferences preferences) {
+        super(manager, IconTheme.JabRefIcons.TOGGLE_GROUPS, Localization.lang("Groups"));
+        this.preferences = preferences;
     }
 
     @Override
-    public void componentOpening() {
-        Globals.prefs.putBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
+    public void afterOpening() {
+        preferences.putBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
     }
 
     @Override
-    public int getRescalingWeight() {
-        return 1;
+    public Priority getResizePolicy() {
+        return Priority.ALWAYS;
     }
 
     @Override
-    public void componentClosing() {
-        getToggleAction().setSelected(false);
-        Globals.prefs.putBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE, Boolean.FALSE);
+    public void beforeClosing() {
+        preferences.putBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE, Boolean.FALSE);
     }
 
     @Override
-    public void setActiveBasePanel(BasePanel panel) {
-        super.setActiveBasePanel(panel);
-        if (panel == null) { // hide groups
-            frame.getSidePaneManager().hide(GroupSidePane.class);
-            return;
-        }
-
-        synchronized (getTreeLock()) {
-            validateTree();
-        }
+    public ActionsFX getToggleAction() {
+        return ActionsFX.toggleGroups;
     }
 
     @Override
-    public void grabFocus() {
-
+    protected Node createContentPane() {
+        return new GroupTreeView().getView();
     }
 
     @Override
-    public ToggleAction getToggleAction() {
-        return toggleAction;
+    public SidePaneType getType() {
+        return SidePaneType.GROUPS;
     }
 }

@@ -83,7 +83,10 @@ public enum ActionsFX {
     sendAsEmail(Localization.lang("Send as email"), IconTheme.JabRefIcons.EMAIL),
     replaceAll(Localization.menuTitle("Replace string"), KeyBinding.REPLACE_STRING),
     manageKeywords(Localization.menuTitle("Manage keywords")),
-    massSetField(Localization.menuTitle("Set/clear/append/rename fields"));
+    massSetField(Localization.menuTitle("Set/clear/append/rename fields")),
+    toggleGroups(Localization.lang("Toggle groups interface"), IconTheme.JabRefIcons.TOGGLE_GROUPS, KeyBinding.TOGGLE_GROUPS_INTERFACE),
+    toggleOpenOffice(Localization.lang("OpenOffice/LibreOffice connection"), IconTheme.JabRefIcons.FILE_OPENOFFICE, KeyBinding.OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION),
+    toggleWebSearch(Localization.lang("Web search"), Localization.lang("Toggle web search interface"), IconTheme.JabRefIcons.WWW, KeyBinding.WEB_SEARCH);
 
     private final String text;
     private final String description;

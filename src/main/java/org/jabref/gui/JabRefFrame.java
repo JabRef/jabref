@@ -10,7 +10,6 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.io.File;
 import java.io.IOException;
@@ -47,10 +46,9 @@ import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
-import javafx.embed.swing.JFXPanel;
-import javafx.embed.swing.SwingNode;
-import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
@@ -59,6 +57,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
@@ -83,7 +82,6 @@ import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.customentrytypes.EntryCustomizationDialog;
-import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.exporter.ExportCommand;
@@ -93,20 +91,17 @@ import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiletype.ExternalFileTypeEditor;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.groups.EntryTableTransferHandler;
-import org.jabref.gui.groups.GroupSidePane;
 import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.ImportCustomizationDialog;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
-import org.jabref.gui.importer.fetcher.GeneralFetcher;
 import org.jabref.gui.journals.ManageJournalsAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingAction;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.menus.FileHistoryMenu;
-import org.jabref.gui.openoffice.OpenOfficePanel;
 import org.jabref.gui.preftabs.PreferencesDialog;
 import org.jabref.gui.protectedterms.ProtectedTermsDialog;
 import org.jabref.gui.push.PushToApplicationButton;
@@ -381,6 +376,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final List<Object> oneEntryWithURLorDOIOnlyActions = new LinkedList<>();
     private final List<Object> twoEntriesOnlyActions = new LinkedList<>();
     private final List<Object> atLeastOneEntryActions = new LinkedList<>();
+    private final Stage mainStage;
     private PreferencesDialog prefsDialog;
     // The sidepane manager takes care of populating the sidepane.
     private SidePaneManager sidePaneManager;
@@ -390,13 +386,11 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private JMenu rankSubMenu;
     private PushToApplicationButton pushExternalButton;
     private PushToApplications pushApplications;
-    private GeneralFetcher generalFetcher;
-    private OpenOfficePanel openOfficePanel;
-    private GroupSidePane groupSidePane;
     private JMenu newSpec;
     private final CountingUndoManager undoManager = new CountingUndoManager();
 
-    public JabRefFrame() {
+    public JabRefFrame(Stage mainStage) {
+        this.mainStage = mainStage;
         init();
     }
 
@@ -494,7 +488,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         // TODO: popup
         // tabbedPane = new DragDropPopupPane(tabPopupMenu());
 
-        initSidePane();
+        sidePaneManager = new SidePaneManager(Globals.prefs, this);
 
         initLayout();
 
@@ -545,10 +539,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
             currentBasePanel.getPreviewPanel().updateLayout(Globals.prefs.getPreviewPreferences());
 
-            // groupSidePane.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
+            // groupSidePane.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
             //previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
-            //generalFetcher.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GeneralFetcher.class));
-            //openOfficePanel.getToggleAction().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
+            //generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GeneralFetcher.class));
+            //openOfficePanel.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
             // TODO: Can't notify focus listener since it is expecting a swing component
             //Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
             setWindowTitle();
@@ -635,20 +629,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             //setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBMSSynchronizer().getDBName() + " ["
             //        + Localization.lang("shared") + "]" + modeInfo);
         }
-    }
-
-    private void initSidePane() {
-        sidePaneManager = new SidePaneManager(this);
-
-        groupSidePane = new GroupSidePane(this, sidePaneManager);
-        if (prefs.getBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE)) {
-            sidePaneManager.register(groupSidePane);
-            sidePaneManager.show(GroupSidePane.class);
-        }
-        openOfficePanel = new OpenOfficePanel(this, sidePaneManager);
-        generalFetcher = new GeneralFetcher(this, sidePaneManager);
-
-        sidePaneManager.register(groupSidePane);
     }
 
     /**
@@ -826,39 +806,26 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         toolbarPanel.add(globalSearchBar);
         //getContentPane().add(toolbarPanel, BorderLayout.PAGE_START);
 
-        JFXPanel tabbedPaneContainer = CustomJFXPanel.wrap(new Scene(tabbedPane));
-        // TODO: Remove this hack as soon as toolbar is implemented in JavaFX and these events are no longer captured globally
-        tabbedPaneContainer.addKeyListener(new KeyAdapter() {
+        splitPane.getItems().addAll(sidePaneManager.getPane(), tabbedPane);
+
+        // We need to wait with setting the divider since it gets reset a few times during the initial set-up
+        mainStage.showingProperty().addListener(new ChangeListener<Boolean>() {
+
             @Override
-            public void keyPressed(KeyEvent e) {
-                // We need to consume a few events that have a global listener
-                // Otherwise, they propagate to the JFrame (i.e. "Ctrl + A" in the entry editor still triggers the "Select all" action)
-                Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
-                if (keyBinding.isPresent()) {
-                    switch (keyBinding.get()) {
-                        case CUT:
-                        case COPY:
-                        case PASTE:
-                        case DELETE_ENTRY:
-                        case SELECT_ALL:
-                            e.consume();
-                            break;
-                        default:
-                            //do nothing
-                    }
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean showing) {
+                if (showing) {
+                    splitPane.setDividerPositions(prefs.getDouble(JabRefPreferences.SIDE_PANE_WIDTH));
+                    EasyBind.subscribe(splitPane.getDividers().get(0).positionProperty(),
+                            position -> prefs.putDouble(JabRefPreferences.SIDE_PANE_WIDTH, position.doubleValue()));
+                    mainStage.showingProperty().removeListener(this);
+                    observable.removeListener(this);
                 }
             }
         });
 
-        SwingNode swingSidePane = new SwingNode();
-        SwingUtilities.invokeLater(() -> {
-            swingSidePane.setContent(sidePaneManager.getPanel());
-        });
-        splitPane.getItems().addAll(swingSidePane, tabbedPane);
         setCenter(splitPane);
 
         UIManager.put("TabbedPane.contentBorderInsets", new Insets(0, 0, 0, 0));
-        sidePaneManager.updateView();
 
         GridBagLayout gbl = new GridBagLayout();
         GridBagConstraints con = new GridBagConstraints();
@@ -891,7 +858,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         //tabbedPane.setTransferHandler(xfer);
         tlb.setTransferHandler(xfer);
         // TODO: mb.setTransferHandler(xfer);
-        sidePaneManager.getPanel().setTransferHandler(xfer);
+        // TODO: sidePaneManager.getPanel().setTransferHandler(xfer);
     }
 
     /**
@@ -1095,14 +1062,14 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         /*
         search.add(normalSearch);
         search.addSeparator();
-        search.add(new JCheckBoxMenuItem(generalFetcher.getToggleAction()));
+        search.add(new JCheckBoxMenuItem(generalFetcher.getToggleCommand()));
         if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
             sidePaneManager.register(generalFetcher);
             sidePaneManager.show(GeneralFetcher.class);
         }
         mb.add(search);
 
-        groups.add(new JCheckBoxMenuItem(groupSidePane.getToggleAction()));
+        groups.add(new JCheckBoxMenuItem(groupSidePane.getToggleCommand()));
 
         groups.addSeparator();
         groups.add(addToGroup);
@@ -1122,8 +1089,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         view.add(defaultFontSize);
         view.addSeparator();
         view.add(new JCheckBoxMenuItem(toggleToolbar));
-        view.add(new JCheckBoxMenuItem(enableToggle(generalFetcher.getToggleAction())));
-        view.add(new JCheckBoxMenuItem(groupSidePane.getToggleAction()));
+        view.add(new JCheckBoxMenuItem(enableToggle(generalFetcher.getToggleCommand())));
+        view.add(new JCheckBoxMenuItem(groupSidePane.getToggleCommand()));
         view.add(new JCheckBoxMenuItem(togglePreview));
         view.add(showPdvViewer);
         view.add(getNextPreviewStyleAction());
@@ -1173,7 +1140,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         tools.add(newSubDatabaseAction);
         tools.add(writeXmpAction);
-        tools.add(new JCheckBoxMenuItem(openOfficePanel.getToggleAction()));
+        tools.add(new JCheckBoxMenuItem(openOfficePanel.getToggleCommand()));
         tools.add(pushExternalButton.getMenuAction());
         tools.addSeparator();
         tools.add(openFolder);
@@ -1335,12 +1302,12 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
         tlb.addSeparator();
 
-        tlb.addJToggleButton(new JToggleButton(generalFetcher.getToggleAction()));
+        tlb.addJToggleButton(new JToggleButton(generalFetcher.getToggleCommand()));
 
         previewToggle = new JToggleButton(togglePreview);
         tlb.addJToggleButton(previewToggle);
 
-        tlb.addJToggleButton(new JToggleButton(groupSidePane.getToggleAction()));
+        tlb.addJToggleButton(new JToggleButton(groupSidePane.getToggleCommand()));
 
         tlb.addSeparator();
 
@@ -1371,8 +1338,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save, copyPreview,
                 saveAs, saveSelectedAs, saveSelectedAsPlain, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
                 unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, copyKeyAndLink, editPreamble, editStrings,
-                groupSidePane.getToggleAction(), makeKeyAction, normalSearch, generalFetcher.getToggleAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
-                sendAsEmail, downloadFullText, lookupIdentifiers, writeXmpAction, openOfficePanel.getToggleAction(), findUnlinkedFiles, addToGroup, removeFromGroup,
+                groupSidePane.getToggleCommand(), makeKeyAction, normalSearch, generalFetcher.getToggleCommand(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
+                sendAsEmail, downloadFullText, lookupIdentifiers, writeXmpAction, openOfficePanel.getToggleCommand(), findUnlinkedFiles, addToGroup, removeFromGroup,
                 moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
                 dupliCheck, autoSetFile, newEntryAction, newSpec, customizeAction, plainTextImport, getMassSetField(), getManageKeywords(),
                 pushExternalButton.getMenuAction(), closeDatabaseAction, getNextPreviewStyleAction(), getPreviousPreviewStyleAction(), checkIntegrity,

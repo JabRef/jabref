@@ -1749,12 +1749,11 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     public void cleanUp() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
 
-        // Check if there is a FileUpdatePanel for this BasePanel being shown. If so,
-        // remove it:
-        if (sidePaneManager.hasComponent(FileUpdatePanel.class)) {
-            FileUpdatePanel fup = (FileUpdatePanel) sidePaneManager.getComponent(FileUpdatePanel.class);
+        // Check if there is a FileUpdatePanel for this BasePanel being shown. If so remove it:
+        if (sidePaneManager.isComponentVisible(SidePaneType.FILE_UPDATE_NOTIFICATION)) {
+            FileUpdatePanel fup = (FileUpdatePanel) sidePaneManager.getComponent(SidePaneType.FILE_UPDATE_NOTIFICATION);
             if (fup.getPanel() == this) {
-                sidePaneManager.hideComponent(FileUpdatePanel.class);
+                sidePaneManager.hide(SidePaneType.FILE_UPDATE_NOTIFICATION);
             }
         }
     }

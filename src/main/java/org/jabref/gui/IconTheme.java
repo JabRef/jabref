@@ -24,6 +24,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -355,6 +356,13 @@ public class IconTheme {
             public JabRefIcon disabled() {
                 throw new NotImplementedException("Cannot create disabled version of a file-based icon");
             }
+        }
+
+        public Button asButton() {
+            Button button = new Button();
+            button.setGraphic(getGraphicNode());
+            button.getStyleClass().add("flatButton");
+            return button;
         }
     }
 

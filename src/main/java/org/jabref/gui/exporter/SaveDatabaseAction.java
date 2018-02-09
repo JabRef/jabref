@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
@@ -16,9 +15,9 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.SidePaneType;
 import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import org.jabref.gui.collab.ChangeScanner;
-import org.jabref.gui.collab.FileUpdatePanel;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;
@@ -425,8 +424,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                         scanner.displayResult(resolved -> {
                             if (resolved) {
                                 panel.markExternalChangesAsResolved();
-                                SwingUtilities
-                                        .invokeLater(() -> panel.getSidePaneManager().hide(FileUpdatePanel.class));
+                                DefaultTaskExecutor.runInJavaFXThread(() -> panel.getSidePaneManager().hide(SidePaneType.FILE_UPDATE_NOTIFICATION));
                             } else {
                                 canceled = true;
                             }
@@ -444,7 +442,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                     canceled = true;
                 } else {
                     panel.markExternalChangesAsResolved();
-                    panel.getSidePaneManager().hide(FileUpdatePanel.class);
+                    panel.getSidePaneManager().hide(SidePaneType.FILE_UPDATE_NOTIFICATION);
                 }
             }
         }
