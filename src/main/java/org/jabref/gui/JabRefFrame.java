@@ -82,6 +82,7 @@ import org.jabref.gui.actions.NewEntryAction;
 import org.jabref.gui.actions.NewSubLibraryAction;
 import org.jabref.gui.actions.OldDatabaseCommandWrapper;
 import org.jabref.gui.actions.OpenBrowserAction;
+import org.jabref.gui.actions.SearchForUpdateAction;
 import org.jabref.gui.actions.SetupGeneralFieldsAction;
 import org.jabref.gui.actions.ShowPreferencesAction;
 import org.jabref.gui.actions.SimpleCommand;
@@ -171,34 +172,12 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     // BasePanel's runCommand() method to be called with that command.
     // Note: GeneralAction's constructor automatically gets translations
     // for the name and message strings.
-    private final AbstractAction jabrefWebPageAction = new OpenBrowserAction("https://jabref.org",
-            Localization.menuTitle("Website"), Localization.lang("Opens JabRef's website"),
-            IconTheme.getImage("about"), IconTheme.getImage("about"));
-    private final AbstractAction jabrefFacebookAction = new OpenBrowserAction("https://www.facebook.com/JabRef/",
-            "Facebook", Localization.lang("Opens JabRef's Facebook page"),
-            IconTheme.JabRefIcons.FACEBOOK.getSmallIcon(), IconTheme.JabRefIcons.FACEBOOK.getIcon());
-    private final AbstractAction jabrefTwitterAction = new OpenBrowserAction("https://twitter.com/jabref_org",
-            "Twitter", Localization.lang("Opens JabRef's Twitter page"),
-            IconTheme.JabRefIcons.TWITTER.getSmallIcon(), IconTheme.JabRefIcons.TWITTER.getIcon());
-    private final AbstractAction jabrefBlogAction = new OpenBrowserAction("https://blog.jabref.org/",
-            Localization.menuTitle("Blog"), Localization.lang("Opens JabRef's blog"),
-            IconTheme.JabRefIcons.BLOG.getSmallIcon(), IconTheme.JabRefIcons.BLOG.getIcon());
-    private final AbstractAction developmentVersionAction = new OpenBrowserAction("https://builds.jabref.org/master/",
-            Localization.menuTitle("Development version"),
-            Localization.lang("Opens a link where the current development version can be downloaded"));
-    private final AbstractAction changeLogAction = new OpenBrowserAction(
-            "https://github.com/JabRef/jabref/blob/master/CHANGELOG.md", Localization.menuTitle("View change log"),
-            Localization.lang("See what has been changed in the JabRef versions"));
-    private final AbstractAction forkMeOnGitHubAction = new OpenBrowserAction("https://github.com/JabRef/jabref",
-            Localization.menuTitle("Fork me on GitHub"), Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcons.GITHUB.getSmallIcon(), IconTheme.JabRefIcons.GITHUB.getIcon());
-    private final AbstractAction donationAction = new OpenBrowserAction("https://donations.jabref.org",
-            Localization.menuTitle("Donate to JabRef"), Localization.lang("Donate to JabRef"), IconTheme.JabRefIcons.DONATE.getSmallIcon(), IconTheme.JabRefIcons.DONATE.getIcon());
-    private final AbstractAction openForumAction = new OpenBrowserAction("http://discourse.jabref.org/",
-            Localization.menuTitle("Online help forum"), Localization.lang("Online help forum"), IconTheme.JabRefIcons.FORUM.getSmallIcon(), IconTheme.JabRefIcons.FORUM.getIcon());
+
+
+
     private final AbstractAction help = new HelpAction(Localization.menuTitle("Online help"), Localization.lang("Online help"),
             HelpFile.CONTENTS, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
-    private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), Localization.lang("About JabRef"),
-            IconTheme.getImage("about"));
+
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, Localization.menuTitle("Edit entry"),
             Localization.lang("Edit entry"), Globals.getKeyPrefs().getKey(KeyBinding.EDIT_ENTRY), IconTheme.JabRefIcons.EDIT_ENTRY.getIcon());
     private final AbstractAction focusTable = new GeneralAction(Actions.FOCUS_TABLE,
@@ -289,7 +268,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             Globals.getKeyPrefs().getKey(KeyBinding.SYNCHRONIZE_FILES));
 
     private final AbstractAction bibtexKeyPattern = new BibtexKeyPatternAction();
-    private final AbstractAction errorConsole = new ErrorConsoleAction();
     private final AbstractAction cleanupEntries = new GeneralAction(Actions.CLEANUP,
             Localization.menuTitle("Cleanup entries") + ELLIPSES,
             Localization.lang("Cleanup entries"),
@@ -602,7 +580,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     public void about() {
         // reuse the normal about action
         // null as parameter is OK as the code of actionPerformed does not rely on the data sent in the event.
-        about.actionPerformed(null);
+        //   about.actionPerformed(null);
     }
 
     // General preferences dialog.  The MacAdapter calls this method when "Preferences..."
@@ -1029,6 +1007,49 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(ActionsFX.CUSTOMIZE_KEYBINDING, new CustomizeKeyBindingAction()),
                 factory.createMenuItem(ActionsFX.MANAGE_PROTECTED_TERMS, new ManageProtectedTermsAction(this, Globals.protectedTermsLoader)),
                 factory.createMenuItem(ActionsFX.MANAGE_CONTENT_SELECTORS, new OldDatabaseCommandWrapper(Actions.MANAGE_SELECTORS, this, Globals.stateManager)));
+
+        help.getItems().addAll(
+                //TODO: This. helpAction
+                factory.createMenuItem(ActionsFX.OPEN_FORUM, new OpenBrowserAction("https://discourse.jabref.org/")),
+                new SeparatorMenuItem(),
+                factory.createMenuItem(ActionsFX.ERROR_CONSOLE, new ErrorConsoleAction()),
+                new SeparatorMenuItem(),
+                factory.createMenuItem(ActionsFX.SEARCH_FOR_UPDATES, new SearchForUpdateAction()),
+                factory.createSubMenu(ActionsFX.WEB_MENU,
+                        factory.createMenuItem(ActionsFX.OPEN_WEBPAGE, new OpenBrowserAction("https://jabref.org/")),
+                        factory.createMenuItem(ActionsFX.OPEN_BLOG, new OpenBrowserAction("https://blog.jabref.org/")),
+                        factory.createMenuItem(ActionsFX.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
+                        factory.createMenuItem(ActionsFX.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org")),
+                        new SeparatorMenuItem(),
+                        factory.createMenuItem(ActionsFX.FORK_ME, new OpenBrowserAction("https://github.com/JabRef/jabref")),
+                        factory.createMenuItem(ActionsFX.OPEN_DEV_VERSION_LINK, new OpenBrowserAction("https://builds.jabref.org/master/")),
+                        factory.createMenuItem(ActionsFX.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/master/CHANGELOG.md")),
+                        new SeparatorMenuItem(),
+                        factory.createMenuItem(ActionsFX.DONATE, new OpenBrowserAction("https://donations.jabref.org"))),
+                factory.createMenuItem(ActionsFX.ABOUT, new AboutAction()));
+
+        /*
+
+        help.add(this.help);
+        help.add(openForumAction);
+        help.addSeparator();
+        help.add(errorConsole);
+        help.addSeparator();
+        help.add(new SearchForUpdateAction());
+        JMenu webMenu = JabRefFrame.subMenu(Localization.menuTitle("JabRef resources"));
+        webMenu.add(jabrefWebPageAction);
+        webMenu.add(jabrefBlogAction);
+        webMenu.add(jabrefFacebookAction);
+        webMenu.add(jabrefTwitterAction);
+        webMenu.addSeparator();
+        webMenu.add(forkMeOnGitHubAction);
+        webMenu.add(developmentVersionAction);
+        webMenu.add(changeLogAction);
+        webMenu.addSeparator();
+        webMenu.add(donationAction);
+        help.add(webMenu);
+        help.add(about);
+        */
 
         /*
         factory.createMenuItem(ActionsFX., new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),

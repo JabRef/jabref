@@ -103,11 +103,27 @@ public enum ActionsFX {
     MANAGE_EXTERNAL_FILETYPES(Localization.menuTitle("Manage external file types")),
     MANAGE_PROTECTED_TERMS(Localization.menuTitle("Manage protected terms")),
     LIBRARY_PROPERTIES(Localization.menuTitle("Library properties")),
-    BIBTEX_KEY_PATTERN( Localization.lang("BibTeX key patterns")),
+    BIBTEX_KEY_PATTERN(Localization.lang("BibTeX key patterns")),
     SHOW_PREFS(Localization.menuTitle("Preferences")),
     MANAGE_JOURNALS(Localization.menuTitle("Manage journal abbreviations")),
     CUSTOMIZE_KEYBINDING(Localization.lang("Customize key bindings"), IconTheme.JabRefIcons.KEY_BINDINGS),
-    MANAGE_CONTENT_SELECTORS(Localization.menuTitle("Manage content selectors"), IconTheme.JabRefIcons.PREFERENCES);
+    MANAGE_CONTENT_SELECTORS(Localization.menuTitle("Manage content selectors"), IconTheme.JabRefIcons.PREFERENCES),
+
+    WEB_MENU(Localization.menuTitle("JabRef resources")),
+    OPEN_WEBPAGE(Localization.menuTitle("Website"), Localization.lang("Opens JabRef's website")),
+    OPEN_FACEBOOK("Facebook", Localization.lang("Opens JabRef's Facebook page"), IconTheme.JabRefIcons.FACEBOOK),
+    OPEN_TWITTER("Twitter", Localization.lang("Opens JabRef's Twitter page"), IconTheme.JabRefIcons.TWITTER),
+    OPEN_BLOG(Localization.menuTitle("Blog"), Localization.lang("Opens JabRef's blog"), IconTheme.JabRefIcons.BLOG),
+    OPEN_DEV_VERSION_LINK(Localization.menuTitle("Development version"), Localization.lang("Opens a link where the current development version can be downloaded")),
+    OPEN_CHANGELOG(Localization.menuTitle("View change log"), Localization.lang("See what has been changed in the JabRef versions")),
+    FORK_ME(Localization.menuTitle("Fork me on GitHub"), Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcons.GITHUB),
+    DONATE(Localization.menuTitle("Donate to JabRef"), Localization.lang("Donate to JabRef"), IconTheme.JabRefIcons.DONATE),
+    OPEN_FORUM(Localization.menuTitle("Online help forum"), Localization.lang("Online help forum"), IconTheme.JabRefIcons.FORUM),
+    HELP(Localization.menuTitle("Online help"), Localization.lang("Online help"), KeyBinding.HELP),
+    ERROR_CONSOLE(Localization.menuTitle("View event log"), Localization.lang("Display all error messages")),
+    SEARCH_FOR_UPDATES(Localization.lang("Check for updates")),
+    ABOUT(Localization.menuTitle("About JabRef"), Localization.lang("About JabRef"));
+
 
     private final String text;
     private final String description;
