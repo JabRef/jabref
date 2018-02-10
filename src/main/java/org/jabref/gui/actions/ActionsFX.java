@@ -30,7 +30,6 @@ public enum ActionsFX {
     CUT(Localization.lang("Cut"), IconTheme.JabRefIcons.CUT, KeyBinding.CUT),
     DELETE(Localization.lang("Delete"), IconTheme.JabRefIcons.DELETE_ENTRY, KeyBinding.DELETE_ENTRY),
     SEND_AS_EMAIL(Localization.lang("Send as email"), IconTheme.JabRefIcons.EMAIL),
-    OPEN_FOLDER(Localization.lang("Open folder"), KeyBinding.OPEN_FOLDER),
     OPEN_EXTERNAL_FILE(Localization.lang("Open file"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
     OPEN_URL(Localization.lang("Open URL or DOI"), IconTheme.JabRefIcons.WWW, KeyBinding.OPEN_URL_OR_DOI),
     MERGE_WITH_FETCHED_ENTRY(Localization.lang("Get BibTeX data from %0", "DOI/ISBN/...")),
@@ -89,6 +88,13 @@ public enum ActionsFX {
 
     NEW_SUB_LIBRARY_FROM_AUX(Localization.menuTitle("New sublibrary based on AUX file") + "...", Localization.lang("New BibTeX sublibrary"), IconTheme.JabRefIcons.NEW),
     WRITE_XMP(Localization.menuTitle("Write XMP-metadata to PDFs"), Localization.lang("Will write XMP-metadata to the PDFs linked from selected entries."), KeyBinding.WRITE_XMP),
+    OPEN_FOLDER(Localization.menuTitle("Open folder"), Localization.lang("Open folder"), KeyBinding.OPEN_FOLDER),
+    OPEN_FILE(Localization.menuTitle("Open file"), Localization.lang("Open file"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
+    OPEN_CONSOLE(Localization.menuTitle("Open terminal here"), Localization.lang("Open terminal here"), IconTheme.JabRefIcons.CONSOLE, KeyBinding.OPEN_CONSOLE),
+    COPY_LINKED_FILES(Localization.lang("Copy linked files to folder...")),
+    ABBREVIATE_ISO(Localization.menuTitle("Abbreviate journal names (ISO)"), Localization.lang("Abbreviate journal names of the selected entries (ISO abbreviation)"), KeyBinding.ABBREVIATE),
+    ABBREVIATE_MEDLINE(Localization.menuTitle("Abbreviate journal names (MEDLINE)"), Localization.lang("Abbreviate journal names of the selected entries (MEDLINE abbreviation)")),
+    UNABBREVIATE(Localization.menuTitle("Unabbreviate journal names"), Localization.lang("Unabbreviate journal names of the selected entries"), KeyBinding.UNABBREVIATE),
 
     MANAGE_CUSTOM_EXPORTS(Localization.menuTitle("Manage custom exports")),
     MANAGE_CUSTOM_IMPORTS(Localization.menuTitle("Manage custom imports")),

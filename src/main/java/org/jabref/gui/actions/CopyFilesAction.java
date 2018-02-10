@@ -1,0 +1,65 @@
+package org.jabref.gui.actions;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+
+import javafx.concurrent.Task;
+
+import org.jabref.Globals;
+import org.jabref.JabRefGUI;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.copyfiles.CopyFilesDialogView;
+import org.jabref.gui.copyfiles.CopyFilesResultItemViewModel;
+import org.jabref.gui.copyfiles.CopyFilesResultListDependency;
+import org.jabref.gui.copyfiles.CopyFilesTask;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.JabRefPreferences;
+
+public class CopyFilesAction extends SimpleCommand {
+
+    private final DialogService dialogService = new FXDialogService();
+    private BibDatabaseContext databaseContext;
+    private List<BibEntry> entries;
+    private final JabRefFrame frame;
+    public CopyFilesAction(JabRefFrame frame) {
+        this.frame = frame;
+    }
+
+
+    private void startServiceAndshowProgessDialog(Task<List<CopyFilesResultItemViewModel>> exportService) {
+
+        dialogService.showCanceableProgressDialogAndWait(exportService);
+
+        exportService.run(); //Run kinda blocks, so we just show the result dialog wgeb run is ready
+        showDialog(exportService.getValue());
+    }
+
+    private void showDialog(List<CopyFilesResultItemViewModel> data) {
+        CopyFilesDialogView dlg = new CopyFilesDialogView(databaseContext, new CopyFilesResultListDependency(data));
+        dlg.show();
+    }
+
+    @Override
+    public void execute() {
+        DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(Paths.get(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY)))
+                .build();
+        entries = frame.getCurrentBasePanel().getSelectedEntries();
+
+        Optional<Path> exportPath = dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
+
+        exportPath.ifPresent(path -> {
+            databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabaseContext();
+
+            Task<List<CopyFilesResultItemViewModel>> exportTask = new CopyFilesTask(databaseContext, entries, path);
+            startServiceAndshowProgessDialog(exportTask);
+        });
+
+    }
+}
