@@ -78,15 +78,18 @@ public enum ActionsFX {
     PULL_CHANGES_FROM_SHARED_DB(Localization.menuTitle("Pull changes from shared database"), IconTheme.JabRefIcons.PULL, KeyBinding.PULL_CHANGES_FROM_SHARED_DATABASE),
     CLOSE_LIBRARY(Localization.menuTitle("Close library"), Localization.lang("Close the current library"), IconTheme.JabRefIcons.CLOSE, KeyBinding.CLOSE_DATABASE),
     QUIT(Localization.menuTitle("Quit"), Localization.lang("Quit JabRef"), IconTheme.JabRefIcons.CLOSE_JABREF, KeyBinding.QUIT_JABREF),
-    undo(Localization.lang("Undo"), IconTheme.JabRefIcons.UNDO, KeyBinding.UNDO),
-    redo(Localization.lang("Redo"), IconTheme.JabRefIcons.REDO, KeyBinding.REDO),
-    sendAsEmail(Localization.lang("Send as email"), IconTheme.JabRefIcons.EMAIL),
-    replaceAll(Localization.menuTitle("Replace string"), KeyBinding.REPLACE_STRING),
-    manageKeywords(Localization.menuTitle("Manage keywords")),
-    massSetField(Localization.menuTitle("Set/clear/append/rename fields")),
-    toggleGroups(Localization.lang("Toggle groups interface"), IconTheme.JabRefIcons.TOGGLE_GROUPS, KeyBinding.TOGGLE_GROUPS_INTERFACE),
-    toggleOpenOffice(Localization.lang("OpenOffice/LibreOffice connection"), IconTheme.JabRefIcons.FILE_OPENOFFICE, KeyBinding.OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION),
-    toggleWebSearch(Localization.lang("Web search"), Localization.lang("Toggle web search interface"), IconTheme.JabRefIcons.WWW, KeyBinding.WEB_SEARCH),
+    UNDO(Localization.lang("Undo"), IconTheme.JabRefIcons.UNDO, KeyBinding.UNDO),
+    REDO(Localization.lang("Redo"), IconTheme.JabRefIcons.REDO, KeyBinding.REDO),
+    REPLACE_ALL(Localization.menuTitle("Replace string"), KeyBinding.REPLACE_STRING),
+    MANAGE_KEYWORDS(Localization.menuTitle("Manage keywords")),
+    MASS_SET_FIELDS(Localization.menuTitle("Set/clear/append/rename fields")),
+    TOGGLE_GROUPS(Localization.lang("Toggle groups interface"), IconTheme.JabRefIcons.TOGGLE_GROUPS, KeyBinding.TOGGLE_GROUPS_INTERFACE),
+    TOOGLE_OO(Localization.lang("OpenOffice/LibreOffice connection"), IconTheme.JabRefIcons.FILE_OPENOFFICE, KeyBinding.OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION),
+    TOGGLE_WEB_SEARCH(Localization.lang("Web search"), Localization.lang("Toggle web search interface"), IconTheme.JabRefIcons.WWW, KeyBinding.WEB_SEARCH),
+
+    NEW_SUB_LIBRARY_FROM_AUX(Localization.menuTitle("New sublibrary based on AUX file") + "...", Localization.lang("New BibTeX sublibrary"), IconTheme.JabRefIcons.NEW),
+    WRITE_XMP(Localization.menuTitle("Write XMP-metadata to PDFs"), Localization.lang("Will write XMP-metadata to the PDFs linked from selected entries."), KeyBinding.WRITE_XMP),
+
     MANAGE_CUSTOM_EXPORTS(Localization.menuTitle("Manage custom exports")),
     MANAGE_CUSTOM_IMPORTS(Localization.menuTitle("Manage custom imports")),
     CUSTOMIZE_ENTRY_TYPES(Localization.menuTitle("Customize entry types")),
@@ -123,6 +126,13 @@ public enum ActionsFX {
         this.keyBinding = Optional.of(keyBinding);
     }
 
+    ActionsFX(String text, String description, IconTheme.JabRefIcons icon) {
+        this.text = text;
+        this.description = description;
+        this.icon = Optional.of(icon);
+        this.keyBinding = Optional.empty();
+    }
+
     ActionsFX(String text, String description, IconTheme.JabRefIcons icon, KeyBinding keyBinding) {
         this.text = text;
         this.description = description;
@@ -142,6 +152,13 @@ public enum ActionsFX {
         this.description = description;
         this.icon = Optional.empty();
         this.keyBinding = Optional.empty();
+    }
+
+    ActionsFX(String text, String description, KeyBinding keyBinding) {
+        this.text = text;
+        this.description = description;
+        this.icon = Optional.empty();
+        this.keyBinding = Optional.of(keyBinding);
     }
 
     public Optional<JabRefIcon> getIcon() {

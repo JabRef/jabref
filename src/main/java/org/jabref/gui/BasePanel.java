@@ -59,7 +59,7 @@ import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.FindFullTextAction;
 import org.jabref.gui.externalfiles.SynchronizeFileField;
-import org.jabref.gui.externalfiles.WriteXMPAction;
+import org.jabref.gui.externalfiles.WriteXMPActionWorker;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -679,7 +679,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         actions.put(Actions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(frame));
         actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
 
-        actions.put(Actions.WRITE_XMP, new WriteXMPAction(this));
+        actions.put(Actions.WRITE_XMP, new WriteXMPActionWorker(this));
 
         actions.put(Actions.ABBREVIATE_ISO, new AbbreviateAction(this, true));
         actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));

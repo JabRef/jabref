@@ -40,7 +40,7 @@ public class GroupSidePane extends SidePaneComponent {
 
     @Override
     public ActionsFX getToggleAction() {
-        return ActionsFX.toggleGroups;
+        return ActionsFX.TOGGLE_GROUPS;
     }
 
     @Override

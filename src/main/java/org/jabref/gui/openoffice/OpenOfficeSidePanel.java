@@ -42,7 +42,7 @@ public class OpenOfficeSidePanel extends SidePaneComponent {
 
     @Override
     public ActionsFX getToggleAction() {
-        return ActionsFX.toggleOpenOffice;
+        return ActionsFX.TOOGLE_OO;
     }
 
     @Override

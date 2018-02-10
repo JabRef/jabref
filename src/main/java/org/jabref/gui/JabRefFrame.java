@@ -79,13 +79,14 @@ import org.jabref.gui.actions.MassSetFieldAction;
 import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.gui.actions.NewDatabaseAction;
 import org.jabref.gui.actions.NewEntryAction;
-import org.jabref.gui.actions.NewSubDatabaseAction;
+import org.jabref.gui.actions.NewSubLibraryAction;
 import org.jabref.gui.actions.OldDatabaseCommandWrapper;
 import org.jabref.gui.actions.OpenBrowserAction;
 import org.jabref.gui.actions.SetupGeneralFieldsAction;
 import org.jabref.gui.actions.ShowPreferencesAction;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.SortTabsAction;
+import org.jabref.gui.actions.WriteXMPAction;
 import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
 import org.jabref.gui.copyfiles.CopyFilesAction;
@@ -170,7 +171,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     // BasePanel's runCommand() method to be called with that command.
     // Note: GeneralAction's constructor automatically gets translations
     // for the name and message strings.
-    private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
     private final AbstractAction jabrefWebPageAction = new OpenBrowserAction("https://jabref.org",
             Localization.menuTitle("Website"), Localization.lang("Opens JabRef's website"),
             IconTheme.getImage("about"), IconTheme.getImage("about"));
@@ -282,10 +282,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             Localization.lang("Autogenerate BibTeX keys"),
             Globals.getKeyPrefs().getKey(KeyBinding.AUTOGENERATE_BIBTEX_KEYS),
             IconTheme.JabRefIcons.MAKE_KEY.getIcon());
-    private final AbstractAction writeXmpAction = new GeneralAction(Actions.WRITE_XMP,
-            Localization.menuTitle("Write XMP-metadata to PDFs"),
-            Localization.lang("Will write XMP-metadata to the PDFs linked from selected entries."),
-            Globals.getKeyPrefs().getKey(KeyBinding.WRITE_XMP));
+
     private final AbstractAction openFolder = new GeneralAction(Actions.OPEN_FOLDER,
             Localization.menuTitle("Open folder"), Localization.lang("Open folder"),
             Globals.getKeyPrefs().getKey(KeyBinding.OPEN_FOLDER));
@@ -963,8 +960,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         );
 
         edit.getItems().addAll(
-                factory.createMenuItem(ActionsFX.undo, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.redo, new OldDatabaseCommandWrapper(Actions.REDO, this, Globals.stateManager)),
+                factory.createMenuItem(ActionsFX.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
+                factory.createMenuItem(ActionsFX.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, Globals.stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -984,7 +981,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(ActionsFX.sendAsEmail, new OldDatabaseCommandWrapper(Actions.SEND_AS_EMAIL, this, Globals.stateManager)),
+                factory.createMenuItem(ActionsFX.SEND_AS_EMAIL, new OldDatabaseCommandWrapper(Actions.SEND_AS_EMAIL, this, Globals.stateManager)),
 
                 new SeparatorMenuItem()
         );
@@ -1040,9 +1037,15 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         //factory.createMenuItem(ActionsFX., new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
 
         edit.getItems().addAll(
-                factory.createMenuItem(ActionsFX.manageKeywords, new ManageKeywordsAction(this)),
-                factory.createMenuItem(ActionsFX.replaceAll, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.massSetField, new MassSetFieldAction(this))
+                factory.createMenuItem(ActionsFX.MANAGE_KEYWORDS, new ManageKeywordsAction(this)),
+                factory.createMenuItem(ActionsFX.REPLACE_ALL, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, Globals.stateManager)),
+                factory.createMenuItem(ActionsFX.MASS_SET_FIELDS, new MassSetFieldAction(this))
+        );
+
+        tools.getItems().addAll(
+                factory.createMenuItem(ActionsFX.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(this)),
+                factory.createMenuItem(ActionsFX.WRITE_XMP, new WriteXMPAction(getCurrentBasePanel()))
+
         );
 
         options.getItems().addAll(
@@ -1059,7 +1062,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
 
         /*
-factory.createMenuItem(ActionsFX., new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
+        factory.createMenuItem(ActionsFX., new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
 
         search.add(normalSearch);
         search.addSeparator();

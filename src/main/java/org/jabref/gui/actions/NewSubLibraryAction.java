@@ -1,13 +1,8 @@
 package org.jabref.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.Action;
-
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelPreferences;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.auximport.FromAuxDialog;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -18,21 +13,16 @@ import org.jabref.model.database.BibDatabaseContext;
 /**
  * The action concerned with generate a new (sub-)database from latex AUX file.
  */
-public class NewSubDatabaseAction extends MnemonicAwareAction {
+public class NewSubLibraryAction extends SimpleCommand {
 
     private final JabRefFrame jabRefFrame;
 
-    public NewSubDatabaseAction(JabRefFrame jabRefFrame) {
-        super(IconTheme.JabRefIcons.NEW.getIcon());
+    public NewSubLibraryAction(JabRefFrame jabRefFrame) {
         this.jabRefFrame = jabRefFrame;
-        putValue(Action.NAME, Localization.menuTitle("New sublibrary based on AUX file") + "...");
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang("New BibTeX sublibrary"));
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        // Create a new, empty, database.
-
+    public void execute() {
         FromAuxDialog dialog = new FromAuxDialog(jabRefFrame, "", true, jabRefFrame.getTabbedPane());
 
         dialog.setVisible(true);
@@ -44,4 +34,5 @@ public class NewSubDatabaseAction extends MnemonicAwareAction {
             jabRefFrame.output(Localization.lang("New library created."));
         }
     }
+
 }

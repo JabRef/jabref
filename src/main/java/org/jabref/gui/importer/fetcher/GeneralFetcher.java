@@ -62,7 +62,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
     @Override
     public ActionsFX getToggleAction() {
-        return ActionsFX.toggleWebSearch;
+        return ActionsFX.TOGGLE_WEB_SEARCH;
     }
 
     @Override

@@ -43,7 +43,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
  * This action goes through all selected entries in the BasePanel, and attempts
  * to write the XMP data to the external pdf.
  */
-public class WriteXMPAction extends AbstractWorker {
+public class WriteXMPActionWorker extends AbstractWorker {
 
     private final BasePanel panel;
     private final JabRefFrame frame;
@@ -61,7 +61,7 @@ public class WriteXMPAction extends AbstractWorker {
     private int errors;
 
 
-    public WriteXMPAction(BasePanel panel) {
+    public WriteXMPActionWorker(BasePanel panel) {
         this.panel = panel;
         this.frame = panel.frame();
     }
