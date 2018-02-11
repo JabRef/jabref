@@ -87,6 +87,14 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
+    public void showErrorDialogAndWait(String title, String content, Throwable exception) {
+        ExceptionDialog exceptionDialog = new ExceptionDialog(exception);
+        exceptionDialog.setHeaderText(title);
+        exceptionDialog.setContentText(content);
+        exceptionDialog.showAndWait();
+    }
+
+    @Override
     public void showErrorDialogAndWait(String message) {
         FXDialog alert = createDialog(AlertType.ERROR, Localization.lang("Error Occurred"), message);
         alert.showAndWait();

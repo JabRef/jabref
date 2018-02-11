@@ -407,9 +407,9 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 numSelected = entries.size();
 
                 if (entries.isEmpty()) { // None selected. Inform the user to select entries first.
-                    JOptionPane.showMessageDialog(null,
-                            Localization.lang("First select the entries you want keys to be generated for."),
-                            Localization.lang("Autogenerate BibTeX keys"), JOptionPane.INFORMATION_MESSAGE);
+                    dialogService.showWarningDialogAndWait(
+                            Localization.lang("Autogenerate BibTeX keys"),
+                            Localization.lang("First select the entries you want keys to be generated for."));
                     return;
                 }
                 frame.block();
@@ -1042,8 +1042,10 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 LOGGER.warn("Could not save", ex);
             }
 
-            JOptionPane.showMessageDialog(null, Localization.lang("Could not save file.") + "\n" + ex.getMessage(),
-                    SAVE_DATABASE, JOptionPane.ERROR_MESSAGE);
+            dialogService.showErrorDialogAndWait(
+                    SAVE_DATABASE,
+                    Localization.lang("Could not save file."),
+                    ex);
             throw new SaveException("rt");
         } finally {
             frame.unblock();
