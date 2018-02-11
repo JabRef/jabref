@@ -158,8 +158,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private final UndoAction undoAction = new UndoAction();
     private final RedoAction redoAction = new RedoAction();
     private final CountingUndoManager undoManager;
-    private final List<BibEntry> previousEntries = new ArrayList<>();
-    private final List<BibEntry> nextEntries = new ArrayList<>();
     // Keeps track of the string dialog if it is open.
     private final Map<Actions, Object> actions = new HashMap<>();
     private final SidePaneManager sidePaneManager;
@@ -181,9 +179,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     // Used to track whether the base has changed since last save.
     private MainTable mainTable;
     private BibEntry showing;
-    // Variable to prevent erroneous update of back/forward histories at the time
-    // when a Back or Forward operation is being processed:
-    private boolean backOrForwardInProgress;
+
     // in switching between entries.
     private PreambleEditor preambleEditor;
     // Keeps track of the preamble dialog if it is open.
@@ -336,10 +332,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         actions.put(Actions.UNDO, undoAction);
         actions.put(Actions.REDO, redoAction);
-
-        actions.put(Actions.FOCUS_TABLE, (BaseAction) () -> {
-            mainTable.requestFocus();
-        });
 
         // The action for opening an entry editor.
         actions.put(Actions.EDIT, (BaseAction) this::showAndEdit);
@@ -685,9 +677,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
         actions.put(Actions.AUTO_SET_FILE, new SynchronizeFileField(this));
-
-        actions.put(Actions.BACK, (BaseAction) BasePanel.this::back);
-        actions.put(Actions.FORWARD, (BaseAction) BasePanel.this::forward);
 
         actions.put(Actions.RESOLVE_DUPLICATE_KEYS, new SearchFixDuplicateLabels(this));
 
@@ -1422,7 +1411,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
             if (entry != getShowing()) {
                 entryEditor.setEntry(entry);
-                newEntryShowing(entry);
+                showing = entry;
             }
             entryEditor.requestFocus();
 
@@ -1802,71 +1791,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
     private BibEntry getShowing() {
         return showing;
-    }
-
-    /**
-     * Update the pointer to the currently shown entry in all cases where the user has moved to a new entry, except when
-     * using Back and Forward commands. Also updates history for Back command, and clears history for Forward command.
-     *
-     * @param entry The entry that is now to be shown.
-     */
-    private void newEntryShowing(BibEntry entry) {
-
-        // If this call is the result of a Back or Forward operation, we must take
-        // care not to make any history changes, since the necessary changes will
-        // already have been done in the back() or forward() method:
-        if (backOrForwardInProgress) {
-            showing = entry;
-            backOrForwardInProgress = false;
-            setBackAndForwardEnabledState();
-            return;
-        }
-        nextEntries.clear();
-        if (!Objects.equals(entry, showing)) {
-            // Add the entry we are leaving to the history:
-            if (showing != null) {
-                previousEntries.add(showing);
-                if (previousEntries.size() > GUIGlobals.MAX_BACK_HISTORY_SIZE) {
-                    previousEntries.remove(0);
-                }
-            }
-            showing = entry;
-            setBackAndForwardEnabledState();
-        }
-    }
-
-    /**
-     * Go back (if there is any recorded history) and update the histories for the Back and Forward commands.
-     */
-    private void back() {
-        if (!previousEntries.isEmpty()) {
-            BibEntry toShow = previousEntries.get(previousEntries.size() - 1);
-            previousEntries.remove(previousEntries.size() - 1);
-            // Add the entry we are going back from to the Forward history:
-            if (showing != null) {
-                nextEntries.add(showing);
-            }
-            backOrForwardInProgress = true; // to avoid the history getting updated erroneously
-            clearAndSelect(toShow);
-        }
-    }
-
-    private void forward() {
-        if (!nextEntries.isEmpty()) {
-            BibEntry toShow = nextEntries.get(nextEntries.size() - 1);
-            nextEntries.remove(nextEntries.size() - 1);
-            // Add the entry we are going forward from to the Back history:
-            if (showing != null) {
-                previousEntries.add(showing);
-            }
-            backOrForwardInProgress = true; // to avoid the history getting updated erroneously
-            clearAndSelect(toShow);
-        }
-    }
-
-    public void setBackAndForwardEnabledState() {
-        frame.getBackAction().setEnabled(!previousEntries.isEmpty());
-        frame.getForwardAction().setEnabled(!nextEntries.isEmpty());
     }
 
     private String formatOutputMessage(String start, int count) {

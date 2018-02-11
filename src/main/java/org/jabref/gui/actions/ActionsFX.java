@@ -109,6 +109,13 @@ public enum ActionsFX {
     CUSTOMIZE_KEYBINDING(Localization.lang("Customize key bindings"), IconTheme.JabRefIcons.KEY_BINDINGS),
     MANAGE_CONTENT_SELECTORS(Localization.menuTitle("Manage content selectors"), IconTheme.JabRefIcons.PREFERENCES),
 
+    TOGGLE_PREVIEW(Localization.lang("Toggle entry preview"), IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW, KeyBinding.TOGGLE_ENTRY_PREVIEW),
+    EDIT_ENTRY(Localization.lang("Edit entry"), IconTheme.JabRefIcons.EDIT_ENTRY, KeyBinding.EDIT_ENTRY),
+    SHOW_PDV_VIEWER(Localization.lang("Show document viewer"), IconTheme.JabRefIcons.PDF_FILE),
+    NEXT_PREVIEW_STYLE(Localization.menuTitle("Next preview layout"), KeyBinding.NEXT_PREVIEW_LAYOUT),
+    PREVIOUS_PREVIEW_STYLE(Localization.menuTitle("Previous preview layout"), KeyBinding.PREVIOUS_PREVIEW_LAYOUT),
+    SELECT_ALL(Localization.menuTitle("Select all"), KeyBinding.SELECT_ALL),
+
     WEB_MENU(Localization.menuTitle("JabRef resources")),
     OPEN_WEBPAGE(Localization.menuTitle("Website"), Localization.lang("Opens JabRef's website")),
     OPEN_FACEBOOK("Facebook", Localization.lang("Opens JabRef's Facebook page"), IconTheme.JabRefIcons.FACEBOOK),

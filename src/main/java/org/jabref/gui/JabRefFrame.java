@@ -55,6 +55,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -84,12 +85,11 @@ import org.jabref.gui.actions.OldDatabaseCommandWrapper;
 import org.jabref.gui.actions.OpenBrowserAction;
 import org.jabref.gui.actions.SearchForUpdateAction;
 import org.jabref.gui.actions.SetupGeneralFieldsAction;
+import org.jabref.gui.actions.ShowDocumentViewerAction;
 import org.jabref.gui.actions.ShowPreferencesAction;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.actions.SortTabsAction;
 import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
-import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.exporter.ExportCommand;
 import org.jabref.gui.exporter.SaveAllAction;
 import org.jabref.gui.exporter.SaveDatabaseAction;
@@ -150,8 +150,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     // Frame titles.
     public static final String FRAME_TITLE = "JabRef";
     private static final String ELLIPSES = "...";
-    public final AbstractAction nextTab = new ChangeTabAction(true);
-    public final AbstractAction prevTab = new ChangeTabAction(false);
     private final SplitPane splitPane = new SplitPane();
     private final JabRefPreferences prefs = Globals.prefs;
     private final Insets marg = new Insets(1, 0, 2, 0);
@@ -178,16 +176,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final AbstractAction help = new HelpAction(Localization.menuTitle("Online help"), Localization.lang("Online help"),
             HelpFile.CONTENTS, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
 
-    private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, Localization.menuTitle("Edit entry"),
-            Localization.lang("Edit entry"), Globals.getKeyPrefs().getKey(KeyBinding.EDIT_ENTRY), IconTheme.JabRefIcons.EDIT_ENTRY.getIcon());
-    private final AbstractAction focusTable = new GeneralAction(Actions.FOCUS_TABLE,
-            Localization.menuTitle("Focus entry table"),
-            Localization.lang("Move the keyboard focus to the entry table"), Globals.getKeyPrefs().getKey(KeyBinding.FOCUS_ENTRY_TABLE));
-    private final AbstractAction sortTabs = new SortTabsAction(this);
-    private final AbstractAction forward = new GeneralAction(Actions.FORWARD, Localization.menuTitle("Forward"),
-            Localization.lang("Forward"), Globals.getKeyPrefs().getKey(KeyBinding.FORWARD), IconTheme.JabRefIcons.RIGHT.getIcon());
-    private final AbstractAction back = new GeneralAction(Actions.BACK, Localization.menuTitle("Back"),
-            Localization.lang("Back"), Globals.getKeyPrefs().getKey(KeyBinding.BACK), IconTheme.JabRefIcons.LEFT.getIcon());
     private final AbstractAction deleteEntry = new GeneralAction(Actions.DELETE, Localization.menuTitle("Delete entry"),
             Localization.lang("Delete entry"), Globals.getKeyPrefs().getKey(KeyBinding.DELETE_ENTRY), IconTheme.JabRefIcons.DELETE_ENTRY.getIcon());
 
@@ -224,33 +212,11 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             Localization.lang("Edit strings"),
             Globals.getKeyPrefs().getKey(KeyBinding.EDIT_STRINGS),
             IconTheme.JabRefIcons.EDIT_STRINGS.getIcon());
-    private final Action toggleToolbar = enableToggle(new AbstractAction(Localization.menuTitle("Hide/show toolbar")) {
-
-        {
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Hide/show toolbar"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            tlb.setVisible(!tlb.isVisible());
-        }
-    });
-    private final AbstractAction showPdvViewer = new ShowDocumentViewerAction();
     private final AbstractAction addToGroup = new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group") + ELLIPSES);
     private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP,
             Localization.lang("Remove from group") + ELLIPSES);
     private final AbstractAction moveToGroup = new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group") + ELLIPSES);
-    private final Action togglePreview = enableToggle(new GeneralAction(Actions.TOGGLE_PREVIEW,
-            Localization.menuTitle("Toggle entry preview"),
-            Localization.lang("Toggle entry preview"),
-            Globals.getKeyPrefs().getKey(KeyBinding.TOGGLE_ENTRY_PREVIEW),
-            IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW.getIcon()));
-    private final AbstractAction nextPreviewStyle = new GeneralAction(Actions.NEXT_PREVIEW_STYLE,
-            Localization.menuTitle("Next preview layout"),
-            Globals.getKeyPrefs().getKey(KeyBinding.NEXT_PREVIEW_LAYOUT));
-    private final AbstractAction previousPreviewStyle = new GeneralAction(Actions.PREVIOUS_PREVIEW_STYLE,
-            Localization.menuTitle("Previous preview layout"),
-            Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_PREVIEW_LAYOUT));
+
     private final AbstractAction makeKeyAction = new GeneralAction(Actions.MAKE_KEY,
             Localization.menuTitle("Autogenerate BibTeX keys"),
             Localization.lang("Autogenerate BibTeX keys"),
@@ -280,9 +246,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final AbstractAction downloadFullText = new GeneralAction(Actions.DOWNLOAD_FULL_TEXT,
             Localization.menuTitle("Look up full text documents"),
             Globals.getKeyPrefs().getKey(KeyBinding.DOWNLOAD_FULL_TEXT));
-    private final AbstractAction increaseFontSize = new IncreaseTableFontSizeAction();
-    private final AbstractAction defaultFontSize = new DefaultTableFontSizeAction();
-    private final AbstractAction decreseFontSize = new DecreaseTableFontSizeAction();
     private final AbstractAction resolveDuplicateKeys = new GeneralAction(Actions.RESOLVE_DUPLICATE_KEYS,
             Localization.menuTitle("Resolve duplicate BibTeX keys"),
             Localization.lang("Find and remove duplicate BibTeX keys"),
@@ -431,6 +394,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         initActions();
 
+        initKeyBindings();
+
         // Show the toolbar if it was visible at last shutdown:
         tlb.setVisible(Globals.prefs.getBoolean(JabRefPreferences.TOOLBAR_VISIBLE));
 
@@ -483,8 +448,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             setWindowTitle();
             // Update search autocompleter with information for the correct database:
             currentBasePanel.updateSearchManager();
-            // Set correct enabled state for Back and Forward actions:
-            currentBasePanel.setBackAndForwardEnabledState();
+
             currentBasePanel.getUndoManager().postUndoRedoEvent();
             currentBasePanel.getMainTable().requestFocus();
         });
@@ -502,6 +466,41 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         initShowTrackingNotification();
 
+    }
+
+    private void initKeyBindings() {
+        addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
+            if (keyBinding.isPresent()) {
+                switch (keyBinding.get()) {
+                    case FOCUS_ENTRY_TABLE:
+                        getCurrentBasePanel().getMainTable().requestFocus();
+                        event.consume();
+                        break;
+                    case NEXT_LIBRARY:
+                        tabbedPane.getSelectionModel().selectNext();
+                        event.consume();
+                        break;
+                    case PREVIOUS_LIBRARY:
+                        tabbedPane.getSelectionModel().selectPrevious();
+                        event.consume();
+                        break;
+                    case INCREASE_TABLE_FONT_SIZE:
+                        increaseTableFontSize();
+                        event.consume();
+                        break;
+                    case DECREASE_TABLE_FONT_SIZE:
+                        decreaseTableFontSize();
+                        event.consume();
+                        break;
+                    case DEFAULT_TABLE_FONT_SIZE:
+                        setDefaultTableFontSize();
+                        event.consume();
+                        break;
+                    default:
+                }
+            }
+        });
     }
 
     private void initShowTrackingNotification() {
@@ -885,7 +884,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                         factory.createMenuItem(ActionsFX.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, false)),
                         factory.createMenuItem(ActionsFX.EXPORT_ALL, new ExportCommand(this, false)),
                         factory.createMenuItem(ActionsFX.EXPORT_SELECTED, new ExportCommand(this, true)),
-                        factory.createMenuItem(ActionsFX.SAVE_SELECTED_AS_PLAIN_BIBTEX, new OldDatabaseCommandWrapper(Actions.SAVE_SELECTED_AS_PLAIN, this, Globals.stateManager))),
+                        factory.createMenuItem(ActionsFX.SAVE_SELECTED_AS_PLAIN_BIBTEX, new OldDatabaseCommandWrapper(Actions.SAVE_SELECTED_AS_PLAIN, this, Globals.stateManager))
+                ),
 
                 new SeparatorMenuItem(),
 
@@ -899,7 +899,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(ActionsFX.CLOSE_LIBRARY, new CloseDatabaseAction()),
-                factory.createMenuItem(ActionsFX.QUIT, new CloseAction()));
+                factory.createMenuItem(ActionsFX.QUIT, new CloseAction())
+        );
 
         edit.getItems().addAll(
                 factory.createMenuItem(ActionsFX.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
@@ -916,7 +917,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                         factory.createMenuItem(ActionsFX.COPY_KEY_AND_TITLE, new OldDatabaseCommandWrapper(Actions.COPY_KEY_AND_TITLE, this, Globals.stateManager)),
                         factory.createMenuItem(ActionsFX.COPY_KEY_AND_LINK, new OldDatabaseCommandWrapper(Actions.COPY_KEY_AND_LINK, this, Globals.stateManager)),
                         factory.createMenuItem(ActionsFX.COPY_CITATION_PREVIEW, new OldDatabaseCommandWrapper(Actions.COPY_CITATION_HTML, this, Globals.stateManager)),
-                        factory.createMenuItem(ActionsFX.EXPORT_SELECTED_TO_CLIPBOARD, new OldDatabaseCommandWrapper(Actions.EXPORT_TO_CLIPBOARD, this, Globals.stateManager))),
+                        factory.createMenuItem(ActionsFX.EXPORT_SELECTED_TO_CLIPBOARD, new OldDatabaseCommandWrapper(Actions.EXPORT_TO_CLIPBOARD, this, Globals.stateManager))
+                ),
 
                 factory.createMenuItem(ActionsFX.PASTE, new EditAction(Actions.PASTE)),
 
@@ -924,7 +926,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 factory.createMenuItem(ActionsFX.SEND_AS_EMAIL, new OldDatabaseCommandWrapper(Actions.SEND_AS_EMAIL, this, Globals.stateManager)),
 
-                new SeparatorMenuItem());
+                new SeparatorMenuItem()
+        );
         /*
         edit.add(mark);
         for (int i = 0; i < EntryMarker.MAX_MARKING_LEVEL; i++) {
@@ -974,12 +977,30 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
         */
 
-        //factory.createMenuItem(ActionsFX., new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
-
         edit.getItems().addAll(
                 factory.createMenuItem(ActionsFX.MANAGE_KEYWORDS, new ManageKeywordsAction(this)),
                 factory.createMenuItem(ActionsFX.REPLACE_ALL, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.MASS_SET_FIELDS, new MassSetFieldAction(this)));
+                factory.createMenuItem(ActionsFX.MASS_SET_FIELDS, new MassSetFieldAction(this))
+        );
+
+        SidePaneComponent webSearch = sidePaneManager.getComponent(SidePaneType.WEB_SEARCH);
+        SidePaneComponent groups = sidePaneManager.getComponent(SidePaneType.GROUPS);
+        view.getItems().addAll(
+                factory.createMenuItem(webSearch.getToggleAction(), webSearch.getToggleCommand()),
+                factory.createMenuItem(groups.getToggleAction(), groups.getToggleCommand()),
+                factory.createMenuItem(ActionsFX.TOGGLE_PREVIEW, new OldDatabaseCommandWrapper(Actions.TOGGLE_PREVIEW, this, Globals.stateManager)),
+                factory.createMenuItem(ActionsFX.EDIT_ENTRY, new OldDatabaseCommandWrapper(Actions.EDIT, this, Globals.stateManager)),
+                factory.createMenuItem(ActionsFX.SHOW_PDV_VIEWER, new ShowDocumentViewerAction()),
+
+                new SeparatorMenuItem(),
+
+                factory.createMenuItem(ActionsFX.SELECT_ALL, new OldDatabaseCommandWrapper(Actions.SELECT_ALL, this, Globals.stateManager)),
+
+                new SeparatorMenuItem(),
+
+                factory.createMenuItem(ActionsFX.NEXT_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.NEXT_PREVIEW_STYLE, this, Globals.stateManager)),
+                factory.createMenuItem(ActionsFX.PREVIOUS_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.PREVIOUS_PREVIEW_STYLE, this, Globals.stateManager))
+        );
 
         tools.getItems().addAll(
                 factory.createMenuItem(ActionsFX.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(this)),
@@ -994,7 +1015,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(ActionsFX.ABBREVIATE_ISO, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_ISO, this, Globals.stateManager)),
                 factory.createMenuItem(ActionsFX.ABBREVIATE_MEDLINE, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_MEDLINE, this, Globals.stateManager)),
                 factory.createMenuItem(ActionsFX.UNABBREVIATE, new OldDatabaseCommandWrapper(Actions.UNABBREVIATE, this, Globals.stateManager))
-
         );
 
         options.getItems().addAll(
@@ -1006,50 +1026,41 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(ActionsFX.MANAGE_JOURNALS, new ManageJournalsAction()),
                 factory.createMenuItem(ActionsFX.CUSTOMIZE_KEYBINDING, new CustomizeKeyBindingAction()),
                 factory.createMenuItem(ActionsFX.MANAGE_PROTECTED_TERMS, new ManageProtectedTermsAction(this, Globals.protectedTermsLoader)),
-                factory.createMenuItem(ActionsFX.MANAGE_CONTENT_SELECTORS, new OldDatabaseCommandWrapper(Actions.MANAGE_SELECTORS, this, Globals.stateManager)));
+                factory.createMenuItem(ActionsFX.MANAGE_CONTENT_SELECTORS, new OldDatabaseCommandWrapper(Actions.MANAGE_SELECTORS, this, Globals.stateManager))
+        );
 
         help.getItems().addAll(
                 //TODO: This. helpAction
                 factory.createMenuItem(ActionsFX.OPEN_FORUM, new OpenBrowserAction("https://discourse.jabref.org/")),
+
                 new SeparatorMenuItem(),
+
                 factory.createMenuItem(ActionsFX.ERROR_CONSOLE, new ErrorConsoleAction()),
+
                 new SeparatorMenuItem(),
+
                 factory.createMenuItem(ActionsFX.SEARCH_FOR_UPDATES, new SearchForUpdateAction()),
                 factory.createSubMenu(ActionsFX.WEB_MENU,
                         factory.createMenuItem(ActionsFX.OPEN_WEBPAGE, new OpenBrowserAction("https://jabref.org/")),
                         factory.createMenuItem(ActionsFX.OPEN_BLOG, new OpenBrowserAction("https://blog.jabref.org/")),
                         factory.createMenuItem(ActionsFX.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
                         factory.createMenuItem(ActionsFX.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org")),
+
                         new SeparatorMenuItem(),
+
                         factory.createMenuItem(ActionsFX.FORK_ME, new OpenBrowserAction("https://github.com/JabRef/jabref")),
                         factory.createMenuItem(ActionsFX.OPEN_DEV_VERSION_LINK, new OpenBrowserAction("https://builds.jabref.org/master/")),
                         factory.createMenuItem(ActionsFX.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/master/CHANGELOG.md")),
+
                         new SeparatorMenuItem(),
-                        factory.createMenuItem(ActionsFX.DONATE, new OpenBrowserAction("https://donations.jabref.org"))),
-                factory.createMenuItem(ActionsFX.ABOUT, new AboutAction()));
 
-        /*
+                        factory.createMenuItem(ActionsFX.DONATE, new OpenBrowserAction("https://donations.jabref.org"))
+                ),
+                factory.createMenuItem(ActionsFX.ABOUT, new AboutAction())
+        );
 
-        help.add(this.help);
-        help.add(openForumAction);
-        help.addSeparator();
-        help.add(errorConsole);
-        help.addSeparator();
-        help.add(new SearchForUpdateAction());
-        JMenu webMenu = JabRefFrame.subMenu(Localization.menuTitle("JabRef resources"));
-        webMenu.add(jabrefWebPageAction);
-        webMenu.add(jabrefBlogAction);
-        webMenu.add(jabrefFacebookAction);
-        webMenu.add(jabrefTwitterAction);
-        webMenu.addSeparator();
-        webMenu.add(forkMeOnGitHubAction);
-        webMenu.add(developmentVersionAction);
-        webMenu.add(changeLogAction);
-        webMenu.addSeparator();
-        webMenu.add(donationAction);
-        help.add(webMenu);
-        help.add(about);
-        */
+
+
 
         /*
         factory.createMenuItem(ActionsFX., new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
@@ -1071,24 +1082,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         groups.add(moveToGroup);
         mb.add(groups);
 
-        view.add(getBackAction());
-        view.add(getForwardAction());
-        view.add(focusTable);
-        view.add(nextTab);
-        view.add(prevTab);
-        view.add(sortTabs);
-        view.addSeparator();
-        view.add(increaseFontSize);
-        view.add(decreseFontSize);
-        view.add(defaultFontSize);
-        view.addSeparator();
-        view.add(new JCheckBoxMenuItem(toggleToolbar));
-        view.add(new JCheckBoxMenuItem(enableToggle(generalFetcher.getToggleCommand())));
-        view.add(new JCheckBoxMenuItem(groupSidePane.getToggleCommand()));
-        view.add(new JCheckBoxMenuItem(togglePreview));
-        view.add(showPdvViewer);
-        view.add(getNextPreviewStyleAction());
-        view.add(getPreviousPreviewStyleAction());
+
 
         mb.add(view);
 
@@ -1101,7 +1095,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         library.add(plainTextImport);
         library.addSeparator();
-        library.add(editEntry);
         library.add(editPreamble);
         library.add(editStrings);
         library.addSeparator();
@@ -1386,8 +1379,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             setEnabled(severalDatabasesOnlyActions, tabCount > 1);
         }
         if (tabCount == 0) {
-            getBackAction().setEnabled(false);
-            getForwardAction().setEnabled(false);
             setEnabled(openAndSavedDatabasesOnlyActions, false);
             setEnabled(sharedDatabaseOnlyActions, false);
             setEnabled(oneEntryOnlyActions, false);
@@ -1567,15 +1558,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 createDisabledIconsForButtons((JPanel) component);
             }
         }
-    }
-
-    public void sortTabs() {
-        // We are going to be crude: remove all tabs and re-add them in a sorted way
-        // This is ugly, but otherwise we run into issues: https://stackoverflow.com/questions/37328760/javafx-tabpane-sorting-tabs-creates-havoc
-        List<Tab> tabs = new ArrayList<>(tabbedPane.getTabs());
-        tabs.sort((o1, o2) -> o2.getText().compareTo(o1.getText()));
-        tabbedPane.getTabs().clear();
-        tabbedPane.getTabs().setAll(tabs);
     }
 
     /**
@@ -1833,22 +1815,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         return statusLine.getText();
     }
 
-    public AbstractAction getForwardAction() {
-        return forward;
-    }
-
-    public AbstractAction getBackAction() {
-        return back;
-    }
-
-    public AbstractAction getNextPreviewStyleAction() {
-        return nextPreviewStyle;
-    }
-
-    public AbstractAction getPreviousPreviewStyleAction() {
-        return previousPreviewStyle;
-    }
-
     public SplitPane getSplitPane() {
         return splitPane;
     }
@@ -1975,27 +1941,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
     }
 
-    private class ChangeTabAction extends MnemonicAwareAction {
-
-        private final boolean next;
-
-        public ChangeTabAction(boolean next) {
-            putValue(Action.NAME, next ? Localization.menuTitle("Next tab") : Localization.menuTitle("Previous tab"));
-            this.next = next;
-            putValue(Action.ACCELERATOR_KEY,
-                    next ? Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB) : Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (next) {
-                tabbedPane.getSelectionModel().selectNext();
-            } else {
-                tabbedPane.getSelectionModel().selectPrevious();
-            }
-        }
-    }
-
     /**
      * Class for handling general actions; cut, copy and paste. The focused component is
      * kept track of by Globals.focusListener, and we call the action stored under the
@@ -2044,49 +1989,23 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
     }
 
-    private class DefaultTableFontSizeAction extends MnemonicAwareAction {
-
-        public DefaultTableFontSizeAction() {
-            putValue(Action.NAME, Localization.menuTitle("Default table font size"));
-            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.DEFAULT_TABLE_FONT_SIZE));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
+    private void setDefaultTableFontSize() {
             GUIGlobals.setFont(Globals.prefs.getIntDefault(JabRefPreferences.FONT_SIZE));
             for (BasePanel basePanel : getBasePanelList()) {
                 basePanel.updateTableFont();
             }
             setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
         }
-    }
 
-    private class IncreaseTableFontSizeAction extends MnemonicAwareAction {
-
-        public IncreaseTableFontSizeAction() {
-            putValue(Action.NAME, Localization.menuTitle("Increase table font size"));
-            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.INCREASE_TABLE_FONT_SIZE));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
+    private void increaseTableFontSize() {
             GUIGlobals.setFont(GUIGlobals.currentFont.getSize() + 1);
             for (BasePanel basePanel : getBasePanelList()) {
                 basePanel.updateTableFont();
             }
             setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
         }
-    }
 
-    private class DecreaseTableFontSizeAction extends MnemonicAwareAction {
-
-        public DecreaseTableFontSizeAction() {
-            putValue(Action.NAME, Localization.menuTitle("Decrease table font size"));
-            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.DECREASE_TABLE_FONT_SIZE));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
+    private void decreaseTableFontSize() {
             int currentSize = GUIGlobals.currentFont.getSize();
             if (currentSize < 2) {
                 return;
@@ -2097,7 +2016,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             }
             setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
         }
-    }
 
     private class CloseDatabaseAction extends SimpleCommand {
 

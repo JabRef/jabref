@@ -30,7 +30,6 @@ public class GUIGlobals {
     public static final int WIDTH_ICON_COL_RANKING = 5 * JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL); // Width of Ranking Icon Column
 
     public static final String UNTITLED_TITLE = Localization.lang("untitled");
-    public static final int MAX_BACK_HISTORY_SIZE = 10; // The maximum number of "Back" operations stored.
 
     //	Colors.
     public static final Color ENTRY_EDITOR_LABEL_COLOR = new Color(100, 100, 150); // Empty field, blue.
