@@ -264,3 +264,7 @@
 .sidePaneComponentHeader {
     -fx-background-color: -fx-dark-background;
 }
+
+.mainMenu {
+    -fx-background-color: #7d6180;
+}

@@ -1182,13 +1182,14 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         */
 
         MenuBar menu = new MenuBar();
+        menu.getStyleClass().add("mainMenu");
         menu.getMenus().addAll(
                 file,
                 edit,
                 library,
                 quality,
-                view,
                 tools,
+                view,
                 options,
                 help);
         return menu;
