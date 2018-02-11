@@ -1,7 +1,7 @@
 package org.jabref.logic.layout.format;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class AuthorFirstFirstTest {
 
@@ -11,7 +11,7 @@ public class AuthorFirstFirstTest {
      */
     @Test
     public void testFormat() {
-        Assert.assertEquals("John von Neumann and John Smith and Peter Black Brown, Jr",
+        assertEquals("John von Neumann and John Smith and Peter Black Brown, Jr",
                 new AuthorFirstFirst()
                         .format("von Neumann,,John and John Smith and Black Brown, Jr, Peter"));
     }
