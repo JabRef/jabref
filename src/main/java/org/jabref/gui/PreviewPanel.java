@@ -67,15 +67,16 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     private Optional<Future<?>> citationStyleFuture = Optional.empty();
 
     /**
-     * @param preferences
      * @param panel           (may be null) Only set this if the preview is associated to the main window.
      * @param databaseContext (may be null) Used for resolving pdf directories for links.
+     * @param preferences
+     * @param dialogService
      */
-    public PreviewPanel(BasePanel panel, BibDatabaseContext databaseContext, KeyBindingRepository keyBindingRepository, PreviewPreferences preferences) {
+    public PreviewPanel(BasePanel panel, BibDatabaseContext databaseContext, KeyBindingRepository keyBindingRepository, PreviewPreferences preferences, DialogService dialogService) {
         this.databaseContext = Optional.ofNullable(databaseContext);
         this.basePanel = Optional.ofNullable(panel);
+        this.dialogService = dialogService;
         this.clipBoardManager = new ClipBoardManager();
-        this.dialogService = new FXDialogService();
         this.keyBindingRepository = keyBindingRepository;
 
         // Set up scroll pane for preview pane

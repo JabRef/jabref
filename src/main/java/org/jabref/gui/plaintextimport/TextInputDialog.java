@@ -62,7 +62,6 @@ import org.jabref.Globals;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.EntryMarker;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -559,7 +558,7 @@ public class TextInputDialog extends JabRefDialog {
                         .addExtensionFilter(FileType.TXT)
                         .withDefaultExtension(FileType.TXT)
                         .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-                DialogService ds = new FXDialogService();
+                DialogService ds = frame.getDialogService();
 
                 Optional<Path> path = DefaultTaskExecutor
                         .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));

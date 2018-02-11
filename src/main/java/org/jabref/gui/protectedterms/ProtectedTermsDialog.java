@@ -37,7 +37,6 @@ import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -435,7 +434,7 @@ public class ProtectedTermsDialog {
                     .addExtensionFilter(FileType.TERMS)
                     .withDefaultExtension(FileType.TERMS)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-            DialogService ds = new FXDialogService();
+            DialogService ds = frame.getDialogService();
 
             browse.addActionListener(e -> {
                 Optional<Path> file = DefaultTaskExecutor

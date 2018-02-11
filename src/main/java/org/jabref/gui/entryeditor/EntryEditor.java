@@ -20,6 +20,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.help.HelpAction;
@@ -68,13 +69,15 @@ public class EntryEditor extends BorderPane {
     private SourceTab sourceTab;
     @FXML private Label typeLabel;
     private final EntryEditorPreferences preferences;
+    private final DialogService dialogService;
 
-    public EntryEditor(BasePanel panel, EntryEditorPreferences preferences, FileUpdateMonitor fileMonitor) {
+    public EntryEditor(BasePanel panel, EntryEditorPreferences preferences, FileUpdateMonitor fileMonitor, DialogService dialogService) {
         this.panel = panel;
         this.bibDatabaseContext = panel.getBibDatabaseContext();
         this.undoManager = panel.getUndoManager();
         this.preferences = Objects.requireNonNull(preferences);
         this.fileMonitor = fileMonitor;
+        this.dialogService = dialogService;
 
         ControlHelper.loadFXMLForControl(this);
 
@@ -155,19 +158,19 @@ public class EntryEditor extends BorderPane {
         List<EntryEditorTab> tabs = new LinkedList<>();
 
         // Required fields
-        tabs.add(new RequiredFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager));
+        tabs.add(new RequiredFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager, dialogService));
 
         // Optional fields
-        tabs.add(new OptionalFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager));
-        tabs.add(new OptionalFields2Tab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager));
-        tabs.add(new DeprecatedFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager));
+        tabs.add(new OptionalFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager, dialogService));
+        tabs.add(new OptionalFields2Tab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager, dialogService));
+        tabs.add(new DeprecatedFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager, dialogService));
 
         // Other fields
-        tabs.add(new OtherFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager, preferences.getCustomTabFieldNames()));
+        tabs.add(new OtherFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager, preferences.getCustomTabFieldNames(), dialogService));
 
         // General fields from preferences
         for (Map.Entry<String, List<String>> tab : preferences.getEntryEditorTabList().entrySet()) {
-            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager));
+            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager, dialogService));
         }
 
         // Special tabs

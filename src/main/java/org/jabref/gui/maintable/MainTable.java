@@ -74,7 +74,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         super();
         this.model = model;
 
-        this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager()).createColumns());
+        this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
         this.setRowFactory(new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
                     if (event.getClickCount() == 2) {

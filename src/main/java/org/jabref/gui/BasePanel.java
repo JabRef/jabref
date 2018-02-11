@@ -192,6 +192,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
 
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
+    private final DialogService dialogService;
 
     public BasePanel(JabRefFrame frame, BasePanelPreferences preferences, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes) {
         this.preferences = Objects.requireNonNull(preferences);
@@ -199,6 +200,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.undoManager = frame.getUndoManager();
+        this.dialogService = frame.getDialogService();
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
@@ -236,9 +238,9 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
-        this.entryEditor = new EntryEditor(this, preferences.getEntryEditorPreferences(), Globals.getFileUpdateMonitor());
+        this.entryEditor = new EntryEditor(this, preferences.getEntryEditorPreferences(), Globals.getFileUpdateMonitor(), dialogService);
 
-        this.preview = new PreviewPanel(this, getBibDatabaseContext(), preferences.getKeyBindings(), preferences.getPreviewPreferences());
+        this.preview = new PreviewPanel(this, getBibDatabaseContext(), preferences.getKeyBindings(), preferences.getPreviewPreferences(), dialogService);
         DefaultTaskExecutor.runInJavaFXThread(() -> frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview));
     }
 
@@ -1638,7 +1640,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         }
 
         if (entries.size() > 1) {
-            DialogService dialogService = new FXDialogService();
             boolean proceed = dialogService.showConfirmationDialogAndWait(Localization.lang("Change entry type"), Localization.lang("Multiple entries selected. Do you want to change the type of all these to '%0'?"));
             if (!proceed) {
                 return;
@@ -2103,11 +2104,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                     .addExtensionFilter(FileType.BIBTEX_DB)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
 
-            DialogService ds = new FXDialogService();
-
-            Optional<Path> chosenFile = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
-
+            Optional<Path> chosenFile = dialogService.showFileSaveDialog(fileDialogConfiguration);
             if (chosenFile.isPresent()) {
                 Path path = chosenFile.get();
                 saveDatabase(path.toFile(), true, Globals.prefs.getDefaultEncoding(), saveType);

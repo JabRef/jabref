@@ -24,7 +24,6 @@ import javax.swing.ListSelectionModel;
 import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -163,7 +162,7 @@ public class PreferencesDialog extends JabRefDialog {
                     .addExtensionFilter(FileType.XML)
                     .withDefaultExtension(FileType.XML)
                     .withInitialDirectory(getPrefsExportPath()).build();
-            DialogService ds = new FXDialogService();
+            DialogService ds = frame.getDialogService();
 
             Optional<Path> fileName = DefaultTaskExecutor
                     .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
@@ -286,7 +285,7 @@ public class PreferencesDialog extends JabRefDialog {
                     .addExtensionFilter(FileType.XML)
                     .withDefaultExtension(FileType.XML)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-            DialogService ds = new FXDialogService();
+            DialogService ds = frame.getDialogService();
             Optional<Path> path = DefaultTaskExecutor
                     .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
 

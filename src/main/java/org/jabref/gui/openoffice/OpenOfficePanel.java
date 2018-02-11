@@ -34,7 +34,6 @@ import javax.swing.JTextField;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -477,37 +476,36 @@ public class OpenOfficePanel extends AbstractWorker {
         final JDialog cDiag = new JDialog((JFrame) null, Localization.lang("Set connection parameters"), true);
         final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
 
-        final DialogService dirDialog = new FXDialogService();
+        final DialogService dialogService = frame.getDialogService();
         DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(nativeDesktop.getApplicationDirectory()).build();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(nativeDesktop.getApplicationDirectory()).build();
-        DialogService fileDialog = new FXDialogService();
 
         // Path fields
         final JTextField ooPath = new JTextField(30);
         JButton browseOOPath = new JButton(Localization.lang("Browse"));
         ooPath.setText(preferences.getInstallationPath());
         browseOOPath.addActionListener(e ->
-                DefaultTaskExecutor.runInJavaFXThread(() -> dirDialog.showDirectorySelectionDialog(dirDialogConfiguration))
-                        .ifPresent(f -> ooPath.setText(f.toAbsolutePath().toString()))
+                DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showDirectorySelectionDialog(dirDialogConfiguration))
+                                   .ifPresent(f -> ooPath.setText(f.toAbsolutePath().toString()))
         );
 
         final JTextField ooExec = new JTextField(30);
         JButton browseOOExec = new JButton(Localization.lang("Browse"));
         ooExec.setText(preferences.getExecutablePath());
         browseOOExec.addActionListener(e ->
-                DefaultTaskExecutor.runInJavaFXThread(() -> fileDialog.showFileOpenDialog(fileDialogConfiguration))
-                        .ifPresent(f -> ooExec.setText(f.toAbsolutePath().toString()))
+                DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showFileOpenDialog(fileDialogConfiguration))
+                                   .ifPresent(f -> ooExec.setText(f.toAbsolutePath().toString()))
         );
 
         final JTextField ooJars = new JTextField(30);
         ooJars.setText(preferences.getJarsPath());
         JButton browseOOJars = new JButton(Localization.lang("Browse"));
         browseOOJars.addActionListener(e ->
-                DefaultTaskExecutor.runInJavaFXThread(() -> dirDialog.showDirectorySelectionDialog(dirDialogConfiguration))
-                        .ifPresent(f -> ooJars.setText(f.toAbsolutePath().toString()))
+                DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showDirectorySelectionDialog(dirDialogConfiguration))
+                                   .ifPresent(f -> ooJars.setText(f.toAbsolutePath().toString()))
         );
 
         FormBuilder builder = FormBuilder.create()

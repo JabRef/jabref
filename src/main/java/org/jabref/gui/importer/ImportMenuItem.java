@@ -17,7 +17,6 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.EntryMarker;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -92,7 +91,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
 
-            DialogService ds = new FXDialogService();
+            DialogService ds = frame.getDialogService();
 
             filenames = DefaultTaskExecutor
                     .runInJavaFXThread(() -> ds.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));

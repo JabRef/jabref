@@ -128,7 +128,7 @@ public class SearchResultFrame {
         searchResultFrame.setTitle(title);
         searchResultFrame.setIconImages(IconTheme.getLogoSet());
 
-        preview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences());
+        preview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), frame.getDialogService());
 
         sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, FieldName.AUTHOR));
         model = (DefaultEventTableModel<BibEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,

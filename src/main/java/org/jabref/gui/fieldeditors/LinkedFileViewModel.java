@@ -23,7 +23,6 @@ import javafx.scene.control.ButtonType;
 import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefIcon;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -55,14 +54,15 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final BooleanProperty downloadOngoing = new SimpleBooleanProperty(false);
     private final BooleanProperty isAutomaticallyFound = new SimpleBooleanProperty(false);
     private final BooleanProperty canWriteXMPMetadata = new SimpleBooleanProperty(false);
-    private final DialogService dialogService = new FXDialogService();
+    private final DialogService dialogService;
     private final BibEntry entry;
     private final TaskExecutor taskExecutor;
 
-    public LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
+    public LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext, DialogService dialogService, TaskExecutor taskExecutor) {
         this.linkedFile = linkedFile;
         this.databaseContext = databaseContext;
         this.entry = entry;
+        this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(100)));

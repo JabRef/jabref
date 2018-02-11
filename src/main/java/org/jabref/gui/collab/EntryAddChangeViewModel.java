@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.undo.NamedCompound;
@@ -26,7 +27,7 @@ class EntryAddChangeViewModel extends ChangeViewModel {
         super(Localization.lang("Added entry"));
         this.diskEntry = diskEntry;
 
-        PreviewPanel previewPanel = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences());
+        PreviewPanel previewPanel = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), new FXDialogService());
         previewPanel.setEntry(diskEntry);
         container = CustomJFXPanel.wrap(new Scene(previewPanel));
     }

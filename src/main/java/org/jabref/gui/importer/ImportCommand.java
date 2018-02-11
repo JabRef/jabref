@@ -14,7 +14,6 @@ import javafx.stage.FileChooser;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -53,7 +52,7 @@ public class ImportCommand extends SimpleCommand {
                 .addExtensionFilters(extensions)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY))
                 .build();
-        DialogService dialogService = new FXDialogService();
+        DialogService dialogService = frame.getDialogService();
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             dialogService.showFileOpenDialog(fileDialogConfiguration)
                          .ifPresent(path -> doImport(path, importers, fileDialogConfiguration.getSelectedExtensionFilter()));

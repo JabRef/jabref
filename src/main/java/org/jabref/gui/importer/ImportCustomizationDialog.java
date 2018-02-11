@@ -29,7 +29,6 @@ import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.help.HelpAction;
@@ -87,7 +86,7 @@ public class ImportCustomizationDialog extends JabRefDialog {
                     .addExtensionFilter(FileType.CLASS)
                     .withDefaultExtension(FileType.JAR)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-            DialogService ds = new FXDialogService();
+            DialogService ds = frame.getDialogService();
 
             Optional<Path> selectedFile = DefaultTaskExecutor
                     .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
@@ -122,7 +121,7 @@ public class ImportCustomizationDialog extends JabRefDialog {
                     .addExtensionFilters(EnumSet.of(FileType.ZIP, FileType.JAR))
                     .withDefaultExtension(FileType.JAR)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-            DialogService ds = new FXDialogService();
+            DialogService ds = frame.getDialogService();
 
             Optional<Path> jarZipFile = DefaultTaskExecutor
                     .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));

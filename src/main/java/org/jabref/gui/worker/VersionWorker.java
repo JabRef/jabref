@@ -12,6 +12,7 @@ import javax.swing.SwingWorker;
 
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.help.NewVersionDialog;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.Version;
 
@@ -105,7 +106,7 @@ public class VersionWorker extends SwingWorker<List<Version>, Void> {
         if (!newerVersion.isPresent() || (newerVersion.get().equals(toBeIgnored) && !manualExecution)) {
             String upToDate = Localization.lang("JabRef is up-to-date.");
             if (manualExecution) {
-                JOptionPane.showMessageDialog(null, upToDate, upToDate, JOptionPane.INFORMATION_MESSAGE);
+                DefaultTaskExecutor.runInJavaFXThread(() -> mainFrame.getDialogService().showInformationDialogAndWait(upToDate, upToDate));
             }
             this.mainFrame.output(upToDate);
 

@@ -13,7 +13,6 @@ import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.SidePaneType;
 import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
@@ -294,7 +293,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 .addExtensionFilter(FileType.BIBTEX_DB)
                 .withDefaultExtension(FileType.BIBTEX_DB)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-        DialogService ds = new FXDialogService();
+        DialogService ds = frame.getDialogService();
 
         Optional<Path> path = DefaultTaskExecutor
                 .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));

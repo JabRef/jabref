@@ -585,7 +585,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-        DialogService ds = new FXDialogService();
+        DialogService ds = frame.getDialogService();
         /**
          * Stores the selected directory.
          */

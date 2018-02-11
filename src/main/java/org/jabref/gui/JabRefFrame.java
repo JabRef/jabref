@@ -288,9 +288,11 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private PushToApplications pushApplications;
     private JMenu newSpec;
     private final CountingUndoManager undoManager = new CountingUndoManager();
+    private final DialogService dialogService;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
+        this.dialogService = new FXDialogService();
         init();
     }
 
@@ -519,7 +521,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
     private Void showTrackingNotification() {
         if (!Globals.prefs.shouldCollectTelemetry()) {
-            DialogService dialogService = new FXDialogService();
             boolean shouldCollect = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Telemetry: Help make JabRef better"),
                     Localization.lang("To improve the user experience, we would like to collect anonymous statistics on the features you use. We will only record what features you access and how often you do it. We will neither collect any personal data nor the content of bibliographic items. If you choose to allow data collection, you can later disable it via Options -> Preferences -> General."),
@@ -1837,6 +1838,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
     public CountingUndoManager getUndoManager() {
         return undoManager;
+    }
+
+    public DialogService getDialogService() {
+        return dialogService;
     }
 
     private static class MyGlassPane extends JPanel {

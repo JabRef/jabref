@@ -21,7 +21,6 @@ import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelPreferences;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupUIManager;
@@ -89,7 +88,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     public void execute() {
         List<Path> filesToOpen = new ArrayList<>();
 
-        DialogService ds = new FXDialogService();
+        DialogService ds = frame.getDialogService();
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(FileType.BIBTEX_DB)
                 .withDefaultExtension(FileType.BIBTEX_DB)

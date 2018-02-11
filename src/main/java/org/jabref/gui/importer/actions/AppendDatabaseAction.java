@@ -12,7 +12,6 @@ import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.MergeDialog;
 import org.jabref.gui.actions.BaseAction;
@@ -154,7 +153,7 @@ public class AppendDatabaseAction implements BaseAction {
                     .withDefaultExtension(FileType.BIBTEX_DB)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                     .build();
-            DialogService dialogService = new FXDialogService();
+            DialogService dialogService = frame.getDialogService();
 
             List<Path> chosen = DefaultTaskExecutor
                     .runInJavaFXThread(() -> dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));

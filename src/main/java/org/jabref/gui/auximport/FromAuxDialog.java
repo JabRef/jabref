@@ -25,8 +25,6 @@ import javafx.scene.control.TabPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -166,11 +164,10 @@ public class FromAuxDialog extends JabRefDialog {
                 .addExtensionFilter(FileType.AUX)
                 .withDefaultExtension(FileType.AUX)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-        DialogService ds = new FXDialogService();
 
         browseAuxFileButton.addActionListener(e -> {
             Optional<Path> file = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
+                    .runInJavaFXThread(() -> parentFrame.getDialogService().showFileOpenDialog(fileDialogConfiguration));
             file.ifPresent(f -> auxFileField.setText(f.toAbsolutePath().toString()));
         });
 
