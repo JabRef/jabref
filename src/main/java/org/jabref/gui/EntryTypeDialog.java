@@ -45,7 +45,6 @@ import org.jabref.model.entry.IEEETranEntryTypes;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
