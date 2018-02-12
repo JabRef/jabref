@@ -10,7 +10,6 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.junit.Before;
@@ -44,7 +43,7 @@ public class XMPUtilTest {
      * Create a temporary PDF-file with a single empty page.
      */
     @Before
-    public void setUp() throws IOException, COSVisitorException {
+    public void setUp() throws IOException, IOException {
 
         pdfFile = tempFolder.newFile("JabRef.pdf");
 
