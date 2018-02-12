@@ -116,6 +116,7 @@ public enum ActionsFX {
     PREVIOUS_PREVIEW_STYLE(Localization.menuTitle("Previous preview layout"), KeyBinding.PREVIOUS_PREVIEW_LAYOUT),
     SELECT_ALL(Localization.menuTitle("Select all"), KeyBinding.SELECT_ALL),
 
+    HELP(Localization.lang("Online help"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
     WEB_MENU(Localization.menuTitle("JabRef resources")),
     OPEN_WEBPAGE(Localization.menuTitle("Website"), Localization.lang("Opens JabRef's website")),
     OPEN_FACEBOOK("Facebook", Localization.lang("Opens JabRef's Facebook page"), IconTheme.JabRefIcons.FACEBOOK),
@@ -126,7 +127,6 @@ public enum ActionsFX {
     FORK_ME(Localization.menuTitle("Fork me on GitHub"), Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcons.GITHUB),
     DONATE(Localization.menuTitle("Donate to JabRef"), Localization.lang("Donate to JabRef"), IconTheme.JabRefIcons.DONATE),
     OPEN_FORUM(Localization.menuTitle("Online help forum"), Localization.lang("Online help forum"), IconTheme.JabRefIcons.FORUM),
-    HELP(Localization.menuTitle("Online help"), Localization.lang("Online help"), KeyBinding.HELP),
     ERROR_CONSOLE(Localization.menuTitle("View event log"), Localization.lang("Display all error messages")),
     SEARCH_FOR_UPDATES(Localization.lang("Check for updates")),
     ABOUT(Localization.menuTitle("About JabRef"), Localization.lang("About JabRef"));

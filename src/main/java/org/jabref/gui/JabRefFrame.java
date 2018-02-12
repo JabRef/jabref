@@ -112,7 +112,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -172,9 +171,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     // for the name and message strings.
 
 
-
-    private final AbstractAction help = new HelpAction(Localization.menuTitle("Online help"), Localization.lang("Online help"),
-            HelpFile.CONTENTS, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
 
     private final AbstractAction deleteEntry = new GeneralAction(Actions.DELETE, Localization.menuTitle("Delete entry"),
             Localization.lang("Delete entry"), Globals.getKeyPrefs().getKey(KeyBinding.DELETE_ENTRY), IconTheme.JabRefIcons.DELETE_ENTRY.getIcon());
@@ -1031,7 +1027,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         );
 
         help.getItems().addAll(
-                //TODO: This. helpAction
+                factory.createMenuItem(ActionsFX.HELP, HelpAction.getCommand()),
                 factory.createMenuItem(ActionsFX.OPEN_FORUM, new OpenBrowserAction("https://discourse.jabref.org/")),
 
                 new SeparatorMenuItem(),
