@@ -107,9 +107,10 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 // Check whether we have an article set, an article, a book article or a book article set
                 Xml root = (Xml) unmarshalledObject;
                 List<BibEntry> bibEntries = root.getRecords()
-                                                .getRecord().stream()
-                                                .map(this::parseRecord)
-                                                .collect(Collectors.toList());
+                        .getRecord()
+                        .stream()
+                        .map(this::parseRecord)
+                        .collect(Collectors.toList());
 
                 return new ParserResult(bibEntries);
             } else {
@@ -123,12 +124,24 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
     private BibEntry parseRecord(Record record) {
         BibEntry entry = new BibEntry();
+
         entry.setType(BiblatexEntryTypes.ARTICLE);
-        entry.setField(FieldName.AUTHOR, getAuthors(record));
-        entry.setField(FieldName.TITLE, clean(record.getTitles().getTitle().getStyle().getvalue()));
-        entry.setField(FieldName.PAGES, record.getPages().getStyle().getvalue());
-        entry.setField(FieldName.NUMBER, record.getNumber().getStyle().getvalue());
-        entry.setField(FieldName.VOLUME, record.getVolume().getStyle().getvalue());
+        Optional.ofNullable(getAuthors(record))
+                .ifPresent(value -> entry.setField(FieldName.AUTHOR, value));
+        Optional.ofNullable(clean(record.getTitles().getTitle().getStyle().getvalue()))
+                .ifPresent(value -> entry.setField(FieldName.TITLE, value));
+        Optional.ofNullable(record.getPages())
+                .map(value -> value.getStyle().getvalue())
+                .ifPresent(value -> entry.setField(FieldName.PAGES, value));
+        Optional.ofNullable(record.getNumber())
+                .map(value -> value.getStyle().getvalue())
+                .ifPresent(value -> entry.setField(FieldName.NUMBER, value));
+
+        Optional.ofNullable(record.getVolume())
+                .flatMap(value -> Optional.ofNullable(value.getStyle())
+                        .map(values -> value.getStyle().getvalue()))
+                .ifPresent(value -> entry.setField(FieldName.VOLUME, value));
+
         entry.setField(FieldName.YEAR, record.getDates().getYear().getStyle().getvalue());
         entry.putKeywords(getKeywords(record), preferences.getKeywordSeparator());
         Optional.ofNullable(record.getAbstract())
@@ -147,7 +160,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
     private List<LinkedFile> getLinkedFiles(Record record) {
         PdfUrls pdfUrls = record.getUrls()
-                                .getPdfUrls();
+                .getPdfUrls();
         if (pdfUrls != null) {
             return pdfUrls
                     .getUrl()
@@ -163,9 +176,9 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         Keywords keywords = record.getKeywords();
         if (keywords != null) {
             return keywords.getKeyword()
-                           .stream()
-                           .map(keyword -> keyword.getStyle().getvalue())
-                           .collect(Collectors.toList());
+                    .stream()
+                    .map(keyword -> keyword.getStyle().getvalue())
+                    .collect(Collectors.toList());
         } else {
             return Collections.emptyList();
         }
@@ -173,16 +186,17 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
     private String getAuthors(Record record) {
         return record.getContributors()
-                     .getAuthors()
-                     .getAuthor().stream()
-                     .map(author -> author.getStyle().getvalue())
-                     .collect(Collectors.joining(" and "));
+                .getAuthors()
+                .getAuthor()
+                .stream()
+                .map(author -> author.getStyle().getvalue())
+                .collect(Collectors.joining(" and "));
     }
 
     private String clean(String input) {
         return StringUtil.unifyLineBreaks(input, " ")
-                         .trim()
-                         .replaceAll(" +", " ");
+                .trim()
+                .replaceAll(" +", " ");
     }
 
     @Override
