@@ -7,6 +7,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
@@ -34,6 +36,7 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -55,6 +58,7 @@ public class EntryEditor extends BorderPane {
     private final CountingUndoManager undoManager;
     private final BasePanel panel;
     private final List<SearchQueryHighlightListener> searchListeners = new ArrayList<>();
+    private EntryTypeListener typeListener;
     private final List<EntryEditorTab> tabs;
     /**
      * A reference to the entry this editor works on.
@@ -210,7 +214,13 @@ public class EntryEditor extends BorderPane {
      * Sets the entry to edit.
      */
     public void setEntry(BibEntry entry) {
-        this.entry = Objects.requireNonNull(entry);
+        Objects.requireNonNull(entry);
+
+        // remove listener for old entry if existing
+        if (typeListener != null) {
+            this.entry.getTypeProperty().removeListener(typeListener);
+        }
+        this.entry = entry;
 
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             recalculateVisibleTabs();
@@ -224,16 +234,16 @@ public class EntryEditor extends BorderPane {
 
             setupToolBar();
         });
+
+        // listen to type changes for rebuilding the currently visible tab
+        typeListener = new EntryTypeListener(entry, bibDatabaseContext.getMode(), typeLabel, tabbed);
+        this.entry.getTypeProperty().addListener(typeListener);
     }
 
     private void setupToolBar() {
         // Update type label
         TypedBibEntry typedEntry = new TypedBibEntry(entry, bibDatabaseContext.getMode());
         typeLabel.setText(typedEntry.getTypeForDisplay());
-
-        entry.getTypeProperty().addListener(e -> {
-            typeLabel.setText(new TypedBibEntry(entry, bibDatabaseContext.getMode()).getTypeForDisplay());
-        });
 
         // Add type change menu
         ContextMenu typeMenu = new ChangeEntryTypeMenu().getChangeEntryTypePopupMenu(entry, bibDatabaseContext, undoManager);
@@ -267,5 +277,30 @@ public class EntryEditor extends BorderPane {
                 }
             }
         });
+    }
+
+    class EntryTypeListener implements ChangeListener<String> {
+
+        private final BibEntry entry;
+
+        private final BibDatabaseMode mode;
+
+        private final Label typeLabel;
+
+        private final TabPane tabbed;
+
+        public EntryTypeListener(BibEntry entry, BibDatabaseMode mode, Label typeLabel, TabPane tabbed) {
+            this.entry = entry;
+            this.mode = mode;
+            this.typeLabel = typeLabel;
+            this.tabbed = tabbed;
+        }
+
+        @Override
+        public void changed(ObservableValue observable, String oldValue, String newValue) {
+            typeLabel.setText(new TypedBibEntry(entry, mode).getTypeForDisplay());
+            EntryEditorTab selectedTab = (EntryEditorTab) tabbed.getSelectionModel().getSelectedItem();
+            selectedTab.refresh(entry);
+        }
     }
 }

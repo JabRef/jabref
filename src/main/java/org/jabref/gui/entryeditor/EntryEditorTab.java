@@ -1,5 +1,7 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.Objects;
+
 import javafx.scene.control.Tab;
 
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -35,6 +37,17 @@ public abstract class EntryEditorTab extends Tab {
             currentEntry = entry;
             DefaultTaskExecutor.runInJavaFXThread(() -> bindToEntry(entry));
         }
+        handleFocus();
+    }
+
+    /**
+     *  Rebuilds the tab for an entry, irrespective of whether the entry was set before
+     *
+     * @param entry the entry to rebuild the tab for
+     */
+    public void refresh(BibEntry entry) {
+        Objects.requireNonNull(entry);
+        DefaultTaskExecutor.runInJavaFXThread(() -> bindToEntry(entry));
         handleFocus();
     }
 }
