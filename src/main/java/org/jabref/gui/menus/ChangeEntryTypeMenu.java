@@ -49,48 +49,48 @@ public class ChangeEntryTypeMenu {
         return menu;
     }
 
-    public ContextMenu getChangeEntryTypePopupMenu(BibEntry entry, BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager) {
+    public ContextMenu getChangeEntryTypePopupMenu(BibEntry entry, BibDatabaseContext bibDatabaseContext, BasePanel panel) {
         ContextMenu menu = new ContextMenu();
 
         if (bibDatabaseContext.isBiblatexMode()) {
             // Default BibLaTeX
-            populate(menu, EntryTypes.getAllValues(BibDatabaseMode.BIBLATEX), entry, undoManager);
+            populate(menu, EntryTypes.getAllValues(BibDatabaseMode.BIBLATEX), entry, panel);
 
             // Custom types
-            populateSubMenu(menu, Localization.lang("Custom"), EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBLATEX), entry, undoManager);
+            populateSubMenu(menu, Localization.lang("Custom"), EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBLATEX), entry, panel);
         } else {
             // Default BibTeX
-            populateSubMenu(menu, Localization.BIBTEX, BibtexEntryTypes.ALL, entry, undoManager);
+            populateSubMenu(menu, Localization.BIBTEX, BibtexEntryTypes.ALL, entry, panel);
             menu.getItems().remove(0); // Remove separator
 
             // IEEETran
-            populateSubMenu(menu, "IEEETran", IEEETranEntryTypes.ALL, entry, undoManager);
+            populateSubMenu(menu, "IEEETran", IEEETranEntryTypes.ALL, entry, panel);
 
             // Custom types
-            populateSubMenu(menu, Localization.lang("Custom"), EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBTEX), entry, undoManager);
+            populateSubMenu(menu, Localization.lang("Custom"), EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBTEX), entry, panel);
         }
 
         return menu;
     }
 
-    private void populateSubMenu(ContextMenu menu, String text, List<EntryType> entryTypes, BibEntry entry, CountingUndoManager undoManager) {
+    private void populateSubMenu(ContextMenu menu, String text, List<EntryType> entryTypes, BibEntry entry, BasePanel panel) {
         if (!entryTypes.isEmpty()) {
             menu.getItems().add(new SeparatorMenuItem());
             Menu custom = new Menu(text);
-            populate(custom, entryTypes, entry, undoManager);
+            populate(custom, entryTypes, entry, panel);
             menu.getItems().add(custom);
         }
     }
 
-    private void populate(ContextMenu menu, Collection<EntryType> types, BibEntry entry, UndoManager undoManager) {
+    private void populate(ContextMenu menu, Collection<EntryType> types, BibEntry entry, BasePanel panel) {
         for (EntryType type : types) {
-            menu.getItems().add(ChangeTypeAction.as(type, entry, undoManager));
+            menu.getItems().add(ChangeTypeAction.as(type, entry, panel));
         }
     }
 
-    private void populate(Menu menu, Collection<EntryType> types, BibEntry entry, UndoManager undoManager) {
+    private void populate(Menu menu, Collection<EntryType> types, BibEntry entry, BasePanel panel) {
         for (EntryType type : types) {
-            menu.getItems().add(ChangeTypeAction.as(type, entry, undoManager));
+            menu.getItems().add(ChangeTypeAction.as(type, entry, panel));
         }
     }
 

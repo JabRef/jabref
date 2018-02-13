@@ -32,20 +32,14 @@ public class ChangeTypeAction extends AbstractAction {
         panel.changeTypeOfSelectedEntries(type);
     }
 
-    public static MenuItem as(EntryType type, BibEntry entry, UndoManager undoManager) {
-        return as(type, Collections.singletonList(entry), undoManager);
+    public static MenuItem as(EntryType type, BibEntry entry, BasePanel panel) {
+        return as(type, Collections.singletonList(entry), panel);
     }
 
-    public static MenuItem as(EntryType type, List<BibEntry> entries, UndoManager undoManager) {
+    public static MenuItem as(EntryType type, List<BibEntry> entries, BasePanel panel) {
         MenuItem menuItem = new MenuItem(type.getName());
         menuItem.setOnAction(event -> {
-            NamedCompound compound = new NamedCompound(Localization.lang("Change entry type"));
-            for (BibEntry entry : entries) {
-                entry.setType(type)
-                        .ifPresent(change -> compound.addEdit(new UndoableChangeType(change)));
-            }
-
-            undoManager.addEdit(compound);
+            panel.changeType(entries, type.getName());
         });
         return menuItem;
     }
