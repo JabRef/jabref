@@ -17,6 +17,8 @@ import java.util.regex.Pattern;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
@@ -56,7 +58,7 @@ public class BibEntry implements Cloneable {
     private final Map<String, String> latexFreeFields = new ConcurrentHashMap<>();
     private final EventBus eventBus = new EventBus();
     private String id;
-    private String type;
+    private StringProperty type = new SimpleStringProperty();
     private ObservableMap<String, String> fields = FXCollections.observableMap(new ConcurrentHashMap<>());
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit;
@@ -200,6 +202,10 @@ public class BibEntry implements Cloneable {
      * Returns this entry's type.
      */
     public String getType() {
+        return type.getValue();
+    }
+
+    public StringProperty getTypeProperty() {
         return type;
     }
 
@@ -232,7 +238,7 @@ public class BibEntry implements Cloneable {
             return Optional.empty();
         }
 
-        this.type = newType.toLowerCase(Locale.ENGLISH);
+        this.type.setValue(newType.toLowerCase(Locale.ENGLISH));
         changed = true;
 
         FieldChange change = new FieldChange(this, TYPE_HEADER, oldType, newType);
@@ -528,7 +534,7 @@ public class BibEntry implements Cloneable {
      */
     @Override
     public Object clone() {
-        BibEntry clone = new BibEntry(type);
+        BibEntry clone = new BibEntry(type.getValue());
         clone.fields = FXCollections.observableMap(new ConcurrentHashMap<>(fields));
         return clone;
     }

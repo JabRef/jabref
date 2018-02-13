@@ -231,6 +231,10 @@ public class EntryEditor extends BorderPane {
         TypedBibEntry typedEntry = new TypedBibEntry(entry, bibDatabaseContext.getMode());
         typeLabel.setText(typedEntry.getTypeForDisplay());
 
+        entry.getTypeProperty().addListener(e -> {
+            typeLabel.setText(new TypedBibEntry(entry, bibDatabaseContext.getMode()).getTypeForDisplay());
+        });
+
         // Add type change menu
         ContextMenu typeMenu = new ChangeEntryTypeMenu().getChangeEntryTypePopupMenu(entry, bibDatabaseContext, undoManager);
         typeLabel.setOnMouseClicked(event -> typeMenu.show(typeLabel, Side.RIGHT, 0, 0));
