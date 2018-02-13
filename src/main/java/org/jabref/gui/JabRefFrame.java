@@ -3,7 +3,6 @@ package org.jabref.gui;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -48,15 +47,21 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 
 import org.jabref.Globals;
@@ -717,12 +722,14 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         pushApplications = new PushToApplications();
         pushExternalButton = new PushToApplicationButton(this, pushApplications.getApplications());
         //createToolBar();
-        setTop(createMenu());
+        BorderPane head = new BorderPane();
+        head.setTop(createMenu());
+        head.setCenter(createToolbar());
+        setTop(head);
         //getContentPane().setLayout(new BorderLayout());
 
-        JPanel toolbarPanel = new JPanel(new WrapLayout(FlowLayout.LEFT));
-        toolbarPanel.add(tlb);
-        toolbarPanel.add(globalSearchBar);
+        //JPanel toolbarPanel = new JPanel(new WrapLayout(FlowLayout.LEFT));
+        //toolbarPanel.add(tlb);
         //getContentPane().add(toolbarPanel, BorderLayout.PAGE_START);
 
         splitPane.getItems().addAll(sidePaneManager.getPane(), tabbedPane);
@@ -775,9 +782,30 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         TransferHandler xfer = new EntryTableTransferHandler(null, this, null);
         // TODO:
         //tabbedPane.setTransferHandler(xfer);
-        tlb.setTransferHandler(xfer);
+        //tlb.setTransferHandler(xfer);
         // TODO: mb.setTransferHandler(xfer);
         // TODO: sidePaneManager.getPanel().setTransferHandler(xfer);
+    }
+
+    private Node createToolbar() {
+        Pane leftSpacer = new Pane();
+        HBox.setHgrow(leftSpacer, Priority.SOMETIMES);
+        Pane rightSpacer = new Pane();
+        HBox.setHgrow(rightSpacer, Priority.SOMETIMES);
+
+        ToolBar toolBar = new ToolBar(
+                new Button("Good"),
+                new Button("Boys"),
+                leftSpacer,
+
+                globalSearchBar,
+
+                rightSpacer,
+                new Button("Always")
+        );
+        toolBar.getStyleClass().add("mainToolbar");
+
+        return toolBar;
     }
 
     /**
@@ -2051,35 +2079,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                     closeTab(tab);
                 }
             }
-        }
-    }
-
-    private class ToolBar extends OSXCompatibleToolbar {
-
-        public void addAction(Action a) {
-            JButton b = new JButton(a);
-            b.setText(null);
-            if (!OS.OS_X) {
-                b.setMargin(marg);
-            }
-            // create a disabled Icon for FontBasedIcons as Swing does not automatically create one
-            Object obj = a.getValue(Action.LARGE_ICON_KEY);
-            if (obj instanceof IconTheme.FontBasedIcon) {
-                b.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
-            }
-            add(b);
-        }
-
-        public void addJToggleButton(JToggleButton button) {
-            button.setText(null);
-            if (!OS.OS_X) {
-                button.setMargin(marg);
-            }
-            Object obj = button.getAction().getValue(Action.LARGE_ICON_KEY);
-            if (obj instanceof IconTheme.FontBasedIcon) {
-                button.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
-            }
-            add(button);
         }
     }
 

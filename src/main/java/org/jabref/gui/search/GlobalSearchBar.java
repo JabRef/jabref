@@ -1,49 +1,53 @@
 package org.jabref.gui.search;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.AbstractAction;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
-
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.beans.binding.Bindings;
 import javafx.css.PseudoClass;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
+import javafx.event.Event;
+import javafx.geometry.Orientation;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Separator;
+import javafx.scene.control.Skin;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.TextFieldListCell;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.TextFlow;
+import javafx.util.Duration;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.PersonNameStringConverter;
-import org.jabref.gui.customjfx.CustomJFXPanel;
-import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.search.SearchQueryHighlightObservable;
@@ -51,9 +55,15 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.SearchPreferences;
 
+import impl.org.controlsfx.skin.AutoCompletePopup;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.fxmisc.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class GlobalSearchBar extends JPanel {
+public class GlobalSearchBar extends HBox {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchBar.class);
 
     private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
     private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
@@ -61,13 +71,13 @@ public class GlobalSearchBar extends JPanel {
     private final JabRefFrame frame;
 
     private final TextField searchField = SearchTextField.create();
-    private final JToggleButton caseSensitive;
-    private final JToggleButton regularExp;
-    private final JButton searchModeButton = new JButton();
-    private final JLabel currentResults = new JLabel("");
+    private final ToggleButton caseSensitive;
+    private final ToggleButton regularExp;
+    private final ToggleButton globalSearch;
+    private final Button searchModeButton = new Button();
+    private final Label currentResults = new Label("");
     private final SearchQueryHighlightObservable searchQueryHighlightObservable = new SearchQueryHighlightObservable();
-    private final JButton openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcons.OPEN_IN_NEW_WINDOW.getSmallIcon());
-    private final JFXPanel container;
+    private final Button openCurrentResultsInDialog = IconTheme.JabRefIcons.OPEN_IN_NEW_WINDOW.asButton();
     private SearchWorker searchWorker;
     private GlobalSearchWorker globalSearchWorker;
 
@@ -87,32 +97,12 @@ public class GlobalSearchBar extends JPanel {
         searchDisplayMode = searchPreferences.getSearchMode();
 
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the frame width is too small
-        currentResults.setPreferredSize(new Dimension(150, 5));
-        currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
+        currentResults.setPrefWidth(150);
 
-        JToggleButton globalSearch = new JToggleButton(IconTheme.JabRefIcons.GLOBAL_SEARCH.getSmallIcon(), searchPreferences.isGlobalSearch());
-        globalSearch.setToolTipText(Localization.lang("Search in all open libraries"));
+        globalSearch = IconTheme.JabRefIcons.GLOBAL_SEARCH.asToggleButton();
+        globalSearch.setSelected(searchPreferences.isGlobalSearch());
+        globalSearch.setTooltip(new Tooltip(Localization.lang("Search in all open libraries")));
 
-        // default action to be performed for toggling globalSearch
-        AbstractAction globalSearchStandardAction = new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                searchPreferences.setGlobalSearch(globalSearch.isSelected());
-                updateOpenCurrentResultsTooltip(globalSearch.isSelected());
-            }
-        };
-
-        // additional action for global search shortcut
-        AbstractAction globalSearchShortCutAction = new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                globalSearch.setSelected(true);
-                globalSearchStandardAction.actionPerformed(new ActionEvent(this, 0, "fire standard action"));
-                focus();
-            }
-        };
         //TODO: These have to be somehow converted
         /*
         String endSearch = "endSearch";
@@ -143,62 +133,76 @@ public class GlobalSearchBar extends JPanel {
         });
         */
 
-        String searchGlobalByKey = "searchGlobalByKey";
-        globalSearch.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(Globals.getKeyPrefs().getKey(KeyBinding.GLOBAL_SEARCH), searchGlobalByKey);
-        globalSearch.getActionMap().put(searchGlobalByKey, globalSearchShortCutAction);
+        KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
+        addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
+            if (keyBinding.isPresent() && keyBinding.get().equals(KeyBinding.GLOBAL_SEARCH)) {
+                globalSearch.setSelected(true);
+                searchPreferences.setGlobalSearch(globalSearch.isSelected());
+                updateOpenCurrentResultsTooltip(globalSearch.isSelected());
+                focus();
+            }
+        });
 
-        globalSearch.addActionListener(globalSearchStandardAction);
+        globalSearch.setOnAction(event -> {
+            searchPreferences.setGlobalSearch(globalSearch.isSelected());
+            updateOpenCurrentResultsTooltip(globalSearch.isSelected());
+        });
 
-        openCurrentResultsInDialog.setDisabledIcon(IconTheme.JabRefIcons.OPEN_IN_NEW_WINDOW.disabled().getSmallIcon());
-        openCurrentResultsInDialog.addActionListener(event -> {
+        //openCurrentResultsInDialog.setDisabledIcon(IconTheme.JabRefIcons.OPEN_IN_NEW_WINDOW.disabled().getSmallIcon());
+        openCurrentResultsInDialog.setOnAction(event -> {
             if (globalSearch.isSelected()) {
                 performGlobalSearch();
             } else {
                 openLocalFindingsInExternalPanel();
             }
         });
-        openCurrentResultsInDialog.setEnabled(false);
+        openCurrentResultsInDialog.setDisable(true);
         updateOpenCurrentResultsTooltip(globalSearch.isSelected());
 
-        regularExp = new JToggleButton(IconTheme.JabRefIcons.REG_EX.getSmallIcon(),
-                searchPreferences.isRegularExpression());
-        regularExp.setToolTipText(Localization.lang("regular expression"));
-        regularExp.addActionListener(event -> {
+        regularExp = IconTheme.JabRefIcons.REG_EX.asToggleButton();
+        regularExp.setSelected(searchPreferences.isRegularExpression());
+        regularExp.setTooltip(new Tooltip(Localization.lang("regular expression")));
+        regularExp.setOnAction(event -> {
             searchPreferences.setRegularExpression(regularExp.isSelected());
             performSearch();
         });
 
-        caseSensitive = new JToggleButton(IconTheme.JabRefIcons.CASE_SENSITIVE.getSmallIcon(),
-                searchPreferences.isCaseSensitive());
-        caseSensitive.setToolTipText(Localization.lang("Case sensitive"));
-        caseSensitive.addActionListener(event -> {
+        caseSensitive = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();
+        caseSensitive.setSelected(searchPreferences.isCaseSensitive());
+        caseSensitive.setTooltip(new Tooltip(Localization.lang("Case sensitive")));
+        caseSensitive.setOnAction(event -> {
             searchPreferences.setCaseSensitive(caseSensitive.isSelected());
             performSearch();
         });
 
         updateSearchModeButtonText();
-        searchModeButton.addActionListener(event -> toggleSearchModeAndSearch());
+        searchModeButton.setOnAction(event -> toggleSearchModeAndSearch());
 
+        int initialSize = 400;
+        int expandedSize = 700;
+        searchField.setMinWidth(200);
+        searchField.setMaxWidth(initialSize);
+        searchField.setPrefWidth(expandedSize);
         EasyBind.subscribe(searchField.textProperty(), searchText -> performSearch());
+        EasyBind.subscribe(searchField.focusedProperty(), isFocused -> {
+            if (isFocused) {
+                KeyValue widthValue = new KeyValue(searchField.maxWidthProperty(), expandedSize);
+                KeyFrame keyFrame = new KeyFrame(Duration.millis(600), widthValue);
+                Timeline timeline = new Timeline(keyFrame);
+                timeline.play();
+            } else {
+                KeyValue widthValue = new KeyValue(searchField.maxWidthProperty(), initialSize);
+                KeyFrame keyFrame = new KeyFrame(Duration.millis(400), widthValue);
+                Timeline timeline = new Timeline(keyFrame);
+                timeline.play();
+            }
+        });
 
-        container = CustomJFXPanel.wrap(new Scene(searchField));
-        container.addKeyListener(new SearchKeyAdapter());
-
-        setLayout(new FlowLayout(FlowLayout.RIGHT));
-        JToolBar toolBar = new OSXCompatibleToolbar();
-        toolBar.setFloatable(false);
-        toolBar.add(container);
-        toolBar.add(openCurrentResultsInDialog);
-        toolBar.addSeparator();
-        toolBar.add(globalSearch);
-        toolBar.add(regularExp);
-        toolBar.add(caseSensitive);
-        toolBar.add(searchModeButton);
-        toolBar.addSeparator();
-        toolBar.add(new HelpAction(HelpFile.SEARCH));
-        toolBar.addSeparator();
-        toolBar.add(currentResults);
-        this.add(toolBar);
+        this.getChildren().addAll(
+                searchField,
+                currentResults
+        );
     }
 
     public void performGlobalSearch() {
@@ -268,7 +272,7 @@ public class GlobalSearchBar extends JPanel {
 
     private void updateSearchModeButtonText() {
         searchModeButton.setText(searchDisplayMode.getDisplayName());
-        searchModeButton.setToolTipText(searchDisplayMode.getToolTipText());
+        searchModeButton.setTooltip(new Tooltip(searchDisplayMode.getToolTipText()));
     }
 
     public void endSearch() {
@@ -287,7 +291,6 @@ public class GlobalSearchBar extends JPanel {
      */
     public void focus() {
         if (!searchField.isFocused()) {
-            container.requestFocus();
             searchField.requestFocus();
         }
         searchField.selectAll();
@@ -297,7 +300,7 @@ public class GlobalSearchBar extends JPanel {
         currentResults.setText("");
         searchField.setText("");
         searchQueryHighlightObservable.reset();
-        openCurrentResultsInDialog.setEnabled(false);
+        openCurrentResultsInDialog.setDisable(true);
 
         Globals.stateManager.clearSearchQuery();
 
@@ -346,15 +349,31 @@ public class GlobalSearchBar extends JPanel {
 
         String illegalSearch = Localization.lang("Search failed: illegal search expression");
         currentResults.setText(illegalSearch);
-        openCurrentResultsInDialog.setEnabled(false);
+        openCurrentResultsInDialog.setDisable(true);
     }
 
     public void setAutoCompleter(AutoCompleteSuggestionProvider<Author> searchCompleter) {
         if (Globals.prefs.getAutoCompletePreferences().shouldAutoComplete()) {
-            AutoCompletionTextInputBinding.autoComplete(searchField,
+            AutoCompletionTextInputBinding<Author> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
                     searchCompleter,
                     new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
                     new AppendPersonNamesStrategy());
+            AutoCompletePopup<Author> popup = getPopup(autoComplete);
+            popup.setSkin(new SearchPopupSkin<>(popup));
+        }
+    }
+
+    /**
+     * The popup has private access in {@link AutoCompletionBinding}, so we use reflection to access it.
+     */
+    private <T> AutoCompletePopup<T> getPopup(AutoCompletionBinding<T> autoCompletionBinding) {
+        try {
+            Field privatePopup = AutoCompletionBinding.class.getDeclaredField("autoCompletionPopup");
+            privatePopup.setAccessible(true);
+            return (AutoCompletePopup<T>) privatePopup.get(autoCompletionBinding);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            LOGGER.error("Could not get access to auto completion popup", e);
+            return new AutoCompletePopup<>();
         }
     }
 
@@ -386,8 +405,8 @@ public class GlobalSearchBar extends JPanel {
         tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         tooltip.setGraphic(description);
         tooltip.setMaxHeight(10);
-        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setTooltip(tooltip));
-        openCurrentResultsInDialog.setEnabled(true);
+        searchField.setTooltip(tooltip);
+        openCurrentResultsInDialog.setDisable(false);
     }
 
     public void setSearchResultFrame(SearchResultFrame searchResultFrame) {
@@ -409,9 +428,9 @@ public class GlobalSearchBar extends JPanel {
 
     private void updateOpenCurrentResultsTooltip(boolean globalSearchEnabled) {
         if (globalSearchEnabled) {
-            openCurrentResultsInDialog.setToolTipText(Localization.lang("Show global search results in a window"));
+            openCurrentResultsInDialog.setTooltip(new Tooltip(Localization.lang("Show global search results in a window")));
         } else {
-            openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
+            openCurrentResultsInDialog.setTooltip(new Tooltip(Localization.lang("Show search results in a window")));
         }
     }
 
@@ -446,6 +465,76 @@ public class GlobalSearchBar extends JPanel {
                         //do nothing
                 }
             }
+        }
+    }
+
+    private class SearchPopupSkin<T> implements Skin<AutoCompletePopup<T>> {
+        private final AutoCompletePopup<T> control;
+        private final ListView<T> suggestionList;
+        private final BorderPane container;
+
+        public SearchPopupSkin(AutoCompletePopup<T> control) {
+            this.control = control;
+            this.suggestionList = new ListView<>(control.getSuggestions());
+            this.suggestionList.getStyleClass().add("auto-complete-popup");
+            this.suggestionList.getStylesheets().add(AutoCompletionBinding.class.getResource("autocompletion.css").toExternalForm());
+            this.suggestionList.prefHeightProperty().bind(Bindings.min(control.visibleRowCountProperty(), Bindings.size(this.suggestionList.getItems())).multiply(24).add(18));
+            this.suggestionList.setCellFactory(TextFieldListCell.forListView(control.getConverter()));
+            this.suggestionList.prefWidthProperty().bind(control.prefWidthProperty());
+            this.suggestionList.maxWidthProperty().bind(control.maxWidthProperty());
+            this.suggestionList.minWidthProperty().bind(control.minWidthProperty());
+
+            ToolBar toolBar = new ToolBar(
+                    openCurrentResultsInDialog,
+                    new Separator(Orientation.VERTICAL),
+                    globalSearch,
+                    regularExp,
+                    caseSensitive,
+                    searchModeButton
+            );
+
+            this.container = new BorderPane();
+            this.container.setCenter(suggestionList);
+            this.container.setBottom(toolBar);
+
+            this.registerEventListener();
+        }
+
+        private void registerEventListener() {
+            this.suggestionList.setOnMouseClicked((me) -> {
+                if (me.getButton() == MouseButton.PRIMARY) {
+                    this.onSuggestionChosen(this.suggestionList.getSelectionModel().getSelectedItem());
+                }
+            });
+            this.suggestionList.setOnKeyPressed((ke) -> {
+                switch (ke.getCode()) {
+                    case TAB:
+                    case ENTER:
+                        this.onSuggestionChosen(this.suggestionList.getSelectionModel().getSelectedItem());
+                        break;
+                    case ESCAPE:
+                        if (this.control.isHideOnEscape()) {
+                            this.control.hide();
+                        }
+                }
+            });
+        }
+
+        private void onSuggestionChosen(T suggestion) {
+            if (suggestion != null) {
+                Event.fireEvent(this.control, new AutoCompletePopup.SuggestionEvent<>(suggestion));
+            }
+        }
+
+        public Node getNode() {
+            return this.container;
+        }
+
+        public AutoCompletePopup<T> getSkinnable() {
+            return this.control;
+        }
+
+        public void dispose() {
         }
     }
 }

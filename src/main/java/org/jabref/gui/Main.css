@@ -70,10 +70,10 @@
     -fx-text-fill: -fx-accent;
 }
 
- .icon {
- 	-fx-font-family: 'Material Design Icons';
-	-fx-font-size: 16.0;
- }
+.icon {
+    -fx-font-family: 'Material Design Icons';
+    -fx-font-size: 16.0;
+}
 
 .glyph-icon {
     -fx-font-size: 20.0;
@@ -266,5 +266,19 @@
 }
 
 .mainMenu {
-    -fx-background-color: #7d6180;
+    -fx-background-color: #80397b;
+}
+
+.menu-bar > .container > .menu-button:hover,
+.menu-bar > .container > .menu-button:focused,
+.menu-bar > .container > .menu-button:showing {
+    -fx-background: #9e5499;
+}
+
+.mainMenu > .container > .menu-button > .label {
+    -fx-text-fill: white;
+}
+
+.mainToolbar {
+    -fx-background-color: #80397b;
 }

@@ -25,6 +25,7 @@ import javax.swing.ImageIcon;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -360,6 +361,13 @@ public class IconTheme {
 
         public Button asButton() {
             Button button = new Button();
+            button.setGraphic(getGraphicNode());
+            button.getStyleClass().add("flatButton");
+            return button;
+        }
+
+        public ToggleButton asToggleButton() {
+            ToggleButton button = new ToggleButton();
             button.setGraphic(getGraphicNode());
             button.getStyleClass().add("flatButton");
             return button;
