@@ -1687,7 +1687,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         changeType(bes, newType);
     }
 
-    public void changeType(List<BibEntry> entries, String newType) {
+    private void changeType(List<BibEntry> entries, String newType) {
         if ((entries == null) || (entries.isEmpty())) {
             LOGGER.error("At least one entry must be selected to be able to change the type.");
             return;
@@ -1707,8 +1707,6 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             compound.addEdit(new UndoableChangeType(entry, entry.getType(), newType));
             DefaultTaskExecutor.runInJavaFXThread(() -> {
                 entry.setType(newType);
-                // rebuild tool bar with new type
-                entryEditor.setupToolBar();
             });
         }
 
