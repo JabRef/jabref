@@ -105,6 +105,7 @@ public class MyDialogView extends AbstractDialogView {
 - [Undo manager](https://github.com/TomasMikula/UndoFX)
 - [Docking manager](https://github.com/alexbodogit/AnchorFX) [or](https://github.com/RobertBColton/DockFX)
 - [additional bindings](https://github.com/lestard/advanced-bindings) or [EasyBind](https://github.com/TomasMikula/EasyBind)
+- [Kubed](https://github.com/hudsonb/kubed): data visualization (inspired by d3)
 - [Validation framework](https://github.com/sialcasa/mvvmFX/wiki/Validation)
 - [mvvm framework](https://github.com/sialcasa/mvvmFX/wiki)
 - [CSS Reference](http://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html)
