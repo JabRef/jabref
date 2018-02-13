@@ -178,7 +178,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
             row.setOnMouseClicked((mouseClickedEvent) -> {
                 if (mouseClickedEvent.getButton().equals(MouseButton.PRIMARY)
                         && (mouseClickedEvent.getClickCount() == 2)) {
-                    GroupNodeViewModel groupToEdit = EasyBind.monadic(row.itemProperty()).getValue();
+                    GroupNodeViewModel groupToEdit = row.itemProperty().getValue();
                     if (groupToEdit != null) {
                         viewModel.editGroup(groupToEdit);
                     }
