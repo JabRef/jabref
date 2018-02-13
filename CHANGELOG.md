@@ -27,6 +27,7 @@ For more details refer to the [field mapping help page](http://help.jabref.org/e
 - We improved file saving so that hard links are now preserved when a save is performed [#2633](https://github.com/JabRef/jabref/issues/2633)
 - We changed the default dialog option when removing a [file link](http://help.jabref.org/en/FileLinks#adding-external-links-to-an-entry) from an entry.
 The new default removes the linked file from the entry instead of deleting the file from disk. [#3679](https://github.com/JabRef/jabref/issues/3679)
+- The group editing window can now also be called by double-clicking the group to be edited. [koppor#277](https://github.com/koppor/jabref/issues/277)
 
 ### Fixed
 - We fixed an issue where pressing space caused the cursor to jump to the start of the text field. [#3471](https://github.com/JabRef/jabref/issues/3471)
@@ -37,6 +38,7 @@ The new default removes the linked file from the entry instead of deleting the f
 - Chaining modifiers in BibTeX key pattern now works as described in the documentation. [#3648](https://github.com/JabRef/jabref/issues/3648)
 - We fixed an issue where not all bibtex/biblatex fields would be exported as latex-free to MS-Office XML [koppor#284](https://github.com/koppor/jabref/issues/284)
 - We fixed an issue where linked files would be deleted from bibliography entries despite choosing the "Cancel" option in the dialog menu.
+- We fixed the name of the group editing window to "Add group" instead of "Edit Group" when adding a new group. [koppor#277](https://github.com/koppor/jabref/issues/277)
 
 ### Removed
 - We removed the [Look and Feels from JGoodies](http://www.jgoodies.com/freeware/libraries/looks/), because the open source version is not compatible with Java 9.
