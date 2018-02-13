@@ -236,7 +236,7 @@ public class EntryEditor extends BorderPane {
         });
 
         // listen to type changes for rebuilding the currently visible tab
-        typeListener = new EntryTypeListener(entry, bibDatabaseContext.getMode(), typeLabel, tabbed);
+        typeListener = new EntryTypeListener(this.entry, bibDatabaseContext.getMode(), typeLabel, tabbed);
         this.entry.getTypeProperty().addListener(typeListener);
     }
 

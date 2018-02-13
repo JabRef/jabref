@@ -1,7 +1,5 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.Objects;
-
 import javafx.scene.control.Tab;
 
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -45,5 +43,5 @@ public abstract class EntryEditorTab extends Tab {
         }
         handleFocus();
     }
-    
+
 }
