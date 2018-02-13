@@ -22,7 +22,6 @@ import javax.swing.SwingUtilities;
 
 import javafx.css.PseudoClass;
 import javafx.embed.swing.JFXPanel;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TextField;
