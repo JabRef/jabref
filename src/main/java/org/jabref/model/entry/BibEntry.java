@@ -722,14 +722,14 @@ public class BibEntry implements Cloneable {
             return false;
         }
         BibEntry entry = (BibEntry) o;
-        return Objects.equals(type, entry.type)
+        return Objects.equals(type.getValue(), entry.type.getValue())
                 && Objects.equals(fields, entry.fields)
                 && Objects.equals(commentsBeforeEntry, entry.commentsBeforeEntry);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, fields);
+        return Objects.hash(type.getValue(), fields);
     }
 
     public void registerListener(Object object) {
