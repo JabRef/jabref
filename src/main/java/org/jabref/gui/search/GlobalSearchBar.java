@@ -22,6 +22,7 @@ import javax.swing.SwingUtilities;
 
 import javafx.css.PseudoClass;
 import javafx.embed.swing.JFXPanel;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TextField;
@@ -77,6 +78,8 @@ public class GlobalSearchBar extends JPanel {
     private SearchResultFrame searchResultFrame;
 
     private SearchDisplayMode searchDisplayMode;
+
+    private JLabel searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getIcon());
 
     /**
      * if this flag is set the searchbar won't be selected after the next search
@@ -195,6 +198,7 @@ public class GlobalSearchBar extends JPanel {
         setLayout(new FlowLayout(FlowLayout.RIGHT));
         JToolBar toolBar = new OSXCompatibleToolbar();
         toolBar.setFloatable(false);
+        toolBar.add(searchIcon);
         toolBar.add(container);
         toolBar.add(openCurrentResultsInDialog);
         toolBar.addSeparator();
@@ -391,7 +395,11 @@ public class GlobalSearchBar extends JPanel {
             currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
             searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
         }
-        SearchTextField.switchSearchColor(searchField, grammarBasedSearch);
+        if (grammarBasedSearch) {
+           searchIcon.setIcon(IconTheme.JabRefIcon.ADVANCED_SEARCH.getIcon());
+        } else {
+            searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
+        }
         Tooltip tooltip = new Tooltip();
         tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         tooltip.setGraphic(description);
