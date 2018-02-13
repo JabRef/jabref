@@ -300,6 +300,7 @@ public class EntryEditor extends BorderPane {
         public void changed(ObservableValue observable, String oldValue, String newValue) {
             DefaultTaskExecutor.runInJavaFXThread(() -> {
                 typeLabel.setText(new TypedBibEntry(entry, mode).getTypeForDisplay());
+                recalculateVisibleTabs();
                 EntryEditorTab selectedTab = (EntryEditorTab) tabbed.getSelectionModel().getSelectedItem();
                 selectedTab.notifyAboutFocus(entry);
             });
