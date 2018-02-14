@@ -1,9 +1,8 @@
-package org.jabref.logic.importer.util;
+package org.jabref.migrations;
 
 import java.util.Collections;
 
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.migrations.RenameReviewToComment;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
