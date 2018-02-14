@@ -44,13 +44,11 @@ public class JabRefExecutorService implements Executor {
     @Override
     public void execute(Runnable command) {
         Objects.requireNonNull(command);
-        
         executorService.execute(command);
     }
 
     public void executeAndWait(Runnable command) {
         Objects.requireNonNull(command);
-
         Future<?> future = executorService.submit(command);
         while (true) {
             try {
@@ -66,7 +64,6 @@ public class JabRefExecutorService implements Executor {
 
     public boolean executeAndWait(Callable<?> command) {
         Objects.requireNonNull(command);
-        
         Future<?> future = executorService.submit(command);
         while (true) {
             try {
