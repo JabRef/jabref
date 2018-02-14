@@ -60,7 +60,7 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 ### Generating additional source codes and getting dependencies using Gradle:
 1. Go to the jabref folder (the repo you just cloned, if you are following this tutorial, just execute `cd jabref`)
 2. Execute the following steps from the git-bash:
-  - Run `./gradlew build` 
+  - Run `./gradlew assemble` 
   - If you use Eclipse: Additionally run `./gradlew eclipse` 
   - If you use IntelliJ: No further setup is required
 3. In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files. 
