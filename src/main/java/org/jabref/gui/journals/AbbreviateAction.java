@@ -15,6 +15,8 @@ import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Converts journal full names to either iso or medline abbreviations for all
@@ -25,6 +27,8 @@ public class AbbreviateAction extends AbstractWorker {
     private final BasePanel panel;
     private String message = "";
     private final boolean iso;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbbreviateAction.class);
 
     public AbbreviateAction(BasePanel panel, boolean iso) {
         this.panel = panel;
@@ -57,18 +61,18 @@ public class AbbreviateAction extends AbstractWorker {
 
                 return false;
             };
-            
+
             Future<Boolean> result = JabRefExecutorService.INSTANCE.executeAndReturn(callable);
             futures.add(result);
         }
-        
+
         for (Future<Boolean> future : futures) {
             try {
-                if(future.get()) {
+                if (future.get()) {
                     count++;
                 }
             } catch (InterruptedException | ExecutionException e) {
-                // Do nothing.
+                LOGGER.debug("Unable to retrieve return value.");
             }
         }
 
