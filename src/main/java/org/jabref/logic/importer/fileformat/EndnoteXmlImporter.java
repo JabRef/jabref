@@ -47,6 +47,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EndnoteXmlImporter.class);
     private final ImportFormatPreferences preferences;
+    private Unmarshaller unmarshaller;
 
     public EndnoteXmlImporter(ImportFormatPreferences preferences) {
         this.preferences = preferences;
@@ -91,17 +92,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         Objects.requireNonNull(reader);
 
         try {
-            JAXBContext context = JAXBContext.newInstance("org.jabref.logic.importer.fileformat.endnote");
-            XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
-
-            //go to the root element
-            while (!xmlStreamReader.isStartElement()) {
-                xmlStreamReader.next();
-            }
-
-            Unmarshaller unmarshaller = context.createUnmarshaller();
-            Object unmarshalledObject = unmarshaller.unmarshal(xmlStreamReader);
+            Object unmarshalledObject = unmarshallRoot(reader);
 
             if (unmarshalledObject instanceof Xml) {
                 // Check whether we have an article set, an article, a book article or a book article set
@@ -118,6 +109,28 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         } catch (JAXBException | XMLStreamException e) {
             LOGGER.debug("could not parse document", e);
             return ParserResult.fromError(e);
+        }
+    }
+
+    private Object unmarshallRoot(BufferedReader reader) throws XMLStreamException, JAXBException {
+        initUnmarshaller();
+
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
+
+        // Go to the root element
+        while (!xmlStreamReader.isStartElement()) {
+            xmlStreamReader.next();
+        }
+
+        return unmarshaller.unmarshal(xmlStreamReader);
+    }
+
+    private void initUnmarshaller() throws JAXBException {
+        if (unmarshaller == null) {
+            // Lazy init because this is expensive
+            JAXBContext context = JAXBContext.newInstance("org.jabref.logic.importer.fileformat.endnote");
+            unmarshaller = context.createUnmarshaller();
         }
     }
 
