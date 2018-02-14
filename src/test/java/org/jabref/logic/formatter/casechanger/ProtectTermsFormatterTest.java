@@ -19,11 +19,9 @@ public class ProtectTermsFormatterTest {
 
     @BeforeEach
     public void setUp() {
-        ProtectTermsFormatter
-                .setProtectedTermsLoader(
+        formatter = new ProtectTermsFormatter(
                         new ProtectedTermsLoader(new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
                                 Collections.emptyList(), Collections.emptyList(), Collections.emptyList())));
-        formatter = new ProtectTermsFormatter();
     }
 
     @Test
