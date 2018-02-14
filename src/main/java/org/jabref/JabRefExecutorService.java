@@ -89,19 +89,16 @@ public class JabRefExecutorService implements Executor {
      */
     public <T> Future<T> executeAndReturn(Callable<T> command) {
         Objects.requireNonNull(command);
-
         return executorService.submit(command);
     }
     
     public <T> List<Future<T>> executeAll(Collection<Callable<T>> tasks) throws InterruptedException {
         Objects.requireNonNull(tasks);
-        
         List<Future<T>> futures = null; 
-        
         try {
             futures =  executorService.invokeAll(tasks);
         } catch (InterruptedException e) {
-            LOGGER.debug("Invokation has been interrupted during execution.");
+            LOGGER.info("Invokation has been interrupted during execution.");
         }
         Objects.requireNonNull(futures);
         return futures;
