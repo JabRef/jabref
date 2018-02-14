@@ -28,6 +28,7 @@ For more details refer to the [field mapping help page](http://help.jabref.org/e
 - We changed the default dialog option when removing a [file link](http://help.jabref.org/en/FileLinks#adding-external-links-to-an-entry) from an entry.
 The new default removes the linked file from the entry instead of deleting the file from disk. [#3679](https://github.com/JabRef/jabref/issues/3679)
 - The group editing window can now also be called by double-clicking the group to be edited. [koppor#277](https://github.com/koppor/jabref/issues/277)
+- We added a new cleanup operation that replaces ligatures with their expanded form. [3613](https://github.com/JabRef/jabref/issues/3613)
 
 ### Fixed
 - We fixed an issue where pressing space caused the cursor to jump to the start of the text field. [#3471](https://github.com/JabRef/jabref/issues/3471)
