@@ -18,60 +18,60 @@ import org.jabref.model.entry.InternalBibtexFields;
  */
 public class AbbreviateAction extends AbstractWorker {
 
-	private final BasePanel panel;
-	private String message = "";
-	private final boolean iso;
+    private final BasePanel panel;
+    private String message = "";
+    private final boolean iso;
 
-	public AbbreviateAction(BasePanel panel, boolean iso) {
-		this.panel = panel;
-		this.iso = iso;
-	}
+    public AbbreviateAction(BasePanel panel, boolean iso) {
+	this.panel = panel;
+	this.iso = iso;
+    }
 
-	@Override
-	public void init() {
-		panel.output(Localization.lang("Abbreviating..."));
-	}
+    @Override
+    public void init() {
+	panel.output(Localization.lang("Abbreviating..."));
+    }
 
-	@Override
-	public void run() {
-		List<BibEntry> entries = panel.getSelectedEntries();
+    @Override
+    public void run() {
+	List<BibEntry> entries = panel.getSelectedEntries();
 
-		UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
-				Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
-				iso);
+	UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
+		Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
+		iso);
 
-		NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
-		int count = 0;
+	NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
+	int count = 0;
 
-		for (BibEntry entry : entries) {
-			Callable<Boolean> callable = () -> {
-				for (String journalField : InternalBibtexFields.getJournalNameFields()) {
-					if (undoableAbbreviator.abbreviate(panel.getDatabase(), entry, journalField, ce)) {
-						return true;
-					}
-				}
-
-				return false;
-			};
-
-			boolean result = JabRefExecutorService.INSTANCE.executeAndWait(callable);
-			if (result) {
-				count++;
-			}
+	for (BibEntry entry : entries) {
+	    Callable<Boolean> callable = () -> {
+		for (String journalField : InternalBibtexFields.getJournalNameFields()) {
+		    if (undoableAbbreviator.abbreviate(panel.getDatabase(), entry, journalField, ce)) {
+			return true;
+		    }
 		}
 
-		if (count > 0) {
-			ce.end();
-			panel.getUndoManager().addEdit(ce);
-			panel.markBaseChanged();
-			message = Localization.lang("Abbreviated %0 journal names.", String.valueOf(count));
-		} else {
-			message = Localization.lang("No journal names could be abbreviated.");
-		}
+		return false;
+	    };
+
+	    boolean result = JabRefExecutorService.INSTANCE.executeAndWait(callable);
+	    if (result) {
+		count++;
+	    }
 	}
 
-	@Override
-	public void update() {
-		panel.output(message);
+	if (count > 0) {
+	    ce.end();
+	    panel.getUndoManager().addEdit(ce);
+	    panel.markBaseChanged();
+	    message = Localization.lang("Abbreviated %0 journal names.", String.valueOf(count));
+	} else {
+	    message = Localization.lang("No journal names could be abbreviated.");
 	}
+    }
+
+    @Override
+    public void update() {
+	panel.output(message);
+    }
 }
