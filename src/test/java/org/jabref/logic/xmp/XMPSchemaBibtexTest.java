@@ -17,33 +17,37 @@ import org.jabref.model.entry.BibEntry;
 
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class XMPSchemaBibtexTest {
 
-    @Mock
     private ImportFormatPreferences prefs;
 
-    public void assertEqualsBibtexEntry(BibEntry e, BibEntry x) {
-        Assert.assertNotNull(e);
-        Assert.assertNotNull(x);
-        Assert.assertEquals(e.getCiteKeyOptional(), x.getCiteKeyOptional());
-        Assert.assertEquals(e.getType(), x.getType());
+    @BeforeEach
+    public void setUp() {
+        prefs = mock(ImportFormatPreferences.class);
+    }
 
-        Assert.assertEquals(e.getFieldNames().size(), x.getFieldNames().size());
+    public void assertEqualsBibtexEntry(BibEntry e, BibEntry x) {
+        assertNotNull(e);
+        assertNotNull(x);
+        assertEquals(e.getCiteKeyOptional(), x.getCiteKeyOptional());
+        assertEquals(e.getType(), x.getType());
+
+        assertEquals(e.getFieldNames().size(), x.getFieldNames().size());
 
         for (String name : e.getFieldNames()) {
-            Assert.assertEquals(e.getField(name), x.getField(name));
+            assertEquals(e.getField(name), x.getField(name));
         }
     }
 
@@ -53,8 +57,8 @@ public class XMPSchemaBibtexTest {
         XMPMetadata xmp = new XMPMetadata();
         XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
-        Assert.assertNotNull(bibtex.getElement());
-        Assert.assertEquals("rdf:Description", bibtex.getElement().getTagName());
+        assertNotNull(bibtex.getElement());
+        assertEquals("rdf:Description", bibtex.getElement().getTagName());
 
     }
 
@@ -68,8 +72,8 @@ public class XMPSchemaBibtexTest {
 
         XMPSchemaBibtex bibtex = new XMPSchemaBibtex(e, "bibtex");
 
-        Assert.assertEquals(e, bibtex.getElement());
-        Assert.assertEquals("rdf:Description", bibtex.getElement().getTagName());
+        assertEquals(e, bibtex.getElement());
+        assertEquals("rdf:Description", bibtex.getElement().getTagName());
     }
 
     @Test
@@ -82,21 +86,21 @@ public class XMPSchemaBibtexTest {
         Element e = bibtex.getElement();
 
         NodeList l1 = e.getElementsByTagName("bibtex:author");
-        Assert.assertEquals(1, l1.getLength());
+        assertEquals(1, l1.getLength());
 
         NodeList l = e.getElementsByTagName("rdf:li");
 
-        Assert.assertEquals(2, l.getLength());
+        assertEquals(2, l.getLength());
 
-        Assert.assertEquals("Tom DeMarco", XMLUtil
+        assertEquals("Tom DeMarco", XMLUtil
                 .getStringValue((Element) l.item(0)));
-        Assert.assertEquals("Kent Beck", XMLUtil.getStringValue((Element) l.item(1)));
+        assertEquals("Kent Beck", XMLUtil.getStringValue((Element) l.item(1)));
 
         List<String> authors = bibtex.getPersonList("author");
-        Assert.assertEquals(2, authors.size());
+        assertEquals(2, authors.size());
 
-        Assert.assertEquals("Tom DeMarco", authors.get(0));
-        Assert.assertEquals("Kent Beck", authors.get(1));
+        assertEquals("Tom DeMarco", authors.get(0));
+        assertEquals("Kent Beck", authors.get(1));
     }
 
     @Test
@@ -108,27 +112,27 @@ public class XMPSchemaBibtexTest {
                 "The advanced Flux-Compensation for Delawney-Separation");
 
         Element e = bibtex.getElement();
-        Assert.assertEquals("The advanced Flux-Compensation for Delawney-Separation",
+        assertEquals("The advanced Flux-Compensation for Delawney-Separation",
                 e.getAttribute("bibtex:title"));
 
-        Assert.assertEquals("The advanced Flux-Compensation for Delawney-Separation",
+        assertEquals("The advanced Flux-Compensation for Delawney-Separation",
                 bibtex.getTextProperty("title"));
 
         bibtex.setTextProperty("title",
                 "The advanced Flux-Correlation for Delawney-Separation");
 
         e = bibtex.getElement();
-        Assert.assertEquals("The advanced Flux-Correlation for Delawney-Separation", e
+        assertEquals("The advanced Flux-Correlation for Delawney-Separation", e
                 .getAttribute("bibtex:title"));
 
-        Assert.assertEquals("The advanced Flux-Correlation for Delawney-Separation",
+        assertEquals("The advanced Flux-Correlation for Delawney-Separation",
                 bibtex.getTextProperty("title"));
 
         bibtex
                 .setTextProperty(
                         "abstract",
                         "   The abstract\n can go \n \n on several \n lines with \n many \n\n empty ones in \n between.");
-        Assert.assertEquals(
+        assertEquals(
                 "   The abstract\n can go \n \n on several \n lines with \n many \n\n empty ones in \n between.",
                 bibtex.getTextProperty("abstract"));
     }
@@ -145,36 +149,36 @@ public class XMPSchemaBibtexTest {
 
             List<String> l = bibtex.getBagList("author");
 
-            Assert.assertEquals(2, l.size());
+            assertEquals(2, l.size());
 
-            Assert.assertTrue(l.get(0).equals("Tom DeMarco")
+            assertTrue(l.get(0).equals("Tom DeMarco")
                     || l.get(1).equals("Tom DeMarco"));
-            Assert.assertTrue(l.get(0).equals("Kent Beck")
+            assertTrue(l.get(0).equals("Kent Beck")
                     || l.get(1).equals("Kent Beck"));
         }
         {
             bibtex.removeBagValue("author", "Kent Beck");
             List<String> l = bibtex.getBagList("author");
-            Assert.assertEquals(1, l.size());
-            Assert.assertTrue(l.get(0).equals("Tom DeMarco"));
+            assertEquals(1, l.size());
+            assertTrue(l.get(0).equals("Tom DeMarco"));
         }
         { // Already removed
             bibtex.removeBagValue("author", "Kent Beck");
             List<String> l = bibtex.getBagList("author");
-            Assert.assertEquals(1, l.size());
-            Assert.assertTrue(l.get(0).equals("Tom DeMarco"));
+            assertEquals(1, l.size());
+            assertTrue(l.get(0).equals("Tom DeMarco"));
         }
         { // Duplicates allowed!
             bibtex.addBagValue("author", "Tom DeMarco");
             List<String> l = bibtex.getBagList("author");
-            Assert.assertEquals(2, l.size());
-            Assert.assertTrue(l.get(0).equals("Tom DeMarco"));
-            Assert.assertTrue(l.get(1).equals("Tom DeMarco"));
+            assertEquals(2, l.size());
+            assertTrue(l.get(0).equals("Tom DeMarco"));
+            assertTrue(l.get(1).equals("Tom DeMarco"));
         }
         // Removes both
         bibtex.removeBagValue("author", "Tom DeMarco");
         List<String> l = bibtex.getBagList("author");
-        Assert.assertEquals(0, l.size());
+        assertEquals(0, l.size());
     }
 
     @Test
@@ -189,34 +193,34 @@ public class XMPSchemaBibtexTest {
 
             List<String> l = bibtex.getSequenceList("author");
 
-            Assert.assertEquals(2, l.size());
+            assertEquals(2, l.size());
 
-            Assert.assertEquals("Tom DeMarco", l.get(0));
-            Assert.assertEquals("Kent Beck", l.get(1));
+            assertEquals("Tom DeMarco", l.get(0));
+            assertEquals("Kent Beck", l.get(1));
         }
         {
             bibtex.removeSequenceValue("author", "Tom DeMarco");
             List<String> l = bibtex.getSequenceList("author");
-            Assert.assertEquals(1, l.size());
-            Assert.assertTrue(l.get(0).equals("Kent Beck"));
+            assertEquals(1, l.size());
+            assertTrue(l.get(0).equals("Kent Beck"));
         }
         { // Already removed
             bibtex.removeSequenceValue("author", "Tom DeMarco");
             List<String> l = bibtex.getSequenceList("author");
-            Assert.assertEquals(1, l.size());
-            Assert.assertTrue(l.get(0).equals("Kent Beck"));
+            assertEquals(1, l.size());
+            assertTrue(l.get(0).equals("Kent Beck"));
         }
         { // Duplicates allowed!
             bibtex.addSequenceValue("author", "Kent Beck");
             List<String> l = bibtex.getSequenceList("author");
-            Assert.assertEquals(2, l.size());
-            Assert.assertTrue(l.get(0).equals("Kent Beck"));
-            Assert.assertTrue(l.get(1).equals("Kent Beck"));
+            assertEquals(2, l.size());
+            assertTrue(l.get(0).equals("Kent Beck"));
+            assertTrue(l.get(1).equals("Kent Beck"));
         }
         // Remvoes all
         bibtex.removeSequenceValue("author", "Kent Beck");
         List<String> l = bibtex.getSequenceList("author");
-        Assert.assertEquals(0, l.size());
+        assertEquals(0, l.size());
     }
 
     @Test
@@ -233,15 +237,15 @@ public class XMPSchemaBibtexTest {
         Map<String, String> s = XMPSchemaBibtex.getAllProperties(bibtex,
                 "bibtex");
 
-        Assert.assertEquals(5, s.size());
-        Assert.assertTrue(s.containsKey("title"));
-        Assert.assertTrue(s.containsKey("author"));
+        assertEquals(5, s.size());
+        assertTrue(s.containsKey("title"));
+        assertTrue(s.containsKey("author"));
 
-        Assert.assertEquals("BlaBla Ta Ta Hello World", s.get("title"));
-        Assert.assertEquals("BlaBla Ta Ta\nHello World", s.get("abstract"));
-        Assert.assertEquals("BlaBla Ta Ta\nHello World", s.get("review"));
-        Assert.assertEquals("BlaBla Ta Ta\nHello World", s.get("note"));
-        Assert.assertEquals("Mickey Mouse and James Bond", s.get("author"));
+        assertEquals("BlaBla Ta Ta Hello World", s.get("title"));
+        assertEquals("BlaBla Ta Ta\nHello World", s.get("abstract"));
+        assertEquals("BlaBla Ta Ta\nHello World", s.get("review"));
+        assertEquals("BlaBla Ta Ta\nHello World", s.get("note"));
+        assertEquals("Mickey Mouse and James Bond", s.get("author"));
     }
 
     @Test
@@ -272,7 +276,7 @@ public class XMPSchemaBibtexTest {
         Document d = XMLUtil.parse(new ByteArrayInputStream(bibtexString
                 .getBytes(StandardCharsets.UTF_8)));
 
-        Assert.assertEquals("Beach sand convolution by surf-wave optimzation",
+        assertEquals("Beach sand convolution by surf-wave optimzation",
                 XMPSchemaBibtex.getTextContent(
                         d.getElementsByTagName("bibtex:title").item(0)).trim());
 

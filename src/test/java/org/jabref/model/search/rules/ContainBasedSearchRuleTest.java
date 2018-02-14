@@ -3,8 +3,9 @@ package org.jabref.model.search.rules;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test case for ContainBasedSearchRule.
@@ -21,24 +22,24 @@ public class ContainBasedSearchRuleTest {
 
         String query = "marine 2001 shields";
 
-        Assert.assertEquals(false, bsCaseSensitive.applyRule(query, be));
-        Assert.assertEquals(true, bsCaseInsensitive.applyRule(query, be));
-        Assert.assertEquals(false, bsCaseSensitiveRegexp.applyRule(query, be));
-        Assert.assertEquals(false, bsCaseInsensitiveRegexp.applyRule(query, be));
+        assertEquals(false, bsCaseSensitive.applyRule(query, be));
+        assertEquals(true, bsCaseInsensitive.applyRule(query, be));
+        assertEquals(false, bsCaseSensitiveRegexp.applyRule(query, be));
+        assertEquals(false, bsCaseInsensitiveRegexp.applyRule(query, be));
 
         query = "\"marine larviculture\"";
 
-        Assert.assertEquals(false, bsCaseSensitive.applyRule(query, be));
-        Assert.assertEquals(false, bsCaseInsensitive.applyRule(query, be));
-        Assert.assertEquals(false, bsCaseSensitiveRegexp.applyRule(query, be));
-        Assert.assertEquals(false, bsCaseInsensitiveRegexp.applyRule(query, be));
+        assertEquals(false, bsCaseSensitive.applyRule(query, be));
+        assertEquals(false, bsCaseInsensitive.applyRule(query, be));
+        assertEquals(false, bsCaseSensitiveRegexp.applyRule(query, be));
+        assertEquals(false, bsCaseInsensitiveRegexp.applyRule(query, be));
 
         query = "marine [A-Za-z]* larviculture";
 
-        Assert.assertEquals(false, bsCaseSensitive.applyRule(query, be));
-        Assert.assertEquals(false, bsCaseInsensitive.applyRule(query, be));
-        Assert.assertEquals(false, bsCaseSensitiveRegexp.applyRule(query, be));
-        Assert.assertEquals(true, bsCaseInsensitiveRegexp.applyRule(query, be));
+        assertEquals(false, bsCaseSensitive.applyRule(query, be));
+        assertEquals(false, bsCaseInsensitive.applyRule(query, be));
+        assertEquals(false, bsCaseSensitiveRegexp.applyRule(query, be));
+        assertEquals(true, bsCaseInsensitiveRegexp.applyRule(query, be));
 
     }
 

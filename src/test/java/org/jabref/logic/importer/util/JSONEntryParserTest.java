@@ -5,8 +5,9 @@ import java.util.Optional;
 import org.jabref.model.entry.BibEntry;
 
 import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JSONEntryParserTest {
 
@@ -27,15 +28,15 @@ public class JSONEntryParserTest {
         JSONObject jsonObject = new JSONObject(jsonString);
         BibEntry bibEntry = jc.parseBibJSONtoBibtex(jsonObject, ',');
 
-        Assert.assertEquals("article", bibEntry.getType());
-        Assert.assertEquals(Optional.of("VLSI Design"), bibEntry.getField("journal"));
-        Assert.assertEquals(Optional.of("10.1155/2014/217495"), bibEntry.getField("doi"));
-        Assert.assertEquals(Optional.of("Syed Asad Alam and Oscar Gustafsson"), bibEntry.getField("author"));
-        Assert.assertEquals(
+        assertEquals("article", bibEntry.getType());
+        assertEquals(Optional.of("VLSI Design"), bibEntry.getField("journal"));
+        assertEquals(Optional.of("10.1155/2014/217495"), bibEntry.getField("doi"));
+        assertEquals(Optional.of("Syed Asad Alam and Oscar Gustafsson"), bibEntry.getField("author"));
+        assertEquals(
                 Optional.of(
                         "Design of Finite Word Length Linear-Phase FIR Filters in the Logarithmic Number System Domain"),
                 bibEntry.getField("title"));
-        Assert.assertEquals(Optional.of("2014"), bibEntry.getField("year"));
+        assertEquals(Optional.of("2014"), bibEntry.getField("year"));
     }
 
     @Test
@@ -52,13 +53,13 @@ public class JSONEntryParserTest {
 
         JSONObject jsonObject = new JSONObject(jsonString);
         BibEntry bibEntry = JSONEntryParser.parseSpringerJSONtoBibtex(jsonObject);
-        Assert.assertEquals(Optional.of("1992"), bibEntry.getField("year"));
-        Assert.assertEquals(Optional.of("5"), bibEntry.getField("number"));
-        Assert.assertEquals(Optional.of("#sep#"), bibEntry.getField("month"));
-        Assert.assertEquals(Optional.of("10.1007/BF01201962"), bibEntry.getField("doi"));
-        Assert.assertEquals(Optional.of("8"), bibEntry.getField("volume"));
-        Assert.assertEquals(Optional.of("Springer"), bibEntry.getField("publisher"));
-        Assert.assertEquals(Optional.of("1992-09-01"), bibEntry.getField("date"));
+        assertEquals(Optional.of("1992"), bibEntry.getField("year"));
+        assertEquals(Optional.of("5"), bibEntry.getField("number"));
+        assertEquals(Optional.of("#sep#"), bibEntry.getField("month"));
+        assertEquals(Optional.of("10.1007/BF01201962"), bibEntry.getField("doi"));
+        assertEquals(Optional.of("8"), bibEntry.getField("volume"));
+        assertEquals(Optional.of("Springer"), bibEntry.getField("publisher"));
+        assertEquals(Optional.of("1992-09-01"), bibEntry.getField("date"));
     }
 
 }

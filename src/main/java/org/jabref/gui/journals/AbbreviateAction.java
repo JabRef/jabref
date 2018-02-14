@@ -1,6 +1,5 @@
 package org.jabref.gui.journals;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -14,14 +13,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 
 /**
- * Converts journal full names to either iso or medline abbreviations for all selected entries.
+ * Converts journal full names to either iso or medline abbreviations for all
+ * selected entries.
  */
 public class AbbreviateAction extends AbstractWorker {
 
     private final BasePanel panel;
     private String message = "";
     private final boolean iso;
-
 
     public AbbreviateAction(BasePanel panel, boolean iso) {
         this.panel = panel;
@@ -36,17 +35,14 @@ public class AbbreviateAction extends AbstractWorker {
     @Override
     public void run() {
         List<BibEntry> entries = panel.getSelectedEntries();
-        if (entries == null) {
-            return;
-        }
 
-        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(Globals.journalAbbreviationLoader
-                .getRepository(Globals.prefs.getJournalAbbreviationPreferences()), iso);
+        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
+                Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
+                iso);
 
         NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
         int count = 0;
 
-        List<Boolean> futures = new ArrayList<>();
         for (BibEntry entry : entries) {
             Callable<Boolean> callable = () -> {
                 for (String journalField : InternalBibtexFields.getJournalNameFields()) {
@@ -57,13 +53,11 @@ public class AbbreviateAction extends AbstractWorker {
 
                 return false;
             };
-            JabRefExecutorService.INSTANCE.executeAndWait(callable);
-            futures.add(JabRefExecutorService.INSTANCE.executeAndWait(callable));
-        }
 
-        for (Boolean future : futures) {
-            if (future)
+            boolean result = JabRefExecutorService.INSTANCE.executeAndWait(callable);
+            if (result) {
                 count++;
+            }
         }
 
         if (count > 0) {
