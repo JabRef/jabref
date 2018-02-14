@@ -1,5 +1,6 @@
 package org.jabref;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -91,13 +92,12 @@ public class JabRefExecutorService implements Executor {
     
     public <T> List<Future<T>> executeAll(Collection<Callable<T>> tasks) {
         Objects.requireNonNull(tasks);
-        List<Future<T>> futures = null; 
+        List<Future<T>> futures = new ArrayList<>(); 
         try {
             futures =  executorService.invokeAll(tasks);
         } catch (InterruptedException e) {
             LOGGER.info("Invokation has been interrupted during execution.");
         }
-        Objects.requireNonNull(futures);
         return futures;
     }
 
