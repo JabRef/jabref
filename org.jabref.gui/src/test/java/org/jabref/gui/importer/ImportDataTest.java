@@ -11,15 +11,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ImportDataTest {
 
     public static final File FILE_IN_DATABASE = Paths
-            .get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/pdfInDatabase.pdf").toFile();
+            .get("src/test/resources/org/jabref/gui/importer/unlinkedFilesTestFolder/pdfInDatabase.pdf").toFile();
     public static final File FILE_NOT_IN_DATABASE = Paths
-            .get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/pdfNotInDatabase.pdf")
+            .get("src/test/resources/org/jabref/gui/importer/unlinkedFilesTestFolder/pdfNotInDatabase.pdf")
             .toFile();
     public static final File EXISTING_FOLDER = Paths
-            .get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder").toFile();
+            .get("src/test/resources/org/jabref/gui/importer/unlinkedFilesTestFolder").toFile();
     public static final File NOT_EXISTING_FOLDER = Paths.get("notexistingfolder").toFile();
     public static final File NOT_EXISTING_PDF = Paths
-            .get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/null.pdf").toFile();
+            .get("src/test/resources/org/jabref/gui/importer/unlinkedFilesTestFolder/null.pdf").toFile();
 
     /**
      * Tests the testing environment.
