@@ -110,10 +110,7 @@ public class JabRefExecutorService implements Executor {
     }
 
     public void executeInterruptableTaskAndWait(Runnable runnable) {
-        if (runnable == null) {
-            LOGGER.debug("Received null as command for execution");
-            return;
-        }
+        Objects.requireNonNull(runnable);
 
         Future<?> future = lowPriorityExecutorService.submit(runnable);
         while (true) {
