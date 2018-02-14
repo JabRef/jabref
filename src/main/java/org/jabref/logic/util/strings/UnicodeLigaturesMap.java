@@ -38,8 +38,9 @@ public class UnicodeLigaturesMap extends HashMap<String, String> {
         put("\u0153", "oe");
         put("\uA74E", "OO");
         put("\uA74F", "oo");
-        put("\u1E9E", "ſs");
-        put("\u00DF", "ſz");
+        // we explicitly decided to exclude the conversion of ß or ẞ
+        // put("\u1E9E", "ſs");
+        // put("\u00DF", "ſz");
         put("\uA728", "TZ");
         put("\uA729", "tz");
         put("\u1D6B", "ue");

@@ -48,6 +48,6 @@ public class ReplaceUnicodeLigaturesFormatter implements LayoutFormatter, Format
 
     @Override
     public String getExampleInput() {
-        return "Straße";
+        return "Æneas";
     }
 }

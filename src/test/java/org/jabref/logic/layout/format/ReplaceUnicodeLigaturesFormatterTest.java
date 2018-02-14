@@ -24,7 +24,6 @@ public class ReplaceUnicodeLigaturesFormatterTest {
         assertEquals("AA", formatter.format("\uA732"));
         assertEquals("fi", formatter.format("ﬁ"));
         assertEquals("et", formatter.format("\uD83D\uDE70"));
-        assertEquals("ſz", formatter.format("ß"));
     }
 
     @Test
@@ -34,6 +33,6 @@ public class ReplaceUnicodeLigaturesFormatterTest {
 
     @Test
     public void testSampleInput() {
-        assertEquals("Straſze", formatter.format("Straße"));
+        assertEquals("AEneas", formatter.format("Æneas"));
     }
 }
