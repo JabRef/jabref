@@ -1,4 +1,4 @@
-package org.jabref.logic.util;
+package org.jabref.logic.bibtexkeypattern;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -338,40 +338,33 @@ public class BracketedPattern {
      * @param offset The number of initial items in the modifiers array to skip.
      * @return The modified label.
      */
-    public static String applyModifiers(final String label, final List<String> parts, final int offset) {
+    static String applyModifiers(final String label, final List<String> parts, final int offset) {
         String resultingLabel = label;
-        if (parts.size() > offset) {
-            for (int j = offset; j < parts.size(); j++) {
-                String modifier = parts.get(j);
+        for (int j = offset; j < parts.size(); j++) {
+            String modifier = parts.get(j);
 
-                if ("abbr".equals(modifier)) {
-                    // Abbreviate - that is,
-                    StringBuilder abbreviateSB = new StringBuilder();
-                    String[] words = resultingLabel.replaceAll("[\\{\\}']", "")
-                            .split("[\\(\\) \r\n\"]");
-                    for (String word : words) {
-                        if (!word.isEmpty()) {
-                            abbreviateSB.append(word.charAt(0));
-                        }
+            if ("abbr".equals(modifier)) {
+                // Abbreviate - that is,
+                StringBuilder abbreviateSB = new StringBuilder();
+                String[] words = resultingLabel.replaceAll("[\\{\\}']", "")
+                                               .split("[\\(\\) \r\n\"]");
+                for (String word : words) {
+                    if (!word.isEmpty()) {
+                        abbreviateSB.append(word.charAt(0));
                     }
-                    resultingLabel =  abbreviateSB.toString();
+                }
+                resultingLabel = abbreviateSB.toString();
+            } else {
+                Optional<Formatter> formatter = Formatters.getFormatterForModifier(modifier);
+                if (formatter.isPresent()) {
+                    resultingLabel = formatter.get().format(resultingLabel);
+                } else if (!modifier.isEmpty() && (modifier.length() >= 2) && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
+                    // Alternate text modifier in parentheses. Should be inserted if the label is empty
+                    if (label.isEmpty() && (modifier.length() > 2)) {
+                        resultingLabel = modifier.substring(1, modifier.length() - 1);
+                    }
                 } else {
-                    Optional<Formatter> formatter = Formatters.getFormatterForModifier(modifier);
-                    if (formatter.isPresent()) {
-                        resultingLabel = formatter.get().format(label);
-                    } else if (!modifier.isEmpty() && (modifier.length() >= 2) && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
-                        // Alternate text modifier in parentheses. Should be inserted if
-                        // the label is empty:
-                        if (label.isEmpty() && (modifier.length() > 2)) {
-                            resultingLabel = modifier.substring(1, modifier.length() - 1);
-                        } else {
-                            resultingLabel = label;
-                        }
-                    } else {
-                        // LOGGER.info("Key generator warning: unknown modifier '"
-                        //        + modifier + "'.");
-                        resultingLabel = label;
-                    }
+                    LOGGER.warn("Key generator warning: unknown modifier '" + modifier + "'.");
                 }
             }
         }

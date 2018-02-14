@@ -11,21 +11,20 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Category(FetcherTest.class)
+@FetcherTest
 public class GvkFetcherTest {
 
     private GvkFetcher fetcher;
     private BibEntry bibEntryPPN591166003;
     private BibEntry bibEntryPPN66391437X;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         fetcher = new GvkFetcher();
 
@@ -68,7 +67,7 @@ public class GvkFetcherTest {
     }
 
     @Test
-    public void simpleSearchQueryStringCorrect() throws FetcherException {
+    public void simpleSearchQueryStringCorrect() {
         String query = "java jdk";
         String result = fetcher.getSearchQueryString(query);
         assertEquals("pica.all=java jdk", result);
@@ -82,7 +81,7 @@ public class GvkFetcherTest {
     }
 
     @Test
-    public void complexSearchQueryStringCorrect() throws FetcherException {
+    public void complexSearchQueryStringCorrect() {
         String query = "kon java tit jdk";
         String result = fetcher.getSearchQueryString(query);
         assertEquals("pica.kon=java and pica.tit=jdk", result);

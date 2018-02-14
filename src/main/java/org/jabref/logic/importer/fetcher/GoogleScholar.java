@@ -24,6 +24,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
@@ -49,7 +50,6 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
 
     public GoogleScholar(ImportFormatPreferences importFormatPreferences) {
         Objects.requireNonNull(importFormatPreferences);
-
         this.importFormatPreferences = importFormatPreferences;
     }
 
@@ -151,7 +151,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
 
     private BibEntry downloadEntry(String link) throws IOException, FetcherException {
         String downloadedContent = new URLDownload(link).asString();
-        BibtexParser parser = new BibtexParser(importFormatPreferences);
+        BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
         ParserResult result = parser.parse(new StringReader(downloadedContent));
         if ((result == null) || (result.getDatabase() == null)) {
             throw new FetcherException("Parsing entries from Google Scholar bib file failed.");

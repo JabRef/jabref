@@ -90,23 +90,21 @@ public class Layout {
      * recursive string references are resolved.
      */
     public String doLayout(BibEntry bibtex, BibDatabase database) {
-        StringBuilder sb = new StringBuilder(100);
+        StringBuilder builder = new StringBuilder(100);
 
         for (LayoutEntry layoutEntry : layoutEntries) {
             String fieldText = layoutEntry.doLayout(bibtex, database);
 
-            // 2005.05.05 M. Alver
             // The following change means we treat null fields as "". This is to fix the
-            // problem of whitespace disappearing after missing fields. Hoping there are
-            // no side effects.
+            // problem of whitespace disappearing after missing fields.
             if (fieldText == null) {
                 fieldText = "";
             }
 
-            sb.append(fieldText);
+            builder.append(fieldText);
         }
 
-        return sb.toString();
+        return builder.toString();
     }
 
     /**
