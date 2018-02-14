@@ -27,8 +27,7 @@ class RenameReviewToCommentTest {
 
         action.performAction(actualParserResult);
 
-        assertEquals(new ParserResult(Collections.singletonList(entry)).getDatabase().getEntryByKey("Entry1"),
-                actualParserResult.getDatabase().getEntryByKey("Entry1"));
+        assertEquals(entry, actualParserResult.getDatabase().getEntryByKey("Entry1").get());
     }
 
     @Test
@@ -42,8 +41,7 @@ class RenameReviewToCommentTest {
 
         action.performAction(actualParserResult);
 
-        assertEquals(new ParserResult(Collections.singletonList(expectedEntry)).getDatabase().getEntryByKey("Entry1"),
-                actualParserResult.getDatabase().getEntryByKey("Entry1"));
+        assertEquals(expectedEntry, actualParserResult.getDatabase().getEntryByKey("Entry1").get());
     }
 
     @Test
@@ -54,8 +52,7 @@ class RenameReviewToCommentTest {
 
         action.performAction(actualParserResult);
 
-        assertEquals(new ParserResult(Collections.singletonList(entry)).getDatabase().getEntryByKey("Entry1"),
-                actualParserResult.getDatabase().getEntryByKey("Entry1"));
+        assertEquals(entry, actualParserResult.getDatabase().getEntryByKey("Entry1").get());
     }
 
 
@@ -72,8 +69,7 @@ class RenameReviewToCommentTest {
 
         action.performAction(actualParserResult);
 
-        assertEquals(new ParserResult(Collections.singletonList(expectedEntry)).getDatabase().getEntryByKey("Entry1"),
-                actualParserResult.getDatabase().getEntryByKey("Entry1"));
+        assertEquals(expectedEntry, actualParserResult.getDatabase().getEntryByKey("Entry1").get());
     }
 
     private BibEntry createMinimalBibEntry() {
