@@ -10,9 +10,7 @@ public class FormatterConfiguration {
     /**
      * Default instance that can be customized on program startup
      */
-    private static ProtectedTermsLoader protectedTermsLoader = new ProtectedTermsLoader(
-            new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
-                    Collections.emptyList(), Collections.emptyList()));
+    private static ProtectedTermsLoader protectedTermsLoader = new ProtectedTermsLoader();
 
     public static void setProtectedTermsLoader(ProtectedTermsLoader protectedTermsLoader) {
         FormatterConfiguration.protectedTermsLoader = protectedTermsLoader;
