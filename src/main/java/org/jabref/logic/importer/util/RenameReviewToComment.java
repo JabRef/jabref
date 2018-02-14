@@ -25,7 +25,7 @@ public class RenameReviewToComment implements PostOpenAction {
         if (entry.getField(FieldName.COMMENT).isPresent()) {
             String comment = entry.getField(FieldName.COMMENT).get().trim();
             if (!comment.isEmpty()) {
-                review = String.format("%s\n Review:\n%s", comment, review.trim());
+                review = String.format("%s\nReview:\n%s", comment, review.trim());
             }
         }
 
