@@ -50,7 +50,9 @@ public class AbbreviateAction extends AbstractWorker {
 
         NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
         int count = 0;
-        Set<Future<Boolean>> futures = new HashSet<>();
+        Set<Callable<Boolean>> tasks = new HashSet<>();
+        
+        // Collect all callables to execute in one collection.
         for (BibEntry entry : entries) {
             Callable<Boolean> callable = () -> {
                 for (String journalField : InternalBibtexFields.getJournalNameFields()) {
@@ -61,11 +63,13 @@ public class AbbreviateAction extends AbstractWorker {
 
                 return false;
             };
-
-            Future<Boolean> result = JabRefExecutorService.INSTANCE.executeAndReturn(callable);
-            futures.add(result);
+            tasks.add(callable);
         }
 
+        // Execute the callables and wait for the results.
+        List<Future<Boolean>> futures = JabRefExecutorService.INSTANCE.executeAll(tasks);
+
+        // Evaluate the results of the callables.
         for (Future<Boolean> future : futures) {
             try {
                 if (future.get()) {
