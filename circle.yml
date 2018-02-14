@@ -14,7 +14,7 @@ dependencies:
     #--win-keystore-password $CERTIFICATE_PW --mac-keystore-password $CERTIFICATE_PW
   override:
     # We do this to decrease build time by using CircleCI's cache. See https://discuss.circleci.com/t/effective-caching-for-gradle/540 for a longer motivation.
-    - ./gradlew --no-daemon compileJava
+    - ./gradlew --no-daemon -Pdev=true compileJava
   cache_directories:
     - "~/.install4j7"
     - "~/downloads"
