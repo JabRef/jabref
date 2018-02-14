@@ -16,12 +16,12 @@ class RenameReviewToCommentTest {
     private RenameReviewToComment action;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         action = new RenameReviewToComment();
     }
 
     @Test
-    void noFields() {
+    public void noFields() {
         BibEntry entry = createMinimalBibEntry();
         ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
 
@@ -31,7 +31,7 @@ class RenameReviewToCommentTest {
     }
 
     @Test
-    void reviewField() {
+    public void reviewField() {
         BibEntry actualEntry = createMinimalBibEntry();
         actualEntry.setField(FieldName.REVIEW, "My Review");
         ParserResult actualParserResult = new ParserResult(Collections.singletonList(actualEntry));
@@ -45,7 +45,7 @@ class RenameReviewToCommentTest {
     }
 
     @Test
-    void commentField() {
+    public void commentField() {
         BibEntry entry = createMinimalBibEntry();
         entry.setField(FieldName.COMMENT, "My Comment");
         ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
@@ -57,7 +57,7 @@ class RenameReviewToCommentTest {
 
 
     @Test
-    void reviewAndCommentField() {
+    public void reviewAndCommentField() {
         BibEntry actualEntry = createMinimalBibEntry();
         actualEntry.setField(FieldName.REVIEW, "My Review");
         actualEntry.setField(FieldName.COMMENT, "My Comment");
