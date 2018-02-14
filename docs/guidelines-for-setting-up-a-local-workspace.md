@@ -58,13 +58,13 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 * Run `git clone --depth=10 https://github.com/YOUR_USERNAME/jabref.git`. The `--depth--10` is used to limit the download to ~20 MB instead of downloading the complete history (~800 MB). If you want to dig in our commit history, feel free to download everything.
 
 ### Generating additional source codes and getting dependencies using Gradle:
-* Go to the jabref folder (the repo you just cloned, if you are following this tutorial, just execute `cd jabref`)
-* On windows, execute the following steps from the git-bash:
-* Run `./gradlew build` 
-* If you use Eclipse: run `./gradlew eclipse` 
-* If you use IntelliJ: No extra setup is required
-* In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files. 
-* `./gradlew tasks` shows many other runnable tasks.  
+1. Go to the jabref folder (the repo you just cloned, if you are following this tutorial, just execute `cd jabref`)
+2. Execute the following steps from the git-bash:
+  - Run `./gradlew build` 
+  - If you use Eclipse: Additionally run `./gradlew eclipse` 
+  - If you use IntelliJ: No further setup is required
+3. In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files. 
+4. `./gradlew tasks` shows many other runnable tasks.  
 
 ### Building it into your IDE
 * Open Eclipse (or your preferred IDE)
