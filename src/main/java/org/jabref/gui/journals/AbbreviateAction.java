@@ -69,16 +69,13 @@ public class AbbreviateAction extends AbstractWorker {
         List<Future<Boolean>> futures = JabRefExecutorService.INSTANCE.executeAll(tasks);
 
         // Evaluate the results of the callables.
-        long count = futures.stream().filter(f -> {
-            boolean result;
+        long count = futures.stream().filter(future -> {
             try {
-                result = f.get();
-            } catch (InterruptedException | ExecutionException e) {
-                LOGGER.debug("Invokation has been interrupted during execution.");
-            } finally {
-                result = false;
+                return future.get();
+            } catch (InterruptedException | ExecutionException exception) {
+                LOGGER.error("Unable to retrieve value.", exception);
+                return false;
             }
-            return result;
         }).count();
 
         if (count > 0) {
