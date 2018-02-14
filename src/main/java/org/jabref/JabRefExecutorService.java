@@ -1,5 +1,7 @@
 package org.jabref;
 
+import java.util.Collection;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
@@ -40,19 +42,13 @@ public class JabRefExecutorService implements Executor {
 
     @Override
     public void execute(Runnable command) {
-        if (command == null) {
-            LOGGER.debug("Received null as command for execution");
-            return;
-        }
-
+        Objects.requireNonNull(command);
+        
         executorService.execute(command);
     }
 
     public void executeAndWait(Runnable command) {
-        if (command == null) {
-            LOGGER.debug("Received null as command for execution");
-            return;
-        }
+        Objects.requireNonNull(command);
 
         Future<?> future = executorService.submit(command);
         while (true) {
@@ -67,12 +63,9 @@ public class JabRefExecutorService implements Executor {
         }
     }
 
-    public boolean executeAndWait(Callable command) {
-        if (command == null) {
-            LOGGER.debug("Received null as command for execution");
-            return false;
-        }
-
+    public boolean executeAndWait(Callable<?> command) {
+        Objects.requireNonNull(command);
+        
         Future<?> future = executorService.submit(command);
         while (true) {
             try {
@@ -89,16 +82,25 @@ public class JabRefExecutorService implements Executor {
 
     /**
      * This method allows to execute a callable task that provides a return value after the calculation is done.
+     * 
      * @param command The task to execute.
      * @return A Future object that provides the returning value.
      */
     public <T> Future<T> executeAndReturn(Callable<T> command) {
-        if (command == null) {
-            LOGGER.debug("Received null as command for execution");
-            return null;
-        }
+        Objects.requireNonNull(command);
 
         return executorService.submit(command);
+    }
+    
+    public void executeAll(Collection<? extends Callable<?>> tasks) {
+        Objects.requireNonNull(tasks);
+        
+        
+        try {
+            executorService.invokeAll(tasks);
+        } catch (InterruptedException e) {
+            LOGGER.debug("Invokation has been interrupted during execution.");
+        }
     }
 
     public void executeInterruptableTask(final Runnable runnable) {
