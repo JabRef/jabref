@@ -49,9 +49,8 @@ public class AbbreviateAction extends AbstractWorker {
                 iso);
 
         NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
-        int count = 0;
         Set<Callable<Boolean>> tasks = new HashSet<>();
-        
+
         // Collect all callables to execute in one collection.
         for (BibEntry entry : entries) {
             Callable<Boolean> callable = () -> {
@@ -70,15 +69,17 @@ public class AbbreviateAction extends AbstractWorker {
         List<Future<Boolean>> futures = JabRefExecutorService.INSTANCE.executeAll(tasks);
 
         // Evaluate the results of the callables.
-        for (Future<Boolean> future : futures) {
+        long count = futures.stream().filter(f -> {
+            boolean result;
             try {
-                if (future.get()) {
-                    count++;
-                }
+                result = f.get();
             } catch (InterruptedException | ExecutionException e) {
-                LOGGER.debug("Unable to retrieve return value.");
+                LOGGER.debug("Invokation has been interrupted during execution.");
+            } finally {
+                result = false;
             }
-        }
+            return result;
+        }).count();
 
         if (count > 0) {
             ce.end();
