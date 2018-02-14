@@ -1,6 +1,7 @@
 package org.jabref;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -92,15 +93,18 @@ public class JabRefExecutorService implements Executor {
         return executorService.submit(command);
     }
     
-    public void executeAll(Collection<? extends Callable<?>> tasks) {
+    public <T> List<Future<T>> executeAll(Collection<Callable<T>> tasks) throws InterruptedException {
         Objects.requireNonNull(tasks);
         
+        List<Future<T>> futures = null; 
         
         try {
-            executorService.invokeAll(tasks);
+            futures =  executorService.invokeAll(tasks);
         } catch (InterruptedException e) {
             LOGGER.debug("Invokation has been interrupted during execution.");
         }
+        Objects.requireNonNull(futures);
+        return futures;
     }
 
     public void executeInterruptableTask(final Runnable runnable) {
