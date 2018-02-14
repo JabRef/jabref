@@ -89,7 +89,7 @@ public class JabRefExecutorService implements Executor {
         return executorService.submit(command);
     }
     
-    public <T> List<Future<T>> executeAll(Collection<Callable<T>> tasks) throws InterruptedException {
+    public <T> List<Future<T>> executeAll(Collection<Callable<T>> tasks) {
         Objects.requireNonNull(tasks);
         List<Future<T>> futures = null; 
         try {
