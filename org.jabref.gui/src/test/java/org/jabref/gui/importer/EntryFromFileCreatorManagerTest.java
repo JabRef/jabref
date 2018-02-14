@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.logic.importer.ImportDataTest;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -45,6 +44,7 @@ public class EntryFromFileCreatorManagerTest {
     public void setUp() {
         externalFileTypes = mock(ExternalFileTypes.class, Answers.RETURNS_DEEP_STUBS);
         when(externalFileTypes.getExternalFileTypeByExt("pdf")).thenReturn(Optional.empty());
+    }
 
     /**
      * Tests the prerequisites of this test-class itself.
@@ -53,20 +53,22 @@ public class EntryFromFileCreatorManagerTest {
     public void testTestDatabase() throws IOException {
         BibDatabase database;
         Collection<BibEntry> entries;
+        BibEntry entry1;
+        BibEntry entry2;
         try (FileInputStream stream = new FileInputStream(UNLINKED_FILES_TEST_BIB);
              InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             ParserResult result = new BibtexParser(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).parse(reader);
             database = result.getDatabase();
             entries = database.getEntries();
 
-            BibEntry entry1 = database.getEntryByKey("entry1").get();
-            BibEntry entry2 = database.getEntryByKey("entry2").get();
+            entry1 = database.getEntryByKey("entry1").get();
+            entry2 = database.getEntryByKey("entry2").get();
         }
 
-        Assert.assertEquals(2, database.getEntryCount());
-        Assert.assertEquals(2, entries.size());
-        Assert.assertNotNull(entry1);
-        Assert.assertNotNull(entry2);
+        assertEquals(2, database.getEntryCount());
+        assertEquals(2, entries.size());
+        assertNotNull(entry1);
+        assertNotNull(entry2);
     }
 
     @Test

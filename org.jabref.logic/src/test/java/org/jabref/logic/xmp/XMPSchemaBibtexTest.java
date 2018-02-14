@@ -258,7 +258,7 @@ public class XMPSchemaBibtexTest {
 
         BibEntry e2 = bibtex.getBibtexEntry();
 
-        Assert.assertEquals(e, e2);
+        assertEquals(e, e2);
     }
 
     @Test
