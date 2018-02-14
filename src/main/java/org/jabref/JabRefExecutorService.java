@@ -12,7 +12,6 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Responsible for managing of all threads (except Swing threads) in JabRef
  */
@@ -36,7 +35,8 @@ public class JabRefExecutorService implements Executor {
     private final Timer timer = new Timer("timer", true);
     private Thread remoteThread;
 
-    private JabRefExecutorService() { }
+    private JabRefExecutorService() {
+    }
 
     @Override
     public void execute(Runnable command) {
@@ -85,6 +85,20 @@ public class JabRefExecutorService implements Executor {
                 return false;
             }
         }
+    }
+
+    /**
+     * This method allows to execute a callable task that provides a return value after the calculation is done.
+     * @param command The task to execute.
+     * @return A Future object that provides the returning value.
+     */
+    public <T> Future<T> executeAndReturn(Callable<T> command) {
+        if (command == null) {
+            LOGGER.debug("Received null as command for execution");
+            return null;
+        }
+
+        return executorService.submit(command);
     }
 
     public void executeInterruptableTask(final Runnable runnable) {
