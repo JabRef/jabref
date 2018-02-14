@@ -8,6 +8,7 @@ import java.util.List;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.util.ConvertLegacyExplicitGroups;
 import org.jabref.logic.importer.util.PostOpenAction;
+import org.jabref.logic.importer.util.RenameReviewToComment;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.logic.util.io.FileBasedLock;
@@ -85,7 +86,8 @@ public class OpenDatabase {
     }
 
     private static void applyPostActions(ParserResult parserResult) {
-        List<PostOpenAction> actions = Arrays.asList(new ConvertLegacyExplicitGroups());
+
+        List<PostOpenAction> actions = Arrays.asList(new ConvertLegacyExplicitGroups(), new RenameReviewToComment());
 
         for (PostOpenAction action : actions) {
             action.performAction(parserResult);
