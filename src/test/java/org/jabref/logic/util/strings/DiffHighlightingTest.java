@@ -1,10 +1,10 @@
 package org.jabref.logic.util.strings;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DiffHighlightingTest {
 
@@ -13,9 +13,9 @@ public class DiffHighlightingTest {
         assertNull(DiffHighlighting.generateDiffHighlighting(null, null, ""));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testNullSeparatorThrowsNPE() {
-        assertNull(DiffHighlighting.generateDiffHighlighting("", "", null));
+        assertThrows(NullPointerException.class, () -> DiffHighlighting.generateDiffHighlighting("", "", null));
     }
 
     @Test

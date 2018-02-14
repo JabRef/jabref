@@ -2,22 +2,22 @@ package org.jabref.logic.l10n;
 
 import java.util.Locale;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LocalizationTest {
 
     private Locale locale;
 
-    @Before
+    @BeforeEach
     public void storeDefaultLocale() {
         locale = Locale.getDefault();
     }
 
-    @After
+    @AfterEach
     public void restoreDefaultLocale() {
         Locale.setDefault(locale);
         javax.swing.JComponent.setDefaultLocale(locale);
@@ -67,7 +67,7 @@ public class LocalizationTest {
         Localization.setLanguage("de");
         String knownKey = "Save all";
         assertEquals("Alle speichern", Localization.lang(knownKey));
-        assertEquals( "A&lle speichern", Localization.menuTitle(knownKey));
+        assertEquals("A&lle speichern", Localization.menuTitle(knownKey));
     }
 
     @Test

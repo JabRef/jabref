@@ -103,7 +103,7 @@ public class SourceTab extends EntryEditorTab {
         // Store source for every change in the source code
         // and update source code for every change of entry field values
         BindingsHelper.bindContentBidirectional(entry.getFieldsObservable(), codeArea.textProperty(), this::storeSource, fields -> {
-            DefaultTaskExecutor.runInJavaFXThread(() -> {
+            DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
                 codeArea.clear();
                 try {
                     codeArea.appendText(getSourceString(entry, mode, fieldFormatterPreferences));

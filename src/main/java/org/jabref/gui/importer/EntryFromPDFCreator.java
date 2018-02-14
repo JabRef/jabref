@@ -33,12 +33,12 @@ import org.apache.pdfbox.pdmodel.PDDocumentInformation;
  */
 public class EntryFromPDFCreator extends EntryFromFileCreator {
 
-    public EntryFromPDFCreator() {
-        super(EntryFromPDFCreator.getPDFExternalFileType());
+    public EntryFromPDFCreator(ExternalFileTypes externalFileTypes) {
+        super(EntryFromPDFCreator.getPDFExternalFileType(externalFileTypes));
     }
 
-    private static ExternalFileType getPDFExternalFileType() {
-        Optional<ExternalFileType> pdfFileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
+    private static ExternalFileType getPDFExternalFileType(ExternalFileTypes externalFileTypes) {
+        Optional<ExternalFileType> pdfFileType = externalFileTypes.getExternalFileTypeByExt("pdf");
         if (!pdfFileType.isPresent()) {
             return new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall", IconTheme.JabRefIcon.PDF_FILE.getSmallIcon());
         }
@@ -90,7 +90,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
             if (pdfDocInfo != null) {
                 Optional<BibEntry> entryDI = XMPUtil
                         .getBibtexEntryFromDocumentInformation(document
-                        .getDocumentInformation());
+                                .getDocumentInformation());
                 if (entryDI.isPresent()) {
                     addEntryDataToEntry(entry, entryDI.get());
                     Calendar creationDate = pdfDocInfo.getCreationDate();

@@ -53,10 +53,9 @@ public class ArXivTest {
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
-    public void findFullTextRejectsNullParameter() throws IOException {
-
+    @Test
+    public void findFullTextRejectsNullParameter() {
         assertThrows(NullPointerException.class, () -> finder.findFullText(null));
-
     }
 
     @Test
@@ -71,7 +70,6 @@ public class ArXivTest {
     @Test
     public void findFullTextByEprint() throws IOException {
         entry.setField("eprint", "1603.06570");
-
         assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), finder.findFullText(entry));
     }
 
@@ -107,14 +105,12 @@ public class ArXivTest {
     @Test
     public void notFindFullTextByUnknownDOI() throws IOException {
         entry.setField("doi", "10.1529/unknown");
-
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
     public void notFindFullTextByUnknownId() throws IOException {
         entry.setField("eprint", "1234.12345");
-
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 

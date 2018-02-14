@@ -10,10 +10,10 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ConvertLegacyExplicitGroupsTest {
 
@@ -21,7 +21,7 @@ public class ConvertLegacyExplicitGroupsTest {
     private BibEntry entry;
     private ExplicitGroup group;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         action = new ConvertLegacyExplicitGroups();
 

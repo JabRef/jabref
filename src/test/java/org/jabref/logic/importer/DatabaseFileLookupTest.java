@@ -10,11 +10,12 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -30,7 +31,7 @@ public class DatabaseFileLookupTest {
     private BibEntry entry2;
 
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         try (FileInputStream stream = new FileInputStream(ImportDataTest.UNLINKED_FILES_TEST_BIB);
                 InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
@@ -48,10 +49,10 @@ public class DatabaseFileLookupTest {
      */
     @Test
     public void testTestDatabase() {
-        Assert.assertEquals(2, database.getEntryCount());
-        Assert.assertEquals(2, entries.size());
-        Assert.assertNotNull(entry1);
-        Assert.assertNotNull(entry2);
+        assertEquals(2, database.getEntryCount());
+        assertEquals(2, entries.size());
+        assertNotNull(entry1);
+        assertNotNull(entry2);
     }
 
 }

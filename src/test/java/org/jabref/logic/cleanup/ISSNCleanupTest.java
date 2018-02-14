@@ -7,18 +7,17 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class ISSNCleanupTest {
 
     private CleanupWorker worker;
 
-
-    @Before
+    @BeforeEach
     public void setUp() {
         worker = new CleanupWorker(mock(BibDatabaseContext.class),
                 new CleanupPreferences("", "", mock(LayoutFormatterPreferences.class),
@@ -32,7 +31,7 @@ public class ISSNCleanupTest {
         entry.setField("issn", "0123-4567");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("0123-4567"), entry.getField("issn"));
+        assertEquals(Optional.of("0123-4567"), entry.getField("issn"));
     }
 
     @Test
@@ -42,7 +41,7 @@ public class ISSNCleanupTest {
         entry.setField("issn", "01234567");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("0123-4567"), entry.getField("issn"));
+        assertEquals(Optional.of("0123-4567"), entry.getField("issn"));
     }
 
     @Test
@@ -52,7 +51,7 @@ public class ISSNCleanupTest {
         entry.setField("issn", "Banana");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("Banana"), entry.getField("issn"));
+        assertEquals(Optional.of("Banana"), entry.getField("issn"));
     }
 
 }

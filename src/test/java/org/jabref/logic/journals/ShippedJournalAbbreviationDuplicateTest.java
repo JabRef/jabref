@@ -1,7 +1,8 @@
 package org.jabref.logic.journals;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class ShippedJournalAbbreviationDuplicateTest {
 
@@ -10,11 +11,11 @@ public class ShippedJournalAbbreviationDuplicateTest {
         JournalAbbreviationRepository repoBuiltIn = new JournalAbbreviationRepository();
         repoBuiltIn.addEntries(JournalAbbreviationLoader.getBuiltInAbbreviations());
 
-        for (Abbreviation abbreviation : JournalAbbreviationLoader.getOfficialIEEEAbbreviations()) {
-            Assert.assertFalse("duplicate name " + abbreviation.toString(), repoBuiltIn.getAbbreviation(abbreviation.getName()).isPresent());
-            Assert.assertFalse("duplicate iso " + abbreviation.toString(), repoBuiltIn.getAbbreviation(abbreviation.getIsoAbbreviation()).isPresent());
-            Assert.assertFalse("duplicate medline " + abbreviation.toString(), repoBuiltIn.getAbbreviation(abbreviation.getMedlineAbbreviation()).isPresent());
-        }
+        JournalAbbreviationLoader.getOfficialIEEEAbbreviations().parallelStream().forEach(abbreviation -> {
+            assertFalse(repoBuiltIn.getAbbreviation(abbreviation.getName()).isPresent());
+            assertFalse(repoBuiltIn.getAbbreviation(abbreviation.getIsoAbbreviation()).isPresent(), "duplicate iso " + abbreviation.toString());
+            assertFalse(repoBuiltIn.getAbbreviation(abbreviation.getMedlineAbbreviation()).isPresent(), "duplicate medline " + abbreviation.toString());
+        });
     }
 
     @Test
@@ -22,11 +23,11 @@ public class ShippedJournalAbbreviationDuplicateTest {
         JournalAbbreviationRepository repoBuiltIn = new JournalAbbreviationRepository();
         repoBuiltIn.addEntries(JournalAbbreviationLoader.getBuiltInAbbreviations());
 
-        for (Abbreviation abbreviation : JournalAbbreviationLoader.getStandardIEEEAbbreviations()) {
-            Assert.assertFalse("duplicate name " + abbreviation.toString(), repoBuiltIn.getAbbreviation(abbreviation.getName()).isPresent());
-            Assert.assertFalse("duplicate iso " + abbreviation.toString(), repoBuiltIn.getAbbreviation(abbreviation.getIsoAbbreviation()).isPresent());
-            Assert.assertFalse("duplicate medline " + abbreviation.toString(), repoBuiltIn.getAbbreviation(abbreviation.getMedlineAbbreviation()).isPresent());
-        }
+        JournalAbbreviationLoader.getStandardIEEEAbbreviations().parallelStream().forEach(abbreviation -> {
+            assertFalse(repoBuiltIn.getAbbreviation(abbreviation.getName()).isPresent(), "duplicate name " + abbreviation.toString());
+            assertFalse(repoBuiltIn.getAbbreviation(abbreviation.getIsoAbbreviation()).isPresent(), "duplicate iso " + abbreviation.toString());
+            assertFalse(repoBuiltIn.getAbbreviation(abbreviation.getMedlineAbbreviation()).isPresent(), "duplicate medline " + abbreviation.toString());
+        });
     }
 
 }
