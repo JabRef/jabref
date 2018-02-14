@@ -3,6 +3,7 @@ package org.jabref.logic.importer.util;
 import java.util.Collections;
 
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.migrations.RenameReviewToComment;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
@@ -25,7 +26,7 @@ class RenameReviewToCommentTest {
         BibEntry entry = createMinimalBibEntry();
         ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
 
-        action.performAction(actualParserResult);
+        action.performMigration(actualParserResult);
 
         assertEquals(entry, actualParserResult.getDatabase().getEntryByKey("Entry1").get());
     }
@@ -39,7 +40,7 @@ class RenameReviewToCommentTest {
         BibEntry expectedEntry = createMinimalBibEntry();
         expectedEntry.setField(FieldName.COMMENT, "My Review");
 
-        action.performAction(actualParserResult);
+        action.performMigration(actualParserResult);
 
         assertEquals(expectedEntry, actualParserResult.getDatabase().getEntryByKey("Entry1").get());
     }
@@ -50,7 +51,7 @@ class RenameReviewToCommentTest {
         entry.setField(FieldName.COMMENT, "My Comment");
         ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
 
-        action.performAction(actualParserResult);
+        action.performMigration(actualParserResult);
 
         assertEquals(entry, actualParserResult.getDatabase().getEntryByKey("Entry1").get());
     }
@@ -67,7 +68,7 @@ class RenameReviewToCommentTest {
         BibEntry expectedEntry = createMinimalBibEntry();
         expectedEntry.setField(FieldName.COMMENT, "My Comment\nReview:\nMy Review");
 
-        action.performAction(actualParserResult);
+        action.performMigration(actualParserResult);
 
         assertEquals(expectedEntry, actualParserResult.getDatabase().getEntryByKey("Entry1").get());
     }

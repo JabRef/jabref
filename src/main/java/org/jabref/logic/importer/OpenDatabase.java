@@ -6,12 +6,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.logic.importer.fileformat.BibtexImporter;
-import org.jabref.logic.importer.util.ConvertLegacyExplicitGroups;
-import org.jabref.logic.importer.util.PostOpenAction;
-import org.jabref.logic.importer.util.RenameReviewToComment;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.logic.util.io.FileBasedLock;
+import org.jabref.migrations.ConvertLegacyExplicitGroups;
+import org.jabref.migrations.PostOpenMigration;
+import org.jabref.migrations.RenameReviewToComment;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -82,17 +82,17 @@ public class OpenDatabase {
             LOGGER.debug("Synchronized special fields based on keywords");
         }
 
-        applyPostActions(result);
+        performLoadDatabaseMigrations(result);
 
         return result;
     }
 
-    private static void applyPostActions(ParserResult parserResult) {
+    private static void performLoadDatabaseMigrations(ParserResult parserResult) {
 
-        List<PostOpenAction> actions = Arrays.asList(new ConvertLegacyExplicitGroups(), new RenameReviewToComment());
+        List<PostOpenMigration> postOpenMigrations = Arrays.asList(new ConvertLegacyExplicitGroups(), new RenameReviewToComment());
 
-        for (PostOpenAction action : actions) {
-            action.performAction(parserResult);
+        for (PostOpenMigration migration : postOpenMigrations) {
+            migration.performMigration(parserResult);
         }
     }
 }

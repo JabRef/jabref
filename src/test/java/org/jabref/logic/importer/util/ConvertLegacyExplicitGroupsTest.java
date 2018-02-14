@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.migrations.ConvertLegacyExplicitGroups;
+import org.jabref.migrations.PostOpenMigration;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
@@ -17,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 public class ConvertLegacyExplicitGroupsTest {
 
-    private PostOpenAction action;
+    private PostOpenMigration action;
     private BibEntry entry;
     private ExplicitGroup group;
 
@@ -35,7 +37,7 @@ public class ConvertLegacyExplicitGroupsTest {
     public void performActionWritesGroupMembershipInEntry() throws Exception {
         ParserResult parserResult = generateParserResult(GroupTreeNode.fromGroup(group));
 
-        action.performAction(parserResult);
+        action.performMigration(parserResult);
 
         assertEquals(Optional.of("TestGroup"), entry.getField("groups"));
     }
@@ -44,7 +46,7 @@ public class ConvertLegacyExplicitGroupsTest {
     public void performActionClearsLegacyKeys() throws Exception {
         ParserResult parserResult = generateParserResult(GroupTreeNode.fromGroup(group));
 
-        action.performAction(parserResult);
+        action.performMigration(parserResult);
 
         assertEquals(Collections.emptyList(), group.getLegacyEntryKeys());
     }
@@ -56,7 +58,7 @@ public class ConvertLegacyExplicitGroupsTest {
         root.addSubgroup(group);
         ParserResult parserResult = generateParserResult(root);
 
-        action.performAction(parserResult);
+        action.performMigration(parserResult);
 
         assertEquals(Optional.of("TestGroup"), entry.getField("groups"));
     }

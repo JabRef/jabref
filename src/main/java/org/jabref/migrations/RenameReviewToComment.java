@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.util;
+package org.jabref.migrations;
 
 import java.util.Objects;
 
@@ -6,10 +6,10 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-public class RenameReviewToComment implements PostOpenAction {
+public class RenameReviewToComment implements PostOpenMigration {
 
     @Override
-    public void performAction(ParserResult parserResult) {
+    public void performMigration(ParserResult parserResult) {
         Objects.requireNonNull(parserResult);
 
         for (BibEntry entry : parserResult.getDatabase().getEntries()) {
