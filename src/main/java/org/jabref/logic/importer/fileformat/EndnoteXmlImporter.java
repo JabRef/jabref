@@ -24,16 +24,32 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.endnote.Abstract;
+import org.jabref.logic.importer.fileformat.endnote.Authors;
+import org.jabref.logic.importer.fileformat.endnote.Contributors;
+import org.jabref.logic.importer.fileformat.endnote.Dates;
+import org.jabref.logic.importer.fileformat.endnote.ElectronicResourceNum;
+import org.jabref.logic.importer.fileformat.endnote.Isbn;
 import org.jabref.logic.importer.fileformat.endnote.Keywords;
+import org.jabref.logic.importer.fileformat.endnote.Number;
+import org.jabref.logic.importer.fileformat.endnote.Pages;
 import org.jabref.logic.importer.fileformat.endnote.PdfUrls;
 import org.jabref.logic.importer.fileformat.endnote.Record;
+import org.jabref.logic.importer.fileformat.endnote.Style;
+import org.jabref.logic.importer.fileformat.endnote.Title;
+import org.jabref.logic.importer.fileformat.endnote.Titles;
+import org.jabref.logic.importer.fileformat.endnote.Url;
+import org.jabref.logic.importer.fileformat.endnote.Urls;
+import org.jabref.logic.importer.fileformat.endnote.Volume;
 import org.jabref.logic.importer.fileformat.endnote.Xml;
+import org.jabref.logic.importer.fileformat.endnote.Year;
 import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.OptionalUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,69 +157,82 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         entry.setType(BiblatexEntryTypes.ARTICLE);
         Optional.ofNullable(getAuthors(record))
                 .ifPresent(value -> entry.setField(FieldName.AUTHOR, value));
-        Optional.ofNullable(clean(record.getTitles().getTitle().getStyle().getvalue()))
-                .ifPresent(value -> entry.setField(FieldName.TITLE, value));
+        Optional.ofNullable(record.getTitles())
+                .map(Titles::getTitle)
+                .map(Title::getStyle)
+                .map(Style::getvalue)
+                .ifPresent(value -> entry.setField(FieldName.TITLE, clean(value)));
         Optional.ofNullable(record.getPages())
-                .map(value -> value.getStyle().getvalue())
+                .map(Pages::getStyle)
+                .map(Style::getvalue)
                 .ifPresent(value -> entry.setField(FieldName.PAGES, value));
         Optional.ofNullable(record.getNumber())
-                .map(value -> value.getStyle().getvalue())
+                .map(Number::getStyle)
+                .map(Style::getvalue)
                 .ifPresent(value -> entry.setField(FieldName.NUMBER, value));
-
         Optional.ofNullable(record.getVolume())
-                .flatMap(value -> Optional.ofNullable(value.getStyle())
-                        .map(values -> value.getStyle().getvalue()))
+                .map(Volume::getStyle)
+                .map(Style::getvalue)
                 .ifPresent(value -> entry.setField(FieldName.VOLUME, value));
-
-        entry.setField(FieldName.YEAR, record.getDates().getYear().getStyle().getvalue());
+        Optional.ofNullable(record.getDates())
+                .map(Dates::getYear)
+                .map(Year::getStyle)
+                .map(Style::getvalue)
+                .ifPresent(value -> entry.setField(FieldName.YEAR, value));
         entry.putKeywords(getKeywords(record), preferences.getKeywordSeparator());
         Optional.ofNullable(record.getAbstract())
-                .map(value -> value.getStyle().getvalue().trim())
-                .ifPresent(value -> entry.setField(FieldName.ABSTRACT, value));
+                .map(Abstract::getStyle)
+                .map(Style::getvalue)
+                .ifPresent(value -> entry.setField(FieldName.ABSTRACT, value.trim()));
         entry.setFiles(getLinkedFiles(record));
         Optional.ofNullable(record.getIsbn())
-                .map(value -> clean(value.getStyle().getvalue()))
-                .ifPresent(value -> entry.setField(FieldName.ISBN, value));
+                .map(Isbn::getStyle)
+                .map(Style::getvalue)
+                .ifPresent(value -> entry.setField(FieldName.ISBN, clean(value)));
         Optional.ofNullable(record.getElectronicResourceNum())
-                .map(doi -> doi.getStyle().getvalue().trim())
-                .ifPresent(doi -> entry.setField(FieldName.DOI, doi));
+                .map(ElectronicResourceNum::getStyle)
+                .map(Style::getvalue)
+                .ifPresent(doi -> entry.setField(FieldName.DOI, doi.trim()));
 
         return entry;
     }
 
     private List<LinkedFile> getLinkedFiles(Record record) {
-        PdfUrls pdfUrls = record.getUrls()
-                .getPdfUrls();
-        if (pdfUrls != null) {
-            return pdfUrls
-                    .getUrl()
-                    .stream()
-                    .map(url -> new LinkedFile("", clean(url.getStyle().getvalue()), "PDF"))
-                    .collect(Collectors.toList());
-        } else {
-            return Collections.emptyList();
-        }
+        Optional<PdfUrls> urls = Optional.ofNullable(record.getUrls())
+                                         .map(Urls::getPdfUrls);
+        return OptionalUtil.toStream(urls)
+                           .flatMap(pdfUrls -> pdfUrls.getUrl().stream())
+                           .flatMap(url -> OptionalUtil.toStream(getUrl(url)))
+                           .map(url -> new LinkedFile("", url, "PDF"))
+                           .collect(Collectors.toList());
+    }
+
+    private Optional<String> getUrl(Url url) {
+        return Optional.ofNullable(url)
+                       .map(Url::getStyle)
+                       .map(Style::getvalue)
+                       .map(this::clean);
     }
 
     private List<String> getKeywords(Record record) {
         Keywords keywords = record.getKeywords();
         if (keywords != null) {
             return keywords.getKeyword()
-                    .stream()
-                    .map(keyword -> keyword.getStyle().getvalue())
-                    .collect(Collectors.toList());
+                           .stream()
+                           .map(keyword -> keyword.getStyle().getvalue())
+                           .collect(Collectors.toList());
         } else {
             return Collections.emptyList();
         }
     }
 
     private String getAuthors(Record record) {
-        return record.getContributors()
-                .getAuthors()
-                .getAuthor()
-                .stream()
-                .map(author -> author.getStyle().getvalue())
-                .collect(Collectors.joining(" and "));
+        Optional<Authors> authors = Optional.ofNullable(record.getContributors())
+                                            .map(Contributors::getAuthors);
+        return OptionalUtil.toStream(authors)
+                           .flatMap(value -> value.getAuthor().stream())
+                           .map(author -> author.getStyle().getvalue())
+                           .collect(Collectors.joining(" and "));
     }
 
     private String clean(String input) {
