@@ -28,7 +28,6 @@ plugins {
 
 apply plugin: 'install4j'
 
-group = "org.jabref"
 String plainVersion = "4.2-dev"
 project.ext.threeDotVersion = "4.1.0.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (org.gradle.internal.os.OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j7' : 'install4j7')
@@ -68,13 +67,15 @@ if (project.hasProperty('dev')) {
 } else {
     versionAppendix = ""
 }
-version = plainVersion + versionAppendix
 
 // enable buildscan providing insights to our build (speed, ...)
 // see https://gradle.com/build-scans for more information
 buildScan { licenseAgreementUrl = 'https://gradle.com/terms-of-service'; licenseAgree = 'yes' }
 
 allprojects {
+    group = "org.jabref"
+    version = plainVersion + versionAppendix
+
     apply plugin: 'java'
     apply plugin: 'checkstyle'
 
@@ -259,7 +260,7 @@ task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
     }
 }
 
-task release(dependsOn: ["media", "releaseJar"]) {
+task release(dependsOn: ["media"]) {
     group = 'JabRef - Release'
     description 'Creates a release for all target platforms.'
 }

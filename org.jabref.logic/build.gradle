@@ -64,6 +64,27 @@ dependencies {
     testCompile 'org.xmlunit:xmlunit-matchers:2.5.1'
 }
 
+processResources {
+    filteringCharset = 'UTF-8'
+
+    filesMatching("build.properties") {
+        expand(version: project.version,
+                "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
+                "authors": new File('../AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
+                "developers": new File('../DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
+                "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'),
+                "minRequiredJavaVersion": minRequiredJavaVersion,
+                "allowJava9": allowJava9
+
+        )
+        filteringCharset = 'UTF-8'
+    }
+
+    filesMatching("resource/**/meta.xml") {
+        expand version: project.version
+    }
+}
+
 clean {
     delete "src/main/gen"
 }
