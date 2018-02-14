@@ -3,8 +3,11 @@ package org.jabref.logic.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 /**
  * Tests for ensuring we can compare most appearing version strings
@@ -42,39 +45,39 @@ public class JavaVersionTest {
         // Check that all valid java versions below 9 are recognized as not java 9
         for (String versionString : java) {
             final JavaVersion java8 = new JavaVersion(versionString);
-            Assert.assertFalse(java8.isJava9());
+            assertFalse(java8.isJava9());
         }
         // Check if all valid version 9 strings are recognized as being version 9
         for (String version9String : java9) {
             final JavaVersion java9 = new JavaVersion(version9String);
-            Assert.assertTrue(java9.isJava9());
+            assertTrue(java9.isJava9());
         }
 
         // For impossible comparisons we assume it's not java 9
-        Assert.assertFalse(nullCheck.isJava9());
-        Assert.assertFalse(noSenseCheck.isJava9());
+        assertFalse(nullCheck.isJava9());
+        assertFalse(noSenseCheck.isJava9());
     }
 
     @Test
     public void isAtLeast() throws Exception {
         final JavaVersion java8 = new JavaVersion("1.8");
         for (String version8 : java) {
-            Assert.assertTrue(java8.isAtLeast(version8));
+            assertTrue(java8.isAtLeast(version8));
             final JavaVersion java8Example = new JavaVersion(version8);
-            Assert.assertTrue(java8Example.isAtLeast("1.5"));
+            assertTrue(java8Example.isAtLeast("1.5"));
 
             // Check if we optimistically return true if we cannot determine the result
-            Assert.assertTrue(java8Example.isAtLeast(null));
-            Assert.assertTrue(nullCheck.isAtLeast(version8));
-            Assert.assertTrue(noSenseCheck.isAtLeast(version8));
-            Assert.assertTrue(java8Example.isAtLeast("useless"));
+            assertTrue(java8Example.isAtLeast(null));
+            assertTrue(nullCheck.isAtLeast(version8));
+            assertTrue(noSenseCheck.isAtLeast(version8));
+            assertTrue(java8Example.isAtLeast("useless"));
 
 
             // Check against all java 9 entries in both directions
             for (String version9 : java9) {
-                Assert.assertFalse(java8Example.isAtLeast(version9));
+                assertFalse(java8Example.isAtLeast(version9));
                 final JavaVersion java9 = new JavaVersion(version9);
-                Assert.assertTrue(java9.isAtLeast(version8));
+                assertTrue(java9.isAtLeast(version8));
             }
         }
     }

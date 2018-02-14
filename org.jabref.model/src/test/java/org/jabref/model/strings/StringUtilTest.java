@@ -6,13 +6,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StringUtilTest {
 
@@ -233,19 +233,19 @@ public class StringUtilTest {
         assertEquals(1234, StringUtil.intValueOf("001234"));
     }
 
-    @Test(expected = NumberFormatException.class)
+    @Test
     public void testIntValueOfExceptionIfStringContainsLetter() {
-        StringUtil.intValueOf("12A2");
+        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOf("12A2"));
     }
 
-    @Test(expected = NumberFormatException.class)
+    @Test
     public void testIntValueOfExceptionIfStringNull() {
-        StringUtil.intValueOf(null);
+        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOf(null));
     }
 
-    @Test(expected = NumberFormatException.class)
+    @Test
     public void testIntValueOfExceptionfIfStringEmpty() {
-        StringUtil.intValueOf("");
+        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOf(""));
     }
 
     @Test

@@ -14,17 +14,17 @@ import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MetaDataSerializerTest {
 
     private MetaData metaData;
     private GlobalBibtexKeyPattern pattern;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         metaData = new MetaData();
         pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");

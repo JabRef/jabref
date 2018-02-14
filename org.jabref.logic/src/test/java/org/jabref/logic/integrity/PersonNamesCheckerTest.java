@@ -5,16 +5,16 @@ import java.util.Optional;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PersonNamesCheckerTest {
 
     private PersonNamesChecker checker;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         BibDatabaseContext databaseContext = new BibDatabaseContext();
         databaseContext.setMode(BibDatabaseMode.BIBTEX);

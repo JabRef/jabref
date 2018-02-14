@@ -1,7 +1,9 @@
 package org.jabref.logic.bst;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class BibtexPurifyTest {
 
@@ -19,7 +21,6 @@ public class BibtexPurifyTest {
     }
 
     private void assertPurify(final String string, final String string2) {
-        Assert.assertEquals(string, BibtexPurify.purify(string2, s ->
-                Assert.fail("Should not Warn (" + s + ")! purify should be " + string + " for " + string2)));
+        assertEquals(string, BibtexPurify.purify(string2, s -> fail("Should not Warn (" + s + ")! purify should be " + string + " for " + string2)));
     }
 }
