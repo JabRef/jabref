@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.exporter.ExporterFactory;
+import org.jabref.logic.formatter.FormatterConfiguration;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
@@ -150,6 +151,7 @@ public class JabRefMain extends Application {
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());
+        FormatterConfiguration.setProtectedTermsLoader(Globals.protectedTermsLoader);
 
         // Check for running JabRef
         RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();

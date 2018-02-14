@@ -10,13 +10,15 @@ import javafx.scene.control.TextArea;
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.protectedterms.NewProtectedTermsFileDialog;
-import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.model.cleanup.Formatter;
 
 class ProtectedTermsMenu extends Menu {
 
-    private static final ProtectTermsFormatter FORMATTER = new ProtectTermsFormatter(Globals.protectedTermsLoader);
+    private static final Formatter FORMATTER = Formatters.getFormatterForModifier("protect_terms").get();
     private final Menu externalFiles;
     private final TextArea opener;
 
@@ -45,7 +47,8 @@ class ProtectedTermsMenu extends Menu {
 
     private void updateFiles() {
         externalFiles.getItems().clear();
-        for (ProtectedTermsList list : Globals.protectedTermsLoader.getProtectedTermsLists()) {
+        ProtectedTermsLoader loader = Globals.protectedTermsLoader;
+        for (ProtectedTermsList list : loader.getProtectedTermsLists()) {
             if (!list.isInternalList()) {
                 MenuItem fileItem = new MenuItem(list.getDescription());
                 fileItem.setOnAction(event -> {
@@ -61,14 +64,14 @@ class ProtectedTermsMenu extends Menu {
         MenuItem addToNewFileItem = new MenuItem(Localization.lang("New") + "...");
         addToNewFileItem.setOnAction(event -> {
             NewProtectedTermsFileDialog dialog = new NewProtectedTermsFileDialog(JabRefGUI.getMainFrame(),
-                    Globals.protectedTermsLoader);
+                    loader);
 
             SwingUtilities.invokeLater(() -> {
                 dialog.setVisible(true);
 
                 if (dialog.isOKPressed()) {
                     // Update preferences with new list
-                    Globals.prefs.setProtectedTermsPreferences(Globals.protectedTermsLoader);
+                    Globals.prefs.setProtectedTermsPreferences(loader);
                     this.updateFiles();
                 }
             });

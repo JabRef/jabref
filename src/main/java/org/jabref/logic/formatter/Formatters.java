@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.Globals;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeUnderscoresFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
@@ -43,7 +42,7 @@ public class Formatters {
     public static final List<Formatter> CASE_CHANGERS = Arrays.asList(
             new CapitalizeFormatter(),
             new LowerCaseFormatter(),
-            new ProtectTermsFormatter(Globals.protectedTermsLoader),
+            new ProtectTermsFormatter(FormatterConfiguration.getProtectedTermsLoader()),
             new SentenceCaseFormatter(),
             new TitleCaseFormatter(),
             new UpperCaseFormatter()

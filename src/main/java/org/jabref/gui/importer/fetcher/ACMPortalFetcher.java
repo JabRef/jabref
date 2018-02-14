@@ -27,9 +27,9 @@ import javax.swing.JRadioButton;
 
 import org.jabref.Globals;
 import org.jabref.gui.importer.FetcherPreviewDialog;
+import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
-import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportInspector;
 import org.jabref.logic.importer.OutputPrinter;
@@ -37,6 +37,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
@@ -86,7 +87,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
 
-    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter(Globals.protectedTermsLoader);
+    private final Formatter protectTermsFormatter = Formatters.getFormatterForModifier("protect_terms").get();
 
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
     private String terms;

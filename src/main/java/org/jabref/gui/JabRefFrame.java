@@ -124,6 +124,7 @@ import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
@@ -173,7 +174,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
     private final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
     private final EditModeAction editModeAction = new EditModeAction();
-
+    private final ProtectedTermsLoader loader = Globals.protectedTermsLoader;
 
     // Here we instantiate menu/toolbar actions. Actions regarding
     // the currently open database are defined as a GeneralAction
@@ -1248,7 +1249,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         options.add(showPrefs);
 
         AbstractAction genFieldsCustomization = new GenFieldsCustomizationAction();
-        AbstractAction protectTerms = new ProtectedTermsAction();
+        AbstractAction protectTerms = new ProtectedTermsAction(loader);
         options.add(genFieldsCustomization);
         options.add(customImpAction);
         options.add(customExpAction);
@@ -2204,14 +2205,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private class ProtectedTermsAction extends MnemonicAwareAction {
 
-        public ProtectedTermsAction() {
+        private ProtectedTermsLoader loader;
+
+        public ProtectedTermsAction(ProtectedTermsLoader loader) {
+            this.loader = loader;
             putValue(Action.NAME, Localization.menuTitle("Manage protected terms"));
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             ProtectedTermsDialog protectTermsDialog = new ProtectedTermsDialog(JabRefFrame.this,
-                    Globals.protectedTermsLoader);
+                    loader);
             protectTermsDialog.setVisible(true);
         }
     }

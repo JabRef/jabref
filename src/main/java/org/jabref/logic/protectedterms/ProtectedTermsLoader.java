@@ -3,7 +3,6 @@ package org.jabref.logic.protectedterms;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -141,14 +140,6 @@ public class ProtectedTermsLoader {
         LOGGER.debug("Reading term list from file " + file);
         ProtectedTermsParser parser = new ProtectedTermsParser();
         parser.readTermsFromFile(Objects.requireNonNull(file));
-        return parser.getProtectTermsList(enabled, false);
-    }
-
-    public static ProtectedTermsList readProtectedTermsListFromFile(File file, Charset encoding, boolean enabled)
-            throws FileNotFoundException {
-        LOGGER.debug("Reading term list from file " + file);
-        ProtectedTermsParser parser = new ProtectedTermsParser();
-        parser.readTermsFromFile(Objects.requireNonNull(file), Objects.requireNonNull(encoding));
         return parser.getProtectTermsList(enabled, false);
     }
 
