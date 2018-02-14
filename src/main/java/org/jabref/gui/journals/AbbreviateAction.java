@@ -1,7 +1,11 @@
 package org.jabref.gui.journals;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
@@ -42,7 +46,7 @@ public class AbbreviateAction extends AbstractWorker {
 
         NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
         int count = 0;
-
+        Set<Future<Boolean>> futures = new HashSet<>();
         for (BibEntry entry : entries) {
             Callable<Boolean> callable = () -> {
                 for (String journalField : InternalBibtexFields.getJournalNameFields()) {
@@ -53,10 +57,18 @@ public class AbbreviateAction extends AbstractWorker {
 
                 return false;
             };
-
-            boolean result = JabRefExecutorService.INSTANCE.executeAndWait(callable);
-            if (result) {
-                count++;
+            
+            Future<Boolean> result = JabRefExecutorService.INSTANCE.executeAndReturn(callable);
+            futures.add(result);
+        }
+        
+        for (Future<Boolean> future : futures) {
+            try {
+                if(future.get()) {
+                    count++;
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                // Do nothing.
             }
         }
 
