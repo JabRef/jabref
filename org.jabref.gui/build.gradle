@@ -24,10 +24,6 @@ jacoco {
 
 mainClassName = "org.jabref.JabRefMain"
 
-// These are the Java version requirements we will check on each start of JabRef
-ext.minRequiredJavaVersion = "1.8.0_144"
-ext.allowJava9 = false
-
 sourceSets {
     main {
         java {

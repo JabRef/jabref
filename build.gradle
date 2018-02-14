@@ -33,7 +33,7 @@ project.ext.threeDotVersion = "4.1.0.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (org.gradle.internal.os.OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j7' : 'install4j7')
 
 /*
- * Set vrsion to VERSION--snapshot--DATE--GIT_HASH
+ * Set version to VERSION--snapshot--DATE--GIT_HASH
  */
 String versionAppendix
 if (project.hasProperty('dev')) {
@@ -75,6 +75,10 @@ buildScan { licenseAgreementUrl = 'https://gradle.com/terms-of-service'; license
 allprojects {
     group = "org.jabref"
     version = plainVersion + versionAppendix
+
+    // These are the Java version requirements we will check on each start of JabRef
+    ext.minRequiredJavaVersion = "1.8.0_144"
+    ext.allowJava9 = false
 
     apply plugin: 'java'
     apply plugin: 'checkstyle'
