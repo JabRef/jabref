@@ -70,8 +70,8 @@ processResources {
     filesMatching("build.properties") {
         expand(version: project.version,
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
-                "authors": Project.getRootProject().file('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
-                "developers": Project.getRootProject().file('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
+                "authors": rootProject.file('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
+                "developers": rootProject.file('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'),
                 "minRequiredJavaVersion": minRequiredJavaVersion,
                 "allowJava9": allowJava9
