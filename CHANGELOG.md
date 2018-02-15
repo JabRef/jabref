@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Abbreviate journal names functionality is now running parallel, increasing performance significantly. [#2831] (https://github.com/JabRef/jabref/issues/2831)
 - Changed ID-based entry generator to store the last used fetcher. [#2796] (https://github.com/JabRef/jabref/issues/2796)
 - Reorganised annotation information on the right side of the "File annotations" tab. [#3109](https://github.com/JabRef/jabref/issues/3109)
 - We now show a small notification icon in the entry editor when we detect data inconsistency or other problems. [#3145](https://github.com/JabRef/jabref/issues/3145)
