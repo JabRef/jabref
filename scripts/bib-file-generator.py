@@ -1,5 +1,4 @@
 number_of_entries = 100000
-
 file = open("generatedDatabase.bib", 'w')
 
 for i in range(number_of_entries):
@@ -12,6 +11,5 @@ for i in range(number_of_entries):
     pages   = {%i},
  }""" % (i, i, i, i, i, i, i)
     file.write(entry)
-    
 file.flush()
 file.close()
