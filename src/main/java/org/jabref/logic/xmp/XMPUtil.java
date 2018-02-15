@@ -221,6 +221,12 @@ public class XMPUtil {
         }
     }
 
+    /**
+     * Editor in BibTex - Contributor in DublinCore
+     *
+     * @param entry The BibEntry object, which is filled during metadata extraction.
+     * @param dcSchema Metadata in DublinCore format.
+     */
     private static void setEditor(BibEntry entry, DublinCoreSchema dcSchema) {
         List<String> contributors = dcSchema.getContributors();
         if ((contributors != null) && !contributors.isEmpty()) {
@@ -228,6 +234,12 @@ public class XMPUtil {
         }
     }
 
+    /**
+     * Author in BibTex - Creator in DublinCore
+     *
+     * @param entry The BibEntry object, which is filled during metadata extraction.
+     * @param dcSchema Metadata in DublinCore format.
+     */
     private static void setAuthor(BibEntry entry, DublinCoreSchema dcSchema) {
         List<String> creators = dcSchema.getCreators();
         if ((creators != null) && !creators.isEmpty()) {
@@ -235,8 +247,14 @@ public class XMPUtil {
         }
     }
 
+    /**
+     * Year + Month in BibTex - Date in DublinCore is a combination of year and month information
+     *
+     * @param entry The BibEntry object, which is filled during metadata extraction.
+     * @param dcSchema Metadata in DublinCore format.
+     */
     private static void setYearAndMonth(BibEntry entry, DublinCoreSchema dcSchema) {
-        List<String> dates = dcSchema.getUnqualifiedSequenceValueList("dc:date");
+        List<String> dates = dcSchema.getUnqualifiedSequenceValueList("date");
         if ((dates != null) && !dates.isEmpty()) {
             String date = dates.get(0).trim();
             Calendar c = null;
@@ -255,6 +273,12 @@ public class XMPUtil {
         }
     }
 
+    /**
+     * Abstract in BibTex - Description in DublinCore
+     *
+     * @param entry The BibEntry object, which is filled during metadata extraction.
+     * @param dcSchema Metadata in DublinCore format.
+     */
     private static void setAbstract(BibEntry entry, DublinCoreSchema dcSchema) {
         String s = dcSchema.getDescription();
         if (s != null) {
@@ -262,6 +286,12 @@ public class XMPUtil {
         }
     }
 
+    /**
+     * DOI in BibTex - Identifier in DublinCore
+     *
+     * @param entry The BibEntry object, which is filled during metadata extraction.
+     * @param dcSchema Metadata in DublinCore format.
+     */
     private static void setDOI(BibEntry entry, DublinCoreSchema dcSchema) {
         String s = dcSchema.getIdentifier();
         if (s != null) {
@@ -269,6 +299,12 @@ public class XMPUtil {
         }
     }
 
+    /**
+     * Publisher are equivalent in both formats (BibTex and DublinCore)
+     *
+     * @param entry The BibEntry object, which is filled during metadata extraction.
+     * @param dcSchema Metadata in DublinCore format.
+     */
     private static void setPublisher(BibEntry entry, DublinCoreSchema dcSchema) {
         List<String> publishers = dcSchema.getPublishers();
         if ((publishers != null) && !publishers.isEmpty()) {
@@ -299,6 +335,12 @@ public class XMPUtil {
         }
     }
 
+    /**
+     * Rights are equivalent in both formats (BibTex and DublinCore)
+     *
+     * @param entry The BibEntry object, which is filled during metadata extraction.
+     * @param dcSchema Metadata in DublinCore format.
+     */
     private static void setRights(BibEntry entry, DublinCoreSchema dcSchema) {
         String s = dcSchema.getRights();
         if (s != null) {
@@ -306,6 +348,12 @@ public class XMPUtil {
         }
     }
 
+    /**
+     * Source is equivalent in both formats (BibTex and DublinCore)
+     *
+     * @param entry The BibEntry object, which is filled during metadata extraction.
+     * @param dcSchema Metadata in DublinCore format.
+     */
     private static void setSource(BibEntry entry, DublinCoreSchema dcSchema) {
         String s = dcSchema.getSource();
         if (s != null) {
@@ -313,6 +361,11 @@ public class XMPUtil {
         }
     }
 
+    /**
+     * Keywords in BibTex - Subjects in DublinCore
+     * @param entry The BibEntry object, which is filled during metadata extraction.
+     * @param dcSchema Metadata in DublinCore format.
+     */
     private static void setSubject(BibEntry entry, DublinCoreSchema dcSchema,
             Character keyWordSeparator) {
         List<String> subjects = dcSchema.getSubjects();
@@ -321,6 +374,12 @@ public class XMPUtil {
         }
     }
 
+    /**
+     * Title is equivalent in both formats (BibTex and DublinCore)
+     *
+     * @param entry The BibEntry object, which is filled during metadata extraction.
+     * @param dcSchema Metadata in DublinCore format.
+     */
     private static void setTitle(BibEntry entry, DublinCoreSchema dcSchema) {
         String s = dcSchema.getTitle();
         if (s != null) {
@@ -328,6 +387,12 @@ public class XMPUtil {
         }
     }
 
+    /**
+     * Type is equivalent in both formats (BibTex and DublinCore)
+     *
+     * @param entry The BibEntry object, which is filled during metadata extraction.
+     * @param dcSchema Metadata in DublinCore format.
+     */
     private static void setType(BibEntry entry, DublinCoreSchema dcSchema) {
         List<String> l = dcSchema.getTypes();
         if ((l != null) && !l.isEmpty()) {
@@ -356,40 +421,28 @@ public class XMPUtil {
 
         BibEntry entry = new BibEntry();
 
-        // Contributor -> Editor
         XMPUtil.setEditor(entry, dcSchema);
 
-        // Author -> Creator
         XMPUtil.setAuthor(entry, dcSchema);
 
-        // Year + Month -> Date
         XMPUtil.setYearAndMonth(entry, dcSchema);
 
-        // Abstract -> Description
         XMPUtil.setAbstract(entry, dcSchema);
 
-        // Identifier -> DOI
         XMPUtil.setDOI(entry, dcSchema);
 
-        // Publisher -> Publisher
         XMPUtil.setPublisher(entry, dcSchema);
 
-        // Relation -> bibtexkey
         XMPUtil.setBibTexFields(entry, dcSchema);
 
-        // Rights -> Rights
         XMPUtil.setRights(entry, dcSchema);
 
-        // Source -> Source
         XMPUtil.setSource(entry, dcSchema);
 
-        // Subject -> Keywords
         XMPUtil.setSubject(entry, dcSchema, xmpPreferences.getKeywordSeparator());
 
-        // Title -> Title
         XMPUtil.setTitle(entry, dcSchema);
 
-        // Type -> Type
         XMPUtil.setType(entry, dcSchema);
 
         if (entry.getFieldNames().isEmpty()) {

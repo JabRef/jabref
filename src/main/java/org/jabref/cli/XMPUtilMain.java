@@ -1,6 +1,5 @@
 package org.jabref.cli;
 
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -71,7 +70,7 @@ public class XMPUtilMain {
         } else if (argsLength == 1) {
             if (args[0].endsWith(".pdf")) {
                 // Read from pdf and write as BibTex
-                List<BibEntry> l = XMPUtil.readXMP(new File(args[0]), xmpPreferences);
+                List<BibEntry> l = XMPUtil.readXMP(args[0], xmpPreferences);
 
                 BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
                         new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()), false);
@@ -98,7 +97,7 @@ public class XMPUtilMain {
         } else if (argsLength == 2) {
             if ("-x".equals(args[0]) && args[1].endsWith(".pdf")) {
                 // Read from pdf and write as BibTex
-                Optional<XMPMetadata> meta = XMPUtil.readRawXMP(new File(args[1]));
+                Optional<XMPMetadata> meta = XMPUtil.readRawXMP(Paths.get(args[1]).toFile());
 
                 if (meta.isPresent()) {
                     XmpSerializer serializer = new XmpSerializer();
@@ -118,7 +117,7 @@ public class XMPUtilMain {
                     if (entries.isEmpty()) {
                         System.err.println("Could not find BibEntry in " + args[0]);
                     } else {
-                        XMPUtil.writeXMP(new File(args[1]), entries, result.getDatabase(), false, xmpPreferences);
+                        XMPUtil.writeXMP(Paths.get(args[1]).toFile(), entries, result.getDatabase(), false, xmpPreferences);
                         System.out.println("XMP written.");
                     }
                 }
