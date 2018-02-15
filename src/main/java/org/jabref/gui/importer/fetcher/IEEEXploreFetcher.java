@@ -20,9 +20,9 @@ import javax.swing.JPanel;
 
 import org.jabref.Globals;
 import org.jabref.gui.importer.ImportInspectionDialog;
-import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
+import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportInspector;
 import org.jabref.logic.importer.OutputPrinter;
@@ -65,7 +65,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private static final Pattern SUPER_DETECTION_2 = Pattern.compile("\\(sup\\)([^(]+)\\(/sup\\)");
     private static final String SUPER_TEXT_RESULT = "\\\\textsuperscript\\{$1\\}";
 
-    private final Formatter protectTermsFormatter = Formatters.getFormatterForModifier("protect_terms").get();
+    private final Formatter protectTermsFormatter = new ProtectTermsFormatter(Globals.protectedTermsLoader);
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
     private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
     private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);

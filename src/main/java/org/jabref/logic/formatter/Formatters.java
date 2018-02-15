@@ -22,7 +22,6 @@ import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import org.jabref.logic.formatter.casechanger.CapitalizeFormatter;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
-import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import org.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
@@ -42,7 +41,6 @@ public class Formatters {
     private static final List<Formatter> CASE_CHANGERS = Arrays.asList(
             new CapitalizeFormatter(),
             new LowerCaseFormatter(),
-            new ProtectTermsFormatter(FormatterConfiguration.getProtectedTermsLoader()),
             new SentenceCaseFormatter(),
             new TitleCaseFormatter(),
             new UpperCaseFormatter()
@@ -63,16 +61,29 @@ public class Formatters {
             new EscapeUnderscoresFormatter()
     );
 
+    private static final String REGEX = "regex";
+
+    private static final int LENGTH_OF_REGEX_PREFIX = REGEX.length();
+
+    private Formatters() {
+    }
+
     public static final List<Formatter> getConverters() {
-        return CONVERTERS;
+        List<Formatter> converters = new ArrayList<>();
+        converters.addAll(CONVERTERS);
+        return converters;
     }
 
     public static final List<Formatter> getCaseChangers() {
-        return CASE_CHANGERS;
+        List<Formatter> caseChangers = new ArrayList<>();
+        caseChangers.addAll(CASE_CHANGERS);
+        return caseChangers;
     }
 
     public static final List<Formatter> getOthers() {
-        return OTHERS;
+        List<Formatter> others = new ArrayList<>();
+        others.addAll(OTHERS);
+        return others;
     }
 
     public static final List<Formatter> getAll() {
@@ -81,13 +92,6 @@ public class Formatters {
         all.addAll(CASE_CHANGERS);
         all.addAll(OTHERS);
         return all;
-    }
-
-    private static final String REGEX = "regex";
-
-    private static final int LENGTH_OF_REGEX_PREFIX = REGEX.length();
-
-    private Formatters() {
     }
 
     public static Optional<Formatter> getFormatterForModifier(String modifier) {

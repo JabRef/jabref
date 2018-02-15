@@ -10,7 +10,7 @@ import javafx.scene.control.TextArea;
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.protectedterms.NewProtectedTermsFileDialog;
-import org.jabref.logic.formatter.Formatters;
+import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
@@ -18,7 +18,7 @@ import org.jabref.model.cleanup.Formatter;
 
 class ProtectedTermsMenu extends Menu {
 
-    private static final Formatter FORMATTER = Formatters.getFormatterForModifier("protect_terms").get();
+    private static final Formatter FORMATTER = new ProtectTermsFormatter(Globals.protectedTermsLoader);
     private final Menu externalFiles;
     private final TextArea opener;
 

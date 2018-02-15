@@ -55,7 +55,7 @@ public class Cleanups {
     private Cleanups() {
     }
 
-    public static List<Formatter> getAvailableFormatters() {
+    public static List<Formatter> getBuiltInFormatters() {
         List<Formatter> availableFormatters = new ArrayList<>();
         availableFormatters.addAll(Formatters.getAll());
         return availableFormatters;
@@ -127,7 +127,7 @@ public class Cleanups {
     }
 
     private static Formatter getFormatterFromString(String formatterName) {
-        for (Formatter formatter : getAvailableFormatters()) {
+        for (Formatter formatter : getBuiltInFormatters()) {
             if (formatterName.equals(formatter.getKey())) {
                 return formatter;
             }
