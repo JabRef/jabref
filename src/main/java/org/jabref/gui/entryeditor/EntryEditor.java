@@ -218,7 +218,7 @@ public class EntryEditor extends BorderPane {
 
         // remove listener for old entry if existing
         if (typeListener != null) {
-            this.entry.getTypeProperty().removeListener(typeListener);
+            this.entry.typeProperty().removeListener(typeListener);
         }
         this.entry = entry;
 
@@ -237,7 +237,7 @@ public class EntryEditor extends BorderPane {
 
         // listen to type changes for rebuilding the currently visible tab
         typeListener = new EntryTypeListener(this.entry, bibDatabaseContext.getMode(), typeLabel, tabbed);
-        this.entry.getTypeProperty().addListener(typeListener);
+        this.entry.typeProperty().addListener(typeListener);
     }
 
     private void setupToolBar() {

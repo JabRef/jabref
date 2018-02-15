@@ -205,7 +205,7 @@ public class BibEntry implements Cloneable {
         return type.getValue();
     }
 
-    public StringProperty getTypeProperty() {
+    public StringProperty typeProperty() {
         return type;
     }
 
