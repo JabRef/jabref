@@ -86,7 +86,7 @@ public class JabRefExecutorService implements Executor {
      * @param command The task to execute.
      * @return A Future object that provides the returning value.
      */
-    public <T> Future<T> executeAndReturn(Callable<T> command) {
+    public <T> Future<T> execute(Callable<T> command) {
         Objects.requireNonNull(command);
         return executorService.submit(command);
     }
