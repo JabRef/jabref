@@ -58,6 +58,8 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 * Run `git clone --depth=10 https://github.com/YOUR_USERNAME/jabref.git`. The `--depth--10` is used to limit the download to ~20 MB instead of downloading the complete history (~800 MB). If you want to dig in our commit history, feel free to download everything.
 
 ### Generating additional source codes and getting dependencies using Gradle:
+(not required for IntelliJ)
+
 1. Go to the jabref folder (the repo you just cloned, if you are following this tutorial, just execute `cd jabref`)
 2. Execute the following steps from the git-bash:
   - Run `./gradlew assemble` 
@@ -66,9 +68,9 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 3. In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files. 
 4. `./gradlew tasks` shows many other runnable tasks.  
 
-### Building it into your IDE
-* Open Eclipse (or your preferred IDE)
-* To Import your jabref project go to menu File --> Import
+### Set-up Eclipse
+* Open Eclipse
+* To Import your JabRef project go to menu File --> Import
 
 1. Choose General --> Existing projects in the workspace and "next"
 2. For "select root directory", browse until the root folder of your jabref just cloned from your repo (e.g., `/home/user/<YOU>/jabref`)
@@ -77,6 +79,11 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 5. Choose JabRefMain as the main class to be executed
 
 ### Set-up your IDE (IntelliJ)
+
+See <https://youtu.be/FeQpygT0314>. This ensures that `src/main/gen` is present.
+
+After that steps, please follow these:
+
 1. Install the [CheckStyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr=idea), it can be found via plug-in repository (File > Settings > Plugins > Browse repositories).
 2. Go to File > Settings > Editor > Code Style, choose a code style (or create a new one) 
 3. Click on the settings wheel (next to the scheme chooser), then Import scheme and choose "CheckStyle Configuration". Select the CheckStyle configuration file `config\checkstyle\checkstyle.xml`. Click OK and restart IntelliJ.
