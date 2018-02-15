@@ -10,6 +10,11 @@ public abstract class EntryEditorTab extends Tab {
     protected BibEntry currentEntry;
 
     /**
+     * Needed to track for which type of entry this tab was build and to rebuild it if the type changes
+     */
+    private String currentEntryType = "";
+
+    /**
      * Decide whether to show this tab for the given entry.
      */
     public abstract boolean shouldShow(BibEntry entry);
@@ -31,10 +36,12 @@ public abstract class EntryEditorTab extends Tab {
      * Notifies the tab that it got focus and should display the given entry.
      */
     public void notifyAboutFocus(BibEntry entry) {
-        if (!entry.equals(currentEntry)) {
+        if (!entry.equals(currentEntry) || !currentEntryType.equals(entry.getType())) {
             currentEntry = entry;
+            currentEntryType = entry.getType();
             DefaultTaskExecutor.runInJavaFXThread(() -> bindToEntry(entry));
         }
         handleFocus();
     }
+
 }
