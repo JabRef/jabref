@@ -131,7 +131,7 @@ public class XMPUtil {
                 // Only support Dublin Core since JabRef 4.2
                 DublinCoreSchema schema = meta.get().getDublinCoreSchema();
                 if (schema != null) {
-                    Optional<BibEntry> entry = XMPUtil.getBibtexEntryFromDublinCore(schema, xmpPreferences);
+                    Optional<BibEntry> entry = XMPUtil.getBibtexEntry(schema, xmpPreferences);
 
                     if (entry.isPresent()) {
                         if (entry.get().getType() == null) {
@@ -221,43 +221,21 @@ public class XMPUtil {
         }
     }
 
-    /**
-     * Helper function for retrieving a BibEntry from the DublinCore metadata
-     * in a PDF file.
-     *
-     * To understand how to get hold of a DublinCore have a look in the
-     * test cases for XMPUtil.
-     *
-     * The BibEntry is build by mapping individual fields in the dublin core
-     * (like creator, title, subject) to fields in a bibtex entry.
-     *
-     * @param dcSchema The document information from which to build a BibEntry.
-     * @return The bibtex entry found in the document information.
-     */
-    public static Optional<BibEntry> getBibtexEntryFromDublinCore(DublinCoreSchema dcSchema,
-            XMPPreferences xmpPreferences) {
-
-        BibEntry entry = new BibEntry();
-
-        /*
-         * Contributor -> Editor
-         */
+    private static void setEditor(BibEntry entry, DublinCoreSchema dcSchema) {
         List<String> contributors = dcSchema.getContributors();
         if ((contributors != null) && !contributors.isEmpty()) {
             entry.setField(FieldName.EDITOR, String.join(" and ", contributors));
         }
+    }
 
-        /*
-         * Author -> Creator
-         */
+    private static void setAuthor(BibEntry entry, DublinCoreSchema dcSchema) {
         List<String> creators = dcSchema.getCreators();
         if ((creators != null) && !creators.isEmpty()) {
             entry.setField(FieldName.AUTHOR, String.join(" and ", creators));
         }
+    }
 
-        /*
-         * Year + Month -> Date
-         */
+    private static void setYearAndMonth(BibEntry entry, DublinCoreSchema dcSchema) {
         List<String> dates = dcSchema.getUnqualifiedSequenceValueList("dc:date");
         if ((dates != null) && !dates.isEmpty()) {
             String date = dates.get(0).trim();
@@ -275,37 +253,38 @@ public class XMPUtil {
                 }
             }
         }
+    }
 
-        /*
-         * Abstract -> Description
-         */
+    private static void setAbstract(BibEntry entry, DublinCoreSchema dcSchema) {
         String s = dcSchema.getDescription();
         if (s != null) {
             entry.setField(FieldName.ABSTRACT, s);
         }
+    }
 
-        /*
-         * Identifier -> DOI
-         */
-        s = dcSchema.getIdentifier();
+    private static void setDOI(BibEntry entry, DublinCoreSchema dcSchema) {
+        String s = dcSchema.getIdentifier();
         if (s != null) {
             entry.setField(FieldName.DOI, s);
         }
+    }
 
-        /*
-         * Publisher -> Publisher
-         */
+    private static void setPublisher(BibEntry entry, DublinCoreSchema dcSchema) {
         List<String> publishers = dcSchema.getPublishers();
         if ((publishers != null) && !publishers.isEmpty()) {
             entry.setField(FieldName.PUBLISHER, String.join(" and ", publishers));
         }
+    }
 
-        /*
-         * Relation -> bibtexkey
-         *
-         * We abuse the relationship attribute to store all other values in the
-         * bibtex document
-         */
+    /**
+     * This method sets all fields, which are custom in bibtext and therefore supported by jabref, but which are not included in the DublinCore format.
+     * <p/>
+     * The relation attribute of DublinCore is abused to insert these custom fields.
+     *
+     * @param entry The BibEntry object, which is filled during metadata extraction.
+     * @param dcSchema Metadata in DublinCore format.
+     */
+    private static void setBibTexFields(BibEntry entry, DublinCoreSchema dcSchema) {
         List<String> relationships = dcSchema.getRelations();
         if (relationships != null) {
             for (String r : relationships) {
@@ -318,51 +297,106 @@ public class XMPUtil {
                 }
             }
         }
+    }
 
-        /*
-         * Rights -> Rights
-         */
-        s = dcSchema.getRights();
+    private static void setRights(BibEntry entry, DublinCoreSchema dcSchema) {
+        String s = dcSchema.getRights();
         if (s != null) {
             entry.setField("rights", s);
         }
+    }
 
-        /*
-         * Source -> Source
-         */
-        s = dcSchema.getSource();
+    private static void setSource(BibEntry entry, DublinCoreSchema dcSchema) {
+        String s = dcSchema.getSource();
         if (s != null) {
             entry.setField("source", s);
         }
+    }
 
-        /*
-         * Subject -> Keywords
-         */
+    private static void setSubject(BibEntry entry, DublinCoreSchema dcSchema,
+            Character keyWordSeparator) {
         List<String> subjects = dcSchema.getSubjects();
         if (subjects != null) {
-            entry.addKeywords(subjects, xmpPreferences.getKeywordSeparator());
+            entry.addKeywords(subjects, keyWordSeparator);
         }
+    }
 
-        /*
-         * Title -> Title
-         */
-        s = dcSchema.getTitle();
+    private static void setTitle(BibEntry entry, DublinCoreSchema dcSchema) {
+        String s = dcSchema.getTitle();
         if (s != null) {
             entry.setField(FieldName.TITLE, s);
         }
+    }
 
-        /*
-         * Type -> Type
-         */
+    private static void setType(BibEntry entry, DublinCoreSchema dcSchema) {
         List<String> l = dcSchema.getTypes();
         if ((l != null) && !l.isEmpty()) {
-            s = l.get(0);
+            String s = l.get(0);
             if (s != null) {
                 entry.setType(s);
             }
         }
+    }
 
-        return entry.getFieldNames().isEmpty() ? Optional.empty() : Optional.of(entry);
+    /**
+     * Helper function for retrieving a BibEntry from the DublinCore metadata
+     * in a PDF file.
+     *
+     * To understand how to get hold of a DublinCore have a look in the
+     * test cases for XMPUtil.
+     *
+     * The BibEntry is build by mapping individual fields in the dublin core
+     * (like creator, title, subject) to fields in a bibtex entry.
+     *
+     * @param dcSchema The document information from which to build a BibEntry.
+     * @return The bibtex entry found in the document information.
+     */
+    public static Optional<BibEntry> getBibtexEntry(DublinCoreSchema dcSchema,
+            XMPPreferences xmpPreferences) {
+
+        BibEntry entry = new BibEntry();
+
+        // Contributor -> Editor
+        XMPUtil.setEditor(entry, dcSchema);
+
+        // Author -> Creator
+        XMPUtil.setAuthor(entry, dcSchema);
+
+        // Year + Month -> Date
+        XMPUtil.setYearAndMonth(entry, dcSchema);
+
+        // Abstract -> Description
+        XMPUtil.setAbstract(entry, dcSchema);
+
+        // Identifier -> DOI
+        XMPUtil.setDOI(entry, dcSchema);
+
+        // Publisher -> Publisher
+        XMPUtil.setPublisher(entry, dcSchema);
+
+        // Relation -> bibtexkey
+        XMPUtil.setBibTexFields(entry, dcSchema);
+
+        // Rights -> Rights
+        XMPUtil.setRights(entry, dcSchema);
+
+        // Source -> Source
+        XMPUtil.setSource(entry, dcSchema);
+
+        // Subject -> Keywords
+        XMPUtil.setSubject(entry, dcSchema, xmpPreferences.getKeywordSeparator());
+
+        // Title -> Title
+        XMPUtil.setTitle(entry, dcSchema);
+
+        // Type -> Type
+        XMPUtil.setType(entry, dcSchema);
+
+        if (entry.getFieldNames().isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(entry);
+        }
     }
 
     /**

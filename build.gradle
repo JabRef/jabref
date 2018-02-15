@@ -90,7 +90,6 @@ dependencies {
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
 
-    // update possible because custom metadata format was dropped, https://github.com/JabRef/jabref/pull/3710 - https://github.com/JabRef/jabref/pull/1096
     compile 'org.apache.pdfbox:pdfbox:2.0.8'
     compile 'org.apache.pdfbox:fontbox:2.0.8'
     compile 'org.apache.pdfbox:xmpbox:2.0.8'
