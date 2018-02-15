@@ -12,11 +12,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class FieldContentParserTest {
 
     private FieldContentParser parser;
-    private FieldContentParserPreferences prefs;
+
 
     @BeforeEach
     public void setUp() throws Exception {
-        prefs = new FieldContentParserPreferences(Collections.emptyList());
+        FieldContentParserPreferences prefs = new FieldContentParserPreferences(Collections.emptyList());
         parser = new FieldContentParser(prefs);
     }
 
