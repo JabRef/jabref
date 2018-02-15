@@ -1,6 +1,10 @@
 package org.jabref.migrations;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import javafx.collections.ObservableList;
 
 import org.jabref.gui.dialogs.MergeReviewIntoCommentUIManager;
 import org.jabref.logic.importer.ParserResult;
@@ -16,27 +20,46 @@ public class MergeReviewIntoComment implements PostOpenMigration {
 
     @Override
     public void performMigration(ParserResult parserResult) {
-        Objects.requireNonNull(parserResult);
+        ObservableList<BibEntry> entries = Objects.requireNonNull(parserResult).getDatabase().getEntries();
 
-        for (BibEntry entry : parserResult.getDatabase().getEntries()) {
-            if (entry.getField(FieldName.REVIEW).isPresent()) {
-                String review = entry.getField(FieldName.REVIEW).get();
-                review = mergeCommentFieldIfPresent(entry, review);
-                updateFields(entry, review);
-            }
+        // migrate non-conflicting entries first
+        entries.stream()
+                .filter(this::hasReviewField)
+                .filter(entry -> !this.hasCommentField(entry))
+                .forEach(this::migrate);
+
+        // determine conflicts
+        List<BibEntry> conflicts = entries.stream()
+                .filter(this::hasReviewField)
+                .filter(this::hasCommentField)
+                .collect(Collectors.toList());
+
+        // resolve conflicts if users agrees
+        if (!conflicts.isEmpty() && new MergeReviewIntoCommentUIManager().askUserForMerge(conflicts)) {
+            conflicts.stream()
+                    .filter(this::hasReviewField)
+                    .forEach(this::migrate);
         }
     }
 
     private String mergeCommentFieldIfPresent(BibEntry entry, String review) {
         if (entry.getField(FieldName.COMMENT).isPresent()) {
-            String comment = entry.getField(FieldName.COMMENT).get().trim();
-            if (!comment.isEmpty() && new MergeReviewIntoCommentUIManager().askUserForMerge(entry)) {
-                LOGGER.info(String.format("Both Comment and Review fields are present in %s! Merging them into the comment field.", entry.getAuthorTitleYear(150)));
-                return String.format("%s\n%s:\n%s", comment, Localization.lang("Review"), review.trim());
-            }
+            LOGGER.info(String.format("Both Comment and Review fields are present in %s! Merging them into the comment field.", entry.getAuthorTitleYear(150)));
+            return String.format("%s\n%s:\n%s", entry.getField(FieldName.COMMENT).get().trim(), Localization.lang("Review"), review.trim());
         }
-
         return review;
+    }
+
+    private boolean hasCommentField(BibEntry entry) {
+        return entry.getField(FieldName.COMMENT).isPresent();
+    }
+
+    private boolean hasReviewField(BibEntry entry) {
+        return entry.getField(FieldName.REVIEW).isPresent();
+    }
+
+    private void migrate(BibEntry entry) {
+        updateFields(entry, mergeCommentFieldIfPresent(entry, entry.getField(FieldName.REVIEW).get()));
     }
 
     private void updateFields(BibEntry entry, String review) {
