@@ -24,11 +24,10 @@ import org.slf4j.LoggerFactory;
  */
 public class AbbreviateAction extends AbstractWorker {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbbreviateAction.class);
     private final BasePanel panel;
     private String message = "";
     private final boolean iso;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbbreviateAction.class);
 
     public AbbreviateAction(BasePanel panel, boolean iso) {
         this.panel = panel;
@@ -43,7 +42,6 @@ public class AbbreviateAction extends AbstractWorker {
     @Override
     public void run() {
         List<BibEntry> entries = panel.getSelectedEntries();
-
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
                 Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
                 iso);
@@ -59,7 +57,6 @@ public class AbbreviateAction extends AbstractWorker {
                         return true;
                     }
                 }
-
                 return false;
             };
             tasks.add(callable);
