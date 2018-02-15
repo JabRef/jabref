@@ -7,8 +7,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
@@ -36,11 +34,11 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.fxmisc.easybind.EasyBind;
+import org.fxmisc.easybind.Subscription;
 
 /**
  * GUI component that allows editing of the fields of a BibEntry (i.e. the
@@ -58,7 +56,7 @@ public class EntryEditor extends BorderPane {
     private final CountingUndoManager undoManager;
     private final BasePanel panel;
     private final List<SearchQueryHighlightListener> searchListeners = new ArrayList<>();
-    private EntryTypeListener typeListener;
+    private Subscription typeSubscription;
     private final List<EntryEditorTab> tabs;
     /**
      * A reference to the entry this editor works on.
@@ -216,9 +214,9 @@ public class EntryEditor extends BorderPane {
     public void setEntry(BibEntry entry) {
         Objects.requireNonNull(entry);
 
-        // remove listener for old entry if existing
-        if (typeListener != null) {
-            this.entry.typeProperty().removeListener(typeListener);
+        // remove subscription for old entry if existing
+        if (typeSubscription != null) {
+            typeSubscription.unsubscribe();
         }
         this.entry = entry;
 
@@ -235,9 +233,15 @@ public class EntryEditor extends BorderPane {
             setupToolBar();
         });
 
-        // listen to type changes for rebuilding the currently visible tab
-        typeListener = new EntryTypeListener(this.entry, bibDatabaseContext.getMode(), typeLabel, tabbed);
-        this.entry.typeProperty().addListener(typeListener);
+        // subscribe to type changes for rebuilding the currently visible tab
+        typeSubscription = EasyBind.subscribe(this.entry.typeProperty(), type -> {
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                typeLabel.setText(new TypedBibEntry(entry, bibDatabaseContext.getMode()).getTypeForDisplay());
+                recalculateVisibleTabs();
+                EntryEditorTab selectedTab = (EntryEditorTab) tabbed.getSelectionModel().getSelectedItem();
+                selectedTab.notifyAboutFocus(entry);
+            });
+        });
     }
 
     private void setupToolBar() {
@@ -279,31 +283,4 @@ public class EntryEditor extends BorderPane {
         });
     }
 
-    class EntryTypeListener implements ChangeListener<String> {
-
-        private final BibEntry entry;
-
-        private final BibDatabaseMode mode;
-
-        private final Label typeLabel;
-
-        private final TabPane tabbed;
-
-        public EntryTypeListener(BibEntry entry, BibDatabaseMode mode, Label typeLabel, TabPane tabbed) {
-            this.entry = entry;
-            this.mode = mode;
-            this.typeLabel = typeLabel;
-            this.tabbed = tabbed;
-        }
-
-        @Override
-        public void changed(ObservableValue observable, String oldValue, String newValue) {
-            DefaultTaskExecutor.runInJavaFXThread(() -> {
-                typeLabel.setText(new TypedBibEntry(entry, mode).getTypeForDisplay());
-                recalculateVisibleTabs();
-                EntryEditorTab selectedTab = (EntryEditorTab) tabbed.getSelectionModel().getSelectedItem();
-                selectedTab.notifyAboutFocus(entry);
-            });
-        }
-    }
 }
