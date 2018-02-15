@@ -56,9 +56,7 @@ public class Cleanups {
     }
 
     public static List<Formatter> getBuiltInFormatters() {
-        List<Formatter> availableFormatters = new ArrayList<>();
-        availableFormatters.addAll(Formatters.getAll());
-        return availableFormatters;
+        return Formatters.getAll();
     }
 
     public static List<FieldFormatterCleanup> parse(String formatterString) {
