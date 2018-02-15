@@ -3,6 +3,7 @@ package org.jabref.migrations;
 import java.util.Collections;
 
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
@@ -65,7 +66,7 @@ class MergeReviewIntoCommentTest {
         ParserResult actualParserResult = new ParserResult(Collections.singletonList(actualEntry));
 
         BibEntry expectedEntry = createMinimalBibEntry();
-        expectedEntry.setField(FieldName.COMMENT, "My Comment\nReview:\nMy Review");
+        expectedEntry.setField(FieldName.COMMENT, "My Comment\n" + Localization.lang("Review") + ":\nMy Review");
 
         action.performMigration(actualParserResult);
 
