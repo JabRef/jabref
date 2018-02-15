@@ -15,6 +15,7 @@ import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
