@@ -19,7 +19,7 @@ class ConversionMenu extends Menu {
         super(Localization.lang("Convert"));
 
         // create menu items, one for each converter
-        for (Formatter converter : Formatters.CONVERTERS) {
+        for (Formatter converter : Formatters.getConverters()) {
             CustomMenuItem menuItem = new CustomMenuItem(new Label(converter.getName()));
             Tooltip toolTip = new Tooltip(converter.getDescription());
             Tooltip.install(menuItem.getContent(), toolTip);
