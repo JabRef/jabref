@@ -23,12 +23,12 @@ import org.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
  */
 public class EntryFromPDFCreator extends EntryFromFileCreator {
 
-    public EntryFromPDFCreator() {
-        super(EntryFromPDFCreator.getPDFExternalFileType());
+    public EntryFromPDFCreator(ExternalFileTypes externalFileTypes) {
+        super(EntryFromPDFCreator.getPDFExternalFileType(externalFileTypes));
     }
 
-    private static ExternalFileType getPDFExternalFileType() {
-        Optional<ExternalFileType> pdfFileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
+    private static ExternalFileType getPDFExternalFileType(ExternalFileTypes externalFileTypes) {
+        Optional<ExternalFileType> pdfFileType = externalFileTypes.getExternalFileTypeByExt("pdf");
         if (!pdfFileType.isPresent()) {
             return new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall", IconTheme.JabRefIcon.PDF_FILE.getSmallIcon());
         }

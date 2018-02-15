@@ -148,7 +148,8 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
      *                    created.
      */
     public GroupDialog(JabRefFrame jabrefFrame, AbstractGroup editedGroup) {
-        super(jabrefFrame, Localization.lang("Edit group"), true, GroupDialog.class);
+        super(jabrefFrame, (editedGroup == null) ? Localization.lang("Add group") : Localization.lang("Edit group"),
+                true, GroupDialog.class);
 
         // set default values (overwritten if editedGroup != null)
         keywordGroupSearchField.setText(jabrefFrame.prefs().get(JabRefPreferences.GROUPS_DEFAULT_FIELD));

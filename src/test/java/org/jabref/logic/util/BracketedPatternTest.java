@@ -7,18 +7,20 @@ import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.FieldName;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class BracketedPatternTest {
+
     private BibEntry bibentry;
     private BibDatabase database;
     private BibEntry dbentry;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         bibentry = new BibEntry();
         bibentry.setField("author", "O. Kitsune");
@@ -120,19 +122,19 @@ public class BracketedPatternTest {
         assertEquals("2017_Gražulis_213", pattern.expand(another_bibentry, ';', another_database));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void nullBibentryBracketExpansionTest() {
         BibDatabase another_database = null;
         BibEntry another_bibentry = null;
         BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
-        pattern.expand(another_bibentry, ';', another_database);
+        assertThrows(NullPointerException.class, () -> pattern.expand(another_bibentry, ';', another_database));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void bracketedExpressionDefaultConstructorTest() {
         BibDatabase another_database = null;
         BracketedPattern pattern = new BracketedPattern();
-        pattern.expand(bibentry, ';', another_database);
+        assertThrows(NullPointerException.class, () -> pattern.expand(bibentry, ';', another_database));
     }
 
     @Test

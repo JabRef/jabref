@@ -14,6 +14,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.cleanup.Formatter;
@@ -35,6 +36,7 @@ public class Cleanups {
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.PAGES, new NormalizePagesFormatter()));
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.DATE, new NormalizeDateFormatter()));
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.MONTH, new NormalizeMonthFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new ReplaceUnicodeLigaturesFormatter()));
         DEFAULT_SAVE_ACTIONS = new FieldFormatterCleanups(false, defaultFormatters);
 
         List<FieldFormatterCleanup> recommendedBibTeXFormatters = new ArrayList<>();
@@ -82,7 +84,7 @@ public class Cleanups {
             while (startIndex < formatterString.length()) {
                 // read the field name
                 int currentIndex = remainingString.indexOf('[');
-                        String fieldKey = remainingString.substring(0, currentIndex);
+                String fieldKey = remainingString.substring(0, currentIndex);
                 int endIndex = remainingString.indexOf(']');
                 startIndex += endIndex + 1;
 
@@ -125,7 +127,6 @@ public class Cleanups {
             // return default actions
             return DEFAULT_SAVE_ACTIONS;
         }
-
     }
 
     private static Formatter getFormatterFromString(String formatterName) {
