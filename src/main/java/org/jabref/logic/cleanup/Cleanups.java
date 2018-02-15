@@ -26,12 +26,8 @@ public class Cleanups {
     public static final FieldFormatterCleanups DEFAULT_SAVE_ACTIONS;
     public static final FieldFormatterCleanups RECOMMEND_BIBTEX_ACTIONS;
     public static final FieldFormatterCleanups RECOMMEND_BIBLATEX_ACTIONS;
-    public static List<Formatter> availableFormatters;
 
     static {
-        availableFormatters = new ArrayList<>();
-        availableFormatters.addAll(Formatters.ALL);
-
         List<FieldFormatterCleanup> defaultFormatters = new ArrayList<>();
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.PAGES, new NormalizePagesFormatter()));
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.DATE, new NormalizeDateFormatter()));
@@ -61,7 +57,9 @@ public class Cleanups {
     }
 
     public static List<Formatter> getAvailableFormatters() {
-        return Collections.unmodifiableList(availableFormatters);
+        List<Formatter> availableFormatters = new ArrayList<>();
+        availableFormatters.addAll(Formatters.ALL);
+        return availableFormatters;
     }
 
     public static List<FieldFormatterCleanup> parse(String formatterString) {
@@ -130,7 +128,7 @@ public class Cleanups {
     }
 
     private static Formatter getFormatterFromString(String formatterName) {
-        for (Formatter formatter : availableFormatters) {
+        for (Formatter formatter : getAvailableFormatters()) {
             if (formatterName.equals(formatter.getKey())) {
                 return formatter;
             }
