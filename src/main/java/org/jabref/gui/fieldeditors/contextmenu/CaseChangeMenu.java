@@ -19,7 +19,7 @@ class CaseChangeMenu extends Menu {
         Objects.requireNonNull(text);
 
         // create menu items, one for each case changer
-        for (final Formatter caseChanger : Formatters.CASE_CHANGERS) {
+        for (final Formatter caseChanger : Formatters.getCaseChangers()) {
             CustomMenuItem menuItem = new CustomMenuItem(new Label(caseChanger.getName()));
             Tooltip toolTip = new Tooltip(caseChanger.getDescription());
             Tooltip.install(menuItem.getContent(), toolTip);

@@ -1,7 +1,6 @@
 package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.formatter.Formatters;
@@ -58,7 +57,7 @@ public class Cleanups {
 
     public static List<Formatter> getAvailableFormatters() {
         List<Formatter> availableFormatters = new ArrayList<>();
-        availableFormatters.addAll(Formatters.ALL);
+        availableFormatters.addAll(Formatters.getAll());
         return availableFormatters;
     }
 
