@@ -1,5 +1,8 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.swing.SwingUtilities;
 
 import javafx.scene.control.Menu;
@@ -48,17 +51,18 @@ class ProtectedTermsMenu extends Menu {
     private void updateFiles() {
         externalFiles.getItems().clear();
         ProtectedTermsLoader loader = Globals.protectedTermsLoader;
-        for (ProtectedTermsList list : loader.getProtectedTermsLists()) {
-            if (!list.isInternalList()) {
-                MenuItem fileItem = new MenuItem(list.getDescription());
-                fileItem.setOnAction(event -> {
-                    String selectedText = opener.getSelectedText();
-                    if ((selectedText != null) && !selectedText.isEmpty()) {
-                        list.addProtectedTerm(selectedText);
-                    }
-                });
-                externalFiles.getItems().add(fileItem);
-            }
+        List<ProtectedTermsList> nonInternal = loader.getProtectedTermsLists().stream()
+                .filter(list -> !list.isInternalList())
+                .collect(Collectors.toList());
+        for (ProtectedTermsList list : nonInternal) {
+            MenuItem fileItem = new MenuItem(list.getDescription());
+            fileItem.setOnAction(event -> {
+                String selectedText = opener.getSelectedText();
+                if ((selectedText != null) && !selectedText.isEmpty()) {
+                    list.addProtectedTerm(selectedText);
+                }
+            });
+            externalFiles.getItems().add(fileItem);
         }
         externalFiles.getItems().add(new SeparatorMenuItem());
         MenuItem addToNewFileItem = new MenuItem(Localization.lang("New") + "...");
