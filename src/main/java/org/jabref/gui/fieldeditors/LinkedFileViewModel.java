@@ -328,13 +328,13 @@ public class LinkedFileViewModel extends AbstractViewModel {
             Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
             if (!file.isPresent()) {
                 // TODO: Print error message
-                // Localization.lang("PDF does not exist");
+                LOGGER.warn("PDF does not exist!");
             } else {
                 try {
                     XMPUtil.writeXMP(file.get(), entry, databaseContext.getDatabase(), Globals.prefs.getXMPPreferences());
                 } catch (IOException | TransformerException ex) {
                     // TODO: Print error message
-                    // Localization.lang("Error while writing") + " '" + file.toString() + "': " + ex;
+                    LOGGER.warn("Error while writing" + " '" + file.toString() + "': " + ex);
                 }
             }
             return null;
