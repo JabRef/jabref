@@ -31,10 +31,14 @@ import org.jabref.logic.importer.fileformat.endnote.Dates;
 import org.jabref.logic.importer.fileformat.endnote.ElectronicResourceNum;
 import org.jabref.logic.importer.fileformat.endnote.Isbn;
 import org.jabref.logic.importer.fileformat.endnote.Keywords;
+import org.jabref.logic.importer.fileformat.endnote.Notes;
 import org.jabref.logic.importer.fileformat.endnote.Number;
 import org.jabref.logic.importer.fileformat.endnote.Pages;
 import org.jabref.logic.importer.fileformat.endnote.PdfUrls;
 import org.jabref.logic.importer.fileformat.endnote.Record;
+import org.jabref.logic.importer.fileformat.endnote.RefType;
+import org.jabref.logic.importer.fileformat.endnote.RelatedUrls;
+import org.jabref.logic.importer.fileformat.endnote.SecondaryTitle;
 import org.jabref.logic.importer.fileformat.endnote.Style;
 import org.jabref.logic.importer.fileformat.endnote.Title;
 import org.jabref.logic.importer.fileformat.endnote.Titles;
@@ -45,6 +49,7 @@ import org.jabref.logic.importer.fileformat.endnote.Xml;
 import org.jabref.logic.importer.fileformat.endnote.Year;
 import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BiblatexEntryType;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
@@ -151,10 +156,30 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         }
     }
 
+    private static BiblatexEntryType convertRefNameToType(String refName) {
+        switch (refName.toLowerCase().trim()) {
+            case "artwork":
+                return BiblatexEntryTypes.MISC;
+            case "generic":
+                return BiblatexEntryTypes.MISC;
+            case "electronic rticle":
+                return BiblatexEntryTypes.ELECTRONIC;
+            case "book section":
+                return BiblatexEntryTypes.INBOOK;
+            case "book":
+                return BiblatexEntryTypes.BOOK;
+            case "journal article":
+                return BiblatexEntryTypes.ARTICLE;
+
+            default:
+                return BiblatexEntryTypes.ARTICLE;
+        }
+    }
+
     private BibEntry parseRecord(Record record) {
         BibEntry entry = new BibEntry();
 
-        entry.setType(BiblatexEntryTypes.ARTICLE);
+        entry.setType(getType(record));
         Optional.ofNullable(getAuthors(record))
                 .ifPresent(value -> entry.setField(FieldName.AUTHOR, value));
         Optional.ofNullable(record.getTitles())
@@ -162,6 +187,11 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 .map(Title::getStyle)
                 .map(Style::getvalue)
                 .ifPresent(value -> entry.setField(FieldName.TITLE, clean(value)));
+        Optional.ofNullable(record.getTitles())
+                .map(Titles::getSecondaryTitle)
+                .map(SecondaryTitle::getStyle)
+                .map(Style::getvalue)
+                .ifPresent(value -> entry.setField(FieldName.JOURNAL, clean(value)));
         Optional.ofNullable(record.getPages())
                 .map(Pages::getStyle)
                 .map(Style::getvalue)
@@ -179,6 +209,12 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 .map(Year::getStyle)
                 .map(Style::getvalue)
                 .ifPresent(value -> entry.setField(FieldName.YEAR, value));
+        Optional.ofNullable(record.getNotes())
+                .map(Notes::getStyle)
+                .map(Style::getvalue)
+                .ifPresent(value -> entry.setField(FieldName.NOTE, value.trim()));
+        getUrl(record)
+                .ifPresent(value -> entry.setField(FieldName.URL, value));
         entry.putKeywords(getKeywords(record), preferences.getKeywordSeparator());
         Optional.ofNullable(record.getAbstract())
                 .map(Abstract::getStyle)
@@ -197,17 +233,33 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         return entry;
     }
 
+    private BiblatexEntryType getType(Record record) {
+        return Optional.ofNullable(record.getRefType())
+                       .map(RefType::getName)
+                       .map(EndnoteXmlImporter::convertRefNameToType)
+                       .orElse(BiblatexEntryTypes.ARTICLE);
+    }
+
     private List<LinkedFile> getLinkedFiles(Record record) {
         Optional<PdfUrls> urls = Optional.ofNullable(record.getUrls())
                                          .map(Urls::getPdfUrls);
         return OptionalUtil.toStream(urls)
                            .flatMap(pdfUrls -> pdfUrls.getUrl().stream())
-                           .flatMap(url -> OptionalUtil.toStream(getUrl(url)))
+                           .flatMap(url -> OptionalUtil.toStream(getUrlValue(url)))
                            .map(url -> new LinkedFile("", url, "PDF"))
                            .collect(Collectors.toList());
     }
 
-    private Optional<String> getUrl(Url url) {
+    private Optional<String> getUrl(Record record) {
+        Optional<RelatedUrls> urls = Optional.ofNullable(record.getUrls())
+                                             .map(Urls::getRelatedUrls);
+        return OptionalUtil.toStream(urls)
+                           .flatMap(url -> url.getUrl().stream())
+                           .flatMap(url -> OptionalUtil.toStream(getUrlValue(url)))
+                           .findFirst();
+    }
+
+    private Optional<String> getUrlValue(Url url) {
         return Optional.ofNullable(url)
                        .map(Url::getStyle)
                        .map(Style::getvalue)
