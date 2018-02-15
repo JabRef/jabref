@@ -11,13 +11,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class RenameReviewToCommentTest {
+class MergeReviewIntoCommentTest {
 
-    private RenameReviewToComment action;
+    private MergeReviewIntoComment action;
 
     @BeforeEach
     public void setUp() {
-        action = new RenameReviewToComment();
+        action = new MergeReviewIntoComment();
     }
 
     @Test

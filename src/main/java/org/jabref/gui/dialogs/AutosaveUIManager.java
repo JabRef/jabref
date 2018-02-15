@@ -1,4 +1,4 @@
-package org.jabref.gui.autosaveandbackup;
+package org.jabref.gui.dialogs;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.exporter.SaveDatabaseAction;

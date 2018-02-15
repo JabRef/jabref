@@ -10,8 +10,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.migrations.ConvertLegacyExplicitGroups;
+import org.jabref.migrations.MergeReviewIntoComment;
 import org.jabref.migrations.PostOpenMigration;
-import org.jabref.migrations.RenameReviewToComment;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -89,7 +89,7 @@ public class OpenDatabase {
 
     private static void performLoadDatabaseMigrations(ParserResult parserResult) {
 
-        List<PostOpenMigration> postOpenMigrations = Arrays.asList(new ConvertLegacyExplicitGroups(), new RenameReviewToComment());
+        List<PostOpenMigration> postOpenMigrations = Arrays.asList(new ConvertLegacyExplicitGroups(), new MergeReviewIntoComment());
 
         for (PostOpenMigration migration : postOpenMigrations) {
             migration.performMigration(parserResult);
