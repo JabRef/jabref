@@ -35,9 +35,6 @@ public class ProtectedTermsLoader {
         update(preferences);
     }
 
-    public ProtectedTermsLoader () {
-    }
-
     public static List<String> getInternalLists() {
         return new ArrayList<>(INTERNAL_LISTS.keySet());
     }
