@@ -30,11 +30,9 @@ public class MergeReviewIntoComment implements PostOpenMigration {
     private String mergeCommentFieldIfPresent(BibEntry entry, String review) {
         if (entry.getField(FieldName.COMMENT).isPresent()) {
             String comment = entry.getField(FieldName.COMMENT).get().trim();
-            if (!comment.isEmpty()) {
-                if (new MergeReviewIntoCommentUIManager().showMergeReviewIntoCommentConflictDialog(entry)) {
-                    LOGGER.info(String.format("Both Comment and Review fields are present in %s! Merging them into the comment field.", entry.getAuthorTitleYear(150)));
-                    return String.format("%s\n%s:\n%s", comment, Localization.lang("Review"), review.trim());
-                }
+            if (!comment.isEmpty() && new MergeReviewIntoCommentUIManager().askUserForMerge(entry)) {
+                LOGGER.info(String.format("Both Comment and Review fields are present in %s! Merging them into the comment field.", entry.getAuthorTitleYear(150)));
+                return String.format("%s\n%s:\n%s", comment, Localization.lang("Review"), review.trim());
             }
         }
 

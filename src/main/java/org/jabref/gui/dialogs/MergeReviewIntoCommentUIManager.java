@@ -7,7 +7,7 @@ import org.jabref.model.entry.BibEntry;
 
 public class MergeReviewIntoCommentUIManager {
 
-    public boolean showMergeReviewIntoCommentConflictDialog(BibEntry entry) {
+    public boolean askUserForMerge(BibEntry entry) {
         int answer = JOptionPane.showConfirmDialog(
                 null,
                 entry.getAuthorTitleYear(150) +
