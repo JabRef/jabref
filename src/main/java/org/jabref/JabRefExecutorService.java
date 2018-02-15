@@ -2,6 +2,7 @@ package org.jabref;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
@@ -80,7 +81,7 @@ public class JabRefExecutorService implements Executor {
     }
 
     /**
-     * This method allows to execute a callable task that provides a return value after the calculation is done.
+     * Executes a callable task that provides a return value after the calculation is done.
      * 
      * @param command The task to execute.
      * @return A Future object that provides the returning value.
@@ -90,13 +91,20 @@ public class JabRefExecutorService implements Executor {
         return executorService.submit(command);
     }
 
+    /**
+     * Executes a collection of callable tasks and returns a List of the resulting Future objects after the calculation is done. 
+     * 
+     * @param tasks The tasks to execute
+     * @return A List of Future objects that provide the returning values.
+     */
     public <T> List<Future<T>> executeAll(Collection<Callable<T>> tasks) {
         Objects.requireNonNull(tasks);
         List<Future<T>> futures = new ArrayList<>();
         try {
             futures = executorService.invokeAll(tasks);
         } catch (InterruptedException exception) {
-            LOGGER.error("Unble to execute tasks", exception);
+            LOGGER.error("Unable to execute tasks", exception);
+            return Collections.emptyList();
         }
         return futures;
     }
