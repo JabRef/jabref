@@ -26,7 +26,7 @@ public class MergeReviewIntoComment implements PostOpenMigration {
         entries.stream()
                 .filter(this::hasReviewField)
                 .filter(entry -> !this.hasCommentField(entry))
-                .forEach(this::migrate);
+                .forEach(entry -> migrate(entry, parserResult));
 
         // determine conflicts
         List<BibEntry> conflicts = entries.stream()
@@ -38,7 +38,7 @@ public class MergeReviewIntoComment implements PostOpenMigration {
         if (!conflicts.isEmpty() && new MergeReviewIntoCommentUIManager().askUserForMerge(conflicts)) {
             conflicts.stream()
                     .filter(this::hasReviewField)
-                    .forEach(this::migrate);
+                    .forEach(entry -> migrate(entry, parserResult));
         }
     }
 
@@ -58,8 +58,9 @@ public class MergeReviewIntoComment implements PostOpenMigration {
         return entry.getField(FieldName.REVIEW).isPresent();
     }
 
-    private void migrate(BibEntry entry) {
+    private void migrate(BibEntry entry, ParserResult parserResult) {
         updateFields(entry, mergeCommentFieldIfPresent(entry, entry.getField(FieldName.REVIEW).get()));
+        parserResult.wasChangedOnMigration = true;
     }
 
     private void updateFields(BibEntry entry, String review) {

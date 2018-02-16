@@ -19,6 +19,7 @@ import org.jabref.model.entry.EntryType;
 import org.jabref.model.metadata.MetaData;
 
 public class ParserResult {
+    public boolean wasChangedOnMigration = false;
 
     private final Map<String, EntryType> entryTypes;
     private final List<String> warnings = new ArrayList<>();
