@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Abbreviate journal names functionality is now running parallel, increasing performance significantly. [#2831] (https://github.com/JabRef/jabref/issues/2831)
 - Changed ID-based entry generator to store the last used fetcher. [#2796] (https://github.com/JabRef/jabref/issues/2796)
 - Reorganised annotation information on the right side of the "File annotations" tab. [#3109](https://github.com/JabRef/jabref/issues/3109)
 - We now show a small notification icon in the entry editor when we detect data inconsistency or other problems. [#3145](https://github.com/JabRef/jabref/issues/3145)
@@ -28,9 +29,11 @@ For more details refer to the [field mapping help page](http://help.jabref.org/e
 - We changed the default dialog option when removing a [file link](http://help.jabref.org/en/FileLinks#adding-external-links-to-an-entry) from an entry.
 The new default removes the linked file from the entry instead of deleting the file from disk. [#3679](https://github.com/JabRef/jabref/issues/3679)
 - The group editing window can now also be called by double-clicking the group to be edited. [koppor#277](https://github.com/koppor/jabref/issues/277)
-- We added a new cleanup operation that replaces ligatures with their expanded form. [3613](https://github.com/JabRef/jabref/issues/3613)
+- The magnifier icon at the search shows the [search mode](https://help.jabref.org/en/Search#search-modes) again. [#3535](https://github.com/JabRef/jabref/issues/3535)
+- We added a new cleanup operation that replaces ligatures with their expanded form. [#3613](https://github.com/JabRef/jabref/issues/3613)
 
 ### Fixed
+- We fixed an issue where changing the type of an entry did not update the label in the tool bar of the entry editor and the contents of the currently visible entry editor tab
 - We fixed an issue where pressing space caused the cursor to jump to the start of the text field. [#3471](https://github.com/JabRef/jabref/issues/3471)
 - We fixed the missing dot in the name of an exported file. [#3576](https://github.com/JabRef/jabref/issues/3576)
 - Autocompletion in the search bar can now be disabled via the preferences. [#3598](https://github.com/JabRef/jabref/issues/3598)

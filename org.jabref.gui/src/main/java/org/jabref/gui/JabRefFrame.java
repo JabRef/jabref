@@ -174,7 +174,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
     private final EditModeAction editModeAction = new EditModeAction();
 
-
     // Here we instantiate menu/toolbar actions. Actions regarding
     // the currently open database are defined as a GeneralAction
     // with a unique command string. This causes the appropriate
@@ -2210,8 +2209,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ProtectedTermsDialog protectTermsDialog = new ProtectedTermsDialog(JabRefFrame.this,
-                    Globals.protectedTermsLoader);
+            ProtectedTermsDialog protectTermsDialog = new ProtectedTermsDialog(JabRefFrame.this);
             protectTermsDialog.setVisible(true);
         }
     }

@@ -32,6 +32,7 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
@@ -64,7 +65,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private static final Pattern SUPER_DETECTION_2 = Pattern.compile("\\(sup\\)([^(]+)\\(/sup\\)");
     private static final String SUPER_TEXT_RESULT = "\\\\textsuperscript\\{$1\\}";
 
-    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
+    private final Formatter protectTermsFormatter = new ProtectTermsFormatter(Globals.protectedTermsLoader);
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
     private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
     private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);

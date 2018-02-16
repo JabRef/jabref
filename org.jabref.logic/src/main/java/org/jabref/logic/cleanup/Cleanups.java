@@ -1,7 +1,6 @@
 package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.formatter.Formatters;
@@ -26,12 +25,8 @@ public class Cleanups {
     public static final FieldFormatterCleanups DEFAULT_SAVE_ACTIONS;
     public static final FieldFormatterCleanups RECOMMEND_BIBTEX_ACTIONS;
     public static final FieldFormatterCleanups RECOMMEND_BIBLATEX_ACTIONS;
-    public static List<Formatter> availableFormatters;
 
     static {
-        availableFormatters = new ArrayList<>();
-        availableFormatters.addAll(Formatters.ALL);
-
         List<FieldFormatterCleanup> defaultFormatters = new ArrayList<>();
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.PAGES, new NormalizePagesFormatter()));
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.DATE, new NormalizeDateFormatter()));
@@ -60,8 +55,8 @@ public class Cleanups {
     private Cleanups() {
     }
 
-    public static List<Formatter> getAvailableFormatters() {
-        return Collections.unmodifiableList(availableFormatters);
+    public static List<Formatter> getBuiltInFormatters() {
+        return Formatters.getAll();
     }
 
     public static List<FieldFormatterCleanup> parse(String formatterString) {
@@ -130,7 +125,7 @@ public class Cleanups {
     }
 
     private static Formatter getFormatterFromString(String formatterName) {
-        for (Formatter formatter : availableFormatters) {
+        for (Formatter formatter : getBuiltInFormatters()) {
             if (formatterName.equals(formatter.getKey())) {
                 return formatter;
             }
