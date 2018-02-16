@@ -3,10 +3,10 @@ package org.jabref.logic.xmp;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.model.database.BibDatabaseMode;
@@ -340,7 +340,7 @@ public class DublinCoreExtractor {
         dcSchema.addRelation("bibtex/" + key + '/' + value);
     }
 
-    public DublinCoreSchema fillDublinCoreSchema() {
+    public void fillDublinCoreSchema() {
 
         // Query privacy filter settings
         boolean useXmpPrivacyFilter = xmpPreferences.isUseXMPPrivacyFilter();
@@ -382,6 +382,5 @@ public class DublinCoreExtractor {
         if (!o.isEmpty()) {
             dcSchema.addType(o);
         }
-        return this.dcSchema;
     }
 }

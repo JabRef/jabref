@@ -90,7 +90,7 @@ public class DocumentInformationExtractor {
         this.extractSubject();
         this.extractOtherFields();
 
-        if(bibEntry.getFieldNames().isEmpty()) {
+        if (bibEntry.getFieldNames().isEmpty()) {
             return Optional.empty();
         } else {
             return Optional.of(bibEntry);

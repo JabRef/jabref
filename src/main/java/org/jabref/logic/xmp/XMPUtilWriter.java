@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import javax.xml.transform.TransformerException;
 
@@ -90,7 +90,7 @@ public class XMPUtilWriter {
         BibEntry resolvedEntry = XMPUtilWriter.getDefaultOrDatabaseEntry(entry, database);
 
         DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, resolvedEntry);
-        dcSchema = dcExtractor.fillDublinCoreSchema();
+        dcExtractor.fillDublinCoreSchema();
     }
 
 
