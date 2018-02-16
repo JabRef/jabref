@@ -350,8 +350,9 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      * {@link JournalAbbreviationLoader#update(JournalAbbreviationPreferences)}.
      */
     public void saveEverythingAndUpdateAutoCompleter() {
+        saveExternalFilesList();
+
         if (shouldWriteLists) {
-            saveExternalFilesList();
             saveJournalAbbreviationFiles();
             shouldWriteLists = false;
         }
