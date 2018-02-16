@@ -1,7 +1,6 @@
 package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.formatter.Formatters;
@@ -14,6 +13,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.cleanup.Formatter;
@@ -25,16 +25,13 @@ public class Cleanups {
     public static final FieldFormatterCleanups DEFAULT_SAVE_ACTIONS;
     public static final FieldFormatterCleanups RECOMMEND_BIBTEX_ACTIONS;
     public static final FieldFormatterCleanups RECOMMEND_BIBLATEX_ACTIONS;
-    public static List<Formatter> availableFormatters;
 
     static {
-        availableFormatters = new ArrayList<>();
-        availableFormatters.addAll(Formatters.ALL);
-
         List<FieldFormatterCleanup> defaultFormatters = new ArrayList<>();
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.PAGES, new NormalizePagesFormatter()));
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.DATE, new NormalizeDateFormatter()));
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.MONTH, new NormalizeMonthFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new ReplaceUnicodeLigaturesFormatter()));
         DEFAULT_SAVE_ACTIONS = new FieldFormatterCleanups(false, defaultFormatters);
 
         List<FieldFormatterCleanup> recommendedBibTeXFormatters = new ArrayList<>();
@@ -58,8 +55,8 @@ public class Cleanups {
     private Cleanups() {
     }
 
-    public static List<Formatter> getAvailableFormatters() {
-        return Collections.unmodifiableList(availableFormatters);
+    public static List<Formatter> getBuiltInFormatters() {
+        return Formatters.getAll();
     }
 
     public static List<FieldFormatterCleanup> parse(String formatterString) {
@@ -82,7 +79,7 @@ public class Cleanups {
             while (startIndex < formatterString.length()) {
                 // read the field name
                 int currentIndex = remainingString.indexOf('[');
-                        String fieldKey = remainingString.substring(0, currentIndex);
+                String fieldKey = remainingString.substring(0, currentIndex);
                 int endIndex = remainingString.indexOf(']');
                 startIndex += endIndex + 1;
 
@@ -125,11 +122,10 @@ public class Cleanups {
             // return default actions
             return DEFAULT_SAVE_ACTIONS;
         }
-
     }
 
     private static Formatter getFormatterFromString(String formatterName) {
-        for (Formatter formatter : availableFormatters) {
+        for (Formatter formatter : getBuiltInFormatters()) {
             if (formatterName.equals(formatter.getKey())) {
                 return formatter;
             }

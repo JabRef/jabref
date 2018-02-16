@@ -21,7 +21,7 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.strings.StringUtil;
 
 public class GroupSerializer {
-    private static String serializeAllEntriesGroup(AllEntriesGroup group) {
+    private static String serializeAllEntriesGroup() {
         return MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID;
     }
 
@@ -115,7 +115,7 @@ public class GroupSerializer {
 
     private String serializeGroup(AbstractGroup group) {
         if (group instanceof AllEntriesGroup) {
-            return serializeAllEntriesGroup((AllEntriesGroup)group);
+            return serializeAllEntriesGroup();
         } else if (group instanceof ExplicitGroup) {
             return serializeExplicitGroup((ExplicitGroup)group);
         } else if (group instanceof KeywordGroup) {
