@@ -1286,7 +1286,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             if (panel == null) {
                 // There is no open tab to add to, so we create a new tab:
                 panel = addTab(parserResult.getDatabaseContext(), focusPanel);
-                if (parserResult.wasChangedOnMigration) {
+                if (parserResult.wasChangedOnMigration()) {
                     panel.markBaseChanged();
                 }
             } else {
@@ -1302,7 +1302,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 tabbedPane.setSelectedComponent(panel.get());
             } else {
                 BasePanel basePanel = addTab(parserResult.getDatabaseContext(), focusPanel);
-                if (parserResult.wasChangedOnMigration) {
+                if (parserResult.wasChangedOnMigration()) {
                     basePanel.markBaseChanged();
                 }
             }

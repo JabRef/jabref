@@ -59,8 +59,9 @@ public class MergeReviewIntoComment implements PostOpenMigration {
     }
 
     private void migrate(BibEntry entry, ParserResult parserResult) {
+        // this method may only be called if the review field is present
         updateFields(entry, mergeCommentFieldIfPresent(entry, entry.getField(FieldName.REVIEW).get()));
-        parserResult.wasChangedOnMigration = true;
+        parserResult.wasChangedOnMigration();
     }
 
     private void updateFields(BibEntry entry, String review) {
