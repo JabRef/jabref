@@ -5,7 +5,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,12 +79,13 @@ public class XMPUtilTest {
     @Test
     public void testReadArticleDublinCoreReadXMP() throws IOException, URISyntaxException, ParseException {
 
-        File file = Paths.get(XMPUtil.class.getResource("/org/jabref/logic/xmp/article_dublinCore.pdf").toURI()).toFile();
-        Optional<XMPMetadata> meta = XMPUtil.readRawXMP(file);
+        Path path = Paths.get(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/article_dublinCore.pdf").toURI());
+        Optional<XMPMetadata> meta = XMPUtilReader.readRawXMP(path);
 
         DublinCoreSchema dcSchema = meta.get().getDublinCoreSchema();
-        Optional<BibEntry> entry = XMPUtil.getBibtexEntry(dcSchema, xmpPreferences);
-        String bibString = Resources.toString(XMPUtil.class.getResource("/org/jabref/logic/xmp/article_dublinCore.bib"), StandardCharsets.UTF_8);
+        DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
+        Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
+        String bibString = Resources.toString(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/article_dublinCore.bib"), StandardCharsets.UTF_8);
         Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
 
         Assert.assertEquals(entryFromBibFile.get(), entry.get());
@@ -101,10 +104,10 @@ public class XMPUtilTest {
      */
     @Test
     public void testReadArticleDublinCoreXMP() throws IOException, URISyntaxException, ParseException {
-        List<BibEntry> entries = XMPUtil.readXMP(XMPUtil.class.getResource("/org/jabref/logic/xmp/article_dublinCore.pdf").toURI().getPath(), xmpPreferences);
+        List<BibEntry> entries = XMPUtilReader.readXMP(Paths.get(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/article_dublinCore.pdf").toURI()), xmpPreferences);
         BibEntry entry = entries.get(0);
 
-        String bibString = Resources.toString(XMPUtil.class.getResource("/org/jabref/logic/xmp/article_dublinCore.bib"), StandardCharsets.UTF_8);
+        String bibString = Resources.toString(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/article_dublinCore.bib"), StandardCharsets.UTF_8);
         Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
 
         Assert.assertEquals(entryFromBibFile.get(), entry);
@@ -118,8 +121,8 @@ public class XMPUtilTest {
      */
     @Test
     public void testReadEmtpyMetadata() throws IOException, URISyntaxException {
-        List<BibEntry> entries = XMPUtil.readXMP(XMPUtil.class.getResource("/org/jabref/logic/xmp/empty_metadata.pdf").toURI().getPath(), xmpPreferences);
-        Assert.assertEquals(0, entries.size());
+        List<BibEntry> entries = XMPUtilReader.readXMP(Paths.get(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/empty_metadata.pdf").toURI()), xmpPreferences);
+        Assert.assertEquals(Collections.EMPTY_LIST, entries);
     }
 
     /**
@@ -131,9 +134,9 @@ public class XMPUtilTest {
      */
     @Test
     public void testReadPDMetadata() throws IOException, URISyntaxException, ParseException {
-        List<BibEntry> entries = XMPUtil.readXMP(XMPUtil.class.getResource("/org/jabref/logic/xmp/PD_metadata.pdf").toURI().getPath(), xmpPreferences);
+        List<BibEntry> entries = XMPUtilReader.readXMP(Paths.get(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/PD_metadata.pdf").toURI()), xmpPreferences);
 
-        String bibString = Resources.toString(XMPUtil.class.getResource("/org/jabref/logic/xmp/PD_metadata.bib"), StandardCharsets.UTF_8);
+        String bibString = Resources.toString(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/PD_metadata.bib"), StandardCharsets.UTF_8);
         Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
 
         Assert.assertEquals(entryFromBibFile.get(), entries.get(0));
@@ -147,20 +150,20 @@ public class XMPUtilTest {
         try (PDDocument pdf = new PDDocument()) {
             // Need a single page to open in Acrobat
             pdf.addPage(new PDPage());
-            pdf.save(pdfFile.getAbsolutePath());
+            pdf.save(pdfFile.getPath());
         }
 
         // read a bib entry from the tests before
-        List<BibEntry> entries = XMPUtil.readXMP(XMPUtil.class.getResource("/org/jabref/logic/xmp/PD_metadata.pdf").toURI().getPath(), xmpPreferences);
+        List<BibEntry> entries = XMPUtilReader.readXMP(Paths.get(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/PD_metadata.pdf").toURI()), xmpPreferences);
         BibEntry entry = entries.get(0);
         entry.setCiteKey("WriteXMPTest");
         entry.setId("ID4711");
 
         // write the changed bib entry to the create PDF
-        XMPUtil.writeXMP(pdfFile.getAbsolutePath(), entry, null, xmpPreferences);
+        XMPUtilWriter.writeXMP(pdfFile.getAbsolutePath(), entry, null, xmpPreferences);
 
         // read entry again
-        List<BibEntry> entriesWritten = XMPUtil.readXMP(pdfFile.getAbsolutePath(), xmpPreferences);
+        List<BibEntry> entriesWritten = XMPUtilReader.readXMP(pdfFile.getPath(), xmpPreferences);
         BibEntry entryWritten = entriesWritten.get(0);
 
         // compare the two entries
