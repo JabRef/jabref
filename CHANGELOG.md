@@ -19,6 +19,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added [oaDOI](https://oadoi.org/) as a fulltext provider, so that JabRef is now able to provide fulltexts for more than 90 million open-access articles.
 - We changed one default of [Cleanup entries dialog](http://help.jabref.org/en/CleanupEntries): Per default, the PDF are not moved to the default file directory anymore. [#3619](https://github.com/JabRef/jabref/issues/3619)
 - We added a new type of group that shows all items referenced in a given LaTeX file (actually the generated AUX file). [#1664](https://github.com/JabRef/jabref/issues/1664)
+- We added an importer for the EndNote XML format. [Feature request in the forum](http://discourse.jabref.org/t/import-from-bookends-or-endnote/1048)
 - We added the export of the `translator` field to the according MS-Office XML field. [#1750, comment](https://github.com/JabRef/jabref/issues/1750#issuecomment-357350986)
 - We changed the import of the MS-Office XML fields `bookauthor` and `translator`. Both are now imported to their corresponding bibtex/biblatex fields.
 - We improved the export of the `address` and `location` field to the MS-Office XML fields. If the address field does not contain a comma, it is treated as single value and exported to the field `city`. [#1750, comment](https://github.com/JabRef/jabref/issues/1750#issuecomment-357539167)

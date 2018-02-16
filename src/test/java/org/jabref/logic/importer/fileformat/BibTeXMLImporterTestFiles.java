@@ -38,7 +38,7 @@ public class BibTeXMLImporterTestFiles {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws IOException {
+    public void testImportEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(new BibTeXMLImporter(), fileName, FILE_ENDING);
     }
 
