@@ -33,6 +33,7 @@ The new default removes the linked file from the entry instead of deleting the f
 - We added a new cleanup operation that replaces ligatures with their expanded form. [#3613](https://github.com/JabRef/jabref/issues/3613)
 
 ### Fixed
+- We fixed several performance problems with the management of journal abbreviations [#3323](https://github.com/JabRef/jabref/issues/3323)
 - We fixed an issue where changing the type of an entry did not update the label in the tool bar of the entry editor and the contents of the currently visible entry editor tab
 - We fixed an issue where pressing space caused the cursor to jump to the start of the text field. [#3471](https://github.com/JabRef/jabref/issues/3471)
 - We fixed the missing dot in the name of an exported file. [#3576](https://github.com/JabRef/jabref/issues/3576)
