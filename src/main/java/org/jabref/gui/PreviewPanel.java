@@ -138,8 +138,8 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         menu.getItems().add(copyPreview);
         menu.getItems().add(printEntryPreview);
         menu.getItems().add(new SeparatorMenuItem());
-        menu.getItems().add(previousPreviewLayout);
         menu.getItems().add(nextPreviewLayout);
+        menu.getItems().add(previousPreviewLayout);
         return menu;
     }
 
