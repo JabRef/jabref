@@ -159,13 +159,13 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
     private boolean checkBoxWhyIsThereNoGetSelectedStupidSwing;
 
-    public FindUnlinkedFilesDialog(Frame owner, JabRefFrame frame, BasePanel panel) {
+    public FindUnlinkedFilesDialog(Frame owner, JabRefFrame frame) {
         super(owner, Localization.lang("Find unlinked files"), true, FindUnlinkedFilesDialog.class);
         this.frame = frame;
 
         restoreSizeOfDialog();
 
-        databaseContext = panel.getDatabaseContext();
+        databaseContext = frame.getCurrentBasePanel().getDatabaseContext();
         creatorManager = new EntryFromFileCreatorManager();
         crawler = new UnlinkedFilesCrawler(databaseContext);
 

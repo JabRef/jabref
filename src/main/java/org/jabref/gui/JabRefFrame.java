@@ -75,16 +75,21 @@ import org.jabref.gui.actions.CopyFilesAction;
 import org.jabref.gui.actions.CustomizeKeyBindingAction;
 import org.jabref.gui.actions.EditExternalFileTypesAction;
 import org.jabref.gui.actions.ErrorConsoleAction;
+import org.jabref.gui.actions.FindUnlinkedFilesAction;
 import org.jabref.gui.actions.IntegrityCheckAction;
+import org.jabref.gui.actions.LibraryPropertiesAction;
+import org.jabref.gui.actions.LookupIdentifierAction;
 import org.jabref.gui.actions.ManageCustomExportsAction;
 import org.jabref.gui.actions.ManageCustomImportsAction;
 import org.jabref.gui.actions.ManageJournalsAction;
 import org.jabref.gui.actions.ManageKeywordsAction;
 import org.jabref.gui.actions.ManageProtectedTermsAction;
 import org.jabref.gui.actions.MassSetFieldAction;
+import org.jabref.gui.actions.MergeEntriesAction;
 import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.gui.actions.NewDatabaseAction;
 import org.jabref.gui.actions.NewEntryAction;
+import org.jabref.gui.actions.NewEntryFromPlainTextAction;
 import org.jabref.gui.actions.NewSubLibraryAction;
 import org.jabref.gui.actions.OldDatabaseCommandWrapper;
 import org.jabref.gui.actions.OpenBrowserAction;
@@ -116,8 +121,10 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
+import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.undo.AddUndoableActionEvent;
@@ -130,6 +137,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.preferences.JabRefPreferences;
@@ -173,11 +181,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     // Note: GeneralAction's constructor automatically gets translations
     // for the name and message strings.
 
-
-
-    private final AbstractAction deleteEntry = new GeneralAction(Actions.DELETE, Localization.menuTitle("Delete entry"),
-            Localization.lang("Delete entry"), Globals.getKeyPrefs().getKey(KeyBinding.DELETE_ENTRY), IconTheme.JabRefIcons.DELETE_ENTRY.getIcon());
-
     private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, Localization.menuTitle("Mark entries"),
             Localization.lang("Mark entries"), Globals.getKeyPrefs().getKey(KeyBinding.MARK_ENTRIES), IconTheme.JabRefIcons.MARK_ENTRIES.getIcon());
     private final JMenu markSpecific = JabRefFrame.subMenu(Localization.menuTitle("Mark specific color"));
@@ -203,14 +206,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
             Localization.lang("Search"), Globals.getKeyPrefs().getKey(KeyBinding.SEARCH), IconTheme.JabRefIcons.SEARCH.getIcon());
 
-    private final AbstractAction editPreamble = new GeneralAction(Actions.EDIT_PREAMBLE,
-            Localization.menuTitle("Edit preamble"),
-            Localization.lang("Edit preamble"));
-    private final AbstractAction editStrings = new GeneralAction(Actions.EDIT_STRINGS,
-            Localization.menuTitle("Edit strings"),
-            Localization.lang("Edit strings"),
-            Globals.getKeyPrefs().getKey(KeyBinding.EDIT_STRINGS),
-            IconTheme.JabRefIcons.EDIT_STRINGS.getIcon());
     private final AbstractAction addToGroup = new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group") + ELLIPSES);
     private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP,
             Localization.lang("Remove from group") + ELLIPSES);
@@ -224,9 +219,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
     private final AbstractAction dupliCheck = new GeneralAction(Actions.DUPLI_CHECK,
             Localization.menuTitle("Find duplicates"), IconTheme.JabRefIcons.FIND_DUPLICATES.getIcon());
-    private final AbstractAction plainTextImport = new GeneralAction(Actions.PLAIN_TEXT_IMPORT,
-            Localization.menuTitle("New entry from plain text") + ELLIPSES,
-            Globals.getKeyPrefs().getKey(KeyBinding.NEW_FROM_PLAIN_TEXT));
 
     private final AbstractAction autoSetFile = new GeneralAction(Actions.AUTO_SET_FILE,
             Localization.lang("Synchronize file links") + ELLIPSES,
@@ -250,7 +242,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             Localization.lang("Find and remove duplicate BibTeX keys"),
             Globals.getKeyPrefs().getKey(KeyBinding.RESOLVE_DUPLICATE_BIBTEX_KEYS));
 
-    private final JMenu lookupIdentifiers = JabRefFrame.subMenu(Localization.menuTitle("Look up document identifier..."));
     private final GeneralAction findUnlinkedFiles = new GeneralAction(
             Actions.findUnlinkedFiles,
             FindUnlinkedFilesDialog.ACTION_MENU_TITLE, FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION,
@@ -790,8 +781,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createIconButton(ActionsFX.OPEN_LIBRARY, new OpenDatabaseAction(this)),
                 factory.createIconButton(ActionsFX.SAVE_LIBRARY, new OldDatabaseCommandWrapper(Actions.SAVE, this, Globals.stateManager)),
 
-                leftSpacer
-        );
+                leftSpacer);
         leftSide.minWidthProperty().bind(sidePane.widthProperty());
         leftSide.prefWidthProperty().bind(sidePane.widthProperty());
         leftSide.maxWidthProperty().bind(sidePane.widthProperty());
@@ -802,8 +792,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 globalSearchBar,
 
                 rightSpacer,
-                factory.createIconButton(ActionsFX.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE))
-        );
+                factory.createIconButton(ActionsFX.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE)));
         toolBar.getStyleClass().add("mainToolbar");
 
         return toolBar;
@@ -910,8 +899,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                         factory.createMenuItem(ActionsFX.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, false)),
                         factory.createMenuItem(ActionsFX.EXPORT_ALL, new ExportCommand(this, false)),
                         factory.createMenuItem(ActionsFX.EXPORT_SELECTED, new ExportCommand(this, true)),
-                        factory.createMenuItem(ActionsFX.SAVE_SELECTED_AS_PLAIN_BIBTEX, new OldDatabaseCommandWrapper(Actions.SAVE_SELECTED_AS_PLAIN, this, Globals.stateManager))
-                ),
+                        factory.createMenuItem(ActionsFX.SAVE_SELECTED_AS_PLAIN_BIBTEX, new OldDatabaseCommandWrapper(Actions.SAVE_SELECTED_AS_PLAIN, this, Globals.stateManager))),
 
                 new SeparatorMenuItem(),
 
@@ -925,8 +913,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(ActionsFX.CLOSE_LIBRARY, new CloseDatabaseAction()),
-                factory.createMenuItem(ActionsFX.QUIT, new CloseAction())
-        );
+                factory.createMenuItem(ActionsFX.QUIT, new CloseAction()));
 
         edit.getItems().addAll(
                 factory.createMenuItem(ActionsFX.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
@@ -935,6 +922,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(ActionsFX.CUT, new EditAction(Actions.CUT)),
+                factory.createMenuItem(ActionsFX.DELETE_ENTRY, new EditAction(Actions.DELETE)),
+
                 factory.createMenuItem(ActionsFX.COPY, new EditAction(Actions.COPY)),
                 factory.createSubMenu(ActionsFX.COPY_MORE,
                         factory.createMenuItem(ActionsFX.COPY_TITLE, new OldDatabaseCommandWrapper(Actions.COPY_TITLE, this, Globals.stateManager)),
@@ -943,8 +932,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                         factory.createMenuItem(ActionsFX.COPY_KEY_AND_TITLE, new OldDatabaseCommandWrapper(Actions.COPY_KEY_AND_TITLE, this, Globals.stateManager)),
                         factory.createMenuItem(ActionsFX.COPY_KEY_AND_LINK, new OldDatabaseCommandWrapper(Actions.COPY_KEY_AND_LINK, this, Globals.stateManager)),
                         factory.createMenuItem(ActionsFX.COPY_CITATION_PREVIEW, new OldDatabaseCommandWrapper(Actions.COPY_CITATION_HTML, this, Globals.stateManager)),
-                        factory.createMenuItem(ActionsFX.EXPORT_SELECTED_TO_CLIPBOARD, new OldDatabaseCommandWrapper(Actions.EXPORT_TO_CLIPBOARD, this, Globals.stateManager))
-                ),
+                        factory.createMenuItem(ActionsFX.EXPORT_SELECTED_TO_CLIPBOARD, new OldDatabaseCommandWrapper(Actions.EXPORT_TO_CLIPBOARD, this, Globals.stateManager))),
 
                 factory.createMenuItem(ActionsFX.PASTE, new EditAction(Actions.PASTE)),
 
@@ -952,8 +940,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 factory.createMenuItem(ActionsFX.SEND_AS_EMAIL, new OldDatabaseCommandWrapper(Actions.SEND_AS_EMAIL, this, Globals.stateManager)),
 
-                new SeparatorMenuItem()
-        );
+                new SeparatorMenuItem());
         /*
         edit.add(mark);
         for (int i = 0; i < EntryMarker.MAX_MARKING_LEVEL; i++) {
@@ -1006,11 +993,39 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         edit.getItems().addAll(
                 factory.createMenuItem(ActionsFX.MANAGE_KEYWORDS, new ManageKeywordsAction(this)),
                 factory.createMenuItem(ActionsFX.REPLACE_ALL, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.MASS_SET_FIELDS, new MassSetFieldAction(this))
+                factory.createMenuItem(ActionsFX.MASS_SET_FIELDS, new MassSetFieldAction(this)));
+
+        library.getItems().addAll(
+                //TODO: We need to determine the BibDatabase Mode
+                factory.createMenuItem(ActionsFX.NEW_ARTICLE, new NewEntryAction(this, BibtexEntryTypes.ARTICLE)),
+                factory.createMenuItem(ActionsFX.NEW_ENTRY, new NewEntryAction(this)),
+                factory.createMenuItem(ActionsFX.NEW_ENTRY_FROM_PLAINTEX, new NewEntryFromPlainTextAction(this, Globals.prefs.getUpdateFieldPreferences())),
+
+                new SeparatorMenuItem(),
+                factory.createMenuItem(ActionsFX.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this)),
+                factory.createMenuItem(ActionsFX.EDIT_PREAMBLE, new OldDatabaseCommandWrapper(Actions.EDIT_PREAMBLE, this, Globals.stateManager)),
+                factory.createMenuItem(ActionsFX.EDIT_STRINGS, new OldDatabaseCommandWrapper(Actions.EDIT_STRINGS, this, Globals.stateManager))
+
+        );
+
+        Menu lookupIdentifiers = factory.createSubMenu(ActionsFX.LOOKUP_DOC_IDENTIFIER);
+
+        for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences())) {
+            lookupIdentifiers.getItems().add(
+                    factory.createMenuItem(ActionsFX.LOOKUP_DOC_IDENTIFIER, new LookupIdentifierAction(this, fetcher)));
+        }
+
+        quality.getItems().addAll(
+                factory.createMenuItem(ActionsFX.FIND_DUPLICATES, new DuplicateSearch(this)),
+                factory.createMenuItem(ActionsFX.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this)),
+                factory.createMenuItem(ActionsFX.MERGE_ENTRIES, new MergeEntriesAction(this))
+
         );
 
         SidePaneComponent webSearch = sidePaneManager.getComponent(SidePaneType.WEB_SEARCH);
         SidePaneComponent groups = sidePaneManager.getComponent(SidePaneType.GROUPS);
+        SidePaneComponent openOffice = sidePaneManager.getComponent(SidePaneType.OPEN_OFFICE);
+
         view.getItems().addAll(
                 factory.createMenuItem(webSearch.getToggleAction(), webSearch.getToggleCommand()),
                 factory.createMenuItem(groups.getToggleAction(), groups.getToggleCommand()),
@@ -1026,12 +1041,15 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 factory.createMenuItem(ActionsFX.NEXT_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.NEXT_PREVIEW_STYLE, this, Globals.stateManager)),
                 factory.createMenuItem(ActionsFX.PREVIOUS_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.PREVIOUS_PREVIEW_STYLE, this, Globals.stateManager))
+
         );
 
         tools.getItems().addAll(
                 factory.createMenuItem(ActionsFX.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(this)),
                 factory.createMenuItem(ActionsFX.WRITE_XMP, new OldDatabaseCommandWrapper(Actions.WRITE_XMP, this, Globals.stateManager)),
-                //TODO: Add OpenOffice
+
+                factory.createMenuItem(openOffice.getToggleAction(), openOffice.getToggleCommand()),
+
                 //TODO: Push Entries
                 factory.createMenuItem(ActionsFX.OPEN_FOLDER, new OldDatabaseCommandWrapper(Actions.OPEN_FOLDER, this, Globals.stateManager)),
                 factory.createMenuItem(ActionsFX.OPEN_FILE, new OldDatabaseCommandWrapper(Actions.OPEN_EXTERNAL_FILE, this, Globals.stateManager)),
@@ -1040,8 +1058,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(ActionsFX.COPY_LINKED_FILES, new CopyFilesAction(this)),
                 factory.createMenuItem(ActionsFX.ABBREVIATE_ISO, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_ISO, this, Globals.stateManager)),
                 factory.createMenuItem(ActionsFX.ABBREVIATE_MEDLINE, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_MEDLINE, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.UNABBREVIATE, new OldDatabaseCommandWrapper(Actions.UNABBREVIATE, this, Globals.stateManager))
-        );
+                factory.createMenuItem(ActionsFX.UNABBREVIATE, new OldDatabaseCommandWrapper(Actions.UNABBREVIATE, this, Globals.stateManager)));
 
         options.getItems().addAll(
                 factory.createMenuItem(ActionsFX.SHOW_PREFS, new ShowPreferencesAction(this)),
@@ -1053,6 +1070,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(ActionsFX.CUSTOMIZE_KEYBINDING, new CustomizeKeyBindingAction()),
                 factory.createMenuItem(ActionsFX.MANAGE_PROTECTED_TERMS, new ManageProtectedTermsAction(this, Globals.protectedTermsLoader)),
                 factory.createMenuItem(ActionsFX.MANAGE_CONTENT_SELECTORS, new OldDatabaseCommandWrapper(Actions.MANAGE_SELECTORS, this, Globals.stateManager))
+
         );
 
         help.getItems().addAll(
@@ -1081,12 +1099,11 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                         new SeparatorMenuItem(),
 
                         factory.createMenuItem(ActionsFX.DONATE, new OpenBrowserAction("https://donations.jabref.org"))
+
                 ),
                 factory.createMenuItem(ActionsFX.ABOUT, new AboutAction())
+
         );
-
-
-
 
         /*
         factory.createMenuItem(ActionsFX., new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
@@ -1662,8 +1679,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
     private int showSaveDialog(String filename) {
         Object[] options = {Localization.lang("Save changes"),
-                Localization.lang("Discard changes"),
-                Localization.lang("Return to JabRef")};
+            Localization.lang("Discard changes"),
+            Localization.lang("Return to JabRef")};
 
         return JOptionPane.showOptionDialog(null,
                 Localization.lang("Library '%0' has changed.", filename),
@@ -1930,32 +1947,32 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     }
 
     private void setDefaultTableFontSize() {
-            GUIGlobals.setFont(Globals.prefs.getIntDefault(JabRefPreferences.FONT_SIZE));
-            for (BasePanel basePanel : getBasePanelList()) {
-                basePanel.updateTableFont();
-            }
-            setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+        GUIGlobals.setFont(Globals.prefs.getIntDefault(JabRefPreferences.FONT_SIZE));
+        for (BasePanel basePanel : getBasePanelList()) {
+            basePanel.updateTableFont();
         }
+        setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+    }
 
     private void increaseTableFontSize() {
-            GUIGlobals.setFont(GUIGlobals.currentFont.getSize() + 1);
-            for (BasePanel basePanel : getBasePanelList()) {
-                basePanel.updateTableFont();
-            }
-            setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+        GUIGlobals.setFont(GUIGlobals.currentFont.getSize() + 1);
+        for (BasePanel basePanel : getBasePanelList()) {
+            basePanel.updateTableFont();
         }
+        setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+    }
 
     private void decreaseTableFontSize() {
-            int currentSize = GUIGlobals.currentFont.getSize();
-            if (currentSize < 2) {
-                return;
-            }
-            GUIGlobals.setFont(currentSize - 1);
-            for (BasePanel basePanel : getBasePanelList()) {
-                basePanel.updateTableFont();
-            }
-            setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+        int currentSize = GUIGlobals.currentFont.getSize();
+        if (currentSize < 2) {
+            return;
         }
+        GUIGlobals.setFont(currentSize - 1);
+        for (BasePanel basePanel : getBasePanelList()) {
+            basePanel.updateTableFont();
+        }
+        setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+    }
 
     private class CloseDatabaseAction extends SimpleCommand {
 

@@ -21,6 +21,7 @@ public class NewEntryAction extends SimpleCommand {
      */
     private final Optional<EntryType> type;
 
+
     public NewEntryAction(JabRefFrame jabRefFrame) {
         this.jabRefFrame = jabRefFrame;
         this.type = Optional.empty();

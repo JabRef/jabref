@@ -10,6 +10,7 @@ import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverType;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
@@ -20,18 +21,22 @@ import org.jabref.model.entry.BibEntry;
 
 import spin.Spin;
 
-public class DuplicateSearch implements Runnable {
+public class DuplicateSearch extends SimpleCommand {
 
     private final BasePanel panel;
     private List<BibEntry> bes;
     private final List<List<BibEntry>> duplicates = new ArrayList<>();
 
-
-    public DuplicateSearch(BasePanel bp) {
-        panel = bp;
+    public DuplicateSearch(JabRefFrame jabRefFrame) {
+        panel = jabRefFrame.getCurrentBasePanel();
     }
 
     @Override
+    public void execute() {
+        JabRefExecutorService.INSTANCE.execute(() -> run());
+
+    }
+
     public void run() {
 
         panel.output(Localization.lang("Searching for duplicates..."));
@@ -190,7 +195,6 @@ public class DuplicateSearch implements Runnable {
         private final BibEntry two;
         private final DuplicateResolverType dialogType;
         private BibEntry merged;
-
 
         public DuplicateCallBack(JabRefFrame frame, BibEntry one, BibEntry two, DuplicateResolverType dialogType) {
             this.frame = frame;

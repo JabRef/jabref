@@ -73,7 +73,6 @@ import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.journals.UnabbreviateAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
-import org.jabref.gui.mergeentries.MergeEntriesDialog;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
 import org.jabref.gui.plaintextimport.TextInputDialog;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
@@ -388,10 +387,10 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             }
         });
 
-        actions.put(Actions.findUnlinkedFiles, (BaseAction) () -> {
+        /*   actions.put(Actions.findUnlinkedFiles, (BaseAction) () -> {
             final FindUnlinkedFilesDialog dialog = new FindUnlinkedFilesDialog(null, frame, BasePanel.this);
             dialog.setVisible(true);
-        });
+        });*/
 
         // The action for auto-generating keys.
         actions.put(Actions.MAKE_KEY, new AbstractWorker() {
@@ -473,7 +472,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         // The action for cleaning up entry.
         actions.put(Actions.CLEANUP, cleanUpAction);
 
-        actions.put(Actions.MERGE_ENTRIES, (BaseAction) () -> new MergeEntriesDialog(BasePanel.this));
+        //actions.put(Actions.MERGE_ENTRIES, (BaseAction) () -> new MergeEntriesDialog(BasePanel.this));
 
         actions.put(Actions.SEARCH, (BaseAction) frame.getGlobalSearchBar()::focus);
         actions.put(Actions.GLOBAL_SEARCH, (BaseAction) frame.getGlobalSearchBar()::performGlobalSearch);
@@ -562,9 +561,9 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             }
         });
 
-        actions.put(Actions.DUPLI_CHECK,
+        /*     actions.put(Actions.DUPLI_CHECK,
                 (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(new DuplicateSearch(BasePanel.this)));
-
+        */
         actions.put(Actions.PLAIN_TEXT_IMPORT, (BaseAction) () -> {
             // get Type of new entry
             EntryTypeDialog etd = new EntryTypeDialog(frame);
