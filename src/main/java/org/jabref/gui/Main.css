@@ -44,11 +44,6 @@
     -fx-light-background: #ffffff;
 
     /*
-     * A strong blue for backgrounds of active items (toggle button, selected list item)
-     */
-    -fx-active-background: #6A9FCD;
-
-    /*
      * A dark gray for borders
      */
     -fx-border: #868786;
@@ -57,6 +52,16 @@
      * A light gray for background for active items in list like elements such as menus, lists, trees, and tables.
      */
     -fx-selection-bar: #e5e5e5;
+
+    /*
+     * The base color for the theme
+     */
+    -fx-theme-base: #4d4673;
+
+    /*
+     * A slightly lighter theme-based color for backgrounds of active items (toggle button, selected list item)
+     */
+    -fx-active-background: derive(-fx-theme-base, 20%);
 }
 
 .hyperlink {
@@ -76,8 +81,7 @@
 }
 
 .glyph-icon {
-    -fx-font-size: 20.0;
-    -glyph-size: 20.0;
+    -fx-font-size: 1em;
 }
 
 .tooltip {
@@ -110,7 +114,7 @@
     -fx-shadow-highlight-color: transparent;
     -fx-outer-border: transparent;
     -fx-inner-border: transparent;
-    -fx-focus-color: #6A9FCD;
+    -fx-focus-color: -fx-active-background;
     -fx-faint-focus-color: transparent;
     -fx-background-color: transparent;
     -fx-text-background-color: dimgray;
@@ -223,7 +227,7 @@
 
 .table-row-cell:selected,
 .tree-table-row-cell:selected {
-    -fx-background-color: #6A9FCD;
+    -fx-background-color: -fx-active-background;
     -fx-text-fill: white;
     -fx-fill: white;
 }
@@ -266,19 +270,34 @@
 }
 
 .mainMenu {
-    -fx-background-color: #80397b;
+    -fx-background-color: derive(-fx-theme-base, -10%);
 }
 
 .menu-bar > .container > .menu-button:hover,
 .menu-bar > .container > .menu-button:focused,
 .menu-bar > .container > .menu-button:showing {
-    -fx-background: #9e5499;
+    -fx-background: derive(-fx-theme-base, 10%);
 }
 
 .mainMenu > .container > .menu-button > .label {
     -fx-text-fill: white;
+    -fx-font-weight: bold;
 }
 
 .mainToolbar {
-    -fx-background-color: #80397b;
+    -fx-background-color: derive(-fx-theme-base, -10%);
+}
+
+.mainToolbar .glyph-icon {
+    -fx-font-size: 1.7em;
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+.mainToolbar .search-field {
+    -fx-background-color: derive(-fx-theme-base, -15%);
+}
+
+.mainToolbar .search-field:focused {
+    -fx-background-color: derive(-fx-theme-base, 15%);
 }

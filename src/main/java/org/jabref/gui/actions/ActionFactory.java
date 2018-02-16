@@ -2,6 +2,7 @@ package org.jabref.gui.actions;
 
 import java.util.Objects;
 
+import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
@@ -25,12 +26,18 @@ public class ActionFactory {
         return ActionUtils.configureMenuItem(new JabRefAction(action, command, keyBindingRepository), menuItem);
     }
 
+    /**
+     * For some reason the graphic is not set correctly by the {@link ActionUtils} class, so we have to fix this by hand
+     */
+    private static void setGraphic(MenuItem node, ActionsFX action) {
+        node.graphicProperty().unbind();
+        action.getIcon().ifPresent(icon -> node.setGraphic(icon.getGraphicNode()));
+    }
+
     public MenuItem createMenuItem(ActionsFX action, Command command) {
         MenuItem menuItem = ActionUtils.createMenuItem(new JabRefAction(action, command, keyBindingRepository));
+        setGraphic(menuItem, action);
 
-        // For some reason the graphic is not set correctly, so let's fix this
-        menuItem.graphicProperty().unbind();
-        action.getIcon().ifPresent(icon -> menuItem.setGraphic(icon.getGraphicNode()));
         return menuItem;
     }
 
@@ -38,8 +45,7 @@ public class ActionFactory {
         Menu menu = ActionUtils.createMenu(new JabRefAction(action, keyBindingRepository));
 
         // For some reason the graphic is not set correctly, so let's fix this
-        menu.graphicProperty().unbind();
-        action.getIcon().ifPresent(icon -> menu.setGraphic(icon.getGraphicNode()));
+        setGraphic(menu, action);
         return menu;
     }
 
@@ -47,5 +53,16 @@ public class ActionFactory {
         Menu menu = createMenu(action);
         menu.getItems().addAll(children);
         return menu;
+    }
+
+    public Button createIconButton(ActionsFX action, Command command) {
+        Button button = ActionUtils.createButton(new JabRefAction(action, command, keyBindingRepository), ActionUtils.ActionTextBehavior.HIDE);
+        button.getStyleClass().add("flatButton");
+
+        // For some reason the graphic is not set correctly, so let's fix this
+        button.graphicProperty().unbind();
+        action.getIcon().ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
+
+        return button;
     }
 }

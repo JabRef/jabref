@@ -33,7 +33,7 @@
                     <Button fx:id="newGroupButton" onAction="#addNewGroup" styleClass="flatButton"
                             ButtonBar.buttonData="LEFT">
                         <graphic>
-                            <MaterialDesignIconView glyphName="PLUS"/>
+                            <MaterialDesignIconView glyphName="PLUS" glyphSize="18"/>
                         </graphic>
                         <tooltip>
                             <Tooltip text="%New group"/>

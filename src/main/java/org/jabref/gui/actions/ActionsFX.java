@@ -116,6 +116,8 @@ public enum ActionsFX {
     PREVIOUS_PREVIEW_STYLE(Localization.menuTitle("Previous preview layout"), KeyBinding.PREVIOUS_PREVIEW_LAYOUT),
     SELECT_ALL(Localization.menuTitle("Select all"), KeyBinding.SELECT_ALL),
 
+    NEW_ENTRY(Localization.menuTitle("New entry"), IconTheme.JabRefIcons.ADD_ENTRY, KeyBinding.NEW_ENTRY),
+
     HELP(Localization.lang("Online help"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
     WEB_MENU(Localization.menuTitle("JabRef resources")),
     OPEN_WEBPAGE(Localization.menuTitle("Website"), Localization.lang("Opens JabRef's website")),

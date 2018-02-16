@@ -181,6 +181,7 @@ public class GlobalSearchBar extends HBox {
 
         int initialSize = 400;
         int expandedSize = 700;
+        searchField.getStyleClass().add("search-field");
         searchField.setMinWidth(200);
         searchField.setMaxWidth(initialSize);
         searchField.setPrefWidth(expandedSize);

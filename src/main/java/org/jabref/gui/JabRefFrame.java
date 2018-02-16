@@ -106,7 +106,6 @@ import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.preftabs.PreferencesDialog;
 import org.jabref.gui.push.PushToApplicationButton;
@@ -130,8 +129,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.preferences.JabRefPreferences;
@@ -258,9 +256,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             FindUnlinkedFilesDialog.ACTION_MENU_TITLE, FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION,
             Globals.getKeyPrefs().getKey(KeyBinding.FIND_UNLINKED_FILES));
     private final AutoLinkFilesAction autoLinkFile = new AutoLinkFilesAction();
-    // The action for adding a new entry of unspecified type.
-    private final NewEntryAction newEntryAction = new NewEntryAction(this, Globals.getKeyPrefs().getKey(KeyBinding.NEW_ENTRY));
-    private final List<NewEntryAction> newSpecificEntryAction = getNewEntryActions();
     // The action for closing the current database and leaving the window open.
     private final CloseAllDatabasesAction closeAllDatabasesAction = new CloseAllDatabasesAction();
     private final CloseOtherDatabasesAction closeOtherDatabasesAction = new CloseOtherDatabasesAction();
@@ -290,6 +285,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private JMenu newSpec;
     private final CountingUndoManager undoManager = new CountingUndoManager();
     private final DialogService dialogService;
+    private SidePane sidePane;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
@@ -345,20 +341,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
     }
 
-    private List<NewEntryAction> getNewEntryActions() {
-        // only Bibtex
-        List<NewEntryAction> actions = new ArrayList<>();
-        for (EntryType type : BibtexEntryTypes.ALL) {
-            KeyStroke keyStroke = new ChangeEntryTypeMenu(Globals.getKeyPrefs()).entryShortCuts.get(type.getName());
-            if (keyStroke == null) {
-                actions.add(new NewEntryAction(this, type.getName()));
-            } else {
-                actions.add(new NewEntryAction(this, type.getName(), keyStroke));
-            }
-        }
-        return actions;
-    }
-
     private JPopupMenu tabPopupMenu() {
         JPopupMenu popupMenu = new JPopupMenu();
 
@@ -392,6 +374,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         // tabbedPane = new DragDropPopupPane(tabPopupMenu());
 
         sidePaneManager = new SidePaneManager(Globals.prefs, this);
+        sidePane = sidePaneManager.getPane();
 
         initLayout();
 
@@ -732,7 +715,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         //toolbarPanel.add(tlb);
         //getContentPane().add(toolbarPanel, BorderLayout.PAGE_START);
 
-        splitPane.getItems().addAll(sidePaneManager.getPane(), tabbedPane);
+        splitPane.getItems().addAll(sidePane, tabbedPane);
 
         // We need to wait with setting the divider since it gets reset a few times during the initial set-up
         mainStage.showingProperty().addListener(new ChangeListener<Boolean>() {
@@ -793,15 +776,33 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         Pane rightSpacer = new Pane();
         HBox.setHgrow(rightSpacer, Priority.SOMETIMES);
 
+        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+
+        Button newLibrary;
+        if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
+            newLibrary = factory.createIconButton(ActionsFX.NEW_LIBRARY_BIBLATEX, new NewDatabaseAction(this, BibDatabaseMode.BIBLATEX));
+        } else {
+            newLibrary = factory.createIconButton(ActionsFX.NEW_LIBRARY_BIBTEX, new NewDatabaseAction(this, BibDatabaseMode.BIBTEX));
+        }
+
+        HBox leftSide = new HBox(
+                newLibrary,
+                factory.createIconButton(ActionsFX.OPEN_LIBRARY, new OpenDatabaseAction(this)),
+                factory.createIconButton(ActionsFX.SAVE_LIBRARY, new OldDatabaseCommandWrapper(Actions.SAVE, this, Globals.stateManager)),
+
+                leftSpacer
+        );
+        leftSide.minWidthProperty().bind(sidePane.widthProperty());
+        leftSide.prefWidthProperty().bind(sidePane.widthProperty());
+        leftSide.maxWidthProperty().bind(sidePane.widthProperty());
+
         ToolBar toolBar = new ToolBar(
-                new Button("Good"),
-                new Button("Boys"),
-                leftSpacer,
+                leftSide,
 
                 globalSearchBar,
 
                 rightSpacer,
-                new Button("Always")
+                factory.createIconButton(ActionsFX.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE))
         );
         toolBar.getStyleClass().add("mainToolbar");
 
@@ -1242,97 +1243,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             }
         }
     }
-
-    /*
-    private void createToolBar() {
-        tlb.setBorder(null);
-        tlb.setRollover(true);
-
-        tlb.setFloatable(false);
-        if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
-            tlb.addAction(newBiblatexDatabaseAction);
-        } else {
-            tlb.addAction(newBibtexDatabaseAction);
-        }
-        tlb.addAction(getOpenDatabaseAction());
-        tlb.addAction(save);
-        tlb.addAction(saveAll);
-
-        tlb.addSeparator();
-        tlb.addAction(cut);
-        tlb.addAction(copy);
-        tlb.addAction(paste);
-        tlb.addAction(undo);
-        tlb.addAction(redo);
-
-        tlb.addSeparator();
-        tlb.addAction(getBackAction());
-        tlb.addAction(getForwardAction());
-        tlb.addSeparator();
-        tlb.addAction(newEntryAction);
-        tlb.addAction(editEntry);
-        tlb.addAction(editStrings);
-        tlb.addAction(deleteEntry);
-        tlb.addSeparator();
-        tlb.addAction(makeKeyAction);
-        tlb.addAction(cleanupEntries);
-        tlb.addAction(mergeEntries);
-        tlb.addAction(pullChangesFromSharedDatabase);
-        tlb.addAction(openConsole);
-
-        tlb.addSeparator();
-        tlb.addAction(mark);
-        tlb.addAction(unmark);
-        if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
-                JButton button = SpecialFieldDropDown
-                        .generateSpecialFieldButtonWithDropDown(SpecialField.RANKING, this);
-                tlb.add(button);
-                specialFieldButtons.add(button);
-            }
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
-                tlb.addAction(toggleRelevance);
-            }
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
-                tlb.addAction(toggleQualityAssured);
-            }
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
-                JButton button = SpecialFieldDropDown
-                        .generateSpecialFieldButtonWithDropDown(SpecialField.PRIORITY, this);
-                tlb.add(button);
-                specialFieldButtons.add(button);
-            }
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
-                tlb.addAction(togglePrinted);
-            }
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
-                JButton button = SpecialFieldDropDown
-                        .generateSpecialFieldButtonWithDropDown(SpecialField.READ_STATUS, this);
-                tlb.add(button);
-                specialFieldButtons.add(button);
-            }
-        }
-        tlb.addSeparator();
-
-        tlb.addJToggleButton(new JToggleButton(generalFetcher.getToggleCommand()));
-
-        previewToggle = new JToggleButton(togglePreview);
-        tlb.addJToggleButton(previewToggle);
-
-        tlb.addJToggleButton(new JToggleButton(groupSidePane.getToggleCommand()));
-
-        tlb.addSeparator();
-
-        tlb.add(pushExternalButton.getComponent());
-        tlb.addSeparator();
-        tlb.add(donationAction);
-        tlb.add(forkMeOnGitHubAction);
-        tlb.add(jabrefFacebookAction);
-        tlb.add(jabrefTwitterAction);
-
-        createDisabledIconsForButtons(tlb);
-    }
-    */
 
     /**
      * displays the String on the Status Line visible on the bottom of the JabRef mainframe
