@@ -1,0 +1,6 @@
+dependencies {
+    compile project(':org.jabref.model')
+    compile project(':org.jabref.logic')
+
+    compile 'org.apache.pdfbox:jempbox:1.8.13'
+}

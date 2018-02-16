@@ -10,18 +10,19 @@ dependencies:
     # openssl aes-256-cbc -e -in ./buildres/jabref-cert-2016.p12 -out jabref-cert-2016.p12.enc -k {PASSWORD}
     #- openssl aes-256-cbc -d -in ./buildres/jabref-cert-2016.p12.enc -out ./buildres/jabref-cert-2016.p12 -k $CERTIFICATE
     - scripts/prepare-install4j.sh
-    - install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY 
+    - install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
     #--win-keystore-password $CERTIFICATE_PW --mac-keystore-password $CERTIFICATE_PW
   override:
     # We do this to decrease build time by using CircleCI's cache. See https://discuss.circleci.com/t/effective-caching-for-gradle/540 for a longer motivation.
-    - ./gradlew compileJava
+    - ./gradlew --no-daemon -Pdev=true compileJava
   cache_directories:
     - "~/.install4j7"
     - "~/downloads"
 
 test:
   override:
-    - ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
+    - ./gradlew --no-daemon -Pdev=true -Pinstall4jDir="install4j7" --stacktrace release
+    - ./gradlew --no-daemon -Drevision=release -DoutputFormatter=json -DoutputDir=build/releases dependencyUpdates
   post:
     # save test reports as build artifacts
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
@@ -33,18 +34,15 @@ deployment:
    tag: /v[0-9]+(\.[0-9]+)*(-.+)?/
    commands:
       # we have to do a clean build as changing gradle's "project.version" does not lead to a rebuild of resources (mirroring project.version)
-      - ./gradlew -Pinstall4jDir="install4j7" clean release --stacktrace
+      - ./gradlew --no-daemon -Pinstall4jDir="install4j7" --stacktrace clean release
       # upload at all circumstances
       - scripts/upload-to-builds.jabref.org.sh
-      - ./gradlew dependencyUpdates -Drevision=release -DoutputFormatter=json -DoutputDir=build/releases
   development:
      # match all branches; this is executed, if "release" is not matched - see https://circleci.com/docs/configuration/
     branch: /.*/
     commands:
       # if upload fails, it is accepted; CircleCI provides deep links to the binaries as fallback
       - timeout 580 scripts/upload-to-builds.jabref.org.sh || exit 0
-
-
 
 general:
   artifacts:
