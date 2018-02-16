@@ -15,7 +15,9 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
+import org.jabref.model.strings.StringUtil;
 
+import com.microsoft.applicationinsights.agent.internal.common.StringUtils;
 import org.apache.xmpbox.DateConverter;
 import org.apache.xmpbox.schema.DublinCoreSchema;
 
@@ -69,16 +71,16 @@ public class DublinCoreExtractor {
         List<String> dates = dcSchema.getUnqualifiedSequenceValueList("date");
         if ((dates != null) && !dates.isEmpty()) {
             String date = dates.get(0).trim();
-            Calendar c = null;
+            Calendar calender = null;
             try {
-                c = DateConverter.toCalendar(date);
+                calender = DateConverter.toCalendar(date);
             } catch (IOException ignored) {
                 // Ignored
             }
-            if (c != null) {
-                bibEntry.setField(FieldName.YEAR, String.valueOf(c.get(Calendar.YEAR)));
+            if (calender != null) {
+                bibEntry.setField(FieldName.YEAR, String.valueOf(calender.get(Calendar.YEAR)));
                 if (date.length() > 4) {
-                    Optional<Month> month = Month.getMonthByNumber(c.get(Calendar.MONTH) + 1);
+                    Optional<Month> month = Month.getMonthByNumber(calender.get(Calendar.MONTH) + 1);
                     month.ifPresent(bibEntry::setMonth);
                 }
             }
@@ -92,9 +94,9 @@ public class DublinCoreExtractor {
      * @param dcSchema Metadata in DublinCore format.
      */
     private void extractAbstract() {
-        String s = dcSchema.getDescription();
-        if (s != null) {
-            bibEntry.setField(FieldName.ABSTRACT, s);
+        String description = dcSchema.getDescription();
+        if (!StringUtil.isNullOrEmpty(description)) {
+            bibEntry.setField(FieldName.ABSTRACT, description);
         }
     }
 
@@ -105,9 +107,9 @@ public class DublinCoreExtractor {
      * @param dcSchema Metadata in DublinCore format.
      */
     private void extractDOI() {
-        String s = dcSchema.getIdentifier();
-        if (s != null) {
-            bibEntry.setField(FieldName.DOI, s);
+        String identifier = dcSchema.getIdentifier();
+        if (!StringUtils.isNullOrEmpty(identifier)) {
+            bibEntry.setField(FieldName.DOI, identifier);
         }
     }
 
@@ -154,9 +156,9 @@ public class DublinCoreExtractor {
      * @param dcSchema Metadata in DublinCore format.
      */
     private void extractRights() {
-        String s = dcSchema.getRights();
-        if (s != null) {
-            bibEntry.setField("rights", s);
+        String rights = dcSchema.getRights();
+        if (!StringUtils.isNullOrEmpty(rights)) {
+            bibEntry.setField("rights", rights);
         }
     }
 
@@ -167,9 +169,9 @@ public class DublinCoreExtractor {
      * @param dcSchema Metadata in DublinCore format.
      */
     private void extractSource() {
-        String s = dcSchema.getSource();
-        if (s != null) {
-            bibEntry.setField("source", s);
+        String source = dcSchema.getSource();
+        if (!StringUtils.isNullOrEmpty(source)) {
+            bibEntry.setField("source", source);
         }
     }
 
@@ -180,7 +182,7 @@ public class DublinCoreExtractor {
      */
     private void extractSubject() {
         List<String> subjects = dcSchema.getSubjects();
-        if (subjects != null) {
+        if ((subjects != null) && !subjects.isEmpty()) {
             bibEntry.addKeywords(subjects, xmpPreferences.getKeywordSeparator());
         }
     }
@@ -192,9 +194,9 @@ public class DublinCoreExtractor {
      * @param dcSchema Metadata in DublinCore format.
      */
     private void extractTitle() {
-        String s = dcSchema.getTitle();
-        if (s != null) {
-            bibEntry.setField(FieldName.TITLE, s);
+        String title = dcSchema.getTitle();
+        if (!StringUtil.isNullOrEmpty(title)) {
+            bibEntry.setField(FieldName.TITLE, title);
         }
     }
 
@@ -205,11 +207,11 @@ public class DublinCoreExtractor {
      * @param dcSchema Metadata in DublinCore format.
      */
     private void extractType() {
-        List<String> l = dcSchema.getTypes();
-        if ((l != null) && !l.isEmpty()) {
-            String s = l.get(0);
-            if (s != null) {
-                bibEntry.setType(s);
+        List<String> types = dcSchema.getTypes();
+        if ((types != null) && !types.isEmpty()) {
+            String type = types.get(0);
+            if (!StringUtils.isNullOrEmpty(type)) {
+                bibEntry.setType(type);
             }
         }
     }
