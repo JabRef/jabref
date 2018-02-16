@@ -27,6 +27,7 @@ For more details refer to the [field mapping help page](http://help.jabref.org/e
 - We improved file saving so that hard links are now preserved when a save is performed [#2633](https://github.com/JabRef/jabref/issues/2633)
 - We changed the default dialog option when removing a [file link](http://help.jabref.org/en/FileLinks#adding-external-links-to-an-entry) from an entry.
 The new default removes the linked file from the entry instead of deleting the file from disk. [#3679](https://github.com/JabRef/jabref/issues/3679)
+- Added a "Select all" [#280](https://github.com/koppor/jabref/issues/280) and "Deselect all" button in the "Review changes" dialog.
 
 ### Fixed
 - We fixed an issue where pressing space caused the cursor to jump to the start of the text field. [#3471](https://github.com/JabRef/jabref/issues/3471)

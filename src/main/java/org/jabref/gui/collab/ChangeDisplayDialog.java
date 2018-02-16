@@ -1,7 +1,10 @@
 package org.jabref.gui.collab;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Insets;
+import java.awt.event.ActionListener;
 import java.util.Collections;
 import java.util.Enumeration;
 
@@ -50,8 +53,36 @@ class ChangeDisplayDialog extends JabRefDialog implements TreeSelectionListener 
         tree = new JTree(root);
         tree.addTreeSelectionListener(this);
 
+        //start fix issue 280
+        this.setMinimumSize(new Dimension(400, 400));
+        JPanel treePanel = new JPanel(new BorderLayout());
+        JPanel buttonAlignment = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        treePanel.add(tree, BorderLayout.CENTER);
+        JButton selectAll = new JButton(Localization.lang("Select all"));
+        JButton deselectAll = new JButton(Localization.lang("Deselect all"));
+        ActionListener selectEvent = (event) -> {
+            boolean accept = event.getSource() == selectAll;
+            Enumeration<? extends Object> nodes = root.preorderEnumeration();
+            while (nodes.hasMoreElements()) {
+                Object o = nodes.nextElement();
+                if ((o instanceof ChangeViewModel) && (o != root)) {
+                    ((ChangeViewModel) o).setAccepted(accept);
+                }
+            }
+            cb.setSelected(accept);
+            if (selected != null) {
+                cb.setEnabled(selected.isAcceptable());
+            }
+        };
+        selectAll.addActionListener(selectEvent);
+        deselectAll.addActionListener(selectEvent);
+        buttonAlignment.add(selectAll);
+        buttonAlignment.add(deselectAll);
+        treePanel.add(buttonAlignment, BorderLayout.SOUTH);
+        //end fix issue 280
+
         JSplitPane pane = new JSplitPane();
-        pane.setLeftComponent(new JScrollPane(tree));
+        pane.setLeftComponent(new JScrollPane(treePanel)); //fix issue 280 change: tree -> treePanel
         JPanel infoBorder = new JPanel();
         pane.setRightComponent(infoBorder);
 
