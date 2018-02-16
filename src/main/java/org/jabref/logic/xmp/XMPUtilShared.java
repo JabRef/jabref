@@ -53,7 +53,7 @@ public class XMPUtilShared {
             LOGGER.info("Encryption not supported by XMPUtil");
             return false;
         } catch (IOException e) {
-            // happens if no metadata is found, no reason to log the exception
+            XMPUtilShared.LOGGER.debug("No metadata was found. Path: " + path.toString());
             return false;
         }
     }
