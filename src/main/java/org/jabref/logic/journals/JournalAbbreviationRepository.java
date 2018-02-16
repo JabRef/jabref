@@ -63,8 +63,6 @@ public class JournalAbbreviationRepository {
         // Abbreviation equality is tested on name only, so we might have to remove an old abbreviation
         if (abbreviations.contains(abbreviation)) {
             abbreviations.remove(abbreviation);
-            LOGGER.info("Duplicate journal abbreviation - old one will be overwritten by new one\nOLD: "
-                    + abbreviation + "\nNEW: " + abbreviation);
         }
 
         abbreviations.add(abbreviation);
