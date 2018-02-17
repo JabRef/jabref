@@ -53,7 +53,6 @@ public class CleanupAction extends AbstractWorker {
             canceled = true;
             return;
         }
-        frame.block();
         panel.output(Localization.lang("Doing a cleanup for %0 entries...",
                 Integer.toString(panel.getSelectedEntries().size())));
     }
@@ -105,7 +104,6 @@ public class CleanupAction extends AbstractWorker {
     @Override
     public void update() {
         if (canceled) {
-            frame.unblock();
             return;
         }
         if (unsuccessfulRenames > 0) { //Rename failed for at least one entry
@@ -130,7 +128,6 @@ public class CleanupAction extends AbstractWorker {
             break;
         }
         panel.output(message);
-        frame.unblock();
     }
 
     private int showDialog(CleanupPresetPanel presetPanel) {

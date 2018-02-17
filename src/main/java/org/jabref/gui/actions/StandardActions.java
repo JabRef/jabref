@@ -107,6 +107,7 @@ public enum StandardActions implements Action {
     MANAGE_JOURNALS(Localization.menuTitle("Manage journal abbreviations")),
     CUSTOMIZE_KEYBINDING(Localization.lang("Customize key bindings"), IconTheme.JabRefIcons.KEY_BINDINGS),
     MANAGE_CONTENT_SELECTORS(Localization.menuTitle("Manage content selectors"), IconTheme.JabRefIcons.PREFERENCES),
+    MANAGE_CITE_KEY_PATTERNS(Localization.lang("BibTeX key patterns")),
 
     TOGGLE_PREVIEW(Localization.lang("Toggle entry preview"), IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW, KeyBinding.TOGGLE_ENTRY_PREVIEW),
     EDIT_ENTRY(Localization.lang("Edit entry"), IconTheme.JabRefIcons.EDIT_ENTRY, KeyBinding.EDIT_ENTRY),

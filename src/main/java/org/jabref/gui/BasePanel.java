@@ -409,7 +409,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                             Localization.lang("First select the entries you want keys to be generated for."));
                     return;
                 }
-                frame.block();
                 output(formatOutputMessage(Localization.lang("Generating BibTeX key for"), numSelected));
             }
 
@@ -457,13 +456,11 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             @Override
             public void update() {
                 if (canceled) {
-                    frame.unblock();
                     return;
                 }
                 markBaseChanged();
                 numSelected = entries.size();
                 output(formatOutputMessage(Localization.lang("Generated BibTeX key for"), numSelected));
-                frame.unblock();
             }
         });
 
@@ -638,7 +635,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                     .build();
             Globals.prefs.storePreviewPreferences(newPreviewPreferences);
             DefaultTaskExecutor.runInJavaFXThread(() -> setPreviewActiveBasePanels(enabled));
-            frame.setPreviewToggle(enabled);
         });
 
         actions.put(Actions.NEXT_PREVIEW_STYLE, (BaseAction) this::nextPreviewStyle);
@@ -978,10 +974,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 runWorker((AbstractWorker) o);
             }
         } catch (Throwable ex) {
-            // If the action has blocked the JabRefFrame before crashing, we need to unblock it.
-            // The call to unblock will simply hide the glasspane, so there is no harm in calling
-            // it even if the frame hasn't been blocked.
-            frame.unblock();
             LOGGER.error("runCommand error: " + ex.getMessage(), ex);
         }
     }
@@ -989,7 +981,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private boolean saveDatabase(File file, boolean selectedOnly, Charset enc,
             SavePreferences.DatabaseSaveType saveType) throws SaveException {
         SaveSession session;
-        frame.block();
         final String SAVE_DATABASE = Localization.lang("Save library");
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(enc)
@@ -1025,8 +1016,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                     Localization.lang("Could not save file."),
                     ex);
             throw new SaveException("rt");
-        } finally {
-            frame.unblock();
         }
 
         boolean commit = true;

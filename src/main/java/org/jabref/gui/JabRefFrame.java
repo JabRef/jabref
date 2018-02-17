@@ -1,15 +1,11 @@
 package org.jabref.gui;
 
 import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.MouseAdapter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -26,21 +22,15 @@ import java.util.TimerTask;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
-import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
-import javax.swing.MenuElement;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 
 import javafx.application.Platform;
@@ -69,6 +59,7 @@ import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.AutoLinkFilesAction;
+import org.jabref.gui.actions.BibtexKeyPatternAction;
 import org.jabref.gui.actions.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.actions.CopyFilesAction;
 import org.jabref.gui.actions.CustomizeEntryAction;
@@ -100,12 +91,10 @@ import org.jabref.gui.actions.ShowPreferencesAction;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
-import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
 import org.jabref.gui.exporter.ExportCommand;
 import org.jabref.gui.exporter.SaveAllAction;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.groups.EntryTableTransferHandler;
 import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.ImportCommand;
@@ -113,7 +102,6 @@ import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.menus.FileHistoryMenu;
-import org.jabref.gui.preftabs.PreferencesDialog;
 import org.jabref.gui.push.PushToApplicationButton;
 import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.search.GlobalSearchBar;
@@ -160,11 +148,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
     // Frame titles.
     public static final String FRAME_TITLE = "JabRef";
-    private static final String ELLIPSES = "...";
     private final SplitPane splitPane = new SplitPane();
     private final JabRefPreferences prefs = Globals.prefs;
-    private final Insets marg = new Insets(1, 0, 2, 0);
-    private final ToolBar tlb = new ToolBar();
     private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this);
     private final JLabel statusLine = new JLabel("", SwingConstants.LEFT);
     private final JLabel statusLabel = new JLabel(
@@ -205,12 +190,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             IconTheme.JabRefIcons.PRINTED.getIcon());
 
 
-    private final AbstractAction bibtexKeyPattern = new BibtexKeyPatternAction();
-
-    // The action for closing the current database and leaving the window open.
-    private final CloseAllDatabasesAction closeAllDatabasesAction = new CloseAllDatabasesAction();
-    private final CloseOtherDatabasesAction closeOtherDatabasesAction = new CloseOtherDatabasesAction();
-
     // Lists containing different subsets of actions for different purposes
     private final List<Object> specialFieldButtons = new LinkedList<>();
     private final List<Object> openDatabaseOnlyActions = new LinkedList<>();
@@ -224,13 +203,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final List<Object> twoEntriesOnlyActions = new LinkedList<>();
     private final List<Object> atLeastOneEntryActions = new LinkedList<>();
     private final Stage mainStage;
-    private PreferencesDialog prefsDialog;
     // The sidepane manager takes care of populating the sidepane.
     private SidePaneManager sidePaneManager;
     private final TabPane tabbedPane = new TabPane();
-    /* References to the toggle buttons in the toolbar */
-    private JToggleButton previewToggle;
-    private JMenu rankSubMenu;
     private PushToApplications pushApplications;
     private final CountingUndoManager undoManager = new CountingUndoManager();
     private final DialogService dialogService;
@@ -242,18 +217,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         init();
     }
 
-    private static Action enableToggle(Action a, boolean initialValue) {
-        // toggle only works correctly when the SELECTED_KEY is set to false or true explicitly upon start
-        a.putValue(Action.SELECTED_KEY, String.valueOf(initialValue));
-
-        return a;
-    }
-
-    private static Action enableToggle(Action a) {
-        return enableToggle(a, false);
-    }
-
-    public static JMenu subMenu(String name) {
+    private static JMenu subMenu(String name) {
         int i = name.indexOf('&');
         JMenu res;
         if (i >= 0) {
@@ -290,38 +254,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
     }
 
-    private JPopupMenu tabPopupMenu() {
-        JPopupMenu popupMenu = new JPopupMenu();
-
-        // Close actions
-        JMenuItem close = new JMenuItem(Localization.lang("Close"));
-        JMenuItem closeOthers = new JMenuItem(Localization.lang("Close others"));
-        JMenuItem closeAll = new JMenuItem(Localization.lang("Close all"));
-        //close.addActionListener(closeDatabaseAction);
-        closeOthers.addActionListener(closeOtherDatabasesAction);
-        closeAll.addActionListener(closeAllDatabasesAction);
-        popupMenu.add(close);
-        popupMenu.add(closeOthers);
-        popupMenu.add(closeAll);
-
-        popupMenu.addSeparator();
-
-        JMenuItem databasePropertiesMenu = new JMenuItem(Localization.lang("Library properties"));
-        // databasePropertiesMenu.addActionListener(this.databaseProperties);
-        popupMenu.add(databasePropertiesMenu);
-
-        JMenuItem bibtexKeyPatternBtn = new JMenuItem(Localization.lang("BibTeX key patterns"));
-        bibtexKeyPatternBtn.addActionListener(bibtexKeyPattern);
-        popupMenu.add(bibtexKeyPatternBtn);
-
-        return popupMenu;
-    }
-
     private void init() {
-
-        // TODO: popup
-        // tabbedPane = new DragDropPopupPane(tabPopupMenu());
-
         sidePaneManager = new SidePaneManager(Globals.prefs, this);
         sidePane = sidePaneManager.getPane();
 
@@ -331,17 +264,13 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         initKeyBindings();
 
-        // Show the toolbar if it was visible at last shutdown:
-        tlb.setVisible(Globals.prefs.getBoolean(JabRefPreferences.TOOLBAR_VISIBLE));
-
         //setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
         //WindowLocation pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
         //        JabRefPreferences.SIZE_Y);
         //pw.displayWindowAtStoredLocation();
 
         tabbedPane.setBorder(null);
-        // TODO: Color
-        //tabbedPane.setForeground(GUIGlobals.INACTIVE_TABBED_COLOR);
+
 
         /*
          * The following state listener makes sure focus is registered with the
@@ -508,16 +437,12 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         getOpenDatabaseAction().openFile(file, true);
     }
 
-    // General info dialog.  The MacAdapter calls this method when "About"
-    // is selected from the application menu.
+    /**
+     * The MacAdapter calls this method when "About" is selected from the application menu.
+     */
     public void about() {
-        // reuse the normal about action
-        // null as parameter is OK as the code of actionPerformed does not rely on the data sent in the event.
-        //   about.actionPerformed(null);
+        HelpAction.getCommand().execute();
     }
-
-    // General preferences dialog.  The MacAdapter calls this method when "Preferences..."
-    // is selected from the application menu.
 
     public JabRefPreferences prefs() {
         return prefs;
@@ -538,7 +463,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
 
-        prefs.putBoolean(JabRefPreferences.TOOLBAR_VISIBLE, tlb.isVisible());
         // Store divider location for side pane:
         double width = splitPane.getDividerPositions()[0];
         if (width > 0) {
@@ -648,21 +572,14 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     }
 
     private void initLayout() {
-
         setProgressBarVisible(false);
 
         pushApplications = new PushToApplications();
 
-        //createToolBar();
         BorderPane head = new BorderPane();
         head.setTop(createMenu());
         head.setCenter(createToolbar());
         setTop(head);
-        //getContentPane().setLayout(new BorderLayout());
-
-        //JPanel toolbarPanel = new JPanel(new WrapLayout(FlowLayout.LEFT));
-        //toolbarPanel.add(tlb);
-        //getContentPane().add(toolbarPanel, BorderLayout.PAGE_START);
 
         splitPane.getItems().addAll(sidePane, tabbedPane);
 
@@ -708,15 +625,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         gbl.setConstraints(progressBar, con);
         status.add(progressBar);
         statusLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR.darker());
-        //getContentPane().add(status, BorderLayout.PAGE_END);
-
-        // Drag and drop for tabbedPane:
-        TransferHandler xfer = new EntryTableTransferHandler(null, this, null);
-        // TODO:
-        //tabbedPane.setTransferHandler(xfer);
-        //tlb.setTransferHandler(xfer);
-        // TODO: mb.setTransferHandler(xfer);
-        // TODO: sidePaneManager.getPanel().setTransferHandler(xfer);
     }
 
     private Node createToolbar() {
@@ -1057,7 +965,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new OldDatabaseCommandWrapper(Actions.MANAGE_SELECTORS, this, Globals.stateManager)),
-                factory.createMenuItem(StandardActions.CUSTOMIZE_ENTRY_TYPES, new CustomizeEntryAction(this))
+                factory.createMenuItem(StandardActions.CUSTOMIZE_ENTRY_TYPES, new CustomizeEntryAction(this)),
+                factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this))
         );
 
         help.getItems().addAll(
@@ -1114,7 +1023,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 addTab(pr.getDatabaseContext(), focusPanel);
             } else {
                 List<BibEntry> entries = new ArrayList<>(pr.getDatabase().getEntries());
-                addImportedEntries(panel, entries, false);
+                addImportedEntries(panel, entries);
             }
         } else {
             // only add tab if DB is not already open
@@ -1326,7 +1235,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     }
 
     private void trackOpenNewDatabase(BasePanel basePanel) {
-
         Map<String, String> properties = new HashMap<>();
         Map<String, Double> measurements = new HashMap<>();
         measurements.put("NumberOfEntries", (double) basePanel.getDatabaseContext().getDatabase().getEntryCount());
@@ -1349,54 +1257,18 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     }
 
     /**
-     * Creates icons for the disabled state for all JMenuItems with FontBasedIcons in the given menuElement.
-     * This is necessary as Swing is not able to generate default disabled icons for font based icons.
-     *
-     * @param menuElement the menuElement for which disabled icons should be generated
-     */
-    public void createDisabledIconsForMenuEntries(MenuElement menuElement) {
-        for (MenuElement subElement : menuElement.getSubElements()) {
-            if ((subElement instanceof JMenu) || (subElement instanceof JPopupMenu)) {
-                createDisabledIconsForMenuEntries(subElement);
-            } else if (subElement instanceof JMenuItem) {
-                JMenuItem item = (JMenuItem) subElement;
-                if (item.getIcon() instanceof IconTheme.FontBasedIcon) {
-                    item.setDisabledIcon(((IconTheme.FontBasedIcon) item.getIcon()).createDisabledIcon());
-                }
-            }
-        }
-    }
-
-    public void createDisabledIconsForButtons(Container container) {
-        for (int index = 0; index < container.getComponentCount(); index++) {
-            Component component = container.getComponent(index);
-            if (component instanceof JButton) {
-                JButton button = (JButton) component;
-                if (button.getIcon() instanceof IconTheme.FontBasedIcon) {
-                    button.setDisabledIcon(((IconTheme.FontBasedIcon) button.getIcon()).createDisabledIcon());
-                }
-            } else if (component instanceof JPanel) {
-                createDisabledIconsForButtons((JPanel) component);
-            }
-        }
-    }
-
-    /**
      * This method does the job of adding imported entries into the active
      * database, or into a new one. It shows the ImportInspectionDialog if
      * preferences indicate it should be used. Otherwise it imports directly.
-     *
-     * @param panel     The BasePanel to add to.
+     *  @param panel     The BasePanel to add to.
      * @param entries   The entries to add.
-     * @param openInNew Should the entries be imported into a new database?
      */
-    private void addImportedEntries(final BasePanel panel, final List<BibEntry> entries, final boolean openInNew) {
+    private void addImportedEntries(final BasePanel panel, final List<BibEntry> entries) {
         SwingUtilities.invokeLater(() -> {
             ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this, panel,
-                    Localization.lang("Import"), openInNew);
+                    Localization.lang("Import"), false);
             diag.addEntries(entries);
             diag.entryListComplete();
-            //diag.setLocationRelativeTo(JabRefFrame.this);
             diag.setVisible(true);
             diag.toFront();
         });
@@ -1404,40 +1276,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
     public FileHistoryMenu getFileHistory() {
         return fileHistory;
-    }
-
-    /**
-     * This method shows a wait cursor and blocks all input to the JFrame's contents.
-     */
-    public void block() {
-        changeBlocking(true);
-    }
-
-    /**
-     * This method reverts the cursor to normal, and stops blocking input to the JFrame's contents.
-     * There are no adverse effects of calling this method redundantly.
-     */
-    public void unblock() {
-        changeBlocking(false);
-    }
-
-    /**
-     * Do the actual blocking/unblocking
-     *
-     * @param blocked true if input should be blocked
-     */
-    private void changeBlocking(boolean blocked) {
-        /*
-        if (SwingUtilities.isEventDispatchThread()) {
-            getGlassPane().setVisible(blocked);
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(() -> getGlassPane().setVisible(blocked));
-            } catch (InvocationTargetException | InterruptedException e) {
-                LOGGER.error("Problem " + (blocked ? "" : "un") + "blocking UI", e);
-            }
-        }
-        */
     }
 
     /**
@@ -1636,16 +1474,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         return statusLine.getText();
     }
 
-    public SplitPane getSplitPane() {
-        return splitPane;
-    }
-
     public SidePaneManager getSidePaneManager() {
         return sidePaneManager;
-    }
-
-    public void setPreviewToggle(boolean enabled) {
-        previewToggle.setSelected(enabled);
     }
 
     public PushToApplications getPushApplications() {
@@ -1662,30 +1492,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
     public DialogService getDialogService() {
         return dialogService;
-    }
-
-    private static class MyGlassPane extends JPanel {
-
-        public MyGlassPane() {
-            addKeyListener(new KeyAdapter() {
-                // Nothing
-            });
-            addMouseListener(new MouseAdapter() {
-                // Nothing
-            });
-            /*  infoLabel.setForeground(new Color(255, 100, 100, 124));
-
-              setLayout(new BorderLayout());
-              add(infoLabel, BorderLayout.CENTER);*/
-            super.setCursor(
-                    Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        }
-
-        // Override isOpaque() to prevent the glasspane from hiding the window contents:
-        @Override
-        public boolean isOpaque() {
-            return false;
-        }
     }
 
     private class GeneralAction extends MnemonicAwareAction {
@@ -1790,30 +1596,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
     }
 
-    private class BibtexKeyPatternAction extends MnemonicAwareAction {
-
-        private BibtexKeyPatternDialog bibtexKeyPatternDialog;
-
-        public BibtexKeyPatternAction() {
-            putValue(Action.NAME, Localization.lang("BibTeX key patterns"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            JabRefPreferences.getInstance();
-            if (bibtexKeyPatternDialog == null) {
-                // if no instance of BibtexKeyPatternDialog exists, create new one
-                bibtexKeyPatternDialog = new BibtexKeyPatternDialog(JabRefFrame.this, getCurrentBasePanel());
-            } else {
-                // BibtexKeyPatternDialog allows for updating content based on currently selected panel
-                bibtexKeyPatternDialog.setPanel(getCurrentBasePanel());
-            }
-            bibtexKeyPatternDialog.setLocationRelativeTo(null);
-            bibtexKeyPatternDialog.setVisible(true);
-        }
-
-    }
-
     private void setDefaultTableFontSize() {
         GUIGlobals.setFont(Globals.prefs.getIntDefault(JabRefPreferences.FONT_SIZE));
         for (BasePanel basePanel : getBasePanelList()) {
@@ -1847,33 +1629,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         @Override
         public void execute() {
             closeTab(getCurrentBasePanel());
-        }
-    }
-
-    private class CloseAllDatabasesAction extends MnemonicAwareAction {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            final List<Tab> tabs = tabbedPane.getTabs();
-
-            for (Tab tab : tabs) {
-                closeTab(tab);
-            }
-        }
-    }
-
-    private class CloseOtherDatabasesAction extends MnemonicAwareAction {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            final BasePanel active = getCurrentBasePanel();
-            final List<Tab> tabs = tabbedPane.getTabs();
-
-            for (Tab tab : tabs) {
-                if (!tab.getContent().equals(active)) {
-                    closeTab(tab);
-                }
-            }
         }
     }
 

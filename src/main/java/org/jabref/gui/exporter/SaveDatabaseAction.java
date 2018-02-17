@@ -172,9 +172,6 @@ public class SaveDatabaseAction extends AbstractWorker {
     private boolean saveDatabase(File file, boolean selectedOnly, Charset encoding) throws SaveException {
         SaveSession session;
 
-        // block user input
-        frame.block();
-
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(encoding);
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
@@ -211,9 +208,6 @@ public class SaveDatabaseAction extends AbstractWorker {
                     Localization.lang("Save library"), JOptionPane.ERROR_MESSAGE);
             // FIXME: rethrow anti-pattern
             throw new SaveException("rt");
-        } finally {
-            // re-enable user input
-            frame.unblock();
         }
 
         // handle encoding problems
