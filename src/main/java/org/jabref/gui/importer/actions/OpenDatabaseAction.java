@@ -50,7 +50,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // The action concerned with opening an existing database.
-
 public class OpenDatabaseAction extends MnemonicAwareAction {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
@@ -59,11 +58,13 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = new ArrayList<>();
 
     static {
-        // Add the action for checking for new custom entry types loaded from the BIB file:
+        // Warning for migrating the Review into the Comment field
+        POST_OPEN_ACTIONS.add(new MergeReviewIntoComment());
+        // Check for new custom entry types loaded from the BIB file:
         POST_OPEN_ACTIONS.add(new CheckForNewEntryTypesAction());
-        // Add the action for the new external file handling system in version 2.3:
+        // External file handling system in version 2.3:
         POST_OPEN_ACTIONS.add(new FileLinksUpgradeWarning());
-        // Add the action for warning about and handling duplicate BibTeX keys:
+        // Warning about and handling duplicate BibTeX keys:
         POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
     }
 
@@ -99,7 +100,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         List<Path> filesToOpen = new ArrayList<>();
 
         if (showDialog) {
-
             DialogService ds = new FXDialogService();
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .addExtensionFilter(FileType.BIBTEX_DB)

@@ -1,8 +1,7 @@
-package org.jabref.migrations;
+package org.jabref.logic.importer;
 
 import java.util.Collections;
 
-import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -13,13 +12,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class MergeReviewIntoCommentTest {
-
-    private MergeReviewIntoComment action;
+class MergeReviewIntoCommentMigrationTest {
+    private MergeReviewIntoCommentMigration action;
 
     @BeforeEach
     public void setUp() {
-        action = new MergeReviewIntoComment();
+        action = new MergeReviewIntoCommentMigration();
     }
 
     @Test
@@ -59,7 +57,7 @@ class MergeReviewIntoCommentTest {
 
 
     @Test
-    @Disabled("Re-enable if the MergeReviewIntoComment.mergeCommentFieldIfPresent() does not block and wait for user input.")
+    @Disabled("Re-enable if the MergeReviewIntoCommentMigration.mergeCommentFieldIfPresent() does not block and wait for user input.")
     public void reviewAndCommentField() {
         BibEntry actualEntry = createMinimalBibEntry();
         actualEntry.setField(FieldName.REVIEW, "My Review");
