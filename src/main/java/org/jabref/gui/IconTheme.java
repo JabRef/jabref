@@ -273,6 +273,12 @@ public class IconTheme {
         FILE_TEXT(MaterialDesignIcon.FILE_DOCUMENT), /*css: file-document */
         FILE_MULTIPLE(MaterialDesignIcon.FILE_MULTIPLE), /*css: file-multiple */
         FILE_OPENOFFICE(IconTheme.getImage("openoffice")),
+        APPLICATION_EMACS(IconTheme.getImage("emacs")),
+        APPLICATION_LYX(IconTheme.getImage("lyx")),
+        APPLICATION_TEXSTUDIO(IconTheme.getImage("texstudio")),
+        APPLICATION_TEXMAKER(IconTheme.getImage("texmaker")),
+        APPLICATION_VIM(IconTheme.getImage("vim")),
+        APPLICATION_WINEDT(IconTheme.getImage("winedt")),
         KEY_BINDINGS(MaterialDesignIcon.KEYBOARD), /*css: keyboard */
         FIND_DUPLICATES(MaterialDesignIcon.CODE_EQUAL), /*css: code-equal */
         PULL(MaterialDesignIcon.SOURCE_PULL), /*source-pull*/

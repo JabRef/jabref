@@ -7,7 +7,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
-import org.jabref.gui.actions.ActionsFX;
+import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.SimpleCommand;
 
 public abstract class SidePaneComponent {
@@ -70,7 +70,7 @@ public abstract class SidePaneComponent {
     /**
      * @return the action to toggle this {@link SidePaneComponent}
      */
-    public abstract ActionsFX getToggleAction();
+    public abstract Action getToggleAction();
 
     /**
      * @return the content of this component

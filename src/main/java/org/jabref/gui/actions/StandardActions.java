@@ -8,7 +8,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 
-public enum ActionsFX {
+public enum StandardActions implements Action {
 
     COPY_MORE(Localization.lang("Copy") + "..."),
     COPY_TITLE(Localization.lang("Copy title"), KeyBinding.COPY_TITLE),
@@ -159,71 +159,75 @@ public enum ActionsFX {
     private final Optional<JabRefIcon> icon;
     private final Optional<KeyBinding> keyBinding;
 
-    ActionsFX(String text) {
+    StandardActions(String text) {
         this(text, "");
     }
 
-    ActionsFX(String text, IconTheme.JabRefIcons icon) {
+    StandardActions(String text, IconTheme.JabRefIcons icon) {
         this.text = text;
         this.description = "";
         this.icon = Optional.of(icon);
         this.keyBinding = Optional.empty();
     }
 
-    ActionsFX(String text, IconTheme.JabRefIcons icon, KeyBinding keyBinding) {
+    StandardActions(String text, IconTheme.JabRefIcons icon, KeyBinding keyBinding) {
         this.text = text;
         this.description = "";
         this.icon = Optional.of(icon);
         this.keyBinding = Optional.of(keyBinding);
     }
 
-    ActionsFX(String text, String description, IconTheme.JabRefIcons icon) {
+    StandardActions(String text, String description, IconTheme.JabRefIcons icon) {
         this.text = text;
         this.description = description;
         this.icon = Optional.of(icon);
         this.keyBinding = Optional.empty();
     }
 
-    ActionsFX(String text, String description, IconTheme.JabRefIcons icon, KeyBinding keyBinding) {
+    StandardActions(String text, String description, IconTheme.JabRefIcons icon, KeyBinding keyBinding) {
         this.text = text;
         this.description = description;
         this.icon = Optional.of(icon);
         this.keyBinding = Optional.of(keyBinding);
     }
 
-    ActionsFX(String text, KeyBinding keyBinding) {
+    StandardActions(String text, KeyBinding keyBinding) {
         this.text = text;
         this.description = "";
         this.keyBinding = Optional.of(keyBinding);
         this.icon = Optional.empty();
     }
 
-    ActionsFX(String text, String description) {
+    StandardActions(String text, String description) {
         this.text = text;
         this.description = description;
         this.icon = Optional.empty();
         this.keyBinding = Optional.empty();
     }
 
-    ActionsFX(String text, String description, KeyBinding keyBinding) {
+    StandardActions(String text, String description, KeyBinding keyBinding) {
         this.text = text;
         this.description = description;
         this.icon = Optional.empty();
         this.keyBinding = Optional.of(keyBinding);
     }
 
+    @Override
     public Optional<JabRefIcon> getIcon() {
         return icon;
     }
 
+    @Override
     public Optional<KeyBinding> getKeyBinding() {
         return keyBinding;
     }
 
+    @Override
     public String getText() {
         return text;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }

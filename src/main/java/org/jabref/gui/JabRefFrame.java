@@ -68,7 +68,6 @@ import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.Actions;
-import org.jabref.gui.actions.ActionsFX;
 import org.jabref.gui.actions.AutoLinkFilesAction;
 import org.jabref.gui.actions.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.actions.CopyFilesAction;
@@ -98,6 +97,7 @@ import org.jabref.gui.actions.SetupGeneralFieldsAction;
 import org.jabref.gui.actions.ShowDocumentViewerAction;
 import org.jabref.gui.actions.ShowPreferencesAction;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
 import org.jabref.gui.exporter.ExportCommand;
@@ -230,7 +230,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     /* References to the toggle buttons in the toolbar */
     private JToggleButton previewToggle;
     private JMenu rankSubMenu;
-    private PushToApplicationButton pushExternalButton;
     private PushToApplications pushApplications;
     private final CountingUndoManager undoManager = new CountingUndoManager();
     private final DialogService dialogService;
@@ -652,7 +651,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         setProgressBarVisible(false);
 
         pushApplications = new PushToApplications();
-        pushExternalButton = new PushToApplicationButton(this, pushApplications.getApplications());
+
         //createToolBar();
         BorderPane head = new BorderPane();
         head.setTop(createMenu());
@@ -729,15 +728,15 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         Button newLibrary;
         if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
-            newLibrary = factory.createIconButton(ActionsFX.NEW_LIBRARY_BIBLATEX, new NewDatabaseAction(this, BibDatabaseMode.BIBLATEX));
+            newLibrary = factory.createIconButton(StandardActions.NEW_LIBRARY_BIBLATEX, new NewDatabaseAction(this, BibDatabaseMode.BIBLATEX));
         } else {
-            newLibrary = factory.createIconButton(ActionsFX.NEW_LIBRARY_BIBTEX, new NewDatabaseAction(this, BibDatabaseMode.BIBTEX));
+            newLibrary = factory.createIconButton(StandardActions.NEW_LIBRARY_BIBTEX, new NewDatabaseAction(this, BibDatabaseMode.BIBTEX));
         }
 
         HBox leftSide = new HBox(
                 newLibrary,
-                factory.createIconButton(ActionsFX.OPEN_LIBRARY, new OpenDatabaseAction(this)),
-                factory.createIconButton(ActionsFX.SAVE_LIBRARY, new OldDatabaseCommandWrapper(Actions.SAVE, this, Globals.stateManager)),
+                factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this)),
+                factory.createIconButton(StandardActions.SAVE_LIBRARY, new OldDatabaseCommandWrapper(Actions.SAVE, this, Globals.stateManager)),
 
                 leftSpacer);
         leftSide.minWidthProperty().bind(sidePane.widthProperty());
@@ -750,7 +749,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 globalSearchBar,
 
                 rightSpacer,
-                factory.createIconButton(ActionsFX.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE)));
+                factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE)));
         toolBar.getStyleClass().add("mainToolbar");
 
         return toolBar;
@@ -844,25 +843,25 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         Menu help = new Menu(Localization.menuTitle("Help"));
 
         file.getItems().addAll(
-                factory.createMenuItem(ActionsFX.NEW_LIBRARY_BIBTEX, new NewDatabaseAction(this, BibDatabaseMode.BIBTEX)),
-                factory.createMenuItem(ActionsFX.NEW_LIBRARY_BIBLATEX, new NewDatabaseAction(this, BibDatabaseMode.BIBLATEX)),
-                factory.createMenuItem(ActionsFX.OPEN_LIBRARY, getOpenDatabaseAction()),
-                factory.createMenuItem(ActionsFX.SAVE_LIBRARY, new OldDatabaseCommandWrapper(Actions.SAVE, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.SAVE_LIBRARY_AS, new OldDatabaseCommandWrapper(Actions.SAVE_AS, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.SAVE_ALL, new SaveAllAction(this)),
+                factory.createMenuItem(StandardActions.NEW_LIBRARY_BIBTEX, new NewDatabaseAction(this, BibDatabaseMode.BIBTEX)),
+                factory.createMenuItem(StandardActions.NEW_LIBRARY_BIBLATEX, new NewDatabaseAction(this, BibDatabaseMode.BIBLATEX)),
+                factory.createMenuItem(StandardActions.OPEN_LIBRARY, getOpenDatabaseAction()),
+                factory.createMenuItem(StandardActions.SAVE_LIBRARY, new OldDatabaseCommandWrapper(Actions.SAVE, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new OldDatabaseCommandWrapper(Actions.SAVE_AS, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(this)),
 
-                factory.createSubMenu(ActionsFX.IMPORT_EXPORT,
-                        factory.createMenuItem(ActionsFX.MERGE_DATABASE, new OldDatabaseCommandWrapper(Actions.MERGE_DATABASE, this, Globals.stateManager)), // TODO: merge with import
-                        factory.createMenuItem(ActionsFX.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(this, true)),
-                        factory.createMenuItem(ActionsFX.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, false)),
-                        factory.createMenuItem(ActionsFX.EXPORT_ALL, new ExportCommand(this, false)),
-                        factory.createMenuItem(ActionsFX.EXPORT_SELECTED, new ExportCommand(this, true)),
-                        factory.createMenuItem(ActionsFX.SAVE_SELECTED_AS_PLAIN_BIBTEX, new OldDatabaseCommandWrapper(Actions.SAVE_SELECTED_AS_PLAIN, this, Globals.stateManager))),
+                factory.createSubMenu(StandardActions.IMPORT_EXPORT,
+                        factory.createMenuItem(StandardActions.MERGE_DATABASE, new OldDatabaseCommandWrapper(Actions.MERGE_DATABASE, this, Globals.stateManager)), // TODO: merge with import
+                        factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(this, true)),
+                        factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, false)),
+                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(this, false)),
+                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(this, true)),
+                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new OldDatabaseCommandWrapper(Actions.SAVE_SELECTED_AS_PLAIN, this, Globals.stateManager))),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(ActionsFX.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(this)),
-                factory.createMenuItem(ActionsFX.PULL_CHANGES_FROM_SHARED_DB, new OldDatabaseCommandWrapper(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(this)),
+                factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new OldDatabaseCommandWrapper(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, this, Globals.stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -870,34 +869,34 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(ActionsFX.CLOSE_LIBRARY, new CloseDatabaseAction()),
-                factory.createMenuItem(ActionsFX.QUIT, new CloseAction())
+                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction()),
+                factory.createMenuItem(StandardActions.QUIT, new CloseAction())
         );
 
         edit.getItems().addAll(
-                factory.createMenuItem(ActionsFX.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, Globals.stateManager)),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(ActionsFX.CUT, new EditAction(Actions.CUT)),
-                factory.createMenuItem(ActionsFX.DELETE_ENTRY, new EditAction(Actions.DELETE)),
+                factory.createMenuItem(StandardActions.CUT, new EditAction(Actions.CUT)),
+                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(Actions.DELETE)),
 
-                factory.createMenuItem(ActionsFX.COPY, new EditAction(Actions.COPY)),
-                factory.createSubMenu(ActionsFX.COPY_MORE,
-                        factory.createMenuItem(ActionsFX.COPY_TITLE, new OldDatabaseCommandWrapper(Actions.COPY_TITLE, this, Globals.stateManager)),
-                        factory.createMenuItem(ActionsFX.COPY_KEY, new OldDatabaseCommandWrapper(Actions.COPY_KEY, this, Globals.stateManager)),
-                        factory.createMenuItem(ActionsFX.COPY_CITE_KEY, new OldDatabaseCommandWrapper(Actions.COPY_CITE_KEY, this, Globals.stateManager)),
-                        factory.createMenuItem(ActionsFX.COPY_KEY_AND_TITLE, new OldDatabaseCommandWrapper(Actions.COPY_KEY_AND_TITLE, this, Globals.stateManager)),
-                        factory.createMenuItem(ActionsFX.COPY_KEY_AND_LINK, new OldDatabaseCommandWrapper(Actions.COPY_KEY_AND_LINK, this, Globals.stateManager)),
-                        factory.createMenuItem(ActionsFX.COPY_CITATION_PREVIEW, new OldDatabaseCommandWrapper(Actions.COPY_CITATION_HTML, this, Globals.stateManager)),
-                        factory.createMenuItem(ActionsFX.EXPORT_SELECTED_TO_CLIPBOARD, new OldDatabaseCommandWrapper(Actions.EXPORT_TO_CLIPBOARD, this, Globals.stateManager))),
+                factory.createMenuItem(StandardActions.COPY, new EditAction(Actions.COPY)),
+                factory.createSubMenu(StandardActions.COPY_MORE,
+                        factory.createMenuItem(StandardActions.COPY_TITLE, new OldDatabaseCommandWrapper(Actions.COPY_TITLE, this, Globals.stateManager)),
+                        factory.createMenuItem(StandardActions.COPY_KEY, new OldDatabaseCommandWrapper(Actions.COPY_KEY, this, Globals.stateManager)),
+                        factory.createMenuItem(StandardActions.COPY_CITE_KEY, new OldDatabaseCommandWrapper(Actions.COPY_CITE_KEY, this, Globals.stateManager)),
+                        factory.createMenuItem(StandardActions.COPY_KEY_AND_TITLE, new OldDatabaseCommandWrapper(Actions.COPY_KEY_AND_TITLE, this, Globals.stateManager)),
+                        factory.createMenuItem(StandardActions.COPY_KEY_AND_LINK, new OldDatabaseCommandWrapper(Actions.COPY_KEY_AND_LINK, this, Globals.stateManager)),
+                        factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new OldDatabaseCommandWrapper(Actions.COPY_CITATION_HTML, this, Globals.stateManager)),
+                        factory.createMenuItem(StandardActions.EXPORT_SELECTED_TO_CLIPBOARD, new OldDatabaseCommandWrapper(Actions.EXPORT_TO_CLIPBOARD, this, Globals.stateManager))),
 
-                factory.createMenuItem(ActionsFX.PASTE, new EditAction(Actions.PASTE)),
+                factory.createMenuItem(StandardActions.PASTE, new EditAction(Actions.PASTE)),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(ActionsFX.SEND_AS_EMAIL, new OldDatabaseCommandWrapper(Actions.SEND_AS_EMAIL, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new OldDatabaseCommandWrapper(Actions.SEND_AS_EMAIL, this, Globals.stateManager)),
 
                 new SeparatorMenuItem()
         );
@@ -951,47 +950,47 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         */
 
         edit.getItems().addAll(
-                factory.createMenuItem(ActionsFX.MANAGE_KEYWORDS, new ManageKeywordsAction(this)),
-                factory.createMenuItem(ActionsFX.REPLACE_ALL, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.MASS_SET_FIELDS, new MassSetFieldAction(this))
+                factory.createMenuItem(StandardActions.MANAGE_KEYWORDS, new ManageKeywordsAction(this)),
+                factory.createMenuItem(StandardActions.REPLACE_ALL, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.MASS_SET_FIELDS, new MassSetFieldAction(this))
         );
 
         library.getItems().addAll(
-                factory.createMenuItem(ActionsFX.NEW_ARTICLE, new NewEntryAction(this, BibtexEntryTypes.ARTICLE)),
-                factory.createMenuItem(ActionsFX.NEW_ENTRY, new NewEntryAction(this)),
-                factory.createMenuItem(ActionsFX.NEW_ENTRY_FROM_PLAINTEX, new NewEntryFromPlainTextAction(this, Globals.prefs.getUpdateFieldPreferences())),
+                factory.createMenuItem(StandardActions.NEW_ARTICLE, new NewEntryAction(this, BibtexEntryTypes.ARTICLE)),
+                factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(this)),
+                factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAINTEX, new NewEntryFromPlainTextAction(this, Globals.prefs.getUpdateFieldPreferences())),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(ActionsFX.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this)),
-                factory.createMenuItem(ActionsFX.EDIT_PREAMBLE, new OldDatabaseCommandWrapper(Actions.EDIT_PREAMBLE, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.EDIT_STRINGS, new OldDatabaseCommandWrapper(Actions.EDIT_STRINGS, this, Globals.stateManager))
+                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this)),
+                factory.createMenuItem(StandardActions.EDIT_PREAMBLE, new OldDatabaseCommandWrapper(Actions.EDIT_PREAMBLE, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.EDIT_STRINGS, new OldDatabaseCommandWrapper(Actions.EDIT_STRINGS, this, Globals.stateManager))
         );
 
-        Menu lookupIdentifiers = factory.createSubMenu(ActionsFX.LOOKUP_DOC_IDENTIFIER);
+        Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
         for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences())) {
             lookupIdentifiers.getItems().add(
-                    factory.createMenuItem(ActionsFX.LOOKUP_DOC_IDENTIFIER, new LookupIdentifierAction<>(this, fetcher)));
+                    factory.createMenuItem(StandardActions.LOOKUP_DOC_IDENTIFIER, new LookupIdentifierAction<>(this, fetcher)));
         }
 
         quality.getItems().addAll(
-                factory.createMenuItem(ActionsFX.FIND_DUPLICATES, new DuplicateSearch(this)),
-                factory.createMenuItem(ActionsFX.MERGE_ENTRIES, new MergeEntriesAction(this)),
+                factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(this)),
+                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(this)),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(ActionsFX.RESOLVE_DUPLICATE_KEYS, new OldDatabaseCommandWrapper(Actions.RESOLVE_DUPLICATE_KEYS, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.CHECK_INTEGRITY, new IntegrityCheckAction(this)),
-                factory.createMenuItem(ActionsFX.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.GENERATE_CITE_KEY, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.RESOLVE_DUPLICATE_KEYS, new OldDatabaseCommandWrapper(Actions.RESOLVE_DUPLICATE_KEYS, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(this)),
+                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.GENERATE_CITE_KEY, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, Globals.stateManager)),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(ActionsFX.SYNCHRONIZE_FILE_LINKS, new OldDatabaseCommandWrapper(Actions.AUTO_SET_FILE, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.SET_FILE_LINKS, new AutoLinkFilesAction()),
-                factory.createMenuItem(ActionsFX.DOWNLOAD_FULL_TEXT, new OldDatabaseCommandWrapper(Actions.DOWNLOAD_FULL_TEXT, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.SYNCHRONIZE_FILE_LINKS, new OldDatabaseCommandWrapper(Actions.AUTO_SET_FILE, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction()),
+                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new OldDatabaseCommandWrapper(Actions.DOWNLOAD_FULL_TEXT, this, Globals.stateManager)),
 
-                factory.createMenuItem(ActionsFX.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this)),
+                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this)),
 
                 lookupIdentifiers
         );
@@ -1003,78 +1002,78 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         view.getItems().addAll(
                 factory.createMenuItem(webSearch.getToggleAction(), webSearch.getToggleCommand()),
                 factory.createMenuItem(groups.getToggleAction(), groups.getToggleCommand()),
-                factory.createMenuItem(ActionsFX.TOGGLE_PREVIEW, new OldDatabaseCommandWrapper(Actions.TOGGLE_PREVIEW, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.EDIT_ENTRY, new OldDatabaseCommandWrapper(Actions.EDIT, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.SHOW_PDV_VIEWER, new ShowDocumentViewerAction()),
+                factory.createMenuItem(StandardActions.TOGGLE_PREVIEW, new OldDatabaseCommandWrapper(Actions.TOGGLE_PREVIEW, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.EDIT_ENTRY, new OldDatabaseCommandWrapper(Actions.EDIT, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.SHOW_PDV_VIEWER, new ShowDocumentViewerAction()),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(ActionsFX.SELECT_ALL, new OldDatabaseCommandWrapper(Actions.SELECT_ALL, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.SELECT_ALL, new OldDatabaseCommandWrapper(Actions.SELECT_ALL, this, Globals.stateManager)),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(ActionsFX.NEXT_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.NEXT_PREVIEW_STYLE, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.PREVIOUS_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.PREVIOUS_PREVIEW_STYLE, this, Globals.stateManager))
+                factory.createMenuItem(StandardActions.NEXT_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.NEXT_PREVIEW_STYLE, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.PREVIOUS_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.PREVIOUS_PREVIEW_STYLE, this, Globals.stateManager))
         );
 
+        PushToApplicationButton pushToExternal = new PushToApplicationButton(this, pushApplications.getApplications());
         tools.getItems().addAll(
-                factory.createMenuItem(ActionsFX.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(this)),
-                factory.createMenuItem(ActionsFX.WRITE_XMP, new OldDatabaseCommandWrapper(Actions.WRITE_XMP, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(this)),
+                factory.createMenuItem(StandardActions.WRITE_XMP, new OldDatabaseCommandWrapper(Actions.WRITE_XMP, this, Globals.stateManager)),
 
                 factory.createMenuItem(openOffice.getToggleAction(), openOffice.getToggleCommand()),
 
-                //TODO: Push Entries
-                // tools.add(pushExternalButton.getMenuAction());
-                factory.createMenuItem(ActionsFX.OPEN_FOLDER, new OldDatabaseCommandWrapper(Actions.OPEN_FOLDER, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.OPEN_FILE, new OldDatabaseCommandWrapper(Actions.OPEN_EXTERNAL_FILE, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.OPEN_URL, new OldDatabaseCommandWrapper(Actions.OPEN_URL, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.OPEN_CONSOLE, new OldDatabaseCommandWrapper(Actions.OPEN_CONSOLE, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.COPY_LINKED_FILES, new CopyFilesAction(this)),
-                factory.createMenuItem(ActionsFX.ABBREVIATE_ISO, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_ISO, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.ABBREVIATE_MEDLINE, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_MEDLINE, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.UNABBREVIATE, new OldDatabaseCommandWrapper(Actions.UNABBREVIATE, this, Globals.stateManager)));
+                factory.createMenuItem(pushToExternal.getMenuAction(), pushToExternal),
+                factory.createMenuItem(StandardActions.OPEN_FOLDER, new OldDatabaseCommandWrapper(Actions.OPEN_FOLDER, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.OPEN_FILE, new OldDatabaseCommandWrapper(Actions.OPEN_EXTERNAL_FILE, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.OPEN_URL, new OldDatabaseCommandWrapper(Actions.OPEN_URL, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OldDatabaseCommandWrapper(Actions.OPEN_CONSOLE, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(this)),
+                factory.createMenuItem(StandardActions.ABBREVIATE_ISO, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_ISO, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.ABBREVIATE_MEDLINE, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_MEDLINE, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.UNABBREVIATE, new OldDatabaseCommandWrapper(Actions.UNABBREVIATE, this, Globals.stateManager)));
 
         options.getItems().addAll(
-                factory.createMenuItem(ActionsFX.SHOW_PREFS, new ShowPreferencesAction(this)),
-                factory.createMenuItem(ActionsFX.SETUP_GENERAL_FIELDS, new SetupGeneralFieldsAction(this)),
-                factory.createMenuItem(ActionsFX.MANAGE_CUSTOM_IMPORTS, new ManageCustomImportsAction(this)),
-                factory.createMenuItem(ActionsFX.MANAGE_CUSTOM_EXPORTS, new ManageCustomExportsAction(this)),
-                factory.createMenuItem(ActionsFX.MANAGE_EXTERNAL_FILETYPES, new EditExternalFileTypesAction()),
-                factory.createMenuItem(ActionsFX.MANAGE_JOURNALS, new ManageJournalsAction()),
-                factory.createMenuItem(ActionsFX.CUSTOMIZE_KEYBINDING, new CustomizeKeyBindingAction()),
-                factory.createMenuItem(ActionsFX.MANAGE_PROTECTED_TERMS, new ManageProtectedTermsAction(this, Globals.protectedTermsLoader)),
-                factory.createMenuItem(ActionsFX.MANAGE_CONTENT_SELECTORS, new OldDatabaseCommandWrapper(Actions.MANAGE_SELECTORS, this, Globals.stateManager))
+                factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(this)),
+                factory.createMenuItem(StandardActions.SETUP_GENERAL_FIELDS, new SetupGeneralFieldsAction(this)),
+                factory.createMenuItem(StandardActions.MANAGE_CUSTOM_IMPORTS, new ManageCustomImportsAction(this)),
+                factory.createMenuItem(StandardActions.MANAGE_CUSTOM_EXPORTS, new ManageCustomExportsAction(this)),
+                factory.createMenuItem(StandardActions.MANAGE_EXTERNAL_FILETYPES, new EditExternalFileTypesAction()),
+                factory.createMenuItem(StandardActions.MANAGE_JOURNALS, new ManageJournalsAction()),
+                factory.createMenuItem(StandardActions.CUSTOMIZE_KEYBINDING, new CustomizeKeyBindingAction()),
+                factory.createMenuItem(StandardActions.MANAGE_PROTECTED_TERMS, new ManageProtectedTermsAction(this, Globals.protectedTermsLoader)),
+                factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new OldDatabaseCommandWrapper(Actions.MANAGE_SELECTORS, this, Globals.stateManager))
         );
 
         help.getItems().addAll(
-                factory.createMenuItem(ActionsFX.HELP, HelpAction.getCommand()),
-                factory.createMenuItem(ActionsFX.OPEN_FORUM, new OpenBrowserAction("https://discourse.jabref.org/")),
+                factory.createMenuItem(StandardActions.HELP, HelpAction.getCommand()),
+                factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction("https://discourse.jabref.org/")),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(ActionsFX.ERROR_CONSOLE, new ErrorConsoleAction()),
+                factory.createMenuItem(StandardActions.ERROR_CONSOLE, new ErrorConsoleAction()),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(ActionsFX.SEARCH_FOR_UPDATES, new SearchForUpdateAction()),
-                factory.createSubMenu(ActionsFX.WEB_MENU,
-                        factory.createMenuItem(ActionsFX.OPEN_WEBPAGE, new OpenBrowserAction("https://jabref.org/")),
-                        factory.createMenuItem(ActionsFX.OPEN_BLOG, new OpenBrowserAction("https://blog.jabref.org/")),
-                        factory.createMenuItem(ActionsFX.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
-                        factory.createMenuItem(ActionsFX.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org")),
+                factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction()),
+                factory.createSubMenu(StandardActions.WEB_MENU,
+                        factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction("https://jabref.org/")),
+                        factory.createMenuItem(StandardActions.OPEN_BLOG, new OpenBrowserAction("https://blog.jabref.org/")),
+                        factory.createMenuItem(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
+                        factory.createMenuItem(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org")),
 
                         new SeparatorMenuItem(),
 
-                        factory.createMenuItem(ActionsFX.FORK_ME, new OpenBrowserAction("https://github.com/JabRef/jabref")),
-                        factory.createMenuItem(ActionsFX.OPEN_DEV_VERSION_LINK, new OpenBrowserAction("https://builds.jabref.org/master/")),
-                        factory.createMenuItem(ActionsFX.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/master/CHANGELOG.md")),
+                        factory.createMenuItem(StandardActions.FORK_ME, new OpenBrowserAction("https://github.com/JabRef/jabref")),
+                        factory.createMenuItem(StandardActions.OPEN_DEV_VERSION_LINK, new OpenBrowserAction("https://builds.jabref.org/master/")),
+                        factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/master/CHANGELOG.md")),
 
                         new SeparatorMenuItem(),
 
-                        factory.createMenuItem(ActionsFX.DONATE, new OpenBrowserAction("https://donations.jabref.org"))
+                        factory.createMenuItem(StandardActions.DONATE, new OpenBrowserAction("https://donations.jabref.org"))
 
                 ),
-                factory.createMenuItem(ActionsFX.ABOUT, new AboutAction())
+                factory.createMenuItem(StandardActions.ABOUT, new AboutAction())
         );
 
         MenuBar menu = new MenuBar();

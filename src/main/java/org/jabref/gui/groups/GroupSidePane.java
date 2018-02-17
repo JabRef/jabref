@@ -7,7 +7,8 @@ import org.jabref.gui.IconTheme;
 import org.jabref.gui.SidePaneComponent;
 import org.jabref.gui.SidePaneManager;
 import org.jabref.gui.SidePaneType;
-import org.jabref.gui.actions.ActionsFX;
+import org.jabref.gui.actions.Action;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -39,8 +40,8 @@ public class GroupSidePane extends SidePaneComponent {
     }
 
     @Override
-    public ActionsFX getToggleAction() {
-        return ActionsFX.TOGGLE_GROUPS;
+    public Action getToggleAction() {
+        return StandardActions.TOGGLE_GROUPS;
     }
 
     @Override
