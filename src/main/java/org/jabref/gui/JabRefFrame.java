@@ -987,7 +987,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(ActionsFX.SYNCHRONIZE_FILE_LINKS, new OldDatabaseCommandWrapper(Actions.AUTO_SET_FILE, this, Globals.stateManager)),
                 factory.createMenuItem(ActionsFX.SET_FILE_LINKS, new AutoLinkFilesAction()),
                 factory.createMenuItem(ActionsFX.DOWNLOAD_FULL_TEXT, new OldDatabaseCommandWrapper(Actions.DOWNLOAD_FULL_TEXT, this, Globals.stateManager)),
 
@@ -995,6 +994,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 lookupIdentifiers
         );
+
 
         SidePaneComponent webSearch = sidePaneManager.getComponent(SidePaneType.WEB_SEARCH);
         SidePaneComponent groups = sidePaneManager.getComponent(SidePaneType.GROUPS);

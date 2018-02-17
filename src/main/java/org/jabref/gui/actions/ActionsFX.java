@@ -133,7 +133,6 @@ public enum ActionsFX {
     LOOKUP_FULLTEXT(Localization.menuTitle("Look up full text documents"), KeyBinding.DOWNLOAD_FULL_TEXT),
 
     GENERATE_CITE_KEY(Localization.lang("Autogenerate BibTeX keys"), IconTheme.JabRefIcons.MAKE_KEY, KeyBinding.AUTOGENERATE_BIBTEX_KEYS),
-    SYNCHRONIZE_FILE_LINKS(Localization.lang("Synchronize file links"), KeyBinding.SYNCHRONIZE_FILES),
     DOWNLOAD_FULL_TEXT(Localization.menuTitle("Look up full text documents"), KeyBinding.DOWNLOAD_FULL_TEXT),
     CLEANUP_ENTRIES(Localization.lang("Cleanup entries"), IconTheme.JabRefIcons.CLEANUP_ENTRIES, KeyBinding.CLEANUP),
     SET_FILE_LINKS(Localization.lang("Automatically set file links"), IconTheme.JabRefIcons.AUTO_FILE_LINK, KeyBinding.AUTOMATICALLY_LINK_FILES),

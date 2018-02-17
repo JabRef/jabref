@@ -58,7 +58,6 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.FindFullTextAction;
-import org.jabref.gui.externalfiles.SynchronizeFileField;
 import org.jabref.gui.externalfiles.WriteXMPActionWorker;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -677,7 +676,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         actions.put(Actions.ABBREVIATE_ISO, new AbbreviateAction(this, true));
         actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
-        actions.put(Actions.AUTO_SET_FILE, new SynchronizeFileField(this));
 
         actions.put(Actions.RESOLVE_DUPLICATE_KEYS, new SearchFixDuplicateLabels(this));
 
