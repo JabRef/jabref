@@ -13,6 +13,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 - Abbreviate journal names functionality is now running parallel, increasing performance significantly. [#2831] (https://github.com/JabRef/jabref/issues/2831)
+- Changed order of items in context menu [#298] (https://github.com/koppor/jabref/issues/298)
 - Changed ID-based entry generator to store the last used fetcher. [#2796] (https://github.com/JabRef/jabref/issues/2796)
 - Reorganised annotation information on the right side of the "File annotations" tab. [#3109](https://github.com/JabRef/jabref/issues/3109)
 - We now show a small notification icon in the entry editor when we detect data inconsistency or other problems. [#3145](https://github.com/JabRef/jabref/issues/3145)
@@ -25,6 +26,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We improved the export of the `address` and `location` field to the MS-Office XML fields. If the address field does not contain a comma, it is treated as single value and exported to the field `city`. [#1750, comment](https://github.com/JabRef/jabref/issues/1750#issuecomment-357539167)
 For more details refer to the [field mapping help page](http://help.jabref.org/en/MsOfficeBibFieldMapping)
 - We added Facebook and Twitter icons in the toolbar to link to our [Facebook](https://www.facebook.com/JabRef/) and [Twitter](https://twitter.com/jabref_org) pages.
+- Renamed the _Review_ Tab into _Comments_ Tab
 - We no longer print empty lines when exporting an entry in RIS format [#3634](https://github.com/JabRef/jabref/issues/3634)
 - We improved file saving so that hard links are now preserved when a save is performed [#2633](https://github.com/JabRef/jabref/issues/2633)
 - We changed the default dialog option when removing a [file link](http://help.jabref.org/en/FileLinks#adding-external-links-to-an-entry) from an entry.
