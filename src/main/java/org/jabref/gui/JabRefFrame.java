@@ -163,7 +163,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final SplitPane splitPane = new SplitPane();
     private final JabRefPreferences prefs = Globals.prefs;
     private final Insets marg = new Insets(1, 0, 2, 0);
-    private final IntegrityCheckAction checkIntegrity = new IntegrityCheckAction(this);
     private final ToolBar tlb = new ToolBar();
     private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this);
     private final JLabel statusLine = new JLabel("", SwingConstants.LEFT);
@@ -203,50 +202,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getMenuString(),
             new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getToolTipText(),
             IconTheme.JabRefIcons.PRINTED.getIcon());
-    private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
-            Localization.lang("Search"), Globals.getKeyPrefs().getKey(KeyBinding.SEARCH), IconTheme.JabRefIcons.SEARCH.getIcon());
 
-    private final AbstractAction addToGroup = new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group") + ELLIPSES);
-    private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP,
-            Localization.lang("Remove from group") + ELLIPSES);
-    private final AbstractAction moveToGroup = new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group") + ELLIPSES);
-
-    private final AbstractAction makeKeyAction = new GeneralAction(Actions.MAKE_KEY,
-            Localization.menuTitle("Autogenerate BibTeX keys"),
-            Localization.lang("Autogenerate BibTeX keys"),
-            Globals.getKeyPrefs().getKey(KeyBinding.AUTOGENERATE_BIBTEX_KEYS),
-            IconTheme.JabRefIcons.MAKE_KEY.getIcon());
-
-    private final AbstractAction dupliCheck = new GeneralAction(Actions.DUPLI_CHECK,
-            Localization.menuTitle("Find duplicates"), IconTheme.JabRefIcons.FIND_DUPLICATES.getIcon());
-
-    private final AbstractAction autoSetFile = new GeneralAction(Actions.AUTO_SET_FILE,
-            Localization.lang("Synchronize file links") + ELLIPSES,
-            Globals.getKeyPrefs().getKey(KeyBinding.SYNCHRONIZE_FILES));
 
     private final AbstractAction bibtexKeyPattern = new BibtexKeyPatternAction();
-    private final AbstractAction cleanupEntries = new GeneralAction(Actions.CLEANUP,
-            Localization.menuTitle("Cleanup entries") + ELLIPSES,
-            Localization.lang("Cleanup entries"),
-            Globals.getKeyPrefs().getKey(KeyBinding.CLEANUP),
-            IconTheme.JabRefIcons.CLEANUP_ENTRIES.getIcon());
-    private final AbstractAction mergeEntries = new GeneralAction(Actions.MERGE_ENTRIES,
-            Localization.menuTitle("Merge entries") + ELLIPSES,
-            Localization.lang("Merge entries"),
-            IconTheme.JabRefIcons.MERGE_ENTRIES.getIcon());
-    private final AbstractAction downloadFullText = new GeneralAction(Actions.DOWNLOAD_FULL_TEXT,
-            Localization.menuTitle("Look up full text documents"),
-            Globals.getKeyPrefs().getKey(KeyBinding.DOWNLOAD_FULL_TEXT));
-    private final AbstractAction resolveDuplicateKeys = new GeneralAction(Actions.RESOLVE_DUPLICATE_KEYS,
-            Localization.menuTitle("Resolve duplicate BibTeX keys"),
-            Localization.lang("Find and remove duplicate BibTeX keys"),
-            Globals.getKeyPrefs().getKey(KeyBinding.RESOLVE_DUPLICATE_BIBTEX_KEYS));
 
-    private final GeneralAction findUnlinkedFiles = new GeneralAction(
-            Actions.findUnlinkedFiles,
-            FindUnlinkedFilesDialog.ACTION_MENU_TITLE, FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION,
-            Globals.getKeyPrefs().getKey(KeyBinding.FIND_UNLINKED_FILES));
-    private final AutoLinkFilesAction autoLinkFile = new AutoLinkFilesAction();
     // The action for closing the current database and leaving the window open.
     private final CloseAllDatabasesAction closeAllDatabasesAction = new CloseAllDatabasesAction();
     private final CloseOtherDatabasesAction closeOtherDatabasesAction = new CloseOtherDatabasesAction();
@@ -273,7 +232,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private JMenu rankSubMenu;
     private PushToApplicationButton pushExternalButton;
     private PushToApplications pushApplications;
-    private JMenu newSpec;
     private final CountingUndoManager undoManager = new CountingUndoManager();
     private final DialogService dialogService;
     private SidePane sidePane;
@@ -913,7 +871,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(ActionsFX.CLOSE_LIBRARY, new CloseDatabaseAction()),
-                factory.createMenuItem(ActionsFX.QUIT, new CloseAction()));
+                factory.createMenuItem(ActionsFX.QUIT, new CloseAction())
+        );
 
         edit.getItems().addAll(
                 factory.createMenuItem(ActionsFX.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
@@ -940,7 +899,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 factory.createMenuItem(ActionsFX.SEND_AS_EMAIL, new OldDatabaseCommandWrapper(Actions.SEND_AS_EMAIL, this, Globals.stateManager)),
 
-                new SeparatorMenuItem());
+                new SeparatorMenuItem()
+        );
         /*
         edit.add(mark);
         for (int i = 0; i < EntryMarker.MAX_MARKING_LEVEL; i++) {
@@ -993,33 +953,47 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         edit.getItems().addAll(
                 factory.createMenuItem(ActionsFX.MANAGE_KEYWORDS, new ManageKeywordsAction(this)),
                 factory.createMenuItem(ActionsFX.REPLACE_ALL, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.MASS_SET_FIELDS, new MassSetFieldAction(this)));
+                factory.createMenuItem(ActionsFX.MASS_SET_FIELDS, new MassSetFieldAction(this))
+        );
 
         library.getItems().addAll(
-                //TODO: We need to determine the BibDatabase Mode
                 factory.createMenuItem(ActionsFX.NEW_ARTICLE, new NewEntryAction(this, BibtexEntryTypes.ARTICLE)),
                 factory.createMenuItem(ActionsFX.NEW_ENTRY, new NewEntryAction(this)),
                 factory.createMenuItem(ActionsFX.NEW_ENTRY_FROM_PLAINTEX, new NewEntryFromPlainTextAction(this, Globals.prefs.getUpdateFieldPreferences())),
 
                 new SeparatorMenuItem(),
+
                 factory.createMenuItem(ActionsFX.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this)),
                 factory.createMenuItem(ActionsFX.EDIT_PREAMBLE, new OldDatabaseCommandWrapper(Actions.EDIT_PREAMBLE, this, Globals.stateManager)),
                 factory.createMenuItem(ActionsFX.EDIT_STRINGS, new OldDatabaseCommandWrapper(Actions.EDIT_STRINGS, this, Globals.stateManager))
-
         );
 
         Menu lookupIdentifiers = factory.createSubMenu(ActionsFX.LOOKUP_DOC_IDENTIFIER);
-
         for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences())) {
             lookupIdentifiers.getItems().add(
-                    factory.createMenuItem(ActionsFX.LOOKUP_DOC_IDENTIFIER, new LookupIdentifierAction(this, fetcher)));
+                    factory.createMenuItem(ActionsFX.LOOKUP_DOC_IDENTIFIER, new LookupIdentifierAction<>(this, fetcher)));
         }
 
         quality.getItems().addAll(
                 factory.createMenuItem(ActionsFX.FIND_DUPLICATES, new DuplicateSearch(this)),
-                factory.createMenuItem(ActionsFX.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this)),
-                factory.createMenuItem(ActionsFX.MERGE_ENTRIES, new MergeEntriesAction(this))
+                factory.createMenuItem(ActionsFX.MERGE_ENTRIES, new MergeEntriesAction(this)),
 
+                new SeparatorMenuItem(),
+
+                factory.createMenuItem(ActionsFX.RESOLVE_DUPLICATE_KEYS, new OldDatabaseCommandWrapper(Actions.RESOLVE_DUPLICATE_KEYS, this, Globals.stateManager)),
+                factory.createMenuItem(ActionsFX.CHECK_INTEGRITY, new IntegrityCheckAction(this)),
+                factory.createMenuItem(ActionsFX.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, Globals.stateManager)),
+                factory.createMenuItem(ActionsFX.GENERATE_CITE_KEY, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, Globals.stateManager)),
+
+                new SeparatorMenuItem(),
+
+                factory.createMenuItem(ActionsFX.SYNCHRONIZE_FILE_LINKS, new OldDatabaseCommandWrapper(Actions.AUTO_SET_FILE, this, Globals.stateManager)),
+                factory.createMenuItem(ActionsFX.SET_FILE_LINKS, new AutoLinkFilesAction()),
+                factory.createMenuItem(ActionsFX.DOWNLOAD_FULL_TEXT, new OldDatabaseCommandWrapper(Actions.DOWNLOAD_FULL_TEXT, this, Globals.stateManager)),
+
+                factory.createMenuItem(ActionsFX.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this)),
+
+                lookupIdentifiers
         );
 
         SidePaneComponent webSearch = sidePaneManager.getComponent(SidePaneType.WEB_SEARCH);
@@ -1041,7 +1015,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 factory.createMenuItem(ActionsFX.NEXT_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.NEXT_PREVIEW_STYLE, this, Globals.stateManager)),
                 factory.createMenuItem(ActionsFX.PREVIOUS_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.PREVIOUS_PREVIEW_STYLE, this, Globals.stateManager))
-
         );
 
         tools.getItems().addAll(
@@ -1051,6 +1024,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(openOffice.getToggleAction(), openOffice.getToggleCommand()),
 
                 //TODO: Push Entries
+                // tools.add(pushExternalButton.getMenuAction());
                 factory.createMenuItem(ActionsFX.OPEN_FOLDER, new OldDatabaseCommandWrapper(Actions.OPEN_FOLDER, this, Globals.stateManager)),
                 factory.createMenuItem(ActionsFX.OPEN_FILE, new OldDatabaseCommandWrapper(Actions.OPEN_EXTERNAL_FILE, this, Globals.stateManager)),
                 factory.createMenuItem(ActionsFX.OPEN_URL, new OldDatabaseCommandWrapper(Actions.OPEN_URL, this, Globals.stateManager)),
@@ -1070,7 +1044,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(ActionsFX.CUSTOMIZE_KEYBINDING, new CustomizeKeyBindingAction()),
                 factory.createMenuItem(ActionsFX.MANAGE_PROTECTED_TERMS, new ManageProtectedTermsAction(this, Globals.protectedTermsLoader)),
                 factory.createMenuItem(ActionsFX.MANAGE_CONTENT_SELECTORS, new OldDatabaseCommandWrapper(Actions.MANAGE_SELECTORS, this, Globals.stateManager))
-
         );
 
         help.getItems().addAll(
@@ -1102,126 +1075,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 ),
                 factory.createMenuItem(ActionsFX.ABOUT, new AboutAction())
-
         );
-
-        /*
-        factory.createMenuItem(ActionsFX., new OldDatabaseCommandWrapper(Actions., this, Globals.stateManager)),
-
-        search.add(normalSearch);
-        search.addSeparator();
-        search.add(new JCheckBoxMenuItem(generalFetcher.getToggleCommand()));
-        if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
-            sidePaneManager.register(generalFetcher);
-            sidePaneManager.show(GeneralFetcher.class);
-        }
-        mb.add(search);
-
-        groups.add(new JCheckBoxMenuItem(groupSidePane.getToggleCommand()));
-
-        groups.addSeparator();
-        groups.add(addToGroup);
-        groups.add(removeFromGroup);
-        groups.add(moveToGroup);
-        mb.add(groups);
-
-
-
-        mb.add(view);
-
-        library.add(newEntryAction);
-
-        for (NewEntryAction a : newSpecificEntryAction) {
-            newSpec.add(a);
-        }
-        library.add(newSpec);
-
-        library.add(plainTextImport);
-        library.addSeparator();
-        library.add(editPreamble);
-        library.add(editStrings);
-        library.addSeparator();
-        library.add(customizeAction);
-        library.addSeparator();
-        library.add(deleteEntry);
-        library.add(databaseProperties),
-        newSpec = JabRefFrame.subMenu(Localization.menuTitle("New entry by type..."));
-        mb.add(library);
-
-        quality.add(dupliCheck);
-        quality.add(mergeEntries);
-        quality.addSeparator();
-        quality.add(resolveDuplicateKeys);
-        quality.add(checkIntegrity);
-        quality.add(cleanupEntries);
-        quality.add(massSetField);
-        quality.add(makeKeyAction);
-        quality.addSeparator();
-        quality.add(autoSetFile);
-        quality.add(findUnlinkedFiles);
-        quality.add(autoLinkFile);
-
-        for (IdFetcher fetcher : WebFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences())) {
-            lookupIdentifiers.add(new LookupIdentifierAction(this, fetcher));
-        }
-        quality.add(lookupIdentifiers);
-        quality.add(downloadFullText);
-        mb.add(quality);
-
-        tools.add(newSubDatabaseAction);
-        tools.add(writeXmpAction);
-        tools.add(new JCheckBoxMenuItem(openOfficePanel.getToggleCommand()));
-        tools.add(pushExternalButton.getMenuAction());
-        tools.addSeparator();
-        tools.add(openFolder);
-        tools.add(openFile);
-        tools.add(openUrl);
-        tools.add(openConsole);
-        tools.addSeparator();
-        file.add(exportLinkedFiles),
-
-        tools.add(abbreviateIso);
-        tools.add(abbreviateMedline);
-        tools.add(unabbreviate);
-        mb.add(tools);
-
-        options.add(showPrefs);
-
-        AbstractAction genFieldsCustomization = new GenFieldsCustomizationAction();
-        AbstractAction protectTerms = new ProtectedTermsAction();
-        options.add(genFieldsCustomization);
-        options.add(customImpAction);
-        options.add(customExpAction);
-        options.add(customFileTypesAction);
-        options.add(manageJournals);
-        options.add(keyBindingAction);
-        options.add(protectTerms);
-        options.add(manageSelectors);
-        mb.add(options);
-
-        help.add(this.help);
-        help.add(openForumAction);
-        help.addSeparator();
-        help.add(errorConsole);
-        help.addSeparator();
-        help.add(new SearchForUpdateAction());
-        JMenu webMenu = JabRefFrame.subMenu(Localization.menuTitle("JabRef resources"));
-        webMenu.add(jabrefWebPageAction);
-        webMenu.add(jabrefBlogAction);
-        webMenu.add(jabrefFacebookAction);
-        webMenu.add(jabrefTwitterAction);
-        webMenu.addSeparator();
-        webMenu.add(forkMeOnGitHubAction);
-        webMenu.add(developmentVersionAction);
-        webMenu.add(changeLogAction);
-        webMenu.addSeparator();
-        webMenu.add(donationAction);
-        help.add(webMenu);
-        help.add(about);
-        mb.add(help);
-
-        createDisabledIconsForMenuEntries(mb);
-        */
 
         MenuBar menu = new MenuBar();
         menu.getStyleClass().add("mainMenu");

@@ -123,14 +123,20 @@ public enum ActionsFX {
     EDIT_STRINGS(Localization.lang("Edit strings"), IconTheme.JabRefIcons.EDIT_STRINGS, KeyBinding.EDIT_STRINGS),
 
     FIND_DUPLICATES(Localization.menuTitle("Find duplicates"), IconTheme.JabRefIcons.FIND_DUPLICATES),
-    MERGE_ENTRIES(Localization.lang("Merge entries") + "...", IconTheme.JabRefIcons.MERGE_ENTRIES),
+    MERGE_ENTRIES(Localization.lang("Merge entries"), IconTheme.JabRefIcons.MERGE_ENTRIES),
     RESOLVE_DUPLICATE_KEYS(Localization.menuTitle("Resolve duplicate BibTeX keys"), Localization.lang("Find and remove duplicate BibTeX keys"), KeyBinding.RESOLVE_DUPLICATE_BIBTEX_KEYS),
     CHECK_INTEGRITY(Localization.menuTitle("Check integrity"), KeyBinding.CHECK_INTEGRITY),
     AUTOGENERATE_KEYS(Localization.lang("Autogenerate BibTeX keys"), IconTheme.JabRefIcons.MAKE_KEY, KeyBinding.AUTOGENERATE_BIBTEX_KEYS),
-    FIND_UNLINKED_FILES(Localization.menuTitle("Find unlinked files..."), Localization.lang("Searches for unlinked PDF files on the file system"), KeyBinding.FIND_UNLINKED_FILES),
+    FIND_UNLINKED_FILES(Localization.menuTitle("Find unlinked files"), Localization.lang("Searches for unlinked PDF files on the file system"), KeyBinding.FIND_UNLINKED_FILES),
     AUTO_LINK_FILES(Localization.lang("Automatically set file links"), IconTheme.JabRefIcons.AUTO_FILE_LINK, KeyBinding.AUTOMATICALLY_LINK_FILES),
     LOOKUP_DOC_IDENTIFIER(Localization.menuTitle("Look up document identifier...")),
     LOOKUP_FULLTEXT(Localization.menuTitle("Look up full text documents"), KeyBinding.DOWNLOAD_FULL_TEXT),
+
+    GENERATE_CITE_KEY(Localization.lang("Autogenerate BibTeX keys"), IconTheme.JabRefIcons.MAKE_KEY, KeyBinding.AUTOGENERATE_BIBTEX_KEYS),
+    SYNCHRONIZE_FILE_LINKS(Localization.lang("Synchronize file links"), KeyBinding.SYNCHRONIZE_FILES),
+    DOWNLOAD_FULL_TEXT(Localization.menuTitle("Look up full text documents"), KeyBinding.DOWNLOAD_FULL_TEXT),
+    CLEANUP_ENTRIES(Localization.lang("Cleanup entries"), IconTheme.JabRefIcons.CLEANUP_ENTRIES, KeyBinding.CLEANUP),
+    SET_FILE_LINKS(Localization.lang("Automatically set file links"), IconTheme.JabRefIcons.AUTO_FILE_LINK, KeyBinding.AUTOMATICALLY_LINK_FILES),
 
     HELP(Localization.lang("Online help"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
     WEB_MENU(Localization.menuTitle("JabRef resources")),

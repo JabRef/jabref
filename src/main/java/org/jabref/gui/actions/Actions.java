@@ -80,6 +80,5 @@ public enum Actions {
     clearReadStatus,
     setReadStatusToRead,
     setReadStatusToSkimmed,
-    toggleRelevance,
-    findUnlinkedFiles
+    toggleRelevance
 }
