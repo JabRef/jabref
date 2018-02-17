@@ -1,6 +1,8 @@
 package org.jabref.model.entry;
 
-import java.text.DateFormatSymbols;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -107,18 +109,15 @@ public enum Month {
 	 *            a String that represents a month in German form
 	 * @return the corresponding month instance, empty if input is not in German
 	 *         form
-         * @author Johannes Preßmar
+	 * @author Johannes Pre�mar
 	 */
 	private static Optional<Month> parseGermanShortMonth(String value) {
-		String[] shortMonths = new DateFormatSymbols(Locale.GERMAN).getShortMonths();
-
-		for (int i = 0; i < shortMonths.length; i++) {
-			if (value.equals(shortMonths[i])) {
-				return Month.getMonthByNumber(i + 1);
-			}
+		try {
+		YearMonth yearMonth = YearMonth.parse("1969-" + value, DateTimeFormatter.ofPattern("yyyy-MMM", Locale.GERMAN));
+		return Month.getMonthByNumber(yearMonth.getMonthValue());
+		} catch(DateTimeParseException e) {
+			return Optional.empty();
 		}
-
-		return Optional.empty();
 	}
 
     /**
