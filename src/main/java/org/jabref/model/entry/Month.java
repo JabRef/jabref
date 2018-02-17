@@ -115,7 +115,7 @@ public enum Month {
 		try {
 		YearMonth yearMonth = YearMonth.parse("1969-" + value, DateTimeFormatter.ofPattern("yyyy-MMM", Locale.GERMAN));
 		return Month.getMonthByNumber(yearMonth.getMonthValue());
-		} catch(DateTimeParseException e) {
+		} catch (DateTimeParseException e) {
 			return Optional.empty();
 		}
 	}
