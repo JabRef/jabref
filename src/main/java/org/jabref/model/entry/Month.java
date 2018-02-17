@@ -1,5 +1,7 @@
 package org.jabref.model.entry;
 
+import java.text.DateFormatSymbols;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.model.strings.StringUtil;
@@ -93,9 +95,30 @@ public enum Month {
             int number = Integer.parseInt(value);
             return Month.getMonthByNumber(number);
         } catch (NumberFormatException e) {
-            return Optional.empty();
+            return parseGermanShortMonth(testString);
         }
     }
+    
+    /**
+	 * Parses a month having the string in German standard form such as
+	 * "Oktober" or in German short form such as "Okt"
+	 * 
+	 * @param value,
+	 *            a String that represents a month in German form
+	 * @return the corresponding month instance, empty if input is not in German
+	 *         form
+	 */
+	private static Optional<Month> parseGermanShortMonth(String value) {
+		String[] shortMonths = new DateFormatSymbols(Locale.GERMAN).getShortMonths();
+
+		for (int i = 0; i < shortMonths.length; i++) {
+			if (value.equals(shortMonths[i])) {
+				return Month.getMonthByNumber(i + 1);
+			}
+		}
+
+		return Optional.empty();
+	}
 
     /**
      * Returns the name of a Month in a short (3-letter) format. (jan, feb, mar, ...)
