@@ -117,6 +117,7 @@ import org.jabref.gui.push.PushToApplicationButton;
 import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
+import org.jabref.gui.strings.StringAction;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
@@ -965,7 +966,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 factory.createMenuItem(ActionsFX.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this)),
                 factory.createMenuItem(ActionsFX.EDIT_PREAMBLE, new OldDatabaseCommandWrapper(Actions.EDIT_PREAMBLE, this, Globals.stateManager)),
-                factory.createMenuItem(ActionsFX.EDIT_STRINGS, new OldDatabaseCommandWrapper(Actions.EDIT_STRINGS, this, Globals.stateManager))
+                factory.createMenuItem(ActionsFX.EDIT_STRINGS, new StringAction())
         );
 
         Menu lookupIdentifiers = factory.createSubMenu(ActionsFX.LOOKUP_DOC_IDENTIFIER);

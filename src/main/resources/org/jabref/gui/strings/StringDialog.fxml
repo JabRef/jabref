@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToolBar?>
+
+
+<DialogPane xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.strings.StringDialogController">
+   <header>
+      <ToolBar maxWidth="1.7976931348623157E308" prefHeight="40.0" prefWidth="299.0">
+        <items>
+          <Button fx:id="btnNewString" mnemonicParsing="false" onAction="#addString" text="New String" />
+            <Button fx:id="btnRemove" mnemonicParsing="false" onAction="#removeString" text="Remove String" />
+            <Separator orientation="VERTICAL" prefHeight="200.0" />
+            <Button fx:id="btnHelp" mnemonicParsing="false" onAction="#openHelp" text="Help" />
+        </items>
+      </ToolBar>
+   </header>
+   <content>
+      <TableView fx:id="tblStrings" prefHeight="241.0" prefWidth="0.0">
+        <columns>
+          <TableColumn fx:id="colLabel" prefWidth="75.0" text="Label" />
+          <TableColumn fx:id="colContent" prefWidth="75.0" text="Content" />
+        </columns>
+      </TableView>
+   </content>
+</DialogPane>
