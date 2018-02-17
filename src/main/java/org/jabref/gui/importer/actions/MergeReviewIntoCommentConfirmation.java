@@ -19,15 +19,15 @@ public class MergeReviewIntoCommentConfirmation {
     }
 
     public boolean askUserForMerge(List<BibEntry> conflicts) {
-        List<String> bibKeys = conflicts.stream()
+        String bibKeys = conflicts.stream()
                 .map(BibEntry::getCiteKeyOptional)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
+                .collect(Collectors.joining(",\n"));
 
         int answer = JOptionPane.showConfirmDialog(
                 panel,
-                String.join(",\n", bibKeys) + " " +
+                bibKeys + " " +
                         Localization.lang("has/have both a 'Comment' and a 'Review' field.") + "\n" +
                         Localization.lang("Since the 'Review' field was deprecated in JabRef 4.2, these two fields are about to be merged into the 'Comment' field.") + "\n" +
                         Localization.lang("The conflicting fields of these entries will be merged into the 'Comment' field."),
