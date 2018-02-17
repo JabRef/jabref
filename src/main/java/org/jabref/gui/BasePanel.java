@@ -58,7 +58,6 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.FindFullTextAction;
-import org.jabref.gui.externalfiles.SynchronizeFileField;
 import org.jabref.gui.externalfiles.WriteXMPActionWorker;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -74,7 +73,6 @@ import org.jabref.gui.journals.UnabbreviateAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
-import org.jabref.gui.plaintextimport.TextInputDialog;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
@@ -564,25 +562,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         /*     actions.put(Actions.DUPLI_CHECK,
                 (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(new DuplicateSearch(BasePanel.this)));
         */
-        actions.put(Actions.PLAIN_TEXT_IMPORT, (BaseAction) () -> {
-            // get Type of new entry
-            EntryTypeDialog etd = new EntryTypeDialog(frame);
-            etd.setVisible(true);
-            EntryType tp = etd.getChoice();
-            if (tp == null) {
-                return;
-            }
 
-            BibEntry bibEntry = new BibEntry(tp.getName());
-            TextInputDialog tidialog = new TextInputDialog(frame, bibEntry);
-            tidialog.setVisible(true);
-
-            if (tidialog.okPressed()) {
-                UpdateField.setAutomaticFields(Collections.singletonList(bibEntry), false, false,
-                        Globals.prefs.getUpdateFieldPreferences());
-                insertEntry(bibEntry);
-            }
-        });
 
         // TODO
         //actions.put(Actions.MARK_ENTRIES, new MarkEntriesAction(frame, 0));
@@ -677,7 +657,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         actions.put(Actions.ABBREVIATE_ISO, new AbbreviateAction(this, true));
         actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
-        actions.put(Actions.AUTO_SET_FILE, new SynchronizeFileField(this));
 
         actions.put(Actions.RESOLVE_DUPLICATE_KEYS, new SearchFixDuplicateLabels(this));
 

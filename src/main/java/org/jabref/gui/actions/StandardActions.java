@@ -129,11 +129,10 @@ public enum StandardActions implements Action {
     AUTOGENERATE_KEYS(Localization.lang("Autogenerate BibTeX keys"), IconTheme.JabRefIcons.MAKE_KEY, KeyBinding.AUTOGENERATE_BIBTEX_KEYS),
     FIND_UNLINKED_FILES(Localization.menuTitle("Find unlinked files"), Localization.lang("Searches for unlinked PDF files on the file system"), KeyBinding.FIND_UNLINKED_FILES),
     AUTO_LINK_FILES(Localization.lang("Automatically set file links"), IconTheme.JabRefIcons.AUTO_FILE_LINK, KeyBinding.AUTOMATICALLY_LINK_FILES),
-    LOOKUP_DOC_IDENTIFIER(Localization.menuTitle("Look up document identifier...")),
+    LOOKUP_DOC_IDENTIFIER(Localization.menuTitle("Look up document identifier")),
     LOOKUP_FULLTEXT(Localization.menuTitle("Look up full text documents"), KeyBinding.DOWNLOAD_FULL_TEXT),
 
     GENERATE_CITE_KEY(Localization.lang("Autogenerate BibTeX keys"), IconTheme.JabRefIcons.MAKE_KEY, KeyBinding.AUTOGENERATE_BIBTEX_KEYS),
-    SYNCHRONIZE_FILE_LINKS(Localization.lang("Synchronize file links"), KeyBinding.SYNCHRONIZE_FILES),
     DOWNLOAD_FULL_TEXT(Localization.menuTitle("Look up full text documents"), KeyBinding.DOWNLOAD_FULL_TEXT),
     CLEANUP_ENTRIES(Localization.lang("Cleanup entries"), IconTheme.JabRefIcons.CLEANUP_ENTRIES, KeyBinding.CLEANUP),
     SET_FILE_LINKS(Localization.lang("Automatically set file links"), IconTheme.JabRefIcons.AUTO_FILE_LINK, KeyBinding.AUTOMATICALLY_LINK_FILES),

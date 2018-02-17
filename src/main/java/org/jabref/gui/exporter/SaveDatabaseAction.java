@@ -293,10 +293,8 @@ public class SaveDatabaseAction extends AbstractWorker {
                 .addExtensionFilter(FileType.BIBTEX_DB)
                 .withDefaultExtension(FileType.BIBTEX_DB)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-        DialogService ds = frame.getDialogService();
-
-        Optional<Path> path = DefaultTaskExecutor
-                .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
+        DialogService dialogService = frame.getDialogService();
+        Optional<Path> path = dialogService.showFileSaveDialog(fileDialogConfiguration);
         if (path.isPresent()) {
             saveAs(path.get().toFile());
         } else {

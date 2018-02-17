@@ -23,12 +23,12 @@ import spin.Spin;
 
 public class DuplicateSearch extends SimpleCommand {
 
-    private final BasePanel panel;
+    private final JabRefFrame frame;
     private List<BibEntry> bes;
     private final List<List<BibEntry>> duplicates = new ArrayList<>();
 
-    public DuplicateSearch(JabRefFrame jabRefFrame) {
-        panel = jabRefFrame.getCurrentBasePanel();
+    public DuplicateSearch(JabRefFrame frame) {
+        this.frame = frame;
     }
 
     @Override
@@ -38,6 +38,7 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     public void run() {
+        BasePanel panel = frame.getCurrentBasePanel();
 
         panel.output(Localization.lang("Searching for duplicates..."));
 
@@ -154,6 +155,7 @@ public class DuplicateSearch extends SimpleCommand {
 
         @Override
         public void run() {
+            BasePanel panel = frame.getCurrentBasePanel();
             for (int i = 0; (i < (bes.size() - 1)) && !finished; i++) {
                 for (int j = i + 1; (j < bes.size()) && !finished; j++) {
                     BibEntry first = bes.get(i);

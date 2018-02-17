@@ -71,6 +71,7 @@ import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.AutoLinkFilesAction;
 import org.jabref.gui.actions.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.actions.CopyFilesAction;
+import org.jabref.gui.actions.CustomizeEntryAction;
 import org.jabref.gui.actions.CustomizeKeyBindingAction;
 import org.jabref.gui.actions.EditExternalFileTypesAction;
 import org.jabref.gui.actions.ErrorConsoleAction;
@@ -880,7 +881,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.CUT, new EditAction(Actions.CUT)),
-                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(Actions.DELETE)),
 
                 factory.createMenuItem(StandardActions.COPY, new EditAction(Actions.COPY)),
                 factory.createSubMenu(StandardActions.COPY_MORE,
@@ -962,6 +962,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 new SeparatorMenuItem(),
 
+                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(Actions.DELETE)),
+
+                new SeparatorMenuItem(),
+
                 factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this)),
                 factory.createMenuItem(StandardActions.EDIT_PREAMBLE, new OldDatabaseCommandWrapper(Actions.EDIT_PREAMBLE, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.EDIT_STRINGS, new OldDatabaseCommandWrapper(Actions.EDIT_STRINGS, this, Globals.stateManager))
@@ -969,8 +973,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
         for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences())) {
-            lookupIdentifiers.getItems().add(
-                    factory.createMenuItem(StandardActions.LOOKUP_DOC_IDENTIFIER, new LookupIdentifierAction<>(this, fetcher)));
+            LookupIdentifierAction<?> identifierAction = new LookupIdentifierAction<>(this, fetcher);
+            lookupIdentifiers.getItems().add(factory.createMenuItem(identifierAction.getAction(), identifierAction));
         }
 
         quality.getItems().addAll(
@@ -986,13 +990,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SYNCHRONIZE_FILE_LINKS, new OldDatabaseCommandWrapper(Actions.AUTO_SET_FILE, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction()),
-                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new OldDatabaseCommandWrapper(Actions.DOWNLOAD_FULL_TEXT, this, Globals.stateManager)),
-
                 factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this)),
-
-                lookupIdentifiers
+                lookupIdentifiers,
+                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new OldDatabaseCommandWrapper(Actions.DOWNLOAD_FULL_TEXT, this, Globals.stateManager))
         );
 
         SidePaneComponent webSearch = sidePaneManager.getComponent(SidePaneType.WEB_SEARCH);
@@ -1021,20 +1022,30 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(StandardActions.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(this)),
                 factory.createMenuItem(StandardActions.WRITE_XMP, new OldDatabaseCommandWrapper(Actions.WRITE_XMP, this, Globals.stateManager)),
 
-                factory.createMenuItem(openOffice.getToggleAction(), openOffice.getToggleCommand()),
+                new SeparatorMenuItem(),
 
+                factory.createMenuItem(openOffice.getToggleAction(), openOffice.getToggleCommand()),
                 factory.createMenuItem(pushToExternal.getMenuAction(), pushToExternal),
+
+                new SeparatorMenuItem(),
+
                 factory.createMenuItem(StandardActions.OPEN_FOLDER, new OldDatabaseCommandWrapper(Actions.OPEN_FOLDER, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.OPEN_FILE, new OldDatabaseCommandWrapper(Actions.OPEN_EXTERNAL_FILE, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.OPEN_URL, new OldDatabaseCommandWrapper(Actions.OPEN_URL, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OldDatabaseCommandWrapper(Actions.OPEN_CONSOLE, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(this)),
+
+                new SeparatorMenuItem(),
+
                 factory.createMenuItem(StandardActions.ABBREVIATE_ISO, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_ISO, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.ABBREVIATE_MEDLINE, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_MEDLINE, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.UNABBREVIATE, new OldDatabaseCommandWrapper(Actions.UNABBREVIATE, this, Globals.stateManager)));
 
         options.getItems().addAll(
                 factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(this)),
+
+                new SeparatorMenuItem(),
+
                 factory.createMenuItem(StandardActions.SETUP_GENERAL_FIELDS, new SetupGeneralFieldsAction(this)),
                 factory.createMenuItem(StandardActions.MANAGE_CUSTOM_IMPORTS, new ManageCustomImportsAction(this)),
                 factory.createMenuItem(StandardActions.MANAGE_CUSTOM_EXPORTS, new ManageCustomExportsAction(this)),
@@ -1042,7 +1053,11 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(StandardActions.MANAGE_JOURNALS, new ManageJournalsAction()),
                 factory.createMenuItem(StandardActions.CUSTOMIZE_KEYBINDING, new CustomizeKeyBindingAction()),
                 factory.createMenuItem(StandardActions.MANAGE_PROTECTED_TERMS, new ManageProtectedTermsAction(this, Globals.protectedTermsLoader)),
-                factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new OldDatabaseCommandWrapper(Actions.MANAGE_SELECTORS, this, Globals.stateManager))
+
+                new SeparatorMenuItem(),
+
+                factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new OldDatabaseCommandWrapper(Actions.MANAGE_SELECTORS, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.CUSTOMIZE_ENTRY_TYPES, new CustomizeEntryAction(this))
         );
 
         help.getItems().addAll(
