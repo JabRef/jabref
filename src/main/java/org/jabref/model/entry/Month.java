@@ -107,6 +107,7 @@ public enum Month {
 	 *            a String that represents a month in German form
 	 * @return the corresponding month instance, empty if input is not in German
 	 *         form
+         * @author Johannes Preßmar
 	 */
 	private static Optional<Month> parseGermanShortMonth(String value) {
 		String[] shortMonths = new DateFormatSymbols(Locale.GERMAN).getShortMonths();
