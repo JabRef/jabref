@@ -2,7 +2,7 @@ package org.jabref.logic.importer;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -86,11 +86,7 @@ public class OpenDatabase {
     }
 
     private static void performLoadDatabaseMigrations(ParserResult parserResult) {
-
-        List<PostOpenMigration> postOpenMigrations = Arrays.asList(
-                new ConvertLegacyExplicitGroups(),
-                new MergeReviewIntoCommentMigration()
-        );
+        List<PostOpenMigration> postOpenMigrations = Collections.singletonList(new ConvertLegacyExplicitGroups());
 
         for (PostOpenMigration migration : postOpenMigrations) {
             migration.performMigration(parserResult);

@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -35,12 +36,12 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.migrations.FileLinksUpgradeWarning;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileBasedLock;
-import org.jabref.migrations.FileLinksUpgradeWarning;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.strings.StringUtil;
@@ -55,18 +56,18 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     public static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
-    private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = new ArrayList<>();
+    private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = Arrays.asList(
+            // Migrations:
+            // Warning for migrating the Review into the Comment field
+            new MergeReviewIntoComment(),
+            // External file handling system in version 2.3:
+            new FileLinksUpgradeWarning(),
 
-    static {
-        // Warning for migrating the Review into the Comment field
-        POST_OPEN_ACTIONS.add(new MergeReviewIntoComment());
-        // Check for new custom entry types loaded from the BIB file:
-        POST_OPEN_ACTIONS.add(new CheckForNewEntryTypesAction());
-        // External file handling system in version 2.3:
-        POST_OPEN_ACTIONS.add(new FileLinksUpgradeWarning());
-        // Warning about and handling duplicate BibTeX keys:
-        POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
-    }
+            // Check for new custom entry types loaded from the BIB file:
+            new CheckForNewEntryTypesAction(),
+            // Warning about and handling duplicate BibTeX keys:
+            new HandleDuplicateWarnings());
+
 
     private final boolean showDialog;
     private final JabRefFrame frame;
@@ -146,7 +147,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         int removed = 0;
 
         // Check if any of the files are already open:
-        for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext();) {
+        for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext(); ) {
             Path file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
                 BasePanel basePanel = frame.getBasePanelAt(i);
@@ -224,7 +225,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                             Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-
             }
 
             if (BackupManager.checkForBackupFile(fileToLoad)) {
@@ -284,5 +284,4 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         return basePanel;
     }
-
 }
