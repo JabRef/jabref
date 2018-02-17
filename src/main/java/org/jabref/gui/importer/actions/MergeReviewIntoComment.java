@@ -2,7 +2,7 @@ package org.jabref.gui.importer.actions;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.migrations.MergeReviewIntoCommentMigration;
+import org.jabref.logic.migrations.MergeReviewIntoCommentMigration;
 
 public class MergeReviewIntoComment implements GUIPostOpenAction {
 
