@@ -363,7 +363,7 @@ class SyncLang:
                 if key is not None:
                     # Do not write empty keys
                     # if keys[key] != "":
-                    other_lines_to_write.append(Keys.format_key_and_value(key=key, value=keys[key]))
+                    other_lines_to_write.append(Keys.format_key_and_value(key=key, value=keys[key]) + "\n")
                 else:
                     other_lines_to_write.append(line)
 
