@@ -750,6 +750,13 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         actions.put(Actions.REMOVE_FROM_GROUP, new GroupAddRemoveDialog(this, false, false));
         actions.put(Actions.MOVE_TO_GROUP, new GroupAddRemoveDialog(this, true, true));
 
+        actions.put(Actions.INTERSECTION_PREF_GROUP, (BaseAction) () -> {
+            System.out.println("blubb");
+            boolean state = Globals.prefs.getBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS);
+            state = !state;
+            Globals.prefs.putBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS, state);
+        });
+
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this));
     }
 
