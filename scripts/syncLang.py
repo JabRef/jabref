@@ -33,7 +33,7 @@ try:
             return pathlib.Path(__file__)
         
         @staticmethod
-        def getJabRefMainDirectory():
+        def getJabRefBaseDirectory():
             """
             Searches the script's path backwards until it finds the matching base directory.
             :return the path to JabRef's base directory as pathlib.Path object.
@@ -43,11 +43,11 @@ try:
                 if parent.name == 'jabref':
                     return parent
     
-    # Important paths of the JabRef repository
-    JABREF_BASE_DIRECTORY = PathFinder.getJabRefMainDirectory()
-    JABREF_SOURCE_DIRECTORY = JABREF_BASE_DIRECTORY / 'src'
-    JABREF_SCRIPTS_DIRECTORY = JABREF_BASE_DIRECTORY / 'scripts'
-    JABREF_LOCALIZATION_DIRECTORY = JABREF_SOURCE_DIRECTORY / 'main/resources/l10n'
+        # Important paths of the JabRef repository
+        JABREF_BASE_DIRECTORY = self.getJabRefBaseDirectory()
+        JABREF_SOURCE_DIRECTORY = JABREF_BASE_DIRECTORY / 'src'
+        JABREF_SCRIPTS_DIRECTORY = JABREF_BASE_DIRECTORY / 'scripts'
+        JABREF_LOCALIZATION_DIRECTORY = JABREF_SOURCE_DIRECTORY / 'main/resources/l10n'
 except:
     logging.info("Unable to use PathFinder class.")
 
