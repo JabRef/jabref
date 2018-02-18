@@ -14,7 +14,47 @@ RES_DIR = "src/main/resources/l10n"
 URL_BASE = "https://github.com/JabRef/jabref/tree/master/src/main/resources/l10n/"
 
 
+try:
+    # Just to make sure not to break anything, in case py3.x is not supported.
+    import pathlib
+    
+    class PathFinder:
+        """
+        This class is designed to automatically locate this script's path within the repository.
+        Once it found it's location it can easily provide paths to other important directories and files.
+        
+        requires Python 3.4 or higher
+        """
+        
+        
+        @staticmethod
+        def getScriptLocation():
+            """
+            :return the path this script is currently located as pathlib.Path object.
+            """
+            return pathlib.Path(__file__)
+        
+        @staticmethod
+        def getJabRefMainDirectory():
+            """
+            Searches the script's path backwards until it finds the matching base directory.
+            :return the path to JabRef's base directory as pathlib.Path object.
+            """
+            scriptLocation = PathFinder.getScriptLocation()
+            for parent in scriptLocation.parents:
+                if parent.name == 'jabref':
+                    return parent
+    
+    # Important paths of the JabRef repository
+    JABREF_BASE_DIRECTORY = PathFinder.getJabRefMainDirectory()
+    JABREF_SOURCE_DIRECTORY = JABREF_BASE_DIRECTORY / 'src'
+    JABREF_SCRIPTS_DIRECTORY = JABREF_BASE_DIRECTORY / 'scripts'
+    JABREF_LOCALIZATION_DIRECTORY = JABREF_SOURCE_DIRECTORY / 'main/resources/l10n'
+except:
+    logging.info("Unable to use PathFinder class.")
+    
 class Git:
+
     def get_current_branch(self):
         """
         :return: the current git branch
@@ -36,6 +76,7 @@ class Git:
 
 
 class Keys:
+
     def __init__(self, lines):
         self.lines = lines
 
@@ -50,7 +91,7 @@ class Keys:
             if key:
                 if key in keys_checked:
                     duplicates.append(u"{key}={value}".format(key=key, value=value))
-                    translation_in_list = "u{key}={value}".format(key=key, value=keys_checked[key])
+                    translation_in_list = u"{key}={value}".format(key=key, value=keys_checked[key])
                     if translation_in_list not in duplicates:
                         duplicates.append(translation_in_list)
                 else:
@@ -152,6 +193,7 @@ class Keys:
 
 
 class SyncLang:
+
     def __init__(self, extended, out_file='status.md'):
         """
         :param extended: boolean: if the keys with problems should be printed
@@ -258,7 +300,7 @@ class SyncLang:
         :return: list of strings: all the JabRef_*.preferences files with the english at the beginning
         """
         jabref_property_files = sorted(self.__other_jabref_properties())
-        jabref_property_files.insert(0, os.path.join(RES_DIR, "JabRef_en.properties"))
+        jabref_property_files.insert(0, self.main_jabref_preferences)
         return jabref_property_files
 
     def __other_jabref_properties(self):
@@ -315,7 +357,7 @@ class SyncLang:
                 key = main_keys.key_from_line(line)
                 if key is not None:
                     # Do not write empty keys
-                    if keys[key] !=  "":
+                    if keys[key] != "":
                         other_lines_to_write.append(u"{key}={value}\n".format(key=key, value=keys[key]))
                 else:
                     other_lines_to_write.append(line)
@@ -433,8 +475,7 @@ class SyncLang:
         logging.info('Current status written to ' + self.markdown_output)
 
 
-if '__main__' == __name__:
-
+def main():
     if len(sys.argv) == 2 and sys.argv[1] == "markdown":
         SyncLang(extended=False, out_file='status.md').status_create_markdown()
 
@@ -464,3 +505,7 @@ if '__main__' == __name__:
             [-e | --extended]:
                 if the translations keys which create problems should be printed
     """)
+
+
+if '__main__' == __name__:
+    main()
