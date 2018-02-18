@@ -13,7 +13,6 @@ logging.basicConfig(level=logging.INFO)
 RES_DIR = "src/main/resources/l10n"
 URL_BASE = "https://github.com/JabRef/jabref/tree/master/src/main/resources/l10n/"
 
-
 try:
     # Just to make sure not to break anything, in case py3.x is not supported.
     import pathlib
@@ -25,7 +24,6 @@ try:
         
         requires Python 3.4 or higher
         """
-        
         
         @staticmethod
         def getScriptLocation():
@@ -52,6 +50,7 @@ try:
     JABREF_LOCALIZATION_DIRECTORY = JABREF_SOURCE_DIRECTORY / 'main/resources/l10n'
 except:
     logging.info("Unable to use PathFinder class.")
+
     
 class Git:
 
@@ -90,8 +89,8 @@ class Keys:
             key, value = self.__extract_key_and_value(line=line)
             if key:
                 if key in keys_checked:
-                    duplicates.append(u"{key}={value}".format(key=key, value=value))
-                    translation_in_list = u"{key}={value}".format(key=key, value=keys_checked[key])
+                    duplicates.append(self.format_key_and_value(key=key, value=value))
+                    translation_in_list = self.format_key_and_value(key=key, value=keys_checked[key])
                     if translation_in_list not in duplicates:
                         duplicates.append(translation_in_list)
                 else:
@@ -111,15 +110,15 @@ class Keys:
             if key:
                 if key in keys:
                     if not keys[key]:
-                        fixed.append(u"{key}={value}".format(key=key, value=keys[key]))
+                        fixed.append(self.format_key_and_value(key=key, value=keys[key]))
                         keys[key] = value
                     elif not value:
-                        fixed.append(u"{key}={value}".format(key=key, value=value))
+                        fixed.append(self.format_key_and_value(key=key, value=value))
                     elif keys[key] == value:
-                        fixed.append(u"{key}={value}".format(key=key, value=value))
+                        fixed.append(self.format_key_and_value(key=key, value=value))
                     elif keys[key] != value:
-                        not_fixed.append(u"{key}={value}".format(key=key, value=value))
-                        not_fixed.append(u"{key}={value}".format(key=key, value=keys[key]))
+                        not_fixed.append(self.format_key_and_value(key=key, value=value))
+                        not_fixed.append(self.format_key_and_value(key=key, value=keys[key]))
                 else:
                     keys[key] = value
 
@@ -190,6 +189,10 @@ class Keys:
             if index_key_end > 0:
                 return line[0:index_key_end].strip(), line[index_key_end + 1:].strip()
         return None, None
+    
+    @staticmethod
+    def format_key_and_value(key, value):
+        return u"{key}={value}".format(key=key, value=value)
 
 
 class SyncLang:
@@ -359,8 +362,8 @@ class SyncLang:
                 key = main_keys.key_from_line(line)
                 if key is not None:
                     # Do not write empty keys
-                    #if keys[key] != "":
-                    other_lines_to_write.append(u"{key}={value}\n".format(key=key, value=keys[key]))
+                    # if keys[key] != "":
+                    other_lines_to_write.append(Keys.format_key_and_value(key=key, value=keys[key]))
                 else:
                     other_lines_to_write.append(line)
 
