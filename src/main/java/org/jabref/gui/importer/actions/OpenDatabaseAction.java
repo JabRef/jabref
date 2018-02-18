@@ -26,7 +26,7 @@ import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.MnemonicAwareAction;
-import org.jabref.gui.autosaveandbackup.BackupUIManager;
+import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.shared.SharedDatabaseUIManager;

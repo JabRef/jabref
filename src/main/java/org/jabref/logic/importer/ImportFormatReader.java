@@ -14,6 +14,7 @@ import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.CopacImporter;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.fileformat.EndnoteImporter;
+import org.jabref.logic.importer.fileformat.EndnoteXmlImporter;
 import org.jabref.logic.importer.fileformat.FreeCiteImporter;
 import org.jabref.logic.importer.fileformat.InspecImporter;
 import org.jabref.logic.importer.fileformat.IsiImporter;
@@ -56,6 +57,7 @@ public class ImportFormatReader {
         formats.add(new BibTeXMLImporter());
         formats.add(new CopacImporter());
         formats.add(new EndnoteImporter(importFormatPreferences));
+        formats.add(new EndnoteXmlImporter(importFormatPreferences));
         formats.add(new FreeCiteImporter(importFormatPreferences));
         formats.add(new InspecImporter());
         formats.add(new IsiImporter());

@@ -40,8 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FormatterTest {
 
-
-
     private static ProtectedTermsLoader protectedTermsLoader;
 
     @BeforeAll
