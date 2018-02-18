@@ -111,15 +111,15 @@ class Keys:
             if key:
                 if key in keys:
                     if not keys[key]:
-                        fixed.append("{key}={value}".format(key=key, value=keys[key]))
+                        fixed.append(u"{key}={value}".format(key=key, value=keys[key]))
                         keys[key] = value
                     elif not value:
-                        fixed.append("{key}={value}".format(key=key, value=value))
+                        fixed.append(u"{key}={value}".format(key=key, value=value))
                     elif keys[key] == value:
-                        fixed.append("{key}={value}".format(key=key, value=value))
+                        fixed.append(u"{key}={value}".format(key=key, value=value))
                     elif keys[key] != value:
-                        not_fixed.append("{key}={value}".format(key=key, value=value))
-                        not_fixed.append("{key}={value}".format(key=key, value=keys[key]))
+                        not_fixed.append(u"{key}={value}".format(key=key, value=value))
+                        not_fixed.append(u"{key}={value}".format(key=key, value=keys[key]))
                 else:
                     keys[key] = value
 
@@ -347,9 +347,11 @@ class SyncLang:
             num_keys_obsolete = len(keys_obsolete)
 
             for missing_key in keys_missing:
+                logging.debug("Adding missing Key: " + missing_key)
                 keys[missing_key] = ""
 
             for obsolete_key in keys_obsolete:
+                logging.debug("Deleting obsolete Key: " + obsolete_key)
                 del keys[obsolete_key]
 
             other_lines_to_write = []
@@ -357,8 +359,8 @@ class SyncLang:
                 key = main_keys.key_from_line(line)
                 if key is not None:
                     # Do not write empty keys
-                    if keys[key] != "":
-                        other_lines_to_write.append(u"{key}={value}\n".format(key=key, value=keys[key]))
+                    #if keys[key] != "":
+                    other_lines_to_write.append(u"{key}={value}\n".format(key=key, value=keys[key]))
                 else:
                     other_lines_to_write.append(line)
 
