@@ -7,6 +7,7 @@ import java.util.Objects;
  * This class models a BibTex String ("@String")
  */
 public class BibtexString implements Cloneable {
+
     /**
      * Type of a \@String.
      * <p>
@@ -95,6 +96,10 @@ public class BibtexString implements Cloneable {
         hasChanged = true;
     }
 
+    /**
+     * Returns the name/label of the string
+     * @return
+     */
     public String getName() {
         return name;
     }
@@ -173,15 +178,19 @@ public class BibtexString implements Cloneable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        }
         BibtexString that = (BibtexString) o;
-        return hasChanged == that.hasChanged &&
+        return (Objects.equals(hasChanged,that.hasChanged) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(content, that.content) &&
-                Objects.equals(id, that.id) &&
-                type == that.type &&
-                Objects.equals(parsedSerialization, that.parsedSerialization);
+                Objects.equals(id, that.id)  &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(parsedSerialization, that.parsedSerialization));
     }
 
     @Override

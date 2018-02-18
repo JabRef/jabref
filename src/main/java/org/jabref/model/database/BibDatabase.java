@@ -318,7 +318,7 @@ public class BibDatabase {
     }
 
     /**
-     * Returns the string with the given name.
+     * Returns the string with the given name/label
      */
     public Optional<BibtexString> getStringByName(String name) {
         for (BibtexString string : getStringValues()) {

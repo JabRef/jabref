@@ -61,6 +61,9 @@ public class StringDialogController extends AbstractController<StringDialogViewM
 
         tblStrings.itemsProperty().bindBidirectional(viewModel.allStringsProperty());
         tblStrings.setEditable(true);
+
+        tblStrings.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> viewModel.validateInput(newValue));
     }
 
     @FXML
@@ -81,7 +84,7 @@ public class StringDialogController extends AbstractController<StringDialogViewM
 
     @FXML
     private void save() {
-
+        viewModel.save();
     }
 
     @FXML
