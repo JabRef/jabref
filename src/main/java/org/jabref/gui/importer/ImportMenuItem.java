@@ -97,7 +97,6 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     .runInJavaFXThread(() -> ds.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));
 
             if (!filenames.isEmpty()) {
-                frame.block();
                 frame.output(Localization.lang("Starting import"));
                 fileOk = true;
 
@@ -179,15 +178,13 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 } else {
                     final BasePanel panel = frame.getCurrentBasePanel();
 
-                    ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"),
-                            openInNew);
+                    ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"), false);
                     diag.addEntries(bibtexResult.getDatabase().getEntries());
                     diag.entryListComplete();
                     diag.setVisible(true);
                     diag.toFront();
                 }
             }
-            frame.unblock();
         }
     }
 

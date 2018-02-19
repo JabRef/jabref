@@ -8,7 +8,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 
-public enum ActionsFX {
+public enum StandardActions implements Action {
 
     COPY_MORE(Localization.lang("Copy") + "..."),
     COPY_TITLE(Localization.lang("Copy title"), KeyBinding.COPY_TITLE),
@@ -107,6 +107,7 @@ public enum ActionsFX {
     MANAGE_JOURNALS(Localization.menuTitle("Manage journal abbreviations")),
     CUSTOMIZE_KEYBINDING(Localization.lang("Customize key bindings"), IconTheme.JabRefIcons.KEY_BINDINGS),
     MANAGE_CONTENT_SELECTORS(Localization.menuTitle("Manage content selectors"), IconTheme.JabRefIcons.PREFERENCES),
+    MANAGE_CITE_KEY_PATTERNS(Localization.lang("BibTeX key patterns")),
 
     TOGGLE_PREVIEW(Localization.lang("Toggle entry preview"), IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW, KeyBinding.TOGGLE_ENTRY_PREVIEW),
     EDIT_ENTRY(Localization.lang("Edit entry"), IconTheme.JabRefIcons.EDIT_ENTRY, KeyBinding.EDIT_ENTRY),
@@ -129,7 +130,7 @@ public enum ActionsFX {
     AUTOGENERATE_KEYS(Localization.lang("Autogenerate BibTeX keys"), IconTheme.JabRefIcons.MAKE_KEY, KeyBinding.AUTOGENERATE_BIBTEX_KEYS),
     FIND_UNLINKED_FILES(Localization.menuTitle("Find unlinked files"), Localization.lang("Searches for unlinked PDF files on the file system"), KeyBinding.FIND_UNLINKED_FILES),
     AUTO_LINK_FILES(Localization.lang("Automatically set file links"), IconTheme.JabRefIcons.AUTO_FILE_LINK, KeyBinding.AUTOMATICALLY_LINK_FILES),
-    LOOKUP_DOC_IDENTIFIER(Localization.menuTitle("Look up document identifier...")),
+    LOOKUP_DOC_IDENTIFIER(Localization.menuTitle("Look up document identifier")),
     LOOKUP_FULLTEXT(Localization.menuTitle("Look up full text documents"), KeyBinding.DOWNLOAD_FULL_TEXT),
 
     GENERATE_CITE_KEY(Localization.lang("Autogenerate BibTeX keys"), IconTheme.JabRefIcons.MAKE_KEY, KeyBinding.AUTOGENERATE_BIBTEX_KEYS),
@@ -158,71 +159,75 @@ public enum ActionsFX {
     private final Optional<JabRefIcon> icon;
     private final Optional<KeyBinding> keyBinding;
 
-    ActionsFX(String text) {
+    StandardActions(String text) {
         this(text, "");
     }
 
-    ActionsFX(String text, IconTheme.JabRefIcons icon) {
+    StandardActions(String text, IconTheme.JabRefIcons icon) {
         this.text = text;
         this.description = "";
         this.icon = Optional.of(icon);
         this.keyBinding = Optional.empty();
     }
 
-    ActionsFX(String text, IconTheme.JabRefIcons icon, KeyBinding keyBinding) {
+    StandardActions(String text, IconTheme.JabRefIcons icon, KeyBinding keyBinding) {
         this.text = text;
         this.description = "";
         this.icon = Optional.of(icon);
         this.keyBinding = Optional.of(keyBinding);
     }
 
-    ActionsFX(String text, String description, IconTheme.JabRefIcons icon) {
+    StandardActions(String text, String description, IconTheme.JabRefIcons icon) {
         this.text = text;
         this.description = description;
         this.icon = Optional.of(icon);
         this.keyBinding = Optional.empty();
     }
 
-    ActionsFX(String text, String description, IconTheme.JabRefIcons icon, KeyBinding keyBinding) {
+    StandardActions(String text, String description, IconTheme.JabRefIcons icon, KeyBinding keyBinding) {
         this.text = text;
         this.description = description;
         this.icon = Optional.of(icon);
         this.keyBinding = Optional.of(keyBinding);
     }
 
-    ActionsFX(String text, KeyBinding keyBinding) {
+    StandardActions(String text, KeyBinding keyBinding) {
         this.text = text;
         this.description = "";
         this.keyBinding = Optional.of(keyBinding);
         this.icon = Optional.empty();
     }
 
-    ActionsFX(String text, String description) {
+    StandardActions(String text, String description) {
         this.text = text;
         this.description = description;
         this.icon = Optional.empty();
         this.keyBinding = Optional.empty();
     }
 
-    ActionsFX(String text, String description, KeyBinding keyBinding) {
+    StandardActions(String text, String description, KeyBinding keyBinding) {
         this.text = text;
         this.description = description;
         this.icon = Optional.empty();
         this.keyBinding = Optional.of(keyBinding);
     }
 
+    @Override
     public Optional<JabRefIcon> getIcon() {
         return icon;
     }
 
+    @Override
     public Optional<KeyBinding> getKeyBinding() {
         return keyBinding;
     }
 
+    @Override
     public String getText() {
         return text;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }

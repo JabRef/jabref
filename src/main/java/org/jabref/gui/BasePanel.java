@@ -73,7 +73,6 @@ import org.jabref.gui.journals.UnabbreviateAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
-import org.jabref.gui.plaintextimport.TextInputDialog;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
@@ -410,7 +409,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                             Localization.lang("First select the entries you want keys to be generated for."));
                     return;
                 }
-                frame.block();
                 output(formatOutputMessage(Localization.lang("Generating BibTeX key for"), numSelected));
             }
 
@@ -458,13 +456,11 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             @Override
             public void update() {
                 if (canceled) {
-                    frame.unblock();
                     return;
                 }
                 markBaseChanged();
                 numSelected = entries.size();
                 output(formatOutputMessage(Localization.lang("Generated BibTeX key for"), numSelected));
-                frame.unblock();
             }
         });
 
@@ -563,25 +559,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         /*     actions.put(Actions.DUPLI_CHECK,
                 (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(new DuplicateSearch(BasePanel.this)));
         */
-        actions.put(Actions.PLAIN_TEXT_IMPORT, (BaseAction) () -> {
-            // get Type of new entry
-            EntryTypeDialog etd = new EntryTypeDialog(frame);
-            etd.setVisible(true);
-            EntryType tp = etd.getChoice();
-            if (tp == null) {
-                return;
-            }
 
-            BibEntry bibEntry = new BibEntry(tp.getName());
-            TextInputDialog tidialog = new TextInputDialog(frame, bibEntry);
-            tidialog.setVisible(true);
-
-            if (tidialog.okPressed()) {
-                UpdateField.setAutomaticFields(Collections.singletonList(bibEntry), false, false,
-                        Globals.prefs.getUpdateFieldPreferences());
-                insertEntry(bibEntry);
-            }
-        });
 
         // TODO
         //actions.put(Actions.MARK_ENTRIES, new MarkEntriesAction(frame, 0));
@@ -657,7 +635,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                     .build();
             Globals.prefs.storePreviewPreferences(newPreviewPreferences);
             DefaultTaskExecutor.runInJavaFXThread(() -> setPreviewActiveBasePanels(enabled));
-            frame.setPreviewToggle(enabled);
         });
 
         actions.put(Actions.NEXT_PREVIEW_STYLE, (BaseAction) this::nextPreviewStyle);
@@ -997,10 +974,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 runWorker((AbstractWorker) o);
             }
         } catch (Throwable ex) {
-            // If the action has blocked the JabRefFrame before crashing, we need to unblock it.
-            // The call to unblock will simply hide the glasspane, so there is no harm in calling
-            // it even if the frame hasn't been blocked.
-            frame.unblock();
             LOGGER.error("runCommand error: " + ex.getMessage(), ex);
         }
     }
@@ -1008,7 +981,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private boolean saveDatabase(File file, boolean selectedOnly, Charset enc,
             SavePreferences.DatabaseSaveType saveType) throws SaveException {
         SaveSession session;
-        frame.block();
         final String SAVE_DATABASE = Localization.lang("Save library");
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(enc)
@@ -1044,8 +1016,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                     Localization.lang("Could not save file."),
                     ex);
             throw new SaveException("rt");
-        } finally {
-            frame.unblock();
         }
 
         boolean commit = true;

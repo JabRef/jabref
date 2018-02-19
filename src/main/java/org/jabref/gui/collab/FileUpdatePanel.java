@@ -21,7 +21,7 @@ import org.jabref.gui.IconTheme;
 import org.jabref.gui.SidePaneComponent;
 import org.jabref.gui.SidePaneManager;
 import org.jabref.gui.SidePaneType;
-import org.jabref.gui.actions.ActionsFX;
+import org.jabref.gui.actions.Action;
 import org.jabref.logic.l10n.Localization;
 
 public class FileUpdatePanel extends SidePaneComponent implements ActionListener, ChangeScanner.DisplayResultCallback {
@@ -65,7 +65,7 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
     }
 
     @Override
-    public ActionsFX getToggleAction() {
+    public Action getToggleAction() {
         throw new UnsupportedOperationException();
     }
 
