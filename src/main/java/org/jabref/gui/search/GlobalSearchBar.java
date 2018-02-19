@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
@@ -29,12 +30,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
-import org.jabref.gui.AbstractView;
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.OSXCompatibleToolbar;
+import org.jabref.gui.*;
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
@@ -45,6 +41,7 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
+import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -56,6 +53,7 @@ import org.jabref.preferences.SearchPreferences;
 
 import org.fxmisc.easybind.EasyBind;
 
+@SuppressWarnings("Duplicates")
 public class GlobalSearchBar extends JPanel {
 
     private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
@@ -437,6 +435,12 @@ public class GlobalSearchBar extends JPanel {
         @Override
         public void keyPressed(java.awt.event.KeyEvent e) {
             switch (e.getKeyCode()) {
+
+                // Clear search bar and select first entry, if available
+                case KeyEvent.VK_ESCAPE:
+                    clearOnEsc();
+                    break;
+
                 //This "hack" prevents that the focus moves out of the field
                 case java.awt.event.KeyEvent.VK_RIGHT:
                 case java.awt.event.KeyEvent.VK_LEFT:
@@ -447,6 +451,7 @@ public class GlobalSearchBar extends JPanel {
                 default:
                     //do nothing
             }
+
 
             //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
             Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
@@ -463,6 +468,18 @@ public class GlobalSearchBar extends JPanel {
                         //do nothing
                 }
             }
+        }
+
+        /**
+         * Clears the search bar and select first entry, if available
+         *
+         * @author Aly Mohamed
+         */
+        private void clearOnEsc() {
+            MainTable currentTable = frame.getCurrentBasePanel().getMainTable();
+            clearSearch(frame.getCurrentBasePanel());
+            BasePanel panel = frame.getCurrentBasePanel();
+            currentTable.setSelected(0);
         }
     }
 }
