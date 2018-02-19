@@ -350,12 +350,10 @@ class SyncLang:
             num_keys_obsolete = len(keys_obsolete)
 
             for missing_key in keys_missing:
-                logging.debug("Adding missing Key: " + missing_key)
                 # Missing keys are added with english translation by default.
                 keys[missing_key] = main_keys_dict[missing_key]
 
             for obsolete_key in keys_obsolete:
-                logging.debug("Deleting obsolete Key: " + obsolete_key)
                 del keys[obsolete_key]
 
             other_lines_to_write = []
