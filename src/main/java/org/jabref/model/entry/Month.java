@@ -78,16 +78,16 @@ public enum Month {
      * @param value the given value
      * @return the corresponding Month instance
      */
-    public static Optional<Month> parse(String value) {
-        if (StringUtil.isBlank(value)) {
-            return Optional.empty();
-        }
+	public static Optional<Month> parse(String value) {
+		if (StringUtil.isBlank(value)) {
+			return Optional.empty();
+		}
 
-        // Much more liberal matching covering most known abbreviations etc.
-        String testString = value.replace("#", "").trim();
-        if (testString.length() > 3) {
-            testString = testString.substring(0, 3);
-        }
+		// Much more liberal matching covering most known abbreviations etc.
+		String testString = value.replace("#", "").trim();
+		if (testString.length() > 3) {
+			testString = testString.substring(0, 3);
+		}
 		Optional<Month> month = Month.getMonthByShortName(testString);
 		Optional<Month> monthGerman = Month.parseGermanShortMonth(testString);
 		if (month.isPresent()) {
@@ -115,7 +115,7 @@ public enum Month {
 	 *         form
 	 */
 	private static Optional<Month> parseGermanShortMonth(String value) {
-		if (value.equals("Mae")) {
+		if ("Mae".equals(value)) {
 			return Month.getMonthByNumber(3);
 		}
 
