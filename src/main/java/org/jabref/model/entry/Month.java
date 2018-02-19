@@ -88,20 +88,24 @@ public enum Month {
         if (testString.length() > 3) {
             testString = testString.substring(0, 3);
         }
-        Optional<Month> month = Month.getMonthByShortName(testString);
-        if (month.isPresent()) {
-            return month;
-        }
+		Optional<Month> month = Month.getMonthByShortName(testString);
+		Optional<Month> monthGerman = Month.parseGermanShortMonth(testString);
+		if (month.isPresent()) {
+			return month;
+		}
+		if (monthGerman.isPresent()) {
+			return monthGerman;
+		}
 
-        try {
-            int number = Integer.parseInt(value);
-            return Month.getMonthByNumber(number);
-        } catch (NumberFormatException e) {
-            return parseGermanShortMonth(testString);
-        }
-    }
-    
-    /**
+		try {
+			int number = Integer.parseInt(value);
+			return Month.getMonthByNumber(number);
+		} catch (NumberFormatException e) {
+			return Optional.empty();
+		}
+	}
+
+	/**
 	 * Parses a month having the string in German standard form such as
 	 * "Oktober" or in German short form such as "Okt"
 	 * 
@@ -109,12 +113,16 @@ public enum Month {
 	 *            a String that represents a month in German form
 	 * @return the corresponding month instance, empty if input is not in German
 	 *         form
-	 * @author Johannes Pre�mar
 	 */
 	private static Optional<Month> parseGermanShortMonth(String value) {
+		if (value.equals("Mae")) {
+			return Month.getMonthByNumber(3);
+		}
+
 		try {
-		YearMonth yearMonth = YearMonth.parse("1969-" + value, DateTimeFormatter.ofPattern("yyyy-MMM", Locale.GERMAN));
-		return Month.getMonthByNumber(yearMonth.getMonthValue());
+			YearMonth yearMonth = YearMonth.parse("1969-" + value,
+					DateTimeFormatter.ofPattern("yyyy-MMM", Locale.GERMAN));
+			return Month.getMonthByNumber(yearMonth.getMonthValue());
 		} catch (DateTimeParseException e) {
 			return Optional.empty();
 		}

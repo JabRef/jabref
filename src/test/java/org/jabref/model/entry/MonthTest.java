@@ -101,11 +101,12 @@ public class MonthTest {
         assertEquals(Optional.empty(), Month.parse(""));
     }
     
-    @Test
+	@Test
 	public void parseCorrectlyByShortNameGerman() {
 		assertEquals(Optional.of(Month.JANUARY), Month.parse("Jan"));
 		assertEquals(Optional.of(Month.FEBRUARY), Month.parse("Feb"));
 		assertEquals(Optional.of(Month.MARCH), Month.parse("Mär"));
+		assertEquals(Optional.of(Month.MARCH), Month.parse("Mae"));
 		assertEquals(Optional.of(Month.APRIL), Month.parse("Apr"));
 		assertEquals(Optional.of(Month.MAY), Month.parse("Mai"));
 		assertEquals(Optional.of(Month.JUNE), Month.parse("Jun"));
@@ -122,6 +123,7 @@ public class MonthTest {
 		assertEquals(Optional.of(Month.JANUARY), Month.parse("Januar"));
 		assertEquals(Optional.of(Month.FEBRUARY), Month.parse("Februar"));
 		assertEquals(Optional.of(Month.MARCH), Month.parse("März"));
+		assertEquals(Optional.of(Month.MARCH), Month.parse("Maerz"));
 		assertEquals(Optional.of(Month.APRIL), Month.parse("April"));
 		assertEquals(Optional.of(Month.MAY), Month.parse("Mai"));
 		assertEquals(Optional.of(Month.JUNE), Month.parse("Juni"));
