@@ -315,6 +315,7 @@ class SyncLang:
     def __update_properties(self, main_property_file, other_property_files):
         main_lines = self.__read_file_as_lines(filename=main_property_file)
         main_keys = Keys(main_lines)
+        main_keys_dict = main_keys.translations_as_dict()
 
         main_duplicates = main_keys.duplicates()
         num_main_duplicates = len(main_duplicates)
@@ -350,7 +351,8 @@ class SyncLang:
 
             for missing_key in keys_missing:
                 logging.debug("Adding missing Key: " + missing_key)
-                keys[missing_key] = ""
+                # Missing keys are added with english translation by default.
+                keys[missing_key] = main_keys_dict[missing_key]
 
             for obsolete_key in keys_obsolete:
                 logging.debug("Deleting obsolete Key: " + obsolete_key)
@@ -361,8 +363,8 @@ class SyncLang:
                 key = main_keys.key_from_line(line)
                 if key is not None:
                     # Do not write empty keys
-                    # if keys[key] != "":
-                    other_lines_to_write.append(Keys.format_key_and_value(key=key, value=keys[key]) + "\n")
+                    if keys[key] != "":
+                        other_lines_to_write.append(Keys.format_key_and_value(key=key, value=keys[key]) + "\n")
                 else:
                     other_lines_to_write.append(line)
 
