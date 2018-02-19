@@ -30,6 +30,7 @@ The new default removes the linked file from the entry instead of deleting the f
 - The group editing window can now also be called by double-clicking the group to be edited. [koppor#277](https://github.com/koppor/jabref/issues/277)
 - The magnifier icon at the search shows the [search mode](https://help.jabref.org/en/Search#search-modes) again. [#3535](https://github.com/JabRef/jabref/issues/3535)
 - We added a new cleanup operation that replaces ligatures with their expanded form. [#3613](https://github.com/JabRef/jabref/issues/3613)
++- Added a "Select all" [#280](https://github.com/koppor/jabref/issues/280) in the"Review changes" dialog.
 
 ### Fixed
 - We fixed an issue where pressing space caused the cursor to jump to the start of the text field. [#3471](https://github.com/JabRef/jabref/issues/3471)
