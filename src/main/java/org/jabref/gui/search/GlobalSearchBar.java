@@ -21,13 +21,6 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
-import org.jabref.gui.AbstractView;
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.OSXCompatibleToolbar;
-
 import javafx.css.PseudoClass;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
@@ -37,7 +30,12 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
-
+import org.jabref.gui.AbstractView;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
