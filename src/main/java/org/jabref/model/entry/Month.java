@@ -22,6 +22,7 @@ public enum Month {
     NOVEMBER("November", "nov", 11),
     DECEMBER("December", "dec", 12);
 
+
     private final String fullName;
     private final String shortName;
     private final String twoDigitNumber;
@@ -128,7 +129,7 @@ public enum Month {
     }
 
     /**
-     * Returns the name of the long in unabbreviated english.
+   forking a repositroy  * Returns the name of the long in unabbreviated english.
      * @return Month
      */
     public String getFullName() {
@@ -141,5 +142,35 @@ public enum Month {
      */
     public String getTwoDigitNumber() {
         return twoDigitNumber;
+    }
+    /**
+    *converts a german month to an english month. Accepts either the short form such as "jan" or the long form such as "januar". 
+    *accepts both lower and upper case
+    *@return the correct month in english short name, if a german month was entered correctly, returns empty if no german month was entered
+    *@author schmidja
+    */
+    private static Optional<Month> convertGermanMonth(String name) {
+        
+        if ("jan".equalsIgnoreCase(name)||"januar".equalsIgnoreCase(name)) {
+            return getMonthByShortName("jan");
+        } else if ("feb".equalsIgnoreCase(name)||"februar".equalsIgnoreCase(name)) {
+            return getMonthByShortName("feb");
+        } else if ("mae".equalsIgnoreCase(name)||"mär".equalsIgnoreCase(name)||"märz".equalsIgnoreCase(name)||"maerz".equalsIgnoreCase(name)){
+            return getMonthByShortName("mar");
+        } else if ("apr".equalsIgnoreCase(name)||"april".equalsIgnoreCase(name)) {
+            return getMonthByShortName("apr");
+        } else if ("mai".equalsIgnoreCase(name)) {
+            return getMonthByShortName("may");
+        } else if ("jun".equalsIgnoreCase(name)||"juni".equalsIgnoreCase(name)) {
+            return getMonthByShortName("jun");
+        } else if ("jul".equalsIgnoreCase(name)||"juli".equalsIgnoreCase(name)) {
+            return getMonthByShortName("jul");
+        } else if ("okt".equalsIgnoreCase(name)||"oktober".equalsIgnoreCase(name)) {
+            return getMonthByShortName("oct");
+        } else if ("dez".equalsIgnoreCase(name)||"dezember".equalsIgnoreCase(name)) {
+            return getMonthByShortName("dec");
+        } else {
+            return Optional.empty();
+        }
     }
 }
