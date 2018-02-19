@@ -24,7 +24,7 @@ public class NormalizeNamesFormatter implements Formatter {
     @Override
     public String format(String nameList) {
         Objects.requireNonNull(nameList);
-        nameList = nameList.replaceAll(" and", ",");
+
         AuthorList authorList = AuthorList.parse(nameList);
         return authorList.getAsLastFirstNamesWithAnd(false);
     }

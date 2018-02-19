@@ -166,7 +166,7 @@ public class AuthorList {
      */
     public static AuthorList parse(String authors) {
         Objects.requireNonNull(authors);
-
+        authors = authors.replaceAll(" and", ",");
         // Handle case names in order lastname, firstname and separated by ","
         // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
         final boolean authorsContainAND = authors.toUpperCase(Locale.ENGLISH).contains(" AND ");
