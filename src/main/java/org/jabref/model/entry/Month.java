@@ -147,6 +147,7 @@ public enum Month {
     *converts a german month to an english month. Accepts either the short form such as "jan" or the long form such as "januar". 
     *accepts both lower and upper case
     *@return the correct month in english short name, if a german month was entered correctly, returns empty if no german month was entered
+    *@author schmidja
     */
     private static Optional<Month> convertGermanMonth(String name) {
         
