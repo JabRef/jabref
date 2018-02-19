@@ -475,8 +475,6 @@ public class GlobalSearchBar extends JPanel {
 
         /**
          * Clears the search bar and select first entry, if available
-         *
-         * @author Aly Mohamed
          */
         private void clearOnEsc() {
             MainTable currentTable = frame.getCurrentBasePanel().getMainTable();
