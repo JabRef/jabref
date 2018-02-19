@@ -32,7 +32,7 @@ task xjc {
         }
         ant.xjc(destdir: 'src/main/gen/', package: 'org.jabref.logic.importer.fileformat.mods') {
             arg(value: '-npa') //don't create package-info.java because it was manually added in src/main/java to ensure the namespace prefix mapping
-            schema(dir: 'src/main/resources/xjc/mods', includes: 'mods-3-6.xsd')
+            schema(dir: 'src/main/resources/xjc/mods', includes: 'mods-3-7.xsd')
             binding(dir: 'src/main/resources/xjc/mods', includes: 'mods-binding.xjb')
         }
     }
