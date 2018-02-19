@@ -20,6 +20,6 @@ public class AuthorAbbreviator implements LayoutFormatter {
     @Override
     public String format(String fieldText) {
         AuthorList list = AuthorList.parse(fieldText);
-        return list.getAsLastFirstLastFirstWithAnd(true);
+        return list.getAsLastFirstNamesWithAnd(true);
     }
 }

@@ -129,7 +129,7 @@ public class AuthorList {
     private final String[] authorLastFirstAnds = new String[2];
     private final String[] authorsLastFirst = new String[4];
     private final String[] authorsLastFirstFirstLast = new String[2];
-    private final String[] authorsLastFirstLastFirst = new String[2];
+
 
     // Variables for storing computed strings, so they only need to be created once:
     private String authorsNatbib;
@@ -538,44 +538,10 @@ public class AuthorList {
             }
         }
 
-        authorsLastFirstLastFirst[abbrInt] = result.toString();
-        return authorsLastFirstLastFirst[abbrInt];
+        authorsLastFirstFirstLast[abbrInt] = result.toString();
+        return authorsLastFirstFirstLast[abbrInt];
     }
 
-    /**
-     * Returns the list of authors separated by commas with last names before
-     * first name; first names are abbreviated or not depending on parameter. If
-     * the list consists of three or more authors, "and" is inserted before the
-     * first author's name.
-     * <p>
-     * <ul>
-     * <li>"John Smith , Peter Black brown" ==> "Smith,John and  Black
-     * Brown,Peter"</li>
-     * </ul>
-     *
-     * @param abbreviate first names
-     * @return formatted list of authors.
-     */
-    public String getAsLastFirstLastFirstWithAnd(boolean abbreviate) {
-        int abbrInt = abbreviate ? 0 : 1;
-        // Check if we've computed this before:
-        if (authorsLastFirstLastFirst[abbrInt] != null) {
-            return authorsLastFirstLastFirst[abbrInt];
-        }
-
-        StringBuilder result = new StringBuilder();
-        if (!isEmpty()) {
-            result.append(getAuthor(0).getLastFirst(abbreviate));
-            for (int i = 1; i < getNumberOfAuthors(); i++) {
-                result.append(" and ");
-                result.append(getAuthor(i).getLastFirst(abbreviate));
-            }
-        }
-
-        authorsLastFirstLastFirst[abbrInt] = result.toString();
-        return authorsLastFirstLastFirst[abbrInt];
-
-    }
 
     /**
      * Returns the list of authors separated by commas with first names before
