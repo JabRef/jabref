@@ -101,37 +101,37 @@ public class MonthTest {
         assertEquals(Optional.empty(), Month.parse(""));
     }
     
-	@Test
-	public void parseCorrectlyByShortNameGerman() {
-		assertEquals(Optional.of(Month.JANUARY), Month.parse("Jan"));
-		assertEquals(Optional.of(Month.FEBRUARY), Month.parse("Feb"));
-		assertEquals(Optional.of(Month.MARCH), Month.parse("Mär"));
-		assertEquals(Optional.of(Month.MARCH), Month.parse("Mae"));
-		assertEquals(Optional.of(Month.APRIL), Month.parse("Apr"));
-		assertEquals(Optional.of(Month.MAY), Month.parse("Mai"));
-		assertEquals(Optional.of(Month.JUNE), Month.parse("Jun"));
-		assertEquals(Optional.of(Month.JULY), Month.parse("Jul"));
-		assertEquals(Optional.of(Month.AUGUST), Month.parse("Aug"));
-		assertEquals(Optional.of(Month.SEPTEMBER), Month.parse("Sep"));
-		assertEquals(Optional.of(Month.OCTOBER), Month.parse("Okt"));
-		assertEquals(Optional.of(Month.NOVEMBER), Month.parse("Nov"));
-		assertEquals(Optional.of(Month.DECEMBER), Month.parse("Dez"));
-	}
+    @Test
+    public void parseCorrectlyByShortNameGerman() {
+        assertEquals(Optional.of(Month.JANUARY), Month.parse("Jan"));
+        assertEquals(Optional.of(Month.FEBRUARY), Month.parse("Feb"));
+        assertEquals(Optional.of(Month.MARCH), Month.parse("Mär"));
+        assertEquals(Optional.of(Month.MARCH), Month.parse("Mae"));
+        assertEquals(Optional.of(Month.APRIL), Month.parse("Apr"));
+        assertEquals(Optional.of(Month.MAY), Month.parse("Mai"));
+        assertEquals(Optional.of(Month.JUNE), Month.parse("Jun"));
+        assertEquals(Optional.of(Month.JULY), Month.parse("Jul"));
+        assertEquals(Optional.of(Month.AUGUST), Month.parse("Aug"));
+        assertEquals(Optional.of(Month.SEPTEMBER), Month.parse("Sep"));
+        assertEquals(Optional.of(Month.OCTOBER), Month.parse("Okt"));
+        assertEquals(Optional.of(Month.NOVEMBER), Month.parse("Nov"));
+        assertEquals(Optional.of(Month.DECEMBER), Month.parse("Dez"));
+    }
 
-	@Test
-	public void parseCorrectlyByFullNameGerman() {
-		assertEquals(Optional.of(Month.JANUARY), Month.parse("Januar"));
-		assertEquals(Optional.of(Month.FEBRUARY), Month.parse("Februar"));
-		assertEquals(Optional.of(Month.MARCH), Month.parse("März"));
-		assertEquals(Optional.of(Month.MARCH), Month.parse("Maerz"));
-		assertEquals(Optional.of(Month.APRIL), Month.parse("April"));
-		assertEquals(Optional.of(Month.MAY), Month.parse("Mai"));
-		assertEquals(Optional.of(Month.JUNE), Month.parse("Juni"));
-		assertEquals(Optional.of(Month.JULY), Month.parse("Juli"));
-		assertEquals(Optional.of(Month.AUGUST), Month.parse("August"));
-		assertEquals(Optional.of(Month.SEPTEMBER), Month.parse("September"));
-		assertEquals(Optional.of(Month.OCTOBER), Month.parse("Oktober"));
-		assertEquals(Optional.of(Month.NOVEMBER), Month.parse("November"));
-		assertEquals(Optional.of(Month.DECEMBER), Month.parse("Dezember"));
-	}
+    @Test
+    public void parseCorrectlyByFullNameGerman() {
+        assertEquals(Optional.of(Month.JANUARY), Month.parse("Januar"));
+        assertEquals(Optional.of(Month.FEBRUARY), Month.parse("Februar"));
+        assertEquals(Optional.of(Month.MARCH), Month.parse("März"));
+        assertEquals(Optional.of(Month.MARCH), Month.parse("Maerz"));
+        assertEquals(Optional.of(Month.APRIL), Month.parse("April"));
+        assertEquals(Optional.of(Month.MAY), Month.parse("Mai"));
+        assertEquals(Optional.of(Month.JUNE), Month.parse("Juni"));
+        assertEquals(Optional.of(Month.JULY), Month.parse("Juli"));
+        assertEquals(Optional.of(Month.AUGUST), Month.parse("August"));
+        assertEquals(Optional.of(Month.SEPTEMBER), Month.parse("September"));
+        assertEquals(Optional.of(Month.OCTOBER), Month.parse("Oktober"));
+        assertEquals(Optional.of(Month.NOVEMBER), Month.parse("November"));
+        assertEquals(Optional.of(Month.DECEMBER), Month.parse("Dezember"));
+    }
 }
