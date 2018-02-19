@@ -123,6 +123,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.specialfields.SpecialField;
@@ -559,7 +560,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         /*     actions.put(Actions.DUPLI_CHECK,
                 (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(new DuplicateSearch(BasePanel.this)));
         */
-
 
         // TODO
         //actions.put(Actions.MARK_ENTRIES, new MarkEntriesAction(frame, 0));
@@ -1861,7 +1861,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             // Run the search operation:
             FileFinder fileFinder = FileFinders.constructFromConfiguration(Globals.prefs.getAutoLinkPreferences());
             try {
-            List<Path> files = fileFinder.findAssociatedFiles(entry, dirs, extensions);
+                List<Path> files = fileFinder.findAssociatedFiles(entry, dirs, extensions);
                 if (!files.isEmpty()) {
                     Path file = files.get(0);
                     Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByFile(file);
@@ -2000,29 +2000,26 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 } else {
                     // No URL or DOI found in the "url" and "doi" fields.
                     // Look for web links in the "file" field as a fallback:
-                    FileListEntry entry = null;
-                    FileListTableModel tm = new FileListTableModel();
-                    bes.get(0).getField(FieldName.FILE).ifPresent(tm::setContent);
-                    for (int i = 0; i < tm.getRowCount(); i++) {
-                        FileListEntry flEntry = tm.getEntry(i);
-                        if (FieldName.URL.equalsIgnoreCase(flEntry.getType().get().getName())
-                                || FieldName.PS.equalsIgnoreCase(flEntry.getType().get().getName())
-                                || FieldName.PDF.equalsIgnoreCase(flEntry.getType().get().getName())) {
-                            entry = flEntry;
-                            break;
-                        }
-                    }
-                    if (entry == null) {
-                        output(Localization.lang("No URL defined") + '.');
-                    } else {
+
+                    List<LinkedFile> files = bes.get(0).getFiles();
+
+                    Optional<LinkedFile> linkedFile = files.stream().filter(file -> (FieldName.URL.equalsIgnoreCase(file.getFileType())
+                            || FieldName.PS.equalsIgnoreCase(file.getFileType())
+                            || FieldName.PDF.equalsIgnoreCase(file.getFileType()))).findFirst();
+
+                    if (linkedFile.isPresent()) {
+
                         try {
-                            JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext, entry.getLink(),
-                                    entry.getType());
+
+                            JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext, linkedFile.get().getLink(), ExternalFileTypes.getInstance().fromLinkedFile(linkedFile.get(), true));
+
                             output(Localization.lang("External viewer called") + '.');
                         } catch (IOException e) {
                             output(Localization.lang("Could not open link"));
                             LOGGER.info("Could not open link", e);
                         }
+                    } else {
+                        output(Localization.lang("No URL defined") + '.');
                     }
                 }
             } else {

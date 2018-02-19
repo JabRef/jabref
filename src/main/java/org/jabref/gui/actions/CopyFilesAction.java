@@ -26,18 +26,20 @@ public class CopyFilesAction extends SimpleCommand {
     private BibDatabaseContext databaseContext;
     private List<BibEntry> entries;
     private final JabRefFrame frame;
+
     public CopyFilesAction(JabRefFrame frame) {
         this.frame = frame;
         this.dialogService = frame.getDialogService();
     }
 
-
     private void startServiceAndshowProgessDialog(Task<List<CopyFilesResultItemViewModel>> exportService) {
 
         dialogService.showCanceableProgressDialogAndWait(exportService);
 
-        exportService.run(); //Run kinda blocks, so we just show the result dialog wgeb run is ready
-        showDialog(exportService.getValue());
+        exportService.run();
+        exportService.setOnSucceeded((e) -> {
+            showDialog(exportService.getValue());
+        });
     }
 
     private void showDialog(List<CopyFilesResultItemViewModel> data) {

@@ -971,7 +971,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         help.getItems().addAll(
                 factory.createMenuItem(StandardActions.HELP, HelpAction.getCommand()),
-                factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction("https://discourse.jabref.org/")),
+                factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction("http://discourse.jabref.org/")),
 
                 new SeparatorMenuItem(),
 
