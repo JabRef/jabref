@@ -79,30 +79,30 @@ public enum Month {
      * @return the corresponding Month instance
      */
     public static Optional<Month> parse(String value) {
-       if (StringUtil.isBlank(value)) {
-           return Optional.empty();
-       }
+        if (StringUtil.isBlank(value)) {
+            return Optional.empty();
+        }
 
-       // Much more liberal matching covering most known abbreviations etc.
-       String testString = value.replace("#", "").trim();
-       if (testString.length() > 3) {
-           testString = testString.substring(0, 3);
-       }
-       Optional<Month> month = Month.getMonthByShortName(testString);
-       Optional<Month> monthGerman = Month.parseGermanShortMonth(testString);
-       if (month.isPresent()) {
-           return month;
-       }
-       if (monthGerman.isPresent()) {
-           return monthGerman;
-       }
+        // Much more liberal matching covering most known abbreviations etc.
+        String testString = value.replace("#", "").trim();
+        if (testString.length() > 3) {
+            testString = testString.substring(0, 3);
+        }
+        Optional<Month> month = Month.getMonthByShortName(testString);
+        Optional<Month> monthGerman = Month.parseGermanShortMonth(testString);
+        if (month.isPresent()) {
+            return month;
+        }
+        if (monthGerman.isPresent()) {
+            return monthGerman;
+        }
 
-       try {
-           int number = Integer.parseInt(value);
-           return Month.getMonthByNumber(number);
-       } catch (NumberFormatException e) {
-           return Optional.empty();
-       }
+        try {
+            int number = Integer.parseInt(value);
+            return Month.getMonthByNumber(number);
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -114,18 +114,18 @@ public enum Month {
      * @return the corresponding month instance, empty if input is not in German
      *         form
      */
-    private static Optional<Month> parseGermanShortMonth(String value) {
-       if ("Mae".equals(value)) {
-           return Month.getMonthByNumber(3);
-       }
+	private static Optional<Month> parseGermanShortMonth(String value) {
+        if ("Mae".equals(value)) {
+            return Month.getMonthByNumber(3);
+        }
 
-       try {
-           YearMonth yearMonth = YearMonth.parse("1969-" + value,
-                             DateTimeFormatter.ofPattern("yyyy-MMM", Locale.GERMAN));
-           return Month.getMonthByNumber(yearMonth.getMonthValue());
-       } catch (DateTimeParseException e) {
-           return Optional.empty();
-       }
+        try {
+            YearMonth yearMonth = YearMonth.parse("1969-" + value, 
+            		DateTimeFormatter.ofPattern("yyyy-MMM", Locale.GERMAN));
+            return Month.getMonthByNumber(yearMonth.getMonthValue());
+        } catch (DateTimeParseException e) {
+            return Optional.empty();
+        }
     }
 
     /**
