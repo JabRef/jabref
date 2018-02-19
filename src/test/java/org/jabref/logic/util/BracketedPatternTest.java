@@ -59,6 +59,13 @@ public class BracketedPatternTest {
         BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
         assertEquals("2017_Kitsune_213", pattern.expand(bibentry, another_database));
     }
+    
+    @Test
+    public void pureauthTest() {
+        BibDatabase another_database = new BibDatabase();
+        BracketedPattern pattern = new BracketedPattern("[pureauth]");
+        assertEquals("Kitsune", pattern.expand(bibentry, another_database));
+    }
 
     @Test
     public void emptyDatabaseExpansionTest() {
