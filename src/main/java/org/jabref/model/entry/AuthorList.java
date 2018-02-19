@@ -128,7 +128,7 @@ public class AuthorList {
     private final String[] authorsLastOnly = new String[2];
     private final String[] authorLastFirstAnds = new String[2];
     private final String[] authorsLastFirst = new String[4];
-    private final String[] authorsLastFirstLastFirst = new String[2];
+    private final String[] authorsLastFirstFirstLast = new String[2];
     private final String[] authorsLastFirstLastFirst = new String[2];
 
     // Variables for storing computed strings, so they only need to be created once:
@@ -525,8 +525,8 @@ public class AuthorList {
     public String getAsLastFirstFirstLastNamesWithAnd(boolean abbreviate) {
         int abbrInt = abbreviate ? 0 : 1;
         // Check if we've computed this before:
-        if (authorsLastFirstLastFirst[abbrInt] != null) {
-            return authorsLastFirstLastFirst[abbrInt];
+        if (authorsLastFirstFirstLast[abbrInt] != null) {
+            return authorsLastFirstFirstLast[abbrInt];
         }
 
         StringBuilder result = new StringBuilder();
