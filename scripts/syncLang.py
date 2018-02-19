@@ -42,11 +42,11 @@ try:
                 if parent.name == 'jabref':
                     return parent
     
-        # Important paths of the JabRef repository
-        JABREF_BASE_DIRECTORY = self.getJabRefBaseDirectory()
-        JABREF_SOURCE_DIRECTORY = JABREF_BASE_DIRECTORY / 'src'
-        JABREF_SCRIPTS_DIRECTORY = JABREF_BASE_DIRECTORY / 'scripts'
-        JABREF_LOCALIZATION_DIRECTORY = JABREF_SOURCE_DIRECTORY / 'main/resources/l10n'
+    # Important paths, files and directories of the JabRef repository
+    JABREF_BASE_DIRECTORY = PathFinder.getJabRefBaseDirectory()
+    JABREF_SOURCE_DIRECTORY = JABREF_BASE_DIRECTORY / 'src'
+    JABREF_SCRIPTS_DIRECTORY = JABREF_BASE_DIRECTORY / 'scripts'
+    JABREF_LOCALIZATION_DIRECTORY = JABREF_SOURCE_DIRECTORY / 'main/resources/l10n'
 except ImportError:
     logging.info("Unable to use PathFinder class.")
 
