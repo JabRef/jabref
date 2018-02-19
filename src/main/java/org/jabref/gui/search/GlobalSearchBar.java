@@ -12,6 +12,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.AbstractView;
+import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.OSXCompatibleToolbar;
+import org.jabref.gui.JabRefFrame;
+
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -30,7 +37,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
-import org.jabref.gui.*;
+
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
@@ -41,7 +48,6 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
-import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -393,7 +399,7 @@ public class GlobalSearchBar extends JPanel {
             searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
         }
         if (grammarBasedSearch) {
-           searchIcon.setIcon(IconTheme.JabRefIcon.ADVANCED_SEARCH.getIcon());
+            searchIcon.setIcon(IconTheme.JabRefIcon.ADVANCED_SEARCH.getIcon());
         } else {
             searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
         }
@@ -433,7 +439,7 @@ public class GlobalSearchBar extends JPanel {
     private class SearchKeyAdapter extends KeyAdapter {
 
         @Override
-        public void keyPressed(java.awt.event.KeyEvent e) {
+        public void keyPressed(KeyEvent e) {
             switch (e.getKeyCode()) {
 
                 // Clear search bar and select first entry, if available
@@ -442,16 +448,15 @@ public class GlobalSearchBar extends JPanel {
                     break;
 
                 //This "hack" prevents that the focus moves out of the field
-                case java.awt.event.KeyEvent.VK_RIGHT:
-                case java.awt.event.KeyEvent.VK_LEFT:
-                case java.awt.event.KeyEvent.VK_UP:
-                case java.awt.event.KeyEvent.VK_DOWN:
+                case KeyEvent.VK_RIGHT:
+                case KeyEvent.VK_LEFT:
+                case KeyEvent.VK_UP:
+                case KeyEvent.VK_DOWN:
                     e.consume();
                     break;
                 default:
                     //do nothing
             }
-
 
             //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
             Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
@@ -478,7 +483,6 @@ public class GlobalSearchBar extends JPanel {
         private void clearOnEsc() {
             MainTable currentTable = frame.getCurrentBasePanel().getMainTable();
             clearSearch(frame.getCurrentBasePanel());
-            BasePanel panel = frame.getCurrentBasePanel();
             currentTable.setSelected(0);
         }
     }
