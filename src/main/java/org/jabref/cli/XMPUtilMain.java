@@ -113,12 +113,12 @@ public class XMPUtilMain {
                 try (FileReader reader = new FileReader(args[0])) {
                     ParserResult result = new BibtexParser(importFormatPreferences, Globals.getFileUpdateMonitor()).parse(reader);
 
-                    Collection<BibEntry> entries = result.getDatabase().getEntries();
+                    List<BibEntry> entries = result.getDatabase().getEntries();
 
                     if (entries.isEmpty()) {
                         System.err.println("Could not find BibEntry in " + args[0]);
                     } else {
-                        XMPUtilWriter.writeXMP(Paths.get(args[1]), entries, result.getDatabase(), false, xmpPreferences);
+                        XMPUtilWriter.writeXMP(Paths.get(args[1]), entries, result.getDatabase(), xmpPreferences);
                         System.out.println("XMP written.");
                     }
                 }

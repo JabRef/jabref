@@ -1,7 +1,6 @@
 package org.jabref.logic.xmp;
 
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -11,8 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import javax.xml.transform.TransformerException;
-
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -21,8 +18,6 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.io.Resources;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.DublinCoreSchema;
 import org.junit.Assert;
@@ -35,7 +30,7 @@ import org.mockito.Answers;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class XMPUtilTest {
+public class XMPUtilReaderTest {
 
     @Rule public TemporaryFolder tempFolder = new TemporaryFolder();
 
@@ -52,7 +47,6 @@ public class XMPUtilTest {
      */
     @Before
     public void setUp() {
-
 
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
@@ -142,31 +136,4 @@ public class XMPUtilTest {
         Assert.assertEquals(entryFromBibFile.get(), entries.get(0));
     }
 
-    @Test
-    public void testWriteXMP() throws IOException, URISyntaxException, TransformerException {
-
-        // create a default PDF
-        File pdfFile = tempFolder.newFile("JabRef.pdf");
-        try (PDDocument pdf = new PDDocument()) {
-            // Need a single page to open in Acrobat
-            pdf.addPage(new PDPage());
-            pdf.save(pdfFile.getPath());
-        }
-
-        // read a bib entry from the tests before
-        List<BibEntry> entries = XMPUtilReader.readXMP(Paths.get(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/PD_metadata.pdf").toURI()), xmpPreferences);
-        BibEntry entry = entries.get(0);
-        entry.setCiteKey("WriteXMPTest");
-        entry.setId("ID4711");
-
-        // write the changed bib entry to the create PDF
-        XMPUtilWriter.writeXMP(pdfFile.getAbsolutePath(), entry, null, xmpPreferences);
-
-        // read entry again
-        List<BibEntry> entriesWritten = XMPUtilReader.readXMP(pdfFile.getPath(), xmpPreferences);
-        BibEntry entryWritten = entriesWritten.get(0);
-
-        // compare the two entries
-        Assert.assertEquals(entry, entryWritten);
-    }
 }
