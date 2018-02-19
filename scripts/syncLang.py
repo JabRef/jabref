@@ -16,7 +16,6 @@ URL_BASE = "https://github.com/JabRef/jabref/tree/master/src/main/resources/l10n
 try:
     # Just to make sure not to break anything, in case py3.x is not supported.
     import pathlib
-    
     class PathFinder:
         """
         This class is designed to automatically locate this script's path within the repository.
@@ -48,7 +47,7 @@ try:
         JABREF_SOURCE_DIRECTORY = JABREF_BASE_DIRECTORY / 'src'
         JABREF_SCRIPTS_DIRECTORY = JABREF_BASE_DIRECTORY / 'scripts'
         JABREF_LOCALIZATION_DIRECTORY = JABREF_SOURCE_DIRECTORY / 'main/resources/l10n'
-except:
+except ImportError:
     logging.info("Unable to use PathFinder class.")
 
     
