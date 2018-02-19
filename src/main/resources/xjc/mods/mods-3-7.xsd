@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Source: www.loc.gov/standards/mods/mods-schemas.html. -->
 <!--  Editor:  Ray Denenberg, Library of Congress; rden@loc.gov -->
+<!-- -->
 <xs:schema xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.loc.gov/mods/v3" targetNamespace="http://www.loc.gov/mods/v3" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<!-- -->
 	<xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.loc.gov/mods/xml.xsd"/>
@@ -10,51 +10,29 @@ MODS: Metadata Object Description Schema. See http://www.loc.gov/standards/mods/
 
           ****************************************************************
          *                                                                                
-         *                            MODS 3.6                                    
-         *
-         *                           May 5, 2015                  
+         *                            MODS 3.7
+         *         
+         *                           January 4, 2018                 
          *                    
           *****************************************************************w
 
+***************************************************
+
+Changes in version 3.7
+1.	Capability added to supply an authority for a publisher. 
+2.	Controlled-list restriction removed from typeOfResource so that any value may be supplied. 
+3.	Capability added to supply  a calendar name for a date. 
+4.	Capability added to supply an alternative name for a name.
 
 ***************************************************
-Changes in version 3.6
-1. nonSort definition revised in 3.6. to add attribute @xml:space.
-
-2. HierarchicalGeographic enhancements. 
-      - <province> depricated in favor of <state>  (<state> re-defined in guidelines)
-      - Attributes @areaType, @regionType, and @citySectionType 
-        defined for elements <area>, <region>, and <citySection> 
-      - Attribute @level defined for all place type elements to indicate hierarchical level.
-      - Authority attributeGroup added to all place type elements. 
-      - Attribute @period defined. Indicates that the described entity once existed but no longer exists.  
-   
-3. Four new attributes for <relatedItem>
-	•	@otherType 
-	•	@otherTypeAuth 
-	•	@otherTypeAuthURI 
-	•	@otherTypeURI
+***************************************************
 
 
-4. New element <nameIdentifier>, subelement of <name>, re-using the existing <identifier> definition
-
-
-5. <cartographics>(subelement of <subject>) is made extensible.
-
-
-6. New element <recordInfoNote>, subelement of <recordInfo>, re-using the existing <note> definition
-
-7.  New element <itemIdentifier>, subelement of <location><physicalLocation><holdingSimple><copyInformation>
-    with attribute @type, for example:
-            <itemIdentifer   type="barcode">
-            <itemIdentifier  type="copyNumber">
-            <itemIdentifier  type="accessionNumber">
-
-*********************************************************************************************
 
      *************************************
      Organization of this schema
      *************************************
+
 The schema has three parts:
 
 1.   Structural declarations and definitions 
@@ -81,6 +59,7 @@ The schema has three parts:
 		<xs:attribute name="version">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
+					<xs:enumeration value="3.7"/>
 					<xs:enumeration value="3.6"/>
 					<xs:enumeration value="3.5"/>
 					<xs:enumeration value="3.4"/>
@@ -391,15 +370,13 @@ End list of "top level" MODS elements
 				</xs:complexType>
 			</xs:element>
 			<xs:element ref="enumerationAndChronology" minOccurs="0" maxOccurs="unbounded"/>
-			<!--  
-    	 ******************the following element <itemIdentifer> added in 3.6   -->
 			<xs:element ref="itemIdentifier" minOccurs="0" maxOccurs="unbounded"/>
 			<!--	-->
 		</xs:sequence>
 	</xs:complexType>
-
-
-		<!-- following definition is new in 3.6 -->
+	<!--
+**********itemIdentifier **********     
+ -->
 		<xs:element name="itemIdentifier" type="itemIdentifierDefinition"/>
 			<xs:complexType name="itemIdentifierDefinition">
 				<xs:simpleContent>
@@ -486,7 +463,7 @@ End list of "top level" MODS elements
 	<xs:complexType name="nameDefinition">
 		<xs:choice>
 			
-			<!-- this choice give two ways to do this.  
+			<!-- this choice gives two ways to do this.  
 				The second way allows the element <etal>,  to express "et. al."
 
 Choice one. WITHOUT <etal>.
@@ -497,13 +474,10 @@ Choice one. WITHOUT <etal>.
 				<xs:element ref="affiliation"/>
 				<xs:element ref="role"/>
 				<xs:element ref="description"/>
-			<!-- 
-				the following element, <nameIdentifier>, is introduced in version 3.6,
-				to allow the inclusion of an identifier for the object named by this <name>.
-				It is typed as "indentifierDefinition", the same definition that 
-				top-level element <identifier> uses. 
-				-->
 				<xs:element ref="nameIdentifier"/>
+				<!-- 
+				The following,alternativeName, is new in 3.7-->
+				<xs:element ref="alternativeName"/>				
 		<!--   -->		
 			</xs:choice>
 			<!-- 
@@ -575,13 +549,14 @@ Choice two.	With <etal>.
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
-	<!-- displayForm, affiliation, description -->
+	<!-- displayForm, affiliation, description, alternativeName -->
 	<xs:element name="displayForm" type="stringPlusLanguage"/>
 	<xs:element name="affiliation" type="stringPlusLanguage"/>
 	<xs:element name="description" type="stringPlusLanguage"/>
-	<!-- new in 3.6 -->
-    <!--  nameIdentifier -->
 	<xs:element name="nameIdentifier" type="identifierDefinition"/>
+	<!-- the following element, alternativeName, is new in 3.7 -->
+	<xs:element name="alternativeName" type="alternativeNameDefinition"/>
+
 	<!--  
 ******** role *********************
     -->
@@ -609,6 +584,27 @@ Choice two.	With <etal>.
 -->
 	<xs:element name="etal" type="stringPlusLanguage"/>
 	<!--   
+********  alternativeName  ********
+******************** new in 3.7 ****************************
+-->
+<xs:complexType name="alternativeNameDefinition">
+
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="namePart"/>
+				<xs:element ref="displayForm"/>
+				<xs:element ref="affiliation"/>
+				<xs:element ref="role"/>
+				<xs:element ref="description"/>
+				<xs:element ref="nameIdentifier"/>				
+		</xs:choice>
+			<!-- -->
+		<xs:attributeGroup ref="xlink:simpleLink"/>
+		<xs:attributeGroup ref="languageAttributeGroup"/>
+		<xs:attribute name="displayLabel" type="xs:string"/>
+		<xs:attribute name="altType" type="xs:string"/>
+</xs:complexType>
+	
+	<!--
 
 ****************************************************
 *   Top Level Element <note>                      *
@@ -697,7 +693,23 @@ Choice two.	With <etal>.
 	<!-- 
 *** publisher ***
 -->
-	<xs:element name="publisher" type="stringPlusLanguagePlusSupplied"/>
+	<xs:element name="publisher" type="publisherDefinition"/> 
+<!--     ******************* definition changed in 3.7 *******************
+		****** in 3.6, publisher was defined as stringPlusLanguagePlusSupplied
+		****** in 3.7, the authority attributes are added
+-->		
+	<xs:complexType  name="publisherDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguagePlusSupplied">
+				<xs:attributeGroup ref="authorityAttributeGroup"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	
+	
+	
+	
 	<!--  
 ********** dates  **********  
 -->
@@ -741,6 +753,11 @@ Choice two.	With <etal>.
 					</xs:simpleType>
 				</xs:attribute>
 				<xs:attribute name="keyDate" fixed="yes"/>
+				<!-- 
+				***********  Following attribute, @calendar, added in 3.7
+				-->
+				<xs:attribute name="calendar" type="xs:string"/>
+<!-- -->				
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -954,8 +971,6 @@ Choice two.	With <etal>.
 			<xs:element ref="languageOfCataloging"/>
 			<xs:element ref="recordOrigin"/>
 			<xs:element ref="descriptionStandard"/>
-			<!--  
-				*****************following added in 3.6 -->
 			<xs:element ref="recordInfoNote"/>
 <!-- -->			
 		</xs:choice>
@@ -970,8 +985,6 @@ Choice two.	With <etal>.
 	<xs:element name="recordContentSource" type="stringPlusLanguagePlusAuthority"/>
 	<xs:element name="recordCreationDate" type="dateDefinition"/>
 	<xs:element name="recordChangeDate" type="dateDefinition"/>
-		<!--  
-				*****************following added in 3.6 -->
 	<xs:element name="recordInfoNote" type="noteDefinition"/>
 	<!--
 ********** recordIdentifier 
@@ -1018,15 +1031,11 @@ Choice two.	With <etal>.
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<!-- 
-		Following four attributes are new in 3.6
-		-->	
+		<!-- -->	
 		<xs:attribute name="otherType" type="xs:string"/>
 		<xs:attribute name="otherTypeAuth" type="xs:string"/>
 		<xs:attribute name="otherTypeAuthURI" type="xs:string"/>
 		<xs:attribute name="otherTypeURI" type="xs:string"/>
-		<!-- -->
-		
 		<xs:attribute name="displayLabel" type="xs:string"/>
 		<xs:attribute name="ID" type="xs:ID"/>
 		<xs:attributeGroup ref="xlink:simpleLink"/>
@@ -1118,7 +1127,6 @@ Choice two.	With <etal>.
 			<xs:element ref="affiliation"/>
 			<xs:element ref="role"/>
 			<xs:element ref="description"/>
-<!--			****** following element <nameIdentifier> new in 3.6. -->
 			<xs:element ref="nameIdentifier"/>
 			<!-- -->
 		</xs:choice>
@@ -1171,10 +1179,9 @@ Choice two.	With <etal>.
 			<xs:element ref="continent"/>
 			<xs:element ref="country"/>
 			<xs:element ref="province"/>
-			<!-- province is deprecated in version 3.6.  Use <state> instead.  -->
+			<!-- province is deprecated.  Use <state> instead.  -->
 			<xs:element ref="region"/>
 			<xs:element ref="state"/>
-			<!-- <state> definition broadened in 3.6.  Use <state> for all first order political divisions, e.g. province. -->
 			<xs:element ref="territory"/>
 			<xs:element ref="county"/>
 			<xs:element ref="city"/>
@@ -1185,23 +1192,7 @@ Choice two.	With <etal>.
 		<xs:attributeGroup ref="authorityAttributeGroup"/>
 	</xs:complexType>
 	<!-- -->
-	<!-- 
-		New in 3.6: 
-		all the above elements were previously stringPlusLanguage.
-		Now the following attributes are added:
-			- @level   (for all)
-			- @authority, @authorityURI, and @valueURI  (the authority attributeGroup)  (for all)
-			- @period  (for all)
-			- @areaType, @regionType, and @citySectionType (for area, region, and citySection, respectively) 
-			
-			So there is a new auxiliary definition, hierarchicalPart which adds @level, authority group, and @period
-			as well as three new definitions each extending hierarchicalPart, for area, region, and city section, each
-			adding its respective attribute.
-	-->
-	
-	<!--
-		********** hierarchicalPart   *** new in 3.6, auxiliary definition  
-	-->
+		<!-- 		********** hierarchicalPart   *** auxiliary definition 	-->
 	<xs:complexType name="hierarchicalPart">
 		<xs:simpleContent>
 			<xs:extension base="stringPlusLanguage">
@@ -1246,7 +1237,7 @@ Choice two.	With <etal>.
 		</xs:simpleContent>
 	</xs:complexType>
 		<!--  
-	For the rest, "stringPlusLanguage" is changed to "hierarchicalPart"   ......
+	The rest are all of type "hierarchicalPart"   ......
 		-->
 	<xs:element name="extraTerrestrialArea" type="hierarchicalPart"/>
 		<xs:element name="city" type="hierarchicalPart"/>
@@ -1257,7 +1248,7 @@ Choice two.	With <etal>.
 	<xs:element name="state" type="hierarchicalPart"/>
 	<xs:element name="territory" type="hierarchicalPart"/>
 	<!--  
-		..... except for province, which remains the same 
+		..... except for province
 	-->
 	<xs:element name="province" type="stringPlusLanguage"/>
 	<!--  
@@ -1271,8 +1262,6 @@ Choice two.	With <etal>.
 			<xs:element ref="scale" minOccurs="0"/>
 			<xs:element ref="projection" minOccurs="0"/>
 			<xs:element ref="coordinates" minOccurs="0" maxOccurs="unbounded"/>
-			<!-- 
-      *********** Following is new in 3.6, to allow an extension schema.    -->
 			<xs:element ref="cartographicExtension" minOccurs="0" maxOccurs="unbounded"/>
 <!--  -->   
 		</xs:sequence>
@@ -1283,7 +1272,6 @@ Choice two.	With <etal>.
 	<xs:element name="scale" type="stringPlusLanguage"/>
 	<xs:element name="projection" type="stringPlusLanguage"/>
 	<xs:element name="coordinates" type="stringPlusLanguage"/>
-<!-- 	*********** Following is new in 3.6,     -->
 	<xs:element name="cartographicExtension" type="extensionDefinition"/>
 	<!-- 
  ********** occupation **********  
@@ -1370,7 +1358,7 @@ Choice two.	With <etal>.
 	<xs:element name="partNumber" type="stringPlusLanguage"/>
 	<xs:element name="partName" type="stringPlusLanguage"/>
 	<!-- 
-*********  nonSort definition revised in 3.6. to add attribute xml:space.
+*********  nonSort
 		-->
 	<xs:element name="nonSort">
 		<xs:complexType>
@@ -1390,7 +1378,14 @@ Choice two.	With <etal>.
 	<!-- -->
 	<xs:complexType name="typeOfResourceDefinition">
 		<xs:simpleContent>
-			<xs:extension base="resourceTypeDefinition">
+			<xs:extension base="stringPlusLanguagePlusAuthority">
+				<!-- 
+					***************** definition changed in 3.7 *****************
+				In 3.6 the base was "resourceTypeDefinition", 
+				which was a controlled list.
+				In 3.7 resourceTypeDefinition is removed, so
+				any value may be supplied.
+				-->
 				<xs:attribute name="collection" fixed="yes"/>
 				<xs:attribute name="manuscript" fixed="yes"/>
 				<xs:attribute name="displayLabel" type="xs:string"/>
@@ -1399,29 +1394,7 @@ Choice two.	With <etal>.
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
-	<!--
-
-********   Subordinate Definitions for <typeOfResource>                
- -->
-	<!-- 
- ******* resourceTypeDefinition  ********    
--->
-	<xs:simpleType name="resourceTypeDefinition">
-		<xs:restriction base="xs:string">
-			<xs:enumeration value="text"/>
-			<xs:enumeration value="cartographic"/>
-			<xs:enumeration value="notated music"/>
-			<xs:enumeration value="sound recording-musical"/>
-			<xs:enumeration value="sound recording-nonmusical"/>
-			<xs:enumeration value="sound recording"/>
-			<xs:enumeration value="still image"/>
-			<xs:enumeration value="moving image"/>
-			<xs:enumeration value="three dimensional object"/>
-			<xs:enumeration value="software, multimedia"/>
-			<xs:enumeration value="mixed material"/>
-			<xs:enumeration value=""/>
-		</xs:restriction>
-	</xs:simpleType>
+	
 	<!--  
          *********************************
          *********************************
