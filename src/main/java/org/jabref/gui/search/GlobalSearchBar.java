@@ -12,13 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.AbstractView;
-import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.OSXCompatibleToolbar;
-import org.jabref.gui.JabRefFrame;
-
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -27,6 +20,13 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+
+import org.jabref.gui.AbstractView;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.OSXCompatibleToolbar;
 
 import javafx.css.PseudoClass;
 import javafx.embed.swing.JFXPanel;
