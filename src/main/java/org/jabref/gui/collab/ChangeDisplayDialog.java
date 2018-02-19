@@ -30,6 +30,7 @@ class ChangeDisplayDialog extends JabRefDialog implements TreeSelectionListener 
     private final JTree tree;
     private final JPanel infoPanel = new JPanel();
     private final JCheckBox cb = new JCheckBox(Localization.lang("Accept change"));
+    private final JCheckBox cb2 = new JCheckBox(Localization.lang("Accept all change"));
     private final JLabel rootInfo = new JLabel(Localization.lang("Select the tree nodes to view and accept or reject changes") + '.');
     private ChangeViewModel selected;
     private JComponent infoShown;
@@ -57,12 +58,14 @@ class ChangeDisplayDialog extends JabRefDialog implements TreeSelectionListener 
 
         cb.setMargin(new Insets(2, 2, 2, 2));
         cb.setEnabled(false);
+        cb2.setMargin(new Insets(4, 4, 4, 4));
+        cb2.setEnabled(false);
         infoPanel.setLayout(new BorderLayout());
         infoBorder.setLayout(new BorderLayout());
         infoBorder.setBorder(BorderFactory.createEtchedBorder());
         infoBorder.add(infoPanel, BorderLayout.CENTER);
         setInfo(rootInfo);
-        infoPanel.add(cb, BorderLayout.SOUTH);
+        infoPanel.add(cb, cb2, BorderLayout.SOUTH);
 
         JButton ok = new JButton(Localization.lang("OK"));
         JPanel buttonPanel = new JPanel();
@@ -78,6 +81,12 @@ class ChangeDisplayDialog extends JabRefDialog implements TreeSelectionListener 
                 selected.setAccepted(cb.isSelected());
             }
         });
+        cb2.addChangeListener(e -> {
+        	if ( selected != null) {
+        		selected.setAccepted(cb2.isSelected());
+        		cb.setEnabled(true);
+        	}
+        })
 
         cancel.addActionListener(e -> dispose());
 
