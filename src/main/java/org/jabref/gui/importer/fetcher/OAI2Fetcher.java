@@ -33,14 +33,12 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- *
  * This class can be used to access any archive offering an OAI2 interface. By
  * default it will access ArXiv.org
  *
- * @see <a href="http://arxiv.org/help/oa/index"></a>
- *
  * @author Ulrich St&auml;rk
  * @author Christian Kopf
+ * @see <a href="http://arxiv.org/help/oa/index"></a>
  */
 public class OAI2Fetcher implements EntryFetcher {
 
@@ -56,33 +54,24 @@ public class OAI2Fetcher implements EntryFetcher {
     private final String oai2Script;
     private final String oai2MetaDataPrefix;
     private final String oai2PrefixIdentifier;
-    private final String oai2ArchiveName;
     private boolean shouldContinue = true;
     private long waitTime = -1;
     private Date lastCall;
 
     /**
-     *
-     *
-     * @param oai2Host
-     *            the host to query without leading http:// and without trailing /
-     * @param oai2Script
-     *            the relative location of the oai2 interface without leading
-     *            and trailing /
-     * @param oai2Metadataprefix
-     *            the urlencoded metadataprefix
-     * @param oai2Prefixidentifier
-     *            the urlencoded prefix identifier
-     * @param waitTimeMs
-     *            Time to wait in milliseconds between query-requests.
+     * @param oai2Host             the host to query without leading http:// and without trailing /
+     * @param oai2Script           the relative location of the oai2 interface without leading
+     *                             and trailing /
+     * @param oai2Metadataprefix   the urlencoded metadataprefix
+     * @param oai2Prefixidentifier the urlencoded prefix identifier
+     * @param waitTimeMs           Time to wait in milliseconds between query-requests.
      */
     public OAI2Fetcher(String oai2Host, String oai2Script, String oai2Metadataprefix, String oai2Prefixidentifier,
-            String oai2ArchiveName, long waitTimeMs) {
+                       long waitTimeMs) {
         this.oai2Host = oai2Host;
         this.oai2Script = oai2Script;
         this.oai2MetaDataPrefix = oai2Metadataprefix;
         this.oai2PrefixIdentifier = oai2Prefixidentifier;
-        this.oai2ArchiveName = oai2ArchiveName;
         this.waitTime = waitTimeMs;
         try {
             SAXParserFactory parserFactory = SAXParserFactory.newInstance();
@@ -94,19 +83,16 @@ public class OAI2Fetcher implements EntryFetcher {
 
     /**
      * Default Constructor. The archive queried will be ArXiv.org
-     *
      */
     public OAI2Fetcher() {
         this(OAI2Fetcher.OAI2_ARXIV_HOST, OAI2Fetcher.OAI2_ARXIV_SCRIPT, OAI2Fetcher.OAI2_ARXIV_METADATAPREFIX,
-                OAI2Fetcher.OAI2_ARXIV_PREFIXIDENTIFIER, OAI2Fetcher.OAI2_ARXIV_ARCHIVENAME, 20000L);
+                OAI2Fetcher.OAI2_ARXIV_PREFIXIDENTIFIER, 20000L);
     }
 
     /**
      * Construct the query URL
      *
-     * @param key
-     *            The key of the OAI2 entry that the url should point to.
-     *
+     * @param key The key of the OAI2 entry that the url should point to.
      * @return a String denoting the query URL
      */
     public String constructUrl(String key) {
@@ -154,12 +140,11 @@ public class OAI2Fetcher implements EntryFetcher {
      * Import an entry from an OAI2 archive. The BibEntry provided has to
      * have the field OAI2_IDENTIFIER_FIELD set to the search string.
      *
-     * @param key
-     *            The OAI2 key to fetch from ArXiv.
+     * @param key The OAI2 key to fetch from ArXiv.
      * @return The imported BibEntry or null if none.
      */
     protected BibEntry importOai2Entry(String key) throws IOException, SAXException {
-        /**
+        /*
          * Fix for problem reported in mailing-list:
          *   https://sourceforge.net/forum/message.php?msg_id=4087158
          */
@@ -252,7 +237,7 @@ public class OAI2Fetcher implements EntryFetcher {
                 } catch (SAXException e) {
                     String url = constructUrl(OAI2Fetcher.fixKey(key));
                     LOGGER.error("Error while fetching from " + getTitle(), e);
-                    ((ImportInspectionDialog)dialog).showMessage(Localization.lang("Error while fetching from %0", getTitle()) + "\n" +
+                    ((ImportInspectionDialog) dialog).showMessage(Localization.lang("Error while fetching from %0", getTitle()) + "\n" +
                                     Localization.lang("A SAX exception occurred while parsing '%0':", url),
                             Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
                 }
@@ -273,8 +258,8 @@ public class OAI2Fetcher implements EntryFetcher {
             return true;
         } catch (IOException | InterruptedException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
-            ((ImportInspectionDialog)dialog).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
-    }
+            ((ImportInspectionDialog) dialog).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
+        }
         return false;
     }
 
