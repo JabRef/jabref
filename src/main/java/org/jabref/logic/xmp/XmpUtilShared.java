@@ -17,14 +17,14 @@ import org.slf4j.LoggerFactory;
  * XMPUtilShared provides support for reading (@link XMPUtilReader) and writing (@link XMPUtilWriter) BibTex data as XMP-Metadata
  * in PDF-documents.
  */
-public class XMPUtilShared {
+public class XmpUtilShared {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(XMPUtilShared.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilShared.class);
 
-    private XMPUtilShared() {
+    private XmpUtilShared() {
     }
 
-    protected static XMPMetadata parseXMPMetadata(InputStream is) throws IOException {
+    protected static XMPMetadata parseXmpMetadata(InputStream is) throws IOException {
         XMPMetadata meta = null;
         try {
             DomXmpParser parser = new DomXmpParser();
@@ -45,15 +45,15 @@ public class XMPUtilShared {
      * @param inputStream The inputStream to read the PDF from.
      * @return whether a BibEntry was found in the given PDF.
      */
-    public static boolean hasMetadata(Path path, XMPPreferences xmpPreferences) {
+    public static boolean hasMetadata(Path path, XmpPreferences xmpPreferences) {
         try {
-            List<BibEntry> bibEntries = XMPUtilReader.readXMP(path, xmpPreferences);
+            List<BibEntry> bibEntries = XmpUtilReader.readXmp(path, xmpPreferences);
             return !bibEntries.isEmpty();
         } catch (EncryptedPdfsNotSupportedException ex) {
             LOGGER.info("Encryption not supported by XMPUtil");
             return false;
         } catch (IOException e) {
-            XMPUtilShared.LOGGER.debug("No metadata was found. Path: " + path.toString());
+            XmpUtilShared.LOGGER.debug("No metadata was found. Path: " + path.toString());
             return false;
         }
     }

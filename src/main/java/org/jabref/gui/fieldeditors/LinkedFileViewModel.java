@@ -34,7 +34,7 @@ import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.xmp.XMPUtilWriter;
+import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -331,7 +331,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 // Localization.lang("PDF does not exist");
             } else {
                 try {
-                    XMPUtilWriter.writeXMP(file.get(), entry, databaseContext.getDatabase(), Globals.prefs.getXMPPreferences());
+                    XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), Globals.prefs.getXMPPreferences());
                 } catch (IOException | TransformerException ex) {
                     // TODO: Print error message
                     // Localization.lang("Error while writing") + " '" + file.toString() + "': " + ex;

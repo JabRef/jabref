@@ -28,7 +28,7 @@ import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.xmp.XMPPreferences;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
@@ -46,7 +46,7 @@ public class ImportFormatReader {
 
     private ImportFormatPreferences importFormatPreferences;
 
-    public void resetImportFormats(ImportFormatPreferences newImportFormatPreferences, XMPPreferences xmpPreferences, FileUpdateMonitor fileMonitor) {
+    public void resetImportFormats(ImportFormatPreferences newImportFormatPreferences, XmpPreferences xmpPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = newImportFormatPreferences;
 
         formats.clear();

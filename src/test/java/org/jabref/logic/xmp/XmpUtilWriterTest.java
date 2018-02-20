@@ -2,14 +2,12 @@ package org.jabref.logic.xmp;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.transform.TransformerException;
 
-import org.jabref.logic.importer.ParseException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
 
@@ -23,11 +21,11 @@ import org.junit.rules.TemporaryFolder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class XMPUtilWriterTest {
+public class XmpUtilWriterTest {
 
     @Rule public TemporaryFolder tempFolder = new TemporaryFolder();
 
-    private XMPPreferences xmpPreferences;
+    private XmpPreferences xmpPreferences;
 
     private static BibEntry olly2018;
     private static BibEntry toral2006;
@@ -84,7 +82,7 @@ public class XMPUtilWriterTest {
     @Before
     public void setUp() {
 
-        xmpPreferences = mock(XMPPreferences.class);
+        xmpPreferences = mock(XmpPreferences.class);
         // The code assumes privacy filters to be off
         when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(false);
 
@@ -95,14 +93,9 @@ public class XMPUtilWriterTest {
 
     /**
      * Test for writing a PDF file with a single DublinCore metadata entry.
-     *
-     * @throws IOException
-     * @throws URISyntaxException
-     * @throws TransformerException
-     * @throws ParseException
      */
     @Test
-    public void testWriteXMP() throws IOException, URISyntaxException, TransformerException, ParseException {
+    public void testWriteXmp() throws IOException, TransformerException {
 
         File pdfFile = this.createDefaultFile("JabRef_writeSingle.pdf");
 
@@ -112,10 +105,10 @@ public class XMPUtilWriterTest {
         entry.setId("ID4711");
 
         // write the changed bib entry to the create PDF
-        XMPUtilWriter.writeXMP(pdfFile.getAbsolutePath(), entry, null, xmpPreferences);
+        XmpUtilWriter.writeXmp(pdfFile.getAbsolutePath(), entry, null, xmpPreferences);
 
         // read entry again
-        List<BibEntry> entriesWritten = XMPUtilReader.readXMP(pdfFile.getPath(), xmpPreferences);
+        List<BibEntry> entriesWritten = XmpUtilReader.readXmp(pdfFile.getPath(), xmpPreferences);
         BibEntry entryWritten = entriesWritten.get(0);
 
         // compare the two entries
@@ -123,6 +116,9 @@ public class XMPUtilWriterTest {
 
     }
 
+    /**
+     * Test, which writes multiple metadata entries to a PDF and reads them again to test the size.
+     */
     @Test
     public void testWriteMultipleBibEntries() throws IOException, TransformerException {
 
@@ -130,9 +126,9 @@ public class XMPUtilWriterTest {
 
         List<BibEntry> entries = Arrays.asList(olly2018, vapnik2000, toral2006);
 
-        XMPUtilWriter.writeXMP(Paths.get(pdfFile.getAbsolutePath()), entries, null, xmpPreferences);
+        XmpUtilWriter.writeXmp(Paths.get(pdfFile.getAbsolutePath()), entries, null, xmpPreferences);
 
-        List<BibEntry> entryList = XMPUtilReader.readXMP(Paths.get(pdfFile.getAbsolutePath()), xmpPreferences);
+        List<BibEntry> entryList = XmpUtilReader.readXmp(Paths.get(pdfFile.getAbsolutePath()), xmpPreferences);
         Assert.assertEquals(3, entryList.size());
 
     }

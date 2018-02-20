@@ -20,7 +20,7 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
-import org.jabref.logic.xmp.XMPUtilReader;
+import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
@@ -204,7 +204,7 @@ public class PdfContentImporter extends Importer {
     @Override
     public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
         final ArrayList<BibEntry> result = new ArrayList<>(1);
-        try (PDDocument document = XMPUtilReader.loadWithAutomaticDecryption(filePath)) {
+        try (PDDocument document = XmpUtilReader.loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
 
             Optional<DOI> doi = DOI.findInText(firstPageContents);

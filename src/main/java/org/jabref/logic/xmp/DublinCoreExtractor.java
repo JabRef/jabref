@@ -24,11 +24,11 @@ import org.apache.xmpbox.schema.DublinCoreSchema;
 public class DublinCoreExtractor {
 
     private final DublinCoreSchema dcSchema;
-    private final XMPPreferences xmpPreferences;
+    private final XmpPreferences xmpPreferences;
 
     private final BibEntry bibEntry;
 
-    public DublinCoreExtractor(DublinCoreSchema dcSchema, XMPPreferences xmpPreferences, BibEntry resolvedEntry) {
+    public DublinCoreExtractor(DublinCoreSchema dcSchema, XmpPreferences xmpPreferences, BibEntry resolvedEntry) {
         this.dcSchema = dcSchema;
         this.xmpPreferences = xmpPreferences;
 

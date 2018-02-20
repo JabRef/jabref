@@ -29,7 +29,7 @@ import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.xmp.XMPUtilShared;
+import org.jabref.logic.xmp.XmpUtilShared;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
@@ -108,7 +108,7 @@ public class PdfImporter {
         for (String fileName : fileNames) {
             if (!neverShow && !doNotShowAgain) {
                 importDialog = new ImportDialog(dropRow >= 0, fileName);
-                if (!XMPUtilShared.hasMetadata(Paths.get(fileName), Globals.prefs.getXMPPreferences())) {
+                if (!XmpUtilShared.hasMetadata(Paths.get(fileName), Globals.prefs.getXMPPreferences())) {
                     importDialog.disableXMPChoice();
                 }
                 importDialog.setLocationRelativeTo(frame);

@@ -1,6 +1,5 @@
 package org.jabref.logic.xmp;
 
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -30,13 +29,13 @@ import org.mockito.Answers;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class XMPUtilReaderTest {
+public class XmpUtilReaderTest {
 
     @Rule public TemporaryFolder tempFolder = new TemporaryFolder();
 
     private static final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
-    private XMPPreferences xmpPreferences;
+    private XmpPreferences xmpPreferences;
 
     private BibtexParser parser;
 
@@ -45,10 +44,9 @@ public class XMPUtilReaderTest {
      */
     @Before
     public void setUp() {
-
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
-        xmpPreferences = mock(XMPPreferences.class);
+        xmpPreferences = mock(XmpPreferences.class);
         // The code assumes privacy filters to be off
         when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(false);
 
@@ -58,48 +56,31 @@ public class XMPUtilReaderTest {
     }
 
     /**
-     * The month attribute in DublinCore is the complete name of the month, e.g. March.
-     * In JabRef, the format is #mar# instead. To get a working unit test, the JabRef's
-     * bib-entry is altered from #mar# to {March}.
-     * <p/>
-     * Tests the readRawXMP - method
-     *
-     * @throws IOException
-     * @throws URISyntaxException
-     * @throws ParseException
+     * Tests reading of dublinCore metadata.
      */
     @Test
-    public void testReadArticleDublinCoreReadXMP() throws IOException, URISyntaxException, ParseException {
-
-        Path path = Paths.get(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/article_dublinCore.pdf").toURI());
-        List<XMPMetadata> meta = XMPUtilReader.readRawXMP(path);
+    public void testReadArticleDublinCoreReadRawXmp() throws IOException, URISyntaxException, ParseException {
+        Path path = Paths.get(XmpUtilShared.class.getResource("article_dublinCore.pdf").toURI());
+        List<XMPMetadata> meta = XmpUtilReader.readRawXmp(path);
 
         DublinCoreSchema dcSchema = meta.get(0).getDublinCoreSchema();
         DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
         Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
-        String bibString = Resources.toString(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/article_dublinCore.bib"), StandardCharsets.UTF_8);
+        String bibString = Resources.toString(XmpUtilShared.class.getResource("article_dublinCore.bib"), StandardCharsets.UTF_8);
         Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
 
         Assert.assertEquals(entryFromBibFile.get(), entry.get());
     }
 
     /**
-     * The month attribute in DublinCore is the complete name of the month, e.g. March.
-     * In JabRef, the format is #mar# instead. To get a working unit test, the JabRef's
-     * bib-entry is altered from #mar# to {March}.
-     * <p/>
-     * Tests the readXMP - method
-     *
-     * @throws IOException
-     * @throws URISyntaxException
-     * @throws ParseException
+     * Tests reading of dublinCore metadata.
      */
     @Test
-    public void testReadArticleDublinCoreXMP() throws IOException, URISyntaxException, ParseException {
-        List<BibEntry> entries = XMPUtilReader.readXMP(Paths.get(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/article_dublinCore.pdf").toURI()), xmpPreferences);
+    public void testReadArticleDublinCoreReadXmp() throws IOException, URISyntaxException, ParseException {
+        List<BibEntry> entries = XmpUtilReader.readXmp(Paths.get(XmpUtilShared.class.getResource("article_dublinCore.pdf").toURI()), xmpPreferences);
         BibEntry entry = entries.get(0);
 
-        String bibString = Resources.toString(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/article_dublinCore.bib"), StandardCharsets.UTF_8);
+        String bibString = Resources.toString(XmpUtilShared.class.getResource("article_dublinCore.bib"), StandardCharsets.UTF_8);
         Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
 
         Assert.assertEquals(entryFromBibFile.get(), entry);
@@ -107,28 +88,21 @@ public class XMPUtilReaderTest {
 
     /**
      * Tests an pdf file with an empty metadata section.
-     *
-     * @throws IOException
-     * @throws URISyntaxException
      */
     @Test
     public void testReadEmtpyMetadata() throws IOException, URISyntaxException {
-        List<BibEntry> entries = XMPUtilReader.readXMP(Paths.get(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/empty_metadata.pdf").toURI()), xmpPreferences);
+        List<BibEntry> entries = XmpUtilReader.readXmp(Paths.get(XmpUtilShared.class.getResource("empty_metadata.pdf").toURI()), xmpPreferences);
         Assert.assertEquals(Collections.EMPTY_LIST, entries);
     }
 
     /**
      * Test non XMP metadata. Metadata are included in the PDInformation
-     *
-     * @throws IOException
-     * @throws URISyntaxException
-     * @throws ParseException
      */
     @Test
     public void testReadPDMetadata() throws IOException, URISyntaxException, ParseException {
-        List<BibEntry> entries = XMPUtilReader.readXMP(Paths.get(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/PD_metadata.pdf").toURI()), xmpPreferences);
+        List<BibEntry> entries = XmpUtilReader.readXmp(Paths.get(XmpUtilShared.class.getResource("PD_metadata.pdf").toURI()), xmpPreferences);
 
-        String bibString = Resources.toString(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/PD_metadata.bib"), StandardCharsets.UTF_8);
+        String bibString = Resources.toString(XmpUtilShared.class.getResource("PD_metadata.bib"), StandardCharsets.UTF_8);
         Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
 
         Assert.assertEquals(entryFromBibFile.get(), entries.get(0));

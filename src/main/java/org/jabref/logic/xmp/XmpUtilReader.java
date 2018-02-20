@@ -20,12 +20,12 @@ import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.DublinCoreSchema;
 
-public class XMPUtilReader {
+public class XmpUtilReader {
 
     private static final String START_TAG = "<rdf:Description";
     private static final String END_TAG = "</rdf:Description>";
 
-    private XMPUtilReader() {
+    private XmpUtilReader() {
     }
 
     /**
@@ -35,9 +35,9 @@ public class XMPUtilReader {
      * @param path The path to read the XMPMetadata from.
      * @return The XMPMetadata object found in the file
      */
-    public static List<XMPMetadata> readRawXMP(Path path) throws IOException {
-        try (PDDocument document = XMPUtilReader.loadWithAutomaticDecryption(path)) {
-            return XMPUtilReader.getXMPMetadata(document);
+    public static List<XMPMetadata> readRawXmp(Path path) throws IOException {
+        try (PDDocument document = XmpUtilReader.loadWithAutomaticDecryption(path)) {
+            return XmpUtilReader.getXmpMetadata(document);
         }
     }
 
@@ -47,8 +47,8 @@ public class XMPUtilReader {
      * @param filename The filename from which to open the file.
      * @return BibtexEntryies found in the PDF or an empty list
      */
-    public static List<BibEntry> readXMP(String filename, XMPPreferences xmpPreferences) throws IOException {
-        return XMPUtilReader.readXMP(Paths.get(filename), xmpPreferences);
+    public static List<BibEntry> readXmp(String filename, XmpPreferences xmpPreferences) throws IOException {
+        return XmpUtilReader.readXmp(Paths.get(filename), xmpPreferences);
     }
 
     /**
@@ -62,13 +62,13 @@ public class XMPUtilReader {
      * @throws IOException Throws an IOException if the file cannot be read, so the user than remove a lock or cancel
      *                     the operation.
      */
-    public static List<BibEntry> readXMP(Path path, XMPPreferences xmpPreferences)
+    public static List<BibEntry> readXmp(Path path, XmpPreferences xmpPreferences)
             throws IOException {
 
         List<BibEntry> result = new LinkedList<>();
 
         try (PDDocument document = loadWithAutomaticDecryption(path)) {
-            List<XMPMetadata> xmpMetaList = XMPUtilReader.getXMPMetadata(document);
+            List<XMPMetadata> xmpMetaList = XmpUtilReader.getXmpMetadata(document);
 
             if (!xmpMetaList.isEmpty()) {
                 // Only support Dublin Core since JabRef 4.2
@@ -110,7 +110,7 @@ public class XMPUtilReader {
      *
      * @return empty Optional if no metadata has been found
      */
-    private static List<XMPMetadata> getXMPMetadata(PDDocument document) throws IOException {
+    private static List<XMPMetadata> getXmpMetadata(PDDocument document) throws IOException {
         PDDocumentCatalog catalog = document.getDocumentCatalog();
         PDMetadata metaRaw = catalog.getMetadata();
         List<XMPMetadata> metaList = new ArrayList<>();
@@ -134,7 +134,7 @@ public class XMPUtilReader {
         for (String s : descriptionsArray) {
             // END_TAG is appended, because of the split operation above
             String xmpMetaString = start + s + END_TAG + end;
-            metaList.add(XMPUtilShared.parseXMPMetadata(new ByteArrayInputStream(xmpMetaString.getBytes())));
+            metaList.add(XmpUtilShared.parseXmpMetadata(new ByteArrayInputStream(xmpMetaString.getBytes())));
         }
         return metaList;
     }
