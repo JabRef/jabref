@@ -162,7 +162,7 @@ dependencies {
     testCompile 'org.junit.platform:junit-platform-launcher:1.1.0-M2'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.10.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.10.0'
-    testCompile 'org.mockito:mockito-core:2.13.0'
+    testCompile 'org.mockito:mockito-core:2.15.0'
     testCompile 'com.github.tomakehurst:wiremock:2.15.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
