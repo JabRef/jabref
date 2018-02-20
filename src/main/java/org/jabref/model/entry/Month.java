@@ -88,13 +88,15 @@ public enum Month {
         if (testString.length() > 3) {
             testString = testString.substring(0, 3);
         }
+        
         Optional<Month> month = Month.getMonthByShortName(testString);
-        Optional<Month> monthGerman = Month.parseGermanShortMonth(testString);
         if (month.isPresent()) {
             return month;
         }
-        if (monthGerman.isPresent()) {
-            return monthGerman;
+
+        month = Month.parseGermanShortMonth(testString);
+        if (month.isPresent()) {
+            return month;
         }
 
         try {
@@ -115,6 +117,9 @@ public enum Month {
      *         form
      */
 	private static Optional<Month> parseGermanShortMonth(String value) {
+        // support for lowercase German month
+        value = value.substring(0,1).toUpperCase() + value.substring(1);
+
         if ("Mae".equals(value)) {
             return Month.getMonthByNumber(3);
         }
