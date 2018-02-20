@@ -38,8 +38,6 @@ public class XMPUtilReaderTest {
 
     private XMPPreferences xmpPreferences;
 
-    private ImportFormatPreferences importFormatPreferences;
-
     private BibtexParser parser;
 
     /**
@@ -48,7 +46,7 @@ public class XMPUtilReaderTest {
     @Before
     public void setUp() {
 
-        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         xmpPreferences = mock(XMPPreferences.class);
         // The code assumes privacy filters to be off

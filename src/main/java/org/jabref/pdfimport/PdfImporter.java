@@ -155,7 +155,6 @@ public class PdfImporter {
         }
         localRes.addAll(result.getDatabase().getEntries());
 
-        BibEntry entry;
         if (localRes.isEmpty()) {
             // import failed -> generate default entry
             LOGGER.info("Import failed");
@@ -163,23 +162,21 @@ public class PdfImporter {
             return;
         }
 
-        // only one entry is imported
-        entry = localRes.get(0);
+        for (BibEntry entry : localRes) {
+            // insert entry to database and link file
+            panel.getDatabase().insertEntry(entry);
+            panel.markBaseChanged();
+            FileListTableModel tm = new FileListTableModel();
+            Path toLink = Paths.get(fileName);
+            // Get a list of file directories:
+            List<Path> dirsS = panel.getBibDatabaseContext()
+                    .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
 
-        // insert entry to database and link file
-        panel.getDatabase().insertEntry(entry);
-        panel.markBaseChanged();
-        FileListTableModel tm = new FileListTableModel();
-        Path toLink = Paths.get(fileName);
-        // Get a list of file directories:
-        List<Path> dirsS = panel.getBibDatabaseContext()
-                .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
-
-        tm.addEntry(0, new FileListEntry("", FileUtil.shortenFileName(toLink, dirsS).toString(),
-                ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
-        entry.setField(FieldName.FILE, tm.getStringRepresentation());
-        res.add(entry);
-
+            tm.addEntry(0, new FileListEntry("", FileUtil.shortenFileName(toLink, dirsS).toString(),
+                    ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
+            entry.setField(FieldName.FILE, tm.getStringRepresentation());
+            res.add(entry);
+        }
     }
 
     private Optional<BibEntry> createNewBlankEntry(String fileName) {

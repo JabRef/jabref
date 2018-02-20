@@ -3,14 +3,12 @@ package org.jabref.logic.xmp;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.transform.TransformerException;
 
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
@@ -22,8 +20,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Answers;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -32,8 +28,6 @@ public class XMPUtilWriterTest {
     @Rule public TemporaryFolder tempFolder = new TemporaryFolder();
 
     private XMPPreferences xmpPreferences;
-
-    private ImportFormatPreferences importFormatPreferences;
 
     private static BibEntry olly2018;
     private static BibEntry toral2006;
@@ -90,8 +84,6 @@ public class XMPUtilWriterTest {
     @Before
     public void setUp() {
 
-        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         xmpPreferences = mock(XMPPreferences.class);
         // The code assumes privacy filters to be off
         when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(false);
