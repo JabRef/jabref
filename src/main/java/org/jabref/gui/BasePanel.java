@@ -57,8 +57,7 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.FindFullTextAction;
-import org.jabref.gui.externalfiles.SynchronizeFileField;
-import org.jabref.gui.externalfiles.WriteXMPAction;
+import org.jabref.gui.externalfiles.WriteXMPActionWorker;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -72,9 +71,7 @@ import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.journals.UnabbreviateAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
-import org.jabref.gui.mergeentries.MergeEntriesDialog;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
-import org.jabref.gui.plaintextimport.TextInputDialog;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
@@ -125,6 +122,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.specialfields.SpecialField;
@@ -157,8 +155,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private final UndoAction undoAction = new UndoAction();
     private final RedoAction redoAction = new RedoAction();
     private final CountingUndoManager undoManager;
-    private final List<BibEntry> previousEntries = new ArrayList<>();
-    private final List<BibEntry> nextEntries = new ArrayList<>();
     // Keeps track of the string dialog if it is open.
     private final Map<Actions, Object> actions = new HashMap<>();
     private final SidePaneManager sidePaneManager;
@@ -180,9 +176,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private boolean nonUndoableChange;
     // Used to track whether the base has changed since last save.
     private BibEntry showing;
-    // Variable to prevent erroneous update of back/forward histories at the time
-    // when a Back or Forward operation is being processed:
-    private boolean backOrForwardInProgress;
+
     // in switching between entries.
     private PreambleEditor preambleEditor;
     // Keeps track of the preamble dialog if it is open.
@@ -195,6 +189,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
 
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
+    private final DialogService dialogService;
 
     public BasePanel(JabRefFrame frame, BasePanelPreferences preferences, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes) {
         this.preferences = Objects.requireNonNull(preferences);
@@ -202,6 +197,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.undoManager = frame.getUndoManager();
+        this.dialogService = frame.getDialogService();
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
@@ -239,9 +235,9 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
-        this.entryEditor = new EntryEditor(this, preferences.getEntryEditorPreferences(), Globals.getFileUpdateMonitor());
+        this.entryEditor = new EntryEditor(this, preferences.getEntryEditorPreferences(), Globals.getFileUpdateMonitor(), dialogService);
 
-        this.preview = new PreviewPanel(this, getBibDatabaseContext(), preferences.getKeyBindings(), preferences.getPreviewPreferences());
+        this.preview = new PreviewPanel(this, getBibDatabaseContext(), preferences.getKeyBindings(), preferences.getPreviewPreferences(), dialogService);
         DefaultTaskExecutor.runInJavaFXThread(() -> frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview));
     }
 
@@ -336,10 +332,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         actions.put(Actions.UNDO, undoAction);
         actions.put(Actions.REDO, redoAction);
 
-        actions.put(Actions.FOCUS_TABLE, (BaseAction) () -> {
-            mainTable.requestFocus();
-        });
-
         // The action for opening an entry editor.
         actions.put(Actions.EDIT, (BaseAction) this::showAndEdit);
 
@@ -348,10 +340,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         actions.put(Actions.SAVE_AS, (BaseAction) saveAction::saveAs);
 
-        actions.put(Actions.SAVE_SELECTED_AS, new SaveSelectedAction(SavePreferences.DatabaseSaveType.ALL));
-
-        actions.put(Actions.SAVE_SELECTED_AS_PLAIN,
-                new SaveSelectedAction(SavePreferences.DatabaseSaveType.PLAIN_BIBTEX));
+        actions.put(Actions.SAVE_SELECTED_AS_PLAIN, new SaveSelectedAction(SavePreferences.DatabaseSaveType.PLAIN_BIBTEX));
 
         // The action for copying selected entries.
         actions.put(Actions.COPY, (BaseAction) mainTable::copy);
@@ -378,7 +367,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         actions.put(Actions.EDIT_PREAMBLE, (BaseAction) () -> {
             if (preambleEditor == null) {
                 PreambleEditor form = new PreambleEditor(frame, BasePanel.this, bibDatabaseContext.getDatabase());
-                form.setLocationRelativeTo(frame);
                 form.setVisible(true);
                 preambleEditor = form;
             } else {
@@ -397,11 +385,10 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             }
         });
 
-        actions.put(Actions.findUnlinkedFiles, (BaseAction) () -> {
-            final FindUnlinkedFilesDialog dialog = new FindUnlinkedFilesDialog(frame, frame, BasePanel.this);
-            dialog.setLocationRelativeTo(frame);
+        /*   actions.put(Actions.findUnlinkedFiles, (BaseAction) () -> {
+            final FindUnlinkedFilesDialog dialog = new FindUnlinkedFilesDialog(null, frame, BasePanel.this);
             dialog.setVisible(true);
-        });
+        });*/
 
         // The action for auto-generating keys.
         actions.put(Actions.MAKE_KEY, new AbstractWorker() {
@@ -417,12 +404,11 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 numSelected = entries.size();
 
                 if (entries.isEmpty()) { // None selected. Inform the user to select entries first.
-                    JOptionPane.showMessageDialog(frame,
-                            Localization.lang("First select the entries you want keys to be generated for."),
-                            Localization.lang("Autogenerate BibTeX keys"), JOptionPane.INFORMATION_MESSAGE);
+                    dialogService.showWarningDialogAndWait(
+                            Localization.lang("Autogenerate BibTeX keys"),
+                            Localization.lang("First select the entries you want keys to be generated for."));
                     return;
                 }
-                frame.block();
                 output(formatOutputMessage(Localization.lang("Generating BibTeX key for"), numSelected));
             }
 
@@ -439,7 +425,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                         CheckBoxMessage cbm = new CheckBoxMessage(
                                 Localization.lang("One or more keys will be overwritten. Continue?"),
                                 Localization.lang("Disable this confirmation dialog"), false);
-                        final int answer = JOptionPane.showConfirmDialog(frame, cbm,
+                        final int answer = JOptionPane.showConfirmDialog(null, cbm,
                                 Localization.lang("Overwrite keys"), JOptionPane.YES_NO_OPTION);
                         Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !cbm.isSelected());
 
@@ -470,20 +456,18 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             @Override
             public void update() {
                 if (canceled) {
-                    frame.unblock();
                     return;
                 }
                 markBaseChanged();
                 numSelected = entries.size();
                 output(formatOutputMessage(Localization.lang("Generated BibTeX key for"), numSelected));
-                frame.unblock();
             }
         });
 
         // The action for cleaning up entry.
         actions.put(Actions.CLEANUP, cleanUpAction);
 
-        actions.put(Actions.MERGE_ENTRIES, (BaseAction) () -> new MergeEntriesDialog(BasePanel.this));
+        //actions.put(Actions.MERGE_ENTRIES, (BaseAction) () -> new MergeEntriesDialog(BasePanel.this));
 
         actions.put(Actions.SEARCH, (BaseAction) frame.getGlobalSearchBar()::focus);
         actions.put(Actions.GLOBAL_SEARCH, (BaseAction) frame.getGlobalSearchBar()::performGlobalSearch);
@@ -572,30 +556,9 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             }
         });
 
-        actions.put(Actions.DUPLI_CHECK,
+        /*     actions.put(Actions.DUPLI_CHECK,
                 (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(new DuplicateSearch(BasePanel.this)));
-
-        actions.put(Actions.PLAIN_TEXT_IMPORT, (BaseAction) () -> {
-            // get Type of new entry
-            EntryTypeDialog etd = new EntryTypeDialog(frame);
-            etd.setLocationRelativeTo(frame);
-            etd.setVisible(true);
-            EntryType tp = etd.getChoice();
-            if (tp == null) {
-                return;
-            }
-
-            BibEntry bibEntry = new BibEntry(tp.getName());
-            TextInputDialog tidialog = new TextInputDialog(frame, bibEntry);
-            tidialog.setLocationRelativeTo(frame);
-            tidialog.setVisible(true);
-
-            if (tidialog.okPressed()) {
-                UpdateField.setAutomaticFields(Collections.singletonList(bibEntry), false, false,
-                        Globals.prefs.getUpdateFieldPreferences());
-                insertEntry(bibEntry);
-            }
-        });
+        */
 
         // TODO
         //actions.put(Actions.MARK_ENTRIES, new MarkEntriesAction(frame, 0));
@@ -671,30 +634,24 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                     .build();
             Globals.prefs.storePreviewPreferences(newPreviewPreferences);
             DefaultTaskExecutor.runInJavaFXThread(() -> setPreviewActiveBasePanels(enabled));
-            frame.setPreviewToggle(enabled);
         });
 
         actions.put(Actions.NEXT_PREVIEW_STYLE, (BaseAction) this::nextPreviewStyle);
         actions.put(Actions.PREVIOUS_PREVIEW_STYLE, (BaseAction) this::previousPreviewStyle);
 
         actions.put(Actions.MANAGE_SELECTORS, (BaseAction) () -> {
-            ContentSelectorDialog csd = new ContentSelectorDialog(frame, frame, BasePanel.this, false, null);
-            csd.setLocationRelativeTo(frame);
+            ContentSelectorDialog csd = new ContentSelectorDialog(null, frame, BasePanel.this, false, null);
             csd.setVisible(true);
         });
 
         actions.put(Actions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(frame));
         actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
 
-        actions.put(Actions.WRITE_XMP, new WriteXMPAction(this));
+        actions.put(Actions.WRITE_XMP, new WriteXMPActionWorker(this));
 
         actions.put(Actions.ABBREVIATE_ISO, new AbbreviateAction(this, true));
         actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
-        actions.put(Actions.AUTO_SET_FILE, new SynchronizeFileField(this));
-
-        actions.put(Actions.BACK, (BaseAction) BasePanel.this::back);
-        actions.put(Actions.FORWARD, (BaseAction) BasePanel.this::forward);
 
         actions.put(Actions.RESOLVE_DUPLICATE_KEYS, new SearchFixDuplicateLabels(this));
 
@@ -951,10 +908,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 runWorker((AbstractWorker) o);
             }
         } catch (Throwable ex) {
-            // If the action has blocked the JabRefFrame before crashing, we need to unblock it.
-            // The call to unblock will simply hide the glasspane, so there is no harm in calling
-            // it even if the frame hasn't been blocked.
-            frame.unblock();
             LOGGER.error("runCommand error: " + ex.getMessage(), ex);
         }
     }
@@ -962,7 +915,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     private boolean saveDatabase(File file, boolean selectedOnly, Charset enc,
             SavePreferences.DatabaseSaveType saveType) throws SaveException {
         SaveSession session;
-        frame.block();
         final String SAVE_DATABASE = Localization.lang("Save library");
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(enc)
@@ -979,7 +931,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         }
         // FIXME: not sure if this is really thrown anywhere
         catch (UnsupportedCharsetException ex) {
-            JOptionPane.showMessageDialog(frame,
+            JOptionPane.showMessageDialog(null,
                     Localization.lang("Could not save file.") + ' '
                             + Localization.lang("Character encoding '%0' is not supported.", enc.displayName()),
                     SAVE_DATABASE, JOptionPane.ERROR_MESSAGE);
@@ -993,11 +945,11 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 LOGGER.warn("Could not save", ex);
             }
 
-            JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + "\n" + ex.getMessage(),
-                    SAVE_DATABASE, JOptionPane.ERROR_MESSAGE);
+            dialogService.showErrorDialogAndWait(
+                    SAVE_DATABASE,
+                    Localization.lang("Could not save file."),
+                    ex);
             throw new SaveException("rt");
-        } finally {
-            frame.unblock();
         }
 
         boolean commit = true;
@@ -1011,13 +963,13 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             builder.add(ta).xy(3, 1);
             builder.add(Localization.lang("What do you want to do?")).xy(1, 3);
             String tryDiff = Localization.lang("Try different encoding");
-            int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), SAVE_DATABASE,
+            int answer = JOptionPane.showOptionDialog(null, builder.getPanel(), SAVE_DATABASE,
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
                     new String[] {Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
-                Object choice = JOptionPane.showInputDialog(frame, Localization.lang("Select encoding"), SAVE_DATABASE,
+                Object choice = JOptionPane.showInputDialog(null, Localization.lang("Select encoding"), SAVE_DATABASE,
                         JOptionPane.QUESTION_MESSAGE, null, Encodings.ENCODINGS_DISPLAYNAMES, enc);
                 if (choice == null) {
                     commit = false;
@@ -1064,7 +1016,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             // Find out what type is wanted.
             final EntryTypeDialog etd = new EntryTypeDialog(frame);
             // We want to center the dialog, to make it look nicer.
-            etd.setLocationRelativeTo(frame);
             etd.setVisible(true);
             actualType = etd.getChoice();
         }
@@ -1365,7 +1316,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
             if (entry != getShowing()) {
                 entryEditor.setEntry(entry);
-                newEntryShowing(entry);
+                showing = entry;
             }
             entryEditor.requestFocus();
 
@@ -1588,7 +1539,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         }
 
         if (entries.size() > 1) {
-            DialogService dialogService = new FXDialogService();
             boolean proceed = dialogService.showConfirmationDialogAndWait(Localization.lang("Change entry type"), Localization.lang("Multiple entries selected. Do you want to change the type of all these to '%0'?"));
             if (!proceed) {
                 return;
@@ -1622,7 +1572,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
             CheckBoxMessage cb = new CheckBoxMessage(msg, Localization.lang("Disable this confirmation dialog"), false);
 
-            int answer = JOptionPane.showConfirmDialog(frame, cb, title, JOptionPane.YES_NO_OPTION,
+            int answer = JOptionPane.showConfirmDialog(null, cb, title, JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
             if (cb.isSelected()) {
                 Globals.prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, false);
@@ -1688,12 +1638,11 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     public void cleanUp() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
 
-        // Check if there is a FileUpdatePanel for this BasePanel being shown. If so,
-        // remove it:
-        if (sidePaneManager.hasComponent(FileUpdatePanel.class)) {
-            FileUpdatePanel fup = (FileUpdatePanel) sidePaneManager.getComponent(FileUpdatePanel.class);
+        // Check if there is a FileUpdatePanel for this BasePanel being shown. If so remove it:
+        if (sidePaneManager.isComponentVisible(SidePaneType.FILE_UPDATE_NOTIFICATION)) {
+            FileUpdatePanel fup = (FileUpdatePanel) sidePaneManager.getComponent(SidePaneType.FILE_UPDATE_NOTIFICATION);
             if (fup.getPanel() == this) {
-                sidePaneManager.hideComponent(FileUpdatePanel.class);
+                sidePaneManager.hide(SidePaneType.FILE_UPDATE_NOTIFICATION);
             }
         }
     }
@@ -1742,71 +1691,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
     private BibEntry getShowing() {
         return showing;
-    }
-
-    /**
-     * Update the pointer to the currently shown entry in all cases where the user has moved to a new entry, except when
-     * using Back and Forward commands. Also updates history for Back command, and clears history for Forward command.
-     *
-     * @param entry The entry that is now to be shown.
-     */
-    private void newEntryShowing(BibEntry entry) {
-
-        // If this call is the result of a Back or Forward operation, we must take
-        // care not to make any history changes, since the necessary changes will
-        // already have been done in the back() or forward() method:
-        if (backOrForwardInProgress) {
-            showing = entry;
-            backOrForwardInProgress = false;
-            setBackAndForwardEnabledState();
-            return;
-        }
-        nextEntries.clear();
-        if (!Objects.equals(entry, showing)) {
-            // Add the entry we are leaving to the history:
-            if (showing != null) {
-                previousEntries.add(showing);
-                if (previousEntries.size() > GUIGlobals.MAX_BACK_HISTORY_SIZE) {
-                    previousEntries.remove(0);
-                }
-            }
-            showing = entry;
-            setBackAndForwardEnabledState();
-        }
-    }
-
-    /**
-     * Go back (if there is any recorded history) and update the histories for the Back and Forward commands.
-     */
-    private void back() {
-        if (!previousEntries.isEmpty()) {
-            BibEntry toShow = previousEntries.get(previousEntries.size() - 1);
-            previousEntries.remove(previousEntries.size() - 1);
-            // Add the entry we are going back from to the Forward history:
-            if (showing != null) {
-                nextEntries.add(showing);
-            }
-            backOrForwardInProgress = true; // to avoid the history getting updated erroneously
-            clearAndSelect(toShow);
-        }
-    }
-
-    private void forward() {
-        if (!nextEntries.isEmpty()) {
-            BibEntry toShow = nextEntries.get(nextEntries.size() - 1);
-            nextEntries.remove(nextEntries.size() - 1);
-            // Add the entry we are going forward from to the Back history:
-            if (showing != null) {
-                previousEntries.add(showing);
-            }
-            backOrForwardInProgress = true; // to avoid the history getting updated erroneously
-            clearAndSelect(toShow);
-        }
-    }
-
-    public void setBackAndForwardEnabledState() {
-        frame.getBackAction().setEnabled(!previousEntries.isEmpty());
-        frame.getForwardAction().setEnabled(!nextEntries.isEmpty());
     }
 
     public String formatOutputMessage(String start, int count) {
@@ -2046,29 +1930,26 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 } else {
                     // No URL or DOI found in the "url" and "doi" fields.
                     // Look for web links in the "file" field as a fallback:
-                    FileListEntry entry = null;
-                    FileListTableModel tm = new FileListTableModel();
-                    bes.get(0).getField(FieldName.FILE).ifPresent(tm::setContent);
-                    for (int i = 0; i < tm.getRowCount(); i++) {
-                        FileListEntry flEntry = tm.getEntry(i);
-                        if (FieldName.URL.equalsIgnoreCase(flEntry.getType().get().getName())
-                                || FieldName.PS.equalsIgnoreCase(flEntry.getType().get().getName())
-                                || FieldName.PDF.equalsIgnoreCase(flEntry.getType().get().getName())) {
-                            entry = flEntry;
-                            break;
-                        }
-                    }
-                    if (entry == null) {
-                        output(Localization.lang("No URL defined") + '.');
-                    } else {
+
+                    List<LinkedFile> files = bes.get(0).getFiles();
+
+                    Optional<LinkedFile> linkedFile = files.stream().filter(file -> (FieldName.URL.equalsIgnoreCase(file.getFileType())
+                            || FieldName.PS.equalsIgnoreCase(file.getFileType())
+                            || FieldName.PDF.equalsIgnoreCase(file.getFileType()))).findFirst();
+
+                    if (linkedFile.isPresent()) {
+
                         try {
-                            JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext, entry.getLink(),
-                                    entry.getType());
+
+                            JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext, linkedFile.get().getLink(), ExternalFileTypes.getInstance().fromLinkedFile(linkedFile.get(), true));
+
                             output(Localization.lang("External viewer called") + '.');
                         } catch (IOException e) {
                             output(Localization.lang("Could not open link"));
                             LOGGER.info("Could not open link", e);
                         }
+                    } else {
+                        output(Localization.lang("No URL defined") + '.');
                     }
                 }
             } else {
@@ -2119,11 +2000,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                     .addExtensionFilter(FileType.BIBTEX_DB)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
 
-            DialogService ds = new FXDialogService();
-
-            Optional<Path> chosenFile = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
-
+            Optional<Path> chosenFile = dialogService.showFileSaveDialog(fileDialogConfiguration);
             if (chosenFile.isPresent()) {
                 Path path = chosenFile.get();
                 saveDatabase(path.toFile(), true, Globals.prefs.getDefaultEncoding(), saveType);

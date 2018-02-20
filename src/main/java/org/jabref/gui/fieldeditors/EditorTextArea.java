@@ -67,6 +67,6 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        // not needed
     }
 }

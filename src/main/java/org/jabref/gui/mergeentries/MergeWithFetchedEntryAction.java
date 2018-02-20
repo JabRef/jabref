@@ -22,7 +22,7 @@ public class MergeWithFetchedEntryAction implements BaseAction {
             BibEntry originalEntry = basePanel.getMainTable().getSelectedEntries().get(0);
             new FetchAndMergeEntry(originalEntry, basePanel, FetchAndMergeEntry.SUPPORTED_FIELDS);
         } else {
-            JOptionPane.showMessageDialog(basePanel.frame(),
+            JOptionPane.showMessageDialog(null,
                     Localization.lang("This operation requires exactly one item to be selected."),
                     Localization.lang("Merge entry with %0 information",
                             FieldName.orFields(FieldName.getDisplayName(FieldName.DOI),

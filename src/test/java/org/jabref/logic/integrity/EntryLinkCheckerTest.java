@@ -6,13 +6,12 @@ import java.util.List;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
-
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class EntryLinkCheckerTest {
 
@@ -20,8 +19,7 @@ public class EntryLinkCheckerTest {
     private EntryLinkChecker checker;
     private BibEntry entry;
 
-
-    @Before
+    @BeforeEach
     public void setUp() {
         database = new BibDatabase();
         checker = new EntryLinkChecker(database);
@@ -29,11 +27,9 @@ public class EntryLinkCheckerTest {
         database.insertEntry(entry);
     }
 
-    @SuppressWarnings("unused")
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testEntryLinkChecker() {
-        new EntryLinkChecker(null);
-        fail();
+        assertThrows(NullPointerException.class, () -> new EntryLinkChecker(null));
     }
 
     @Test

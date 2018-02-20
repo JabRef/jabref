@@ -34,9 +34,9 @@
     -fx-accented-background: #dadad8;
 
     /*
-     * A dark gray as background
+     * A darker gray as background
      */
-    -fx-dark-background: #757575;
+    -fx-dark-background: #aaaaaa;
 
     /*
      * A strong white as background
@@ -44,14 +44,24 @@
     -fx-light-background: #ffffff;
 
     /*
-     * A strong blue for backgrounds of active items (toggle button, selected list item)
-     */
-    -fx-active-background: #6A9FCD;
-
-    /*
      * A dark gray for borders
      */
     -fx-border: #868786;
+
+    /*
+     * A light gray for background for active items in list like elements such as menus, lists, trees, and tables.
+     */
+    -fx-selection-bar: #e5e5e5;
+
+    /*
+     * The base color for the theme
+     */
+    -fx-theme-base: #4d4673;
+
+    /*
+     * A slightly lighter theme-based color for backgrounds of active items (toggle button, selected list item)
+     */
+    -fx-active-background: derive(-fx-theme-base, 20%);
 }
 
 .hyperlink {
@@ -65,14 +75,13 @@
     -fx-text-fill: -fx-accent;
 }
 
- .icon {
- 	-fx-font-family: 'Material Design Icons';
-	-fx-font-size: 16.0;
- }
+.icon {
+    -fx-font-family: 'Material Design Icons';
+    -fx-font-size: 16.0;
+}
 
 .glyph-icon {
-    -fx-font-size: 20.0;
-    -glyph-size: 20.0;
+    -fx-font-size: 1em;
 }
 
 .tooltip {
@@ -105,7 +114,7 @@
     -fx-shadow-highlight-color: transparent;
     -fx-outer-border: transparent;
     -fx-inner-border: transparent;
-    -fx-focus-color: #6A9FCD;
+    -fx-focus-color: -fx-active-background;
     -fx-faint-focus-color: transparent;
     -fx-background-color: transparent;
     -fx-text-background-color: dimgray;
@@ -124,6 +133,24 @@
 
 .flatButtonNoSpaceTop {
     -fx-padding: -0.1em 0.5em 0.5em 0.5em;
+}
+
+.menu-bar {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+.menu-bar > .container > .menu-button > .label {
+    -fx-padding: 0.41777em 0.41777em 0.41777em 0.41777em; /* 5 5 5 5 */
+}
+
+.menu-bar > .menu {
+    -fx-padding: 0.0em 0.666667em 0.0em 0.666667em; /* 0 8 0 8 */
+}
+
+.menu-item {
+    -fx-padding: 0.5em 0.41777em 0.5em 0.41777em; /* 6 5 6 5 */
 }
 
 .tab-pane {
@@ -200,7 +227,7 @@
 
 .table-row-cell:selected,
 .tree-table-row-cell:selected {
-    -fx-background-color: #6A9FCD;
+    -fx-background-color: -fx-active-background;
     -fx-text-fill: white;
     -fx-fill: white;
 }
@@ -335,4 +362,41 @@
 .tree-table-view:hover .scroll-bar,
 .text-input:hover .scroll-bar {
     -fx-opacity: 1;
+}
+
+.sidePaneComponentHeader {
+    -fx-background-color: -fx-dark-background;
+}
+
+.mainMenu {
+    -fx-background-color: derive(-fx-theme-base, -10%);
+}
+
+.menu-bar > .container > .menu-button:hover,
+.menu-bar > .container > .menu-button:focused,
+.menu-bar > .container > .menu-button:showing {
+    -fx-background: derive(-fx-theme-base, 10%);
+}
+
+.mainMenu > .container > .menu-button > .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.mainToolbar {
+    -fx-background-color: derive(-fx-theme-base, -10%);
+}
+
+.mainToolbar .glyph-icon {
+    -fx-font-size: 1.7em;
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+.mainToolbar .search-field {
+    -fx-background-color: derive(-fx-theme-base, -15%);
+}
+
+.mainToolbar .search-field:focused {
+    -fx-background-color: derive(-fx-theme-base, 15%);
 }

@@ -15,7 +15,6 @@ import org.jabref.gui.util.ColorUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 
 public class InternalMaterialDesignIcon implements JabRefIcon {
     private final List<MaterialDesignIcon> icons;
@@ -57,9 +56,14 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
 
     @Override
     public Node getGraphicNode() {
-        Text icon = MaterialDesignIconFactory.get().createIcon(icons.get(0));
-        color.ifPresent(color -> icon.setStyle(icon.getStyle() + String.format("-fx-fill: %s;", ColorUtil.toRGBCode(color))));
-        return icon;
+        MaterialDesignIcon icon = icons.get(0);
+
+        Text text = new Text(icon.unicode());
+        text.getStyleClass().add("glyph-icon");
+        text.setStyle(String.format("-fx-font-family: %s;", icon.fontFamily()));
+
+        color.ifPresent(color -> text.setStyle(text.getStyle() + String.format("-fx-fill: %s;", ColorUtil.toRGBCode(color))));
+        return text;
     }
 
     @Override

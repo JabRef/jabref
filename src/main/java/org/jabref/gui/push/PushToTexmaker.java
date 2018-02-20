@@ -1,8 +1,7 @@
 package org.jabref.gui.push;
 
-import javax.swing.Icon;
-
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefIcon;
 import org.jabref.preferences.JabRefPreferences;
 
 /**
@@ -16,8 +15,8 @@ public class PushToTexmaker extends AbstractPushToApplication implements PushToA
     }
 
     @Override
-    public Icon getIcon() {
-        return IconTheme.getImage("texmaker");
+    public JabRefIcon getIcon() {
+        return IconTheme.JabRefIcons.APPLICATION_TEXMAKER;
     }
 
     @Override

@@ -10,6 +10,7 @@ import javax.swing.SwingUtilities;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.SidePaneManager;
+import org.jabref.gui.SidePaneType;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -82,18 +83,15 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         // thread:
         Runnable t = () -> {
 
-            // Check if there is already a notification about external
-            // changes:
+            // Check if there is already a notification about external changes:
             SidePaneManager sidePaneManager = panel.getSidePaneManager();
-            boolean hasAlready = sidePaneManager.hasComponent(FileUpdatePanel.class);
+            boolean hasAlready = sidePaneManager.isComponentVisible(SidePaneType.FILE_UPDATE_NOTIFICATION);
             if (hasAlready) {
-                sidePaneManager.hideComponent(FileUpdatePanel.class);
-                sidePaneManager.unregisterComponent(FileUpdatePanel.class);
+                sidePaneManager.hide(SidePaneType.FILE_UPDATE_NOTIFICATION);
             }
-            FileUpdatePanel pan = new FileUpdatePanel(panel, sidePaneManager,
-                    database.getDatabaseFile().orElse(null), scanner);
-            sidePaneManager.register(pan);
-            sidePaneManager.show(FileUpdatePanel.class);
+
+            FileUpdatePanel component = (FileUpdatePanel) sidePaneManager.getComponent(SidePaneType.FILE_UPDATE_NOTIFICATION);
+            component.showForFile(panel, database.getDatabaseFile().orElse(null), scanner);
         };
 
         if (scanner.changesFound()) {

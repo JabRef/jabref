@@ -3,6 +3,7 @@ package org.jabref.gui.mergeentries;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 
@@ -36,7 +37,7 @@ public class MergeEntriesDialog extends JabRefDialog {
     private final CellConstraints cc = new CellConstraints();
 
     public MergeEntriesDialog(BasePanel panel) {
-        super(panel.frame(), MERGE_ENTRIES, true, MergeEntriesDialog.class);
+        super((JFrame) null, MERGE_ENTRIES, true, MergeEntriesDialog.class);
 
         this.panel = panel;
 
@@ -53,7 +54,7 @@ public class MergeEntriesDialog extends JabRefDialog {
 
         // Check if there are two entries selected
         if (selected.size() != 2) { // None selected. Inform the user to select entries first.
-            JOptionPane.showMessageDialog(panel.frame(),
+            JOptionPane.showMessageDialog(null,
                     Localization.lang("You have to choose exactly two entries to merge."),
                     MERGE_ENTRIES, JOptionPane.INFORMATION_MESSAGE);
             this.dispose();

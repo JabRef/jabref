@@ -37,7 +37,6 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
 
     @Override
     public void performAction(BasePanel panel, ParserResult parserResult) {
-
         BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult);
 
         List<EntryType> typesToStore = determineEntryTypesToSave(panel, getListOfUnknownAndUnequalCustomizations(parserResult), mode);
@@ -77,7 +76,7 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
 
         JPanel checkboxPanel = createCheckBoxPanel(newTypes, differentCustomizations, typeCheckBoxMap);
 
-        int answer = JOptionPane.showConfirmDialog(panel.frame(),
+        int answer = JOptionPane.showConfirmDialog(null,
                 checkboxPanel,
                 Localization.lang("Custom entry types"),
                 JOptionPane.OK_CANCEL_OPTION,

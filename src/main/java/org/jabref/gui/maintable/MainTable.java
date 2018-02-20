@@ -84,7 +84,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.database = Objects.requireNonNull(database);
         this.undoManager = panel.getUndoManager();
 
-        this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager()).createColumns());
+        this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
                     if (event.getClickCount() == 2) {

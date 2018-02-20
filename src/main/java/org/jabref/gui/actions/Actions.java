@@ -9,8 +9,6 @@ public enum Actions {
     ABBREVIATE_MEDLINE,
     ADD_FILE_LINK,
     ADD_TO_GROUP,
-    AUTO_SET_FILE,
-    BACK,
     CLEANUP,
     COPY,
     COPY_CITATION_ASCII_DOC,
@@ -31,8 +29,6 @@ public enum Actions {
     EDIT_PREAMBLE,
     EDIT_STRINGS,
     EXPORT_TO_CLIPBOARD,
-    FOCUS_TABLE,
-    FORWARD,
     MAKE_KEY,
     MANAGE_SELECTORS,
     MARK_ENTRIES,
@@ -46,7 +42,6 @@ public enum Actions {
     OPEN_FOLDER,
     OPEN_URL,
     PASTE,
-    PLAIN_TEXT_IMPORT,
     PREVIOUS_PREVIEW_STYLE,
     PULL_CHANGES_FROM_SHARED_DATABASE,
     REDO,
@@ -55,7 +50,6 @@ public enum Actions {
     RESOLVE_DUPLICATE_KEYS,
     SAVE,
     SAVE_AS,
-    SAVE_SELECTED_AS,
     SAVE_SELECTED_AS_PLAIN,
     SEARCH,
     GLOBAL_SEARCH,
@@ -84,6 +78,5 @@ public enum Actions {
     clearReadStatus,
     setReadStatusToRead,
     setReadStatusToSkimmed,
-    toggleRelevance,
-    findUnlinkedFiles
+    toggleRelevance
 }

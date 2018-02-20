@@ -20,6 +20,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -36,7 +37,6 @@ import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -90,10 +90,10 @@ public class ProtectedTermsDialog {
     private boolean okPressed;
     private final ProtectedTermsLoader loader;
 
-    public ProtectedTermsDialog(JabRefFrame frame, ProtectedTermsLoader loader) {
+    public ProtectedTermsDialog(JabRefFrame frame) {
 
         this.frame = Objects.requireNonNull(frame);
-        this.loader = Objects.requireNonNull(loader);
+        this.loader = Globals.protectedTermsLoader;
         init();
 
     }
@@ -122,7 +122,7 @@ public class ProtectedTermsDialog {
         setupTable();
 
         // Build dialog
-        diag = new JDialog(frame, Localization.lang("Manage protected terms files"), true);
+        diag = new JDialog((JFrame) null, Localization.lang("Manage protected terms files"), true);
 
         FormBuilder builder = FormBuilder.create();
         builder.layout(new FormLayout("fill:pref:grow, 4dlu, left:pref, 4dlu, left:pref, 4dlu, left:pref",
@@ -434,7 +434,7 @@ public class ProtectedTermsDialog {
                     .addExtensionFilter(FileType.TERMS)
                     .withDefaultExtension(FileType.TERMS)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-            DialogService ds = new FXDialogService();
+            DialogService ds = frame.getDialogService();
 
             browse.addActionListener(e -> {
                 Optional<Path> file = DefaultTaskExecutor

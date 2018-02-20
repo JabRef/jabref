@@ -22,7 +22,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 
 import org.jabref.Globals;
-import org.jabref.gui.FXDialogService;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
@@ -49,12 +49,14 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private final BibDatabaseContext databaseContext;
     private UndoManager undoManager;
     private Collection<String> fields;
+    private final DialogService dialogService;
 
-    public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager) {
+    public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService) {
         this.isCompressed = compressed;
         this.databaseContext = databaseContext;
         this.suggestionProviders = suggestionProviders;
         this.undoManager = undoManager;
+        this.dialogService = dialogService;
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -79,7 +81,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
         List<Label> labels = new ArrayList<>();
         for (String fieldName : fields) {
-            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.TASK_EXECUTOR, new FXDialogService(),
+            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.TASK_EXECUTOR, dialogService,
                     Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs,
                     databaseContext, entry.getType(),
                     suggestionProviders, undoManager);

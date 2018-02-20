@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -13,6 +12,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
@@ -35,8 +35,8 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
     }
 
     @Override
-    public Icon getIcon() {
-        return IconTheme.getImage("emacs");
+    public JabRefIcon getIcon() {
+        return IconTheme.JabRefIcons.APPLICATION_EMACS;
     }
 
     @Override
@@ -129,13 +129,13 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
     @Override
     public void operationCompleted(BasePanel panel) {
         if (couldNotConnect) {
-            JOptionPane.showMessageDialog(panel.frame(), "<HTML>" +
+            JOptionPane.showMessageDialog(null, "<HTML>" +
                     Localization.lang("Could not connect to a running gnuserv process. Make sure that "
                             + "Emacs or XEmacs is running,<BR>and that the server has been started "
                             + "(by running the command 'server-start'/'gnuserv-start').") + "</HTML>",
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         } else if (couldNotCall) {
-            JOptionPane.showMessageDialog(panel.frame(),
+            JOptionPane.showMessageDialog(null,
                     Localization.lang("Could not run the gnuclient/emacsclient program. Make sure you have "
                             + "the emacsclient/gnuclient program installed and available in the PATH."),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);

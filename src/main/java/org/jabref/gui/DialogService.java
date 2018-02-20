@@ -65,6 +65,13 @@ public interface DialogService {
     }
 
     /**
+     * Create and display error dialog displaying the given exception.
+     *
+     * @param exception the exception causing the error
+     */
+    void showErrorDialogAndWait(String title, String content, Throwable exception);
+
+    /**
      * Create and display error dialog displaying the given message.
      *
      * @param message the error message

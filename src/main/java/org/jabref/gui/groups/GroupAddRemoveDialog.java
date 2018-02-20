@@ -14,6 +14,7 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -55,7 +56,7 @@ public class GroupAddRemoveDialog implements BaseAction {
 
         selection = panel.getSelectedEntries();
 
-        final JDialog diag = new JDialog(panel.frame(),
+        final JDialog diag = new JDialog((JFrame) null,
                 (add ? (move ? Localization.lang("Move to group") : Localization.lang("Add to group")) : Localization
                         .lang("Remove from group")),
                 true);
@@ -121,7 +122,6 @@ public class GroupAddRemoveDialog implements BaseAction {
 
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
-        diag.setLocationRelativeTo(panel.frame());
         diag.setVisible(true);
 
     }

@@ -112,13 +112,6 @@
     -fx-padding: 0em 1em 0em 1em;
 }
 
-.flatButton {
-    -fx-shadow-highlight-color: transparent;
-    -fx-outer-border: transparent;
-    -fx-inner-border: transparent;
-    -fx-focus-color: #6A9FCD;
-    -fx-faint-focus-color: transparent;
-    -fx-background-color: transparent;
-    -fx-text-background-color: dimgray;
-    -fx-padding: 0.5em;
+#barBottom .glyph-icon {
+    -fx-font-size: 2em;
 }

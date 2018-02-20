@@ -13,6 +13,7 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -24,8 +25,6 @@ import javafx.scene.control.TabPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -70,7 +69,7 @@ public class FromAuxDialog extends JabRefDialog {
     private final JabRefFrame parentFrame;
 
     public FromAuxDialog(JabRefFrame frame, String title, boolean modal, TabPane viewedDBs) {
-        super(frame, title, modal, FromAuxDialog.class);
+        super((JFrame) null, title, modal, FromAuxDialog.class);
 
         parentTabbedPane = viewedDBs;
         parentFrame = frame;
@@ -165,11 +164,10 @@ public class FromAuxDialog extends JabRefDialog {
                 .addExtensionFilter(FileType.AUX)
                 .withDefaultExtension(FileType.AUX)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-        DialogService ds = new FXDialogService();
 
         browseAuxFileButton.addActionListener(e -> {
             Optional<Path> file = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
+                    .runInJavaFXThread(() -> parentFrame.getDialogService().showFileOpenDialog(fileDialogConfiguration));
             file.ifPresent(f -> auxFileField.setText(f.toAbsolutePath().toString()));
         });
 

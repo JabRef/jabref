@@ -24,8 +24,9 @@ public enum FileType {
     CITATION_STYLE(Localization.lang("%0 file", "CSL"), "csl"),
     DOCBOOK(Localization.lang("%0 file", "Docbook 4.4"), "xml"),
     DIN_1505(Localization.lang("%0 file", "DIN 1505"), "rtf"),
-    ENDNOTE(Localization.lang("%0 file", "Endnote/Refer"), "ref", "enw"),
-    ENDNOTE_TXT(Localization.lang("%0 file", "Endnote"), "txt"), //for export
+    ENDNOTE(Localization.lang("%0 file", "EndNote/Refer"), "ref", "enw"),
+    ENDNOTE_XML(Localization.lang("%0 file", "EndNote XML"), "xml"),
+    ENDNOTE_TXT(Localization.lang("%0 file", "EndNote"), "txt"), //for export
     FREECITE(Localization.lang("%0 file", "FreeCite"), "txt", "xml"),
     HARVARD_RTF(Localization.lang("%0 file", "Harvard"), "rtf"),
     HTML_LIST(Localization.lang("%0 file", Localization.lang("HTML list")), "html"),

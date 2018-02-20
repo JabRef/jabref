@@ -35,6 +35,7 @@ import javax.swing.UIManager;
 
 import org.jabref.JabRefException;
 import org.jabref.JabRefMain;
+import org.jabref.gui.SidePaneType;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -49,6 +50,7 @@ import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -68,7 +70,7 @@ import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
-import org.jabref.logic.xmp.XMPPreferences;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -270,7 +272,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String USE_OWNER = "useOwner";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
     public static final String SHOW_FILE_LINKS_UPGRADE_WARNING = "showFileLinksUpgradeWarning";
-    public static final String SIDE_PANE_WIDTH = "sidePaneWidth";
+    public static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
     public static final String LAST_USED_EXPORT = "lastUsedExport";
     public static final String FLOAT_MARKED_ENTRIES = "floatMarkedEntries";
     public static final String CITE_COMMAND = "citeCommand";
@@ -373,6 +375,9 @@ public class JabRefPreferences implements PreferencesService {
     //AutcompleteFields - public because needed for pref migration
     public static final String AUTOCOMPLETER_COMPLETE_FIELDS = "autoCompleteFields";
 
+    // Id Entry Generator Preferences
+    public static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
+
     // Auto completion
     private static final String AUTO_COMPLETE = "autoComplete";
     private static final String AUTOCOMPLETER_FIRSTNAME_MODE = "autoCompFirstNameMode";
@@ -460,6 +465,10 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(TEXSTUDIO_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
 
         defaults.put(BIBLATEX_DEFAULT_MODE, Boolean.FALSE);
+
+        // Set DOI to be the default ID entry generator
+        defaults.put(ID_ENTRY_GENERATOR, DoiFetcher.NAME);
+
 
         if (OS.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
@@ -720,7 +729,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(FLOAT_MARKED_ENTRIES, Boolean.TRUE);
 
         defaults.put(LAST_USED_EXPORT, "");
-        defaults.put(SIDE_PANE_WIDTH, -1);
+        defaults.put(SIDE_PANE_WIDTH, 0.15);
 
         defaults.put(IMPORT_INSPECTION_DIALOG_WIDTH, 650);
         defaults.put(IMPORT_INSPECTION_DIALOG_HEIGHT, 650);
@@ -931,6 +940,27 @@ public class JabRefPreferences implements PreferencesService {
         storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().getAsStringList(OS.NEWLINE)));
     }
 
+    public Map<SidePaneType, Integer> getSidePanePreferredPositions() {
+        Map<SidePaneType, Integer> preferredPositions = new HashMap<>();
+
+        List<String> componentNames = getStringList(SIDE_PANE_COMPONENT_NAMES);
+        List<String> componentPositions = getStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);
+
+        for (int i = 0; i < componentNames.size(); ++i) {
+            String name = componentNames.get(i);
+            try {
+                SidePaneType type = Enum.valueOf(SidePaneType.class, name);
+                preferredPositions.put(type, Integer.parseInt(componentPositions.get(i)));
+            } catch (NumberFormatException e) {
+                LOGGER.debug("Invalid number format for side pane component '" + name + "'", e);
+            } catch (IllegalArgumentException e) {
+                LOGGER.debug("Following component is not a side pane: '" + name + "'", e);
+            }
+        }
+
+        return preferredPositions;
+    }
+
     public int getFontSizeFX() {
         // Decrease font size by 3 since JavaFX has default font size of 9, while Swing uses 12
         return getInt(MENU_FONT_SIZE) - 3;
@@ -973,9 +1003,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CUSTOM_TAB_FIELDS + "_def1", FieldName.ABSTRACT);
         defaults.put(CUSTOM_TAB_NAME + "_def1", Localization.lang("Abstract"));
 
-        // Entry editor tab 2: Review Field - used for research comments, etc.
-        defaults.put(CUSTOM_TAB_FIELDS + "_def2", FieldName.REVIEW);
-        defaults.put(CUSTOM_TAB_NAME + "_def2", Localization.lang("Review"));
+        // Entry editor tab 2: Comments Field - used for research comments, etc.
+        defaults.put(CUSTOM_TAB_FIELDS + "_def2", FieldName.COMMENT);
+        defaults.put(CUSTOM_TAB_NAME + "_def2", Localization.lang("Comments"));
 
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
     }
@@ -1445,8 +1475,8 @@ public class JabRefPreferences implements PreferencesService {
                 getFileLinkPreferences(), journalAbbreviationLoader);
     }
 
-    public XMPPreferences getXMPPreferences() {
-        return new XMPPreferences(getBoolean(USE_XMP_PRIVACY_FILTER), getStringList(XMP_PRIVACY_FILTERS),
+    public XmpPreferences getXMPPreferences() {
+        return new XmpPreferences(getBoolean(USE_XMP_PRIVACY_FILTER), getStringList(XMP_PRIVACY_FILTERS),
                 getKeywordDelimiter());
     }
 
@@ -1669,5 +1699,19 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(AUTOCOMPLETER_LAST_FIRST, autoCompletePreferences.getOnlyCompleteLastFirst());
         putBoolean(AUTOCOMPLETER_FIRST_LAST, autoCompletePreferences.getOnlyCompleteFirstLast());
         putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteFields());
+    }
+
+    public void storeSidePanePreferredPositions(Map<SidePaneType, Integer> preferredPositions) {
+        // Split the map into a pair of parallel String lists suitable for storage
+        List<String> names = preferredPositions.keySet().stream()
+                                               .map(Enum::toString)
+                                               .collect(Collectors.toList());
+
+        List<String> positions = preferredPositions.values().stream()
+                                                   .map(integer -> Integer.toString(integer))
+                                                   .collect(Collectors.toList());
+
+        putStringList(SIDE_PANE_COMPONENT_NAMES, names);
+        putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
     }
 }

@@ -24,6 +24,7 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -74,7 +75,7 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
      * Creates a new instance of EntryCustomizationDialog
      */
     public EntryCustomizationDialog(JabRefFrame frame) {
-        super(frame, Localization.lang("Customize entry types"), false, EntryCustomizationDialog.class);
+        super((JFrame) null, Localization.lang("Customize entry types"), false, EntryCustomizationDialog.class);
 
         this.frame = frame;
         initGui();
@@ -323,7 +324,7 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
         if (type.isPresent() && (type.get() instanceof CustomEntryType)) {
             if (!EntryTypes.getStandardType(name, bibDatabaseMode).isPresent()) {
                 int reply = JOptionPane.showConfirmDialog
-                        (frame, Localization.lang("All entries of this "
+                        (null, Localization.lang("All entries of this "
                                         + "type will be declared "
                                         + "typeless. Continue?"),
                                 Localization.lang("Delete custom format") +

@@ -12,7 +12,7 @@ Stay on top of your literature: JabRef helps you to collect and organize sources
 ## Features
 
 JabRef is a cross-platform application that works on Windows, Linux and Mac OS X. It is available free of charge and is actively developed.
-JabRef supports you every step of your research work.
+JabRef supports you in every step of your research work.
 
 #### Collect
 
@@ -21,7 +21,7 @@ JabRef supports you every step of your research work.
 - Easily retrieve and link full-text articles
 - Fetch complete bibliographic information based on ISBN, DOI, PubMed-ID and arXiv-ID
 - Extract metadata from PDFs
-- [Firefox Add-on](https://addons.mozilla.org/en-US/firefox/addon/jabfox/) that lets you import new references directly from the browser with one click
+- [JabFox Firefox Add-on](https://addons.mozilla.org/en-US/firefox/addon/jabfox/) lets you import new references directly from the browser with one click
 	
 #### Organize
 
@@ -32,7 +32,7 @@ JabRef supports you every step of your research work.
 - Customize and add new metadata fields or reference types
 - Find and merge duplicates
 - Attach related documents: 20 different kinds of documents supported out of the box, completely customizable and extendable
-- Automatically rename and moves associated documents according to customizable rules
+- Automatically rename and move associated documents according to customizable rules
 - Keep track of what you read: ranking, priority, printed, quality-assured 
 	
 #### Cite
@@ -40,13 +40,13 @@ JabRef supports you every step of your research work.
 - Native [BibTeX] and [Biblatex] support
 - Cite-as-you-write functionality for external applications such as Emacs, Kile, LyX, Texmaker, TeXstudio, Vim and WinEdt.
 - Format references in one of the many thousand built-in citation styles or create your own style
-- Support for Word and LibreOffice/OpenOffice to insert and format citations
+- Support for Word and LibreOffice/OpenOffice for inserting and formatting citations
 	
 #### Share
 
 - Many built-in export options or create your own export format
-- Library is saved as a simple text file and thus easy to share with others via Dropbox and is version-control friendly
-- Work in a team: sync the contents of your library with a SQL database
+- Library is saved as a simple text file and thus it is easy to share with others via Dropbox and is version-control friendly
+- Work in a team: sync the contents of your library via a SQL database
 
 ## Installation
 
@@ -70,15 +70,17 @@ Try to double click the `jar` file or execute the following command:
 We are thankful for any bug reports or other feedback.
 If you have ideas for new features you want to be included in JabRef, [tell us in our forum](http://discourse.jabref.org/c/features)!
 If you need support in using JabRef, please read [the documentation](https://help.jabref.org/) first and have a look at our [community forum](http://discourse.jabref.org/c/help).
-You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) to send in bug reports.
+You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) to file bug reports.
 
-Explanation of donation possibilities and usage of donations is available at our [donations page](https://donations.jabref.org).
+An explanation of donation possibilities and usage of donations is available at our [donations page](https://donations.jabref.org).
 
 ## Contributing
 
 [![Help Contribute to Open Source](https://www.codetriage.com/jabref/jabref/badges/users.svg)](https://www.codetriage.com/jabref/jabref)
 [![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![OpenHub](https://www.openhub.net/p/jabref/widgets/project_thin_badge.gif)](https://www.openhub.net/p/jabref)
+
+> Not a programmer? [Learn how to help.](http://contribute.jabref.org)
 
 Want to be part of a free and open-source project that tens of thousands scientist use every day?
 Check out our [issue tracker](https://github.com/JabRef/jabref/issues) to find something to work on.
