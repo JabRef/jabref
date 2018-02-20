@@ -47,7 +47,6 @@ public class OAI2Fetcher implements EntryFetcher {
     private static final String OAI2_ARXIV_HOST = "export.arxiv.org";
     private static final String OAI2_ARXIV_SCRIPT = "oai2";
     private static final String OAI2_ARXIV_METADATAPREFIX = "arXiv";
-    private static final String OAI2_ARXIV_ARCHIVENAME = "ArXiv.org";
     private static final String OAI2_IDENTIFIER_FIELD = "oai2identifier";
     private SAXParser saxParser;
     private final String oai2Host;

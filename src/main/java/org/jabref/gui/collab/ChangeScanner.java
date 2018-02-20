@@ -32,7 +32,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.metadata.MetaData;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +42,6 @@ public class ChangeScanner implements Runnable {
     private final File file;
     private final Path tempFile;
     private final BibDatabaseContext databaseInMemory;
-    private final MetaData metadataInMemory;
 
     private final BasePanel panel;
     private final JabRefFrame frame;
@@ -62,7 +60,6 @@ public class ChangeScanner implements Runnable {
         this.panel = bp;
         this.frame = frame;
         this.databaseInMemory = bp.getDatabaseContext();
-        this.metadataInMemory = bp.getBibDatabaseContext().getMetaData();
         this.file = file;
         this.tempFile = tempFile;
     }
