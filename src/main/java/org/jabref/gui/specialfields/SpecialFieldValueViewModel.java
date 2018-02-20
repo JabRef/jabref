@@ -15,16 +15,15 @@ import org.jabref.model.entry.specialfields.SpecialFieldValue;
 
 public class SpecialFieldValueViewModel {
 
-    public SpecialFieldValue getValue() {
-        return value;
-    }
-
     private final SpecialFieldValue value;
 
     public SpecialFieldValueViewModel(SpecialFieldValue value) {
         Objects.requireNonNull(value);
-
         this.value = value;
+    }
+
+    public SpecialFieldValue getValue() {
+        return value;
     }
 
     public Icon getSpecialFieldValueIcon() {

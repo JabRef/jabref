@@ -239,7 +239,7 @@ public class PdfImporter {
                 UpdateField.setAutomaticFields(list, true, true, Globals.prefs.getUpdateFieldPreferences());
 
                 // Create an UndoableInsertEntry object.
-                panel.getUndoManager().addEdit(new UndoableInsertEntry(panel.getDatabase(), bibEntry, panel));
+                panel.getUndoManager().addEdit(new UndoableInsertEntry(panel.getDatabase(), bibEntry));
                 panel.output(Localization.lang("Added new") + " '" + type.getName().toLowerCase(Locale.ROOT) + "' "
                         + Localization.lang("entry") + ".");
 

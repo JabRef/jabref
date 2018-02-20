@@ -107,7 +107,7 @@ public class EntryEditor extends BorderPane {
      * Set-up key bindings specific for the entry editor.
      */
     private void setupKeyBindings() {
-        tabbed.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+        this.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = preferences.getKeyBindings().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
