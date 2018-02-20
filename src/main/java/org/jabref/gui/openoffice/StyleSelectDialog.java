@@ -2,7 +2,6 @@ package org.jabref.gui.openoffice;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -98,7 +97,6 @@ class StyleSelectDialog {
     private PreviewPanel preview;
     private ActionListener removeAction;
 
-    private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
     private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final BibEntry prevEntry;
@@ -108,13 +106,11 @@ class StyleSelectDialog {
     private final OpenOfficePreferences preferences;
 
     public StyleSelectDialog(JabRefFrame frame, OpenOfficePreferences preferences, StyleLoader loader) {
-
         this.frame = Objects.requireNonNull(frame);
         this.preferences = Objects.requireNonNull(preferences);
         this.loader = Objects.requireNonNull(loader);
         prevEntry = TestEntry.getTestEntry();
         init();
-
     }
 
     private void init() {
@@ -130,7 +126,6 @@ class StyleSelectDialog {
                 }
             });
             updateStyles();
-
         });
         addButton.setToolTipText(Localization.lang("Add style file"));
 
@@ -293,7 +288,6 @@ class StyleSelectDialog {
                 LOGGER.warn("Problem with style file '" + style.getPath() + "'", e);
             }
         }));
-
     }
 
     public void setVisible(boolean visible) {
@@ -356,6 +350,7 @@ class StyleSelectDialog {
 
     /**
      * Get the currently selected style.
+     *
      * @return the selected style, or empty if no style is selected.
      */
     private Optional<OOBibStyle> getSelectedStyle() {
@@ -375,28 +370,28 @@ class StyleSelectDialog {
         @Override
         public String getColumnName(int i) {
             switch (i) {
-            case 0:
-                return Localization.lang("Name");
-            case 1:
-                return Localization.lang("Journals");
-            case 2:
-                return Localization.lang("File");
-            default:
-                return "";
+                case 0:
+                    return Localization.lang("Name");
+                case 1:
+                    return Localization.lang("Journals");
+                case 2:
+                    return Localization.lang("File");
+                default:
+                    return "";
             }
         }
 
         @Override
         public Object getColumnValue(OOBibStyle style, int i) {
             switch (i) {
-            case 0:
-                return style.getName();
-            case 1:
-                return String.join(", ", style.getJournals());
-            case 2:
-                return style.isFromResource() ? Localization.lang("Internal style") : style.getFile().getName();
-            default:
-                return "";
+                case 0:
+                    return style.getName();
+                case 1:
+                    return String.join(", ", style.getJournals());
+                case 2:
+                    return style.isFromResource() ? Localization.lang("Internal style") : style.getFile().getName();
+                default:
+                    return "";
             }
         }
     }
@@ -534,6 +529,5 @@ class StyleSelectDialog {
         public void setDirectoryPath(String path) {
             this.newFile.setText(path);
         }
-
     }
 }
