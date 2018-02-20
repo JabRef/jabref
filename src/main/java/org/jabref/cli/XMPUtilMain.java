@@ -98,11 +98,11 @@ public class XMPUtilMain {
         } else if (argsLength == 2) {
             if ("-x".equals(args[0]) && args[1].endsWith(".pdf")) {
                 // Read from pdf and write as BibTex
-                Optional<XMPMetadata> meta = XMPUtilReader.readRawXMP(Paths.get(args[1]));
+                Optional<List<XMPMetadata>> meta = XMPUtilReader.readRawXMP(Paths.get(args[1]));
 
                 if (meta.isPresent()) {
                     XmpSerializer serializer = new XmpSerializer();
-                    serializer.serialize(meta.get(), System.out, true);
+                    serializer.serialize(meta.get().get(0), System.out, true);
                 } else {
                     System.err.println("The given pdf does not contain any XMP-metadata.");
                 }

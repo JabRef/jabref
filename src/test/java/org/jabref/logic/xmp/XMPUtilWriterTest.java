@@ -19,7 +19,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -113,28 +112,28 @@ public class XMPUtilWriterTest {
      * @throws TransformerException
      * @throws ParseException
      */
-    @Test
-    public void testWriteXMP() throws IOException, URISyntaxException, TransformerException, ParseException {
-
-        File pdfFile = this.createDefaultFile("JabRef_writeSingle.pdf");
-
-        // read a bib entry from the tests before
-        String entryString = vapnik2000;
-        BibEntry entry = parser.parseEntries(entryString).get(0);
-        entry.setCiteKey("WriteXMPTest");
-        entry.setId("ID4711");
-
-        // write the changed bib entry to the create PDF
-        XMPUtilWriter.writeXMP(pdfFile.getAbsolutePath(), entry, null, xmpPreferences);
-
-        // read entry again
-        List<BibEntry> entriesWritten = XMPUtilReader.readXMP(pdfFile.getPath(), xmpPreferences);
-        BibEntry entryWritten = entriesWritten.get(0);
-
-        // compare the two entries
-        Assert.assertEquals(entry, entryWritten);
-
-    }
+    //    @Test
+    //    public void testWriteXMP() throws IOException, URISyntaxException, TransformerException, ParseException {
+    //
+    //        File pdfFile = this.createDefaultFile("JabRef_writeSingle.pdf");
+    //
+    //        // read a bib entry from the tests before
+    //        String entryString = vapnik2000;
+    //        BibEntry entry = parser.parseEntries(entryString).get(0);
+    //        entry.setCiteKey("WriteXMPTest");
+    //        entry.setId("ID4711");
+    //
+    //        // write the changed bib entry to the create PDF
+    //        XMPUtilWriter.writeXMP(pdfFile.getAbsolutePath(), entry, null, xmpPreferences);
+    //
+    //        // read entry again
+    //        List<BibEntry> entriesWritten = XMPUtilReader.readXMP(pdfFile.getPath(), xmpPreferences);
+    //        BibEntry entryWritten = entriesWritten.get(0);
+    //
+    //        // compare the two entries
+    //        Assert.assertEquals(entry, entryWritten);
+    //
+    //    }
 
     @Test
     public void testWriteMultipleBibEntries() throws IOException, ParseException, TransformerException {

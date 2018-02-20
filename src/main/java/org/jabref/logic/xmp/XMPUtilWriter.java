@@ -148,7 +148,6 @@ public class XMPUtilWriter {
         for (BibEntry entry : resolvedEntries) {
             DublinCoreSchema dcSchema = meta.createAndAddDublinCoreSchema();
             XMPUtilWriter.writeToDCSchema(dcSchema, entry, null, xmpPreferences);
-            meta.addSchema(dcSchema);
         }
 
         // Save to stream and then input that stream to the PDF
@@ -257,7 +256,10 @@ public class XMPUtilWriter {
             }
 
             // Write schemas (PDDocumentInformation and DublinCoreSchema) to the document metadata
-            XMPUtilWriter.writeSchemasToPDMetadata(document, resolvedEntries, xmpPreferences);
+            if (resolvedEntries.size() > 0) {
+                XMPUtilWriter.writeDocumentInformation(document, resolvedEntries.get(0), null, xmpPreferences);
+                XMPUtilWriter.writeDublinCore(document, resolvedEntries, null, xmpPreferences);
+            }
 
             // Save
             try {
@@ -267,32 +269,6 @@ public class XMPUtilWriter {
                 throw new TransformerException("Could not write XMP metadata: " + e.getLocalizedMessage(), e);
             }
         }
-    }
-
-    private static void writeSchemasToPDMetadata(PDDocument document, List<BibEntry> resolvedEntries, XMPPreferences xmpPreferences) throws IOException, TransformerException {
-
-        if (resolvedEntries.size() > 0) {
-            XMPUtilWriter.writeDocumentInformation(document, resolvedEntries.get(0), null, xmpPreferences);
-            XMPUtilWriter.writeDublinCore(document, resolvedEntries, null, xmpPreferences);
-        }
-
-        PDDocumentCatalog catalog = document.getDocumentCatalog();
-        PDMetadata metaRaw = catalog.getMetadata();
-
-        XMPMetadata meta;
-        if (metaRaw == null) {
-            meta = XMPMetadata.createXMPMetadata();
-        } else {
-            meta = XMPUtilShared.parseXMPMetadata(metaRaw.createInputStream());
-        }
-
-        // Save to stream and then input that stream to the PDF
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        XmpSerializer serializer = new XmpSerializer();
-        serializer.serialize(meta, os, true);
-        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-        PDMetadata metadataStream = new PDMetadata(document, is);
-        catalog.setMetadata(metadataStream);
     }
 
     private static BibEntry getDefaultOrDatabaseEntry(BibEntry defaultEntry, BibDatabase database) {

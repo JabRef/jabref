@@ -1,9 +1,11 @@
 package org.jabref.logic.xmp;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +22,9 @@ import org.apache.xmpbox.schema.DublinCoreSchema;
 
 public class XMPUtilReader {
 
+    private static final String START_TAG = "<rdf:Description";
+    private static final String END_TAG = "</rdf:Description>";
+
     private XMPUtilReader() {
     }
 
@@ -30,7 +35,7 @@ public class XMPUtilReader {
      * @param path The path to read the XMPMetadata from.
      * @return The XMPMetadata object found in the file
      */
-    public static Optional<XMPMetadata> readRawXMP(Path path) throws IOException {
+    public static Optional<List<XMPMetadata>> readRawXMP(Path path) throws IOException {
         try (PDDocument document = XMPUtilReader.loadWithAutomaticDecryption(path)) {
             return XMPUtilReader.getXMPMetadata(document);
         }
@@ -63,17 +68,20 @@ public class XMPUtilReader {
         List<BibEntry> result = new LinkedList<>();
 
         try (PDDocument document = loadWithAutomaticDecryption(path)) {
-            Optional<XMPMetadata> meta = XMPUtilReader.getXMPMetadata(document);
+            Optional<List<XMPMetadata>> xmpMetaList = XMPUtilReader.getXMPMetadata(document);
 
-            if (meta.isPresent()) {
+            if (xmpMetaList.isPresent()) {
                 // Only support Dublin Core since JabRef 4.2
-                DublinCoreSchema dcSchema = meta.get().getDublinCoreSchema();
-                if (dcSchema != null) {
-                    DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
-                    Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
+                for (XMPMetadata xmpMeta : xmpMetaList.get()) {
+                    DublinCoreSchema dcSchema = xmpMeta.getDublinCoreSchema();
 
-                    if (entry.isPresent()) {
-                        result.add(entry.get());
+                    if (dcSchema != null) {
+                        DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
+                        Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
+
+                        if (entry.isPresent()) {
+                            result.add(entry.get());
+                        }
                     }
                 }
             }
@@ -94,9 +102,15 @@ public class XMPUtilReader {
     }
 
     /**
+     * This method is a hack to generate multiple XMPMetadata objects, because the
+     * implementation of the pdfbox does not support methods for reading multiple
+     * DublinCoreSchemas from a single metadata entry.
+     * <p/>
+     *
+     *
      * @return empty Optional if no metadata has been found
      */
-    private static Optional<XMPMetadata> getXMPMetadata(PDDocument document) throws IOException {
+    private static Optional<List<XMPMetadata>> getXMPMetadata(PDDocument document) throws IOException {
         PDDocumentCatalog catalog = document.getDocumentCatalog();
         PDMetadata metaRaw = catalog.getMetadata();
 
@@ -104,9 +118,26 @@ public class XMPUtilReader {
             return Optional.empty();
         }
 
-        XMPMetadata meta = XMPUtilShared.parseXMPMetadata(metaRaw.createInputStream());
+        String xmp = metaRaw.getCOSObject().toTextString();
 
-        return Optional.of(meta);
+        int startDescriptionSection = xmp.indexOf(START_TAG);
+        int endDescriptionSection = xmp.lastIndexOf(END_TAG) + END_TAG.length();
+
+        // XML header for the xmpDomParser
+        String start = xmp.substring(0, startDescriptionSection);
+        // descriptionArray - mid part of the textual metadata
+        String[] descriptionsArray = xmp.substring(startDescriptionSection, endDescriptionSection).split(END_TAG);
+        // XML footer for the xmpDomParser
+        String end = xmp.substring(endDescriptionSection);
+
+        List<XMPMetadata> metaList = new ArrayList<>();
+
+        for (String s : descriptionsArray) {
+            // END_TAG is appended, because of the split operation above
+            String xmpMetaString = start + s + END_TAG + end;
+            metaList.add(XMPUtilShared.parseXMPMetadata(new ByteArrayInputStream(xmpMetaString.getBytes())));
+        }
+        return Optional.of(metaList);
     }
 
     /**
