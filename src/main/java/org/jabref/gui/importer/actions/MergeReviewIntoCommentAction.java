@@ -1,10 +1,13 @@
 package org.jabref.gui.importer.actions;
 
+import java.util.List;
+
 import org.jabref.gui.BasePanel;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.migrations.MergeReviewIntoCommentMigration;
+import org.jabref.model.entry.BibEntry;
 
-public class MergeReviewIntoComment implements GUIPostOpenAction {
+public class MergeReviewIntoCommentAction implements GUIPostOpenAction {
 
     @Override
     public boolean isActionNecessary(ParserResult parserResult) {
@@ -16,7 +19,8 @@ public class MergeReviewIntoComment implements GUIPostOpenAction {
         MergeReviewIntoCommentMigration migration = new MergeReviewIntoCommentMigration();
 
         migration.performMigration(parserResult);
-        if (new MergeReviewIntoCommentConfirmation(basePanel).askUserForMerge(MergeReviewIntoCommentMigration.collectConflicts(parserResult))) {
+        List<BibEntry> conflicts = MergeReviewIntoCommentMigration.collectConflicts(parserResult);
+        if (new MergeReviewIntoCommentConfirmationDialog(basePanel).askUserForMerge(conflicts)) {
             migration.performConflictingMigration(parserResult);
         }
     }

@@ -10,11 +10,11 @@ import org.jabref.gui.BasePanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-public class MergeReviewIntoCommentConfirmation {
+public class MergeReviewIntoCommentConfirmationDialog {
 
     private final BasePanel panel;
 
-    public MergeReviewIntoCommentConfirmation(BasePanel panel) {
+    public MergeReviewIntoCommentConfirmationDialog(BasePanel panel) {
         this.panel = panel;
     }
 

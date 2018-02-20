@@ -59,7 +59,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = Arrays.asList(
             // Migrations:
             // Warning for migrating the Review into the Comment field
-            new MergeReviewIntoComment(),
+            new MergeReviewIntoCommentAction(),
             // External file handling system in version 2.3:
             new FileLinksUpgradeWarning(),
 

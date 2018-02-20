@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class MergeReviewIntoCommentMigrationTest {
+class MergeReviewIntoCommentActionMigrationTest {
     private MergeReviewIntoCommentMigration action;
 
     @BeforeEach
