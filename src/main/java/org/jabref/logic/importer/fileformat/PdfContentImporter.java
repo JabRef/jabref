@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -21,7 +20,7 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
-import org.jabref.logic.xmp.XMPUtil;
+import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
@@ -30,7 +29,7 @@ import org.jabref.model.entry.identifier.DOI;
 
 import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripper;
 
 /**
  * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
@@ -205,8 +204,7 @@ public class PdfContentImporter extends Importer {
     @Override
     public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
         final ArrayList<BibEntry> result = new ArrayList<>(1);
-        try (FileInputStream fileStream = new FileInputStream(filePath.toFile());
-                PDDocument document = XMPUtil.loadWithAutomaticDecryption(fileStream)) {
+        try (PDDocument document = XmpUtilReader.loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
 
             Optional<DOI> doi = DOI.findInText(firstPageContents);
