@@ -74,9 +74,9 @@ public class XMPUtilReaderTest {
     public void testReadArticleDublinCoreReadXMP() throws IOException, URISyntaxException, ParseException {
 
         Path path = Paths.get(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/article_dublinCore.pdf").toURI());
-        Optional<List<XMPMetadata>> meta = XMPUtilReader.readRawXMP(path);
+        List<XMPMetadata> meta = XMPUtilReader.readRawXMP(path);
 
-        DublinCoreSchema dcSchema = meta.get().get(0).getDublinCoreSchema();
+        DublinCoreSchema dcSchema = meta.get(0).getDublinCoreSchema();
         DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, new BibEntry());
         Optional<BibEntry> entry = dcExtractor.extractBibtexEntry();
         String bibString = Resources.toString(XMPUtilShared.class.getResource("/org/jabref/logic/xmp/article_dublinCore.bib"), StandardCharsets.UTF_8);

@@ -35,7 +35,7 @@ public class XMPUtilReader {
      * @param path The path to read the XMPMetadata from.
      * @return The XMPMetadata object found in the file
      */
-    public static Optional<List<XMPMetadata>> readRawXMP(Path path) throws IOException {
+    public static List<XMPMetadata> readRawXMP(Path path) throws IOException {
         try (PDDocument document = XMPUtilReader.loadWithAutomaticDecryption(path)) {
             return XMPUtilReader.getXMPMetadata(document);
         }
@@ -68,11 +68,11 @@ public class XMPUtilReader {
         List<BibEntry> result = new LinkedList<>();
 
         try (PDDocument document = loadWithAutomaticDecryption(path)) {
-            Optional<List<XMPMetadata>> xmpMetaList = XMPUtilReader.getXMPMetadata(document);
+            List<XMPMetadata> xmpMetaList = XMPUtilReader.getXMPMetadata(document);
 
-            if (xmpMetaList.isPresent()) {
+            if (!xmpMetaList.isEmpty()) {
                 // Only support Dublin Core since JabRef 4.2
-                for (XMPMetadata xmpMeta : xmpMetaList.get()) {
+                for (XMPMetadata xmpMeta : xmpMetaList) {
                     DublinCoreSchema dcSchema = xmpMeta.getDublinCoreSchema();
 
                     if (dcSchema != null) {
@@ -110,12 +110,13 @@ public class XMPUtilReader {
      *
      * @return empty Optional if no metadata has been found
      */
-    private static Optional<List<XMPMetadata>> getXMPMetadata(PDDocument document) throws IOException {
+    private static List<XMPMetadata> getXMPMetadata(PDDocument document) throws IOException {
         PDDocumentCatalog catalog = document.getDocumentCatalog();
         PDMetadata metaRaw = catalog.getMetadata();
+        List<XMPMetadata> metaList = new ArrayList<>();
 
         if (metaRaw == null) {
-            return Optional.empty();
+            return metaList;
         }
 
         String xmp = metaRaw.getCOSObject().toTextString();
@@ -130,14 +131,12 @@ public class XMPUtilReader {
         // XML footer for the xmpDomParser
         String end = xmp.substring(endDescriptionSection);
 
-        List<XMPMetadata> metaList = new ArrayList<>();
-
         for (String s : descriptionsArray) {
             // END_TAG is appended, because of the split operation above
             String xmpMetaString = start + s + END_TAG + end;
             metaList.add(XMPUtilShared.parseXMPMetadata(new ByteArrayInputStream(xmpMetaString.getBytes())));
         }
-        return Optional.of(metaList);
+        return metaList;
     }
 
     /**
