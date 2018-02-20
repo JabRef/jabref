@@ -133,7 +133,7 @@ public class ChangeScanner implements Runnable {
             // Start looking at changes.
             BibDatabaseDiff differences = BibDatabaseDiff.compare(databaseInTemp, databaseOnDisk);
             differences.getMetaDataDifferences().ifPresent(diff -> {
-                changes.add(new MetaDataChangeViewModel(metadataInMemory, diff));
+                changes.add(new MetaDataChangeViewModel(diff));
                 diff.getGroupDifferences().ifPresent(groupDiff -> changes.add(new GroupChangeViewModel(groupDiff)));
             });
             differences.getPreambleDifferences().ifPresent(diff -> changes.add(new PreambleChangeViewModel(databaseInMemory.getDatabase().getPreamble().orElse(""), diff)));
