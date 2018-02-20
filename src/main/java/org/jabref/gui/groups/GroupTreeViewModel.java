@@ -25,7 +25,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
@@ -136,7 +135,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         SwingUtilities.invokeLater(() -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialog());
             newGroup.ifPresent(group -> {
-                GroupTreeNode newGroupNode = parent.addSubgroup(group);
+                parent.addSubgroup(group);
 
                 // TODO: Add undo
                 //UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
@@ -173,7 +172,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     boolean removePreviousAssignents = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
                             && (group instanceof ExplicitGroup);
 
-                    List<FieldChange> addChange = oldGroup.getGroupNode().setGroup(
+                    oldGroup.getGroupNode().setGroup(
                             group,
                             keepPreviousAssignments,
                             removePreviousAssignents,
@@ -259,7 +258,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     void removeGroupsAndSubGroupsFromEntries(GroupNodeViewModel group) {
-        for (GroupNodeViewModel child: group.getChildren()) {
+        for (GroupNodeViewModel child : group.getChildren()) {
             removeGroupsAndSubGroupsFromEntries(child);
         }
 
@@ -275,7 +274,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(node.getNode().getGroup(), panel.frame())) {
         //    return; // user aborted operation
 
-        List<FieldChange> addChange = group.getGroupNode().addEntriesToGroup(stateManager.getSelectedEntries());
+        group.getGroupNode().addEntriesToGroup(stateManager.getSelectedEntries());
 
         // TODO: Add undo
         // NamedCompound undoAll = new NamedCompound(Localization.lang("change assignment of entries"));
@@ -303,7 +302,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(mNode.getNode().getGroup(), mPanel.frame())) {
         //    return; // user aborted operation
 
-        List<FieldChange> removeChange = group.getGroupNode().removeEntriesFromGroup(stateManager.getSelectedEntries());
+        group.getGroupNode().removeEntriesFromGroup(stateManager.getSelectedEntries());
 
         // TODO: Add undo
         // if (!undo.isEmpty()) {
@@ -312,6 +311,5 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
     public void sortAlphabeticallyRecursive(GroupNodeViewModel group) {
         group.getGroupNode().sortChildren(compAlphabetIgnoreCase, true);
-
     }
 }
