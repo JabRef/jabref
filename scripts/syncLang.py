@@ -78,7 +78,7 @@ class Keys:
     def __init__(self, lines):
         self.lines = lines
 
-    def duplicates(self):
+    def find_duplicates(self):
         """
         return: list of unicode strings
         """
@@ -220,7 +220,7 @@ class SyncLang:
     def __print_status_jabref_properties(self):
         self.__check_properties(main_property_file=self.main_jabref_preferences, property_files=self.__all_jabref_properties())
 
-    def update(self):
+    def update_properties(self):
         """
         updates all the localization files
         fixing unambiguous duplicates, removing obsolete keys, adding missing keys, and sorting them
@@ -236,19 +236,19 @@ class SyncLang:
         self.__update_properties(main_property_file=self.main_jabref_preferences, other_property_files=self.__other_jabref_properties())
 
     def __check_properties(self, main_property_file, property_files):
-        main_lines = self.__read_file_as_lines(filename=main_property_file)
+        main_lines = self.__read_lines_from_file(filename=main_property_file)
         main_keys = Keys(main_lines)
 
         # the main property file gets compared to itself, but that is OK
         for file in property_files:
             filename = self.__format_filename(filepath=file)
-            lines = self.__read_file_as_lines(file)
+            lines = self.__read_lines_from_file(file)
             keys1 = Keys(main_lines)
             keys = keys1.keys_from_lines()
 
             keys_missing = self.__missing_keys(main_keys.keys_from_lines(), keys)
             keys_obsolete = self.__missing_keys(keys, main_keys.keys_from_lines())
-            keys_duplicate = Keys(lines).duplicates()
+            keys_duplicate = Keys(lines).find_duplicates()
             keys_not_translated = Keys(lines=lines).empty_keys()
 
             num_keys = len(keys)
@@ -313,11 +313,11 @@ class SyncLang:
         return [os.path.join(RES_DIR, file) for file in jabref_property_files]
 
     def __update_properties(self, main_property_file, other_property_files):
-        main_lines = self.__read_file_as_lines(filename=main_property_file)
+        main_lines = self.__read_lines_from_file(filename=main_property_file)
         main_keys = Keys(main_lines)
         main_keys_dict = main_keys.translations_as_dict()
 
-        main_duplicates = main_keys.duplicates()
+        main_duplicates = main_keys.find_duplicates()
         num_main_duplicates = len(main_duplicates)
         if num_main_duplicates != 0:
             logging.error("There are {num_duplicates} duplicates in {file}, please fix them manually".format(num_duplicates=num_main_duplicates,
@@ -329,7 +329,7 @@ class SyncLang:
 
         for other_property_file in other_property_files:
             filename = self.__format_filename(filepath=other_property_file)
-            lines = self.__read_file_as_lines(filename=other_property_file)
+            lines = self.__read_lines_from_file(filename=other_property_file)
             keys, not_fixed, fixed = Keys(lines).fix_duplicates()
 
             num_keys = len(keys)
@@ -408,13 +408,13 @@ class SyncLang:
         """
         writes the lines to the file in `UTF-8`
         :param filename: string
-        :param content: list of unicode unicode: the lines to write
+        :param content: list of unicode strings: the lines to write
         """
         with codecs.open(filename, 'w', encoding="UTF-8") as f:
             f.writelines(content)
 
     @staticmethod
-    def __read_file_as_lines(filename):
+    def __read_lines_from_file(filename):
         """
         :param filename: string
         :param encoding: string: the encoding of the file to read (standard: `UTF-8`)
@@ -423,7 +423,8 @@ class SyncLang:
         with codecs.open(filename, 'r', encoding="UTF-8") as file:
             return [u"{}\n".format(line.strip()) for line in file.readlines()]
 
-    def __missing_keys(self, first_list, second_list):
+    @staticmethod
+    def __missing_keys(first_list, second_list):
         """
         Finds all keys in the first list that are not present in the second list
 
@@ -431,11 +432,7 @@ class SyncLang:
         :param second_list: list of unicode strings
         :return: list of unicode strings
         """
-        missing = []
-        for key in first_list:
-            if key not in second_list:
-                missing.append(key)
-        return missing
+        return list(set(first_list).difference(second_list))
 
     def status_create_markdown(self):
         """
@@ -447,7 +444,7 @@ class SyncLang:
             output_file.write("| ------------- | ---- | --------------- | ------------------- | ------------ |\n")
 
             for file in property_files:
-                lines = self.__read_file_as_lines(file)
+                lines = self.__read_lines_from_file(file)
                 keys = Keys(lines)
                 num_keys = len(keys.translations_as_dict())
                 num_keys_missing_value = len(keys.empty_keys())
@@ -484,7 +481,7 @@ def main():
         SyncLang(extended=False, out_file='status.md').status_create_markdown()
 
     elif (len(sys.argv) == 2 or len(sys.argv) == 3) and sys.argv[1] == "update":
-        SyncLang(extended=len(sys.argv) == 3 and (sys.argv[2] == "-e" or sys.argv[2] == "--extended")).update()
+        SyncLang(extended=len(sys.argv) == 3 and (sys.argv[2] == "-e" or sys.argv[2] == "--extended")).update_properties()
 
     elif (len(sys.argv) == 2 or len(sys.argv) == 3) and sys.argv[1] == "status":
         SyncLang(extended=len(sys.argv) == 3 and (sys.argv[2] == "-e" or sys.argv[2] == "--extended")).status()
