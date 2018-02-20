@@ -31,8 +31,6 @@ public class PreferencesMigrations {
      * Migrate all preferences from net/sf/jabref to org/jabref
      */
     public static void upgradePrefsToOrgJabRef() {
-
-        JabRefPreferences prefs = Globals.prefs;
         Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
         try {
             if (mainPrefsNode.childrenNames().length != 0) {
