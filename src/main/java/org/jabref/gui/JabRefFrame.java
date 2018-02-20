@@ -741,7 +741,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
      */
     private MenuBar createMenu() {
         ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
-
         Menu file = new Menu(Localization.menuTitle("File"));
         Menu edit = new Menu(Localization.menuTitle("Edit"));
         Menu library = new Menu(Localization.menuTitle("Library"));
@@ -1011,6 +1010,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 view,
                 options,
                 help);
+        menu.setUseSystemMenuBar(true);
         return menu;
     }
 
