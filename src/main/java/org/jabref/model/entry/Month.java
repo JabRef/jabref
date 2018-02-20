@@ -117,10 +117,7 @@ public enum Month {
      *         form
      */
     private static Optional<Month> parseGermanShortMonth(String value) {
-        // support for lowercase German month
-        value = value.substring(0,1).toUpperCase() + value.substring(1);
-
-        if ("Mae".equals(value)) {
+        if ("mae".equalsIgnoreCase(value)) {
             return Month.getMonthByNumber(3);
         }
 
