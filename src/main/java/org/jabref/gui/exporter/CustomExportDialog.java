@@ -45,13 +45,11 @@ class CustomExportDialog extends JabRefDialog {
     private final JTextField name = new JTextField(60);
     private final JTextField layoutFile = new JTextField(60);
     private final JTextField extension = new JTextField(60);
-    private JabRefFrame frame;
     private boolean okPressed;
 
     public CustomExportDialog(final JabRefFrame parent, final String exporterName, final String layoutFileName,
             final String extensionName) {
         this(parent);
-        frame = parent;
         name.setText(exporterName);
         layoutFile.setText(layoutFileName);
         extension.setText(extensionName);
@@ -59,7 +57,6 @@ class CustomExportDialog extends JabRefDialog {
 
     public CustomExportDialog(final JabRefFrame parent) {
         super(parent, Localization.lang("Edit custom export"), true, CustomExportDialog.class);
-        frame = parent;
         ActionListener okListener = e -> {
             Path layoutFileDir = Paths.get(layoutFile.getText()).getParent();
             if (layoutFileDir != null) {
