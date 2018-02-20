@@ -739,7 +739,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
         Menu file = new Menu(Localization.menuTitle("File"));
         Menu edit = new Menu(Localization.menuTitle("Edit"));
-        Menu library = new Menu(Localization.menuTitle("Library"));
+        Menu library = new Menu(Localization.lang("Library"));
         Menu quality = new Menu(Localization.menuTitle("Quality"));
         Menu view = new Menu(Localization.menuTitle("View"));
         Menu tools = new Menu(Localization.menuTitle("Tools"));
