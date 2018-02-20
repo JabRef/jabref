@@ -117,7 +117,7 @@ public enum Month {
      *         form
      */
     private static Optional<Month> parseGermanShortMonth(String value) {
-        if ("mae".equalsIgnoreCase(value)) {
+        if ("Mae".equalsIgnoreCase(value) || "Maerz".equalsIgnoreCase(value)) {
             return Month.getMonthByNumber(3);
         }
 
