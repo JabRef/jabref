@@ -35,7 +35,7 @@ import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.xmp.XMPUtil;
+import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -228,7 +228,7 @@ public class DroppedFileHandler {
 
         List<BibEntry> xmpEntriesInFile;
         try {
-            xmpEntriesInFile = XMPUtil.readXMP(fileName, Globals.prefs.getXMPPreferences());
+            xmpEntriesInFile = XmpUtilReader.readXmp(fileName, Globals.prefs.getXMPPreferences());
         } catch (IOException e) {
             LOGGER.warn("Problem reading XMP", e);
             return false;

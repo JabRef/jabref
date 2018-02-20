@@ -23,7 +23,7 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.autosaveandbackup.BackupUIManager;
+import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
@@ -306,5 +306,4 @@ public class JabRefGUI {
     public static void setMainFrame(JabRefFrame mainFrame) {
         JabRefGUI.mainFrame = mainFrame;
     }
-
 }

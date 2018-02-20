@@ -84,7 +84,6 @@ public class GlobalSearchBar extends HBox {
     private SearchResultFrame searchResultFrame;
 
     private SearchDisplayMode searchDisplayMode;
-
     /**
      * if this flag is set the searchbar won't be selected after the next search
      */
@@ -402,6 +401,13 @@ public class GlobalSearchBar extends HBox {
             currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
             searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
         }
+        if (grammarBasedSearch) {
+            // TODO: switch Icon color
+            // searchIcon.setIcon(IconTheme.JabRefIcon.ADVANCED_SEARCH.getIcon());
+        } else {
+            // TODO: switch Icon color
+            //searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
+        }
         Tooltip tooltip = new Tooltip();
         tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         tooltip.setGraphic(description);
@@ -435,39 +441,6 @@ public class GlobalSearchBar extends HBox {
         }
     }
 
-    private class SearchKeyAdapter extends KeyAdapter {
-
-        @Override
-        public void keyPressed(java.awt.event.KeyEvent e) {
-            switch (e.getKeyCode()) {
-                //This "hack" prevents that the focus moves out of the field
-                case java.awt.event.KeyEvent.VK_RIGHT:
-                case java.awt.event.KeyEvent.VK_LEFT:
-                case java.awt.event.KeyEvent.VK_UP:
-                case java.awt.event.KeyEvent.VK_DOWN:
-                    e.consume();
-                    break;
-                default:
-                    //do nothing
-            }
-
-            //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
-            Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
-            if (keyBinding.isPresent()) {
-                switch (keyBinding.get()) {
-                    case CUT:
-                    case COPY:
-                    case PASTE:
-                    case DELETE_ENTRY:
-                    case SELECT_ALL:
-                        e.consume();
-                        break;
-                    default:
-                        //do nothing
-                }
-            }
-        }
-    }
 
     private class SearchPopupSkin<T> implements Skin<AutoCompletePopup<T>> {
         private final AutoCompletePopup<T> control;

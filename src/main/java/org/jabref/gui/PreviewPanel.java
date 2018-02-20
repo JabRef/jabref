@@ -58,7 +58,6 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
      */
     private Optional<BibEntry> bibEntry = Optional.empty();
 
-    private Optional<Pattern> highlightPattern = Optional.empty();
     /**
      * If a database is set, the preview will attempt to resolve strings in the previewed entry using that database.
      */
@@ -140,8 +139,8 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         menu.getItems().add(copyPreview);
         menu.getItems().add(printEntryPreview);
         menu.getItems().add(new SeparatorMenuItem());
-        menu.getItems().add(previousPreviewLayout);
         menu.getItems().add(nextPreviewLayout);
+        menu.getItems().add(previousPreviewLayout);
         return menu;
     }
 
@@ -261,7 +260,6 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     @Override
     public void highlightPattern(Optional<Pattern> newPattern) {
         // TODO: Implement that search phrases are highlighted
-        this.highlightPattern = newPattern;
         update();
     }
 

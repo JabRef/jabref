@@ -14,18 +14,19 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 public class AuxCommandLineTest {
 
     private ImportFormatPreferences importFormatPreferences;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
@@ -40,8 +41,8 @@ public class AuxCommandLineTest {
 
             AuxCommandLine auxCommandLine = new AuxCommandLine(auxFile.getAbsolutePath(), result.getDatabase());
             BibDatabase newDB = auxCommandLine.perform();
-            Assert.assertNotNull(newDB);
-            Assert.assertEquals(2, newDB.getEntries().size());
+            assertNotNull(newDB);
+            assertEquals(2, newDB.getEntries().size());
         }
     }
 

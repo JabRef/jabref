@@ -90,7 +90,7 @@ import org.jabref.gui.actions.ShowDocumentViewerAction;
 import org.jabref.gui.actions.ShowPreferencesAction;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
+import org.jabref.gui.dialogs.AutosaveUIManager;
 import org.jabref.gui.exporter.ExportCommand;
 import org.jabref.gui.exporter.SaveAllAction;
 import org.jabref.gui.exporter.SaveDatabaseAction;
@@ -1062,34 +1062,24 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 databaseProperties, abbreviateIso, abbreviateMedline,
                 unabbreviate, exportAll, exportSelected, importCurrent, saveAll, focusTable, increaseFontSize, decreseFontSize, defaultFontSize,
                 toggleRelevance, toggleQualityAssured, togglePrinted, pushExternalButton.getComponent()));
-
         openDatabaseOnlyActions.addAll(newSpecificEntryAction);
-
         openDatabaseOnlyActions.addAll(specialFieldButtons);
-
         severalDatabasesOnlyActions.clear();
         severalDatabasesOnlyActions.addAll(Arrays
                 .asList(nextTab, prevTab, sortTabs));
-
         openAndSavedDatabasesOnlyActions.addAll(Collections.singletonList(openConsole));
         sharedDatabaseOnlyActions.addAll(Collections.singletonList(pullChangesFromSharedDatabase));
         noSharedDatabaseActions.addAll(Arrays.asList(save, saveAll));
-
         oneEntryOnlyActions.clear();
         oneEntryOnlyActions.addAll(Arrays.asList(editEntry));
-
         oneEntryWithFileOnlyActions.clear();
         oneEntryWithFileOnlyActions.addAll(Arrays.asList(openFolder, openFile));
-
         oneEntryWithURLorDOIOnlyActions.clear();
         oneEntryWithURLorDOIOnlyActions.addAll(Arrays.asList(openUrl));
-
         twoEntriesOnlyActions.clear();
         twoEntriesOnlyActions.addAll(Arrays.asList(mergeEntries));
-
         atLeastOneEntryActions.clear();
         atLeastOneEntryActions.addAll(Arrays.asList(downloadFullText, lookupIdentifiers, exportLinkedFiles));
-
         tabbedPane.getTabs().addListener(this::updateEnabledState);
         */
     }
@@ -1385,8 +1375,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
     private int showSaveDialog(String filename) {
         Object[] options = {Localization.lang("Save changes"),
-            Localization.lang("Discard changes"),
-            Localization.lang("Return to JabRef")};
+                Localization.lang("Discard changes"),
+                Localization.lang("Return to JabRef")};
 
         return JOptionPane.showOptionDialog(null,
                 Localization.lang("Library '%0' has changed.", filename),

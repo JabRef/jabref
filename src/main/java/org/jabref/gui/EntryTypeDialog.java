@@ -34,7 +34,6 @@ import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
@@ -43,6 +42,7 @@ import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.IEEETranEntryTypes;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.slf4j.Logger;
@@ -166,8 +166,8 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
         comboBox = new JComboBox<>();
 
         WebFetchers.getIdBasedFetchers(Globals.prefs.getImportFormatPreferences()).forEach(fetcher -> comboBox.addItem(fetcher.getName()));
-        // set DOI as default
-        comboBox.setSelectedItem(DoiFetcher.NAME);
+
+        comboBox.setSelectedItem(Globals.prefs.get(JabRefPreferences.ID_ENTRY_GENERATOR));
 
         generateButton.addActionListener(action -> {
             fetcherWorker.execute();
@@ -287,7 +287,10 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                 generateButton.setEnabled(false);
                 generateButton.setText(Localization.lang("Searching..."));
             });
+
+            Globals.prefs.put(JabRefPreferences.ID_ENTRY_GENERATOR,String.valueOf(comboBox.getSelectedItem()));
             searchID = idTextField.getText().trim();
+            searchID = searchID.replaceAll(" ", "");
             fetcher = WebFetchers.getIdBasedFetchers(Globals.prefs.getImportFormatPreferences()).get(comboBox.getSelectedIndex());
             if (!searchID.isEmpty()) {
                 try {

@@ -16,7 +16,7 @@
         <TreeTableView fx:id="groupTree" layoutY="-7.0" prefHeight="600.0" prefWidth="250.0" styleClass="groupsPane">
             <columns>
                 <TreeTableColumn fx:id="mainColumn"/>
-                <TreeTableColumn fx:id="numberColumn" minWidth="43.0" maxWidth="55.0"
+                <TreeTableColumn fx:id="numberColumn" minWidth="50.0" maxWidth="70.0" prefWidth="60.0"
                                  styleClass="numberColumn"/>
                 <TreeTableColumn fx:id="disclosureNodeColumn" maxWidth="14.0" minWidth="14.0"
                                  styleClass="disclosureNodeColumn" text="Column X"/>

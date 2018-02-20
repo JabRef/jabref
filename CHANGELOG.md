@@ -12,26 +12,44 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Abbreviate journal names functionality is now running parallel, increasing performance significantly. [#2831] (https://github.com/JabRef/jabref/issues/2831)
+- Changed order of items in context menu [#298] (https://github.com/koppor/jabref/issues/298)
+- Changed ID-based entry generator to store the last used fetcher. [#2796] (https://github.com/JabRef/jabref/issues/2796)
+- Reorganised annotation information on the right side of the "File annotations" tab. [#3109](https://github.com/JabRef/jabref/issues/3109)
 - We now show a small notification icon in the entry editor when we detect data inconsistency or other problems. [#3145](https://github.com/JabRef/jabref/issues/3145)
 - We added [oaDOI](https://oadoi.org/) as a fulltext provider, so that JabRef is now able to provide fulltexts for more than 90 million open-access articles.
 - We completely reworked and redesigned the main table.
 - We changed one default of [Cleanup entries dialog](http://help.jabref.org/en/CleanupEntries): Per default, the PDF are not moved to the default file directory anymore. [#3619](https://github.com/JabRef/jabref/issues/3619)
 - We added a new type of group that shows all items referenced in a given LaTeX file (actually the generated AUX file). [#1664](https://github.com/JabRef/jabref/issues/1664)
+- We added an importer for the EndNote XML format. [Feature request in the forum](http://discourse.jabref.org/t/import-from-bookends-or-endnote/1048)
 - We added the export of the `translator` field to the according MS-Office XML field. [#1750, comment](https://github.com/JabRef/jabref/issues/1750#issuecomment-357350986)
 - We added the export of the the `translator` field to the according MS-Office XML field. [#1750, comment](https://github.com/JabRef/jabref/issues/1750#issuecomment-357350986)
 - We changed the import of the MS-Office XML fields `bookauthor` and `translator`. Both are now imported to their corresponding bibtex/biblatex fields.
-- We improved the export of the `address` and `location` field to the MS-Office XML fields. If the address field does not contain a comma, it is treated as single value and exported to the field `city`. [#1750, comment](https://github.com/JabRef/jabref/issues/1750#issuecomment-357539167) 
+- We improved the export of the `address` and `location` field to the MS-Office XML fields. If the address field does not contain a comma, it is treated as single value and exported to the field `city`. [#1750, comment](https://github.com/JabRef/jabref/issues/1750#issuecomment-357539167)
 For more details refer to the [field mapping help page](http://help.jabref.org/en/MsOfficeBibFieldMapping)
 - We added Facebook and Twitter icons in the toolbar to link to our [Facebook](https://www.facebook.com/JabRef/) and [Twitter](https://twitter.com/jabref_org) pages.
+- Renamed the _Review_ Tab into _Comments_ Tab
 - We no longer print empty lines when exporting an entry in RIS format [#3634](https://github.com/JabRef/jabref/issues/3634)
 - We improved file saving so that hard links are now preserved when a save is performed [#2633](https://github.com/JabRef/jabref/issues/2633)
+- We changed the default dialog option when removing a [file link](http://help.jabref.org/en/FileLinks#adding-external-links-to-an-entry) from an entry.
+The new default removes the linked file from the entry instead of deleting the file from disk. [#3679](https://github.com/JabRef/jabref/issues/3679)
+- The group editing window can now also be called by double-clicking the group to be edited. [koppor#277](https://github.com/koppor/jabref/issues/277)
+- The magnifier icon at the search shows the [search mode](https://help.jabref.org/en/Search#search-modes) again. [#3535](https://github.com/JabRef/jabref/issues/3535)
+- We added a new cleanup operation that replaces ligatures with their expanded form. [#3613](https://github.com/JabRef/jabref/issues/3613)
+- Pressing <kbd>ESC</kbd> while searching will clear the search field and select the first entry, if available, in the table. [koppor#293](https://github.com/koppor/jabref/issues/293)
 
 ### Fixed
+- We fixed several performance problems with the management of journal abbreviations [#3323](https://github.com/JabRef/jabref/issues/3323)
+- We fixed an issue where changing the type of an entry did not update the label in the tool bar of the entry editor and the contents of the currently visible entry editor tab
+- We fixed an issue where pressing space caused the cursor to jump to the start of the text field. [#3471](https://github.com/JabRef/jabref/issues/3471)
 - We fixed the missing dot in the name of an exported file. [#3576](https://github.com/JabRef/jabref/issues/3576)
 - Autocompletion in the search bar can now be disabled via the preferences. [#3598](https://github.com/JabRef/jabref/issues/3598)
+- We fixed an issue where odd linked files could not be selected in the entry editor. [#3639](https://github.com/JabRef/jabref/issues/3639)
 - We fixed and extended the RIS import functionality to cover more fields. [#3634](https://github.com/JabRef/jabref/issues/3634) [#2607](https://github.com/JabRef/jabref/issues/2607)
 - Chaining modifiers in BibTeX key pattern now works as described in the documentation. [#3648](https://github.com/JabRef/jabref/issues/3648)
 - We fixed an issue where not all bibtex/biblatex fields would be exported as latex-free to MS-Office XML [koppor#284](https://github.com/koppor/jabref/issues/284)
+- We fixed an issue where linked files would be deleted from bibliography entries despite choosing the "Cancel" option in the dialog menu.
+- We fixed the name of the group editing window to "Add group" instead of "Edit Group" when adding a new group. [koppor#277](https://github.com/koppor/jabref/issues/277)
 
 ### Removed
 - We removed the [Look and Feels from JGoodies](http://www.jgoodies.com/freeware/libraries/looks/), because the open source version is not compatible with Java 9.
