@@ -2188,8 +2188,6 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         @Override
         public void action() {
             try {
-
-                JComponent focused = Globals.getFocusListener().getFocused();
                 getUndoManager().redo();
                 markBaseChanged();
                 frame.output(Localization.lang("Redo"));
