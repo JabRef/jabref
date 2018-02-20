@@ -272,7 +272,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String USE_OWNER = "useOwner";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
     public static final String SHOW_FILE_LINKS_UPGRADE_WARNING = "showFileLinksUpgradeWarning";
-    public static final String SIDE_PANE_WIDTH = "sidePaneWidth";
+    public static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
     public static final String LAST_USED_EXPORT = "lastUsedExport";
     public static final String FLOAT_MARKED_ENTRIES = "floatMarkedEntries";
     public static final String CITE_COMMAND = "citeCommand";
@@ -729,7 +729,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(FLOAT_MARKED_ENTRIES, Boolean.TRUE);
 
         defaults.put(LAST_USED_EXPORT, "");
-        defaults.put(SIDE_PANE_WIDTH, -1);
+        defaults.put(SIDE_PANE_WIDTH, 0.15);
 
         defaults.put(IMPORT_INSPECTION_DIALOG_WIDTH, 650);
         defaults.put(IMPORT_INSPECTION_DIALOG_HEIGHT, 650);

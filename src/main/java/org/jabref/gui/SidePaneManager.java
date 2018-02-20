@@ -163,19 +163,9 @@ public class SidePaneManager {
         sidePane.setComponents(visibleComponents);
 
         if (visibleComponents.isEmpty()) {
-            if (sidePane.isVisible()) {
-                preferences.putDouble(JabRefPreferences.SIDE_PANE_WIDTH, sidePane.getWidth());
-            }
             sidePane.setVisible(false);
         } else {
-            boolean wasVisible = sidePane.isVisible();
             sidePane.setVisible(true);
-            if (!wasVisible) {
-                double width = preferences.getDouble(JabRefPreferences.SIDE_PANE_WIDTH);
-                if (width > 0) {
-                    sidePane.setPrefWidth(width);
-                }
-            }
         }
     }
 

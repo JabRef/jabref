@@ -463,11 +463,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
 
-        // Store divider location for side pane:
-        double width = splitPane.getDividerPositions()[0];
-        if (width > 0) {
-            prefs.putDouble(JabRefPreferences.SIDE_PANE_WIDTH, width);
-        }
         if (prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
             // Here we store the names of all current files. If
             // there is no current file, we remove any
@@ -581,6 +576,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         head.setCenter(createToolbar());
         setTop(head);
 
+        SplitPane.setResizableWithParent(sidePane, Boolean.FALSE);
         splitPane.getItems().addAll(sidePane, tabbedPane);
 
         // We need to wait with setting the divider since it gets reset a few times during the initial set-up
