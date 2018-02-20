@@ -1,6 +1,7 @@
 # coding=utf-8
 from __future__ import division
 
+import argparse # Requires Python 2.7, should be safe to use with jython.
 import codecs
 import datetime
 import logging
@@ -42,11 +43,15 @@ try:
                 if parent.name == 'jabref':
                     return parent
     
-    # Important paths, files and directories of the JabRef repository
+    # Important directories of the JabRef repository
     JABREF_BASE_DIRECTORY = PathFinder.getJabRefBaseDirectory()
     JABREF_SOURCE_DIRECTORY = JABREF_BASE_DIRECTORY / 'src'
     JABREF_SCRIPTS_DIRECTORY = JABREF_BASE_DIRECTORY / 'scripts'
     JABREF_LOCALIZATION_DIRECTORY = JABREF_SOURCE_DIRECTORY / 'main/resources/l10n'
+    
+    # Important files
+    JABREF_MAIN_LOCALIZATION_FILE = JABREF_LOCALIZATION_DIRECTORY / 'JabRef_en.properties'
+    JABREF_MAIN_MENU_LOCALIZATION_FILE = JABREF_LOCALIZATION_DIRECTORY / 'Menu_en.properties'
 except ImportError:
     logging.info("Unable to use PathFinder class.")
 
@@ -196,7 +201,7 @@ class Keys:
 
 class SyncLang:
 
-    def __init__(self, extended, out_file='status.md'):
+    def __init__(self, extended):
         """
         :param extended: boolean: if the keys with problems should be printed
 
@@ -204,7 +209,6 @@ class SyncLang:
         self.extended = extended
         self.main_jabref_preferences = os.path.join(RES_DIR, "JabRef_en.properties")
         self.main_menu_preferences = os.path.join(RES_DIR, "Menu_en.properties")
-        self.markdown_output = out_file
 
     def status(self):
         """
@@ -350,7 +354,7 @@ class SyncLang:
             num_keys_obsolete = len(keys_obsolete)
 
             for missing_key in keys_missing:
-                # Missing keys are added with english translation by default.
+                # Missing keys are added with main translation by default.
                 keys[missing_key] = main_keys_dict[missing_key]
 
             for obsolete_key in keys_obsolete:
@@ -434,7 +438,7 @@ class SyncLang:
         """
         return list(set(first_list).difference(second_list))
 
-    def status_create_markdown(self):
+    def status_create_markdown(self, markdown_file='status.md'):
         """
         Creates a markdown file of the current status.
         """
@@ -465,7 +469,7 @@ class SyncLang:
                 return 0
             return int(part / whole * 100.0)
 
-        with codecs.open(self.markdown_output, "w", encoding="UTF-8") as status_file:
+        with codecs.open(markdown_file, "w", encoding="UTF-8") as status_file:
             status_file.write('### Localization files status (' + datetime.datetime.now().strftime(
                 "%Y-%m-%d %H:%M") + ' - Branch `' + Git().get_current_branch() + '` `' + Git().get_current_hash_short() + '`)\n\n')
             status_file.write('Note: To get the current status from your local repository, run `python ./scripts/syncLang.py markdown`\n')
@@ -473,39 +477,43 @@ class SyncLang:
             _write_properties(status_file, self.__all_menu_properties())
             _write_properties(status_file, self.__all_jabref_properties())
 
-        logging.info('Current status written to ' + self.markdown_output)
+        logging.info('Current status written to ' + markdown_file)
 
 
 def main():
-    if len(sys.argv) == 2 and sys.argv[1] == "markdown":
-        SyncLang(extended=False, out_file='status.md').status_create_markdown()
-
-    elif (len(sys.argv) == 2 or len(sys.argv) == 3) and sys.argv[1] == "update":
-        SyncLang(extended=len(sys.argv) == 3 and (sys.argv[2] == "-e" or sys.argv[2] == "--extended")).update_properties()
-
-    elif (len(sys.argv) == 2 or len(sys.argv) == 3) and sys.argv[1] == "status":
-        SyncLang(extended=len(sys.argv) == 3 and (sys.argv[2] == "-e" or sys.argv[2] == "--extended")).status()
-
-    else:
-        logging.info("""This program must be run from the JabRef base directory.
     
-    Usage: syncLang.py {markdown, status [-e | --extended], update [-e | --extended]}
-    Option can be one of the following:
+    def markdown(args):
+        SyncLang(extended=False).status_create_markdown()
+    def status(args):
+        SyncLang(extended=args.extended).status()
+    def update(args):
+        SyncLang(extended=args.extended).update_properties()
     
-        status [-e | --extended]:
-            prints the current status to the terminal
-            [-e | --extended]:
-                if the translations keys which create problems should be printed
     
-        markdown:
-            Creates a markdown file of the current status and opens it
+    parser = argparse.ArgumentParser(add_help=True)
+    parser.description = "This script is used to synchronize the keys of different *.properties files."
     
-        update [-e | --extended]:
-            compares all the localization files against the English one and fixes unambiguous duplicates,
-            removes obsolete keys, adds missing keys, and sorts them
-            [-e | --extended]:
-                if the translations keys which create problems should be printed
-    """)
+    
+    shared_arguments = argparse.ArgumentParser(add_help=False)
+    extended_argument = shared_arguments.add_argument("-e", "--extended", help="Prints extended information about the process to the terminal", required=False, action='store_true', default=False)
+    
+    subcommands = parser.add_subparsers(title="Subcommands", description="Provide different options for the user")
+    
+    # markdown parser
+    markdown_parser = subcommands.add_parser("markdown", description="Creates a markdown file of the current status")
+    markdown_parser.set_defaults(func=markdown)
+    # TODO add argument to pass a file name for the markdown file
+    
+    # status parser
+    status_parser = subcommands.add_parser("status", description="Prints the current status to the terminal", parents=[shared_arguments])
+    status_parser.set_defaults(func=status)
+    
+    # update parser
+    update_parser = subcommands.add_parser("update", description="Compares all the localization files against the English one and fixes unambiguous duplicates, removes obsolete keys, adds missing keys, and sorts them", parents=[shared_arguments])
+    update_parser.set_defaults(func=update)
+    
+    parsed_args = parser.parse_args()
+    parsed_args.func(parsed_args)
 
 
 if '__main__' == __name__:
