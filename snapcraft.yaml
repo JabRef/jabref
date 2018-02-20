@@ -22,7 +22,7 @@ confinement: strict
 apps:
    jabref:
      command: desktop-launch java -jar $SNAP/jar/JabRef-4.2-dev.jar
-     plugs: [desktop, desktop-legacy, wayland, home, network-bind, x11]
+     plugs: [desktop, desktop-legacy, wayland, unity7, home, network-bind]
      desktop: ../buildres/snapcraft/jabref.desktop
 
 parts:
