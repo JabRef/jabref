@@ -1,7 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import java.util.Optional;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -18,9 +16,10 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class JournalEditor extends HBox implements FieldEditorFX {
 
-    @FXML private JournalEditorViewModel viewModel;
-    @FXML private EditorTextArea textArea;
-    private Optional<BibEntry> entry;
+    @FXML
+    private JournalEditorViewModel viewModel;
+    @FXML
+    private EditorTextArea textArea;
 
     public JournalEditor(String fieldName, JournalAbbreviationLoader journalAbbreviationLoader, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
         this.viewModel = new JournalEditorViewModel(fieldName, suggestionProvider, journalAbbreviationLoader, preferences.getJournalAbbreviationPreferences(), fieldCheckers);
@@ -41,7 +40,6 @@ public class JournalEditor extends HBox implements FieldEditorFX {
 
     @Override
     public void bindToEntry(BibEntry entry) {
-        this.entry = Optional.of(entry);
         viewModel.bindToEntry(entry);
     }
 
@@ -51,7 +49,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     }
 
     @FXML
-    private void toggleAbbreviation(ActionEvent event) {
+    private void toggleAbbreviation(ActionEvent unused) {
         viewModel.toggleAbbreviation();
     }
 }
