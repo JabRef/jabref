@@ -34,7 +34,6 @@ import javax.swing.event.DocumentListener;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -76,8 +75,6 @@ public class FileListEntryEditor {
     private final JProgressBar prog = new JProgressBar(SwingConstants.HORIZONTAL);
     private final JLabel downloadLabel = new JLabel(Localization.lang("Downloading..."));
     private JDialog diag;
-    //Do not make this variable final, as then the lambda action listener will fail on compile
-    private JabRefFrame frame;
     private boolean showSaveDialog;
     private ConfirmCloseFileListEntryEditor externalConfirm;
     private LinkedFile entry;
