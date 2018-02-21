@@ -14,10 +14,10 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.WordKeywordGroup;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class GroupTreeViewModelTest {
@@ -26,7 +26,7 @@ public class GroupTreeViewModelTest {
     BibDatabaseContext databaseContext;
     private TaskExecutor taskExecutor;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         databaseContext = new BibDatabaseContext();
         stateManager = new StateManager();

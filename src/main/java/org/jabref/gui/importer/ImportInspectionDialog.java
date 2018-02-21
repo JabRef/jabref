@@ -203,7 +203,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         this.undoName = undoName;
         this.newDatabase = newDatabase;
         setIconImages(IconTheme.getLogoSet());
-        preview = DefaultTaskExecutor.runInJavaFXThread(() -> new PreviewPanel(panel, bibDatabaseContext, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences()));
+        preview = DefaultTaskExecutor.runInJavaFXThread(() -> new PreviewPanel(panel, bibDatabaseContext, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), frame.getDialogService()));
 
         duplLabel.setToolTipText(Localization.lang("Possible duplicate of existing entry. Click to resolve."));
 
@@ -834,7 +834,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 }
 
                 entry.setId(IdGenerator.next());
-                ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
+                ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
             }
             panel.getDatabase().insertEntries(selected);
 

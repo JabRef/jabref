@@ -17,7 +17,7 @@ public class OptionEditor<T> extends HBox implements FieldEditorFX {
     @FXML private OptionEditorViewModel<T> viewModel;
     @FXML private ComboBox<T> comboBox;
 
-    public OptionEditor(String fieldName, OptionEditorViewModel<T> viewModel) {
+    public OptionEditor(OptionEditorViewModel<T> viewModel) {
         this.viewModel = viewModel;
 
         ControlHelper.loadFXMLForControl(this);

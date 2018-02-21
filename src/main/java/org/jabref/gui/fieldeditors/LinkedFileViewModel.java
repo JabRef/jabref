@@ -23,7 +23,6 @@ import javafx.scene.control.ButtonType;
 import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefIcon;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -36,14 +35,17 @@ import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.xmp.XMPUtil;
+import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.metadata.FileDirectoryPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static javafx.scene.control.ButtonBar.ButtonData;
 
 public class LinkedFileViewModel extends AbstractViewModel {
 
@@ -55,14 +57,15 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final BooleanProperty downloadOngoing = new SimpleBooleanProperty(false);
     private final BooleanProperty isAutomaticallyFound = new SimpleBooleanProperty(false);
     private final BooleanProperty canWriteXMPMetadata = new SimpleBooleanProperty(false);
-    private final DialogService dialogService = new FXDialogService();
+    private final DialogService dialogService;
     private final BibEntry entry;
     private final TaskExecutor taskExecutor;
 
-    public LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
+    public LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext, DialogService dialogService, TaskExecutor taskExecutor) {
         this.linkedFile = linkedFile;
         this.databaseContext = databaseContext;
         this.entry = entry;
+        this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(100)));
@@ -286,39 +289,40 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
-    public boolean delete() {
-        Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
-        ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"));
+    public boolean delete(FileDirectoryPreferences prefs) {
+        Optional<Path> file = linkedFile.findIn(databaseContext, prefs);
 
-        if (file.isPresent()) {
-            ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
-            Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
-                    Localization.lang("Delete '%0'", file.get().toString()),
-                    Localization.lang("Delete the selected file permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk."),
-                    deleteFromEntry, removeFromEntry, ButtonType.CANCEL);
+        if (!file.isPresent()) {
+            LOGGER.warn("Could not find file " + linkedFile.getLink());
+            return true;
+        }
 
-            if (buttonType.isPresent()) {
-                if (buttonType.get().equals(removeFromEntry)) {
+        ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"), ButtonData.YES);
+        ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
+        Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
+                Localization.lang("Delete '%0'", file.get().toString()),
+                Localization.lang("Delete the selected file permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk."),
+                removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
+
+        if (buttonType.isPresent()) {
+            if (buttonType.get().equals(removeFromEntry)) {
+                return true;
+            }
+
+            if (buttonType.get().equals(deleteFromEntry)) {
+
+                try {
+                    Files.delete(file.get());
                     return true;
-                }
-                if (buttonType.get().equals(deleteFromEntry)) {
-
-                    try {
-                        Files.delete(file.get());
-                        return true;
-                    } catch (IOException ex) {
-                        dialogService.showErrorDialogAndWait(
-                                Localization.lang("Cannot delete file"),
-                                Localization.lang("File permission error"));
-                        LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
-                        return false;
-                    }
+                } catch (IOException ex) {
+                    dialogService.showErrorDialogAndWait(
+                            Localization.lang("Cannot delete file"),
+                            Localization.lang("File permission error"));
+                    LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
                 }
             }
-        } else {
-            LOGGER.warn("Could not find file " + linkedFile.getLink());
         }
-        return true;
+        return false;
     }
 
     public void edit() {
@@ -335,7 +339,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 // Localization.lang("PDF does not exist");
             } else {
                 try {
-                    XMPUtil.writeXMP(file.get(), entry, databaseContext.getDatabase(), Globals.prefs.getXMPPreferences());
+                    XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), Globals.prefs.getXMPPreferences());
                 } catch (IOException | TransformerException ex) {
                     // TODO: Print error message
                     // Localization.lang("Error while writing") + " '" + file.toString() + "': " + ex;

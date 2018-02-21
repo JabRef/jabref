@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.cleanup.CleanupPresetPanel;
 import org.jabref.gui.undo.NamedCompound;
@@ -24,6 +25,7 @@ public class CleanupAction extends AbstractWorker {
 
     private final BasePanel panel;
     private final JabRefFrame frame;
+    private final DialogService dialogService;
 
     /**
      * Global variable to count unsuccessful renames
@@ -38,6 +40,7 @@ public class CleanupAction extends AbstractWorker {
         this.panel = panel;
         this.frame = panel.frame();
         this.preferences = preferences;
+        this.dialogService = frame.getDialogService();
     }
 
     @Override
@@ -50,7 +53,6 @@ public class CleanupAction extends AbstractWorker {
             canceled = true;
             return;
         }
-        frame.block();
         panel.output(Localization.lang("Doing a cleanup for %0 entries...",
                 Integer.toString(panel.getSelectedEntries().size())));
     }
@@ -102,13 +104,12 @@ public class CleanupAction extends AbstractWorker {
     @Override
     public void update() {
         if (canceled) {
-            frame.unblock();
             return;
         }
         if (unsuccessfulRenames > 0) { //Rename failed for at least one entry
-            JOptionPane.showMessageDialog(null,
-                    Localization.lang("File rename failed for %0 entries.", Integer.toString(unsuccessfulRenames)),
-                    Localization.lang("Autogenerate PDF Names"), JOptionPane.INFORMATION_MESSAGE);
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Autogenerate PDF Names"),
+                    Localization.lang("File rename failed for %0 entries.", Integer.toString(unsuccessfulRenames)));
         }
         if (modifiedEntriesCount > 0) {
             panel.updateEntryEditorIfShowing();
@@ -127,7 +128,6 @@ public class CleanupAction extends AbstractWorker {
             break;
         }
         panel.output(message);
-        frame.unblock();
     }
 
     private int showDialog(CleanupPresetPanel presetPanel) {

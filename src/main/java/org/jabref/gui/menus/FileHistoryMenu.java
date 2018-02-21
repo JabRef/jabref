@@ -4,12 +4,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import javax.swing.JOptionPane;
-
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
 import org.jabref.JabRefExecutorService;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileHistory;
@@ -20,12 +19,14 @@ public class FileHistoryMenu extends Menu {
     private final FileHistory history;
     private final JabRefFrame frame;
     private final JabRefPreferences preferences;
+    private final DialogService dialogService;
 
     public FileHistoryMenu(JabRefPreferences preferences, JabRefFrame frame) {
         setText(Localization.menuTitle("Recent libraries"));
 
         this.frame = frame;
         this.preferences = preferences;
+        this.dialogService = frame.getDialogService();
         history = preferences.getFileHistory();
         if (history.isEmpty()) {
             setDisable(true);
@@ -69,8 +70,9 @@ public class FileHistoryMenu extends Menu {
 
         // the existence check has to be done here (and not in open.openIt) as we have to call "removeItem" if the file does not exist
         if (!Files.exists(fileToOpen)) {
-            JOptionPane.showMessageDialog(null, Localization.lang("File not found") + ": " + fileToOpen.getFileName(),
-                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("File not found"),
+                    Localization.lang("File not found") + ": " + fileToOpen.getFileName());
             history.removeItem(fileName);
             setItems();
             return;

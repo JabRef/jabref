@@ -13,4 +13,7 @@ public class UnknownExternalFileType extends ExternalFileType {
         super(name, "", "", "", "unknown", IconTheme.JabRefIcons.FILE);
     }
 
+    public UnknownExternalFileType(String name, String extension) {
+        super(name, extension, "", "", "unknown", IconTheme.JabRefIcons.FILE);
+    }
 }

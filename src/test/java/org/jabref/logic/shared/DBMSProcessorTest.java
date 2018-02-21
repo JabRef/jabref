@@ -33,8 +33,7 @@ public class DBMSProcessorTest {
     private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
 
-    @Parameter
-    public DBMSType dbmsType;
+    @Parameter public DBMSType dbmsType;
 
     @BeforeEach
     public void setUp() throws SQLException, InvalidDBMSConnectionPropertiesException {

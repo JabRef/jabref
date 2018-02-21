@@ -18,8 +18,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -139,12 +137,11 @@ class FileTab extends JPanel implements PrefsTab {
         JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(e -> {
 
-            DialogService ds = new FXDialogService();
             DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                     .withInitialDirectory(Paths.get(fileDir.getText())).build();
 
-            DefaultTaskExecutor.runInJavaFXThread(() -> ds.showDirectorySelectionDialog(dirDialogConfiguration))
-                    .ifPresent(f -> fileDir.setText(f.toString()));
+            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showDirectorySelectionDialog(dirDialogConfiguration))
+                               .ifPresent(f -> fileDir.setText(f.toString()));
 
         });
         builder.append(browse);

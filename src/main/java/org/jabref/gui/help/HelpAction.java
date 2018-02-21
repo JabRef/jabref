@@ -20,6 +20,7 @@ import javax.swing.KeyStroke;
 import org.jabref.Globals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.actions.MnemonicAwareAction;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -107,5 +108,14 @@ public class HelpAction extends MnemonicAwareAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         openHelpPage(helpPage);
+    }
+
+    public static SimpleCommand getCommand() {
+        return new SimpleCommand() {
+            @Override
+            public void execute() {
+                openHelpPage(HelpFile.CONTENTS);
+            }
+        };
     }
 }

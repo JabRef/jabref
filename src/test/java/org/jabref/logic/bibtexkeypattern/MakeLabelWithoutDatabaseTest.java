@@ -2,8 +2,8 @@ package org.jabref.logic.bibtexkeypattern;
 
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,7 +11,7 @@ public class MakeLabelWithoutDatabaseTest {
 
     private BibEntry entry;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         entry = new BibEntry();
         entry.setField("author", "John Doe");

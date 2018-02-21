@@ -16,6 +16,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.input.MouseButton;
 
 import org.jabref.Globals;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefIcon;
@@ -45,11 +46,13 @@ class MainTableColumnFactory {
     private final BibDatabaseContext database;
     private final CellFactory cellFactory;
     private final UndoManager undoManager;
+    private final DialogService dialogService;
 
-    public MainTableColumnFactory(BibDatabaseContext database, ColumnPreferences preferences, ExternalFileTypes externalFileTypes, UndoManager undoManager) {
+    public MainTableColumnFactory(BibDatabaseContext database, ColumnPreferences preferences, ExternalFileTypes externalFileTypes, UndoManager undoManager, DialogService dialogService) {
         this.database = Objects.requireNonNull(database);
         this.preferences = Objects.requireNonNull(preferences);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
+        this.dialogService = dialogService;
         this.cellFactory = new CellFactory(externalFileTypes, undoManager);
         this.undoManager = undoManager;
     }
@@ -192,7 +195,7 @@ class MainTableColumnFactory {
                         .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
                             if (event.getButton() == MouseButton.PRIMARY && linkedFiles.size() == 1) {
                                 // Only one linked file -> open directly
-                                LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFiles.get(0), entry.getEntry(), database, Globals.TASK_EXECUTOR);
+                                LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFiles.get(0), entry.getEntry(), database, dialogService, Globals.TASK_EXECUTOR);
                                 linkedFileViewModel.open();
                             }
                         })
@@ -208,7 +211,7 @@ class MainTableColumnFactory {
         ContextMenu contextMenu = new ContextMenu();
 
         for (LinkedFile linkedFile : linkedFiles) {
-            LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, entry.getEntry(), database, Globals.TASK_EXECUTOR);
+            LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, entry.getEntry(), database, dialogService, Globals.TASK_EXECUTOR);
 
             MenuItem menuItem = new MenuItem(linkedFileViewModel.getDescriptionAndLink(), linkedFileViewModel.getTypeIcon().getGraphicNode());
             menuItem.setOnAction(event -> linkedFileViewModel.open());

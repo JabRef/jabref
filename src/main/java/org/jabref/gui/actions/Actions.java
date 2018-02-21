@@ -9,7 +9,6 @@ public enum Actions {
     ABBREVIATE_MEDLINE,
     ADD_FILE_LINK,
     ADD_TO_GROUP,
-    AUTO_SET_FILE,
     CLEANUP,
     COPY,
     COPY_CITATION_ASCII_DOC,
@@ -43,7 +42,6 @@ public enum Actions {
     OPEN_FOLDER,
     OPEN_URL,
     PASTE,
-    PLAIN_TEXT_IMPORT,
     PREVIOUS_PREVIEW_STYLE,
     PULL_CHANGES_FROM_SHARED_DATABASE,
     REDO,
@@ -80,6 +78,5 @@ public enum Actions {
     clearReadStatus,
     setReadStatusToRead,
     setReadStatusToSkimmed,
-    toggleRelevance,
-    findUnlinkedFiles
+    toggleRelevance
 }

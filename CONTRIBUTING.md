@@ -48,6 +48,8 @@ Your contribution is considered being made under [MIT license](https://tldrlegal
 
 ### Write a good commit message
 See [good commit message] or [commit guidelines section of Pro Git].
+The first line of your commit message is automatically taken as title for the pull-request.
+All other lines make up the body of the pull request. Add the words `fixes #xxx` to your PR to auto-close the corresponding issue.
 
 
 ### Test your code
@@ -66,7 +68,7 @@ You can see the result in `build\resources\main\help\en\About.html` or when clic
 
 
 ### When making an architectural decision
-In case you add a library or do mayor code rewrites, we ask you to document your decision.
+In case you add a library or do major code rewrites, we ask you to document your decision.
 Recommended reading: <https://adr.github.io/>.
 
 We simply ask to create a new markdown file in `docs/adr` following the template presented at <https://adr.github.io/madr/>.
