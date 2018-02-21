@@ -48,7 +48,7 @@ public class MergeReviewIntoCommentMigration {
     private String mergeCommentFieldIfPresent(BibEntry entry, String review) {
         if (entry.getField(FieldName.COMMENT).isPresent()) {
             LOGGER.info(String.format("Both Comment and Review fields are present in %s! Merging them into the comment field.", entry.getAuthorTitleYear(150)));
-            return String.format("%s\n%s:\n%s", entry.getField(FieldName.COMMENT).get(), Localization.lang("Review"), review);
+            return String.format("%s\n%s:\n%s", entry.getField(FieldName.COMMENT).get().trim(), Localization.lang("Review"), review.trim());
         }
         return review;
     }
