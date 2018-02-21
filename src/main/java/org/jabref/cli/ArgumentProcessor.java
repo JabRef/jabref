@@ -225,6 +225,7 @@ public class ArgumentProcessor {
 
         if (cli.isXmpFacilities()) {
             XmpUtilMain.executeXmpConsoleApplicaton();
+            System.exit(0);
         }
 
         return loaded;
