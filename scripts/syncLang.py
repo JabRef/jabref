@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import division
 
-import argparse # Requires Python 2.7, should be safe to use with jython.
+import argparse  # Requires Python 2.7, should be safe to use with jython.
 import codecs
 import datetime
 import logging
@@ -17,6 +17,7 @@ URL_BASE = "https://github.com/JabRef/jabref/tree/master/src/main/resources/l10n
 try:
     # Just to make sure not to break anything, in case py3.x is not supported.
     import pathlib
+
     class PathFinder:
         """
         This class is designed to automatically locate this script's path within the repository.
@@ -201,14 +202,52 @@ class Keys:
 
 class SyncLang:
 
-    def __init__(self, extended):
+    def __init__(self, extended_logging=False):
         """
         :param extended: boolean: if the keys with problems should be printed
 
         """
-        self.extended = extended
+        self.extended_logging = extended_logging
         self.main_jabref_preferences = os.path.join(RES_DIR, "JabRef_en.properties")
         self.main_menu_preferences = os.path.join(RES_DIR, "Menu_en.properties")
+        
+    def set_extended_logging_enabled(self, value):
+        self.extended_logging = bool(value)
+        
+    def print_missing_keys_for_file(self, file_name):
+        file_status = self.__get_status_for_file(file_name)
+        if file_status:
+            keys_missing, _, _, _ = file_status
+            
+            if len(keys_missing) > 0:
+                logging.info("Printing missing keys for file: " + file_name)
+                self.__print_keys(keys_missing)
+            else:
+                logging.info("No missing keys found for file:" + file_name)
+    
+    def print_obsolete_keys_for_file(self, file_name):
+        file_status = self.__get_status_for_file(file_name)
+        if file_status:
+            _, keys_obsolete, _, _ = file_status
+            
+            if len(keys_obsolete) > 0:
+                
+                logging.info("Printing obsolete keys for file: " + file_name)
+                self.__print_keys(keys_obsolete)
+            else:
+                logging.info("No obsolete keys found for file: " + file_name)
+
+    def print_duplicate_keys_for_file(self, file_name):
+        file_status = self.__get_status_for_file(file_name)
+        if file_status:
+            _, _, keys_duplicate, _ = file_status
+            
+            if len(keys_duplicate) > 0:
+                
+                logging.info("Printing duplicate keys for file: " + file_name)
+                self.__print_keys(keys_duplicate)
+            else:
+                logging.info("No duplicate keys found for file: " + file_name)
 
     def status(self):
         """
@@ -219,10 +258,10 @@ class SyncLang:
         self.__print_status_menu_properties()
 
     def __print_status_menu_properties(self):
-        self.__check_properties(main_property_file=self.main_menu_preferences, property_files=self.__all_menu_properties())
+        self.__compare_properties(main_property_file=self.main_menu_preferences, property_files=self.__all_menu_properties())
 
     def __print_status_jabref_properties(self):
-        self.__check_properties(main_property_file=self.main_jabref_preferences, property_files=self.__all_jabref_properties())
+        self.__compare_properties(main_property_file=self.main_jabref_preferences, property_files=self.__all_jabref_properties())
 
     def update_properties(self):
         """
@@ -238,8 +277,37 @@ class SyncLang:
 
     def __update_jabref_properties(self):
         self.__update_properties(main_property_file=self.main_jabref_preferences, other_property_files=self.__other_jabref_properties())
+        
+    def __get_main_file(self, file_name):
+        
+        file = os.path.join(RES_DIR, file_name)
+        
+        if file in self.__all_jabref_properties():
+            return self.main_jabref_preferences
+        elif file in self.__all_menu_properties():
+            return self.main_menu_preferences
+        
+    def __get_status_for_file(self, file_name):
+        main_file = self.__get_main_file(file_name)
+        if main_file:
+            main_lines = self.__read_lines_from_file(filename=main_file)
+            main_keys = Keys(main_lines)
+            
+            file = os.path.join(RES_DIR, file_name)
+            lines = self.__read_lines_from_file(file)
+            keys1 = Keys(lines)
+            keys = keys1.keys_from_lines()
 
-    def __check_properties(self, main_property_file, property_files):
+            keys_missing = self.__missing_keys(main_keys.keys_from_lines(), keys)
+            keys_obsolete = self.__missing_keys(keys, main_keys.keys_from_lines())
+            keys_duplicates = keys1.find_duplicates()
+            keys_not_translated = keys1.empty_keys()
+            
+            return (keys_missing, keys_obsolete, keys_duplicates, keys_not_translated)
+        else:
+            logging.debug("Unable to find main file for: " + file_name)
+
+    def __compare_properties(self, main_property_file, property_files):
         main_lines = self.__read_lines_from_file(filename=main_property_file)
         main_keys = Keys(main_lines)
 
@@ -247,19 +315,19 @@ class SyncLang:
         for file in property_files:
             filename = self.__format_filename(filepath=file)
             lines = self.__read_lines_from_file(file)
-            keys1 = Keys(main_lines)
+            keys1 = Keys(lines)
             keys = keys1.keys_from_lines()
 
             keys_missing = self.__missing_keys(main_keys.keys_from_lines(), keys)
             keys_obsolete = self.__missing_keys(keys, main_keys.keys_from_lines())
-            keys_duplicate = Keys(lines).find_duplicates()
-            keys_not_translated = Keys(lines=lines).empty_keys()
+            keys_duplicates = keys1.find_duplicates()
+            keys_not_translated = keys1.empty_keys()
 
             num_keys = len(keys)
             num_keys_missing = len(keys_missing)
             num_keys_not_translated = len(keys_not_translated)
             num_keys_obsolete = len(keys_obsolete)
-            num_keys_duplicate = len(keys_duplicate)
+            num_keys_duplicate = len(keys_duplicates)
             num_keys_translated = num_keys - num_keys_not_translated
 
             log = logging.error if num_keys_missing != 0 or num_keys_not_translated != 0 or num_keys_obsolete != 0 or num_keys_duplicate != 0 else logging.info
@@ -268,23 +336,23 @@ class SyncLang:
 
             log = logging.error if num_keys_not_translated != 0 else logging.info
             log("\t{} not translated keys".format(num_keys_not_translated))
-            if self.extended and num_keys_not_translated != 0:
-                logging.info("\t\t{}".format(", ".join(keys_not_translated)))
+            if self.extended_logging and num_keys_not_translated != 0:
+                self.__print_keys(keys_not_translated)
 
             log = logging.error if num_keys_missing != 0 else logging.info
             log("\t{} missing keys".format(num_keys_missing))
-            if self.extended and num_keys_missing != 0:
-                logging.info("\t\t{}".format(", ".join(keys_missing)))
+            if self.extended_logging and num_keys_missing != 0:
+                self.__print_keys(keys_missing)
 
             log = logging.error if num_keys_obsolete != 0 else logging.info
             log("\t{} obsolete keys".format(num_keys_obsolete))
-            if self.extended and num_keys_obsolete != 0:
-                logging.info("\t\t{}".format(", ".join(keys_obsolete)))
+            if self.extended_logging and num_keys_obsolete != 0:
+                self.__print_keys(keysobsolete)
 
             log = logging.error if num_keys_duplicate != 0 else logging.info
             log("\t{} duplicates".format(num_keys_duplicate))
-            if self.extended and num_keys_duplicate != 0:
-                logging.info("\t\t{}".format(", ".join(keys_duplicate)))
+            if self.extended_logging and num_keys_duplicate != 0:
+                self.__print_keys(keys_duplicates)
 
     def __all_menu_properties(self):
         """
@@ -303,7 +371,7 @@ class SyncLang:
 
     def __all_jabref_properties(self):
         """
-        :return: list of strings: all the JabRef_*.preferences files with the english at the beginning
+        :return: list of strings: all the JabRef_*.preferences file paths with the english at the beginning
         """
         jabref_property_files = sorted(self.__other_jabref_properties())
         jabref_property_files.insert(0, self.main_jabref_preferences)
@@ -311,7 +379,7 @@ class SyncLang:
 
     def __other_jabref_properties(self):
         """
-        :return: list of strings: all the JabRef_*.preferences files without the english one
+        :return: list of strings: all the JabRef_*.preferences file paths without the english one
         """
         jabref_property_files = [s for s in os.listdir(RES_DIR) if (s.startswith('JabRef_') and not (s.startswith('JabRef_en')))]
         return [os.path.join(RES_DIR, file) for file in jabref_property_files]
@@ -327,8 +395,8 @@ class SyncLang:
             logging.error("There are {num_duplicates} duplicates in {file}, please fix them manually".format(num_duplicates=num_main_duplicates,
                                                                                                              file=self.__format_filename(
                                                                                                                  filepath=main_property_file)))
-            if self.extended:
-                logging.info("\t{}".format(", ".join(main_duplicates)))
+            if self.extended_logging:
+                self.__print_keys(main_duplicates)
             return
 
         for other_property_file in other_property_files:
@@ -343,8 +411,8 @@ class SyncLang:
             if num_not_fixed != 0:
                 logging.error("There are {num_not_fixed_duplicates} ambiguous duplicates in {file}, please fix them manually".format(
                     num_not_fixed_duplicates=num_not_fixed, file=filename))
-                if self.extended:
-                    logging.error("\t{}".format(", ".join(not_fixed)))
+                if self.extended_logging:
+                    self.__print_keys(not_fixed)
                 continue
 
             keys_missing = self.__missing_keys(main_keys.keys_from_lines(), keys)
@@ -381,18 +449,18 @@ class SyncLang:
             logging.info("Processing file '{file}' with {num_keys} Keys".format(file=filename, num_keys=num_keys))
             if num_fixed != 0:
                 logging.info("\tfixed {} unambiguous duplicates".format(num_fixed))
-                if self.extended:
-                    logging.info("\t\t{}".format(", ".join(fixed)))
+                if self.extended_logging:
+                    self.__print_keys(fixed)
 
             if num_keys_missing != 0:
                 logging.info("\tadded {} missing keys".format(num_keys_missing))
-                if self.extended:
-                    logging.info("\t\t{}".format(", ".join(keys_missing)))
+                if self.extended_logging:
+                    self.__print_keys(keys_missing)
 
             if num_keys_obsolete != 0:
                 logging.info("\tdeleted {} obsolete keys".format(num_keys_obsolete))
-                if self.extended:
-                    logging.info("\t\t{}".format(", ".join(keys_obsolete)))
+                if self.extended_logging:
+                    self.__print_keys(keys_obsolete)
 
             if sorted_lines:
                 logging.info("\thas been sorted successfully")
@@ -403,7 +471,7 @@ class SyncLang:
         removes the res_dir path
 
         :param filepath: string
-        :return: string
+        :return: pure file name of this file path (including file extension e.g. *.txt)
         """
         return filepath.replace("{}\\".format(RES_DIR), "")
 
@@ -437,6 +505,11 @@ class SyncLang:
         :return: list of unicode strings
         """
         return list(set(first_list).difference(second_list))
+    
+    @staticmethod
+    def __print_keys(keys, logger=logging.info):
+        for key in keys:
+            logger("\t{}\n".format(key))
 
     def status_create_markdown(self, markdown_file='status.md'):
         """
@@ -482,17 +555,34 @@ class SyncLang:
 
 def main():
     
-    def markdown(args):
-        SyncLang(extended=False).status_create_markdown()
-    def status(args):
-        SyncLang(extended=args.extended).status()
-    def update(args):
-        SyncLang(extended=args.extended).update_properties()
+    syncer = SyncLang()
     
+    def markdown_command(args):
+        syncer.set_extended_logging_enabled(False)
+        syncer.status_create_markdown()
+
+    def status_command(args):
+        syncer.set_extended_logging_enabled(args.extended)
+        syncer.status()
+
+    def update_command(args):
+        syncer.set_extended_logging_enabled(args.extended)
+        syncer.update_properties()
+
+    def print_missing(args):
+        file_name = args.f
+        syncer.print_missing_keys_for_file(file_name)
+
+    def print_obsolete(args):
+        file_name = args.f
+        syncer.print_obsolete_keys_for_file(file_name)
+
+    def print_duplicates(args):
+        file_name = args.f
+        syncer.print_duplicate_keys_for_file(file_name)
     
     parser = argparse.ArgumentParser(add_help=True)
     parser.description = "This script is used to synchronize the keys of different *.properties files."
-    
     
     shared_arguments = argparse.ArgumentParser(add_help=False)
     extended_argument = shared_arguments.add_argument("-e", "--extended", help="Prints extended information about the process to the terminal", required=False, action='store_true', default=False)
@@ -501,16 +591,33 @@ def main():
     
     # markdown parser
     markdown_parser = subcommands.add_parser("markdown", description="Creates a markdown file of the current status")
-    markdown_parser.set_defaults(func=markdown)
+    markdown_parser.set_defaults(func=markdown_command)
     # TODO add argument to pass a file name for the markdown file
     
     # status parser
     status_parser = subcommands.add_parser("status", description="Prints the current status to the terminal", parents=[shared_arguments])
-    status_parser.set_defaults(func=status)
+    status_parser.set_defaults(func=status_command)
     
     # update parser
     update_parser = subcommands.add_parser("update", description="Compares all the localization files against the English one and fixes unambiguous duplicates, removes obsolete keys, adds missing keys, and sorts them", parents=[shared_arguments])
-    update_parser.set_defaults(func=update)
+    update_parser.set_defaults(func=update_command)
+    
+    # print parser
+    print_parser = subcommands.add_parser("print", description="Prints specific status info to the console")
+    
+    shared_print_arguments = argparse.ArgumentParser(add_help=False)
+    file_argument = shared_print_arguments.add_argument("-f", "-file", help="Specifies a file for the command to run with", required=True, action='store')
+    
+    print_options = print_parser.add_subparsers(title="Print Options", description="Different options for printing")
+    
+    missing_parser = print_options.add_parser("missing", description="Prints all missing keys", parents=[shared_print_arguments])
+    missing_parser.set_defaults(func=print_missing)
+    
+    obsolete_parser = print_options.add_parser("obsolete", description="Prints all obsolete keys", parents=[shared_print_arguments])
+    obsolete_parser.set_defaults(func=print_obsolete)
+    
+    duplicates_parser = print_options.add_parser("duplicates", description="Prints all duplicate keys", parents=[shared_print_arguments])
+    duplicates_parser.set_defaults(func=print_duplicates)
     
     parsed_args = parser.parse_args()
     parsed_args.func(parsed_args)
