@@ -7,10 +7,12 @@ import java.util.List;
 
 import org.jabref.model.metadata.FileDirectoryPreferences;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -23,7 +25,9 @@ public class BibDatabaseContextTest {
     // FileDirectoryPreferences) incocation:
     private FileDirectoryPreferences fileDirPrefs;
 
-    @BeforeEach
+    @Rule public ExpectedException thrown = ExpectedException.none();
+
+    @Before
     public void setUp() {
         fileDirPrefs = mock(FileDirectoryPreferences.class);
         currentWorkingDir = Paths.get(System.getProperty("user.dir"));

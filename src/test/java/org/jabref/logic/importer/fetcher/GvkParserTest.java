@@ -10,11 +10,8 @@ import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.importer.fileformat.GvkParser;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
+import org.junit.Assert;
+import org.junit.Test;
 
 public class GvkParserTest {
 
@@ -22,8 +19,8 @@ public class GvkParserTest {
         try (InputStream is = GvkParserTest.class.getResourceAsStream(xmlName)) {
             GvkParser parser = new GvkParser();
             List<BibEntry> entries = parser.parseEntries(is);
-            assertNotNull(entries);
-            assertEquals(expectedSize, entries.size());
+            Assert.assertNotNull(entries);
+            Assert.assertEquals(expectedSize, entries.size());
             int i = 0;
             for (String resourceName : resourceNames) {
                 BibEntryAssert.assertEquals(GvkParserTest.class, resourceName, entries.get(i));
@@ -52,23 +49,23 @@ public class GvkParserTest {
         try (InputStream is = GvkParserTest.class.getResourceAsStream("gvk_artificial_subtitle_test.xml")) {
             GvkParser parser = new GvkParser();
             List<BibEntry> entries = parser.parseEntries(is);
-            assertNotNull(entries);
-            assertEquals(5, entries.size());
+            Assert.assertNotNull(entries);
+            Assert.assertEquals(5, entries.size());
 
             BibEntry entry = entries.get(0);
-            assertEquals(Optional.empty(), entry.getField("subtitle"));
+            Assert.assertEquals(Optional.empty(), entry.getField("subtitle"));
 
             entry = entries.get(1);
-            assertEquals(Optional.of("C"), entry.getField("subtitle"));
+            Assert.assertEquals(Optional.of("C"), entry.getField("subtitle"));
 
             entry = entries.get(2);
-            assertEquals(Optional.of("Word"), entry.getField("subtitle"));
+            Assert.assertEquals(Optional.of("Word"), entry.getField("subtitle"));
 
             entry = entries.get(3);
-            assertEquals(Optional.of("Word1 word2"), entry.getField("subtitle"));
+            Assert.assertEquals(Optional.of("Word1 word2"), entry.getField("subtitle"));
 
             entry = entries.get(4);
-            assertEquals(Optional.of("Word1 word2"), entry.getField("subtitle"));
+            Assert.assertEquals(Optional.of("Word1 word2"), entry.getField("subtitle"));
         }
     }
 }

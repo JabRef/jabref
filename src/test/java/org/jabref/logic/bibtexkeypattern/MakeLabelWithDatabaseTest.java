@@ -7,8 +7,8 @@ import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -20,7 +20,7 @@ public class MakeLabelWithDatabaseTest {
     private DatabaseBibtexKeyPattern bibtexKeyPattern;
     private BibEntry entry;
 
-    @BeforeEach
+    @Before
     public void setUp() {
         database = new BibDatabase();
 

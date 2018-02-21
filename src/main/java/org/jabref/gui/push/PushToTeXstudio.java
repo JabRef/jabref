@@ -1,7 +1,8 @@
 package org.jabref.gui.push;
 
+import javax.swing.Icon;
+
 import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefIcon;
 import org.jabref.preferences.JabRefPreferences;
 
 public class PushToTeXstudio extends AbstractPushToApplication implements PushToApplication {
@@ -12,8 +13,8 @@ public class PushToTeXstudio extends AbstractPushToApplication implements PushTo
     }
 
     @Override
-    public JabRefIcon getIcon() {
-        return IconTheme.JabRefIcons.APPLICATION_TEXSTUDIO;
+    public Icon getIcon() {
+        return IconTheme.getImage("texstudio");
     }
 
     @Override

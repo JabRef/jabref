@@ -1,6 +1,4 @@
-<!-- describe the changes you have made here: what, why, ... 
-     Link issues by using the following pattern: [#333](https://github.com/JabRef/jabref/issues/333) or [koppor#49](https://github.com/koppor/jabref/issues/47).
-     The title of the PR must not reference an issue, because GitHub does not support autolinking there. -->
+<!-- describe the changes you have made here: what, why, ... -->
 
 
 ----

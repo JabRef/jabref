@@ -29,7 +29,7 @@ import javax.swing.WindowConstants;
 import org.jabref.Globals;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.xmp.XmpUtilReader;
+import org.jabref.logic.xmp.XMPUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
@@ -180,7 +180,7 @@ public class ImportDialog extends JabRefDialog {
     private List<BibEntry> getEntriesFromXMP(String fileName) {
         List<BibEntry> foundEntries = new ArrayList<>();
         try {
-            foundEntries = XmpUtilReader.readXmp(fileName, Globals.prefs.getXMPPreferences());
+            foundEntries =  XMPUtil.readXMP(fileName, Globals.prefs.getXMPPreferences());
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,10 +1,5 @@
 package org.jabref;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
@@ -16,6 +11,7 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * Responsible for managing of all threads (except Swing threads) in JabRef
@@ -40,17 +36,24 @@ public class JabRefExecutorService implements Executor {
     private final Timer timer = new Timer("timer", true);
     private Thread remoteThread;
 
-    private JabRefExecutorService() {
-    }
+    private JabRefExecutorService() { }
 
     @Override
     public void execute(Runnable command) {
-        Objects.requireNonNull(command);
+        if (command == null) {
+            LOGGER.debug("Received null as command for execution");
+            return;
+        }
+
         executorService.execute(command);
     }
 
     public void executeAndWait(Runnable command) {
-        Objects.requireNonNull(command);
+        if (command == null) {
+            LOGGER.debug("Received null as command for execution");
+            return;
+        }
+
         Future<?> future = executorService.submit(command);
         while (true) {
             try {
@@ -64,8 +67,12 @@ public class JabRefExecutorService implements Executor {
         }
     }
 
-    public boolean executeAndWait(Callable<?> command) {
-        Objects.requireNonNull(command);
+    public boolean executeAndWait(Callable command) {
+        if (command == null) {
+            LOGGER.debug("Received null as command for execution");
+            return false;
+        }
+
         Future<?> future = executorService.submit(command);
         while (true) {
             try {
@@ -80,35 +87,6 @@ public class JabRefExecutorService implements Executor {
         }
     }
 
-    /**
-     * Executes a callable task that provides a return value after the calculation is done.
-     * 
-     * @param command The task to execute.
-     * @return A Future object that provides the returning value.
-     */
-    public <T> Future<T> execute(Callable<T> command) {
-        Objects.requireNonNull(command);
-        return executorService.submit(command);
-    }
-
-    /**
-     * Executes a collection of callable tasks and returns a List of the resulting Future objects after the calculation is done. 
-     * 
-     * @param tasks The tasks to execute
-     * @return A List of Future objects that provide the returning values.
-     */
-    public <T> List<Future<T>> executeAll(Collection<Callable<T>> tasks) {
-        Objects.requireNonNull(tasks);
-        List<Future<T>> futures = new ArrayList<>();
-        try {
-            futures = executorService.invokeAll(tasks);
-        } catch (InterruptedException exception) {
-            LOGGER.error("Unable to execute tasks", exception);
-            return Collections.emptyList();
-        }
-        return futures;
-    }
-
     public void executeInterruptableTask(final Runnable runnable) {
         this.lowPriorityExecutorService.execute(runnable);
     }
@@ -118,7 +96,10 @@ public class JabRefExecutorService implements Executor {
     }
 
     public void executeInterruptableTaskAndWait(Runnable runnable) {
-        Objects.requireNonNull(runnable);
+        if (runnable == null) {
+            LOGGER.debug("Received null as command for execution");
+            return;
+        }
 
         Future<?> future = lowPriorityExecutorService.submit(runnable);
         while (true) {

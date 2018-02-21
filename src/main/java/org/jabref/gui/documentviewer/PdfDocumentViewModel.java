@@ -8,7 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPageTree;
+import org.apache.pdfbox.pdmodel.PDPage;
 
 public class PdfDocumentViewModel extends DocumentViewModel {
 
@@ -21,12 +21,13 @@ public class PdfDocumentViewModel extends DocumentViewModel {
 
     @Override
     public ObservableList<DocumentPageViewModel> getPages() {
-        PDPageTree pages = document.getDocumentCatalog().getPages();
+        @SuppressWarnings("unchecked")
+        List<PDPage> pages = document.getDocumentCatalog().getAllPages();
 
-        List<PdfDocumentPageViewModel> pdfPages = new ArrayList<>();
         // There is apparently no neat way to get the page number from a PDPage...thus this old-style for loop
-        for (int i = 0; i < pages.getCount(); i++) {
-            pdfPages.add(new PdfDocumentPageViewModel(pages.get(i), i + 1, document));
+        List<PdfDocumentPageViewModel> pdfPages = new ArrayList<>();
+        for (int i = 0; i < pages.size(); i++) {
+            pdfPages.add(new PdfDocumentPageViewModel(pages.get(i), i + 1));
         }
         return FXCollections.observableArrayList(pdfPages);
     }

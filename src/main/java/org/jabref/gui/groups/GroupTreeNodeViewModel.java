@@ -9,12 +9,14 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.function.Consumer;
 
+import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoManager;
 
+import org.jabref.gui.IconTheme;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
@@ -31,9 +33,11 @@ import org.slf4j.LoggerFactory;
 
 public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
-    private static final DataFlavor FLAVOR;
+    public static final DataFlavor FLAVOR;
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeNodeViewModel.class);
-
+    private static final Icon GROUP_REFINING_ICON = IconTheme.JabRefIcons.GROUP_REFINING.getSmallIcon();
+    private static final Icon GROUP_INCLUDING_ICON = IconTheme.JabRefIcons.GROUP_INCLUDING.getSmallIcon();
+    private static final Icon GROUP_REGULAR_ICON = null;
     private static final DataFlavor[] FLAVORS;
 
     static {

@@ -1,15 +1,15 @@
 package org.jabref.gui.actions;
 
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.BasePanel;
 import org.jabref.gui.dbproperties.DatabasePropertiesDialog;
 
 public class LibraryPropertiesAction extends SimpleCommand {
 
-    private final JabRefFrame frame;
     private DatabasePropertiesDialog propertiesDialog;
+    private final BasePanel basePanel;
 
-    public LibraryPropertiesAction(JabRefFrame frame) {
-        this.frame = frame;
+    public LibraryPropertiesAction(BasePanel basePanel) {
+        this.basePanel = basePanel;
     }
 
     @Override
@@ -17,8 +17,7 @@ public class LibraryPropertiesAction extends SimpleCommand {
         if (propertiesDialog == null) {
             propertiesDialog = new DatabasePropertiesDialog(null);
         }
-
-        propertiesDialog.setPanel(frame.getCurrentBasePanel());
+        propertiesDialog.setPanel(basePanel);
         propertiesDialog.updateEnableStatus();
         propertiesDialog.setLocationRelativeTo(null);
         propertiesDialog.setVisible(true);

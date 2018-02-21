@@ -11,8 +11,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.SidePaneComponent;
 import org.jabref.gui.SidePaneManager;
 import org.jabref.gui.SidePaneType;
-import org.jabref.gui.actions.Action;
-import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.actions.ActionsFX;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 
 public class OpenOfficeSidePanel extends SidePaneComponent {
@@ -42,8 +41,8 @@ public class OpenOfficeSidePanel extends SidePaneComponent {
     }
 
     @Override
-    public Action getToggleAction() {
-        return StandardActions.TOOGLE_OO;
+    public ActionsFX getToggleAction() {
+        return ActionsFX.TOOGLE_OO;
     }
 
     @Override

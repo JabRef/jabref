@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -36,29 +35,28 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
     private final ListProperty<FileAnnotationViewModel> annotations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Path> files = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<FileAnnotationViewModel> currentAnnotation = new SimpleObjectProperty<>();
-    private final ReadOnlyBooleanProperty annotationEmpty = annotations.emptyProperty();
 
     private final FileAnnotationCache cache;
     private final BibEntry entry;
     private Map<Path, List<FileAnnotation>> fileAnnotations;
     private Path currentFile;
-    private final FileUpdateMonitor fileMonitor;
-    private final FileUpdateListener fileListener = this::reloadAnnotations;
+    private FileUpdateMonitor fileMonitor;
+    private FileUpdateListener fileListener = this::reloadAnnotations;
 
     public FileAnnotationTabViewModel(FileAnnotationCache cache, BibEntry entry, FileUpdateMonitor fileMonitor) {
         this.cache = cache;
         this.entry = entry;
         this.fileMonitor = fileMonitor;
-        fileAnnotations = this.cache.getFromCache(this.entry);
+        initialize();
+    }
+
+    private void initialize() {
+        fileAnnotations = cache.getFromCache(entry);
         files.setAll(fileAnnotations.keySet());
     }
 
     public ObjectProperty<FileAnnotationViewModel> currentAnnotationProperty() {
         return currentAnnotation;
-    }
-
-    public ReadOnlyBooleanProperty isAnnotationsEmpty() {
-        return annotationEmpty;
     }
 
     public ListProperty<FileAnnotationViewModel> annotationsProperty() {
@@ -99,8 +97,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             // Remove annotations for the current entry and reinitialize annotation/cache
             cache.remove(entry);
-            fileAnnotations = cache.getFromCache(entry);
-            files.setAll(fileAnnotations.keySet());
+            initialize();
 
             // Pretend that we just switched to the current file in order to refresh the display
             notifyNewSelectedFile(currentFile);

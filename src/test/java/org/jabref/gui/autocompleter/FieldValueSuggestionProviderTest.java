@@ -6,31 +6,30 @@ import java.util.Collections;
 
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import static org.jabref.gui.autocompleter.AutoCompleterUtil.getRequest;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FieldValueSuggestionProviderTest {
-
     private FieldValueSuggestionProvider autoCompleter;
 
-    @BeforeEach
+    @Before
     public void setUp() throws Exception {
         autoCompleter = new FieldValueSuggestionProvider("field");
     }
 
-    @Test
+    @SuppressWarnings("unused")
+    @Test(expected = NullPointerException.class)
     public void initAutoCompleterWithNullFieldThrowsException() {
-        assertThrows(NullPointerException.class, () -> new FieldValueSuggestionProvider(null));
+        new FieldValueSuggestionProvider(null);
     }
 
     @Test
     public void completeWithoutAddingAnythingReturnsNothing() {
         Collection<String> result = autoCompleter.call(getRequest(("test")));
-        assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -38,7 +37,7 @@ public class FieldValueSuggestionProviderTest {
         autoCompleter.indexEntry(null);
 
         Collection<String> result = autoCompleter.call(getRequest(("test")));
-        assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -47,7 +46,7 @@ public class FieldValueSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("test")));
-        assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -57,7 +56,7 @@ public class FieldValueSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("test")));
-        assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -67,7 +66,7 @@ public class FieldValueSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("testValue")));
-        assertEquals(Arrays.asList("testValue"), result);
+        Assert.assertEquals(Arrays.asList("testValue"), result);
     }
 
     @Test
@@ -77,7 +76,7 @@ public class FieldValueSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("test")));
-        assertEquals(Arrays.asList("testValue"), result);
+        Assert.assertEquals(Arrays.asList("testValue"), result);
     }
 
     @Test
@@ -87,16 +86,16 @@ public class FieldValueSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("testvalue")));
-        assertEquals(Arrays.asList("testValue"), result);
+        Assert.assertEquals(Arrays.asList("testValue"), result);
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void completeNullThrowsException() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
         autoCompleter.indexEntry(entry);
 
-        assertThrows(NullPointerException.class, () -> autoCompleter.call(getRequest(null)));
+        autoCompleter.call(getRequest((null)));
     }
 
     @Test
@@ -106,7 +105,7 @@ public class FieldValueSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("")));
-        assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -119,7 +118,7 @@ public class FieldValueSuggestionProviderTest {
         autoCompleter.indexEntry(entryTwo);
 
         Collection<String> result = autoCompleter.call(getRequest(("testValue")));
-        assertEquals(Arrays.asList("testValueOne", "testValueTwo"), result);
+        Assert.assertEquals(Arrays.asList("testValueOne", "testValueTwo"), result);
     }
 
     @Test
@@ -129,7 +128,7 @@ public class FieldValueSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("va")));
-        assertEquals(Collections.singletonList("val"), result);
+        Assert.assertEquals(Collections.singletonList("val"), result);
     }
 
     @Test
@@ -139,7 +138,7 @@ public class FieldValueSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("val")));
-        assertEquals(Collections.singletonList("test value"), result);
+        Assert.assertEquals(Collections.singletonList("test value"), result);
     }
 
     @Test
@@ -149,7 +148,7 @@ public class FieldValueSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("lue")));
-        assertEquals(Collections.singletonList("test value"), result);
+        Assert.assertEquals(Collections.singletonList("test value"), result);
     }
 
     @Test
@@ -159,6 +158,6 @@ public class FieldValueSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("te")));
-        assertEquals(Collections.singletonList("test value"), result);
+        Assert.assertEquals(Collections.singletonList("test value"), result);
     }
 }

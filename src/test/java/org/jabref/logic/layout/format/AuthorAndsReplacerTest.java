@@ -2,8 +2,8 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class AuthorAndsReplacerTest {
 
@@ -16,20 +16,20 @@ public class AuthorAndsReplacerTest {
         LayoutFormatter a = new AuthorAndsReplacer();
 
         // Empty case
-        assertEquals("", a.format(""));
+        Assert.assertEquals("", a.format(""));
 
         // Single Names don't change
-        assertEquals("Someone, Van Something", a.format("Someone, Van Something"));
+        Assert.assertEquals("Someone, Van Something", a.format("Someone, Van Something"));
 
         // Two names just an &
-        assertEquals("John Smith & Black Brown, Peter", a
+        Assert.assertEquals("John Smith & Black Brown, Peter", a
                 .format("John Smith and Black Brown, Peter"));
 
         // Three names put a comma:
-        assertEquals("von Neumann, John; Smith, John & Black Brown, Peter", a
+        Assert.assertEquals("von Neumann, John; Smith, John & Black Brown, Peter", a
                 .format("von Neumann, John and Smith, John and Black Brown, Peter"));
 
-        assertEquals("John von Neumann; John Smith & Peter Black Brown", a
+        Assert.assertEquals("John von Neumann; John Smith & Peter Black Brown", a
                 .format("John von Neumann and John Smith and Peter Black Brown"));
     }
 

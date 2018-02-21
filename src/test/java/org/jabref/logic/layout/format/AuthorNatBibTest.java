@@ -1,7 +1,7 @@
 package org.jabref.logic.layout.format;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class AuthorNatBibTest {
 
@@ -11,7 +11,7 @@ public class AuthorNatBibTest {
      */
     @Test
     public void testFormatThreeAuthors() {
-        assertEquals("von Neumann et al.",
+        Assert.assertEquals("von Neumann et al.",
                 new AuthorNatBib().format("von Neumann,,John and John Smith and Black Brown, Jr, Peter"));
     }
 
@@ -21,7 +21,7 @@ public class AuthorNatBibTest {
      */
     @Test
     public void testFormatTwoAuthors() {
-        assertEquals("von Neumann and Smith", new AuthorNatBib().format("von Neumann,,John and John Smith"));
+        Assert.assertEquals("von Neumann and Smith", new AuthorNatBib().format("von Neumann,,John and John Smith"));
     }
 
 }

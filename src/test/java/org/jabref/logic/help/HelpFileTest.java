@@ -6,14 +6,12 @@ import java.net.URL;
 
 import org.jabref.logic.net.URLDownload;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static junit.framework.TestCase.assertEquals;
 
 public class HelpFileTest {
-
     private final String jabrefHelp = "https://help.jabref.org/en/";
-
     @Test
     public void referToValidPage() throws IOException {
         for (HelpFile help : HelpFile.values()) {

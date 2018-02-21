@@ -7,12 +7,11 @@ import java.util.Collections;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import static org.jabref.gui.autocompleter.AutoCompleterUtil.getRequest;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PersonNameSuggestionProviderTest {
 
@@ -20,11 +19,12 @@ public class PersonNameSuggestionProviderTest {
     private PersonNameSuggestionProvider autoCompleter;
     private BibEntry entry;
 
+    @Test(expected = NullPointerException.class)
     public void initAutoCompleterWithNullFieldThrowsException() {
-        assertThrows(NullPointerException.class, () -> new PersonNameSuggestionProvider((String) null));
+        new PersonNameSuggestionProvider((String) null);
     }
 
-    @BeforeEach
+    @Before
     public void setUp() throws Exception {
         autoCompleter = new PersonNameSuggestionProvider("field");
 
@@ -35,7 +35,7 @@ public class PersonNameSuggestionProviderTest {
     @Test
     public void completeWithoutAddingAnythingReturnsNothing() {
         Collection<Author> result = autoCompleter.call(getRequest(("test")));
-        assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -43,7 +43,7 @@ public class PersonNameSuggestionProviderTest {
         autoCompleter.indexEntry(null);
 
         Collection<Author> result = autoCompleter.call(getRequest(("test")));
-        assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class PersonNameSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<Author> result = autoCompleter.call(getRequest(("test")));
-        assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class PersonNameSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<Author> result = autoCompleter.call(getRequest(("test")));
-        assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -70,7 +70,7 @@ public class PersonNameSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<Author> result = autoCompleter.call(getRequest(("Kostakos")));
-        assertEquals(Collections.singletonList(vassilisKostakos), result);
+        Assert.assertEquals(Collections.singletonList(vassilisKostakos), result);
     }
 
     @Test
@@ -78,7 +78,7 @@ public class PersonNameSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<Author> result = autoCompleter.call(getRequest(("Kosta")));
-        assertEquals(Collections.singletonList(vassilisKostakos), result);
+        Assert.assertEquals(Collections.singletonList(vassilisKostakos), result);
     }
 
     @Test
@@ -86,12 +86,12 @@ public class PersonNameSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<Author> result = autoCompleter.call(getRequest(("kosta")));
-        assertEquals(Collections.singletonList(vassilisKostakos), result);
+        Assert.assertEquals(Collections.singletonList(vassilisKostakos), result);
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void completeNullThrowsException() {
-        assertThrows(NullPointerException.class, () -> autoCompleter.call(getRequest((null))));
+        autoCompleter.call(getRequest((null)));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class PersonNameSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<Author> result = autoCompleter.call(getRequest(("")));
-        assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -111,7 +111,7 @@ public class PersonNameSuggestionProviderTest {
         Author authorTwo = new Author("", "", "", "Kosta", "");
 
         Collection<Author> result = autoCompleter.call(getRequest(("Ko")));
-        assertEquals(Arrays.asList(authorTwo, vassilisKostakos), result);
+        Assert.assertEquals(Arrays.asList(authorTwo, vassilisKostakos), result);
     }
 
     @Test
@@ -119,7 +119,7 @@ public class PersonNameSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<Author> result = autoCompleter.call(getRequest(("osta")));
-        assertEquals(Collections.singletonList(vassilisKostakos), result);
+        Assert.assertEquals(Collections.singletonList(vassilisKostakos), result);
     }
 
     @Test
@@ -127,7 +127,7 @@ public class PersonNameSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<Author> result = autoCompleter.call(getRequest(("Vas")));
-        assertEquals(Collections.singletonList(vassilisKostakos), result);
+        Assert.assertEquals(Collections.singletonList(vassilisKostakos), result);
     }
 
     @Test
@@ -138,7 +138,7 @@ public class PersonNameSuggestionProviderTest {
         Author author = new Author("Joseph M.", "J. M.", "", "Reagle", "Jr.");
 
         Collection<Author> result = autoCompleter.call(getRequest(("Jos")));
-        assertEquals(Collections.singletonList(author), result);
+        Assert.assertEquals(Collections.singletonList(author), result);
     }
 
     @Test
@@ -149,7 +149,7 @@ public class PersonNameSuggestionProviderTest {
         Author author = new Author("Eric", "E.", "von", "Hippel", "");
 
         Collection<Author> result = autoCompleter.call(getRequest(("Eric")));
-        assertEquals(Collections.singletonList(author), result);
+        Assert.assertEquals(Collections.singletonList(author), result);
     }
 
     @Test
@@ -160,7 +160,7 @@ public class PersonNameSuggestionProviderTest {
         Author author = new Author("Honig", "H.", "", "Bär", "");
 
         Collection<Author> result = autoCompleter.call(getRequest(("Bä")));
-        assertEquals(Collections.singletonList(author), result);
+        Assert.assertEquals(Collections.singletonList(author), result);
     }
 
     @Test
@@ -171,7 +171,7 @@ public class PersonNameSuggestionProviderTest {
         Author author = new Author("Eric", "E.", "von", "Hippel", "");
 
         Collection<Author> result = autoCompleter.call(getRequest(("von")));
-        assertEquals(Collections.singletonList(author), result);
+        Assert.assertEquals(Collections.singletonList(author), result);
     }
 
     @Test
@@ -181,6 +181,6 @@ public class PersonNameSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<Author> result = autoCompleter.call(getRequest(("Kostakos, Va")));
-        assertEquals(Collections.singletonList(vassilisKostakos), result);
+        Assert.assertEquals(Collections.singletonList(vassilisKostakos), result);
     }
 }

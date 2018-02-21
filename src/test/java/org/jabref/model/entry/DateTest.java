@@ -3,10 +3,9 @@ package org.jabref.model.entry;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertEquals;
 
 public class DateTest {
 
@@ -16,7 +15,8 @@ public class DateTest {
         assertEquals(Optional.of(expected), Date.parse("19-06-2014"));
     }
 
+    @Test(expected = NullPointerException.class)
     public void parseDateNull() {
-        assertThrows(NullPointerException.class, () -> assertEquals(Optional.empty(), Date.parse(null)));
+        assertEquals(Optional.empty(), Date.parse(null));
     }
 }

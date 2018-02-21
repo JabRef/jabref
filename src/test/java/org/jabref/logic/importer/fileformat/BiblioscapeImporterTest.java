@@ -7,46 +7,45 @@ import java.util.Collections;
 
 import org.jabref.logic.util.FileType;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class BiblioscapeImporterTest {
 
     private BiblioscapeImporter importer;
 
 
-    @BeforeEach
+    @Before
     public void setUp() throws Exception {
         importer = new BiblioscapeImporter();
     }
 
     @Test
     public void testGetFormatName() {
-        assertEquals("Biblioscape", importer.getName());
+        Assert.assertEquals("Biblioscape", importer.getName());
     }
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(FileType.BIBLIOSCAPE, importer.getFileType());
+        Assert.assertEquals(FileType.BIBLIOSCAPE, importer.getFileType());
     }
 
     @Test
     public void testGetDescription() {
-        assertEquals("Imports a Biblioscape Tag File.\n" +
+        Assert.assertEquals("Imports a Biblioscape Tag File.\n" +
                 "Several Biblioscape field types are ignored. Others are only included in the BibTeX field \"comment\".", importer.getDescription());
     }
 
     @Test
     public void testGetCLIID() {
-        assertEquals("biblioscape", importer.getId());
+        Assert.assertEquals("biblioscape", importer.getId());
     }
 
     @Test
     public void testImportEntriesAbortion() throws Throwable {
         Path file = Paths.get(BiblioscapeImporter.class.getResource("BiblioscapeImporterTestCorrupt.txt").toURI());
-        assertEquals(Collections.emptyList(),
+        Assert.assertEquals(Collections.emptyList(),
                 importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries());
     }
 }

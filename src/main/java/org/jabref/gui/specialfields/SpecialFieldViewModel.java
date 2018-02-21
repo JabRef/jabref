@@ -10,8 +10,7 @@ import javax.swing.undo.UndoManager;
 import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.JabRefIcon;
-import org.jabref.gui.actions.Action;
-import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.actions.ActionsFX;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.model.FieldChange;
@@ -53,20 +52,20 @@ public class SpecialFieldViewModel {
         return getAction().getText();
     }
 
-    public Action getAction() {
+    public ActionsFX getAction() {
         switch (field) {
             case PRINTED:
-                return StandardActions.PRINTED;
+                return ActionsFX.PRINTED;
             case PRIORITY:
-                return StandardActions.PRIORITY;
+                return ActionsFX.PRIORITY;
             case QUALITY:
-                return StandardActions.QUALITY;
+                return ActionsFX.QUALITY;
             case RANKING:
-                return StandardActions.RANKING;
+                return ActionsFX.RANKING;
             case READ_STATUS:
-                return StandardActions.READ_STATUS;
+                return ActionsFX.READ_STATUS;
             case RELEVANCE:
-                return StandardActions.RELEVANCE;
+                return ActionsFX.RELEVANCE;
             default:
                 throw new IllegalArgumentException("There is no icon mapping for special field " + field);
         }

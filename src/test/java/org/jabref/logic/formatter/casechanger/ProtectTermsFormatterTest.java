@@ -5,10 +5,11 @@ import java.util.Collections;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
+
 
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
@@ -17,11 +18,13 @@ public class ProtectTermsFormatterTest {
 
     private ProtectTermsFormatter formatter;
 
-    @BeforeEach
+    @Before
     public void setUp() {
-        formatter = new ProtectTermsFormatter(
+        ProtectTermsFormatter
+                .setProtectedTermsLoader(
                         new ProtectedTermsLoader(new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
                                 Collections.emptyList(), Collections.emptyList(), Collections.emptyList())));
+        formatter = new ProtectTermsFormatter();
     }
 
     @Test

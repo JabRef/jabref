@@ -12,20 +12,20 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.pdf.FileAnnotation;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class EntryAnnotationImporterTest {
 
-    private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
-    private final BibEntry entry = new BibEntry("EntryKey");
+    private BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
+    private BibEntry entry = new BibEntry("EntryKey");
 
-    @BeforeEach
+    @Before
     public void setUp() {
         when(databaseContext.getFileDirectoriesAsPaths(any())).thenReturn(Collections.singletonList(Paths.get("src/test/resources/pdfs/")));
     }

@@ -5,14 +5,14 @@ import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 
 public class NoBibTexFieldCheckerTest {
 
-    private final NoBibtexFieldChecker checker = new NoBibtexFieldChecker();
+    private NoBibtexFieldChecker checker = new NoBibtexFieldChecker();
 
     @Test
     public void abstractIsNotRecognizedAsBiblatexOnlyField() {

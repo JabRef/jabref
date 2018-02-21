@@ -10,21 +10,21 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.specialfields.SpecialField;
 
 import com.google.common.collect.Sets;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class BibEntryTests {
 
     private BibEntry keywordEntry;
     private BibEntry emptyEntry;
 
-    @BeforeEach
+
+
+    @Before
     public void setUp() {
         // Default entry for most keyword and some type tests
         keywordEntry = new BibEntry();
@@ -44,8 +44,8 @@ public class BibEntryTests {
         BibEntry entry = new BibEntry();
         // we have to use `getType("misc")` in the case of biblatex mode
         assertEquals("misc", entry.getType());
-        assertNotNull(entry.getId());
-        assertFalse(entry.getField("author").isPresent());
+        Assert.assertNotNull(entry.getId());
+        Assert.assertFalse(entry.getField("author").isPresent());
     }
 
     @Test
@@ -58,10 +58,10 @@ public class BibEntryTests {
 
         requiredFields.add("author");
         requiredFields.add("title");
-        assertTrue(e.allFieldsPresent(requiredFields, null));
+        Assert.assertTrue(e.allFieldsPresent(requiredFields, null));
 
         requiredFields.add("year");
-        assertFalse(e.allFieldsPresent(requiredFields, null));
+        Assert.assertFalse(e.allFieldsPresent(requiredFields, null));
     }
 
     @Test
@@ -74,31 +74,33 @@ public class BibEntryTests {
 
         // XOR required
         requiredFields.add("journal/year");
-        assertTrue(e.allFieldsPresent(requiredFields, null));
+        Assert.assertTrue(e.allFieldsPresent(requiredFields, null));
 
         requiredFields.add("year/address");
-        assertFalse(e.allFieldsPresent(requiredFields, null));
+        Assert.assertFalse(e.allFieldsPresent(requiredFields, null));
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void isNullCiteKeyThrowsNPE() {
         BibEntry e = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
-        assertThrows(NullPointerException.class, () -> e.setCiteKey(null));
+
+        e.setCiteKey(null);
+        Assert.fail();
     }
 
     @Test
     public void isEmptyCiteKey() {
         BibEntry e = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
-        assertFalse(e.hasCiteKey());
+        Assert.assertFalse(e.hasCiteKey());
 
         e.setCiteKey("");
-        assertFalse(e.hasCiteKey());
+        Assert.assertFalse(e.hasCiteKey());
 
         e.setCiteKey("key");
-        assertTrue(e.hasCiteKey());
+        Assert.assertTrue(e.hasCiteKey());
 
         e.clearField(BibEntry.KEY_FIELD);
-        assertFalse(e.hasCiteKey());
+        Assert.assertFalse(e.hasCiteKey());
     }
 
     @Test
@@ -114,6 +116,7 @@ public class BibEntryTests {
         keywordEntry.setType("");
         assertEquals("misc", keywordEntry.getType());
     }
+
 
     @Test
     public void getFieldOrAliasDateWithYearNumericalMonthString() {
@@ -208,28 +211,28 @@ public class BibEntryTests {
         assertEquals(Optional.of("A 32 mA ΣΔ-modulator"), emptyEntry.getFieldOrAliasLatexFree("journaltitle"));
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void setNullField() {
-        assertThrows(NullPointerException.class, () -> emptyEntry.setField(null));
-
+        emptyEntry.setField(null);
+        Assert.fail();
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void addNullKeywordThrowsNPE() {
-        assertThrows(NullPointerException.class, () -> keywordEntry.addKeyword((Keyword) null, ','));
+        keywordEntry.addKeyword((Keyword)null, ',');
+        Assert.fail();
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void putNullKeywordListThrowsNPE() {
-        assertThrows(NullPointerException.class, () -> keywordEntry.putKeywords((KeywordList) null, ','));
-
+        keywordEntry.putKeywords((KeywordList)null, ',');
+        Assert.fail();
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void putNullKeywordSeparatorThrowsNPE() {
-        assertThrows(NullPointerException.class, () -> keywordEntry.putKeywords(Arrays.asList("A", "B"), null));
+        keywordEntry.putKeywords(Arrays.asList("A", "B"), null);
     }
-
     @Test
     public void testGetSeparatedKeywordsAreCorrect() {
         assertEquals(new KeywordList("Foo", "Bar"), keywordEntry.getKeywords(','));
@@ -244,7 +247,7 @@ public class BibEntryTests {
     @Test
     public void testAddKeywordHasChanged() {
         keywordEntry.addKeyword("FooBar", ',');
-        assertTrue(keywordEntry.hasChanged());
+        Assert.assertTrue(keywordEntry.hasChanged());
     }
 
     @Test
@@ -263,7 +266,7 @@ public class BibEntryTests {
     @Test
     public void testAddKeywordWithDifferentCapitalizationChanges() {
         keywordEntry.addKeyword("FOO", ',');
-        assertTrue(keywordEntry.hasChanged());
+        Assert.assertTrue(keywordEntry.hasChanged());
     }
 
     @Test
@@ -275,24 +278,24 @@ public class BibEntryTests {
     @Test
     public void testAddKeywordEmptyKeywordNotChanged() {
         keywordEntry.addKeyword("", ',');
-        assertFalse(keywordEntry.hasChanged());
+        Assert.assertFalse(keywordEntry.hasChanged());
     }
 
     @Test
     public void texNewBibEntryHasNoKeywords() {
-        assertTrue(emptyEntry.getKeywords(',').isEmpty());
+        Assert.assertTrue(emptyEntry.getKeywords(',').isEmpty());
     }
 
     @Test
     public void texNewBibEntryHasNoKeywordsEvenAfterAddingEmptyKeyword() {
         emptyEntry.addKeyword("", ',');
-        assertTrue(emptyEntry.getKeywords(',').isEmpty());
+        Assert.assertTrue(emptyEntry.getKeywords(',').isEmpty());
     }
 
     @Test
     public void texNewBibEntryAfterAddingEmptyKeywordNotChanged() {
         emptyEntry.addKeyword("", ',');
-        assertFalse(emptyEntry.hasChanged());
+        Assert.assertFalse(emptyEntry.hasChanged());
     }
 
     @Test
@@ -310,31 +313,31 @@ public class BibEntryTests {
     @Test
     public void testPutKeywordsHasChanged() {
         keywordEntry.putKeywords(Arrays.asList("Yin", "Yang"), ',');
-        assertTrue(keywordEntry.hasChanged());
+        Assert.assertTrue(keywordEntry.hasChanged());
     }
 
     @Test
     public void testPutKeywordsPutEmpyListErasesPreviousKeywords() {
         keywordEntry.putKeywords(Collections.emptyList(), ',');
-        assertTrue(keywordEntry.getKeywords(',').isEmpty());
+        Assert.assertTrue(keywordEntry.getKeywords(',').isEmpty());
     }
 
     @Test
     public void testPutKeywordsPutEmpyListHasChanged() {
         keywordEntry.putKeywords(Collections.emptyList(), ',');
-        assertTrue(keywordEntry.hasChanged());
+        Assert.assertTrue(keywordEntry.hasChanged());
     }
 
     @Test
     public void testPutKeywordsPutEmpyListToEmptyBibentry() {
         emptyEntry.putKeywords(Collections.emptyList(), ',');
-        assertTrue(emptyEntry.getKeywords(',').isEmpty());
+        Assert.assertTrue(emptyEntry.getKeywords(',').isEmpty());
     }
 
     @Test
     public void testPutKeywordsPutEmpyListToEmptyBibentryNotChanged() {
         emptyEntry.putKeywords(Collections.emptyList(), ',');
-        assertFalse(emptyEntry.hasChanged());
+        Assert.assertFalse(emptyEntry.hasChanged());
     }
 
     @Test
@@ -403,23 +406,23 @@ public class BibEntryTests {
     public void testGroupAndSearchHits() {
         BibEntry be = new BibEntry();
         be.setGroupHit(true);
-        assertTrue(be.isGroupHit());
+        Assert.assertTrue(be.isGroupHit());
         be.setGroupHit(false);
-        assertFalse(be.isGroupHit());
+        Assert.assertFalse(be.isGroupHit());
         be.setSearchHit(true);
-        assertTrue(be.isSearchHit());
+        Assert.assertTrue(be.isSearchHit());
         be.setSearchHit(false);
-        assertFalse(be.isSearchHit());
+        Assert.assertFalse(be.isSearchHit());
 
     }
 
     @Test
     public void setCiteKey() {
         BibEntry be = new BibEntry();
-        assertFalse(be.hasCiteKey());
+        Assert.assertFalse(be.hasCiteKey());
         be.setField("author", "Albert Einstein");
         be.setCiteKey("Einstein1931");
-        assertTrue(be.hasCiteKey());
+        Assert.assertTrue(be.hasCiteKey());
         assertEquals(Optional.of("Einstein1931"), be.getCiteKeyOptional());
         assertEquals(Optional.of("Albert Einstein"), be.getField("author"));
         be.clearField("author");

@@ -15,23 +15,30 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.IdGenerator;
 import org.jabref.model.event.TestEventListener;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 
 public class BibDatabaseTest {
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     private BibDatabase database;
 
-    @BeforeEach
+    @Before
     public void setUp() {
         database = new BibDatabase();
     }
+
 
     @Test
     public void insertEntryAddsEntryToEntriesList() {
@@ -50,15 +57,15 @@ public class BibDatabaseTest {
         assertTrue(database.containsEntryWithId(entry.getId()));
     }
 
-    @Test
+    @Test(expected = KeyCollisionException.class)
     public void insertEntryWithSameIdThrowsException() {
         BibEntry entry0 = new BibEntry();
         database.insertEntry(entry0);
 
         BibEntry entry1 = new BibEntry();
         entry1.setId(entry0.getId());
-        assertThrows(KeyCollisionException.class, () -> database.insertEntry(entry1));
-
+        database.insertEntry(entry1);
+        fail();
     }
 
     @Test
@@ -71,14 +78,16 @@ public class BibDatabaseTest {
         assertFalse(database.containsEntryWithId(entry.getId()));
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void insertNullEntryThrowsException() {
-        assertThrows(NullPointerException.class, () -> database.insertEntry(null));
+        database.insertEntry(null);
+        fail();
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void removeNullEntryThrowsException() {
-        assertThrows(NullPointerException.class, () -> database.removeEntry(null));
+        database.removeEntry(null);
+        fail();
     }
 
     @Test
@@ -114,32 +123,30 @@ public class BibDatabaseTest {
 
     @Test
     public void hasStringLabelFindsString() {
-        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        BibtexString string = new BibtexString( "DSP", "Digital Signal Processing");
         database.addString(string);
         assertTrue(database.hasStringLabel("DSP"));
         assertFalse(database.hasStringLabel("VLSI"));
     }
 
-    @Test
+    @Test(expected = KeyCollisionException.class)
     public void addSameStringLabelTwiceThrowsKeyCollisionException() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         database.addString(string);
-        final BibtexString finalString = new BibtexString("DSP", "Digital Signal Processor");
-
-        assertThrows(KeyCollisionException.class, () -> database.addString(finalString));
-
+        string = new BibtexString("DSP", "Digital Signal Processor");
+        database.addString(string);
+        fail();
     }
 
-    @Test
+    @Test(expected = KeyCollisionException.class)
     public void addSameStringIdTwiceThrowsKeyCollisionException() {
-        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        BibtexString string = new BibtexString( "DSP", "Digital Signal Processing");
         string.setId("duplicateid");
         database.addString(string);
-        final BibtexString finalString = new BibtexString("VLSI", "Very Large Scale Integration");
-        finalString.setId("duplicateid");
-
-        assertThrows(KeyCollisionException.class, () -> database.addString(finalString));
-
+        string = new BibtexString("VLSI", "Very Large Scale Integration");
+        string.setId("duplicateid");
+        database.addString(string);
+        fail();
     }
 
     @Test
@@ -220,11 +227,11 @@ public class BibDatabaseTest {
     public void circularStringResolvingLongerCycle() {
         BibtexString string = new BibtexString("AAA", "#BBB#");
         database.addString(string);
-        string = new BibtexString("BBB", "#CCC#");
+        string = new BibtexString( "BBB", "#CCC#");
         database.addString(string);
         string = new BibtexString("CCC", "#DDD#");
         database.addString(string);
-        string = new BibtexString("DDD", "#AAA#");
+        string = new BibtexString( "DDD", "#AAA#");
         database.addString(string);
         assertEquals("AAA", database.resolveForStrings("#AAA#"));
         assertEquals("BBB", database.resolveForStrings("#BBB#"));
@@ -255,9 +262,9 @@ public class BibDatabaseTest {
     public void getUsedStrings() {
         BibEntry entry = new BibEntry(IdGenerator.next());
         entry.setField("author", "#AAA#");
-        BibtexString tripleA = new BibtexString("AAA", "Some other #BBB#");
-        BibtexString tripleB = new BibtexString("BBB", "Some more text");
-        BibtexString tripleC = new BibtexString("CCC", "Even more text");
+        BibtexString tripleA = new BibtexString( "AAA", "Some other #BBB#");
+        BibtexString tripleB = new BibtexString( "BBB", "Some more text");
+        BibtexString tripleC = new BibtexString( "CCC", "Even more text");
         Set<BibtexString> stringSet = new HashSet<>();
         stringSet.add(tripleA);
         stringSet.add(tripleB);

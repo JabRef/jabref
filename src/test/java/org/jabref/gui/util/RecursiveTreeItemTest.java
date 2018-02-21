@@ -11,8 +11,8 @@ import javafx.scene.control.TreeItem;
 import org.jabref.model.TreeNode;
 import org.jabref.model.TreeNodeTestData;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,7 +23,7 @@ public class RecursiveTreeItemTest {
     private ObjectProperty<Predicate<TreeNodeTestData.TreeNodeMock>> filterPredicate;
     private TreeNodeTestData.TreeNodeMock node;
 
-    @BeforeEach
+    @Before
     public void setUp() throws Exception {
         root = new TreeNodeTestData.TreeNodeMock();
         node = TreeNodeTestData.getNodeInSimpleTree(root);

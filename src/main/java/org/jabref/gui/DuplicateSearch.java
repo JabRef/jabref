@@ -10,7 +10,6 @@ import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverType;
-import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
@@ -21,24 +20,19 @@ import org.jabref.model.entry.BibEntry;
 
 import spin.Spin;
 
-public class DuplicateSearch extends SimpleCommand {
+public class DuplicateSearch implements Runnable {
 
-    private final JabRefFrame frame;
+    private final BasePanel panel;
     private List<BibEntry> bes;
     private final List<List<BibEntry>> duplicates = new ArrayList<>();
 
-    public DuplicateSearch(JabRefFrame frame) {
-        this.frame = frame;
+
+    public DuplicateSearch(BasePanel bp) {
+        panel = bp;
     }
 
     @Override
-    public void execute() {
-        JabRefExecutorService.INSTANCE.execute(() -> run());
-
-    }
-
     public void run() {
-        BasePanel panel = frame.getCurrentBasePanel();
 
         panel.output(Localization.lang("Searching for duplicates..."));
 
@@ -131,7 +125,7 @@ public class DuplicateSearch extends SimpleCommand {
                 if (!toAdd.isEmpty()) {
                     for (BibEntry entry : toAdd) {
                         panel.getDatabase().insertEntry(entry);
-                        ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
+                        ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
                     }
                     panel.markBaseChanged();
                 }
@@ -155,7 +149,6 @@ public class DuplicateSearch extends SimpleCommand {
 
         @Override
         public void run() {
-            BasePanel panel = frame.getCurrentBasePanel();
             for (int i = 0; (i < (bes.size() - 1)) && !finished; i++) {
                 for (int j = i + 1; (j < bes.size()) && !finished; j++) {
                     BibEntry first = bes.get(i);
@@ -197,6 +190,7 @@ public class DuplicateSearch extends SimpleCommand {
         private final BibEntry two;
         private final DuplicateResolverType dialogType;
         private BibEntry merged;
+
 
         public DuplicateCallBack(JabRefFrame frame, BibEntry one, BibEntry two, DuplicateResolverType dialogType) {
             this.frame = frame;

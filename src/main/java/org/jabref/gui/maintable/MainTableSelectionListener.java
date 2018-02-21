@@ -313,16 +313,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                         if ((description == null) || (description.trim().isEmpty())) {
                             description = flEntry.getLink();
                         }
-
-                        Optional<ExternalFileType> fileType = flEntry.getType();
-
-                        // file type might be unknown
-                        if (!fileType.isPresent()) {
-                            String fileExtension = FileUtil.getFileExtension(flEntry.getLink()).orElse("");
-                            fileType = Optional.of(new UnknownExternalFileType(fileExtension.toUpperCase(), fileExtension));
-                        }
                         menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry.getLink(),
-                                fileType.get().getIcon(), panel.getBibDatabaseContext(), fileType));
+                                flEntry.getType().get().getIcon(), panel.getBibDatabaseContext(),
+                                flEntry.getType()));
                         showDefaultPopup = false;
                     }
                 } else {

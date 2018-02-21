@@ -1,10 +1,12 @@
 package org.jabref.gui.actions;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
@@ -24,6 +26,7 @@ import javax.swing.table.TableRowSorter;
 
 import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
@@ -34,7 +37,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IntegrityCheckAction extends SimpleCommand {
+public class IntegrityCheckAction extends MnemonicAwareAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IntegrityCheckAction.class);
     private static final String ELLIPSES = "...";
@@ -43,10 +46,12 @@ public class IntegrityCheckAction extends SimpleCommand {
 
     public IntegrityCheckAction(JabRefFrame frame) {
         this.frame = frame;
+        putValue(Action.NAME, Localization.menuTitle("Check integrity") + ELLIPSES);
+        putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.CHECK_INTEGRITY));
     }
 
     @Override
-    public void execute() {
+    public void actionPerformed(ActionEvent e) {
         IntegrityCheck check = new IntegrityCheck(frame.getCurrentBasePanel().getBibDatabaseContext(),
                 Globals.prefs.getFileDirectoryPreferences(),
                 Globals.prefs.getBibtexKeyPatternPreferences(),

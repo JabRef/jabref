@@ -2,8 +2,8 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class AuthorOrgSciTest {
 
@@ -11,17 +11,17 @@ public class AuthorOrgSciTest {
     public void testOrgSci() {
         LayoutFormatter f = new AuthorOrgSci();
 
-        assertEquals("Flynn, J., S. Gartska", f.format("John Flynn and Sabine Gartska"));
-        assertEquals("Garvin, D. A.", f.format("David A. Garvin"));
-        assertEquals("Makridakis, S., S. C. Wheelwright, V. E. McGee", f.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee"));
+        Assert.assertEquals("Flynn, J., S. Gartska", f.format("John Flynn and Sabine Gartska"));
+        Assert.assertEquals("Garvin, D. A.", f.format("David A. Garvin"));
+        Assert.assertEquals("Makridakis, S., S. C. Wheelwright, V. E. McGee", f.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee"));
 
     }
 
     @Test
     public void testOrgSciPlusAbbreviation() {
         LayoutFormatter f = new CompositeFormat(new AuthorOrgSci(), new NoSpaceBetweenAbbreviations());
-        assertEquals("Flynn, J., S. Gartska", f.format("John Flynn and Sabine Gartska"));
-        assertEquals("Garvin, D.A.", f.format("David A. Garvin"));
-        assertEquals("Makridakis, S., S.C. Wheelwright, V.E. McGee", f.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee"));
+        Assert.assertEquals("Flynn, J., S. Gartska", f.format("John Flynn and Sabine Gartska"));
+        Assert.assertEquals("Garvin, D.A.", f.format("David A. Garvin"));
+        Assert.assertEquals("Makridakis, S., S.C. Wheelwright, V.E. McGee", f.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee"));
     }
 }

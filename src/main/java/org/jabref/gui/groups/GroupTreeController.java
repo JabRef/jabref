@@ -28,7 +28,6 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
@@ -173,17 +172,6 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
             // Simply setting to null is not enough since it would be replaced by the default node on every change
             row.setDisclosureNode(null);
             row.disclosureNodeProperty().addListener((observable, oldValue, newValue) -> row.setDisclosureNode(null));
-
-            // Opens the group's edit window when the group gets double clicked
-            row.setOnMouseClicked((mouseClickedEvent) -> {
-                if (mouseClickedEvent.getButton().equals(MouseButton.PRIMARY)
-                        && (mouseClickedEvent.getClickCount() == 2)) {
-                    GroupNodeViewModel groupToEdit = row.itemProperty().getValue();
-                    if (groupToEdit != null) {
-                        viewModel.editGroup(groupToEdit);
-                    }
-                }
-            });
 
             // Add context menu (only for non-null items)
             row.contextMenuProperty().bind(

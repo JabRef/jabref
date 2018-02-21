@@ -1,30 +1,58 @@
 package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.jabref.logic.bibtex.BibEntryAssert;
+import org.jabref.model.entry.BibEntry;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
+
+@RunWith(Parameterized.class)
 public class RISImporterTestFiles {
 
-    private static final String FILE_ENDING = ".ris";
+    private RisImporter risImporter;
 
-    private static Stream<String> fileNames() throws IOException {
-        Predicate<String> fileName = name -> name.startsWith("RisImporterTest") && name.endsWith(FILE_ENDING);
-        return ImporterTestEngine.getTestFiles(fileName).stream();
+    @Parameter
+    public String fileName;
+
+    private Path risFile;
+
+
+    @Before
+    public void setUp() throws URISyntaxException {
+        risImporter = new RisImporter();
+        risFile = Paths.get(RISImporterTest.class.getResource(fileName + ".ris").toURI());
     }
 
-    @ParameterizedTest
-    @MethodSource("fileNames")
-    public void testIsRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsRecognizedFormat(new RisImporter(), fileName);
+    @Parameters(name = "{0}")
+    public static Collection<String> fileNames() {
+        return Arrays.asList("RisImporterTest1", "RisImporterTest3", "RisImporterTest4a", "RisImporterTest4b",
+                "RisImporterTest4c", "RisImporterTest5a", "RisImporterTest5b", "RisImporterTest6", "RisImporterTest7",
+                "RisImporterTestDoiAndJournalTitle", "RisImporterTestScopus", "RisImporterTestScience");
     }
 
-    @ParameterizedTest
-    @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws Exception {
-        ImporterTestEngine.testImportEntries(new RisImporter(), fileName, FILE_ENDING);
+    @Test
+    public void testIsRecognizedFormat() throws IOException {
+        Assert.assertTrue(risImporter.isRecognizedFormat(risFile, StandardCharsets.UTF_8));
+    }
+
+    @Test
+    public void testImportEntries() throws IOException {
+        List<BibEntry> risEntries = risImporter.importDatabase(risFile, StandardCharsets.UTF_8).getDatabase()
+                .getEntries();
+        BibEntryAssert.assertEquals(RISImporterTest.class, fileName + ".bib", risEntries);
     }
 }

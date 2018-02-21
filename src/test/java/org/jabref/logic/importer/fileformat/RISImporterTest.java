@@ -8,45 +8,44 @@ import java.nio.file.Paths;
 
 import org.jabref.logic.util.FileType;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class RISImporterTest {
 
     private RisImporter importer;
 
-    @BeforeEach
+
+    @Before
     public void setUp() {
         importer = new RisImporter();
     }
 
     @Test
     public void testGetFormatName() {
-        assertEquals("RIS", importer.getName());
+        Assert.assertEquals("RIS", importer.getName());
     }
 
     @Test
     public void testGetCLIId() {
-        assertEquals("ris", importer.getId());
+        Assert.assertEquals("ris", importer.getId());
     }
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(FileType.RIS, importer.getFileType());
+        Assert.assertEquals(FileType.RIS, importer.getFileType());
     }
 
     @Test
     public void testGetDescription() {
-        assertEquals("Imports a Biblioscape Tag File.", importer.getDescription());
+        Assert.assertEquals("Imports a Biblioscape Tag File.", importer.getDescription());
     }
 
     @Test
     public void testIfNotRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Paths.get(RISImporterTest.class.getResource("RisImporterCorrupted.ris").toURI());
-        assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
+        Assert.assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
     }
 
 }

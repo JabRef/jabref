@@ -67,7 +67,7 @@ public class TextArea implements FieldEditor {
 
     @Override
     public void setBackground(Color color) {
-        //not needed
+
     }
 
     @Override
@@ -124,12 +124,12 @@ public class TextArea implements FieldEditor {
 
     @Override
     public void append(String text) {
-        // not needed
+
     }
 
     @Override
     public void setEnabled(boolean enabled) {
-        // not needed
+
     }
 
     @Override
@@ -156,6 +156,6 @@ public class TextArea implements FieldEditor {
 
     @Override
     public void requestFocus() {
-        // not needed
+
     }
 }

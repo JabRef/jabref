@@ -9,12 +9,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.matchers.AndMatcher;
 import org.jabref.model.search.matchers.OrMatcher;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class GroupTreeNodeTest {
 
@@ -107,7 +107,7 @@ public class GroupTreeNodeTest {
         return GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
     }
 
-    @BeforeEach
+    @Before
     public void setUp() throws Exception {
         entries.clear();
         entry = new BibEntry();

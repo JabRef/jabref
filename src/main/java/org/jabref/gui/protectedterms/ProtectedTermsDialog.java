@@ -37,6 +37,7 @@ import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -90,10 +91,10 @@ public class ProtectedTermsDialog {
     private boolean okPressed;
     private final ProtectedTermsLoader loader;
 
-    public ProtectedTermsDialog(JabRefFrame frame) {
+    public ProtectedTermsDialog(JabRefFrame frame, ProtectedTermsLoader loader) {
 
         this.frame = Objects.requireNonNull(frame);
-        this.loader = Globals.protectedTermsLoader;
+        this.loader = Objects.requireNonNull(loader);
         init();
 
     }
@@ -434,7 +435,7 @@ public class ProtectedTermsDialog {
                     .addExtensionFilter(FileType.TERMS)
                     .withDefaultExtension(FileType.TERMS)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-            DialogService ds = frame.getDialogService();
+            DialogService ds = new FXDialogService();
 
             browse.addActionListener(e -> {
                 Optional<Path> file = DefaultTaskExecutor

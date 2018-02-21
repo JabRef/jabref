@@ -21,6 +21,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -97,9 +99,10 @@ class CustomExportDialog extends JabRefDialog {
                 .addExtensionFilter(FileType.LAYOUT)
                 .withDefaultExtension(FileType.LAYOUT)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY)).build();
+        DialogService ds = new FXDialogService();
         browse.addActionListener(
-                e -> DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showFileOpenDialog(fileDialogConfiguration))
-                                        .ifPresent(f -> layoutFile.setText(f.toAbsolutePath().toString())));
+                e -> DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration))
+                        .ifPresent(f -> layoutFile.setText(f.toAbsolutePath().toString())));
 
         AbstractAction cancelAction = new AbstractAction() {
 

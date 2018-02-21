@@ -2,10 +2,10 @@ package org.jabref.gui.push;
 
 import java.util.List;
 
+import javax.swing.Icon;
 import javax.swing.JPanel;
 
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.JabRefIcon;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
@@ -21,7 +21,7 @@ public interface PushToApplication {
 
     String getTooltip();
 
-    JabRefIcon getIcon();
+    Icon getIcon();
 
     /**
      * This method asks the implementing class to return a JPanel populated with the imlementation's options panel, if

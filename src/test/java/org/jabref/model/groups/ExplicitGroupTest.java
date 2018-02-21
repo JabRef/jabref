@@ -5,12 +5,12 @@ import java.util.Optional;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ExplicitGroupTest {
 
@@ -19,7 +19,7 @@ public class ExplicitGroupTest {
 
     private BibEntry entry;
 
-    @BeforeEach
+    @Before
     public void setUp() {
         group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
         group2 = new ExplicitGroup("myExplicitGroup2", GroupHierarchyType.INCLUDING, ',');
@@ -29,6 +29,7 @@ public class ExplicitGroupTest {
     @Test
     public void addSingleGroupToEmptyBibEntryChangesGroupsField() {
         group.add(entry);
+
         assertEquals(Optional.of("myExplicitGroup"), entry.getField(FieldName.GROUPS));
     }
 
@@ -36,6 +37,7 @@ public class ExplicitGroupTest {
     public void addSingleGroupToNonemptyBibEntryAppendsToGroupsField() {
         entry.setField(FieldName.GROUPS, "some thing");
         group.add(entry);
+
         assertEquals(Optional.of("some thing, myExplicitGroup"), entry.getField(FieldName.GROUPS));
     }
 
@@ -43,6 +45,7 @@ public class ExplicitGroupTest {
     public void addTwoGroupsToBibEntryChangesGroupsField() {
         group.add(entry);
         group2.add(entry);
+
         assertEquals(Optional.of("myExplicitGroup, myExplicitGroup2"), entry.getField(FieldName.GROUPS));
     }
 
@@ -50,6 +53,7 @@ public class ExplicitGroupTest {
     public void addDuplicateGroupDoesNotChangeGroupsField() throws Exception {
         entry.setField(FieldName.GROUPS, "myExplicitGroup");
         group.add(entry);
+
         assertEquals(Optional.of("myExplicitGroup"), entry.getField(FieldName.GROUPS));
     }
 
@@ -58,6 +62,7 @@ public class ExplicitGroupTest {
     public void removeDoesNotChangeFieldIfContainsNameAsPart() throws Exception {
         entry.setField(FieldName.GROUPS, "myExplicitGroup_alternative");
         group.remove(entry);
+
         assertEquals(Optional.of("myExplicitGroup_alternative"), entry.getField(FieldName.GROUPS));
     }
 
@@ -74,6 +79,7 @@ public class ExplicitGroupTest {
     // For https://github.com/JabRef/jabref/issues/1873
     public void containsOnlyMatchesCompletePhraseWithWhitespace() throws Exception {
         entry.setField(FieldName.GROUPS, "myExplicitGroup b");
+
         assertFalse(group.contains(entry));
     }
 

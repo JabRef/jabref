@@ -29,15 +29,6 @@ public class BibtexNameFormatter {
     private BibtexNameFormatter() {
     }
 
-    /**
-     * Formats the nth author of the author name list by a given format string
-     *
-     * @param authorsNameList The string from an author field
-     * @param whichName index of the list, starting with 1
-     * @param formatString TODO
-     * @param warn collects the warnings, may-be-null
-     * @return
-     */
     public static String formatName(String authorsNameList, int whichName, String formatString, Warn warn) {
         AuthorList al = AuthorList.parse(authorsNameList);
 
@@ -49,7 +40,11 @@ public class BibtexNameFormatter {
     }
 
     /**
-     * @param warn collects the warnings, may-be-null
+     *
+     * @param author
+     * @param format
+     * @param warn may-be-null
+     * @return
      */
     public static String formatName(Author author, String format, Warn warn) {
 

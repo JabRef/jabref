@@ -12,8 +12,8 @@ import org.jabref.logic.importer.ImportFormatReader.UnknownFormatImport;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 
 import static org.junit.Assert.assertEquals;
@@ -26,7 +26,7 @@ public class ClipBoardManagerTest {
     private Transferable content;
     private ImportFormatReader importFormatReader;
 
-    @BeforeEach
+    @Before
     public void setUp() throws Exception {
         importFormatReader = mock(ImportFormatReader.class);
 

@@ -24,16 +24,16 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 public class GroupSerializerTest {
 
     private GroupSerializer groupSerializer;
 
-    @BeforeEach
+    @Before
     public void setUp() throws Exception {
         groupSerializer = new GroupSerializer();
     }

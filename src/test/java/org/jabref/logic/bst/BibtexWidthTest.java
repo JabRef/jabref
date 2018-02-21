@@ -1,10 +1,7 @@
 package org.jabref.logic.bst;
 
-
-
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * How to create these test using Bibtex:
@@ -36,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class BibtexWidthTest {
 
     private void assertBibtexWidth(final int i, final String string) {
-        assertEquals(i, BibtexWidth.width(string));
+        Assert.assertEquals(i, BibtexWidth.width(string));
     }
 
     @Test
@@ -64,10 +61,10 @@ public class BibtexWidthTest {
 
     @Test
     public void testGetCharWidth() {
-        assertEquals(500, BibtexWidth.getCharWidth('0'));
-        assertEquals(361, BibtexWidth.getCharWidth('I'));
-        assertEquals(500, BibtexWidth.getCharWidth('~'));
-        assertEquals(500, BibtexWidth.getCharWidth('}'));
-        assertEquals(278, BibtexWidth.getCharWidth(' '));
+        Assert.assertEquals(500, BibtexWidth.getCharWidth('0'));
+        Assert.assertEquals(361, BibtexWidth.getCharWidth('I'));
+        Assert.assertEquals(500, BibtexWidth.getCharWidth('~'));
+        Assert.assertEquals(500, BibtexWidth.getCharWidth('}'));
+        Assert.assertEquals(278, BibtexWidth.getCharWidth(' '));
     }
 }

@@ -11,12 +11,12 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.Answers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 
 public class BibtexKeyGeneratorTest {
@@ -44,9 +44,9 @@ public class BibtexKeyGeneratorTest {
     private static final String TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS = "On the Measurement of Design-Time Adaptability for Process-Based Systems ";
 
     private static ImportFormatPreferences importFormatPreferences;
-    private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
+    private FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
-    @BeforeEach
+    @Before
     public void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
@@ -301,8 +301,9 @@ public class BibtexKeyGeneratorTest {
         assertEquals("", BibtexKeyGenerator.firstAuthor(""));
     }
 
+    @Test(expected = NullPointerException.class)
     public void testFirstAuthorNull() {
-        assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.firstAuthor(null));
+        BibtexKeyGenerator.firstAuthor(null);
     }
 
     @Test
@@ -424,8 +425,9 @@ public class BibtexKeyGeneratorTest {
         assertEquals("Newton", BibtexKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 7));
     }
 
+    @Test(expected = NullPointerException.class)
     public void testAuthIniNNull() {
-        assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.authIniN(null, 3));
+        BibtexKeyGenerator.authIniN(null, 3);
     }
 
     @Test
@@ -514,8 +516,9 @@ public class BibtexKeyGeneratorTest {
         assertEquals("", BibtexKeyGenerator.authNofMth("", 2, 4));
     }
 
+    @Test(expected = NullPointerException.class)
     public void authNMThrowsNPE() {
-        assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.authNofMth(null, 2, 4));
+        BibtexKeyGenerator.authNofMth(null, 2, 4);
     }
 
     /**
@@ -687,8 +690,9 @@ public class BibtexKeyGeneratorTest {
         assertEquals("43", BibtexKeyGenerator.firstPage("43+"));
     }
 
+    @Test(expected = NullPointerException.class)
     public void testFirstPageNull() {
-        assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.firstPage(null));
+        BibtexKeyGenerator.firstPage(null);
     }
 
     @Test
@@ -709,8 +713,9 @@ public class BibtexKeyGeneratorTest {
         assertEquals("", BibtexKeyGenerator.pagePrefix("43+"));
     }
 
+    @Test(expected = NullPointerException.class)
     public void testPagePrefixNull() {
-        assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.pagePrefix(null));
+        BibtexKeyGenerator.pagePrefix(null);
     }
 
     @Test
@@ -725,8 +730,9 @@ public class BibtexKeyGeneratorTest {
         assertEquals("43", BibtexKeyGenerator.lastPage("43+"));
     }
 
+    @Test(expected = NullPointerException.class)
     public void testLastPageNull() {
-        assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.lastPage(null));
+        BibtexKeyGenerator.lastPage(null);
     }
 
     /**
@@ -924,10 +930,10 @@ public class BibtexKeyGeneratorTest {
         assertEquals("", BibtexKeyGenerator.cleanKey("\n\t\r", false));
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testCheckLegalNullInNullOut() {
-        assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.cleanKey(null, true));
-        assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.cleanKey(null, false));
+        assertNull(BibtexKeyGenerator.cleanKey(null, true));
+        assertNull(BibtexKeyGenerator.cleanKey(null, false));
     }
 
     @Test

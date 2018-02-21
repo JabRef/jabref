@@ -6,18 +6,16 @@ import java.util.Collections;
 
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import static org.jabref.gui.autocompleter.AutoCompleterUtil.getRequest;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class BibEntrySuggestionProviderTest {
-
     private BibEntrySuggestionProvider autoCompleter;
 
-    @BeforeEach
+    @Before
     public void setUp() throws Exception {
         autoCompleter = new BibEntrySuggestionProvider();
     }
@@ -25,7 +23,7 @@ public class BibEntrySuggestionProviderTest {
     @Test
     public void completeWithoutAddingAnythingReturnsNothing() {
         Collection<BibEntry> result = autoCompleter.call(getRequest(("test")));
-        assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -33,7 +31,7 @@ public class BibEntrySuggestionProviderTest {
         autoCompleter.indexEntry(null);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("test")));
-        assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -42,7 +40,7 @@ public class BibEntrySuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("test")));
-        assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -52,7 +50,7 @@ public class BibEntrySuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("testKey")));
-        assertEquals(Collections.singletonList(entry), result);
+        Assert.assertEquals(Collections.singletonList(entry), result);
     }
 
     @Test
@@ -62,7 +60,7 @@ public class BibEntrySuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("test")));
-        assertEquals(Collections.singletonList(entry), result);
+        Assert.assertEquals(Collections.singletonList(entry), result);
     }
 
     @Test
@@ -72,16 +70,16 @@ public class BibEntrySuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("testkey")));
-        assertEquals(Collections.singletonList(entry), result);
+        Assert.assertEquals(Collections.singletonList(entry), result);
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void completeNullThrowsException() {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("testKey");
         autoCompleter.indexEntry(entry);
 
-        assertThrows(NullPointerException.class, () -> autoCompleter.call(getRequest((null))));
+        autoCompleter.call(getRequest((null)));
     }
 
     @Test
@@ -91,7 +89,7 @@ public class BibEntrySuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("")));
-        assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
@@ -104,7 +102,7 @@ public class BibEntrySuggestionProviderTest {
         autoCompleter.indexEntry(entryTwo);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("testKey")));
-        assertEquals(Arrays.asList(entryTwo, entryOne), result);
+        Assert.assertEquals(Arrays.asList(entryTwo, entryOne), result);
     }
 
     @Test
@@ -114,6 +112,6 @@ public class BibEntrySuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("k")));
-        assertEquals(Collections.singletonList(entry), result);
+        Assert.assertEquals(Collections.singletonList(entry), result);
     }
 }

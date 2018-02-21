@@ -9,18 +9,22 @@ import java.util.Optional;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
+@Category(FetcherTest.class)
 public class FreeCiteImporterTest {
 
     private FreeCiteImporter importer;
 
-    @BeforeEach
+
+    @Before
     public void setUp() {
         importer = new FreeCiteImporter(mock(ImportFormatPreferences.class));
     }
@@ -29,11 +33,9 @@ public class FreeCiteImporterTest {
     public void freeCiteReturnsSomething() throws IOException {
         String entryText = "Kopp, O.; Martin, D.; Wutke, D. & Leymann, F. The Difference Between Graph-Based and Block-Structured Business Process Modelling Languages Enterprise Modelling and Information Systems, Gesellschaft für Informatik e.V. (GI), 2009, 4, 3-13";
         BufferedReader input = new BufferedReader(new StringReader(entryText));
-
         List<BibEntry> bibEntries = importer.importDatabase(input).getDatabase().getEntries();
-        BibEntry bibEntry = bibEntries.get(0);
-
         assertEquals(1, bibEntries.size());
+        BibEntry bibEntry = bibEntries.get(0);
         assertEquals(bibEntry.getField("author"), Optional.of("O Kopp and D Martin and D Wutke and F Leymann"));
     }
 

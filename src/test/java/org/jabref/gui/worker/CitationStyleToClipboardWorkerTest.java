@@ -9,9 +9,9 @@ import org.jabref.gui.fieldeditors.HtmlTransferable;
 import org.jabref.gui.fieldeditors.XmlTransferable;
 import org.jabref.logic.util.OS;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CitationStyleToClipboardWorkerTest {
 
@@ -31,7 +31,7 @@ public class CitationStyleToClipboardWorkerTest {
         HtmlTransferable HtmlTransferable = CitationStyleToClipboardWorker.processPreview(Arrays.asList(citation, citation));
 
         Object actual = HtmlTransferable.getTransferData(DataFlavor.stringFlavor);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -84,7 +84,7 @@ public class CitationStyleToClipboardWorkerTest {
         HtmlTransferable transferable = CitationStyleToClipboardWorker.processPreview(Arrays.asList(citation, citation));
 
         Object actual = transferable.getTransferData(HtmlTransferable.HTML_FLAVOR);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -96,7 +96,7 @@ public class CitationStyleToClipboardWorkerTest {
         StringSelection textTransferable = CitationStyleToClipboardWorker.processText(Arrays.asList(citation, citation));
 
         Object actual = textTransferable.getTransferData(DataFlavor.stringFlavor);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -111,7 +111,7 @@ public class CitationStyleToClipboardWorkerTest {
         RtfTransferable rtfTransferable = CitationStyleToClipboardWorker.processRtf(Arrays.asList(citation, citation));
 
         Object actual = rtfTransferable.getTransferData(DataFlavor.stringFlavor);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -184,7 +184,7 @@ public class CitationStyleToClipboardWorkerTest {
         XmlTransferable xmlTransferable = CitationStyleToClipboardWorker.processXslFo(Arrays.asList(citation, citation));
 
         Object actual = xmlTransferable.getTransferData(DataFlavor.stringFlavor);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -214,7 +214,7 @@ public class CitationStyleToClipboardWorkerTest {
         HtmlTransferable htmlTransferable = CitationStyleToClipboardWorker.processHtml(Arrays.asList(citation, citation));
 
         Object actual = htmlTransferable.getTransferData(DataFlavor.allHtmlFlavor);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -228,6 +228,6 @@ public class CitationStyleToClipboardWorkerTest {
         HtmlTransferable htmlTransferable = CitationStyleToClipboardWorker.processHtml(Arrays.asList(citation, citation));
 
         Object actual = htmlTransferable.getTransferData(DataFlavor.stringFlavor);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 }

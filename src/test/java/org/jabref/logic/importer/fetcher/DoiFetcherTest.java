@@ -70,12 +70,10 @@ public class DoiFetcherTest {
         assertEquals(Optional.of(bibEntryDecker2007), fetchedEntry);
     }
 
-    @Test
     public void testPerformSearchEmptyDOI() {
         assertThrows(FetcherException.class, () -> fetcher.performSearchById(""));
     }
 
-    @Test
     public void testPerformSearchInvalidDOI() {
         assertThrows(FetcherException.class, () -> fetcher.performSearchById("10.1002/9781118257517F"));
 

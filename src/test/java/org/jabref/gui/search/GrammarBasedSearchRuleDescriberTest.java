@@ -10,9 +10,9 @@ import org.jabref.gui.search.rules.describer.GrammarBasedSearchRuleDescriber;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.model.search.rules.GrammarBasedSearchRule;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 public class GrammarBasedSearchRuleDescriberTest {
 

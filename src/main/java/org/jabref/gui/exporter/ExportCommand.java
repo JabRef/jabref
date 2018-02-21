@@ -11,6 +11,7 @@ import javafx.stage.FileChooser;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -49,7 +50,7 @@ public class ExportCommand extends SimpleCommand {
     public void execute() {
         Globals.exportFactory = ExporterFactory.create(Globals.prefs, Globals.journalAbbreviationLoader);
         FileDialogConfiguration fileDialogConfiguration = createExportFileChooser(Globals.exportFactory, Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
-        DialogService dialogService = frame.getDialogService();
+        DialogService dialogService = new FXDialogService();
         DefaultTaskExecutor.runInJavaFXThread(() ->
                 dialogService.showFileSaveDialog(fileDialogConfiguration)
                              .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), Globals.exportFactory.getExporters())));

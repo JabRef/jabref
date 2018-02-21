@@ -4,19 +4,18 @@ import java.util.Collections;
 
 import org.jabref.logic.util.OS;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.Answers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class LatexFieldFormatterTests {
 
     private LatexFieldFormatter formatter;
 
-    @BeforeEach
+    @Before
     public void setUp() {
         this.formatter = new LatexFieldFormatter(mock(LatexFieldFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
@@ -86,16 +85,18 @@ public class LatexFieldFormatterTests {
         assertEquals(expected, any);
     }
 
+    @Test(expected = InvalidFieldValueException.class)
     public void reportUnbalancedBracing() throws Exception {
         String unbalanced = "{";
 
-        assertThrows(InvalidFieldValueException.class, () -> formatter.format(unbalanced, "anyfield"));
+        formatter.format(unbalanced, "anyfield");
     }
 
+    @Test(expected = InvalidFieldValueException.class)
     public void reportUnbalancedBracingWithEscapedBraces() throws Exception {
         String unbalanced = "{\\}";
 
-        assertThrows(InvalidFieldValueException.class, () -> formatter.format(unbalanced, "anyfield"));
+        formatter.format(unbalanced, "anyfield");
     }
 
     @Test

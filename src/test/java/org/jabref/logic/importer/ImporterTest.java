@@ -24,7 +24,7 @@ import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.importer.fileformat.SilverPlatterImporter;
-import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.logic.xmp.XMPPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Assert;
@@ -102,7 +102,7 @@ public class ImporterTest {
         // sorted alphabetically
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        XmpPreferences xmpPreferences = mock(XmpPreferences.class);
+        XMPPreferences xmpPreferences = mock(XMPPreferences.class);
         // @formatter:off
         return Arrays.asList(
                 new Object[]{new BiblioscapeImporter()},

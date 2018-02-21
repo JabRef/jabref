@@ -131,8 +131,8 @@ public class MSBibMapping {
      */
     public static int getLCID(String language) {
         // TODO: add language to LCID mapping
-        // 0x0409 is American English
-        return 0x0409;
+        // 0 is English
+        return 0;
     }
 
     /**

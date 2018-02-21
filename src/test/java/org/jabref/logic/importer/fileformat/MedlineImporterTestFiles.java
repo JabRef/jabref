@@ -1,58 +1,65 @@
 package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
-import java.util.function.Predicate;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.jabref.logic.bibtex.BibEntryAssert;
+import org.jabref.model.entry.BibEntry;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+
+@RunWith(Parameterized.class)
 public class MedlineImporterTestFiles {
 
-    private static final String FILE_ENDING = ".xml";
+    private MedlineImporter medlineImporter;
 
-    private static final String MALFORMED_KEY_WORD = "Malformed";
+    @Parameter
+    public Path importFile;
 
-    private static Stream<String> fileNames() throws IOException {
-        Predicate<String> fileName = name -> name.startsWith("MedlineImporterTest") && name.endsWith(FILE_ENDING)
-                && !name.contains(MALFORMED_KEY_WORD);
-        return ImporterTestEngine.getTestFiles(fileName).stream();
+
+    @Before
+    public void setUp() {
+        medlineImporter = new MedlineImporter();
     }
 
-    private static Stream<String> invalidFileNames() throws IOException {
-        Predicate<String> fileName = name -> !name.startsWith("MedlineImporterTest");
-        return ImporterTestEngine.getTestFiles(fileName).stream();
+    @Parameters(name = "{0}")
+    public static Collection<Path> files() throws Exception {
+        try (Stream<Path> stream = Files.list(Paths.get(MedlineImporterTestFiles.class.getResource("").toURI()))) {
+            return stream.filter(n -> n.getFileName().toString().startsWith("MedlineImporterTest")
+                    && n.getFileName().toString().endsWith(".xml")).collect(Collectors.toList());
+        }
     }
 
-    @ParameterizedTest
-    @MethodSource("fileNames")
-    public void testIsRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsRecognizedFormat(new MedlineImporter(), fileName);
+    @Test
+    public void testIsRecognizedFormat() throws IOException {
+        Assert.assertTrue(medlineImporter.isRecognizedFormat(importFile, StandardCharsets.UTF_8));
     }
 
-    @ParameterizedTest
-    @MethodSource("invalidFileNames")
-    public void testIsNotRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsNotRecognizedFormat(new MedlineImporter(), fileName);
+    @Test
+    public void testImportEntries() throws IOException {
+        List<BibEntry> medlineEntries = medlineImporter.importDatabase(importFile, StandardCharsets.UTF_8).getDatabase()
+                .getEntries();
+        String bibFileName = importFile.getFileName().toString().replace(".xml", ".bib");
+        if (medlineEntries.isEmpty()) {
+            assertEquals(Collections.emptyList(), medlineEntries);
+        } else {
+            BibEntryAssert.assertEquals(MedlineImporterTest.class, bibFileName, medlineEntries);
+        }
     }
-
-    @ParameterizedTest
-    @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws Exception {
-        ImporterTestEngine.testImportEntries(new MedlineImporter(), fileName, FILE_ENDING);
-    }
-
-    private static Stream<String> malformedFileNames() throws IOException {
-        Predicate<String> fileName = name -> name.startsWith("MedlineImporterTest" + MALFORMED_KEY_WORD)
-                && name.endsWith(FILE_ENDING);
-        return ImporterTestEngine.getTestFiles(fileName).stream();
-    }
-
-    @ParameterizedTest
-    @MethodSource("malformedFileNames")
-    public void testImportMalfomedFiles(String fileName) throws IOException {
-        ImporterTestEngine.testImportMalformedFiles(new MedlineImporter(), fileName);
-    }
-
-
 }

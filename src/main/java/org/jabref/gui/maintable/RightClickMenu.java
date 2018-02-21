@@ -12,8 +12,8 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.Actions;
+import org.jabref.gui.actions.ActionsFX;
 import org.jabref.gui.actions.OldCommandWrapper;
-import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
@@ -34,15 +34,15 @@ public class RightClickMenu {
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory(keyBindingRepository);
 
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.COPY, new OldCommandWrapper(Actions.COPY, panel)));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY, new OldCommandWrapper(Actions.COPY, panel)));
         contextMenu.getItems().add(createCopySubMenu(panel, factory));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.PASTE, new OldCommandWrapper(Actions.PASTE, panel)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.CUT, new OldCommandWrapper(Actions.CUT, panel)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.DELETE, new OldCommandWrapper(Actions.DELETE, panel)));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.PASTE, new OldCommandWrapper(Actions.PASTE, panel)));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.CUT, new OldCommandWrapper(Actions.CUT, panel)));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.DELETE, new OldCommandWrapper(Actions.DELETE, panel)));
 
         contextMenu.getItems().add(new SeparatorMenuItem());
 
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new OldCommandWrapper(Actions.SEND_AS_EMAIL, panel)));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.SEND_AS_EMAIL, new OldCommandWrapper(Actions.SEND_AS_EMAIL, panel)));
 
         contextMenu.getItems().add(new SeparatorMenuItem());
 
@@ -76,22 +76,22 @@ public class RightClickMenu {
 
         contextMenu.getItems().add(new SeparatorMenuItem());
 
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.OPEN_FOLDER, getOpenFolderCommand(panel)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, getOpenExternalFileCommand(panel)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.OPEN_URL, getOpenUrlCommand(panel)));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.OPEN_FOLDER, getOpenFolderCommand(panel)));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.OPEN_EXTERNAL_FILE, getOpenExternalFileCommand(panel)));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.OPEN_URL, getOpenUrlCommand(panel)));
 
         contextMenu.getItems().add(new SeparatorMenuItem());
 
         contextMenu.getItems().add(new ChangeEntryTypeMenu(keyBindings).getChangeEntryTypeMenu(entry.getEntry(), panel.getBibDatabaseContext(), panel.getUndoManager()));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, getFetchEntryData(panel)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.ADD_FILE_LINK, getAddFileLinkCommand(panel)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.MERGE_ENTRIES, mergeEntries(panel)));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.MERGE_WITH_FETCHED_ENTRY, getFetchEntryData(panel)));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.ADD_FILE_LINK, getAddFileLinkCommand(panel)));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.MERGE_ENTRIES, mergeEntries(panel)));
 
         contextMenu.getItems().add(new SeparatorMenuItem());
 
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.ADD_TO_GROUP, addToGroup(panel)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.REMOVE_FROM_GROUP, removeFromGroup(panel)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.MOVE_TO_GROUP, moveToGroup(panel)));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.ADD_TO_GROUP, addToGroup(panel)));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.REMOVE_FROM_GROUP, removeFromGroup(panel)));
+        contextMenu.getItems().add(factory.createMenuItem(ActionsFX.MOVE_TO_GROUP, moveToGroup(panel)));
 
         return contextMenu;
     }
@@ -156,29 +156,29 @@ public class RightClickMenu {
     }
 
     private static Menu createCopySubMenu(BasePanel panel, ActionFactory factory) {
-        Menu copySpecialMenu = factory.createMenu(StandardActions.COPY_MORE);
-        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_TITLE, new OldCommandWrapper(Actions.COPY_TITLE, panel)));
-        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_KEY, new OldCommandWrapper(Actions.COPY_KEY, panel)));
-        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITE_KEY, new OldCommandWrapper(Actions.COPY_CITE_KEY, panel)));
-        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_KEY_AND_TITLE, new OldCommandWrapper(Actions.COPY_KEY_AND_TITLE, panel)));
-        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_KEY_AND_LINK, new OldCommandWrapper(Actions.COPY_KEY_AND_LINK, panel)));
+        Menu copySpecialMenu = factory.createMenu(ActionsFX.COPY_MORE);
+        copySpecialMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_TITLE, new OldCommandWrapper(Actions.COPY_TITLE, panel)));
+        copySpecialMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_KEY, new OldCommandWrapper(Actions.COPY_KEY, panel)));
+        copySpecialMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_CITE_KEY, new OldCommandWrapper(Actions.COPY_CITE_KEY, panel)));
+        copySpecialMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_KEY_AND_TITLE, new OldCommandWrapper(Actions.COPY_KEY_AND_TITLE, panel)));
+        copySpecialMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_KEY_AND_LINK, new OldCommandWrapper(Actions.COPY_KEY_AND_LINK, panel)));
 
         // the submenu will behave dependent on what style is currently selected (citation/preview)
         PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
         String style = previewPreferences.getPreviewCycle().get(previewPreferences.getPreviewCyclePosition());
         if (CitationStyle.isCitationStyleFile(style)) {
-            copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITATION_HTML, new OldCommandWrapper(Actions.COPY_CITATION_HTML, panel)));
-            Menu copyCitationMenu = factory.createMenu(StandardActions.COPY_CITATION_MORE);
-            copyCitationMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITATION_TEXT, new OldCommandWrapper(Actions.COPY_CITATION_TEXT, panel)));
-            copyCitationMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITATION_RTF, new OldCommandWrapper(Actions.COPY_CITATION_RTF, panel)));
-            copyCitationMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITATION_ASCII_DOC, new OldCommandWrapper(Actions.COPY_CITATION_ASCII_DOC, panel)));
-            copyCitationMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITATION_XSLFO, new OldCommandWrapper(Actions.COPY_CITATION_XSLFO, panel)));
+            copySpecialMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_CITATION_HTML, new OldCommandWrapper(Actions.COPY_CITATION_HTML, panel)));
+            Menu copyCitationMenu = factory.createMenu(ActionsFX.COPY_CITATION_MORE);
+            copyCitationMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_CITATION_TEXT, new OldCommandWrapper(Actions.COPY_CITATION_TEXT, panel)));
+            copyCitationMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_CITATION_RTF, new OldCommandWrapper(Actions.COPY_CITATION_RTF, panel)));
+            copyCitationMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_CITATION_ASCII_DOC, new OldCommandWrapper(Actions.COPY_CITATION_ASCII_DOC, panel)));
+            copyCitationMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_CITATION_XSLFO, new OldCommandWrapper(Actions.COPY_CITATION_XSLFO, panel)));
             copySpecialMenu.getItems().add(copyCitationMenu);
         } else {
-            copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new OldCommandWrapper(Actions.COPY_CITATION_HTML, panel)));
+            copySpecialMenu.getItems().add(factory.createMenuItem(ActionsFX.COPY_CITATION_PREVIEW, new OldCommandWrapper(Actions.COPY_CITATION_HTML, panel)));
         }
 
-        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.EXPORT_TO_CLIPBOARD, new OldCommandWrapper(Actions.EXPORT_TO_CLIPBOARD, panel)));
+        copySpecialMenu.getItems().add(factory.createMenuItem(ActionsFX.EXPORT_TO_CLIPBOARD, new OldCommandWrapper(Actions.EXPORT_TO_CLIPBOARD, panel)));
         return copySpecialMenu;
     }
 

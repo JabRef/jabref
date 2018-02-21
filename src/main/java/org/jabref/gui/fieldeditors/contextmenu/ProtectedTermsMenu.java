@@ -1,8 +1,5 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.swing.SwingUtilities;
 
 import javafx.scene.control.Menu;
@@ -16,12 +13,10 @@ import org.jabref.gui.protectedterms.NewProtectedTermsFileDialog;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
-import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.model.cleanup.Formatter;
 
 class ProtectedTermsMenu extends Menu {
 
-    private static final Formatter FORMATTER = new ProtectTermsFormatter(Globals.protectedTermsLoader);
+    private static final ProtectTermsFormatter FORMATTER = new ProtectTermsFormatter(Globals.protectedTermsLoader);
     private final Menu externalFiles;
     private final TextArea opener;
 
@@ -50,32 +45,30 @@ class ProtectedTermsMenu extends Menu {
 
     private void updateFiles() {
         externalFiles.getItems().clear();
-        ProtectedTermsLoader loader = Globals.protectedTermsLoader;
-        List<ProtectedTermsList> nonInternal = loader.getProtectedTermsLists().stream()
-                .filter(list -> !list.isInternalList())
-                .collect(Collectors.toList());
-        for (ProtectedTermsList list : nonInternal) {
-            MenuItem fileItem = new MenuItem(list.getDescription());
-            fileItem.setOnAction(event -> {
-                String selectedText = opener.getSelectedText();
-                if ((selectedText != null) && !selectedText.isEmpty()) {
-                    list.addProtectedTerm(selectedText);
-                }
-            });
-            externalFiles.getItems().add(fileItem);
+        for (ProtectedTermsList list : Globals.protectedTermsLoader.getProtectedTermsLists()) {
+            if (!list.isInternalList()) {
+                MenuItem fileItem = new MenuItem(list.getDescription());
+                fileItem.setOnAction(event -> {
+                    String selectedText = opener.getSelectedText();
+                    if ((selectedText != null) && !selectedText.isEmpty()) {
+                        list.addProtectedTerm(selectedText);
+                    }
+                });
+                externalFiles.getItems().add(fileItem);
+            }
         }
         externalFiles.getItems().add(new SeparatorMenuItem());
         MenuItem addToNewFileItem = new MenuItem(Localization.lang("New") + "...");
         addToNewFileItem.setOnAction(event -> {
             NewProtectedTermsFileDialog dialog = new NewProtectedTermsFileDialog(JabRefGUI.getMainFrame(),
-                    loader);
+                    Globals.protectedTermsLoader);
 
             SwingUtilities.invokeLater(() -> {
                 dialog.setVisible(true);
 
                 if (dialog.isOKPressed()) {
                     // Update preferences with new list
-                    Globals.prefs.setProtectedTermsPreferences(loader);
+                    Globals.prefs.setProtectedTermsPreferences(Globals.protectedTermsLoader);
                     this.updateFiles();
                 }
             });

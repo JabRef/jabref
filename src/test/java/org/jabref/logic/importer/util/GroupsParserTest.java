@@ -20,16 +20,15 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertEquals;
 
 public class GroupsParserTest {
     private FileUpdateMonitor fileMonitor;
 
-    @BeforeEach
+    @Before
     public void setUp() throws Exception {
         fileMonitor = new DummyFileUpdateMonitor();
     }
@@ -43,23 +42,9 @@ public class GroupsParserTest {
         assertEquals(expected, parsed);
     }
 
-    @Test
-    public void KeywordDelimiterThatNeedsToBeEscaped() throws Exception {
-        AutomaticGroup expected = new AutomaticKeywordGroup("group1", GroupHierarchyType.INDEPENDENT, "keywords", ';', '>');
-        AbstractGroup parsed = GroupsParser.fromString("AutomaticKeywordGroup:group1;0;keywords;\\;;>;1;;;;;", ';', fileMonitor);
-        assertEquals(expected, parsed);
-    }
-
-    @Test
-    public void HierarchicalDelimiterThatNeedsToBeEscaped() throws Exception {
-        AutomaticGroup expected = new AutomaticKeywordGroup("group1", GroupHierarchyType.INDEPENDENT, "keywords", ',', ';');
-        AbstractGroup parsed = GroupsParser.fromString("AutomaticKeywordGroup:group1;0;keywords;,;\\;;1;;;;;", ';', fileMonitor);
-        assertEquals(expected, parsed);
-    }
-
-    @Test
+    @Test(expected = ParseException.class)
     public void fromStringThrowsParseExceptionForNotEscapedGroupName() throws Exception {
-        assertThrows(ParseException.class, () -> GroupsParser.fromString("ExplicitGroup:slit\\\\;0\\;mertsch_slit2_2007\\;;", ',', fileMonitor));
+        GroupsParser.fromString("ExplicitGroup:slit\\\\;0\\;mertsch_slit2_2007\\;;", ',', fileMonitor);
     }
 
     @Test
@@ -123,8 +108,8 @@ public class GroupsParserTest {
         assertEquals(expected, parsed);
     }
 
-    @Test
+    @Test(expected = ParseException.class)
     public void fromStringUnknownGroupThrowsException() throws Exception {
-        assertThrows(ParseException.class, () -> GroupsParser.fromString("0 UnknownGroup:myUnknownGroup;0;;1;;;;", ',', fileMonitor));
+        GroupsParser.fromString("0 UnknownGroup:myUnknownGroup;0;;1;;;;", ',', fileMonitor);
     }
 }

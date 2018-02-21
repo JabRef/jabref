@@ -10,45 +10,47 @@ import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
-/**
- * The type mapping between BibTeXML and BibTeX is actually an identity mapping. The purpose of this class is to ensure
- * that all BibTeXML types are tested.
- */
+@RunWith(Parameterized.class)
 public class BibTeXMLImporterTestTypes {
 
-    public static Collection<String> types() {
-        return Arrays.asList(new String[]{
-                "article",
-                "book",
-                "booklet",
-                "conference",
-                "inbook",
-                "incollection",
-                "inproceedings",
-                "manual",
-                "mastersthesis",
-                "misc",
-                "phdthesis",
-                "techreport",
-                "unpublished"
-        });
+    private BibTeXMLImporter bibteXMLImporter;
+
+    @Parameter(value = 0)
+    public String bibteXMLType;
+
+    @Parameter(value = 1)
+    public String expectedBibType;
+
+
+    @Parameters
+    public static Collection<String[]> types() {
+        return Arrays.asList(new String[][] {{"journal", "article"}, {"book section", "inbook"}, {"book", "book"},
+                {"conference", "inproceedings"}, {"proceedings", "inproceedings"}, {"report", "techreport"},
+                {"master thesis", "mastersthesis"}, {"thesis", "phdthesis"}, {"master", "misc"}});
     }
 
+    @Before
+    public void setUp() throws Exception {
+        bibteXMLImporter = new BibTeXMLImporter();
+    }
 
-    @ParameterizedTest
-    @MethodSource("types")
-    public void importConvertsToCorrectBibType(String type) throws IOException {
+    @Test
+    public void importConvertsToCorrectBibType() throws IOException {
         String bibteXMLInput = "<?xml version=\"1.0\" ?>\n" + "<bibtex:file xmlns:bibtex=\"http://bibtexml.sf.net/\">\n"
-                + "<bibtex:entry>\n" + "<bibtex:" + type + ">\n"
+                + "<bibtex:entry>\n" + "<bibtex:" + expectedBibType + ">\n"
                 + "<bibtex:author>Max Mustermann</bibtex:author>\n" + "<bibtex:keywords>java</bibtex:keywords>\n"
                 + "<bibtex:title>Java tricks</bibtex:title>\n" + "<bibtex:year>2016</bibtex:year>\n" + "</bibtex:"
-                + type + ">\n" + "</bibtex:entry>\n" + "</bibtex:file>";
+                + expectedBibType + ">\n" + "</bibtex:entry>\n" + "</bibtex:file>";
 
-        List<BibEntry> bibEntries = new BibTeXMLImporter().importDatabase(new BufferedReader(new StringReader(bibteXMLInput)))
+        List<BibEntry> bibEntries = bibteXMLImporter.importDatabase(new BufferedReader(new StringReader(bibteXMLInput)))
                 .getDatabase().getEntries();
 
         BibEntry entry = new BibEntry();
@@ -56,8 +58,8 @@ public class BibTeXMLImporterTestTypes {
         entry.setField("keywords", "java");
         entry.setField("title", "Java tricks");
         entry.setField("year", "2016");
-        entry.setType(type);
+        entry.setType(expectedBibType);
 
-        Assertions.assertEquals(Collections.singletonList(entry), bibEntries);
+        Assert.assertEquals(Collections.singletonList(entry), bibEntries);
     }
 }

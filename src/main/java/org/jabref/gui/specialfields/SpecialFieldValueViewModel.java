@@ -7,23 +7,23 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import org.jabref.gui.JabRefIcon;
-import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.Actions;
-import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.actions.ActionsFX;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
 
 public class SpecialFieldValueViewModel {
 
+    public SpecialFieldValue getValue() {
+        return value;
+    }
+
     private final SpecialFieldValue value;
 
     public SpecialFieldValueViewModel(SpecialFieldValue value) {
         Objects.requireNonNull(value);
-        this.value = value;
-    }
 
-    public SpecialFieldValue getValue() {
-        return value;
+        this.value = value;
     }
 
     public Icon getSpecialFieldValueIcon() {
@@ -123,40 +123,40 @@ public class SpecialFieldValueViewModel {
         }
     }
 
-    public Action getAction() {
+    public ActionsFX getAction() {
         switch (value) {
             case PRINTED:
-                return StandardActions.TOGGLE_PRINTED;
+                return ActionsFX.TOGGLE_PRINTED;
             case CLEAR_PRIORITY:
-                return StandardActions.CLEAR_PRIORITY;
+                return ActionsFX.CLEAR_PRIORITY;
             case PRIORITY_HIGH:
-                return StandardActions.PRIORITY_HIGH;
+                return ActionsFX.PRIORITY_HIGH;
             case PRIORITY_MEDIUM:
-                return StandardActions.PRIORITY_MEDIUM;
+                return ActionsFX.PRIORITY_MEDIUM;
             case PRIORITY_LOW:
-                return StandardActions.PRIORITY_LOW;
+                return ActionsFX.PRIORITY_LOW;
             case QUALITY_ASSURED:
-                return StandardActions.QUALITY_ASSURED;
+                return ActionsFX.QUALITY_ASSURED;
             case CLEAR_RANK:
-                return StandardActions.CLEAR_RANK;
+                return ActionsFX.CLEAR_RANK;
             case RANK_1:
-                return StandardActions.RANK_1;
+                return ActionsFX.RANK_1;
             case RANK_2:
-                return StandardActions.RANK_2;
+                return ActionsFX.RANK_2;
             case RANK_3:
-                return StandardActions.RANK_3;
+                return ActionsFX.RANK_3;
             case RANK_4:
-                return StandardActions.RANK_4;
+                return ActionsFX.RANK_4;
             case RANK_5:
-                return StandardActions.RANK_5;
+                return ActionsFX.RANK_5;
             case CLEAR_READ_STATUS:
-                return StandardActions.CLEAR_READ_STATUS;
+                return ActionsFX.CLEAR_READ_STATUS;
             case READ:
-                return StandardActions.READ;
+                return ActionsFX.READ;
             case SKIMMED:
-                return StandardActions.SKIMMED;
+                return ActionsFX.SKIMMED;
             case RELEVANT:
-                return StandardActions.RELEVANT;
+                return ActionsFX.RELEVANT;
             default:
                 throw new IllegalArgumentException("There is no tooltip localization for special field value " + value);
         }

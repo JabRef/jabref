@@ -5,10 +5,10 @@ import java.util.Optional;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 public class KeyChangeListenerTest {
 
@@ -19,7 +19,7 @@ public class KeyChangeListenerTest {
     private BibEntry entry4;
 
 
-    @BeforeEach
+    @Before
     public void setUp() {
         db = new BibDatabase();
 

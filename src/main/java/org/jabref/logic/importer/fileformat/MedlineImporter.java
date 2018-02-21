@@ -93,7 +93,6 @@ public class MedlineImporter extends Importer implements Parser {
     private static final String KEYWORD_SEPARATOR = "; ";
 
     private static final Locale ENGLISH = Locale.ENGLISH;
-    private Unmarshaller unmarshaller;
 
     private static String join(List<String> list, String string) {
         return Joiner.on(string).join(list);
@@ -142,7 +141,17 @@ public class MedlineImporter extends Importer implements Parser {
         List<BibEntry> bibItems = new ArrayList<>();
 
         try {
-            Object unmarshalledObject = unmarshallRoot(reader);
+            JAXBContext context = JAXBContext.newInstance("org.jabref.logic.importer.fileformat.medline");
+            XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
+
+            //go to the root element
+            while (!xmlStreamReader.isStartElement()) {
+                xmlStreamReader.next();
+            }
+
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            Object unmarshalledObject = unmarshaller.unmarshal(xmlStreamReader);
 
             //check whether we have an article set, an article, a book article or a book article set
             if (unmarshalledObject instanceof PubmedArticleSet) {
@@ -174,28 +183,6 @@ public class MedlineImporter extends Importer implements Parser {
             return ParserResult.fromError(e);
         }
         return new ParserResult(bibItems);
-    }
-
-    private Object unmarshallRoot(BufferedReader reader) throws JAXBException, XMLStreamException {
-        initUmarshaller();
-
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
-        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
-
-        //go to the root element
-        while (!xmlStreamReader.isStartElement()) {
-            xmlStreamReader.next();
-        }
-
-        return unmarshaller.unmarshal(xmlStreamReader);
-    }
-
-    private void initUmarshaller() throws JAXBException {
-        if (unmarshaller == null) {
-            // Lazy init because this is expensive
-            JAXBContext context = JAXBContext.newInstance("org.jabref.logic.importer.fileformat.medline");
-            unmarshaller = context.createUnmarshaller();
-        }
     }
 
     private void parseBookArticle(PubmedBookArticle currentArticle, List<BibEntry> bibItems) {

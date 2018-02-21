@@ -93,7 +93,7 @@ public class MergeEntriesDialog extends JabRefDialog {
             // Remove the other two entries and add them to the undo stack (which is not working...)
             BibEntry mergedEntry = mergeEntries.getMergeEntry();
             panel.insertEntry(mergedEntry);
-            ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), mergedEntry));
+            ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), mergedEntry, panel));
             ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), one, panel));
             panel.getDatabase().removeEntry(one);
             ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), two, panel));

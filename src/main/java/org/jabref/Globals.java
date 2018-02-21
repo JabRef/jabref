@@ -4,7 +4,6 @@ import java.awt.Toolkit;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.GlobalFocusListener;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -50,9 +49,6 @@ public class Globals {
     /**
      * Manager for the state of the GUI.
      */
-
-    public static ClipBoardManager clipboardManager = new ClipBoardManager();
-
     public static StateManager stateManager = new StateManager();
     public static ExporterFactory exportFactory;
     // Key binding preferences
@@ -72,6 +68,7 @@ public class Globals {
         }
         return keyBindingRepository;
     }
+
 
     // Background tasks
     public static void startBackgroundTasks() {

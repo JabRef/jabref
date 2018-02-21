@@ -1,9 +1,8 @@
 package org.jabref.logic.l10n;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertEquals;
 
 public class LocalizationKeyParamsTest {
 
@@ -16,9 +15,9 @@ public class LocalizationKeyParamsTest {
         assertEquals("What \n : %e %c_a b", new LocalizationKeyParams("What \n : %e %c_%0 %1", "a", "b").replacePlaceholders());
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testTooManyParams() {
-        assertThrows(IllegalStateException.class, () -> new LocalizationKeyParams("", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"));
+        new LocalizationKeyParams("", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
     }
 
 }

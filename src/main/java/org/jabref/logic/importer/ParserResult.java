@@ -19,6 +19,7 @@ import org.jabref.model.entry.EntryType;
 import org.jabref.model.metadata.MetaData;
 
 public class ParserResult {
+
     private final Map<String, EntryType> entryTypes;
     private final List<String> warnings = new ArrayList<>();
     private final List<String> duplicateKeys = new ArrayList<>();
@@ -27,7 +28,6 @@ public class ParserResult {
     private File file;
     private boolean invalid;
     private boolean toOpenTab;
-    private boolean changedOnMigration = false;
 
     public ParserResult() {
         this(Collections.emptyList());
@@ -179,13 +179,5 @@ public class ParserResult {
 
     public boolean isEmpty() {
         return this == new ParserResult();
-    }
-
-    public boolean wasChangedOnMigration() {
-        return changedOnMigration;
-    }
-
-    public void setChangedOnMigration(boolean wasChangedOnMigration) {
-        this.changedOnMigration = wasChangedOnMigration;
     }
 }

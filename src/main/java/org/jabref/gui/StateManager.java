@@ -37,7 +37,12 @@ public class StateManager {
     private final ReadOnlyListWrapper<GroupTreeNode> activeGroups = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<BibDatabaseContext, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
+
     private final ObjectProperty<Optional<SearchQuery>> activeSearchQuery = new SimpleObjectProperty<>(Optional.empty());
+
+    public ObjectProperty<Optional<SearchQuery>> activeSearchQueryProperty() {
+        return activeSearchQuery;
+    }
 
     public StateManager() {
         MonadicBinding<BibDatabaseContext> currentDatabase = EasyBind.map(activeDatabase, database -> database.orElse(null));
@@ -46,10 +51,6 @@ public class StateManager {
 
     public ObjectProperty<Optional<BibDatabaseContext>> activeDatabaseProperty() {
         return activeDatabase;
-    }
-
-    public ObjectProperty<Optional<SearchQuery>> activeSearchQueryProperty() {
-        return activeSearchQuery;
     }
 
     public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {

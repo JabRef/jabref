@@ -10,14 +10,15 @@ import java.util.List;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.mockito.Answers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,7 +32,7 @@ public class StyleLoaderTest {
     private Charset encoding;
 
 
-    @BeforeEach
+    @Before
     public void setUp() {
         preferences = mock(OpenOfficePreferences.class, Answers.RETURNS_DEEP_STUBS);
         layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -39,20 +40,22 @@ public class StyleLoaderTest {
 
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void throwNPEWithNullPreferences() {
-        assertThrows(NullPointerException.class, () -> loader = new StyleLoader(null, layoutPreferences, mock(Charset.class)));
-
+        loader = new StyleLoader(null, layoutPreferences, mock(Charset.class));
+        fail();
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void throwNPEWithNullLayoutPreferences() {
-        assertThrows(NullPointerException.class, () -> loader = new StyleLoader(mock(OpenOfficePreferences.class), null, mock(Charset.class)));
+        loader = new StyleLoader(mock(OpenOfficePreferences.class), null, mock(Charset.class));
+        fail();
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void throwNPEWithNullCharset() {
-        assertThrows(NullPointerException.class, () -> loader = new StyleLoader(mock(OpenOfficePreferences.class), layoutPreferences, null));
+        loader = new StyleLoader(mock(OpenOfficePreferences.class), layoutPreferences, null);
+        fail();
     }
 
     @Test
@@ -122,6 +125,7 @@ public class StyleLoaderTest {
     }
 
     @Test
+    @Ignore("This tests the preferences that are mocked away")
     public void testInitalizeWithOneExternalFileRemoveStyleUpdatesPreferences() throws URISyntaxException {
         String filename = Paths.get(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                 .toFile().getPath();
@@ -138,8 +142,7 @@ public class StyleLoaderTest {
         for (OOBibStyle style : toremove) {
             assertTrue(loader.removeStyle(style));
         }
-        //As the prefs are mocked away, the getExternalStyles still returns the initial one
-        assertFalse(preferences.getExternalStyles().isEmpty());
+        assertTrue(preferences.getExternalStyles().isEmpty());
     }
 
     @Test
@@ -154,11 +157,11 @@ public class StyleLoaderTest {
         assertEquals(beforeAdding + 1, loader.getStyles().size());
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testAddNullStyleThrowsNPE() {
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
-        assertThrows(NullPointerException.class, () -> loader.addStyleIfValid(null));
-
+        loader.addStyleIfValid(null);
+        fail();
     }
 
     @Test
@@ -183,12 +186,14 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void testGetDefaultUsedStyleWhenIncorrect() {
+    @Ignore("This tests the preferences that are mocked away")
+    public void testGtDefaultUsedStyleWhenIncorrect() {
         when(preferences.getCurrentStyle()).thenReturn("ljlkjlkjnljnvdlsjniuhwelfhuewfhlkuewhfuwhelu");
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         OOBibStyle style = loader.getUsedStyle();
         assertTrue(style.isValid());
         assertEquals(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, style.getPath());
+        assertEquals(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, preferences.getCurrentStyle());
     }
 
     @Test

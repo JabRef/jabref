@@ -16,5 +16,4 @@ public class SearchTextField {
         textField.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
         return textField;
     }
-
 }

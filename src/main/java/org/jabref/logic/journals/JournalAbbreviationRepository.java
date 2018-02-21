@@ -60,9 +60,11 @@ public class JournalAbbreviationRepository {
     public void addEntry(Abbreviation abbreviation) {
         Objects.requireNonNull(abbreviation);
 
-        // Abbreviation equality is tested on name only, so we might have to remove an old abbreviation
         if (abbreviations.contains(abbreviation)) {
-            abbreviations.remove(abbreviation);
+            Abbreviation previous = getAbbreviation(abbreviation.getName()).get();
+            abbreviations.remove(previous);
+            LOGGER.info("Duplicate journal abbreviation - old one will be overwritten by new one\nOLD: "
+                    + previous + "\nNEW: " + abbreviation);
         }
 
         abbreviations.add(abbreviation);

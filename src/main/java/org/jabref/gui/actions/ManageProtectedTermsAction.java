@@ -15,7 +15,7 @@ public class ManageProtectedTermsAction extends SimpleCommand {
     }
     @Override
     public void execute() {
-        ProtectedTermsDialog protectTermsDialog = new ProtectedTermsDialog(jabRefFrame);
+        ProtectedTermsDialog protectTermsDialog = new ProtectedTermsDialog(jabRefFrame, termsLoader);
         protectTermsDialog.setVisible(true);
 
     }

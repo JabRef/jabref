@@ -26,10 +26,10 @@ import static org.junit.Assert.assertFalse;
 @RunWith(Parameterized.class)
 public class EntryTypesTest {
 
-    private final BibDatabaseMode mode;
-    private final BibDatabaseMode otherMode;
-    private final EntryType standardArticleType;
-    private final EntryType defaultType;
+    private BibDatabaseMode mode;
+    private BibDatabaseMode otherMode;
+    private EntryType standardArticleType;
+    private EntryType defaultType;
 
     private CustomEntryType newCustomType;
     private CustomEntryType overwrittenStandardType;
@@ -43,7 +43,7 @@ public class EntryTypesTest {
 
     @Parameterized.Parameters
     public static Object[] data() {
-        return new Object[] {BibDatabaseMode.BIBTEX, BibDatabaseMode.BIBLATEX};
+        return new Object[] { BibDatabaseMode.BIBTEX, BibDatabaseMode.BIBLATEX };
     }
 
     @Before

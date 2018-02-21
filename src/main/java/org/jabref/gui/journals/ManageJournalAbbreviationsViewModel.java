@@ -54,7 +54,6 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationPreferences abbreviationsPreferences;
     private final JournalAbbreviationLoader journalAbbreviationLoader;
-    private boolean shouldWriteLists = false;
 
     public ManageJournalAbbreviationsViewModel(PreferencesService preferences, DialogService dialogService, TaskExecutor taskExecutor, JournalAbbreviationLoader journalAbbreviationLoader) {
         this.preferences = Objects.requireNonNull(preferences);
@@ -235,7 +234,6 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         } else {
             abbreviations.add(abbreviationViewModel);
             currentAbbreviation.set(abbreviationViewModel);
-            shouldWriteLists = true;
         }
     }
 
@@ -276,7 +274,6 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         }
         currentAbbreviation.get().setName(name);
         currentAbbreviation.get().setAbbreviation(abbreviation);
-        shouldWriteLists = true;
     }
 
     /**
@@ -297,7 +294,6 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
                     currentAbbreviation.set(null);
                 }
                 abbreviations.remove(index);
-                shouldWriteLists = true;
             }
         }
     }
@@ -351,11 +347,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      */
     public void saveEverythingAndUpdateAutoCompleter() {
         saveExternalFilesList();
-
-        if (shouldWriteLists) {
-            saveJournalAbbreviationFiles();
-            shouldWriteLists = false;
-        }
+        saveJournalAbbreviationFiles();
 
         // Update journal abbreviation loader
         journalAbbreviationLoader.update(abbreviationsPreferences);

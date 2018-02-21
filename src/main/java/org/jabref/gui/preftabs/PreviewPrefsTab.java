@@ -25,7 +25,6 @@ import javafx.scene.Scene;
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.logic.citationstyle.CitationStyle;
@@ -122,7 +121,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
         btnTest.addActionListener(event -> {
             try {
-                PreviewPanel testPane = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), new FXDialogService());
+                PreviewPanel testPane = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences());
                 testPane.setFixedLayout(layout.getText());
                 testPane.setEntry(TestEntry.getTestEntry());
                 JFXPanel container = CustomJFXPanel.wrap(new Scene(testPane));

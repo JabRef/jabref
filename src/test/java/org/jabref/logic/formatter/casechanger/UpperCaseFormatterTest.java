@@ -1,9 +1,8 @@
 package org.jabref.logic.formatter.casechanger;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 
 /**
@@ -13,22 +12,22 @@ public class UpperCaseFormatterTest {
 
     private UpperCaseFormatter formatter;
 
-    @BeforeEach
+    @Before
     public void setUp() {
         formatter = new UpperCaseFormatter();
     }
 
     @Test
     public void test() {
-        assertEquals("LOWER", formatter.format("LOWER"));
-        assertEquals("UPPER", formatter.format("upper"));
-        assertEquals("UPPER", formatter.format("UPPER"));
-        assertEquals("UPPER {lower}", formatter.format("upper {lower}"));
-        assertEquals("UPPER {l}OWER", formatter.format("upper {l}ower"));
+        Assert.assertEquals("LOWER", formatter.format("LOWER"));
+        Assert.assertEquals("UPPER", formatter.format("upper"));
+        Assert.assertEquals("UPPER", formatter.format("UPPER"));
+        Assert.assertEquals("UPPER {lower}", formatter.format("upper {lower}"));
+        Assert.assertEquals("UPPER {l}OWER", formatter.format("upper {l}ower"));
     }
 
     @Test
     public void formatExample() {
-        assertEquals("KDE {Amarok}", formatter.format(formatter.getExampleInput()));
+        Assert.assertEquals("KDE {Amarok}", formatter.format(formatter.getExampleInput()));
     }
 }

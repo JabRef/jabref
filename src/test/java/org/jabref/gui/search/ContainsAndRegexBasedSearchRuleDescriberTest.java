@@ -9,9 +9,9 @@ import javafx.scene.text.TextFlow;
 import org.jabref.gui.search.rules.describer.ContainsAndRegexBasedSearchRuleDescriber;
 import org.jabref.gui.util.TooltipTextUtil;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 public class ContainsAndRegexBasedSearchRuleDescriberTest {
 

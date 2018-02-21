@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.logic.xmp.XMPPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Before;
@@ -42,7 +42,7 @@ public class ImportFormatReaderIntegrationTest {
         reader = new ImportFormatReader();
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
-        reader.resetImportFormats(importFormatPreferences, mock(XmpPreferences.class), new DummyFileUpdateMonitor());
+        reader.resetImportFormats(importFormatPreferences, mock(XMPPreferences.class), new DummyFileUpdateMonitor());
     }
 
     @Test

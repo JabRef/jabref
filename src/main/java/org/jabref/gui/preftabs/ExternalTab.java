@@ -20,7 +20,7 @@ import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.ExternalFileTypeEditor;
 import org.jabref.gui.push.PushToApplication;
-import org.jabref.gui.push.PushToApplicationSettingsDialog;
+import org.jabref.gui.push.PushToApplicationButton;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
@@ -201,8 +201,9 @@ class ExternalTab extends JPanel implements PrefsTab {
     }
 
     private void addSettingsButton(final PushToApplication pt, JPanel p) {
-        JButton button = new JButton(Localization.lang("Settings for %0", pt.getApplicationName()), pt.getIcon().getIcon());
-        button.addActionListener(e -> PushToApplicationSettingsDialog.showSettingsDialog(null, pt, pt.getSettingsPanel()));
+        JButton button = new JButton(Localization.lang("Settings for %0", pt.getApplicationName()),
+                pt.getIcon());
+        button.addActionListener(e -> PushToApplicationButton.showSettingsDialog(null, pt, pt.getSettingsPanel()));
         p.add(button);
     }
 

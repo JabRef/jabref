@@ -9,11 +9,11 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 public class RegExpBasedFileFinderTests {
 
@@ -21,7 +21,7 @@ public class RegExpBasedFileFinderTests {
     private BibDatabase database;
     private BibEntry entry;
 
-    @BeforeEach
+    @Before
     public void setUp() {
 
         entry = new BibEntry();
@@ -137,7 +137,7 @@ public class RegExpBasedFileFinderTests {
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
 
         //then
-        assertTrue(result.isEmpty());
+        Assert.assertTrue(result.isEmpty());
     }
 
     @Test

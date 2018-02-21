@@ -25,10 +25,8 @@ import javax.swing.UIManager;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.logic.cleanup.Cleanups;
-import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
@@ -56,14 +54,11 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     private JButton recommendButton;
 
     private final FieldFormatterCleanups defaultFormatters;
-    private List<Formatter> availableFormatters;
 
 
     public FieldFormatterCleanupsPanel(String description, FieldFormatterCleanups defaultFormatters) {
         this.defaultFormatters = Objects.requireNonNull(defaultFormatters);
         cleanupEnabled = new JCheckBox(description);
-        availableFormatters = Cleanups.getBuiltInFormatters();
-        availableFormatters.add(new ProtectTermsFormatter(Globals.protectedTermsLoader));
     }
 
     public void setValues(MetaData metaData) {
@@ -223,9 +218,9 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         selectFieldCombobox.setEditable(true);
         builder.add(selectFieldCombobox).xy(1, 1);
 
-        List<String> formatterNames = availableFormatters.stream()
+        List<String> formatterNames = Cleanups.getAvailableFormatters().stream()
                 .map(Formatter::getName).collect(Collectors.toList());
-        List<String> formatterDescriptions = availableFormatters.stream()
+        List<String> formatterDescriptions = Cleanups.getAvailableFormatters().stream()
                 .map(Formatter::getDescription).collect(Collectors.toList());
         formattersCombobox = new JComboBox<>(formatterNames.toArray());
         formattersCombobox.setRenderer(new DefaultListCellRenderer() {
@@ -296,7 +291,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     private Formatter getFieldFormatter() {
         Formatter selectedFormatter = null;
         String selectedFormatterName = formattersCombobox.getSelectedItem().toString();
-        for (Formatter formatter : availableFormatters) {
+        for (Formatter formatter : Cleanups.getAvailableFormatters()) {
             if (formatter.getName().equals(selectedFormatterName)) {
                 selectedFormatter = formatter;
                 break;

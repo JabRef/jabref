@@ -17,7 +17,6 @@ import static org.mockito.Mockito.mock;
 
 class FulltextFetcherTest {
 
-    @SuppressWarnings("unused")
     private static List<FulltextFetcher> fetcherProvider() {
         return WebFetchers.getFullTextFetchers(mock(ImportFormatPreferences.class));
     }

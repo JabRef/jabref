@@ -25,7 +25,6 @@ import javax.swing.ImageIcon;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -213,7 +212,6 @@ public class IconTheme {
         REFRESH(MaterialDesignIcon.REFRESH),
         DELETE_ENTRY(MaterialDesignIcon.DELETE),
         SEARCH(MaterialDesignIcon.MAGNIFY),
-        ADVANCED_SEARCH(Color.CYAN, MaterialDesignIcon.MAGNIFY),
         PREFERENCES(MaterialDesignIcon.SETTINGS),
         HELP(MaterialDesignIcon.HELP_CIRCLE),
         UP(MaterialDesignIcon.CHEVRON_UP),
@@ -274,12 +272,6 @@ public class IconTheme {
         FILE_TEXT(MaterialDesignIcon.FILE_DOCUMENT), /*css: file-document */
         FILE_MULTIPLE(MaterialDesignIcon.FILE_MULTIPLE), /*css: file-multiple */
         FILE_OPENOFFICE(IconTheme.getImage("openoffice")),
-        APPLICATION_EMACS(IconTheme.getImage("emacs")),
-        APPLICATION_LYX(IconTheme.getImage("lyx")),
-        APPLICATION_TEXSTUDIO(IconTheme.getImage("texstudio")),
-        APPLICATION_TEXMAKER(IconTheme.getImage("texmaker")),
-        APPLICATION_VIM(IconTheme.getImage("vim")),
-        APPLICATION_WINEDT(IconTheme.getImage("winedt")),
         KEY_BINDINGS(MaterialDesignIcon.KEYBOARD), /*css: keyboard */
         FIND_DUPLICATES(MaterialDesignIcon.CODE_EQUAL), /*css: code-equal */
         PULL(MaterialDesignIcon.SOURCE_PULL), /*source-pull*/
@@ -368,13 +360,6 @@ public class IconTheme {
 
         public Button asButton() {
             Button button = new Button();
-            button.setGraphic(getGraphicNode());
-            button.getStyleClass().add("flatButton");
-            return button;
-        }
-
-        public ToggleButton asToggleButton() {
-            ToggleButton button = new ToggleButton();
             button.setGraphic(getGraphicNode());
             button.getStyleClass().add("flatButton");
             return button;

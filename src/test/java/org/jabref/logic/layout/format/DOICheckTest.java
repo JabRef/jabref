@@ -2,8 +2,8 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class DOICheckTest {
 
@@ -11,28 +11,28 @@ public class DOICheckTest {
     public void testFormat() {
         LayoutFormatter lf = new DOICheck();
 
-        assertEquals("", lf.format(""));
-        assertEquals(null, lf.format(null));
+        Assert.assertEquals("", lf.format(""));
+        Assert.assertEquals(null, lf.format(null));
 
-        assertEquals("https://doi.org/10.1000/ISBN1-900512-44-0", lf.format("10.1000/ISBN1-900512-44-0"));
-        assertEquals("https://doi.org/10.1000/ISBN1-900512-44-0",
+        Assert.assertEquals("https://doi.org/10.1000/ISBN1-900512-44-0", lf.format("10.1000/ISBN1-900512-44-0"));
+        Assert.assertEquals("https://doi.org/10.1000/ISBN1-900512-44-0",
                 lf.format("http://dx.doi.org/10.1000/ISBN1-900512-44-0"));
 
-        assertEquals("https://doi.org/10.1000/ISBN1-900512-44-0",
+        Assert.assertEquals("https://doi.org/10.1000/ISBN1-900512-44-0",
                 lf.format("http://doi.acm.org/10.1000/ISBN1-900512-44-0"));
 
-        assertEquals("https://doi.org/10.1145/354401.354407",
+        Assert.assertEquals("https://doi.org/10.1145/354401.354407",
                 lf.format("http://doi.acm.org/10.1145/354401.354407"));
-        assertEquals("https://doi.org/10.1145/354401.354407", lf.format("10.1145/354401.354407"));
+        Assert.assertEquals("https://doi.org/10.1145/354401.354407", lf.format("10.1145/354401.354407"));
 
         // Works even when having a / at the front
-        assertEquals("https://doi.org/10.1145/354401.354407", lf.format("/10.1145/354401.354407"));
+        Assert.assertEquals("https://doi.org/10.1145/354401.354407", lf.format("/10.1145/354401.354407"));
 
         // Obviously a wrong doi, will not change anything.
-        assertEquals("10", lf.format("10"));
+        Assert.assertEquals("10", lf.format("10"));
 
         // Obviously a wrong doi, will not change anything.
-        assertEquals("1", lf.format("1"));
+        Assert.assertEquals("1", lf.format("1"));
     }
 
 }

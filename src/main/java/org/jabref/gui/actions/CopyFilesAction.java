@@ -10,6 +10,7 @@ import javafx.concurrent.Task;
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.copyfiles.CopyFilesDialogView;
 import org.jabref.gui.copyfiles.CopyFilesResultItemViewModel;
@@ -22,24 +23,21 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class CopyFilesAction extends SimpleCommand {
 
-    private final DialogService dialogService;
+    private final DialogService dialogService = new FXDialogService();
     private BibDatabaseContext databaseContext;
     private List<BibEntry> entries;
     private final JabRefFrame frame;
-
     public CopyFilesAction(JabRefFrame frame) {
         this.frame = frame;
-        this.dialogService = frame.getDialogService();
     }
+
 
     private void startServiceAndshowProgessDialog(Task<List<CopyFilesResultItemViewModel>> exportService) {
 
         dialogService.showCanceableProgressDialogAndWait(exportService);
 
-        exportService.run();
-        exportService.setOnSucceeded((e) -> {
-            showDialog(exportService.getValue());
-        });
+        exportService.run(); //Run kinda blocks, so we just show the result dialog wgeb run is ready
+        showDialog(exportService.getValue());
     }
 
     private void showDialog(List<CopyFilesResultItemViewModel> data) {

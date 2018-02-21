@@ -5,11 +5,11 @@ import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 public class EntryLinkListTest {
 
@@ -21,7 +21,7 @@ public class EntryLinkListTest {
     private BibEntry source;
     private BibEntry target;
 
-    @BeforeEach
+    @Before
     public void before() {
         database = new BibDatabase();
         links = EntryLinkList.parse(key, database);

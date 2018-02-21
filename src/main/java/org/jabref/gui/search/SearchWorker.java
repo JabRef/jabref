@@ -10,7 +10,6 @@ import javax.swing.SwingWorker;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -63,10 +62,9 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
     private void updateUIWithSearchResult(List<BibEntry> matchedEntries) {
         GlobalSearchBar globalSearchBar = JabRefGUI.getMainFrame().getGlobalSearchBar();
 
-        DefaultTaskExecutor.runInJavaFXThread(() ->
-                globalSearchBar.updateResults(matchedEntries.size(),
-                        SearchDescribers.getSearchDescriberFor(searchQuery).getDescription(),
-                        searchQuery.isGrammarBasedSearch()));
+        globalSearchBar.updateResults(matchedEntries.size(),
+                SearchDescribers.getSearchDescriberFor(searchQuery).getDescription(),
+                searchQuery.isGrammarBasedSearch());
         globalSearchBar.getSearchQueryHighlightObservable().fireSearchlistenerEvent(searchQuery);
     }
 

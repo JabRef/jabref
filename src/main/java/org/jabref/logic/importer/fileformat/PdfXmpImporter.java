@@ -10,19 +10,18 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
-import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.logic.xmp.XmpUtilReader;
-import org.jabref.logic.xmp.XmpUtilShared;
+import org.jabref.logic.xmp.XMPPreferences;
+import org.jabref.logic.xmp.XMPUtil;
 
 /**
  * Wraps the XMPUtility function to be used as an Importer.
  */
 public class PdfXmpImporter extends Importer {
 
-    private final XmpPreferences xmpPreferences;
+    private final XMPPreferences xmpPreferences;
 
 
-    public PdfXmpImporter(XmpPreferences xmpPreferences) {
+    public PdfXmpImporter(XMPPreferences xmpPreferences) {
         this.xmpPreferences = xmpPreferences;
     }
 
@@ -56,7 +55,7 @@ public class PdfXmpImporter extends Importer {
     public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
         Objects.requireNonNull(filePath);
         try {
-            return new ParserResult(XmpUtilReader.readXmp(filePath, xmpPreferences));
+            return new ParserResult(XMPUtil.readXMP(filePath, xmpPreferences));
         } catch (IOException exception) {
             return ParserResult.fromError(exception);
         }
@@ -75,7 +74,7 @@ public class PdfXmpImporter extends Importer {
     @Override
     public boolean isRecognizedFormat(Path filePath, Charset defaultEncoding) throws IOException {
         Objects.requireNonNull(filePath);
-        return XmpUtilShared.hasMetadata(filePath, xmpPreferences);
+        return XMPUtil.hasMetadata(filePath, xmpPreferences);
     }
 
     @Override

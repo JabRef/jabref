@@ -2,13 +2,12 @@ package org.jabref.model.strings;
 
 import java.util.Optional;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class StringUtilTest {
 
@@ -219,19 +218,19 @@ public class StringUtilTest {
         assertEquals(1234, StringUtil.intValueOf("001234"));
     }
 
-    @Test
+    @Test(expected = NumberFormatException.class)
     public void testIntValueOfExceptionIfStringContainsLetter() {
-        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOf("12A2"));
+        StringUtil.intValueOf("12A2");
     }
 
-    @Test
+    @Test(expected = NumberFormatException.class)
     public void testIntValueOfExceptionIfStringNull() {
-        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOf(null));
+        StringUtil.intValueOf(null);
     }
 
-    @Test
+    @Test(expected = NumberFormatException.class)
     public void testIntValueOfExceptionfIfStringEmpty() {
-        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOf(""));
+        StringUtil.intValueOf("");
     }
 
     @Test

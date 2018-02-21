@@ -15,17 +15,17 @@ import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 public class FieldFormatterCleanupsTest {
 
     private BibEntry entry;
 
 
-    @BeforeEach
+    @Before
     public void setUp() {
         entry = new BibEntry();
         entry.setType(BibtexEntryTypes.INPROCEEDINGS);

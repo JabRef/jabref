@@ -2,8 +2,8 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class DefaultTest {
 
@@ -11,39 +11,39 @@ public class DefaultTest {
     public void testSimpleText() {
         ParamLayoutFormatter a = new Default();
         a.setArgument("DEFAULT TEXT");
-        assertEquals("Bob Bruce", a.format("Bob Bruce"));
+        Assert.assertEquals("Bob Bruce", a.format("Bob Bruce"));
     }
 
     @Test
     public void testFormatNullExpectReplace() {
         ParamLayoutFormatter a = new Default();
         a.setArgument("DEFAULT TEXT");
-        assertEquals("DEFAULT TEXT", a.format(null));
+        Assert.assertEquals("DEFAULT TEXT", a.format(null));
     }
 
     @Test
     public void testFormatEmpty() {
         ParamLayoutFormatter a = new Default();
         a.setArgument("DEFAULT TEXT");
-        assertEquals("DEFAULT TEXT", a.format(""));
+        Assert.assertEquals("DEFAULT TEXT", a.format(""));
     }
 
     @Test
     public void testNoArgumentSet() {
         ParamLayoutFormatter a = new Default();
-        assertEquals("Bob Bruce and Jolly Jumper", a.format("Bob Bruce and Jolly Jumper"));
+        Assert.assertEquals("Bob Bruce and Jolly Jumper", a.format("Bob Bruce and Jolly Jumper"));
     }
 
     @Test
     public void testNoArgumentSetNullInput() {
         ParamLayoutFormatter a = new Default();
-        assertEquals("", a.format(null));
+        Assert.assertEquals("", a.format(null));
     }
 
     @Test
     public void testNoArgumentSetEmptyInput() {
         ParamLayoutFormatter a = new Default();
-        assertEquals("", a.format(""));
+        Assert.assertEquals("", a.format(""));
     }
 
 }

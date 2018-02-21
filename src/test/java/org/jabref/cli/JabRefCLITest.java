@@ -2,10 +2,8 @@ package org.jabref.cli;
 
 import java.util.Collections;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class JabRefCLITest {
 
@@ -13,29 +11,29 @@ public class JabRefCLITest {
     public void testCLIParsingLongOptions() {
         JabRefCLI cli = new JabRefCLI(new String[] {"--nogui", "--import=some/file", "--output=some/export/file"});
 
-        assertEquals(Collections.emptyList(), cli.getLeftOver());
-        assertEquals("some/file", cli.getFileImport());
-        assertTrue(cli.isDisableGui());
-        assertEquals("some/export/file", cli.getFileExport());
+        Assert.assertEquals(Collections.emptyList(), cli.getLeftOver());
+        Assert.assertEquals("some/file", cli.getFileImport());
+        Assert.assertTrue(cli.isDisableGui());
+        Assert.assertEquals("some/export/file", cli.getFileExport());
     }
 
     @Test
     public void testCLIParsingShortOptions() {
         JabRefCLI cli = new JabRefCLI(new String[] {"-n", "-i=some/file", "-o=some/export/file"});
 
-        assertEquals(Collections.emptyList(), cli.getLeftOver());
-        assertEquals("some/file", cli.getFileImport());
-        assertTrue(cli.isDisableGui());
-        assertEquals("some/export/file", cli.getFileExport());
+        Assert.assertEquals(Collections.emptyList(), cli.getLeftOver());
+        Assert.assertEquals("some/file", cli.getFileImport());
+        Assert.assertTrue(cli.isDisableGui());
+        Assert.assertEquals("some/export/file", cli.getFileExport());
     }
 
     @Test
     public void testPreferencesExport() {
         JabRefCLI cli = new JabRefCLI(new String[] {"-n", "-x=some/file"});
 
-        assertEquals(Collections.emptyList(), cli.getLeftOver());
-        assertEquals("some/file", cli.getPreferencesExport());
-        assertTrue(cli.isDisableGui());
+        Assert.assertEquals(Collections.emptyList(), cli.getLeftOver());
+        Assert.assertEquals("some/file", cli.getPreferencesExport());
+        Assert.assertTrue(cli.isDisableGui());
     }
 
 }

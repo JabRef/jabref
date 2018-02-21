@@ -100,7 +100,7 @@ public class FileAnnotationViewModel {
         return super.toString();
     }
 
-    public String getMarking() {
+    public String getDescription() {
         return marking.get();
     }
 }

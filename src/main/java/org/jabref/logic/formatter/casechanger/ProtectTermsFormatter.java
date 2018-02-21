@@ -10,10 +10,27 @@ import org.jabref.model.cleanup.Formatter;
 
 public class ProtectTermsFormatter implements Formatter {
 
-    private final ProtectedTermsLoader protectedTermsLoader;
+    private static ProtectedTermsLoader protectedTermsLoader;
+
+    /**
+     * @Deprecated use ProtectTermsFormatter(ProtectedTermsLoader) instead
+     */
+    @Deprecated
+    public ProtectTermsFormatter() {
+    }
 
     public ProtectTermsFormatter(ProtectedTermsLoader protectedTermsLoader) {
-        this.protectedTermsLoader = protectedTermsLoader;
+        ProtectTermsFormatter.protectedTermsLoader = protectedTermsLoader;
+    }
+
+    /**
+     * This must be called from JabRefMain
+     *
+     * @deprecated use ProtectTermsFormatter(ProtectedTermsLoader) instead
+     */
+    @Deprecated
+    public static void setProtectedTermsLoader(ProtectedTermsLoader loader) {
+        protectedTermsLoader = loader;
     }
 
     private String format(String text, List<String> listOfWords) {
@@ -33,7 +50,8 @@ public class ProtectTermsFormatter implements Formatter {
         if (text.isEmpty()) {
             return text;
         }
-        return this.format(text, this.protectedTermsLoader.getProtectedTerms());
+        Objects.requireNonNull(ProtectTermsFormatter.protectedTermsLoader);
+        return this.format(text, ProtectTermsFormatter.protectedTermsLoader.getProtectedTerms());
     }
 
     @Override

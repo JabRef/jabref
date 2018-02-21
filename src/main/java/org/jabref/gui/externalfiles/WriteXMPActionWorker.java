@@ -18,6 +18,7 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -26,12 +27,12 @@ import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefDialog;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.xmp.XmpUtilWriter;
+import org.jabref.logic.xmp.XMPUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
@@ -45,6 +46,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 public class WriteXMPActionWorker extends AbstractWorker {
 
     private final BasePanel panel;
+    private final JabRefFrame frame;
 
     private Collection<BibEntry> entries;
 
@@ -57,11 +59,11 @@ public class WriteXMPActionWorker extends AbstractWorker {
     private int skipped;
     private int entriesChanged;
     private int errors;
-    private final DialogService dialogService;
+
 
     public WriteXMPActionWorker(BasePanel panel) {
         this.panel = panel;
-        this.dialogService = panel.frame().getDialogService();
+        this.frame = panel.frame();
     }
 
     @Override
@@ -76,17 +78,20 @@ public class WriteXMPActionWorker extends AbstractWorker {
             entries = database.getEntries();
 
             if (entries.isEmpty()) {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("Write XMP-metadata"),
-                        Localization.lang("This operation requires one or more entries to be selected."));
+
+                JOptionPane.showMessageDialog(null,
+                        Localization.lang("This operation requires one or more entries to be selected."),
+                        Localization.lang("Write XMP-metadata"), JOptionPane.ERROR_MESSAGE);
                 goOn = false;
                 return;
 
             } else {
-                boolean confirm = dialogService.showConfirmationDialogAndWait(
-                        Localization.lang("Write XMP-metadata"),
-                        Localization.lang("Write XMP-metadata for all PDFs in current library?"));
-                if (confirm) {
+
+                int response = JOptionPane.showConfirmDialog(null, Localization.lang("Write XMP-metadata for all PDFs in current library?"),
+                        Localization.lang("Write XMP-metadata"), JOptionPane.YES_NO_CANCEL_OPTION,
+                        JOptionPane.QUESTION_MESSAGE);
+
+                if (response != JOptionPane.YES_OPTION) {
                     goOn = false;
                     return;
                 }
@@ -131,7 +136,7 @@ public class WriteXMPActionWorker extends AbstractWorker {
                 for (Path file : files) {
                     if (Files.exists(file)) {
                         try {
-                            XmpUtilWriter.writeXmp(file, entry, database, Globals.prefs.getXMPPreferences());
+                            XMPUtil.writeXMP(file.toFile(), entry, database, Globals.prefs.getXMPPreferences());
                             SwingUtilities.invokeLater(
                                     () -> optDiag.getProgressArea().append("  " + Localization.lang("OK") + ".\n"));
                             entriesChanged++;

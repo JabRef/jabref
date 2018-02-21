@@ -6,7 +6,6 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -22,10 +21,11 @@ import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelPreferences;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.autosaveandbackup.BackupUIManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -47,24 +47,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // The action concerned with opening an existing database.
-public class OpenDatabaseAction extends SimpleCommand {
 
+public class OpenDatabaseAction extends SimpleCommand {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
-    private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = Arrays.asList(
-            // Migrations:
-            // Warning for migrating the Review into the Comment field
-            new MergeReviewIntoCommentAction(),
-            // External file handling system in version 2.3:
-            new FileLinksUpgradeWarning(),
+    private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = new ArrayList<>();
 
-            // Check for new custom entry types loaded from the BIB file:
-            new CheckForNewEntryTypesAction(),
-            // Warning about and handling duplicate BibTeX keys:
-            new HandleDuplicateWarnings());
-
+    static {
+        // Add the action for checking for new custom entry types loaded from the BIB file:
+        POST_OPEN_ACTIONS.add(new CheckForNewEntryTypesAction());
+        // Add the action for the new external file handling system in version 2.3:
+        POST_OPEN_ACTIONS.add(new FileLinksUpgradeWarning());
+        // Add the action for warning about and handling duplicate BibTeX keys:
+        POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
+    }
 
     private final JabRefFrame frame;
 
@@ -87,10 +85,11 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
     }
 
+    @Override
     public void execute() {
         List<Path> filesToOpen = new ArrayList<>();
 
-        DialogService ds = frame.getDialogService();
+        DialogService ds = new FXDialogService();
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(FileType.BIBTEX_DB)
                 .withDefaultExtension(FileType.BIBTEX_DB)
@@ -131,7 +130,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         int removed = 0;
 
         // Check if any of the files are already open:
-        for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext(); ) {
+        for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext();) {
             Path file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabs().size(); i++) {
                 BasePanel basePanel = frame.getBasePanelAt(i);
@@ -209,6 +208,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                             Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
+
             }
 
             if (BackupManager.checkForBackupFile(fileToLoad)) {
@@ -268,4 +268,5 @@ public class OpenDatabaseAction extends SimpleCommand {
                 }
         );
     }
+
 }

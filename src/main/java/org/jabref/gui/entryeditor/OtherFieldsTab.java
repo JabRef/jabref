@@ -8,7 +8,6 @@ import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.Tooltip;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.logic.l10n.Localization;
@@ -20,8 +19,8 @@ public class OtherFieldsTab extends FieldsEditorTab {
 
     private final List<String> customTabFieldNames;
 
-    public OtherFieldsTab(BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, List<String> customTabFieldNames, DialogService dialogService) {
-        super(false, databaseContext, suggestionProviders, undoManager, dialogService);
+    public OtherFieldsTab(BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, List<String> customTabFieldNames) {
+        super(false, databaseContext, suggestionProviders, undoManager);
 
         setText(Localization.lang("Other fields"));
         setTooltip(new Tooltip(Localization.lang("Show remaining fields")));

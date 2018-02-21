@@ -36,14 +36,14 @@ public final class EntryFromFileCreatorManager {
     private final List<EntryFromFileCreator> entryCreators;
 
 
-    public EntryFromFileCreatorManager(ExternalFileTypes externalFilesTypes) {
+    public EntryFromFileCreatorManager() {
 
         entryCreators = new ArrayList<>(10);
-        entryCreators.add(new EntryFromPDFCreator(externalFilesTypes));
+        entryCreators.add(new EntryFromPDFCreator());
 
         // add a creator for each ExternalFileType if there is no specialized
         // creator existing.
-        Collection<ExternalFileType> fileTypes = externalFilesTypes.getExternalFileTypeSelection();
+        Collection<ExternalFileType> fileTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
 
         for (ExternalFileType exFileType : fileTypes) {
             if (!hasSpecialisedCreatorForExternalFileType(exFileType)) {
@@ -152,7 +152,7 @@ public final class EntryFromFileCreatorManager {
                     } else {
                         count++;
                         if (panel != null) {
-                            ce.addEdit(new UndoableInsertEntry(database, entry.get()));
+                            ce.addEdit(new UndoableInsertEntry(database, entry.get(), panel));
                         }
                     }
                 }

@@ -26,10 +26,14 @@ import org.jabref.model.entry.Month;
  * Documentation about ISI WOS format:
  * <p>
  * <ul>
- * <li>https://web.archive.org/web/20131031052339/http://wos.isitrial.com/help/helpprn.html</li>
+ * <li>http://wos.isitrial.com/help/helpprn.html</li>
  * </ul>
  * <p>
  * <ul>
+ * <li>Check compatibility with other ISI2Bib tools like:
+ * http://www-lab.imr.tohoku.ac.jp/~t-nissie/computer/software/isi/ or
+ * http://www.tug.org/tex-archive/biblio/bibtex/utils/isi2bibtex/isi2bibtex or
+ * http://web.mit.edu/emilio/www/utils.html</li>
  * <li>Deal with capitalization correctly</li>
  * </ul>
  */
@@ -326,7 +330,8 @@ public class IsiImporter extends Importer {
     }
 
     private static String parsePages(String value) {
-        return value.replace("-", "--");
+        int lastDash = value.lastIndexOf('-');
+        return value.substring(0, lastDash) + "--" + value.substring(lastDash + 1);
     }
 
     public static String parseMonth(String value) {

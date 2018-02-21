@@ -30,8 +30,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.SidePaneComponent;
 import org.jabref.gui.SidePaneManager;
 import org.jabref.gui.SidePaneType;
-import org.jabref.gui.actions.Action;
-import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.actions.ActionsFX;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.FetcherPreviewDialog;
 import org.jabref.gui.importer.ImportInspectionDialog;
@@ -62,8 +61,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     }
 
     @Override
-    public Action getToggleAction() {
-        return StandardActions.TOGGLE_WEB_SEARCH;
+    public ActionsFX getToggleAction() {
+        return ActionsFX.TOGGLE_WEB_SEARCH;
     }
 
     @Override

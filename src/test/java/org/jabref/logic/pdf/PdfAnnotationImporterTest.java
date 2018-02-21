@@ -8,10 +8,9 @@ import java.util.Optional;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import static org.junit.Assert.assertEquals;
 
 public class PdfAnnotationImporterTest {
 
@@ -103,6 +102,7 @@ public class PdfAnnotationImporterTest {
     }
 
     @Test
+
     public void strikeoutWithNoteMinimal() {
         final FileAnnotation expectedLinkedAnnotation = new FileAnnotation("lynyus", LocalDateTime.of(2017, 6, 1, 13, 2, 3), 1,
                 "striked out", FileAnnotationType.STRIKEOUT, Optional.empty());

@@ -5,16 +5,15 @@ import java.util.Optional;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ConvertToBibtexCleanupTest {
 
     private ConvertToBibtexCleanup worker;
 
-    @BeforeEach
+    @Before
     public void setUp() {
         worker = new ConvertToBibtexCleanup();
     }
@@ -25,9 +24,9 @@ public class ConvertToBibtexCleanupTest {
 
         worker.cleanup(entry);
 
-        assertEquals(Optional.empty(), entry.getField(FieldName.DATE));
-        assertEquals(Optional.of("2011"), entry.getField(FieldName.YEAR));
-        assertEquals(Optional.of("#jan#"), entry.getField(FieldName.MONTH));
+        Assert.assertEquals(Optional.empty(), entry.getField(FieldName.DATE));
+        Assert.assertEquals(Optional.of("2011"), entry.getField(FieldName.YEAR));
+        Assert.assertEquals(Optional.of("#jan#"), entry.getField(FieldName.MONTH));
     }
 
     @Test
@@ -38,8 +37,8 @@ public class ConvertToBibtexCleanupTest {
 
         worker.cleanup(entry);
 
-        assertEquals(Optional.of("2011"), entry.getField(FieldName.YEAR));
-        assertEquals(Optional.of("2012"), entry.getField(FieldName.DATE));
+        Assert.assertEquals(Optional.of("2011"), entry.getField(FieldName.YEAR));
+        Assert.assertEquals(Optional.of("2012"), entry.getField(FieldName.DATE));
     }
 
     @Test
@@ -48,7 +47,7 @@ public class ConvertToBibtexCleanupTest {
 
         worker.cleanup(entry);
 
-        assertEquals(Optional.empty(), entry.getField(FieldName.JOURNALTITLE));
-        assertEquals(Optional.of("Best of JabRef"), entry.getField(FieldName.JOURNAL));
+        Assert.assertEquals(Optional.empty(), entry.getField(FieldName.JOURNALTITLE));
+        Assert.assertEquals(Optional.of("Best of JabRef"), entry.getField(FieldName.JOURNAL));
     }
 }

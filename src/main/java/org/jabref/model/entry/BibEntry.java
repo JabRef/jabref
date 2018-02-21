@@ -18,8 +18,6 @@ import java.util.regex.Pattern;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
@@ -59,7 +57,7 @@ public class BibEntry implements Cloneable {
     private final Map<String, String> latexFreeFields = new ConcurrentHashMap<>();
     private final EventBus eventBus = new EventBus();
     private String id;
-    private StringProperty type = new SimpleStringProperty();
+    private String type;
     private ObservableMap<String, String> fields = FXCollections.observableMap(new ConcurrentHashMap<>());
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit;
@@ -203,10 +201,6 @@ public class BibEntry implements Cloneable {
      * Returns this entry's type.
      */
     public String getType() {
-        return type.getValue();
-    }
-
-    public StringProperty typeProperty() {
         return type;
     }
 
@@ -239,7 +233,7 @@ public class BibEntry implements Cloneable {
             return Optional.empty();
         }
 
-        this.type.setValue(newType.toLowerCase(Locale.ENGLISH));
+        this.type = newType.toLowerCase(Locale.ENGLISH);
         changed = true;
 
         FieldChange change = new FieldChange(this, TYPE_HEADER, oldType, newType);
@@ -535,7 +529,7 @@ public class BibEntry implements Cloneable {
      */
     @Override
     public Object clone() {
-        BibEntry clone = new BibEntry(type.getValue());
+        BibEntry clone = new BibEntry(type);
         clone.fields = FXCollections.observableMap(new ConcurrentHashMap<>(fields));
         return clone;
     }
@@ -723,14 +717,14 @@ public class BibEntry implements Cloneable {
             return false;
         }
         BibEntry entry = (BibEntry) o;
-        return Objects.equals(type.getValue(), entry.type.getValue())
+        return Objects.equals(type, entry.type)
                 && Objects.equals(fields, entry.fields)
                 && Objects.equals(commentsBeforeEntry, entry.commentsBeforeEntry);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type.getValue(), fields);
+        return Objects.hash(type, fields);
     }
 
     public void registerListener(Object object) {

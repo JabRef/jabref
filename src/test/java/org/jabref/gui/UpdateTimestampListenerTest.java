@@ -7,14 +7,19 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class UpdateTimestampListenerTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     private BibDatabase database;
     private BibEntry bibEntry;
@@ -22,8 +27,8 @@ public class UpdateTimestampListenerTest {
     private JabRefPreferences preferencesMock;
     private TimestampPreferences timestampPreferencesMock;
 
-    @BeforeEach
-    public void setUp() {
+    @Before
+    public void setUp(){
         database = new BibDatabase();
         bibEntry = new BibEntry();
 
@@ -36,7 +41,7 @@ public class UpdateTimestampListenerTest {
     }
 
     @Test
-    public void updateTimestampEnabled() {
+    public void updateTimestampEnabled(){
         final String timestampField = "timestamp";
         final String baseDate = "2000-1-1";
         final String newDate = "2000-1-2";
@@ -49,17 +54,19 @@ public class UpdateTimestampListenerTest {
 
         bibEntry.setField(timestampField, baseDate);
 
-        assertEquals(Optional.of(baseDate), bibEntry.getField(timestampField), "Initial timestamp not set correctly");
+        assertEquals("Initial timestamp not set correctly",
+                Optional.of(baseDate), bibEntry.getField(timestampField));
 
         database.registerListener(new UpdateTimestampListener(preferencesMock));
 
         bibEntry.setField("test", "some value");
 
-        assertEquals(Optional.of(newDate), bibEntry.getField(timestampField), "Timestamp not set correctly after entry changed");
+        assertEquals("Timestamp not set correctly after entry changed",
+                Optional.of(newDate), bibEntry.getField(timestampField));
     }
 
     @Test
-    public void updateTimestampDisabled() {
+    public void updateTimestampDisabled(){
         final String timestampField = "timestamp";
         final String baseDate = "2000-1-1";
         final String newDate = "2000-1-2";
@@ -72,12 +79,14 @@ public class UpdateTimestampListenerTest {
 
         bibEntry.setField(timestampField, baseDate);
 
-        assertEquals(Optional.of(baseDate), bibEntry.getField(timestampField), "Initial timestamp not set correctly");
+        assertEquals("Initial timestamp not set correctly",
+                Optional.of(baseDate), bibEntry.getField(timestampField));
 
         database.registerListener(new UpdateTimestampListener(preferencesMock));
 
         bibEntry.setField("test", "some value");
 
-        assertEquals(Optional.of(baseDate), bibEntry.getField(timestampField), "New timestamp set after entry changed even though updates were disabled");
+        assertEquals("New timestamp set after entry changed even though updates were disabled",
+                Optional.of(baseDate), bibEntry.getField(timestampField));
     }
 }

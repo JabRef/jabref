@@ -2,8 +2,8 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class IfPluralTest {
 
@@ -11,40 +11,40 @@ public class IfPluralTest {
     public void testStandardUsageOneEditor() {
         ParamLayoutFormatter a = new IfPlural();
         a.setArgument("Eds.,Ed.");
-        assertEquals("Ed.", a.format("Bob Bruce"));
+        Assert.assertEquals("Ed.", a.format("Bob Bruce"));
     }
 
     @Test
     public void testStandardUsageTwoEditors() {
         ParamLayoutFormatter a = new IfPlural();
         a.setArgument("Eds.,Ed.");
-        assertEquals("Eds.", a.format("Bob Bruce and Jolly Jumper"));
+        Assert.assertEquals("Eds.", a.format("Bob Bruce and Jolly Jumper"));
     }
 
     @Test
     public void testFormatNull() {
         ParamLayoutFormatter a = new IfPlural();
         a.setArgument("Eds.,Ed.");
-        assertEquals("", a.format(null));
+        Assert.assertEquals("", a.format(null));
     }
 
     @Test
     public void testFormatEmpty() {
         ParamLayoutFormatter a = new IfPlural();
         a.setArgument("Eds.,Ed.");
-        assertEquals("", a.format(""));
+        Assert.assertEquals("", a.format(""));
     }
 
     @Test
     public void testNoArgumentSet() {
         ParamLayoutFormatter a = new IfPlural();
-        assertEquals("", a.format("Bob Bruce and Jolly Jumper"));
+        Assert.assertEquals("", a.format("Bob Bruce and Jolly Jumper"));
     }
 
     @Test
     public void testNoProperArgument() {
         ParamLayoutFormatter a = new IfPlural();
         a.setArgument("Eds.");
-        assertEquals("", a.format("Bob Bruce and Jolly Jumper"));
+        Assert.assertEquals("", a.format("Bob Bruce and Jolly Jumper"));
     }
 }

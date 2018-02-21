@@ -1,11 +1,9 @@
 package org.jabref.logic.bibtex;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
@@ -30,15 +28,6 @@ public class BibEntryWriter {
     public BibEntryWriter(LatexFieldFormatter fieldFormatter, boolean write) {
         this.fieldFormatter = fieldFormatter;
         this.write = write;
-    }
-
-    public String serializeAll(List<BibEntry> entries, BibDatabaseMode databaseMode) throws IOException {
-        StringWriter writer = new StringWriter();
-
-        for (BibEntry entry : entries) {
-            write(entry, writer, databaseMode);
-        }
-        return writer.toString();
     }
 
     public void write(BibEntry entry, Writer out, BibDatabaseMode bibDatabaseMode) throws IOException {

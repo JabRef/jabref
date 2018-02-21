@@ -22,10 +22,10 @@ import org.jabref.model.entry.specialfields.SpecialField;
  * config files -> simple extension and definition of new fields
  *
  * TODO:
- * - handling of identically fields with different names (https://github.com/JabRef/jabref/issues/521)
- * e.g. LCCN = lib-congress, journaltitle = journal
- * - group id for each fields, e.g. standard, jurabib, bio, ...
- * - add a additional properties functionality into the BibtexSingleField class
+ *  - handling of identically fields with different names (https://github.com/JabRef/jabref/issues/521)
+ *    e.g. LCCN = lib-congress, journaltitle = journal
+ *  - group id for each fields, e.g. standard, jurabib, bio, ...
+ *  - add a additional properties functionality into the BibtexSingleField class
  */
 public class InternalBibtexFields {
 
@@ -35,7 +35,7 @@ public class InternalBibtexFields {
      *
      * A user can change them. The change is currently stored in the preferences only and not explicitley exposed as separte preferences object
      */
-    public static final List<String> DEFAULT_GENERAL_FIELDS = Arrays.asList(FieldName.CROSSREF, FieldName.KEYWORDS, FieldName.FILE, FieldName.DOI, FieldName.URL, FieldName.GROUPS, FieldName.OWNER, FieldName.TIMESTAMP);
+    public static final List<String> DEFAULT_GENERAL_FIELDS = Arrays.asList(FieldName.CROSSREF, FieldName.KEYWORDS, FieldName.FILE, FieldName.DOI, FieldName.URL, FieldName.GROUPS, FieldName.COMMENT, FieldName.OWNER, FieldName.TIMESTAMP);
 
     // Lists of fields with special properties
     private static final List<String> INTEGER_FIELDS = Arrays.asList(FieldName.CTLMAX_NAMES_FORCED_ETAL,
@@ -382,6 +382,7 @@ public class InternalBibtexFields {
             field.setNumeric(true);
             InternalBibtexFields.RUNTIME.fieldSet.put(fieldName, field);
         }
+
     }
 
     public static Set<FieldProperty> getFieldProperties(String name) {

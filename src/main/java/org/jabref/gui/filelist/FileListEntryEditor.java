@@ -32,6 +32,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.jabref.Globals;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -92,12 +94,13 @@ public class FileListEntryEditor {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(workingDir)
                 .withInitialFileName(fileName).build();
+        DialogService ds = new FXDialogService();
 
         Optional<Path> path;
         if (showSaveDialog) {
-            path = DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showFileSaveDialog(fileDialogConfiguration));
+            path = DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
         } else {
-            path = DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showFileOpenDialog(fileDialogConfiguration));
+            path = DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
         }
 
         path.ifPresent(newFile -> {

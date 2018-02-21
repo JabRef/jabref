@@ -37,6 +37,7 @@ import org.jabref.JabRefException;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.exporter.SaveDatabaseAction;
@@ -472,7 +473,7 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
                 .addExtensionFilter(FileType.BIBTEX_DB)
                 .withDefaultExtension(FileType.BIBTEX_DB)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-        DialogService ds = frame.getDialogService();
+        DialogService ds = new FXDialogService();
 
         Optional<Path> path = DefaultTaskExecutor
                 .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));

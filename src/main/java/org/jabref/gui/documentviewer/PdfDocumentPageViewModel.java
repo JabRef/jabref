@@ -8,11 +8,8 @@ import java.util.Objects;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.rendering.ImageType;
-import org.apache.pdfbox.rendering.PDFRenderer;
 
 /**
  * Represents the view model of a pdf page backed by a {@link PDPage}.
@@ -21,12 +18,10 @@ public class PdfDocumentPageViewModel extends DocumentPageViewModel {
 
     private final PDPage page;
     private final int pageNumber;
-    private final PDDocument document;
 
-    public PdfDocumentPageViewModel(PDPage page, int pageNumber, PDDocument document) {
+    public PdfDocumentPageViewModel(PDPage page, int pageNumber) {
         this.page = Objects.requireNonNull(page);
         this.pageNumber = pageNumber;
-        this.document = document;
     }
 
     // Taken from http://stackoverflow.com/a/9417836/873661
@@ -42,12 +37,10 @@ public class PdfDocumentPageViewModel extends DocumentPageViewModel {
     }
 
     @Override
-    // Taken from https://stackoverflow.com/questions/23326562/apache-pdfbox-convert-pdf-to-images
     public Image render(int width, int height) {
-        PDFRenderer renderer = new PDFRenderer(document);
         try {
             int resolution = 96;
-            BufferedImage image = renderer.renderImageWithDPI(pageNumber, 2 * resolution, ImageType.RGB);
+            BufferedImage image = page.convertToImage(BufferedImage.TYPE_INT_RGB, 2 * resolution);
             return SwingFXUtils.toFXImage(resize(image, width, height), null);
         } catch (IOException e) {
             // TODO: LOG
