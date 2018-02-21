@@ -26,6 +26,8 @@ try:
         requires Python 3.4 or higher
         """
         
+        BASE_DIRECTORY_NAME = 'jabref'
+        
         @staticmethod
         def getJabRefBaseDirectory():
             """
@@ -33,11 +35,11 @@ try:
             :return the path to JabRef's base directory as pathlib.Path object.
             """
             cwd = pathlib.Path.cwd()
-            if cwd.name == 'jabref':
+            if cwd.name == PathFinder.BASE_DIRECTORY_NAME:
                 return cwd
             
             for parent in cwd.parents:
-                if parent.name == 'jabref':
+                if parent.name == PathFinder.BASE_DIRECTORY_NAME:
                     return parent
             # TODO What to do if base directory could not be found?
     
