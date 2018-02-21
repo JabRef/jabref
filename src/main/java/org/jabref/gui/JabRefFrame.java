@@ -144,10 +144,11 @@ import osx.macadapter.MacAdapter;
  */
 public class JabRefFrame extends BorderPane implements OutputPrinter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
-
     // Frame titles.
     public static final String FRAME_TITLE = "JabRef";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
+
     private final SplitPane splitPane = new SplitPane();
     private final JabRefPreferences prefs = Globals.prefs;
     private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this);
@@ -270,7 +271,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         //pw.displayWindowAtStoredLocation();
 
         tabbedPane.setBorder(null);
-
 
         /*
          * The following state listener makes sure focus is registered with the

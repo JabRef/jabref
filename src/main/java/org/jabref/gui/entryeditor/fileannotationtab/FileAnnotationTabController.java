@@ -28,6 +28,7 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.model.entry.BibEntry;
+
 import org.fxmisc.easybind.EasyBind;
 
 public class FileAnnotationTabController extends AbstractController<FileAnnotationTabViewModel> {

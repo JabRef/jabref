@@ -39,8 +39,8 @@ import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

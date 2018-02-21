@@ -1,6 +1,5 @@
 package org.jabref.gui.search;
 
-import java.awt.event.KeyAdapter;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -440,7 +439,6 @@ public class GlobalSearchBar extends HBox {
             openCurrentResultsInDialog.setTooltip(new Tooltip(Localization.lang("Show search results in a window")));
         }
     }
-
 
     private class SearchPopupSkin<T> implements Skin<AutoCompletePopup<T>> {
         private final AutoCompletePopup<T> control;

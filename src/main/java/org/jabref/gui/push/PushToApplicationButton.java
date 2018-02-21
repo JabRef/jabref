@@ -197,7 +197,6 @@ public class PushToApplicationButton extends SimpleCommand implements ActionList
         action.actionPerformed(new ActionEvent(toApp, 0, "push"));
     }
 
-
     class PopupItemActionListener implements ActionListener {
 
         private final PushToApplication application;
