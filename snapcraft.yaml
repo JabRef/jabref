@@ -2,8 +2,8 @@
 
 name: jabref
 
-# the version string 4.0-dev is replaced by scripts/run-snapcraft.sh with the current version provided in build.gradle
-version: '4.0-dev'
+# the version string 4.2-dev is replaced by scripts/run-snapcraft.sh with the current version provided in build.gradle
+version: '4.2-dev'
 
 summary: Bibliography manager
 icon: buildres/snapcraft/JabRef-icon-256.png
@@ -21,8 +21,8 @@ confinement: strict
 
 apps:
    jabref:
-     command: desktop-launch java -jar $SNAP/jar/JabRef-4.0-dev.jar
-     plugs: [home, network-bind, x11]
+     command: desktop-launch java -jar $SNAP/jar/JabRef-4.2-dev.jar
+     plugs: [desktop, desktop-legacy, wayland, unity7, home, network-bind]
      desktop: ../buildres/snapcraft/jabref.desktop
 
 parts:
