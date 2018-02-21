@@ -27,25 +27,19 @@ try:
         """
         
         @staticmethod
-        def getScriptLocation():
-            """
-            :return the path this script is currently located as pathlib.Path object.
-            """
-            return pathlib.Path(__file__)
-        
-        @staticmethod
         def getJabRefBaseDirectory():
             """
             Searches the script's path backwards until it finds the matching base directory.
             :return the path to JabRef's base directory as pathlib.Path object.
             """
-            if pathlib.Path.cwd().name == 'jabref':
-                return pathlib.Path.cwd()
+            cwd = pathlib.Path.cwd()
+            if cwd.name == 'jabref':
+                return cwd
             
-            scriptLocation = PathFinder.getScriptLocation()
-            for parent in scriptLocation.parents:
+            for parent in cwd.parents:
                 if parent.name == 'jabref':
                     return parent
+            # TODO What to do if base directory could not be found?
     
     # Important directories of the JabRef repository
     JABREF_BASE_DIRECTORY = PathFinder.getJabRefBaseDirectory()
