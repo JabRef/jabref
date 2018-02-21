@@ -40,7 +40,7 @@ try:
             :return the path to JabRef's base directory as pathlib.Path object.
             """
             if pathlib.Path.cwd().name == 'jabref':
-                return pathlib.Path.cwd
+                return pathlib.Path.cwd()
             
             scriptLocation = PathFinder.getScriptLocation()
             for parent in scriptLocation.parents:
