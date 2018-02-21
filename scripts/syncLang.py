@@ -39,6 +39,9 @@ try:
             Searches the script's path backwards until it finds the matching base directory.
             :return the path to JabRef's base directory as pathlib.Path object.
             """
+            if pathlib.Path.cwd().name == 'jabref':
+                return pathlib.Path.cwd
+            
             scriptLocation = PathFinder.getScriptLocation()
             for parent in scriptLocation.parents:
                 if parent.name == 'jabref':
