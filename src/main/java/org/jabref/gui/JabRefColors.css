@@ -1,0 +1,99 @@
+/*
+ * The base css file defining the style that is valid for every pane and dialog.
+ */
+
+.root {
+
+    -jr-white: #fff;
+    -jr-black: #000;
+
+    -jr-light-gray: #ecf0f1;
+    -jr-gray: #bdc3c7;
+    -jr-blue: #2980b9;
+    -jr-light-blue: #3498db;
+    -jr-purple: #8e44ad;
+    -jr-light-purple: #9b59b6;
+    -jr-green: #27ae60;
+    -jr-light-green: #2ecc71;
+    -jr-red: #c0392b;
+    -jr-light-red: #e74c3c;
+    -jr-yellow: #f1c40f;
+    -jr-orange: #f39c12;
+    -jr-light-asphalt: #34495e;
+    -jr-asphalt: #2c3e50;
+
+    -jr-hover-cell: derive(-jr-yellow, 50%);
+    -jr-selected-cell: derive(-jr-yellow, 20%);
+
+    -jr-theme: -jr-purple;
+    -jr-info: derive(-jr-blue, 50%);
+    -jr-warn: derive(-jr-orange, 50%);
+    -jr-error: derive(-jr-red, 50%);
+    -jr-background: derive(-jr-white, -5%);
+
+    -jr-icon: -jr-asphalt;
+    -jr-toolbar: derive(-jr-light-blue,80%);
+    -jr-separator: -jr-blue;
+
+
+
+    /*
+     * A strong blue to indicate something neutral.
+     */
+    -fx-neutral: #2980b9;
+
+    /*
+     * A strong green to indicate something positive.
+     */
+    -fx-positive: #27ae60;
+
+    /*
+     * A strong red to indicate something negative.
+     */
+    -fx-negative: #c0392b;
+
+    /*
+     * A dark grayish blue to display information (but kind of highlighted).
+     */
+    -fx-info: #2c3e50;
+
+    /*
+     * A dark gray to indicate something not so important
+     */
+    -fx-unimportant: #595959;
+
+    /*
+     * A light gray for accented background
+     */
+    -fx-accented-background: #dadad8;
+
+    /*
+     * A darker gray as background
+     */
+    -fx-dark-background: #aaaaaa;
+
+    /*
+     * A strong white as background
+     */
+    -fx-light-background: #ffffff;
+
+    /*
+     * A dark gray for borders
+     */
+    -fx-border: #868786;
+
+    /*
+     * A light gray for background for active items in list like elements such as menus, lists, trees, and tables.
+     */
+    -fx-selection-bar: #e5e5e5;
+
+    /*
+     * The base color for the theme
+     */
+    -fx-theme-base: -jr-light-asphalt;
+
+    /*
+     * A slightly lighter theme-based color for backgrounds of active items (toggle button, selected list item)
+     */
+    -fx-active-background: -jr-blue;
+}

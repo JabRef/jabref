@@ -1,10 +1,12 @@
+@import url("../JabRefColors.css");
+
 .tree-table-view, .tree-table-row-cell {
-    -fx-background-color: #dadad8;
+    -fx-background-color: -jr-white;
     -fx-table-cell-border-color: transparent; /* hide grid lines */
 }
 
 .tree-table-cell {
-    -fx-font-size: 105%;
+    /*-fx-font-size: 105%;*/
     -fx-padding: 0.35em 0em 0.25em 0em;
 }
 
@@ -14,8 +16,8 @@
 }
 
 .numberColumn > .hits {
-    -fx-font-size: 85%;
-    -fx-background-color: #c6c6c4;
+    /*-fx-font-size: 85%;*/
+    -fx-background-color: -jr-info;
     -fx-padding: 0.1em 0.4em 0.1em 0.4em;
     -fx-background-insets: 0;
     -fx-background-radius: 0.8em;
@@ -106,8 +108,8 @@
 }
 
 #barBottom {
-    -fx-background-color: #dadad8;
-    -fx-border-color: dimgray;
+    -fx-background-color: -jr-toolbar;
+    -fx-border-color: -jr-separator;
     -fx-border-width: 1 0 0 0;
     -fx-padding: 0em 1em 0em 1em;
 }

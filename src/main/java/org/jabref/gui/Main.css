@@ -1,68 +1,4 @@
-/*
- * The base css file defining the style that is valid for every pane and dialog.
- */
-
-.root {
-    /*
-     * A strong blue to indicate something neutral.
-     */
-    -fx-neutral: #2980b9;
-
-    /*
-     * A strong green to indicate something positive.
-     */
-    -fx-positive: #27ae60;
-
-    /*
-     * A strong red to indicate something negative.
-     */
-    -fx-negative: #c0392b;
-
-    /*
-     * A dark grayish blue to display information (but kind of highlighted).
-     */
-    -fx-info: #2c3e50;
-
-    /*
-     * A dark gray to indicate something not so important
-     */
-    -fx-unimportant: #595959;
-
-    /*
-     * A light gray for accented background
-     */
-    -fx-accented-background: #dadad8;
-
-    /*
-     * A darker gray as background
-     */
-    -fx-dark-background: #aaaaaa;
-
-    /*
-     * A strong white as background
-     */
-    -fx-light-background: #ffffff;
-
-    /*
-     * A dark gray for borders
-     */
-    -fx-border: #868786;
-
-    /*
-     * A light gray for background for active items in list like elements such as menus, lists, trees, and tables.
-     */
-    -fx-selection-bar: #e5e5e5;
-
-    /*
-     * The base color for the theme
-     */
-    -fx-theme-base: #4d4673;
-
-    /*
-     * A slightly lighter theme-based color for backgrounds of active items (toggle button, selected list item)
-     */
-    -fx-active-background: derive(-fx-theme-base, 20%);
-}
+@import url("JabRefColors.css");
 
 .hyperlink {
     -fx-padding: 0;
@@ -136,7 +72,7 @@
 }
 
 .menu-bar {
-    -fx-background-color: white;
+    -fx-background-color: -jr-background;
     -fx-background-insets: 0;
     -fx-background-radius: 0;
 }
@@ -161,14 +97,16 @@
 .tab-pane > .tab-header-area > .headers-region > .tab {
     -fx-background-insets: 0;
     -fx-background-radius: 0;
-    -fx-background-color: -fx-accented-background;
+    -fx-background-color: -jr-light-gray;
+    /*-fx-background-color: -fx-accented-background;*/
     -fx-border-color: -fx-border;
     -fx-border-width: 0.5 0.5 0.5 0.5;
     -fx-padding: 0.4em 0.9em 0.4em 0.9em;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab .tab-label {
-    -fx-text-fill: -fx-unimportant;
+    /*-fx-text-fill: -fx-unimportant;*/
+    -fx-text-fill: -jr-gray;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected {
@@ -188,7 +126,7 @@
 }
 
 .tab-pane > .tab-header-area > .tab-header-background {
-    -fx-background-color: -fx-accented-background;
+    -fx-background-color: -jr-background;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab .glyph-icon {
@@ -198,8 +136,8 @@
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
-    -fx-text-fill: black;
-    -fx-fill: black;
+    -fx-text-fill: -jr-icon;
+    -fx-fill: -jr-icon;
 }
 
 .tab-pane > .tab-header-area {
@@ -216,18 +154,18 @@
 }
 
 .split-pane > .split-pane-divider {
-    -fx-background-color: -fx-accented-background;
+    -fx-background-color: -jr-separator;
     -fx-padding: 0 0.15ex 0 0.15ex;
 }
 
 .table-row-cell:hover,
 .tree-table-row-cell:hover {
-    -fx-background-color: lightgrey;
+    -fx-background-color: -jr-hover-cell;
 }
 
 .table-row-cell:selected,
 .tree-table-row-cell:selected {
-    -fx-background-color: -fx-active-background;
+    -fx-background-color: -jr-selected-cell;
     -fx-text-fill: white;
     -fx-fill: white;
 }
@@ -282,7 +220,7 @@
 }
 
 .text-area {
-    -fx-background-color: white;
+    -fx-background-color: -jr-white;
 }
 
 .text-area .content {
@@ -369,34 +307,39 @@
 }
 
 .mainMenu {
-    -fx-background-color: derive(-fx-theme-base, -10%);
+    /*-fx-background-color: derive(-fx-theme-base, 50%);*/
 }
 
 .menu-bar > .container > .menu-button:hover,
 .menu-bar > .container > .menu-button:focused,
 .menu-bar > .container > .menu-button:showing {
-    -fx-background: derive(-fx-theme-base, 10%);
+    -fx-background: red;
 }
 
 .mainMenu > .container > .menu-button > .label {
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
+    -fx-text-fill: black;
+    /*-fx-font-weight: bold;*/
 }
 
 .mainToolbar {
-    -fx-background-color: derive(-fx-theme-base, -10%);
+    /*-fx-background-color: derive(-fx-theme-base, -10%);*/
+    -fx-background-color: -jr-toolbar;
+    -fx-border-color: -jr-separator;
+    -fx-border-width: 0 0 2 0;
 }
 
 .mainToolbar .glyph-icon {
     -fx-font-size: 1.7em;
-    -fx-text-fill: white;
-    -fx-fill: white;
+    -fx-text-fill: blue;
+    -fx-fill: -jr-icon;
 }
 
 .mainToolbar .search-field {
-    -fx-background-color: derive(-fx-theme-base, -15%);
+    /*-fx-background-color: derive(-fx-theme-base, -15%);*/
+    -fx-background-color: -jr-white;
 }
 
 .mainToolbar .search-field:focused {
-    -fx-background-color: derive(-fx-theme-base, 15%);
+    /*-fx-background-color: derive(-fx-theme-base, 15%);*/
+    -fx-background-color: -jr-white;
 }
