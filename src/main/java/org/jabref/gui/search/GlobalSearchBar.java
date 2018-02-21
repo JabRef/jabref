@@ -26,6 +26,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldListCell;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
@@ -202,6 +203,13 @@ public class GlobalSearchBar extends HBox {
                 searchField,
                 currentResults
         );
+
+        // Clears search on ESC
+        searchField.setOnKeyPressed((event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                clearSearch();
+            }
+        }));
     }
 
     public void performGlobalSearch() {
