@@ -15,14 +15,14 @@ import org.jabref.Globals;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.importer.ParserResult;
 
 public class XmpUtilMain {
 
@@ -87,11 +87,8 @@ public class XmpUtilMain {
 
     /**
      * The tool is implemented as a console application with a read-evaluate-print cycle.
-     *
-     * @param args
      */
-    public static void main(String[] args) {
-
+    public static void executeXmpConsoleApplicaton() {
         if (Globals.prefs == null) {
             Globals.prefs = JabRefPreferences.getInstance();
         }
@@ -124,5 +121,9 @@ public class XmpUtilMain {
                 System.err.println(e.getMessage());
             }
         }
+    }
+
+    public static void main(String[] args) {
+        XmpUtilMain.executeXmpConsoleApplicaton();
     }
 }

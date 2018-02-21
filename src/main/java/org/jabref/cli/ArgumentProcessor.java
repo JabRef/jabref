@@ -223,6 +223,10 @@ public class ArgumentProcessor {
             doAuxImport(loaded);
         }
 
+        if (cli.isXmpFacilities()) {
+            XmpUtilMain.executeXmpConsoleApplicaton();
+        }
+
         return loaded;
     }
 
