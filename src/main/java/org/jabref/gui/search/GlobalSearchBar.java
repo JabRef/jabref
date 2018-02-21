@@ -204,10 +204,12 @@ public class GlobalSearchBar extends HBox {
                 currentResults
         );
 
-        // Clears search on ESC
+        // Clears search on ESC & select first entry, if available
         searchField.setOnKeyPressed((event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
+                MainTable currentTable = frame.getCurrentBasePanel().getMainTable();
                 clearSearch();
+                currentTable.getSelectionModel().selectFirst();
             }
         }));
     }
