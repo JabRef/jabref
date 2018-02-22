@@ -101,13 +101,15 @@ public class SaveDatabaseAction extends AbstractWorker {
     @Override
     public void update() {
         if (success) {
-            // Reset title of tab
-            frame.setTabTitle(panel, panel.getTabTitle(),
-                    panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
-            frame.output(Localization.lang("Saved library") + " '"
-                    + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
-            frame.setWindowTitle();
-            frame.updateAllTabTitles();
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                // Reset title of tab
+                frame.setTabTitle(panel, panel.getTabTitle(),
+                        panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
+                frame.output(Localization.lang("Saved library") + " '"
+                        + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
+                frame.setWindowTitle();
+                frame.updateAllTabTitles();
+            });
         } else if (!canceled) {
             if (fileLockedError) {
                 // TODO: user should have the option to override the lock file.

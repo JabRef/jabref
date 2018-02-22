@@ -1439,12 +1439,14 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     }
 
     private void removeTab(BasePanel panel) {
-        panel.cleanUp();
-        tabbedPane.getTabs().remove(getTab(panel));
-        setWindowTitle();
-        output(Localization.lang("Closed library") + '.');
-        // update tab titles
-        updateAllTabTitles();
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            panel.cleanUp();
+            tabbedPane.getTabs().remove(getTab(panel));
+            setWindowTitle();
+            output(Localization.lang("Closed library") + '.');
+            // update tab titles
+            updateAllTabTitles();
+        });
     }
 
     public void closeCurrentTab() {
