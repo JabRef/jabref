@@ -32,7 +32,7 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
     }
 
     private Boolean initColumnSize(TableView<?> table) {
-        double tableWidth = table.getWidth();
+        double tableWidth = getContentWidth(table);
         List<? extends TableColumnBase<?, ?>> visibleLeafColumns = table.getVisibleLeafColumns();
         double totalWidth = visibleLeafColumns.stream().mapToDouble(TableColumnBase::getWidth).sum();
 
