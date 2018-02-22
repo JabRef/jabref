@@ -7,15 +7,20 @@
 
 .table-view .column-header-background {
     -fx-background-color: -fx-light-background;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: darkgrey;
+}
+
+.table-view .column-header-background:hover {
+    -fx-background-color: darkgray;
 }
 
 .table-view .column-header,
 .table-view .filler {
-    -fx-background-color: -fx-light-background;
+    -fx-background-color: transparent, -fx-light-background;
+    -fx-background-insets: 0, 0 0.02em 0 0.02em;
     -fx-font-weight: bold;
     -fx-size: 3em;
-    -fx-border-width: 0 0 1 0;
-    -fx-border-color: darkgrey;
 }
 
 .table-view .column-header > .label {
