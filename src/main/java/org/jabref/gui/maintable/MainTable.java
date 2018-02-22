@@ -12,17 +12,23 @@ import javax.swing.JTable;
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.EntryMarker;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -35,9 +41,12 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.TypedBibEntry;
+import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -93,6 +102,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 })
                 .withContextMenu(entry1 -> RightClickMenu.create(entry1, keyBindingRepository, panel, Globals.getKeyPrefs()))
                 .setOnDragDetected(this::handleOnDragDetected)
+                .setOnDragDropped(this::handleOnDragDropped)
+                .setOnDragOver(this::handleOnDragOver)
                 .setOnMouseDragEntered(this::handleOnDragEntered)
                 .install(this);
         if (preferences.resizeColumnsToFit()) {
@@ -279,6 +290,48 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private void handleOnDragDetected(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel entry, MouseEvent event) {
         // Start drag'n'drop
         row.startFullDrag();
+
+        List<BibEntry> entries = getSelectionModel().getSelectedItems().stream().map(BibEntryTableViewModel::getEntry).collect(Collectors.toList());
+        BibEntryWriter writer = new BibEntryWriter(new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()), false);
+        try {
+            String serializedEntries = writer.serializeAll(entries, BibDatabaseMode.BIBTEX);
+
+        if (entries != null) {
+            ClipboardContent content = new ClipboardContent();
+            Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
+            //We have to use the model class here, as the content of the dragboard must be serializable
+            content.put(DragAndDropDataFormats.ENTRIES, entries);
+
+            dragboard.setContent(content);
+        }
+        } catch (IOException e) {
+            LOGGER.error("Problem serializing entries", e);
+        }
+        event.consume();
+    }
+
+    private void handleOnDragDropped(BibEntryTableViewModel originalItem, DragEvent event) {
+
+        Dragboard dragboard = event.getDragboard();
+        boolean success = false;
+
+        ObservableList<BibEntryTableViewModel> items = this.itemsProperty().get();
+
+        if (dragboard.hasContent(DragAndDropDataFormats.ENTRIES)) {
+            @SuppressWarnings("unchecked")
+
+            List<BibEntry> entries = (List<BibEntry>) dragboard.getContent(DragAndDropDataFormats.ENTRIES);
+            System.out.println(entries);
+        }
+        event.setDropCompleted(success);
+        event.consume();
+
+    }
+
+    private void handleOnDragOver(BibEntryTableViewModel originalItem, DragEvent event) {
+        if ((event.getGestureSource() != originalItem) && event.getDragboard().hasContent(DragAndDropDataFormats.ENTRIES)) {
+            event.acceptTransferModes(TransferMode.MOVE);
+        }
     }
 
     public void addSelectionListener(ListChangeListener<? super BibEntryTableViewModel> listener) {
