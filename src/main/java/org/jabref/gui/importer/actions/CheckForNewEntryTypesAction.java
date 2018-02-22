@@ -37,7 +37,6 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
 
     @Override
     public void performAction(BasePanel panel, ParserResult parserResult) {
-
         BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult);
 
         List<EntryType> typesToStore = determineEntryTypesToSave(panel, getListOfUnknownAndUnequalCustomizations(parserResult), mode);

@@ -44,8 +44,6 @@ public class NewEntryFromPlainTextAction extends SimpleCommand {
         if (tidialog.okPressed()) {
             UpdateField.setAutomaticFields(bibEntry, false, false, prefs);
             jabRefFrame.getCurrentBasePanel().insertEntry(bibEntry);
-
         }
     }
-
 }

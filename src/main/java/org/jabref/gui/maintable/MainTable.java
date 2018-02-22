@@ -1,37 +1,54 @@
 package org.jabref.gui.maintable;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.JTable;
+import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseDragEvent;
+import javafx.scene.input.MouseEvent;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.EntryMarker;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.renderer.CompleteRenderer;
 import org.jabref.gui.renderer.GeneralRenderer;
 import org.jabref.gui.renderer.IncompleteRenderer;
+import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.TypedBibEntry;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.matchers.Matcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MainTable extends TableView<BibEntryTableViewModel> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainTable.class);
+
     private static GeneralRenderer defRenderer;
     private static GeneralRenderer reqRenderer;
     private static GeneralRenderer optRenderer;
@@ -53,42 +70,37 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     //private final boolean tableResolvedColorCodes;
 
     private final ScrollPane pane;
+    private final BibDatabaseContext database;
+    private final UndoManager undoManager;
     // needed to activate/deactivate the listener
     private PersistenceTableColumnListener tableColumnListener;
 
     private final MainTableDataModel model;
-    // Enum used to define how a cell should be rendered.
-    private enum CellRendererMode {
-        REQUIRED,
-        RESOLVED,
-        OPTIONAL,
-        OTHER
-        }
-
-    static {
-        //MainTable.updateRenderers();
-    }
 
     public MainTable(MainTableDataModel model, JabRefFrame frame,
-                     BasePanel panel, BibDatabaseContext database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
+            BasePanel panel, BibDatabaseContext database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
         super();
         this.model = model;
+        this.database = Objects.requireNonNull(database);
+        this.undoManager = panel.getUndoManager();
 
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
-        this.setRowFactory(new ViewModelTableRowFactory<BibEntryTableViewModel>()
+        new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
                     if (event.getClickCount() == 2) {
                         panel.showAndEdit(entry.getEntry());
                     }
                 })
-                .withContextMenu(entry1 -> RightClickMenu.create(entry1, keyBindingRepository, panel, Globals.getKeyPrefs())));
+                .withContextMenu(entry1 -> RightClickMenu.create(entry1, keyBindingRepository, panel, Globals.getKeyPrefs()))
+                .setOnDragDetected(this::handleOnDragDetected)
+                .setOnMouseDragEntered(this::handleOnDragEntered)
+                .install(this);
         if (preferences.resizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
         }
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        ObservableList<BibEntryTableViewModel> entries = model.getEntriesFiltered();
-        this.setItems(entries);
+        this.setItems(model.getEntriesFiltered());
 
         // Enable sorting
         model.bindComparator(this.comparatorProperty());
@@ -115,12 +127,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // TODO: Tooltip for column header
         /*
         @Override
-    public String getToolTipText(MouseEvent event) {
+        public String getToolTipText(MouseEvent event) {
         int index = columnModel.getColumnIndexAtX(event.getX());
         int realIndex = columnModel.getColumn(index).getModelIndex();
         MainTableColumn column = tableFormat.getTableColumn(realIndex);
         return column.getDisplayName();
-    }
+        }
          */
 
         // TODO: store column widths
@@ -139,53 +151,134 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // TODO: Float marked entries
         //model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
-        // TODO: Keybindings
-        //Override 'selectNextColumnCell' and 'selectPreviousColumnCell' to move rows instead of cells on TAB
-        /*
-        ActionMap actionMap = getActionMap();
-        InputMap inputMap = getInputMap();
-        actionMap.put("selectNextColumnCell", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                panel.selectNextEntry();
-            }
-        });
-        actionMap.put("selectPreviousColumnCell", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                panel.selectPreviousEntry();
-            }
-        });
-        actionMap.put("selectNextRow", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                panel.selectNextEntry();
-            }
-        });
-        actionMap.put("selectPreviousRow", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                panel.selectPreviousEntry();
-            }
-        });
+        setupKeyBindings(keyBindingRepository);
+    }
 
-        String selectFirst = "selectFirst";
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SELECT_FIRST_ENTRY), selectFirst);
-        actionMap.put(selectFirst, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                panel.selectFirstEntry();
+    public void clearAndSelect(BibEntry bibEntry) {
+        findEntry(bibEntry)
+                .ifPresent(entry -> {
+                    getSelectionModel().clearSelection();
+                    getSelectionModel().select(entry);
+                    scrollTo(entry);
+                });
+    }
+
+    public void copy() {
+        List<BibEntry> selectedEntries = getSelectedEntries();
+
+        if (!selectedEntries.isEmpty()) {
+            try {
+                Globals.clipboardManager.setClipboardContent(selectedEntries);
+                panel.output(panel.formatOutputMessage(Localization.lang("Copied"), selectedEntries.size()));
+            } catch (IOException e) {
+                LOGGER.error("Error while copying selected entries to clipboard", e);
+            }
+        }
+    }
+
+    // Enum used to define how a cell should be rendered.
+    private enum CellRendererMode {
+        REQUIRED,
+        RESOLVED,
+        OPTIONAL,
+        OTHER
+    }
+
+    static {
+        //MainTable.updateRenderers();
+    }
+
+    public void cut() {
+        copy();
+        panel.delete(true);
+    }
+
+    private void setupKeyBindings(KeyBindingRepository keyBindings) {
+        this.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            Optional<KeyBinding> keyBinding = keyBindings.mapToKeyBinding(event);
+            if (keyBinding.isPresent()) {
+                switch (keyBinding.get()) {
+                    case SELECT_FIRST_ENTRY:
+                        clearAndSelectFirst();
+                        event.consume();
+                        break;
+                    case SELECT_LAST_ENTRY:
+                        clearAndSelectLast();
+                        event.consume();
+                        break;
+                    case PASTE:
+                        paste();
+                        event.consume();
+                        break;
+                    case COPY:
+                        copy();
+                        event.consume();
+                        break;
+                    case CUT:
+                        cut();
+                        event.consume();
+                        break;
+                    default:
+                        // Pass other keys to parent
+                }
             }
         });
+    }
 
-        String selectLast = "selectLast";
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SELECT_LAST_ENTRY), selectLast);
-        actionMap.put(selectLast, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                panel.selectLastEntry();
+    private void clearAndSelectFirst() {
+        getSelectionModel().clearSelection();
+        getSelectionModel().selectFirst();
+        scrollTo(0);
+    }
+
+    private void clearAndSelectLast() {
+        getSelectionModel().clearSelection();
+        getSelectionModel().selectLast();
+        scrollTo(getItems().size() - 1);
+    }
+
+    public void paste() {
+        // Find entries in clipboard
+        List<BibEntry> entriesToAdd = new ClipBoardManager().extractBibEntriesFromClipboard();
+
+        if (!entriesToAdd.isEmpty()) {
+            // Add new entries
+            NamedCompound ce = new NamedCompound((entriesToAdd.size() > 1 ? Localization.lang("paste entries") : Localization.lang("paste entry")));
+            for (BibEntry entryToAdd : entriesToAdd) {
+                UpdateField.setAutomaticFields(entryToAdd, Globals.prefs.getUpdateFieldPreferences());
+
+                database.getDatabase().insertEntry(entryToAdd);
+
+                ce.addEdit(new UndoableInsertEntry(database.getDatabase(), entryToAdd));
             }
-        });*/
+            ce.end();
+            undoManager.addEdit(ce);
+
+            panel.output(panel.formatOutputMessage(Localization.lang("Pasted"), entriesToAdd.size()));
+
+            // Show editor if user want us to do this
+            BibEntry firstNewEntry = entriesToAdd.get(0);
+            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
+                panel.showAndEdit(firstNewEntry);
+            }
+
+            // Select and focus first new entry
+            clearAndSelect(firstNewEntry);
+            this.requestFocus();
+        }
+    }
+
+    private void handleOnDragEntered(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel entry, MouseDragEvent event) {
+        // Support the following gesture to select entries: click on one row -> hold mouse button -> move over other rows
+        // We need to select all items between the starting row and the row where the user currently hovers the mouse over
+        // It is not enough to just select the currently hovered row since then sometimes rows are not marked selected if the user moves to fast
+        TableRow<BibEntryTableViewModel> sourceRow = (TableRow<BibEntryTableViewModel>) event.getGestureSource();
+        getSelectionModel().selectRange(sourceRow.getIndex(), row.getIndex());
+    }
+
+    private void handleOnDragDetected(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel entry, MouseEvent event) {
+        // Start drag'n'drop
+        row.startFullDrag();
     }
 
     public void addSelectionListener(ListChangeListener<? super BibEntryTableViewModel> listener) {
@@ -353,7 +446,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 int index = -1;
 
                 // TODO where is this prefix set?
-//                if (!sortFields[i].startsWith(MainTableFormat.ICON_COLUMN_PREFIX))
+        //                if (!sortFields[i].startsWith(MainTableFormat.ICON_COLUMN_PREFIX))
                 if (sortFields[i].startsWith("iconcol:")) {
                     for (int j = 0; j < tableFormat.getColumnCount(); j++) {
                         if (sortFields[i].equals(tableFormat.getColumnName(j))) {
@@ -398,9 +491,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, false);
             }
         });
-*/
+        */
     }
-/*
+    /*
     // TODO: Reenable background coloring of fields (required/optional/...)
     private CellRendererMode getCellStatus(int row, int col, boolean checkResolved) {
         try {
@@ -477,13 +570,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         */
     }
 
-
     public static void updateRenderers() {
 
         MainTable.defRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND),
                 Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
-        Color sel = MainTable.defRenderer.getTableCellRendererComponent
-                (new JTable(), "", true, false, 0, 0).getBackground();
+        Color sel = MainTable.defRenderer.getTableCellRendererComponent(new JTable(), "", true, false, 0, 0).getBackground();
         MainTable.reqRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND), Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
         MainTable.optRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND), Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
         MainTable.resolvedRenderer = new GeneralRenderer(

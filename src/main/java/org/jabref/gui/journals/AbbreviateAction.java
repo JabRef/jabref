@@ -1,8 +1,11 @@
 package org.jabref.gui.journals;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
@@ -13,15 +16,19 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
- * Converts journal full names to either iso or medline abbreviations for all selected entries.
+ * Converts journal full names to either iso or medline abbreviations for all
+ * selected entries.
  */
 public class AbbreviateAction extends AbstractWorker {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbbreviateAction.class);
     private final BasePanel panel;
     private String message = "";
     private final boolean iso;
-
 
     public AbbreviateAction(BasePanel panel, boolean iso) {
         this.panel = panel;
@@ -36,17 +43,14 @@ public class AbbreviateAction extends AbstractWorker {
     @Override
     public void run() {
         List<BibEntry> entries = panel.getSelectedEntries();
-        if (entries == null) {
-            return;
-        }
-
-        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(Globals.journalAbbreviationLoader
-                .getRepository(Globals.prefs.getJournalAbbreviationPreferences()), iso);
+        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
+                Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
+                iso);
 
         NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
-        int count = 0;
+        Set<Callable<Boolean>> tasks = new HashSet<>();
 
-        List<Boolean> futures = new ArrayList<>();
+        // Collect all callables to execute in one collection.
         for (BibEntry entry : entries) {
             Callable<Boolean> callable = () -> {
                 for (String journalField : InternalBibtexFields.getJournalNameFields()) {
@@ -54,17 +58,23 @@ public class AbbreviateAction extends AbstractWorker {
                         return true;
                     }
                 }
-
                 return false;
             };
-            JabRefExecutorService.INSTANCE.executeAndWait(callable);
-            futures.add(JabRefExecutorService.INSTANCE.executeAndWait(callable));
+            tasks.add(callable);
         }
 
-        for (Boolean future : futures) {
-            if (future)
-                count++;
-        }
+        // Execute the callables and wait for the results.
+        List<Future<Boolean>> futures = JabRefExecutorService.INSTANCE.executeAll(tasks);
+
+        // Evaluate the results of the callables.
+        long count = futures.stream().filter(future -> {
+            try {
+                return future.get();
+            } catch (InterruptedException | ExecutionException exception) {
+                LOGGER.error("Unable to retrieve value.", exception);
+                return false;
+            }
+        }).count();
 
         if (count > 0) {
             ce.end();

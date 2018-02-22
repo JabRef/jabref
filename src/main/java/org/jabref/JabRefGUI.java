@@ -23,7 +23,7 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.autosaveandbackup.BackupUIManager;
+import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
@@ -34,14 +34,12 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 public class JabRefGUI {
 
@@ -74,12 +72,6 @@ public class JabRefGUI {
     }
 
     private void openWindow(Stage mainStage) {
-
-        // This property is set to make the Mac OSX Java VM move the menu bar to the top of the screen
-        if (OS.OS_X) {
-            System.setProperty("apple.laf.useScreenMenuBar", "true");
-        }
-
         // Set antialiasing on everywhere. This only works in JRE >= 1.5.
         // Or... it doesn't work, period.
         // TODO test and maybe remove this! I found this commented out with no additional info ( payload@lavabit.com )
@@ -313,5 +305,4 @@ public class JabRefGUI {
     public static void setMainFrame(JabRefFrame mainFrame) {
         JabRefGUI.mainFrame = mainFrame;
     }
-
 }

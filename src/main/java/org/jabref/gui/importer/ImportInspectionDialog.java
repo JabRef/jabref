@@ -834,7 +834,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 }
 
                 entry.setId(IdGenerator.next());
-                ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
+                ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
             }
             panel.getDatabase().insertEntries(selected);
 

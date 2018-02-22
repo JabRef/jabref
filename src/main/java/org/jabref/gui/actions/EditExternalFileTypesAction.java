@@ -7,11 +7,11 @@ public class EditExternalFileTypesAction extends SimpleCommand {
 
     private ExternalFileTypeEditor editor;
 
-
     @Override
     public void execute() {
         if (editor == null) {
             editor = new ExternalFileTypeEditor(null);
+            editor.setVisible(true);
 
         }
 

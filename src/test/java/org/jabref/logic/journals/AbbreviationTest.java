@@ -1,9 +1,8 @@
 package org.jabref.logic.journals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AbbreviationTest {
 
@@ -46,8 +45,7 @@ public class AbbreviationTest {
     @Test
     public void testIsoAndMedlineAbbreviationsAreSame() {
         Abbreviation abbreviation = new Abbreviation(" Long Name ", " L N ");
-
-        assertTrue(abbreviation.getIsoAbbreviation().equals(abbreviation.getMedlineAbbreviation()));
+        assertEquals(abbreviation.getIsoAbbreviation(), abbreviation.getMedlineAbbreviation());
     }
 
 }

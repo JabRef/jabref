@@ -82,30 +82,6 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private JPanel content;
 
-    public OpenOfficePanel(JabRefFrame jabRefFrame) {
-        Icon connectImage = IconTheme.JabRefIcons.CONNECT_OPEN_OFFICE.getSmallIcon();
-
-        connect = new JButton(connectImage);
-        manualConnect = new JButton(connectImage);
-        connect.setToolTipText(Localization.lang("Connect"));
-        manualConnect.setToolTipText(Localization.lang("Manual connect"));
-        connect.setPreferredSize(new Dimension(24, 24));
-        manualConnect.setPreferredSize(new Dimension(24, 24));
-
-        selectDocument = new JButton(IconTheme.JabRefIcons.OPEN.getSmallIcon());
-        selectDocument.setToolTipText(Localization.lang("Select Writer document"));
-        selectDocument.setPreferredSize(new Dimension(24, 24));
-        update = new JButton(IconTheme.JabRefIcons.REFRESH.getSmallIcon());
-        update.setToolTipText(Localization.lang("Sync OpenOffice/LibreOffice bibliography"));
-        update.setPreferredSize(new Dimension(24, 24));
-        preferences = new OpenOfficePreferences(Globals.prefs);
-        loader = new StyleLoader(preferences,
-                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
-                Globals.prefs.getDefaultEncoding());
-
-        this.frame = jabRefFrame;
-        initPanel();
-    }
     private JDialog diag;
     private final JButton connect;
     private final JButton manualConnect;
@@ -130,6 +106,31 @@ public class OpenOfficePanel extends AbstractWorker {
     private IOException connectException;
     private final OpenOfficePreferences preferences;
     private final StyleLoader loader;
+
+    public OpenOfficePanel(JabRefFrame jabRefFrame) {
+        Icon connectImage = IconTheme.JabRefIcons.CONNECT_OPEN_OFFICE.getSmallIcon();
+
+        connect = new JButton(connectImage);
+        manualConnect = new JButton(connectImage);
+        connect.setToolTipText(Localization.lang("Connect"));
+        manualConnect.setToolTipText(Localization.lang("Manual connect"));
+        connect.setPreferredSize(new Dimension(24, 24));
+        manualConnect.setPreferredSize(new Dimension(24, 24));
+
+        selectDocument = new JButton(IconTheme.JabRefIcons.OPEN.getSmallIcon());
+        selectDocument.setToolTipText(Localization.lang("Select Writer document"));
+        selectDocument.setPreferredSize(new Dimension(24, 24));
+        update = new JButton(IconTheme.JabRefIcons.REFRESH.getSmallIcon());
+        update.setToolTipText(Localization.lang("Sync OpenOffice/LibreOffice bibliography"));
+        update.setPreferredSize(new Dimension(24, 24));
+        preferences = new OpenOfficePreferences(Globals.prefs);
+        loader = new StyleLoader(preferences,
+                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
+                Globals.prefs.getDefaultEncoding());
+
+        this.frame = jabRefFrame;
+        initPanel();
+    }
 
     public JPanel getContent() {
         return content;

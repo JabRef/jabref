@@ -89,7 +89,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     private static LinkedFile fromFile(Path file, List<Path> fileDirectories) {
         String fileExtension = FileHelper.getFileExtension(file).orElse("");
         ExternalFileType suggestedFileType = ExternalFileTypes.getInstance()
-                .getExternalFileTypeByExt(fileExtension).orElse(new UnknownExternalFileType(fileExtension));
+                .getExternalFileTypeByExt(fileExtension)
+                .orElse(new UnknownExternalFileType(fileExtension));
         Path relativePath = FileUtil.shortenFileName(file, fileDirectories);
         return new LinkedFile("", relativePath.toString(), suggestedFileType.getName());
     }
@@ -305,7 +306,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         if (file.getFile().isOnlineLink()) {
             removeFileLink(file);
         } else {
-            boolean deleteSuccessful = file.delete();
+            boolean deleteSuccessful = file.delete(Globals.prefs.getFileDirectoryPreferences());
             if (deleteSuccessful) {
                 files.remove(file);
             }

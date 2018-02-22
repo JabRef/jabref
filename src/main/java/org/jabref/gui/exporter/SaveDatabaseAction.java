@@ -15,8 +15,8 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.SidePaneType;
-import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import org.jabref.gui.collab.ChangeScanner;
+import org.jabref.gui.dialogs.AutosaveUIManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;
@@ -172,9 +172,6 @@ public class SaveDatabaseAction extends AbstractWorker {
     private boolean saveDatabase(File file, boolean selectedOnly, Charset encoding) throws SaveException {
         SaveSession session;
 
-        // block user input
-        frame.block();
-
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(encoding);
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
@@ -211,9 +208,6 @@ public class SaveDatabaseAction extends AbstractWorker {
                     Localization.lang("Save library"), JOptionPane.ERROR_MESSAGE);
             // FIXME: rethrow anti-pattern
             throw new SaveException("rt");
-        } finally {
-            // re-enable user input
-            frame.unblock();
         }
 
         // handle encoding problems
@@ -293,10 +287,8 @@ public class SaveDatabaseAction extends AbstractWorker {
                 .addExtensionFilter(FileType.BIBTEX_DB)
                 .withDefaultExtension(FileType.BIBTEX_DB)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-        DialogService ds = frame.getDialogService();
-
-        Optional<Path> path = DefaultTaskExecutor
-                .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
+        DialogService dialogService = frame.getDialogService();
+        Optional<Path> path = dialogService.showFileSaveDialog(fileDialogConfiguration);
         if (path.isPresent()) {
             saveAs(path.get().toFile());
         } else {

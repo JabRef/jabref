@@ -17,7 +17,4 @@ public class ManageCustomExportsAction extends SimpleCommand {
         ecd.setVisible(true);
     }
 
-
-
-
 }

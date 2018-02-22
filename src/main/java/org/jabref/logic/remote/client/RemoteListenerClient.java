@@ -35,8 +35,8 @@ public class RemoteListenerClient {
 
                 if (!Protocol.IDENTIFIER.equals(identifier)) {
                     String port = String.valueOf(remoteServerPort);
-                    String error = Localization.lang("Cannot use port %0 for remote operation; another application may be using it. Try specifying another port.", port);
-                    System.out.println(error);
+                    String errorMessage = Localization.lang("Cannot use port %0 for remote operation; another application may be using it. Try specifying another port.", port);
+                    LOGGER.error(errorMessage);
                     return false;
                 }
                 protocol.sendMessage(String.join("\n", args));

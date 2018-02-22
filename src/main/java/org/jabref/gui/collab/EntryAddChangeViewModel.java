@@ -37,7 +37,7 @@ class EntryAddChangeViewModel extends ChangeViewModel {
         diskEntry.setId(IdGenerator.next());
         panel.getDatabase().insertEntry(diskEntry);
         secondary.insertEntry(diskEntry);
-        undoEdit.addEdit(new UndoableInsertEntry(panel.getDatabase(), diskEntry, panel));
+        undoEdit.addEdit(new UndoableInsertEntry(panel.getDatabase(), diskEntry));
         return true;
     }
 

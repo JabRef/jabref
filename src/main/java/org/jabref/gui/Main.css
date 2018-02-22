@@ -265,6 +265,105 @@
     -fx-table-cell-border-color: transparent;
 }
 
+.scroll-pane,
+.split-pane {
+    -fx-background-insets: 0, 0;
+    -fx-padding: 0;
+}
+
+.text-input {
+    -fx-background-color: #cacbca, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+}
+
+.text-input:focused {
+    -fx-background-color: -fx-active-background, -fx-control-inner-background;
+    -fx-background-insets: 0, 2;
+}
+
+.text-area {
+    -fx-background-color: white;
+}
+
+.text-area .content {
+    -fx-background-color: #cacbca, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-padding: 0.333333em 0.583em 0.333333em 0.583em;
+}
+
+.text-area:focused .content {
+    -fx-background-color: -fx-active-background, -fx-control-inner-background;
+    -fx-background-insets: 0, 2;
+}
+
+.date-picker > .text-field:focused {
+    -fx-background-color: -fx-active-background, -fx-control-inner-background;
+    -fx-background-insets: 0, 2;
+}
+
+.scroll-bar {
+    -fx-background-color: transparent;
+    -fx-opacity: 0;
+}
+
+.scroll-bar:horizontal .track,
+.scroll-bar:vertical .track {
+    -fx-background-color: derive(#868786, 20%);
+    -fx-opacity: 0.2;
+    -fx-background-radius: 0em;
+}
+
+.scroll-bar:horizontal .thumb,
+.scroll-bar:vertical .thumb {
+    -fx-background-color: derive(#757575, 60%);
+    -fx-background-insets: 0, 0, 0;
+    -fx-background-radius: 0em;
+}
+
+.scroll-bar .thumb:hover,
+.scroll-bar .thumb:pressed {
+    -fx-background-color: derive(black, 70%);
+}
+
+/* Hide increment and decrement buttons */
+.scroll-bar > .increment-button,
+.scroll-bar > .decrement-button {
+    -fx-background-color: null;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+/* Hide increment and decrement arrows */
+.scroll-bar:horizontal > .decrement-button > .decrement-arrow,
+.scroll-bar:horizontal > .increment-button > .increment-arrow,
+.scroll-bar:vertical > .decrement-button > .decrement-arrow,
+.scroll-bar:vertical > .increment-button > .increment-arrow {
+    -fx-background-color: null;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-shape: null;
+    -fx-padding: 0;
+}
+
+/* Need some padding since otherwise no scroll-bar is displayed at all */
+.scroll-bar:horizontal > .decrement-button > .decrement-arrow {
+    -fx-padding: 0.333em 0.167em 0.333em 0.167em; /* 4 2 4 2 */
+}
+
+.scroll-bar:vertical > .decrement-button > .decrement-arrow {
+    -fx-padding: 0em 0.333em 0em 0.333em; /* 2 4 2 4 */
+}
+
+/* Only show scrollbars for hovered elements */
+.list-view:hover .scroll-bar,
+.tree-view:hover .scroll-bar,
+.table-view:hover .scroll-bar,
+.tree-table-view:hover .scroll-bar,
+.text-input:hover .scroll-bar {
+    -fx-opacity: 1;
+}
+
 .sidePaneComponentHeader {
     -fx-background-color: -fx-dark-background;
 }

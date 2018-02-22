@@ -11,18 +11,17 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class PdfContentImporterTest {
 
     private PdfContentImporter importer;
 
-
-    @Before
+    @BeforeEach
     public void setUp() {
         importer = new PdfContentImporter(mock(ImportFormatPreferences.class));
     }
