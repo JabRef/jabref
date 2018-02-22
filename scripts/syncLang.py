@@ -213,6 +213,14 @@ class SyncLang:
     def set_extended_logging_enabled(self, value):
         self.extended_logging = bool(value)
         
+    def print_missing_keys(self):
+        for file in self.__other_jabref_properties():
+            file_name = self.__format_filename(file)
+            self.print_missing_keys_for_file(file_name)
+        for file in self.__other_menu_properties():
+            file_name = self.__format_filename(file)
+            self.print_missing_keys_for_file(file_name)
+        
     def print_missing_keys_for_file(self, file_name):
         file_status = self.__get_status_for_file(file_name)
         if file_status:
@@ -223,6 +231,15 @@ class SyncLang:
                 self.__print_keys(keys_missing)
             else:
                 logging.info("No missing keys found for file:" + file_name)
+                
+    def print_obsolete_keys(self):
+        for file in self.__other_jabref_properties():
+            file_name = self.__format_filename(file)
+            self.print_obsolete_keys_for_file(file_name)
+        for file in self.__other_menu_properties():
+            file_name = self.__format_filename(file)
+            self.print_obsolete_keys_for_file(file_name)
+                
     
     def print_obsolete_keys_for_file(self, file_name):
         file_status = self.__get_status_for_file(file_name)
@@ -235,6 +252,14 @@ class SyncLang:
                 self.__print_keys(keys_obsolete)
             else:
                 logging.info("No obsolete keys found for file: " + file_name)
+                
+    def print_duplicate_keys(self):
+        for file in self.__other_jabref_properties():
+            file_name = self.__format_filename(file)
+            self.print_duplicate_keys_for_file(file_name)
+        for file in self.__other_menu_properties():
+            file_name = self.__format_filename(file)
+            self.print_duplicate_keys_for_file(file_name)
 
     def print_duplicate_keys_for_file(self, file_name):
         file_status = self.__get_status_for_file(file_name)
@@ -569,16 +594,25 @@ def main():
         syncer.update_properties()
 
     def print_missing(args):
-        file_name = args.f
-        syncer.print_missing_keys_for_file(file_name)
+        file_name = args.file
+        if file_name:
+            syncer.print_missing_keys_for_file(file_name)
+        else:
+            syncer.print_missing_keys()
 
     def print_obsolete(args):
-        file_name = args.f
-        syncer.print_obsolete_keys_for_file(file_name)
+        file_name = args.file
+        if file_name:
+            syncer.print_obsolete_keys_for_file(file_name)
+        else:
+            syncer.print_obsolete_keys()
 
     def print_duplicates(args):
-        file_name = args.f
-        syncer.print_duplicate_keys_for_file(file_name)
+        file_name = args.file
+        if file_name:
+            syncer.print_duplicate_keys_for_file(file_name)
+        else:
+            syncer.print_duplicate_keys()
     
     parser = argparse.ArgumentParser(add_help=True)
     parser.description = "This script is used to synchronize the keys of different *.properties files."
@@ -586,7 +620,7 @@ def main():
     shared_arguments = argparse.ArgumentParser(add_help=False)
     extended_argument = shared_arguments.add_argument("-e", "--extended", help="Prints extended information about the process to the terminal", required=False, action='store_true', default=False)
     
-    subcommands = parser.add_subparsers(title="Subcommands", description="Provide different options for the user")
+    subcommands = parser.add_subparsers(title="Subcommands", description="Provide different options for the user", dest="subcommand")
     
     # markdown parser
     markdown_parser = subcommands.add_parser("markdown", description="Creates a markdown file of the current status")
@@ -605,9 +639,9 @@ def main():
     print_parser = subcommands.add_parser("print", description="Prints specific status info to the console")
     
     shared_print_arguments = argparse.ArgumentParser(add_help=False)
-    file_argument = shared_print_arguments.add_argument("-f", "-file", help="Specifies a file for the command to run with", required=True, action='store')
+    file_argument = shared_print_arguments.add_argument("-f", "--file", help="Specifies a file for the command to run with", required=False, action='store')
     
-    print_options = print_parser.add_subparsers(title="Print Options", description="Different options for printing")
+    print_options = print_parser.add_subparsers(title="Print Options", description="Different options for printing", dest="print_option_name")
     
     missing_parser = print_options.add_parser("missing", description="Prints all missing keys", parents=[shared_print_arguments])
     missing_parser.set_defaults(func=print_missing)
