@@ -67,12 +67,12 @@ public class ImportFormats {
                 List<FileType> extensions = importers.stream().map(Importer::getFileType)
                         .collect(Collectors.toList());
                 FileChooser.ExtensionFilter allImports = FileFilterConverter.forAllImporters(importers);
-
                 FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                         .addExtensionFilter(allImports)
                         .addExtensionFilters(extensions)
                         .withInitialDirectory(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY))
                         .build();
+                fileDialogConfiguration.getExtensionFilters().add(new FileChooser.ExtensionFilter("Any file", "*.*"));
                 DialogService dialogService = new FXDialogService();
                 DefaultTaskExecutor.runInJavaFXThread(() -> {
                     dialogService.showFileOpenDialog(fileDialogConfiguration)

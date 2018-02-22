@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Added "*.*" (any file type) to the Import File Filter Dialog. [#3757] (https://github.com/JabRef/jabref/issues/3757)
 - Abbreviate journal names functionality is now running parallel, increasing performance significantly. [#2831] (https://github.com/JabRef/jabref/issues/2831)
 - Changed order of items in context menu [#298] (https://github.com/koppor/jabref/issues/298)
 - Changed ID-based entry generator to store the last used fetcher. [#2796] (https://github.com/JabRef/jabref/issues/2796)
