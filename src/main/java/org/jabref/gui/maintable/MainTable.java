@@ -43,6 +43,8 @@ import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
+import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabaseContext;
@@ -296,14 +298,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         try {
             String serializedEntries = writer.serializeAll(entries, BibDatabaseMode.BIBTEX);
 
-        if (entries != null) {
-            ClipboardContent content = new ClipboardContent();
-            Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
-            //We have to use the model class here, as the content of the dragboard must be serializable
-            content.put(DragAndDropDataFormats.ENTRIES, entries);
+            if (entries != null) {
+                ClipboardContent content = new ClipboardContent();
+                Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
+                //We have to use the model class here, as the content of the dragboard must be serializable
+                content.put(DragAndDropDataFormats.ENTRIES, serializedEntries);
 
-            dragboard.setContent(content);
-        }
+                dragboard.setContent(content);
+            }
         } catch (IOException e) {
             LOGGER.error("Problem serializing entries", e);
         }
@@ -320,8 +322,17 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if (dragboard.hasContent(DragAndDropDataFormats.ENTRIES)) {
             @SuppressWarnings("unchecked")
 
-            List<BibEntry> entries = (List<BibEntry>) dragboard.getContent(DragAndDropDataFormats.ENTRIES);
-            System.out.println(entries);
+            String entries = (String) dragboard.getContent(DragAndDropDataFormats.ENTRIES);
+
+            BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+            try {
+                List<BibEntry> parsedEntries = parser.parseEntries(entries);
+                System.out.println(parsedEntries);
+
+            } catch (ParseException e) {
+                LOGGER.error("could not parse entries", e);
+            }
+
         }
         event.setDropCompleted(success);
         event.consume();
