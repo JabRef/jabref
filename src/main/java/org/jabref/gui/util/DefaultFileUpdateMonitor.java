@@ -2,6 +2,7 @@ package org.jabref.gui.util;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
  * Implementation based on https://stackoverflow.com/questions/16251273/can-i-watch-for-single-file-change-with-watchservice-not-the-whole-directory
  */
 public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFileUpdateMonitor.class);
 
     private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
@@ -69,10 +71,17 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     @Override
     public void addListenerForFile(Path file, FileUpdateListener listener) throws IOException {
         // We can't watch files directly, so monitor their parent directory for updates
-        Path directory = file.toAbsolutePath().getParent();
-        directory.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
 
-        listeners.put(file, listener);
+        Path directory = file.toAbsolutePath().getParent();
+                System.out.println(directory);
+        if ((directory != null) && Files.exists(directory)) {
+            directory.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
+
+            listeners.put(file, listener);
+        }
+        else {
+            System.out.println("Dir not exist " + directory);
+        }
     }
 
     @Override
