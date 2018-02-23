@@ -14,11 +14,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MainArchitectureTests {
 
@@ -105,7 +106,7 @@ public class MainArchitectureTests {
                     })
                     .collect(Collectors.toList());
 
-            Assertions.assertEquals(Collections.emptyList(), files, "The following classes are not allowed to depend on " + secondPackage);
+            assertEquals(Collections.emptyList(), files, "The following classes are not allowed to depend on " + secondPackage);
         }
     }
 }
