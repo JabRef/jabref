@@ -670,15 +670,13 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org"))
 
                 );
-        rightSide.minWidthProperty().bind(sidePane.widthProperty());
-        rightSide.prefWidthProperty().bind(sidePane.widthProperty());
-        rightSide.maxWidthProperty().bind(sidePane.widthProperty());
 
         ToolBar toolBar = new ToolBar(
                 leftSide,
 
                 globalSearchBar,
 
+                rightSpacer,
                 rightSide
                 );
         toolBar.getStyleClass().add("mainToolbar");
