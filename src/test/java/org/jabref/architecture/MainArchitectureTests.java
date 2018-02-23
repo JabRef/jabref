@@ -14,11 +14,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MainArchitectureTests {
 
@@ -78,7 +79,8 @@ public class MainArchitectureTests {
     @ParameterizedTest(name = "{index} -- is {0} independent of {1}?")
     @MethodSource("getPackages")
     public void firstPackageIsIndependentOfSecondPackage(String firstPackage, String secondPackage) throws IOException {
-        Predicate<String> isExceptionPackage = (s) -> s.startsWith("import " + secondPackage)
+        Predicate<String> isExceptionPackage = (s) -> (s.startsWith("import " + secondPackage)
+                || s.startsWith("import static " + secondPackage))
                 && exceptions.getOrDefault(firstPackage, Collections.emptyList())
                         .stream()
                         .noneMatch(exception -> s.startsWith("import " + exception));
@@ -104,8 +106,7 @@ public class MainArchitectureTests {
                     })
                     .collect(Collectors.toList());
 
-            Assert.assertEquals("The following classes are not allowed to depend on " + secondPackage,
-                    Collections.emptyList(), files);
+            assertEquals(Collections.emptyList(), files, "The following classes are not allowed to depend on " + secondPackage);
         }
     }
 }
