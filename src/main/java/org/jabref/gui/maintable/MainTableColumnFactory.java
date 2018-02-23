@@ -121,7 +121,7 @@ class MainTableColumnFactory {
         if (entry.getEntry().getField(FieldName.TITLE).orElse("").contains("security")) {
             rectangle.setFill(Color.web("#5EBA7D"));
         } else {
-            rectangle.setFill(Color.WHITE);
+            rectangle.setFill(Color.TRANSPARENT);
         }
         //rectangle.setStyle("-fx-background-color: #5eba7d;");
         container.setLeft(rectangle);
