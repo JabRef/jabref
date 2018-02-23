@@ -36,6 +36,8 @@ The new default removes the linked file from the entry instead of deleting the f
 - The magnifier icon at the search shows the [search mode](https://help.jabref.org/en/Search#search-modes) again. [#3535](https://github.com/JabRef/jabref/issues/3535)
 - We added a new cleanup operation that replaces ligatures with their expanded form. [#3613](https://github.com/JabRef/jabref/issues/3613)
 - Pressing <kbd>ESC</kbd> while searching will clear the search field and select the first entry, if available, in the table. [koppor#293](https://github.com/koppor/jabref/issues/293)
+- We changed the metadata reading and writing. DublinCore is now the only metadata format, JabRef supports. (https://github.com/JabRef/jabref/pull/3710)
+- We added another CLI functionality for reading and writing metadata to pdfs. (see https://github.com/JabRef/jabref/pull/3756 and see http://help.jabref.org/en/CommandLine)
 
 ### Fixed
 - We fixed several performance problems with the management of journal abbreviations [#3323](https://github.com/JabRef/jabref/issues/3323)
