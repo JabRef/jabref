@@ -1,9 +1,11 @@
 package org.jabref.model.entry;
 
+import java.io.Serializable;
+
 /**
  *  Stores all informations needed to manage entries on a shared (SQL) database.
  */
-public class SharedBibEntryData {
+public class SharedBibEntryData implements Serializable {
 
     // This id is set by the remote database system (DBS).
     // It has to be unique on remote DBS for all connected JabRef instances.

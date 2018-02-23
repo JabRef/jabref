@@ -327,7 +327,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
             try {
                 List<BibEntry> parsedEntries = parser.parseEntries(entries);
+
                 System.out.println(parsedEntries);
+
 
             } catch (ParseException e) {
                 LOGGER.error("could not parse entries", e);
