@@ -42,12 +42,9 @@ import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.util.LocalDragboard;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.TypedBibEntry;
-import org.jabref.logic.bibtex.BibEntryWriter;
-import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -293,23 +290,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         row.startFullDrag();
 
         List<BibEntry> entries = getSelectionModel().getSelectedItems().stream().map(BibEntryTableViewModel::getEntry).collect(Collectors.toList());
-        BibEntryWriter writer = new BibEntryWriter(new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()), false);
-        try {
-            String serializedEntries = writer.serializeAll(entries, BibDatabaseMode.BIBTEX);
 
-            if (entries != null) {
-                ClipboardContent content = new ClipboardContent();
-                Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
-                //We have to use the model class here, as the content of the dragboard must be serializable
-                content.put(DragAndDropDataFormats.ENTRIES, "");
-                dragboard.setContent(content);
-
-                Class<List<BibEntry>> x = (Class<List<BibEntry>>) (Class<?>) List.class;
-                LocalDragboard.INSTANCE.putValue(x, entries);
-            }
-        } catch (IOException e) {
-            LOGGER.error("Problem serializing entries", e);
+        if (entries != null) {
+            ClipboardContent content = new ClipboardContent();
+            Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
+            content.put(DragAndDropDataFormats.ENTRIES, "");
+            dragboard.setContent(content);
+            LocalDragboard.INSTANCE.putValue(DragAndDropDataFormats.BIBENTRY_LIST_CLASS, entries);
         }
+
         event.consume();
     }
 
