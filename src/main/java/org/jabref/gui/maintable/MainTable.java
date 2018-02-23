@@ -1,6 +1,7 @@
 package org.jabref.gui.maintable;
 
 import java.awt.Color;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
@@ -277,6 +279,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         }
     }
 
+    private void handleOnDragOver(BibEntryTableViewModel originalItem, DragEvent event) {
+        if ((event.getGestureSource() != originalItem) && LocalDragboard.INSTANCE.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
+            event.acceptTransferModes(TransferMode.MOVE);
+        }
+        if (event.getDragboard().hasFiles()) {
+            event.acceptTransferModes(TransferMode.COPY, TransferMode.LINK);
+        }
+    }
+
     private void handleOnDragEntered(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel entry, MouseDragEvent event) {
         // Support the following gesture to select entries: click on one row -> hold mouse button -> move over other rows
         // We need to select all items between the starting row and the row where the user currently hovers the mouse over
@@ -312,18 +323,17 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             List<BibEntry> parsedEntries = LocalDragboard.INSTANCE.getValue(DragAndDropDataFormats.BIBENTRY_LIST_CLASS);
             success = true;
         }
+        if (event.getDragboard().hasContent(DataFormat.FILES)) {
 
-
+            List<File> files = event.getDragboard().getFiles();
+            System.out.println(files);
+        }
         event.setDropCompleted(success);
         event.consume();
 
     }
 
-    private void handleOnDragOver(BibEntryTableViewModel originalItem, DragEvent event) {
-        if ((event.getGestureSource() != originalItem) && LocalDragboard.INSTANCE.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
-            event.acceptTransferModes(TransferMode.MOVE);
-        }
-    }
+
 
     public void addSelectionListener(ListChangeListener<? super BibEntryTableViewModel> listener) {
         getSelectionModel().getSelectedItems().addListener(listener);
