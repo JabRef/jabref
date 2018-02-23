@@ -13,7 +13,6 @@ import javax.swing.JTable;
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
@@ -111,7 +110,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         }
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        this.setItems(model.getEntriesFiltered());
+        this.setItems(model.getEntriesFilteredAndSorted());
 
         // Enable sorting
         model.bindComparator(this.comparatorProperty());
@@ -317,14 +316,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         boolean success = false;
 
-        ObservableList<BibEntryTableViewModel> items = this.itemsProperty().get();
-
-        if (LocalDragboard.INSTANCE.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
-            List<BibEntry> parsedEntries = LocalDragboard.INSTANCE.getValue(DragAndDropDataFormats.BIBENTRY_LIST_CLASS);
-            success = true;
-        }
         if (event.getDragboard().hasContent(DataFormat.FILES)) {
-
             List<File> files = event.getDragboard().getFiles();
             System.out.println(files);
         }
@@ -439,7 +431,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     */
 
     public BibEntry getEntryAt(int row) {
-        return model.getEntriesFiltered().get(row).getEntry();
+        return model.getEntriesFilteredAndSorted().get(row).getEntry();
     }
 
     public List<BibEntry> getSelectedEntries() {
@@ -573,7 +565,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     */
 
     public Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {
-        return model.getEntriesFiltered().stream()
+        return model.getEntriesFilteredAndSorted().stream()
                 .filter(viewModel -> viewModel.getEntry().equals(entry))
                 .findFirst();
     }
@@ -603,7 +595,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private Optional<BibEntry> getBibEntry(int row) {
         try {
-            return Optional.of(model.getEntriesFiltered().get(row).getEntry());
+            return Optional.of(model.getEntriesFilteredAndSorted().get(row).getEntry());
         } catch (IndexOutOfBoundsException e) {
             return Optional.empty();
         }
