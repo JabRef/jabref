@@ -39,10 +39,12 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.LocalDragboard;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AllEntriesGroup;
 
 import org.controlsfx.control.textfield.CustomTextField;
@@ -82,15 +84,13 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         // Set-up bindings
-        Consumer<ObservableList<GroupNodeViewModel>> updateSelectedGroups =
-                (newSelectedGroups) -> newSelectedGroups.forEach(this::selectNode);
+        Consumer<ObservableList<GroupNodeViewModel>> updateSelectedGroups = (newSelectedGroups) -> newSelectedGroups.forEach(this::selectNode);
 
         BindingsHelper.bindContentBidirectional(
                 groupTree.getSelectionModel().getSelectedItems(),
                 viewModel.selectedGroupsProperty(),
                 updateSelectedGroups,
-                this::updateSelection
-        );
+                this::updateSelection);
 
         // We try to to prevent publishing changes in the search field directly to the search task that takes some time
         // for larger group structures.
@@ -244,11 +244,9 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                         success = true;
                     }
                 }
-                if (dragboard.hasContent(DragAndDropDataFormats.ENTRIES)) {
-                    TransferableEntrySelection entrySelection = (TransferableEntrySelection) dragboard
-                            .getContent(DragAndDropDataFormats.ENTRIES);
-
-                    row.getItem().addEntriesToGroup(entrySelection.getSelection());
+                if (LocalDragboard.INSTANCE.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
+                    List<BibEntry> parsedEntries = LocalDragboard.INSTANCE.getValue(DragAndDropDataFormats.BIBENTRY_LIST_CLASS);
+                    row.getItem().addEntriesToGroup(parsedEntries);
                     success = true;
                 }
                 event.setDropCompleted(success);
@@ -263,12 +261,12 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
     }
 
     private void updateSelection(List<TreeItem<GroupNodeViewModel>> newSelectedGroups) {
-        if (newSelectedGroups == null || newSelectedGroups.isEmpty()) {
+        if ((newSelectedGroups == null) || newSelectedGroups.isEmpty()) {
             viewModel.selectedGroupsProperty().clear();
         } else {
             List<GroupNodeViewModel> list = new ArrayList<>();
             for (TreeItem<GroupNodeViewModel> model : newSelectedGroups) {
-                if (model != null && model.getValue() != null && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)) {
+                if ((model != null) && (model.getValue() != null) && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)) {
                     list.add(model.getValue());
                 }
             }
@@ -286,7 +284,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
     }
 
     private Optional<TreeItem<GroupNodeViewModel>> getTreeItemByValue(TreeItem<GroupNodeViewModel> root,
-                                                                      GroupNodeViewModel value) {
+            GroupNodeViewModel value) {
         if (root.getValue().equals(value)) {
             return Optional.of(root);
         }

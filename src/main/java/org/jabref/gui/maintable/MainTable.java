@@ -310,10 +310,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         if (LocalDragboard.INSTANCE.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
             List<BibEntry> parsedEntries = LocalDragboard.INSTANCE.getValue(DragAndDropDataFormats.BIBENTRY_LIST_CLASS);
-            System.out.println(parsedEntries);
             success = true;
-
         }
+
 
         event.setDropCompleted(success);
         event.consume();

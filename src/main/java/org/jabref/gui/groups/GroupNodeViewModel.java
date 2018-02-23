@@ -22,6 +22,7 @@ import org.jabref.gui.JabRefIcon;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.LocalDragboard;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
@@ -250,7 +251,7 @@ public class GroupNodeViewModel {
     public boolean acceptableDrop(Dragboard dragboard) {
         // TODO: we should also check isNodeDescendant
         boolean canDropOtherGroup = dragboard.hasContent(DragAndDropDataFormats.GROUP);
-        boolean canDropEntries = dragboard.hasContent(DragAndDropDataFormats.ENTRIES)
+        boolean canDropEntries = LocalDragboard.INSTANCE.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)
                 && (groupNode.getGroup() instanceof GroupEntryChanger);
         return canDropOtherGroup || canDropEntries;
     }
