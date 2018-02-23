@@ -14,6 +14,9 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
@@ -33,13 +36,15 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
+import org.jabref.model.groups.AbstractGroup;
 
 import org.controlsfx.control.Rating;
 import org.fxmisc.easybind.EasyBind;
 
 class MainTableColumnFactory {
 
-    private static final String STYLE_ICON = "column-icon";
+    private static final String ICON_COLUMN = "column-icon";
+    private static final String GROUP_COLUMN = "column-groups";
 
     private final ColumnPreferences preferences;
     private final ExternalFileTypes externalFileTypes;
@@ -59,6 +64,8 @@ class MainTableColumnFactory {
 
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
+
+        columns.add(createGroupColumn());
 
         // Add column for linked files
         if (preferences.showFileColumn()) {
@@ -93,6 +100,34 @@ class MainTableColumnFactory {
         return columns;
     }
 
+    private TableColumn<BibEntryTableViewModel, ?> createGroupColumn() {
+        TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new TableColumn<>();
+        column.getStyleClass().add(GROUP_COLUMN);
+        setExactWidth(column, 20);
+        column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups());
+        new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
+                .withGraphic(this::createGroupColorRegion)
+                .install(column);
+        return column;
+    }
+
+    private Node createGroupColorRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
+        BorderPane container = new BorderPane();
+        Rectangle rectangle = new Rectangle();
+        // rectangle.setX(50);
+        //rectangle.setY(50);
+        rectangle.setWidth(3);
+        rectangle.setHeight(20);
+        if (entry.getEntry().getField(FieldName.TITLE).orElse("").contains("security")) {
+            rectangle.setFill(Color.web("#5EBA7D"));
+        } else {
+            rectangle.setFill(Color.WHITE);
+        }
+        //rectangle.setStyle("-fx-background-color: #5eba7d;");
+        container.setLeft(rectangle);
+        return container;
+    }
+
     private List<TableColumn<BibEntryTableViewModel, ?>> createNormalColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
@@ -115,7 +150,7 @@ class MainTableColumnFactory {
         TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> column = new TableColumn<>();
         SpecialFieldViewModel specialFieldViewModel = new SpecialFieldViewModel(specialField, undoManager);
         column.setGraphic(specialFieldViewModel.getIcon().getGraphicNode());
-        column.getStyleClass().add(STYLE_ICON);
+        column.getStyleClass().add(ICON_COLUMN);
         if (specialField == SpecialField.RANKING) {
             setExactWidth(column, GUIGlobals.WIDTH_ICON_COL_RANKING);
             new OptionalValueTableCellFactory<BibEntryTableViewModel, SpecialFieldValueViewModel>()
@@ -177,16 +212,16 @@ class MainTableColumnFactory {
                 });
     }
 
-    private void setExactWidth(TableColumn<?, ?> column, int widthIconCol) {
-        column.setMinWidth(widthIconCol);
-        column.setPrefWidth(widthIconCol);
-        column.setMaxWidth(widthIconCol);
+    private void setExactWidth(TableColumn<?, ?> column, int width) {
+        column.setMinWidth(width);
+        column.setPrefWidth(width);
+        column.setMaxWidth(width);
     }
 
     private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createFileColumn() {
         TableColumn<BibEntryTableViewModel, List<LinkedFile>> column = new TableColumn<>();
         column.setGraphic(IconTheme.JabRefIcons.FILE.getGraphicNode());
-        column.getStyleClass().add(STYLE_ICON);
+        column.getStyleClass().add(ICON_COLUMN);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
                 new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
@@ -227,7 +262,7 @@ class MainTableColumnFactory {
     private TableColumn<BibEntryTableViewModel, String> createIconColumn(JabRefIcon icon, String firstField, String secondField) {
         TableColumn<BibEntryTableViewModel, String> column = new TableColumn<>();
         column.setGraphic(icon.getGraphicNode());
-        column.getStyleClass().add(STYLE_ICON);
+        column.getStyleClass().add(ICON_COLUMN);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(firstField)).orElse(cellData.getValue().getField(secondField)));
                 new ValueTableCellFactory<BibEntryTableViewModel, String>()
@@ -239,7 +274,7 @@ class MainTableColumnFactory {
     private TableColumn<BibEntryTableViewModel, String> createIconColumn(JabRefIcon icon, String field) {
         TableColumn<BibEntryTableViewModel, String> column = new TableColumn<>();
         column.setGraphic(icon.getGraphicNode());
-        column.getStyleClass().add(STYLE_ICON);
+        column.getStyleClass().add(ICON_COLUMN);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> cellData.getValue().getField(field));
                 new ValueTableCellFactory<BibEntryTableViewModel, String>()
@@ -259,7 +294,7 @@ class MainTableColumnFactory {
                 externalFileTypes.getExternalFileTypeByName(externalFileTypeName)
                         .map(ExternalFileType::getIcon).orElse(IconTheme.JabRefIcons.FILE)
                         .getGraphicNode());
-        column.getStyleClass().add(STYLE_ICON);
+        column.getStyleClass().add(ICON_COLUMN);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
                 new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
