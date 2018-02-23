@@ -5,6 +5,7 @@ import java.util.Objects;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
 
@@ -58,6 +59,8 @@ public class ActionFactory {
     public Button createIconButton(Action action, Command command) {
         Button button = ActionUtils.createButton(new JabRefAction(action, command, keyBindingRepository), ActionUtils.ActionTextBehavior.HIDE);
         button.getStyleClass().add("flatButton");
+        Tooltip toolTip = new Tooltip(action.getText());
+        Tooltip.install(button, toolTip);
 
         // For some reason the graphic is not set correctly, so let's fix this
         button.graphicProperty().unbind();
