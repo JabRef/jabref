@@ -646,19 +646,42 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 newLibrary,
                 factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this)),
                 factory.createIconButton(StandardActions.SAVE_LIBRARY, new OldDatabaseCommandWrapper(Actions.SAVE, this, Globals.stateManager)),
-
                 leftSpacer);
         leftSide.minWidthProperty().bind(sidePane.widthProperty());
         leftSide.prefWidthProperty().bind(sidePane.widthProperty());
         leftSide.maxWidthProperty().bind(sidePane.widthProperty());
+
+        PushToApplicationButton pushToExternal = new PushToApplicationButton(this, pushApplications.getApplications());
+        HBox rightSide = new HBox (
+                factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE)),
+                factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(Actions.DELETE)),
+
+                // TODO: Undo does not work currently, so there is not much point in adding these buttons
+                //factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
+                //factory.createIconButton(StandardActions.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, Globals.stateManager)),
+                factory.createIconButton(StandardActions.CUT, new EditAction(Actions.CUT)),
+                factory.createIconButton(StandardActions.COPY, new EditAction(Actions.COPY)),
+                factory.createIconButton(StandardActions.PASTE, new EditAction(Actions.PASTE)),
+
+                factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, Globals.stateManager)),
+                factory.createIconButton(pushToExternal.getMenuAction(), pushToExternal),
+
+                factory.createIconButton(StandardActions.FORK_ME, new OpenBrowserAction("https://github.com/JabRef/jabref")),
+                factory.createIconButton(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
+                factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org"))
+
+                );
+        rightSide.minWidthProperty().bind(sidePane.widthProperty());
+        rightSide.prefWidthProperty().bind(sidePane.widthProperty());
+        rightSide.maxWidthProperty().bind(sidePane.widthProperty());
 
         ToolBar toolBar = new ToolBar(
                 leftSide,
 
                 globalSearchBar,
 
-                rightSpacer,
-                factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE)));
+                rightSide
+                );
         toolBar.getStyleClass().add("mainToolbar");
 
         return toolBar;
