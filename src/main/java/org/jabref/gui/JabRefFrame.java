@@ -655,10 +655,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         HBox rightSide = new HBox (
                 factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE)),
                 factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(Actions.DELETE)),
-
-                // TODO: Undo does not work currently, so there is not much point in adding these buttons
-                //factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
-                //factory.createIconButton(StandardActions.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, Globals.stateManager)),
+                
+                factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
+                factory.createIconButton(StandardActions.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, Globals.stateManager)),
                 factory.createIconButton(StandardActions.CUT, new EditAction(Actions.CUT)),
                 factory.createIconButton(StandardActions.COPY, new EditAction(Actions.COPY)),
                 factory.createIconButton(StandardActions.PASTE, new EditAction(Actions.PASTE)),
