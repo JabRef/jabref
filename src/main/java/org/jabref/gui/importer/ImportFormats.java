@@ -72,7 +72,7 @@ public class ImportFormats {
                         .addExtensionFilters(extensions)
                         .withInitialDirectory(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY))
                         .build();
-                fileDialogConfiguration.getExtensionFilters().add(new FileChooser.ExtensionFilter("Any file", "*.*"));
+                fileDialogConfiguration.getExtensionFilters().add(new FileChooser.ExtensionFilter(Localization.lang("Any file"), "*.*"));
                 DialogService dialogService = new FXDialogService();
                 DefaultTaskExecutor.runInJavaFXThread(() -> {
                     dialogService.showFileOpenDialog(fileDialogConfiguration)
