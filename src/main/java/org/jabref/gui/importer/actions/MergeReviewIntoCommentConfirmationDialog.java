@@ -25,13 +25,14 @@ public class MergeReviewIntoCommentConfirmationDialog {
                 .map(Optional::get)
                 .collect(Collectors.joining(",\n"));
 
-        int answer = JOptionPane.showConfirmDialog(
+        String[] options = {Localization.lang("Merge fields")};
+        int answer = JOptionPane.showOptionDialog(
                 panel,
                 bibKeys + " " +
                         Localization.lang("has/have both a 'Comment' and a 'Review' field.") + "\n" +
                         Localization.lang("Since the 'Review' field was deprecated in JabRef 4.2, these two fields are about to be merged into the 'Comment' field.") + "\n" +
                         Localization.lang("The conflicting fields of these entries will be merged into the 'Comment' field."),
-                Localization.lang("Review Field Migration"), JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+                Localization.lang("Review Field Migration"), JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
         return 0 == answer;
     }
