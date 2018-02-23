@@ -57,13 +57,14 @@ public class FileUtil {
         }
     }
 
+
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
      * @return The extension, trimmed and in lowercase.
      */
-    public static Optional<String> getFileExtension(File file) {
-        return getFileExtension(file.getName());
+    public static Optional<String> getFileExtension(Path file) {
+        return getFileExtension(file.getFileName().toString());
     }
 
     /**

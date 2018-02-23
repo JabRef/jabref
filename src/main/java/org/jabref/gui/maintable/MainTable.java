@@ -3,6 +3,7 @@ package org.jabref.gui.maintable;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +33,7 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.EntryMarker;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.externalfiles.NewDroppedFileHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -84,13 +86,17 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private PersistenceTableColumnListener tableColumnListener;
 
     private final MainTableDataModel model;
+    private final NewDroppedFileHandler fileHandler;
 
     public MainTable(MainTableDataModel model, JabRefFrame frame,
             BasePanel panel, BibDatabaseContext database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
         super();
+
         this.model = model;
         this.database = Objects.requireNonNull(database);
         this.undoManager = panel.getUndoManager();
+
+        fileHandler = new NewDroppedFileHandler(database, externalFileTypes, Globals.prefs.getFileDirectoryPreferences());
 
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
@@ -315,17 +321,25 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private void handleOnDragDropped(BibEntryTableViewModel originalItem, DragEvent event) {
 
         boolean success = false;
-
         if (event.getDragboard().hasContent(DataFormat.FILES)) {
-            List<File> files = event.getDragboard().getFiles();
+            List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
             System.out.println(files);
+
+            event.getDragboard();
+
+            TableRow<BibEntryTableViewModel> targetRow = (TableRow<BibEntryTableViewModel>) event.getGestureTarget();
+
+            BibEntry entry = this.getItems().get(targetRow.getIndex()).getEntry();
+            success = true;
+            event.setDropCompleted(success);
+
+            fileHandler.addFilesToEntry(entry, files);
+
         }
         event.setDropCompleted(success);
         event.consume();
 
     }
-
-
 
     public void addSelectionListener(ListChangeListener<? super BibEntryTableViewModel> listener) {
         getSelectionModel().getSelectedItems().addListener(listener);
