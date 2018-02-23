@@ -1,10 +1,5 @@
 package org.jabref.model.entry;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -137,28 +132,5 @@ public class BibEntryTest {
         assertEquals(new KeywordList(new Keyword("kw"), new Keyword("kw2"), new Keyword("kw3")), actual);
     }
 
-    @Test
-    public void testSerializablity() throws IOException, ClassNotFoundException {
-
-        entry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
-        entry.setField("author", "abc");
-        entry.setField("title", "abc");
-        entry.setField("journal", "abc");
-
-        byte[] serialized;
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try (ObjectOutputStream stream = new ObjectOutputStream(bos)) {
-
-            stream.writeObject(entry);
-            serialized = bos.toByteArray();
-
-        }
-        try (ObjectInputStream stream = new ObjectInputStream(new ByteArrayInputStream(serialized))) {
-
-            BibEntry deserializedEntry = (BibEntry) stream.readObject();
-            assertEquals(entry, deserializedEntry);
-        }
-
-    }
 
 }

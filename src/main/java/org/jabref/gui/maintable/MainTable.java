@@ -39,12 +39,11 @@ import org.jabref.gui.renderer.GeneralRenderer;
 import org.jabref.gui.renderer.IncompleteRenderer;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.gui.util.LocalDragboard;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
-import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabaseContext;
@@ -302,9 +301,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 ClipboardContent content = new ClipboardContent();
                 Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
                 //We have to use the model class here, as the content of the dragboard must be serializable
-                content.put(DragAndDropDataFormats.ENTRIES, serializedEntries);
-
+                content.put(DragAndDropDataFormats.ENTRIES, "");
                 dragboard.setContent(content);
+
+                Class<List<BibEntry>> x = (Class<List<BibEntry>>) (Class<?>) List.class;
+                LocalDragboard.INSTANCE.putValue(x, entries);
             }
         } catch (IOException e) {
             LOGGER.error("Problem serializing entries", e);
@@ -314,35 +315,24 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private void handleOnDragDropped(BibEntryTableViewModel originalItem, DragEvent event) {
 
-        Dragboard dragboard = event.getDragboard();
         boolean success = false;
 
         ObservableList<BibEntryTableViewModel> items = this.itemsProperty().get();
 
-        if (dragboard.hasContent(DragAndDropDataFormats.ENTRIES)) {
-            @SuppressWarnings("unchecked")
-
-            String entries = (String) dragboard.getContent(DragAndDropDataFormats.ENTRIES);
-
-            BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
-            try {
-                List<BibEntry> parsedEntries = parser.parseEntries(entries);
-
-                System.out.println(parsedEntries);
-
-
-            } catch (ParseException e) {
-                LOGGER.error("could not parse entries", e);
-            }
+        if (LocalDragboard.INSTANCE.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
+            List<BibEntry> parsedEntries = LocalDragboard.INSTANCE.getValue(DragAndDropDataFormats.BIBENTRY_LIST_CLASS);
+            System.out.println(parsedEntries);
+            success = true;
 
         }
+
         event.setDropCompleted(success);
         event.consume();
 
     }
 
     private void handleOnDragOver(BibEntryTableViewModel originalItem, DragEvent event) {
-        if ((event.getGestureSource() != originalItem) && event.getDragboard().hasContent(DragAndDropDataFormats.ENTRIES)) {
+        if ((event.getGestureSource() != originalItem) && LocalDragboard.INSTANCE.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
             event.acceptTransferModes(TransferMode.MOVE);
         }
     }

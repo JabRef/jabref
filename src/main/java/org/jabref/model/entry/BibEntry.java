@@ -1,9 +1,5 @@
 package org.jabref.model.entry;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,7 +39,7 @@ import com.google.common.eventbus.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BibEntry implements Cloneable, Serializable {
+public class BibEntry implements Cloneable {
 
     public static final String TYPE_HEADER = "entrytype";
     public static final String OBSOLETE_TYPE_HEADER = "bibtextype";
@@ -56,14 +52,14 @@ public class BibEntry implements Cloneable, Serializable {
     /**
      * Map to store the words in every field
      */
-    private Map<String, Set<String>> fieldsAsWords = new HashMap<>();
+    private final Map<String, Set<String>> fieldsAsWords = new HashMap<>();
     /**
      * Cache that stores latex free versions of fields.
      */
-    private Map<String, String> latexFreeFields = new ConcurrentHashMap<>();
+    private final Map<String, String> latexFreeFields = new ConcurrentHashMap<>();
     private final transient EventBus eventBus = new EventBus();
     private String id;
-    private StringProperty type = new SimpleStringProperty();
+    private final StringProperty type = new SimpleStringProperty();
 
     private ObservableMap<String, String> fields = FXCollections.observableMap(new ConcurrentHashMap<>());
     // Search and grouping status is stored in boolean fields for quick reference:
@@ -877,31 +873,6 @@ public class BibEntry implements Cloneable, Serializable {
     private interface GetFieldInterface {
 
         Optional<String> getValueForField(String fieldName);
-    }
-
-    private void writeObject(ObjectOutputStream s) throws IOException {
-        s.writeObject(fieldsAsWords);
-        s.writeObject(latexFreeFields);
-        s.writeUTF(id);
-        s.writeUTF(type.get());
-        s.writeBoolean(searchHit);
-        s.writeBoolean(groupHit);
-        s.writeUTF(parsedSerialization);
-        s.writeUTF(commentsBeforeEntry);
-    }
-
-    private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
-        fieldsAsWords = (Map<String, Set<String>>) s.readObject();
-        latexFreeFields = (Map<String, String>) s.readObject();
-        id = s.readUTF();
-        type = new SimpleStringProperty(s.readUTF());
-        searchHit = s.readBoolean();
-        groupHit = s.readBoolean();
-        parsedSerialization = s.readUTF();
-        commentsBeforeEntry = s.readUTF();
-
-
-
     }
 
 }
