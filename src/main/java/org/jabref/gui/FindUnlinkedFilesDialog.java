@@ -67,6 +67,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.EntryFromFileCreator;
 import org.jabref.gui.importer.EntryFromFileCreatorManager;
 import org.jabref.gui.importer.UnlinkedFilesCrawler;
@@ -167,7 +168,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
         restoreSizeOfDialog();
 
         databaseContext = panel.getDatabaseContext();
-        creatorManager = new EntryFromFileCreatorManager();
+        creatorManager = new EntryFromFileCreatorManager(ExternalFileTypes.getInstance());
         crawler = new UnlinkedFilesCrawler(databaseContext);
 
         lastSelectedDirectory = loadLastSelectedDirectory();

@@ -25,7 +25,7 @@ public class BiblioscapeImporterTestFiles {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws IOException {
+    public void testImportEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(new BiblioscapeImporter(), fileName, FILE_ENDING);
     }
 }

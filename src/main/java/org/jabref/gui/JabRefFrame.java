@@ -81,11 +81,11 @@ import org.jabref.gui.actions.SearchForUpdateAction;
 import org.jabref.gui.actions.SendChangesToShareLatexAction;
 import org.jabref.gui.actions.SortTabsAction;
 import org.jabref.gui.actions.SynchronizeWithShareLatexAction;
-import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.customentrytypes.EntryCustomizationDialog;
 import org.jabref.gui.dbproperties.DatabasePropertiesDialog;
+import org.jabref.gui.dialogs.AutosaveUIManager;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.exporter.ExportAction;
 import org.jabref.gui.exporter.ExportCustomizationDialog;
@@ -664,7 +664,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
 
         initShowTrackingNotification();
-
     }
 
     private void initShowTrackingNotification() {
@@ -807,7 +806,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 File focusedDatabase = getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null);
                 new LastFocusedTabPreferences(prefs).setLastFocusedTab(focusedDatabase);
             }
-
         }
 
         fileHistory.storeHistory();
@@ -970,7 +968,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     /**
      * Returns a list of BasePanel.
-     *
      */
     public List<BasePanel> getBasePanelList() {
         List<BasePanel> returnList = new ArrayList<>();
@@ -1293,26 +1290,32 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         createDisabledIconsForMenuEntries(mb);
     }
 
-    public void addParserResult(ParserResult pr, boolean focusPanel) {
-        if (pr.toOpenTab()) {
+    public void addParserResult(ParserResult parserResult, boolean focusPanel) {
+        if (parserResult.toOpenTab()) {
             // Add the entries to the open tab.
             BasePanel panel = getCurrentBasePanel();
             if (panel == null) {
                 // There is no open tab to add to, so we create a new tab:
-                addTab(pr.getDatabaseContext(), focusPanel);
+                panel = addTab(parserResult.getDatabaseContext(), focusPanel);
+                if (parserResult.wasChangedOnMigration()) {
+                    panel.markBaseChanged();
+                }
             } else {
-                List<BibEntry> entries = new ArrayList<>(pr.getDatabase().getEntries());
+                List<BibEntry> entries = new ArrayList<>(parserResult.getDatabase().getEntries());
                 addImportedEntries(panel, entries, false);
             }
         } else {
             // only add tab if DB is not already open
             Optional<BasePanel> panel = getBasePanelList().stream()
-                    .filter(p -> p.getBibDatabaseContext().getDatabaseFile().equals(pr.getFile())).findFirst();
+                    .filter(p -> p.getBibDatabaseContext().getDatabaseFile().equals(parserResult.getFile())).findFirst();
 
             if (panel.isPresent()) {
                 tabbedPane.setSelectedComponent(panel.get());
             } else {
-                addTab(pr.getDatabaseContext(), focusPanel);
+                BasePanel basePanel = addTab(parserResult.getDatabaseContext(), focusPanel);
+                if (parserResult.wasChangedOnMigration()) {
+                    basePanel.markBaseChanged();
+                }
             }
         }
     }
@@ -1458,7 +1461,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         atLeastOneEntryActions.addAll(Arrays.asList(downloadFullText, lookupIdentifiers, exportLinkedFiles));
 
         tabbedPane.addChangeListener(event -> updateEnabledState());
-
     }
 
     /**
@@ -1521,7 +1523,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             // Update tables:
             if (bf.getDatabase() != null) {
                 bf.setupMainPanel();
-
             }
         }
     }
@@ -1572,7 +1573,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    public void addTab(BasePanel basePanel, boolean raisePanel) {
+    public BasePanel addTab(BasePanel basePanel, boolean raisePanel) {
         // add tab
         tabbedPane.add(basePanel.getTabTitle(), basePanel);
 
@@ -1597,6 +1598,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         // Track opening
         trackOpenNewDatabase(basePanel);
+        return basePanel;
     }
 
     private void trackOpenNewDatabase(BasePanel basePanel) {
@@ -1610,9 +1612,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
-        BasePanel bp = new BasePanel(JabRefFrame.this, databaseContext);
-        addTab(bp, raisePanel);
-        return bp;
+        BasePanel basePanel = new BasePanel(JabRefFrame.this, databaseContext);
+        addTab(basePanel, raisePanel);
+        return basePanel;
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {
@@ -1738,7 +1740,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         } else {
             SwingUtilities.invokeLater(() -> progressBar.setValue(value));
         }
-
     }
 
     /**
@@ -1753,7 +1754,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         } else {
             SwingUtilities.invokeLater(() -> progressBar.setIndeterminate(value));
         }
-
     }
 
     /**
@@ -1770,11 +1770,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         } else {
             SwingUtilities.invokeLater(() -> progressBar.setMaximum(value));
         }
-
     }
 
     /**
      * Return a boolean, if the selected entry have file
+     *
      * @param selectEntryList A selected entries list of the current base pane
      * @return true, if the selected entry contains file.
      * false, if multiple entries are selected or the selected entry doesn't contains file
@@ -1789,6 +1789,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     /**
      * Return a boolean, if the selected entry have url or doi
+     *
      * @param selectEntryList A selected entries list of the current base pane
      * @return true, if the selected entry contains url or doi.
      * false, if multiple entries are selected or the selected entry doesn't contains url or doi
@@ -2209,7 +2210,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             GenFieldsCustomizer gf = new GenFieldsCustomizer(JabRefFrame.this);
             gf.setLocationRelativeTo(JabRefFrame.this);
             gf.setVisible(true);
-
         }
     }
 
@@ -2221,8 +2221,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ProtectedTermsDialog protectTermsDialog = new ProtectedTermsDialog(JabRefFrame.this,
-                    Globals.protectedTermsLoader);
+            ProtectedTermsDialog protectTermsDialog = new ProtectedTermsDialog(JabRefFrame.this);
             protectTermsDialog.setVisible(true);
         }
     }
@@ -2245,7 +2244,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             propertiesDialog.setLocationRelativeTo(JabRefFrame.this);
             propertiesDialog.setVisible(true);
         }
-
     }
 
     private class BibtexKeyPatternAction extends MnemonicAwareAction {
@@ -2269,7 +2267,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             bibtexKeyPatternDialog.setLocationRelativeTo(JabRefFrame.this);
             bibtexKeyPatternDialog.setVisible(true);
         }
-
     }
 
     private class DefaultTableFontSizeAction extends MnemonicAwareAction {

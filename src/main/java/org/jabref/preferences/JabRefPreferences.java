@@ -50,6 +50,7 @@ import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -70,7 +71,7 @@ import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
-import org.jabref.logic.xmp.XMPPreferences;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -384,6 +385,9 @@ public class JabRefPreferences implements PreferencesService {
     //AutcompleteFields - public because needed for pref migration
     public static final String AUTOCOMPLETER_COMPLETE_FIELDS = "autoCompleteFields";
 
+    // Id Entry Generator Preferences
+    public static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
+
     // Auto completion
     private static final String AUTO_COMPLETE = "autoComplete";
     private static final String AUTOCOMPLETER_FIRSTNAME_MODE = "autoCompFirstNameMode";
@@ -471,6 +475,10 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(TEXSTUDIO_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
 
         defaults.put(BIBLATEX_DEFAULT_MODE, Boolean.FALSE);
+
+        // Set DOI to be the default ID entry generator
+        defaults.put(ID_ENTRY_GENERATOR, DoiFetcher.NAME);
+
 
         if (OS.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
@@ -984,9 +992,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CUSTOM_TAB_FIELDS + "_def1", FieldName.ABSTRACT);
         defaults.put(CUSTOM_TAB_NAME + "_def1", Localization.lang("Abstract"));
 
-        // Entry editor tab 2: Review Field - used for research comments, etc.
-        defaults.put(CUSTOM_TAB_FIELDS + "_def2", FieldName.REVIEW);
-        defaults.put(CUSTOM_TAB_NAME + "_def2", Localization.lang("Review"));
+        // Entry editor tab 2: Comments Field - used for research comments, etc.
+        defaults.put(CUSTOM_TAB_FIELDS + "_def2", FieldName.COMMENT);
+        defaults.put(CUSTOM_TAB_NAME + "_def2", Localization.lang("Comments"));
 
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
     }
@@ -1460,8 +1468,8 @@ public class JabRefPreferences implements PreferencesService {
                 getFileLinkPreferences(), journalAbbreviationLoader);
     }
 
-    public XMPPreferences getXMPPreferences() {
-        return new XMPPreferences(getBoolean(USE_XMP_PRIVACY_FILTER), getStringList(XMP_PRIVACY_FILTERS),
+    public XmpPreferences getXMPPreferences() {
+        return new XmpPreferences(getBoolean(USE_XMP_PRIVACY_FILTER), getStringList(XMP_PRIVACY_FILTERS),
                 getKeywordDelimiter());
     }
 

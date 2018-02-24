@@ -31,7 +31,7 @@ import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.xmp.XMPUtil;
+import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
@@ -133,7 +133,7 @@ public class WriteXMPAction extends AbstractWorker {
                 for (Path file : files) {
                     if (Files.exists(file)) {
                         try {
-                            XMPUtil.writeXMP(file.toFile(), entry, database, Globals.prefs.getXMPPreferences());
+                            XmpUtilWriter.writeXmp(file, entry, database, Globals.prefs.getXMPPreferences());
                             SwingUtilities.invokeLater(
                                     () -> optDiag.getProgressArea().append("  " + Localization.lang("OK") + ".\n"));
                             entriesChanged++;

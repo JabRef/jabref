@@ -1,4 +1,4 @@
-package org.jabref.gui.autosaveandbackup;
+package org.jabref.gui.dialogs;
 
 import java.nio.file.Path;
 

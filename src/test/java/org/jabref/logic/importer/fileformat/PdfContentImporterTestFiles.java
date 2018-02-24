@@ -29,7 +29,7 @@ public class PdfContentImporterTestFiles {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws IOException {
+    public void testImportEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(new PdfContentImporter(mock(ImportFormatPreferences.class)), fileName, FILE_ENDING);
     }
 

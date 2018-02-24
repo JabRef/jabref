@@ -3,21 +3,21 @@ package org.jabref.logic.bibtex.comparator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CrossRefEntryComparatorTest {
     private CrossRefEntryComparator comparator;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         comparator = new CrossRefEntryComparator();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         comparator = null;
     }
