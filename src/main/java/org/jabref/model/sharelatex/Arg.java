@@ -1,8 +1,8 @@
 package org.jabref.model.sharelatex;
 
-
 import java.util.ArrayList;
 import java.util.List;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -22,7 +22,7 @@ public class Arg {
 
     public List<Op> getOp() {
         return op;
-}
+    }
 
     public void setOp(List<Op> op) {
         this.op = op;
@@ -35,6 +35,5 @@ public class Arg {
     public void setVersion(int v) {
         this.version = v;
     }
-
 
 }

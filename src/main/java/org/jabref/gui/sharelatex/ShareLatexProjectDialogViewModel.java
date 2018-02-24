@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
+
 import org.jabref.JabRefGUI;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
@@ -87,11 +88,8 @@ public class ShareLatexProjectDialogViewModel extends AbstractViewModel {
                                 entryFromSharelatex.get(),
                                 stateManager.getActiveDatabase().get().getMode());
                         dlg.setMetaData(stateManager.getActiveDatabase().get().getMetaData());
-
                         dlg.showMergeDialog();
-
                         //TODO: After merge we probably need to send the new content to the server
-
                     }
 
                 } else {

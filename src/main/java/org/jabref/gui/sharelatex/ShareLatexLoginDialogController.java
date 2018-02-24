@@ -57,7 +57,6 @@ public class ShareLatexLoginDialogController extends AbstractController<ShareLat
 
                 manager.setConnectionProperties(props);
 
-
                 ShareLatexProjectDialogView dlgprojects = new ShareLatexProjectDialogView();
                 dlgprojects.show();
                 closeDialog();

@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 public class ShareLatexManager {
 
     private static final Log LOGGER = LogFactory.getLog(ShareLatexManager.class);
-    private static final SavePreferences preferences = new SavePreferences().withEncoding(StandardCharsets.UTF_8).withSaveInOriginalOrder(true);
+    private static final SavePreferences PREFS = new SavePreferences().withEncoding(StandardCharsets.UTF_8).withSaveInOriginalOrder(true);
     private final BibtexDatabaseWriter<StringSaveSession> stringdbWriter = new BibtexDatabaseWriter<>(StringSaveSession::new);
     private final BibtexDatabaseWriter<FileSaveSession> fileWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
 
@@ -57,9 +57,9 @@ public class ShareLatexManager {
 
     public void sendNewDatabaseContent(BibDatabaseContext database) {
         try {
-            fileWriter.saveDatabase(database, preferences);
+            fileWriter.saveDatabase(database, PREFS);
 
-            StringSaveSession saveSession = stringdbWriter.saveDatabase(database, preferences);
+            StringSaveSession saveSession = stringdbWriter.saveDatabase(database, PREFS);
             String updatedcontent = saveSession.getStringValue().replace("\r\n", "\n");
 
             connector.sendNewDatabaseContent(updatedcontent);
