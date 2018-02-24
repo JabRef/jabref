@@ -56,7 +56,6 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelPreferences;
 import org.jabref.gui.DuplicateResolverDialog;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
-import org.jabref.gui.EntryMarker;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
@@ -808,19 +807,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
 
             // Set owner/timestamp if options are enabled:
             UpdateField.setAutomaticFields(selected, Globals.prefs.getUpdateFieldPreferences());
-
-            // Mark entries if we should
-            if (EntryMarker.shouldMarkEntries()) {
-                for (BibEntry entry : selected) {
-                    EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
-                }
-            }
-            // Check if we should unmark entries before adding the new ones:
-            if (Globals.prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING)) {
-                for (BibEntry entry : panel.getDatabase().getEntries()) {
-                    EntryMarker.unmarkEntry(entry, true, panel.getDatabase(), ce);
-                }
-            }
 
             for (BibEntry entry : selected) {
                 // Remove settings to group/search hit status:

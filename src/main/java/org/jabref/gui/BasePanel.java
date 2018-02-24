@@ -560,47 +560,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(new DuplicateSearch(BasePanel.this)));
         */
 
-        // TODO
-        //actions.put(Actions.MARK_ENTRIES, new MarkEntriesAction(frame, 0));
-
-        actions.put(Actions.UNMARK_ENTRIES, (BaseAction) () -> {
-            try {
-                List<BibEntry> bes = mainTable.getSelectedEntries();
-                if (bes.isEmpty()) {
-                    output(Localization.lang("This operation requires one or more entries to be selected."));
-                    return;
-                }
-                NamedCompound ce = new NamedCompound(Localization.lang("Unmark entries"));
-                for (BibEntry be : bes) {
-                    EntryMarker.unmarkEntry(be, false, bibDatabaseContext.getDatabase(), ce);
-                }
-                ce.end();
-                getUndoManager().addEdit(ce);
-                markBaseChanged();
-                String outputStr;
-                if (bes.size() == 1) {
-                    outputStr = Localization.lang("Unmarked selected entry");
-                } else {
-                    outputStr = Localization.lang("Unmarked all %0 selected entries", Integer.toString(bes.size()));
-                }
-                output(outputStr);
-            } catch (Throwable ex) {
-                LOGGER.warn("Could not unmark", ex);
-            }
-        });
-
-        actions.put(Actions.UNMARK_ALL, (BaseAction) () -> {
-            NamedCompound ce = new NamedCompound(Localization.lang("Unmark all"));
-
-            for (BibEntry be : bibDatabaseContext.getDatabase().getEntries()) {
-                EntryMarker.unmarkEntry(be, false, bibDatabaseContext.getDatabase(), ce);
-            }
-            ce.end();
-            getUndoManager().addEdit(ce);
-            markBaseChanged();
-            output(Localization.lang("Unmarked all entries"));
-        });
-
         // Note that we can't put the number of entries that have been reverted into the undoText as the concrete number cannot be injected
         actions.put(new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getCommand(),
                 new SpecialFieldViewModel(SpecialField.RELEVANCE, undoManager).getSpecialFieldAction(
