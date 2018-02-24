@@ -11,9 +11,10 @@ import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
-
+import org.jabref.JabRefGUI;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.shared.MergeSharedEntryDialog;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -62,28 +63,52 @@ public class ShareLatexProjectDialogViewModel extends AbstractViewModel {
     public void listenToSharelatexEntryMessage(ShareLatexEntryMessageEvent event) {
 
         Path actualDbPath = stateManager.getActiveDatabase().get().getDatabasePath().get();
+        List<BibEntry> entries = event.getEntries();
 
         try {
             ParserResult result = new BibtexImporter(prefs, fileMonitor).importDatabase(event.getNewDatabaseContent());
 
             ShareLatexParser parser = new ShareLatexParser();
-            if (event.getPosition() > 0) {
-                Optional<BibEntry> entry = parser.getEntryFromPosition(result, event.getPosition());
+            if (event.getPosition() != -1) {
+                //Was the change on the sharelatex server side  actually an entry?
+                Optional<BibEntry> entryFromPosition = parser.getEntryFromPosition(result, event.getPosition());
 
-                System.out.println(entry); //Emtpy => Add
+                if (entryFromPosition.isPresent()) {
+
+                    BibEntry identifedEntry = entryFromPosition.get();
+                    Optional<BibEntry> entryFromSharelatex = entries.stream().filter(searchEntry -> searchEntry.equals(identifedEntry)).findFirst();
+
+                    //we search the local datase for an etry with the cite key
+                    Optional<BibEntry> entryFromLocalDatabase = stateManager.getActiveDatabase().get().getDatabase().getEntryByKey(identifedEntry.getCiteKey());
+
+                    if (entryFromSharelatex.isPresent() && entryFromLocalDatabase.isPresent()) {
+                        MergeSharedEntryDialog dlg = new MergeSharedEntryDialog(JabRefGUI.getMainFrame(),
+                                entryFromLocalDatabase.get(),
+                                entryFromSharelatex.get(),
+                                stateManager.getActiveDatabase().get().getMode());
+                        dlg.setMetaData(stateManager.getActiveDatabase().get().getMetaData());
+
+                        dlg.showMergeDialog();
+
+                        //TODO: After merge we probably need to send the new content to the server
+
+                    }
+
+                } else {
+
+                    try (BufferedWriter writer = Files.newBufferedWriter(actualDbPath, StandardCharsets.UTF_8)) {
+                        writer.write(event.getNewDatabaseContent());
+                        writer.close();
+
+                    } catch (IOException e) {
+                        LOGGER.error("Problem writing new database content", e);
+                    }
+                }
                 System.out.println("Changed chars: " + event.getChars());
             }
         } catch (IOException e1) {
-            // TODO Auto-generated catch block
+            LOGGER.error("Problem parsing position new database content", e1);
 
-        }
-
-        try (BufferedWriter writer = Files.newBufferedWriter(actualDbPath, StandardCharsets.UTF_8)) {
-            writer.write(event.getNewDatabaseContent());
-            writer.close();
-
-        } catch (IOException e) {
-            LOGGER.error("Problem writing new database content", e);
         }
 
     }

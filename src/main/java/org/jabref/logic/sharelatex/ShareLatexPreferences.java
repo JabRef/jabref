@@ -5,8 +5,8 @@ import java.util.prefs.BackingStoreException;
 
 public class ShareLatexPreferences {
 
-    private String defaultNode;
-    private String parentNode;
+    private final String defaultNode;
+    private final String parentNode;
     private String sharelatexUser;
     private String shareLatexUrl;
     private String shareLatexPassword;
@@ -39,7 +39,6 @@ public class ShareLatexPreferences {
         return getOptionalValue(shareLatexProject);
     }
 
-
     public String getDefaultNode() {
         return defaultNode;
     }
@@ -51,7 +50,6 @@ public class ShareLatexPreferences {
     public boolean getShareLatexRememberPassword() {
         return shareLatexRememberPassword;
     }
-
 
     public void setSharelatexUrl(String url) {
         this.shareLatexUrl = url;
@@ -72,7 +70,6 @@ public class ShareLatexPreferences {
     public void setRememberPassword(boolean rememberPassword) {
         this.shareLatexRememberPassword = rememberPassword;
     }
-
 
     public void clear() throws BackingStoreException {
     }

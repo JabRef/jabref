@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.sharelatex.Arg;
+import org.jabref.model.sharelatex.Op;
 import org.jabref.model.sharelatex.SharelatexOtAppliedMessage;
 
 public class ShareLatexEntryMessageEvent {
@@ -28,17 +30,32 @@ public class ShareLatexEntryMessageEvent {
     }
 
     public int getPosition() {
-        if (!this.message.getArgs().isEmpty()) {
-            return this.message.getArgs().get(0).getOp().get(0).getPosition();
+        int pos = getOpFromAtPosZero(message).getPosition();
+        if (pos > 0) {
+            return pos;
         }
-        return 0;
+        return -1;
     }
 
     public String getChars() {
-        if (!this.message.getArgs().isEmpty()) {
-            return this.message.getArgs().get(0).getOp().get(0).getChars();
+
+        String chars = getOpFromAtPosZero(message).getChars();
+        if (chars != null) {
+            return chars;
         }
         return "";
+
     }
 
+    private Op getOpFromAtPosZero(SharelatexOtAppliedMessage message) {
+        if (!this.message.getArgs().isEmpty()) {
+            Arg arg = message.getArgs().get(0);
+            List<Op> ops = arg.getOp();
+            if (!ops.isEmpty()) {
+                return ops.get(0);
+            }
+
+        }
+        return new Op();
+    }
 }

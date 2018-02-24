@@ -15,10 +15,12 @@ import javax.swing.border.EmptyBorder;
 
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.mergeentries.MergeEntries;
+import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.metadata.MetaData;
 
 public class MergeSharedEntryDialog {
 
@@ -28,10 +30,10 @@ public class MergeSharedEntryDialog {
     private final BibEntry sharedBibEntry;
     private final JDialog mergeDialog;
     private final MergeEntries mergeEntries;
-
+    private MetaData metadata;
 
     public MergeSharedEntryDialog(JabRefFrame jabRefFrame, DatabaseSynchronizer dbmsSynchronizer, BibEntry localBibEntry,
-                                  BibEntry sharedBibEntry, BibDatabaseMode bibDatabaseMode) {
+            BibEntry sharedBibEntry, BibDatabaseMode bibDatabaseMode) {
         this.jabRefFrame = jabRefFrame;
         this.dbmsSynchronizer = dbmsSynchronizer;
         this.localBibEntry = localBibEntry;
@@ -39,6 +41,15 @@ public class MergeSharedEntryDialog {
         this.mergeDialog = new JDialog(jabRefFrame, Localization.lang("Update refused"), true);
         this.mergeEntries = new MergeEntries(sharedBibEntry, localBibEntry, Localization.lang("Shared entry"),
                 Localization.lang("Local entry"), bibDatabaseMode);
+    }
+
+    public MergeSharedEntryDialog(JabRefFrame jabRefFrame, BibEntry localBibEntry,
+            BibEntry sharedBibEntry, BibDatabaseMode bibDatabaseMode) {
+        this(jabRefFrame, null, localBibEntry, sharedBibEntry, bibDatabaseMode);
+    }
+
+    public void setMetaData(MetaData metadata) {
+        this.metadata = metadata;
     }
 
     public void showMergeDialog() {
@@ -67,7 +78,14 @@ public class MergeSharedEntryDialog {
         mergeDialog.add(mergeEntries.getMergeEntryPanel(), BorderLayout.CENTER);
 
         JButton mergeButton = new JButton(Localization.lang("Merge entries"));
-        mergeButton.addActionListener(e -> mergeEntries());
+        mergeButton.addActionListener(e -> {
+
+            if (dbmsSynchronizer != null) {
+                mergeEntries();
+            } else {
+                mergeEntriesWithoutSharedDb();
+            }
+        });
 
         JButton cancelButton = new JButton(Localization.lang("Cancel"));
         cancelButton.addActionListener(e -> showConfirmationDialog());
@@ -79,6 +97,7 @@ public class MergeSharedEntryDialog {
         mergeDialog.add(buttonPanel, BorderLayout.SOUTH);
         mergeDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         mergeDialog.addWindowListener(new WindowAdapter() {
+
             @Override
             public void windowClosing(WindowEvent e) {
                 showConfirmationDialog();
@@ -101,6 +120,7 @@ public class MergeSharedEntryDialog {
     }
 
     private void mergeEntries() {
+
         BibEntry mergedBibEntry = mergeEntries.getMergeEntry();
         mergedBibEntry.getSharedBibEntryData().setSharedID(sharedBibEntry.getSharedBibEntryData().getSharedID());
         mergedBibEntry.getSharedBibEntryData().setVersion(sharedBibEntry.getSharedBibEntryData().getVersion());
@@ -109,5 +129,14 @@ public class MergeSharedEntryDialog {
 
         dbmsSynchronizer.synchronizeSharedEntry(mergedBibEntry);
         dbmsSynchronizer.synchronizeLocalDatabase();
+    }
+
+    private void mergeEntriesWithoutSharedDb() {
+        BibEntry mergedBibEntry = mergeEntries.getMergeEntry();
+
+        BibDatabaseWriter.applySaveActions(mergedBibEntry, metadata); // perform possibly existing save actions
+
+        mergeDialog.dispose(); // dispose before synchronizing to avoid multiple merge windows in case of new conflict.
+
     }
 }

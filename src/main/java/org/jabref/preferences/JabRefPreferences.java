@@ -480,6 +480,11 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(ID_ENTRY_GENERATOR, DoiFetcher.NAME);
 
 
+        //Sharelatex
+        defaults.put(DEFAULT_NODE, "default");
+        defaults.put(PARENT_NODE, "jabref-sharelatex");
+
+
         if (OS.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
             defaults.put(WIN_LOOK_AND_FEEL, UIManager.getSystemLookAndFeelClassName());
@@ -1030,7 +1035,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private boolean getBooleanDefault(String key) {
-        return (Boolean) defaults.get(key);
+        return (Boolean) (defaults.get(key) == null ? false : defaults.get(key));
     }
 
     public int getInt(String key) {
@@ -1425,6 +1430,7 @@ public class JabRefPreferences implements PreferencesService {
                 && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
     }
 
+    @Override
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(customImports, getDefaultEncoding(), getKeywordDelimiter(),
                 getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(),
