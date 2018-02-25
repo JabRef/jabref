@@ -417,7 +417,6 @@ public class JabRefPreferences implements PreferencesService {
      * HashMap that contains all preferences which are set by default
      */
     public final Map<String, Object> defaults = new HashMap<>();
-    public final String MARKING_WITH_NUMBER_PATTERN;
     // Object containing custom export formats:
     public final CustomExportList customExports;
     /**
@@ -769,8 +768,6 @@ public class JabRefPreferences implements PreferencesService {
 
         customExports = new CustomExportList(new ExportComparator());
         customImports = new CustomImportList(this);
-
-        MARKING_WITH_NUMBER_PATTERN = "\\[" + get(DEFAULT_OWNER).replaceAll("\\\\", "\\\\\\\\") + ":(\\d+)\\]";
 
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
         defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);

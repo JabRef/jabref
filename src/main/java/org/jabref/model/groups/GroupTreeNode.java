@@ -1,6 +1,7 @@
 package org.jabref.model.groups;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -296,7 +297,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      * If the group does not support explicit adding of entries (i.e., does not implement {@link GroupEntryChanger}),
      * then no action is performed.
      */
-    public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
+    public List<FieldChange> addEntriesToGroup(Collection<BibEntry> entries) {
         if (getGroup() instanceof GroupEntryChanger) {
             return ((GroupEntryChanger) getGroup()).add(entries);
         } else {
