@@ -1,18 +1,42 @@
 package org.jabref.gui.strings;
 
+import java.util.function.Function;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class StringViewModel {
 
-    private final StringProperty label;
-    private final StringProperty content;
+    private final StringProperty label = new SimpleStringProperty();
+    private final StringProperty content = new SimpleStringProperty();
+
+    private final Validator labelValidator;
+
+    private final Function<String, ValidationMessage> function = input -> {
+        if (input == null) {
+            return ValidationMessage.error("May not be null2");
+        } else if (input.trim().isEmpty()) {
+            return ValidationMessage.warning("Should not be empty");
+        } else {
+            return null; // everything is ok
+        }
+    };
 
     public StringViewModel(String label, String content) {
 
-        this.label = new SimpleStringProperty(label);
-        this.content = new SimpleStringProperty(content);
+        this.label.setValue(label);
+        this.content.setValue(content);
+
+        labelValidator = new FunctionBasedValidator<>(this.label, function);
+    }
+
+    public ValidationStatus labelValidation() {
+        return labelValidator.getValidationStatus();
     }
 
     public StringProperty getLabel() {

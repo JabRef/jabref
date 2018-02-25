@@ -47,21 +47,10 @@ public class StringDialogViewModel extends AbstractViewModel {
 
     public void removeString(StringViewModel selected) {
         allStrings.remove(selected);
-
     }
 
     private StringViewModel convertFromBibTexString(BibtexString bibtexString) {
         return new StringViewModel(bibtexString.getName(), bibtexString.getContent());
-
-    }
-
-    public void validateInput(StringViewModel newValue) {
-        if (newValue != null) {
-            String label = newValue.getLabel().getValue();
-            String content = newValue.getContent().getValue();
-
-            //TODO: Validation
-        }
 
     }
 
