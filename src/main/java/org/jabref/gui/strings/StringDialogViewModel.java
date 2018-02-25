@@ -28,10 +28,12 @@ public class StringDialogViewModel extends AbstractViewModel {
 
     private void addAllStringsFromDB() {
 
-        Set<StringViewModel> strings = db.getStringKeySet().stream()
+        Set<StringViewModel> strings = db.getStringKeySet()
+                .stream()
                 .map(string -> db.getString(string))
                 .sorted(new BibtexStringComparator(false))
-                .map(this::convertFromBibTexString).collect(Collectors.toSet());
+                .map(this::convertFromBibTexString)
+                .collect(Collectors.toSet());
         allStrings.addAll(strings);
     }
 

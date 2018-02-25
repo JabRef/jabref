@@ -5,18 +5,25 @@ import javax.inject.Inject;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.util.Callback;
+import javafx.util.converter.DefaultStringConverter;
 
 import org.jabref.gui.AbstractController;
 import org.jabref.gui.IconTheme.JabRefIcons;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.gui.StateManager;
+
+import org.controlsfx.tools.ValueExtractor;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 
 public class StringDialogController extends AbstractController<StringDialogViewModel> {
 
@@ -46,17 +53,49 @@ public class StringDialogController extends AbstractController<StringDialogViewM
         colLabel.setCellValueFactory(cellData -> cellData.getValue().getLabel());
         colContent.setCellValueFactory(cellData -> cellData.getValue().getContent());
 
-        colLabel.setCellFactory(TextFieldTableCell.<StringViewModel> forTableColumn());
-        colContent.setCellFactory(TextFieldTableCell.<StringViewModel> forTableColumn());
+        ValidationSupport validationSupport = new ValidationSupport();
+
+        //Register TextfieldTableCell Control for validation
+        ValueExtractor.addObservableValueExtractor(c -> c instanceof TextFieldTableCell, c -> ((TextFieldTableCell<?, String>) c).textProperty());
+
+        colLabel.setCellFactory(new Callback<TableColumn<StringViewModel, String>, TableCell<StringViewModel, String>>() {
+
+            @Override
+            public TableCell<StringViewModel, String> call(TableColumn<StringViewModel, String> param) {
+
+                TextFieldTableCell<StringViewModel, String> cell = new TextFieldTableCell<>(new DefaultStringConverter());
+                validationSupport.registerValidator(cell, Validator.createEmptyValidator("Text is required"));
+                return cell;
+            }
+
+        });
+
+        colContent.setCellFactory(new Callback<TableColumn<StringViewModel, String>, TableCell<StringViewModel, String>>() {
+
+            @Override
+            public TableCell<StringViewModel, String> call(TableColumn<StringViewModel, String> param) {
+
+                TextFieldTableCell<StringViewModel, String> cell = new TextFieldTableCell<>(new DefaultStringConverter());
+                validationSupport.registerValidator(cell, Validator.createEmptyValidator("Text is required"));
+                return cell;
+            }
+        });
+
         colLabel.setOnEditCommit(
                 (CellEditEvent<StringViewModel, String> t) -> {
-                    t.getTableView().getItems().get(
-                            t.getTablePosition().getRow()).setLabel(t.getNewValue());
+                    t.getTableView()
+                            .getItems()
+                            .get(
+                                    t.getTablePosition().getRow())
+                            .setLabel(t.getNewValue());
                 });
         colContent.setOnEditCommit(
                 (CellEditEvent<StringViewModel, String> t) -> {
-                    t.getTableView().getItems().get(
-                            t.getTablePosition().getRow()).setContent(t.getNewValue());
+                    t.getTableView()
+                            .getItems()
+                            .get(
+                                    t.getTablePosition().getRow())
+                            .setContent(t.getNewValue());
                 });
 
         tblStrings.itemsProperty().bindBidirectional(viewModel.allStringsProperty());
