@@ -191,7 +191,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getToolTipText(),
             IconTheme.JabRefIcons.PRINTED.getIcon());
 
-
     // Lists containing different subsets of actions for different purposes
     private final List<Object> specialFieldButtons = new LinkedList<>();
     private final List<Object> openDatabaseOnlyActions = new LinkedList<>();
@@ -398,8 +397,11 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     }
 
     public void refreshTitleAndTabs() {
-        setWindowTitle();
-        updateAllTabTitles();
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+
+            setWindowTitle();
+            updateAllTabTitles();
+        });
     }
 
     /**
@@ -420,7 +422,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL) {
             String changeFlag = panel.isModified() && !isAutosaveEnabled ? "*" : "";
-            String databaseFile = panel.getBibDatabaseContext().getDatabaseFile().map(File::getPath)
+            String databaseFile = panel.getBibDatabaseContext()
+                    .getDatabaseFile()
+                    .map(File::getPath)
                     .orElse(GUIGlobals.UNTITLED_TITLE);
             //setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
         } else if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
@@ -761,7 +765,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                         factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, false)),
                         factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(this, false)),
                         factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(this, true)),
-                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new OldDatabaseCommandWrapper(Actions.SAVE_SELECTED_AS_PLAIN, this, Globals.stateManager))),
+                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new OldDatabaseCommandWrapper(Actions.SAVE_SELECTED_AS_PLAIN, this, Globals.stateManager))
+                ),
 
                 new SeparatorMenuItem(),
 
@@ -776,6 +781,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction()),
                 factory.createMenuItem(StandardActions.QUIT, new CloseAction())
+
         );
 
         edit.getItems().addAll(
@@ -803,6 +809,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new OldDatabaseCommandWrapper(Actions.SEND_AS_EMAIL, this, Globals.stateManager)),
 
                 new SeparatorMenuItem()
+
         );
         /*
         edit.add(mark);
@@ -857,6 +864,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(StandardActions.MANAGE_KEYWORDS, new ManageKeywordsAction(this)),
                 factory.createMenuItem(StandardActions.REPLACE_ALL, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.MASS_SET_FIELDS, new MassSetFieldAction(this))
+
         );
 
         library.getItems().addAll(
@@ -873,7 +881,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this)),
                 factory.createMenuItem(StandardActions.EDIT_PREAMBLE, new OldDatabaseCommandWrapper(Actions.EDIT_PREAMBLE, this, Globals.stateManager)),
+
                 factory.createMenuItem(StandardActions.EDIT_STRINGS, new StringAction())
+
         );
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
@@ -899,6 +909,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this)),
                 lookupIdentifiers,
                 factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new OldDatabaseCommandWrapper(Actions.DOWNLOAD_FULL_TEXT, this, Globals.stateManager))
+
         );
 
         SidePaneComponent webSearch = sidePaneManager.getComponent(SidePaneType.WEB_SEARCH);
@@ -920,6 +931,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 factory.createMenuItem(StandardActions.NEXT_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.NEXT_PREVIEW_STYLE, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.PREVIOUS_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.PREVIOUS_PREVIEW_STYLE, this, Globals.stateManager))
+
         );
 
         PushToApplicationButton pushToExternal = new PushToApplicationButton(this, pushApplications.getApplications());
@@ -944,7 +956,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 factory.createMenuItem(StandardActions.ABBREVIATE_ISO, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_ISO, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.ABBREVIATE_MEDLINE, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_MEDLINE, this, Globals.stateManager)),
-                factory.createMenuItem(StandardActions.UNABBREVIATE, new OldDatabaseCommandWrapper(Actions.UNABBREVIATE, this, Globals.stateManager)));
+                factory.createMenuItem(StandardActions.UNABBREVIATE, new OldDatabaseCommandWrapper(Actions.UNABBREVIATE, this, Globals.stateManager))
+
+        );
 
         options.getItems().addAll(
                 factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(this)),
@@ -964,6 +978,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new OldDatabaseCommandWrapper(Actions.MANAGE_SELECTORS, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.CUSTOMIZE_ENTRY_TYPES, new CustomizeEntryAction(this)),
                 factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this))
+
         );
 
         help.getItems().addAll(
@@ -995,6 +1010,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 ),
                 factory.createMenuItem(StandardActions.ABOUT, new AboutAction())
+
         );
 
         MenuBar menu = new MenuBar();
@@ -1026,7 +1042,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         } else {
             // only add tab if DB is not already open
             Optional<BasePanel> panel = getBasePanelList().stream()
-                    .filter(p -> p.getBibDatabaseContext().getDatabaseFile().equals(pr.getFile())).findFirst();
+                    .filter(p -> p.getBibDatabaseContext().getDatabaseFile().equals(pr.getFile()))
+                    .findFirst();
 
             if (panel.isPresent()) {
                 tabbedPane.getSelectionModel().select(getTab(panel.get()));
@@ -1419,7 +1436,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         boolean close = false;
         String filename;
 
-        filename = panel.getBibDatabaseContext().getDatabaseFile().map(File::getAbsolutePath)
+        filename = panel.getBibDatabaseContext()
+                .getDatabaseFile()
+                .map(File::getAbsolutePath)
                 .orElse(GUIGlobals.UNTITLED_TITLE);
 
         int answer = showSaveDialog(filename);
@@ -1442,12 +1461,14 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     }
 
     private void removeTab(BasePanel panel) {
-        panel.cleanUp();
-        tabbedPane.getTabs().remove(getTab(panel));
-        setWindowTitle();
-        output(Localization.lang("Closed library") + '.');
-        // update tab titles
-        updateAllTabTitles();
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            panel.cleanUp();
+            tabbedPane.getTabs().remove(getTab(panel));
+            setWindowTitle();
+            output(Localization.lang("Closed library") + '.');
+            // update tab titles
+            updateAllTabTitles();
+        });
     }
 
     public void closeCurrentTab() {
