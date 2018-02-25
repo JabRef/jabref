@@ -13,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
@@ -30,6 +31,7 @@ import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -37,6 +39,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.util.OptionalUtil;
 
 import org.controlsfx.control.Rating;
 import org.fxmisc.easybind.EasyBind;
@@ -104,7 +107,7 @@ class MainTableColumnFactory {
         TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new TableColumn<>();
         column.getStyleClass().add(GROUP_COLUMN);
         setExactWidth(column, 20);
-        column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups());
+        column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups(database));
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
                 .withGraphic(this::createGroupColorRegion)
                 .install(column);
@@ -112,18 +115,22 @@ class MainTableColumnFactory {
     }
 
     private Node createGroupColorRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
-        BorderPane container = new BorderPane();
         Rectangle rectangle = new Rectangle();
-        // rectangle.setX(50);
-        //rectangle.setY(50);
         rectangle.setWidth(3);
         rectangle.setHeight(20);
-        if (entry.getEntry().getField(FieldName.TITLE).orElse("").contains("security")) {
-            rectangle.setFill(Color.web("#5EBA7D"));
-        } else {
-            rectangle.setFill(Color.TRANSPARENT);
-        }
-        //rectangle.setStyle("-fx-background-color: #5eba7d;");
+        Color color = matchedGroups.stream()
+                                   .flatMap(group -> OptionalUtil.toStream(group.getColor()))
+                                   .findFirst()
+                                   .orElse(Color.TRANSPARENT);
+        rectangle.setFill(color);
+
+        String matchedGroupsString = matchedGroups.stream()
+                                                  .map(AbstractGroup::getName)
+                                                  .collect(Collectors.joining(", "));
+        Tooltip tooltip = new Tooltip(Localization.lang("Entry is contained in the following groups:") + "\n" + matchedGroupsString);
+        Tooltip.install(rectangle, tooltip);
+
+        BorderPane container = new BorderPane();
         container.setLeft(rectangle);
         return container;
     }

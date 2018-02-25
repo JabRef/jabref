@@ -161,6 +161,16 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         return groups;
     }
 
+    /**
+     * Determines all groups in the subtree starting at this node which contain the given entry.
+     */
+    public List<GroupTreeNode> getMatchingGroups(BibEntry entry) {
+        return getMatchingGroups(Collections.singletonList(entry));
+    }
+
+    /**
+     * Determines all groups in the subtree starting at this node which contain at least one of the given entries.
+     */
     public List<GroupTreeNode> getMatchingGroups(List<BibEntry> entries) {
         List<GroupTreeNode> groups = new ArrayList<>();
 

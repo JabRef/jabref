@@ -3,23 +3,22 @@ package org.jabref.gui.maintable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.paint.Color;
 
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.groups.AbstractGroup;
-import org.jabref.model.groups.ExplicitGroup;
-import org.jabref.model.groups.GroupHierarchyType;
-import org.jabref.model.groups.KeywordGroup;
+import org.jabref.model.groups.GroupTreeNode;
 
 import org.fxmisc.easybind.EasyBind;
 
@@ -51,14 +50,19 @@ public class BibEntryTableViewModel {
         return EasyBind.map(getField(FieldName.FILE), FileFieldParser::parse);
     }
 
-    public ObservableValue<List<AbstractGroup>> getMatchedGroups() {
+    public ObservableValue<List<AbstractGroup>> getMatchedGroups(BibDatabaseContext database) {
         SimpleObjectProperty<List<AbstractGroup>> matchedGroups = new SimpleObjectProperty<>(Collections.emptyList());
 
-        //if (entry.isGroupHit()) {
-        KeywordGroup testGroup = new ExplicitGroup("Test", GroupHierarchyType.INCLUDING, ',');
-        testGroup.setColor(Color.RED);
-        matchedGroups.setValue(Collections.singletonList(testGroup));
-        //}
+        Optional<GroupTreeNode> root = database.getMetaData()
+                                               .getGroups();
+        if (root.isPresent()) {
+            List<AbstractGroup> groups = root.get().getMatchingGroups(entry)
+                                             .stream()
+                                             .map(GroupTreeNode::getGroup)
+                                             .collect(Collectors.toList());
+            groups.remove(root.get().getGroup());
+            matchedGroups.setValue(groups);
+        }
 
         return matchedGroups;
     }
