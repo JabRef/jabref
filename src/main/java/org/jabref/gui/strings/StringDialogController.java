@@ -10,16 +10,18 @@ import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.util.converter.DefaultStringConverter;
 
 import org.jabref.gui.AbstractController;
 import org.jabref.gui.IconTheme.JabRefIcons;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import de.saxsys.mvvmfx.utils.validation.visualization.ValidationVisualizer;
+import org.controlsfx.tools.ValueExtractor;
 
 public class StringDialogController extends AbstractController<StringDialogViewModel> {
 
@@ -46,13 +48,36 @@ public class StringDialogController extends AbstractController<StringDialogViewM
 
         btnRemove.setGraphic(JabRefIcons.REMOVE.getGraphicNode());
         btnRemove.setTooltip(new Tooltip(Localization.lang("Remove string")));
+        ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
+        visualizer.setDecoration(new IconValidationDecorator());
 
-        colLabel.setCellValueFactory(cellData -> cellData.getValue().getLabel());
-        colContent.setCellValueFactory(cellData -> cellData.getValue().getContent());
-
-        colLabel.setCellFactory(TextFieldTableCell.forTableColumn());
-        colContent.setCellFactory(TextFieldTableCell.forTableColumn());
         //Register TextfieldTableCell Control for validation
+        ValueExtractor.addObservableValueExtractor(c -> c instanceof TextFieldTableCell, c -> ((TextFieldTableCell<?, String>) c).textProperty());
+
+        colLabel.setCellFactory(column -> {
+
+            TextFieldTableCell<StringViewModel, String> cell = new TextFieldTableCell<>(new DefaultStringConverter());
+            column.setCellValueFactory(cellData -> {
+
+                visualizer.initVisualization(cellData.getValue().labelValidation(), cell);
+                return cellData.getValue().getLabel();
+            });
+            return cell;
+
+        });
+
+        colContent.setCellFactory(column -> {
+
+            TextFieldTableCell<StringViewModel, String> cell = new TextFieldTableCell<>(new DefaultStringConverter());
+            column.setCellValueFactory(cellData -> {
+
+                visualizer.initVisualization(cellData.getValue().contentValidation(), cell);
+                return cellData.getValue().getContent();
+            });
+            return cell;
+
+        });
+
 
         colLabel.setOnEditCommit(
                 (CellEditEvent<StringViewModel, String> cell) -> {
@@ -65,8 +90,6 @@ public class StringDialogController extends AbstractController<StringDialogViewM
 
         tblStrings.itemsProperty().bindBidirectional(viewModel.allStringsProperty());
         tblStrings.setEditable(true);
-
-        ValidationVisualizer visualizer = new ControlsFxVisualizer();
 
         //The problemm is that the viewModel here is not the viewModel of the List
         //visualizer.initVisualization(viewModel.labelValidation(), colLabel, true);

@@ -16,6 +16,7 @@ public class StringViewModel {
     private final StringProperty content = new SimpleStringProperty();
 
     private final Validator labelValidator;
+    private final Validator contentValidator;
 
     private final Function<String, ValidationMessage> function = input -> {
         if (input == null) {
@@ -33,10 +34,15 @@ public class StringViewModel {
         this.content.setValue(content);
 
         labelValidator = new FunctionBasedValidator<>(this.label, function);
+        contentValidator = new FunctionBasedValidator<>(this.content, function);
     }
 
     public ValidationStatus labelValidation() {
         return labelValidator.getValidationStatus();
+    }
+
+    public ValidationStatus contentValidation() {
+        return contentValidator.getValidationStatus();
     }
 
     public StringProperty getLabel() {
