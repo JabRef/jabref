@@ -757,7 +757,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                         factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, false)),
                         factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(this, false)),
                         factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(this, true)),
-                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new OldDatabaseCommandWrapper(Actions.SAVE_SELECTED_AS_PLAIN, this, Globals.stateManager))),
+                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new OldDatabaseCommandWrapper(Actions.SAVE_SELECTED_AS_PLAIN, this, Globals.stateManager))
+                ),
 
                 new SeparatorMenuItem(),
 
@@ -771,7 +772,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction()),
-                factory.createMenuItem(StandardActions.QUIT, new CloseAction()));
+                factory.createMenuItem(StandardActions.QUIT, new CloseAction())
+
+        );
 
         edit.getItems().addAll(
                 factory.createMenuItem(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
@@ -797,7 +800,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new OldDatabaseCommandWrapper(Actions.SEND_AS_EMAIL, this, Globals.stateManager)),
 
-                new SeparatorMenuItem());
+                new SeparatorMenuItem()
+
+        );
 
         /* TODO
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
@@ -841,7 +846,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         edit.getItems().addAll(
                 factory.createMenuItem(StandardActions.MANAGE_KEYWORDS, new ManageKeywordsAction(this)),
                 factory.createMenuItem(StandardActions.REPLACE_ALL, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, Globals.stateManager)),
-                factory.createMenuItem(StandardActions.MASS_SET_FIELDS, new MassSetFieldAction(this)));
+                factory.createMenuItem(StandardActions.MASS_SET_FIELDS, new MassSetFieldAction(this))
+
+        );
 
         library.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_ARTICLE, new NewEntryAction(this, BibtexEntryTypes.ARTICLE)),
@@ -856,7 +863,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this)),
                 factory.createMenuItem(StandardActions.EDIT_PREAMBLE, new OldDatabaseCommandWrapper(Actions.EDIT_PREAMBLE, this, Globals.stateManager)),
-                factory.createMenuItem(StandardActions.EDIT_STRINGS, new OldDatabaseCommandWrapper(Actions.EDIT_STRINGS, this, Globals.stateManager)));
+                factory.createMenuItem(StandardActions.EDIT_STRINGS, new OldDatabaseCommandWrapper(Actions.EDIT_STRINGS, this, Globals.stateManager))
+
+        );
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
         for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences())) {
@@ -880,7 +889,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction()),
                 factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this)),
                 lookupIdentifiers,
-                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new OldDatabaseCommandWrapper(Actions.DOWNLOAD_FULL_TEXT, this, Globals.stateManager)));
+                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new OldDatabaseCommandWrapper(Actions.DOWNLOAD_FULL_TEXT, this, Globals.stateManager))
+
+        );
 
         SidePaneComponent webSearch = sidePaneManager.getComponent(SidePaneType.WEB_SEARCH);
         SidePaneComponent groups = sidePaneManager.getComponent(SidePaneType.GROUPS);
@@ -900,7 +911,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.NEXT_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.NEXT_PREVIEW_STYLE, this, Globals.stateManager)),
-                factory.createMenuItem(StandardActions.PREVIOUS_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.PREVIOUS_PREVIEW_STYLE, this, Globals.stateManager)));
+                factory.createMenuItem(StandardActions.PREVIOUS_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.PREVIOUS_PREVIEW_STYLE, this, Globals.stateManager))
+
+        );
 
         PushToApplicationButton pushToExternal = new PushToApplicationButton(this, pushApplications.getApplications());
         tools.getItems().addAll(
@@ -924,7 +937,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 factory.createMenuItem(StandardActions.ABBREVIATE_ISO, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_ISO, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.ABBREVIATE_MEDLINE, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_MEDLINE, this, Globals.stateManager)),
-                factory.createMenuItem(StandardActions.UNABBREVIATE, new OldDatabaseCommandWrapper(Actions.UNABBREVIATE, this, Globals.stateManager)));
+                factory.createMenuItem(StandardActions.UNABBREVIATE, new OldDatabaseCommandWrapper(Actions.UNABBREVIATE, this, Globals.stateManager))
+
+        );
 
         options.getItems().addAll(
                 factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(this)),
@@ -943,7 +958,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new OldDatabaseCommandWrapper(Actions.MANAGE_SELECTORS, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.CUSTOMIZE_ENTRY_TYPES, new CustomizeEntryAction(this)),
-                factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this)));
+                factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this))
+
+        );
 
         help.getItems().addAll(
                 factory.createMenuItem(StandardActions.HELP, HelpAction.getCommand()),
@@ -973,7 +990,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                         factory.createMenuItem(StandardActions.DONATE, new OpenBrowserAction("https://donations.jabref.org"))
 
                 ),
-                factory.createMenuItem(StandardActions.ABOUT, new AboutAction()));
+                factory.createMenuItem(StandardActions.ABOUT, new AboutAction())
+
+        );
 
         MenuBar menu = new MenuBar();
         menu.getStyleClass().add("mainMenu");

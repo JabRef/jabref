@@ -2,7 +2,6 @@ package org.jabref.gui.util;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
@@ -71,17 +70,9 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     @Override
     public void addListenerForFile(Path file, FileUpdateListener listener) throws IOException {
         // We can't watch files directly, so monitor their parent directory for updates
-
         Path directory = file.toAbsolutePath().getParent();
-                System.out.println(directory);
-        if ((directory != null) && Files.exists(directory)) {
-            directory.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
-
-            listeners.put(file, listener);
-        }
-        else {
-            System.out.println("Dir not exist " + directory);
-        }
+        directory.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
+        listeners.put(file, listener);
     }
 
     @Override
