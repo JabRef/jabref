@@ -5,14 +5,18 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javafx.concurrent.Task;
 import javafx.print.PrinterJob;
+import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.Region;
@@ -47,6 +51,38 @@ public class FXDialogService implements DialogService {
 
     private static FXDialog createDialog(AlertType type, String title, String content) {
         FXDialog alert = new FXDialog(type, title, true);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        return alert;
+    }
+
+    private static FXDialog createDialogWithOptOut(AlertType type, String title, String content,
+                                                   String optOutMessage, Consumer<Boolean> optOutAction) {
+        FXDialog alert = new FXDialog(type, title, true);
+        // Need to force the alert to layout in order to grab the graphic as we are replacing the dialog pane with a custom pane
+        alert.getDialogPane().applyCss();
+        Node graphic = alert.getDialogPane().getGraphic();
+
+        // Create a new dialog pane that has a checkbox instead of the hide/show details button
+        // Use the supplied callback for the action of the checkbox
+        alert.setDialogPane(new DialogPane() {
+            @Override
+            protected Node createDetailsButton() {
+                CheckBox optOut = new CheckBox();
+                optOut.setText(optOutMessage);
+                optOut.setOnAction(e -> optOutAction.accept(optOut.isSelected()));
+                return optOut;
+            }
+        });
+
+        // Fool the dialog into thinking there is some expandable content; a group won't take up any space if it has no children
+        alert.getDialogPane().setExpandableContent(new Group());
+        alert.getDialogPane().setExpanded(true);
+
+        // Reset the dialog graphic using the default style
+        alert.getDialogPane().setGraphic(graphic);
+
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
@@ -123,6 +159,15 @@ public class FXDialogService implements DialogService {
         alert.getButtonTypes().setAll(okButtonType, cancelButtonType);
         return alert.showAndWait().filter(buttonType -> buttonType == okButtonType).isPresent();
     }
+
+    @Override
+    public boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
+                                                           String optOutMessage, Consumer<Boolean> optOutAction) {
+        FXDialog alert = createDialogWithOptOut(AlertType.CONFIRMATION, title, content, optOutMessage, optOutAction);
+        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+        return alert.showAndWait().filter(buttonType -> buttonType == ButtonType.YES).isPresent();
+    }
+
 
     @Override
     public Optional<ButtonType> showCustomButtonDialogAndWait(AlertType type, String title, String content,
