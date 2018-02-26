@@ -33,14 +33,11 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumnModel;
 
 import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
-
 import org.jabref.Globals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
-import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -156,7 +153,7 @@ class StyleSelectDialog {
         builder.add(new JScrollPane(table)).xyw(1, 3, 5);
         builder.add(addButton).xy(3, 5);
         builder.add(removeButton).xy(5, 5);
-        JFXPanel container = CustomJFXPanel.wrap(new Scene(preview));
+        JFXPanel container = new JFXPanel();
         builder.add(container).xyw(1, 7, 5);
         builder.padding("5dlu, 5dlu, 5dlu, 5dlu");
 
