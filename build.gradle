@@ -149,7 +149,7 @@ dependencies {
     compile 'org.citationstyles:locales:1.0.1-SNAPSHOT'
     compile 'de.undercouch:citeproc-java:1.0.1'
 
-    compile 'com.github.tomtung:latex2unicode_2.12:0.2.4'
+    compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '1.0.9'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.9'
