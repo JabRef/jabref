@@ -260,6 +260,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         sidePaneManager = new SidePaneManager(Globals.prefs, this);
         sidePane = sidePaneManager.getPane();
 
+        Pane containerPane = DndTabPaneFactory.createDefaultDnDPane(DndTabPaneFactory.FeedbackType.MARKER, null);
+        tabbedPane = (DndTabPane) containerPane.getChildren().get(0);
+
         initLayout();
 
         initActions();
@@ -270,8 +273,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         //WindowLocation pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
         //        JabRefPreferences.SIZE_Y);
         //pw.displayWindowAtStoredLocation();
-
-        tabbedPane.setBorder(null);
 
         /*
          * The following state listener makes sure focus is registered with the
