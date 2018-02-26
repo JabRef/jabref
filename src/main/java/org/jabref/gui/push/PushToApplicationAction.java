@@ -45,7 +45,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         // Check if any entries are selected:
         entries = panel.getSelectedEntries();
         if (entries.isEmpty()) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("This operation requires one or more entries to be selected."), (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, Localization.lang("This operation requires one or more entries to be selected."), (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -53,7 +53,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         if (operation.requiresBibtexKeys()) {
             for (BibEntry entry : entries) {
                 if (!(entry.getCiteKeyOptional().isPresent()) || entry.getCiteKeyOptional().get().trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(frame,
+                    JOptionPane.showMessageDialog(null,
                             Localization
                                     .lang("This operation requires all selected entries to have BibTeX keys defined."),
                             (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);

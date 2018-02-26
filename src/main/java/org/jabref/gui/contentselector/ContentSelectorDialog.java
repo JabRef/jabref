@@ -197,7 +197,7 @@ public class ContentSelectorDialog extends JabRefDialog {
                 dispose();
             } catch (Exception ex) {
                 LOGGER.info("Could not apply changes in \"Manage content selectors\"", ex);
-                JOptionPane.showMessageDialog(frame, Localization.lang("Could not apply changes."));
+                JOptionPane.showMessageDialog(null, Localization.lang("Could not apply changes."));
             }
         });
 
@@ -210,7 +210,7 @@ public class ContentSelectorDialog extends JabRefDialog {
                 applyChanges();
             } catch (Exception ex) {
                 LOGGER.info("Could not apply changes in \"Manage content selectors\"", ex);
-                JOptionPane.showMessageDialog(frame, Localization.lang("Could not apply changes."));
+                JOptionPane.showMessageDialog(null, Localization.lang("Could not apply changes."));
             }
         });
 

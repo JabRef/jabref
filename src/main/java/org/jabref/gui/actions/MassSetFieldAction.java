@@ -19,6 +19,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -45,7 +46,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * * Input field name
  * * Either set field, or clear field.
  */
-public class MassSetFieldAction extends MnemonicAwareAction {
+public class MassSetFieldAction extends SimpleCommand {
 
     private final JabRefFrame frame;
     private JDialog diag;
@@ -64,12 +65,11 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
 
     public MassSetFieldAction(JabRefFrame frame) {
-        putValue(Action.NAME, Localization.menuTitle("Set/clear/append/rename fields") + "...");
         this.frame = frame;
     }
 
     private void createDialog() {
-        diag = new JDialog(frame, Localization.lang("Set/clear/append/rename fields"), true);
+        diag = new JDialog((JFrame) null, Localization.lang("Set/clear/append/rename fields"), true);
 
         field = new JComboBox<>();
         field.setEditable(true);
@@ -207,7 +207,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void execute() {
         BasePanel bp = frame.getCurrentBasePanel();
         if (bp == null) {
             return;
@@ -220,7 +220,6 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         canceled = true;
         prepareDialog(!entries.isEmpty());
         if (diag != null) {
-            diag.setLocationRelativeTo(frame);
             diag.setVisible(true);
         }
         if (canceled) {

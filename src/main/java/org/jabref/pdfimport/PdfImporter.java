@@ -29,7 +29,7 @@ import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.xmp.XMPUtil;
+import org.jabref.logic.xmp.XmpUtilShared;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
@@ -108,10 +108,9 @@ public class PdfImporter {
         for (String fileName : fileNames) {
             if (!neverShow && !doNotShowAgain) {
                 importDialog = new ImportDialog(dropRow >= 0, fileName);
-                if (!XMPUtil.hasMetadata(Paths.get(fileName), Globals.prefs.getXMPPreferences())) {
+                if (!XmpUtilShared.hasMetadata(Paths.get(fileName), Globals.prefs.getXMPPreferences())) {
                     importDialog.disableXMPChoice();
                 }
-                importDialog.setLocationRelativeTo(frame);
                 importDialog.showDialog();
                 doNotShowAgain = importDialog.isDoNotShowAgain();
             }
@@ -155,7 +154,6 @@ public class PdfImporter {
         }
         localRes.addAll(result.getDatabase().getEntries());
 
-        BibEntry entry;
         if (localRes.isEmpty()) {
             // import failed -> generate default entry
             LOGGER.info("Import failed");
@@ -163,23 +161,21 @@ public class PdfImporter {
             return;
         }
 
-        // only one entry is imported
-        entry = localRes.get(0);
+        for (BibEntry entry : localRes) {
+            // insert entry to database and link file
+            panel.getDatabase().insertEntry(entry);
+            panel.markBaseChanged();
+            FileListTableModel tm = new FileListTableModel();
+            Path toLink = Paths.get(fileName);
+            // Get a list of file directories:
+            List<Path> dirsS = panel.getBibDatabaseContext()
+                    .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
 
-        // insert entry to database and link file
-        panel.getDatabase().insertEntry(entry);
-        panel.markBaseChanged();
-        FileListTableModel tm = new FileListTableModel();
-        Path toLink = Paths.get(fileName);
-        // Get a list of file directories:
-        List<Path> dirsS = panel.getBibDatabaseContext()
-                .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
-
-        tm.addEntry(0, new FileListEntry("", FileUtil.shortenFileName(toLink, dirsS).toString(),
-                ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
-        entry.setField(FieldName.FILE, tm.getStringRepresentation());
-        res.add(entry);
-
+            tm.addEntry(0, new FileListEntry("", FileUtil.shortenFileName(toLink, dirsS).toString(),
+                    ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
+            entry.setField(FieldName.FILE, tm.getStringRepresentation());
+            res.add(entry);
+        }
     }
 
     private Optional<BibEntry> createNewBlankEntry(String fileName) {
@@ -229,8 +225,6 @@ public class PdfImporter {
     private Optional<BibEntry> createNewEntry() {
         // Find out what type is desired
         EntryTypeDialog etd = new EntryTypeDialog(frame);
-        // We want to center the dialog, to make it look nicer.
-        etd.setLocationRelativeTo(frame);
         etd.setVisible(true);
         EntryType type = etd.getChoice();
 
@@ -245,7 +239,7 @@ public class PdfImporter {
                 UpdateField.setAutomaticFields(list, true, true, Globals.prefs.getUpdateFieldPreferences());
 
                 // Create an UndoableInsertEntry object.
-                panel.getUndoManager().addEdit(new UndoableInsertEntry(panel.getDatabase(), bibEntry, panel));
+                panel.getUndoManager().addEdit(new UndoableInsertEntry(panel.getDatabase(), bibEntry));
                 panel.output(Localization.lang("Added new") + " '" + type.getName().toLowerCase(Locale.ROOT) + "' "
                         + Localization.lang("entry") + ".");
 

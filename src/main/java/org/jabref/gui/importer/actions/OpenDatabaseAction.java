@@ -1,12 +1,12 @@
 package org.jabref.gui.importer.actions;
 
-import java.awt.event.ActionEvent;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -14,7 +14,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -23,14 +22,11 @@ import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelPreferences;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.MnemonicAwareAction;
-import org.jabref.gui.autosaveandbackup.BackupUIManager;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.ParserResultWarningDialog;
-import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -45,40 +41,35 @@ import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.migrations.FileLinksUpgradeWarning;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // The action concerned with opening an existing database.
+public class OpenDatabaseAction extends SimpleCommand {
 
-public class OpenDatabaseAction extends MnemonicAwareAction {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
-    private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = new ArrayList<>();
+    private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = Arrays.asList(
+            // Migrations:
+            // Warning for migrating the Review into the Comment field
+            new MergeReviewIntoCommentAction(),
+            // External file handling system in version 2.3:
+            new FileLinksUpgradeWarning(),
 
-    static {
-        // Add the action for checking for new custom entry types loaded from the BIB file:
-        POST_OPEN_ACTIONS.add(new CheckForNewEntryTypesAction());
-        // Add the action for the new external file handling system in version 2.3:
-        POST_OPEN_ACTIONS.add(new FileLinksUpgradeWarning());
-        // Add the action for warning about and handling duplicate BibTeX keys:
-        POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
-    }
+            // Check for new custom entry types loaded from the BIB file:
+            new CheckForNewEntryTypesAction(),
+            // Warning about and handling duplicate BibTeX keys:
+            new HandleDuplicateWarnings());
 
-    private final boolean showDialog;
+
     private final JabRefFrame frame;
 
-    public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
-        super(IconTheme.JabRefIcons.OPEN.getIcon());
+    public OpenDatabaseAction(JabRefFrame frame) {
         this.frame = frame;
-        this.showDialog = showDialog;
-        putValue(Action.NAME, Localization.menuTitle("Open library"));
-        putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.OPEN_DATABASE));
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Open BibTeX library"));
     }
 
     /**
@@ -96,26 +87,18 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
+    public void execute() {
         List<Path> filesToOpen = new ArrayList<>();
 
-        if (showDialog) {
+        DialogService ds = frame.getDialogService();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(FileType.BIBTEX_DB)
+                .withDefaultExtension(FileType.BIBTEX_DB)
+                .withInitialDirectory(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)))
+                .build();
 
-            DialogService ds = new FXDialogService();
-            FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileType.BIBTEX_DB)
-                    .withDefaultExtension(FileType.BIBTEX_DB)
-                    .withInitialDirectory(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)))
-                    .build();
-
-            List<Path> chosenFiles = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> ds.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));
-            filesToOpen.addAll(chosenFiles);
-        } else {
-            LOGGER.info(Action.NAME + " " + e.getActionCommand());
-            filesToOpen.add(Paths.get(StringUtil.getCorrectFileName(e.getActionCommand(), "bib")));
-        }
+        List<Path> chosenFiles = ds.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
+        filesToOpen.addAll(chosenFiles);
 
         openFiles(filesToOpen, true);
     }
@@ -148,7 +131,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         int removed = 0;
 
         // Check if any of the files are already open:
-        for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext();) {
+        for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext(); ) {
             Path file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabs().size(); i++) {
                 BasePanel basePanel = frame.getBasePanelAt(i);
@@ -226,11 +209,10 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                             Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-
             }
 
             if (BackupManager.checkForBackupFile(fileToLoad)) {
-                BackupUIManager.showRestoreBackupDialog(frame, fileToLoad);
+                BackupUIManager.showRestoreBackupDialog(null, fileToLoad);
             }
 
             ParserResult result;
@@ -245,7 +227,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     result.getDatabaseContext().clearDatabaseFile(); // do not open the original file
                     result.getDatabase().clearSharedDatabaseID();
                     LOGGER.error("Connection error", e);
-                    JOptionPane.showMessageDialog(frame,
+                    JOptionPane.showMessageDialog(null,
                             e.getMessage() + "\n\n" + Localization.lang("A local copy will be opened."),
                             Localization.lang("Connection error"), JOptionPane.WARNING_MESSAGE);
                 }
@@ -286,5 +268,4 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 }
         );
     }
-
 }

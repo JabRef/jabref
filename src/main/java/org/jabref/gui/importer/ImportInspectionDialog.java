@@ -196,14 +196,14 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
      * @param panel
      */
     public ImportInspectionDialog(JabRefFrame frame, BasePanel panel, String undoName, boolean newDatabase) {
-        super(frame, ImportInspectionDialog.class);
+        super(null, ImportInspectionDialog.class);
         this.frame = frame;
         this.panel = panel;
         this.bibDatabaseContext = (panel == null) ? null : panel.getBibDatabaseContext();
         this.undoName = undoName;
         this.newDatabase = newDatabase;
         setIconImages(IconTheme.getLogoSet());
-        preview = DefaultTaskExecutor.runInJavaFXThread(() -> new PreviewPanel(panel, bibDatabaseContext, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences()));
+        preview = DefaultTaskExecutor.runInJavaFXThread(() -> new PreviewPanel(panel, bibDatabaseContext, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), frame.getDialogService()));
 
         duplLabel.setToolTipText(Localization.lang("Possible duplicate of existing entry. Click to resolve."));
 
@@ -834,7 +834,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 }
 
                 entry.setId(IdGenerator.next());
-                ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
+                ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
             }
             panel.getDatabase().insertEntries(selected);
 
@@ -1237,7 +1237,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             }
             entry = selectionModel.getSelected().get(0);
             if (!entry.getCiteKeyOptional().isPresent()) {
-                int answer = JOptionPane.showConfirmDialog(frame,
+                int answer = JOptionPane.showConfirmDialog(null,
                         Localization.lang("This entry has no BibTeX key. Generate key now?"),
                         Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (answer == JOptionPane.OK_OPTION) {
@@ -1279,7 +1279,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             }
             final BibEntry entry = selectionModel.getSelected().get(0);
             if (!entry.hasCiteKey()) {
-                int answer = JOptionPane.showConfirmDialog(frame,
+                int answer = JOptionPane.showConfirmDialog(null,
                         Localization.lang("This entry has no BibTeX key. Generate key now?"),
                         Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (answer == JOptionPane.OK_OPTION) {

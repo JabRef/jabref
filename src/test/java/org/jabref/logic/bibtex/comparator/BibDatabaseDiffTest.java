@@ -5,11 +5,12 @@ import java.util.Optional;
 
 import org.jabref.model.database.BibDatabaseContext;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BibDatabaseDiffTest {
+
     @Test
     public void compareOfEmptyDatabasesReportsNoDifferences() throws Exception {
         BibDatabaseDiff diff = BibDatabaseDiff.compare(new BibDatabaseContext(), new BibDatabaseContext());

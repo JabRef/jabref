@@ -20,7 +20,6 @@ import org.assertj.swing.timing.Pause;
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 
-import static org.assertj.swing.finder.WindowFinder.findFrame;
 import static org.assertj.swing.launcher.ApplicationLauncher.application;
 
 @Category(GUITest.class)
@@ -42,7 +41,7 @@ public abstract class AbstractUITest extends AssertJSwingJUnitTestCase {
         robot().settings().timeoutToFindSubMenu(1_000);
         robot().settings().delayBetweenEvents(SPEED_NORMAL);
 
-        mainFrame = findFrame(JabRefFrame.class).withTimeout(10_000).using(robot());
+        //mainFrame = findFrame(null).withTimeout(10_000).using(robot());
         robot().waitForIdle();
     }
 

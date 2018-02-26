@@ -16,6 +16,7 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -47,7 +48,7 @@ class ReplaceStringDialog extends JabRefDialog {
 
 
     public ReplaceStringDialog(JabRefFrame parent) {
-        super(parent, Localization.lang("Replace string"), true, ReplaceStringDialog.class);
+        super((JFrame) null, Localization.lang("Replace string"), true, ReplaceStringDialog.class);
 
         ButtonGroup bg = new ButtonGroup();
         bg.add(allFi);
@@ -162,8 +163,6 @@ class ReplaceStringDialog extends JabRefDialog {
         getContentPane().add(opt, BorderLayout.SOUTH);
 
         pack();
-
-        this.setLocationRelativeTo(parent);
     }
 
     public boolean okPressed() {

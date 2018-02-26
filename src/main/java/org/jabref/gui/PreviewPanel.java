@@ -58,7 +58,6 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
      */
     private Optional<BibEntry> bibEntry = Optional.empty();
 
-    private Optional<Pattern> highlightPattern = Optional.empty();
     /**
      * If a database is set, the preview will attempt to resolve strings in the previewed entry using that database.
      */
@@ -67,15 +66,16 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     private Optional<Future<?>> citationStyleFuture = Optional.empty();
 
     /**
-     * @param preferences
      * @param panel           (may be null) Only set this if the preview is associated to the main window.
      * @param databaseContext (may be null) Used for resolving pdf directories for links.
+     * @param preferences
+     * @param dialogService
      */
-    public PreviewPanel(BasePanel panel, BibDatabaseContext databaseContext, KeyBindingRepository keyBindingRepository, PreviewPreferences preferences) {
+    public PreviewPanel(BasePanel panel, BibDatabaseContext databaseContext, KeyBindingRepository keyBindingRepository, PreviewPreferences preferences, DialogService dialogService) {
         this.databaseContext = Optional.ofNullable(databaseContext);
         this.basePanel = Optional.ofNullable(panel);
+        this.dialogService = dialogService;
         this.clipBoardManager = new ClipBoardManager();
-        this.dialogService = new FXDialogService();
         this.keyBindingRepository = keyBindingRepository;
 
         // Set up scroll pane for preview pane
@@ -128,10 +128,10 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         copyPreview.setOnAction(event -> copyPreviewToClipBoard());
         MenuItem printEntryPreview = new MenuItem(Localization.lang("Print entry preview"), IconTheme.JabRefIcons.PRINTED.getGraphicNode());
         printEntryPreview.setOnAction(event -> print());
-        MenuItem previousPreviewLayout = new MenuItem(Localization.menuTitleFX("Previous preview layout"));
+        MenuItem previousPreviewLayout = new MenuItem(Localization.menuTitle("Previous preview layout"));
         previousPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.PREVIOUS_PREVIEW_LAYOUT));
         previousPreviewLayout.setOnAction(event -> basePanel.ifPresent(BasePanel::previousPreviewStyle));
-        MenuItem nextPreviewLayout = new MenuItem(Localization.menuTitleFX("Next preview layout"));
+        MenuItem nextPreviewLayout = new MenuItem(Localization.menuTitle("Next preview layout"));
         nextPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.NEXT_PREVIEW_LAYOUT));
         nextPreviewLayout.setOnAction(event -> basePanel.ifPresent(BasePanel::nextPreviewStyle));
 
@@ -139,8 +139,8 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         menu.getItems().add(copyPreview);
         menu.getItems().add(printEntryPreview);
         menu.getItems().add(new SeparatorMenuItem());
-        menu.getItems().add(previousPreviewLayout);
         menu.getItems().add(nextPreviewLayout);
+        menu.getItems().add(previousPreviewLayout);
         return menu;
     }
 
@@ -260,7 +260,6 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     @Override
     public void highlightPattern(Optional<Pattern> newPattern) {
         // TODO: Implement that search phrases are highlighted
-        this.highlightPattern = newPattern;
         update();
     }
 

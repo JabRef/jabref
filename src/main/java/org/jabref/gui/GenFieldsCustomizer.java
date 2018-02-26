@@ -16,6 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -50,7 +51,7 @@ public class GenFieldsCustomizer extends JabRefDialog {
     private final JButton revert = new JButton();
 
     public GenFieldsCustomizer(JabRefFrame frame) {
-        super(frame, Localization.lang("Set general fields"), false, GenFieldsCustomizer.class);
+        super((JFrame) null, Localization.lang("Set general fields"), false, GenFieldsCustomizer.class);
         helpBut = new HelpAction(HelpFile.GENERAL_FIELDS).getHelpButton();
         jbInit();
         setSize(new Dimension(650, 300));

@@ -1,14 +1,6 @@
 package org.jabref.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-
-import javafx.application.Platform;
-
 import org.jabref.gui.errorconsole.ErrorConsoleView;
-import org.jabref.logic.l10n.Localization;
 
 /**
  * Such an error console can be
@@ -17,16 +9,11 @@ import org.jabref.logic.l10n.Localization;
  * <p/>
  * It offers a separate tab for the log output.
  */
-public class ErrorConsoleAction extends AbstractAction {
-
-    public ErrorConsoleAction() {
-        super(Localization.menuTitle("View event log"));
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Display all error messages"));
-    }
+public class ErrorConsoleAction extends SimpleCommand {
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        Platform.runLater(() -> new ErrorConsoleView().show());
+    public void execute() {
+        new ErrorConsoleView().show();
     }
 
 }

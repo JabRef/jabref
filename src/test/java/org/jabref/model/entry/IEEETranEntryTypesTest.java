@@ -3,8 +3,9 @@ package org.jabref.model.entry;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class IEEETranEntryTypesTest {
 
@@ -13,7 +14,7 @@ public class IEEETranEntryTypesTest {
         Collection<String> ctlFields = IEEETranEntryTypes.IEEETRANBSTCTL.getAllFields();
         List<String> ynFields = InternalBibtexFields.getIEEETranBSTctlYesNoFields();
 
-        Assert.assertTrue(ctlFields.containsAll(ynFields));
+        assertTrue(ctlFields.containsAll(ynFields));
     }
 
 }

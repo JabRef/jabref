@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -56,7 +55,7 @@ public class FindFullTextAction extends AbstractWorker {
         if (basePanel.getSelectedEntries().size() >= WARNING_LIMIT) {
             String[] options = new String[] {Localization.lang("Look up full text documents"),
                     Localization.lang("Cancel")};
-            int answer = JOptionPane.showOptionDialog(basePanel.frame(),
+            int answer = JOptionPane.showOptionDialog(null,
                     Localization.lang(
                             "You are about to look up full text documents for %0 entries.",
                             String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
@@ -79,14 +78,14 @@ public class FindFullTextAction extends AbstractWorker {
     @Override
     public void update() {
         List<Optional<URL>> remove = new ArrayList<>();
-        for (Entry<Optional<URL>, BibEntry> download : downloads.entrySet()) {
+        for (Map.Entry<Optional<URL>, BibEntry> download : downloads.entrySet()) {
             BibEntry entry = download.getValue();
             Optional<URL> result = download.getKey();
             if (result.isPresent()) {
                 Optional<Path> dir = basePanel.getBibDatabaseContext().getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences());
 
                 if (!dir.isPresent()) {
-                    JOptionPane.showMessageDialog(basePanel.frame(),
+                    JOptionPane.showMessageDialog(null,
                             Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
                                     + " -> " + Localization.lang("File"),
                             Localization.lang("Directory not found"), JOptionPane.ERROR_MESSAGE);
@@ -118,7 +117,7 @@ public class FindFullTextAction extends AbstractWorker {
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined")));
 
                 basePanel.output(message);
-                JOptionPane.showMessageDialog(basePanel.frame(), message, title, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
             }
             remove.add(result);
         }

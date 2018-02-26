@@ -1,7 +1,8 @@
 package org.jabref.model.entry;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CanonicalBibEntryTest {
 
@@ -13,7 +14,7 @@ public class CanonicalBibEntryTest {
         e.setField("title", "def");
         e.setField("journal", "hij");
         String canonicalRepresentation = CanonicalBibtexEntry.getCanonicalRepresentation(e);
-        Assert.assertEquals("@article{key,\n  author = {abc},\n  journal = {hij},\n  title = {def}\n}",
+        assertEquals("@article{key,\n  author = {abc},\n  journal = {hij},\n  title = {def}\n}",
                 canonicalRepresentation);
     }
 
@@ -23,7 +24,7 @@ public class CanonicalBibEntryTest {
         e.setCiteKey("key");
         e.setField("abstract", "line 1\nline 2");
         String canonicalRepresentation = CanonicalBibtexEntry.getCanonicalRepresentation(e);
-        Assert.assertEquals("@article{key,\n  abstract = {line 1\nline 2}\n}", canonicalRepresentation);
+        assertEquals("@article{key,\n  abstract = {line 1\nline 2}\n}", canonicalRepresentation);
     }
 
 }

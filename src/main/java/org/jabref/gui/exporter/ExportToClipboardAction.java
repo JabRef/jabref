@@ -63,7 +63,7 @@ public class ExportToClipboardAction extends AbstractWorker {
         list.setBorder(BorderFactory.createEtchedBorder());
         list.setSelectionInterval(0, 0);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        int answer = JOptionPane.showOptionDialog(frame, list, Localization.lang("Select export format"),
+        int answer = JOptionPane.showOptionDialog(null, list, Localization.lang("Select export format"),
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
                 new String[] {Localization.lang("Export"),
                         Localization.lang("Cancel")},

@@ -49,11 +49,9 @@ public class NewProtectedTermsFileDialog extends JabRefDialog {
     }
 
     public NewProtectedTermsFileDialog(JabRefFrame mainFrame, ProtectedTermsLoader loader) {
-        super(mainFrame, Localization.lang("New protected terms file"), true, NewProtectedTermsFileDialog.class);
-        parent = mainFrame;
+        super((JFrame) null, Localization.lang("New protected terms file"), true, NewProtectedTermsFileDialog.class);
         this.loader = loader;
         setupDialog();
-        setLocationRelativeTo(mainFrame);
     }
 
     private void setupDialog() {

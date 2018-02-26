@@ -1,8 +1,7 @@
 package org.jabref.logic.formatter;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
@@ -29,109 +28,112 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.model.cleanup.Formatter;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@RunWith(Parameterized.class)
 public class FormatterTest {
 
-    public Formatter formatter;
+    private static ProtectedTermsLoader protectedTermsLoader;
 
-
-    public FormatterTest(Formatter formatter) {
-        this.formatter = formatter;
-    }
-
-    @BeforeClass
+    @BeforeAll
     public static void setUp() {
-        ProtectTermsFormatter
-                .setProtectedTermsLoader(
-                        new ProtectedTermsLoader(new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
-                                Collections.emptyList(), Collections.emptyList(), Collections.emptyList())));
+        protectedTermsLoader = new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
+                        Collections.emptyList(), Collections.emptyList()));
+
+
     }
 
-    @Test
-    public void getNameReturnsNotNull() {
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    public void getNameReturnsNotNull(Formatter formatter) {
         assertNotNull(formatter.getName());
     }
 
-    @Test
-    public void getNameReturnsNotEmpty() {
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    public void getNameReturnsNotEmpty(Formatter formatter) {
         assertNotEquals("", formatter.getName());
     }
 
-    @Test
-    public void getKeyReturnsNotNull() {
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    public void getKeyReturnsNotNull(Formatter formatter) {
         assertNotNull(formatter.getKey());
     }
 
-    @Test
-    public void getKeyReturnsNotEmpty() {
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    public void getKeyReturnsNotEmpty(Formatter formatter) {
         assertNotEquals("", formatter.getKey());
     }
 
-    @Test(expected = NullPointerException.class)
-    public void formatOfNullThrowsException() {
-        formatter.format(null);
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    public void formatOfNullThrowsException(Formatter formatter) {
+        assertThrows(NullPointerException.class, () -> formatter.format(null));
     }
 
-    @Test
-    public void formatOfEmptyStringReturnsEmpty() {
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    public void formatOfEmptyStringReturnsEmpty(Formatter formatter) {
         assertEquals("", formatter.format(""));
     }
 
-    @Test
-    public void formatNotReturnsNull() {
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    public void formatNotReturnsNull(Formatter formatter) {
         assertNotNull(formatter.format("string"));
     }
 
-    @Test
-    public void getDescriptionAlwaysNonEmpty() {
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    public void getDescriptionAlwaysNonEmpty(Formatter formatter) {
         assertFalse(formatter.getDescription().isEmpty());
     }
 
-    @Test
-    public void getExampleInputAlwaysNonEmpty() {
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    public void getExampleInputAlwaysNonEmpty(Formatter formatter) {
         assertFalse(formatter.getExampleInput().isEmpty());
     }
 
-    @Parameterized.Parameters(name = "{index}: {0}")
-    public static Collection<Object[]> instancesToTest() {
+    public static Stream<Formatter> getFormatters() {
         // all classes implementing {@link net.sf.jabref.model.cleanup.Formatter}
         // sorted alphabetically
         // Alternative: Use reflection - https://github.com/ronmamo/reflections
         // @formatter:off
-        return Arrays.asList(
-                new Object[]{new CapitalizeFormatter()},
-                new Object[]{new ClearFormatter()},
-                new Object[]{new HtmlToLatexFormatter()},
-                new Object[]{new HtmlToUnicodeFormatter()},
-                new Object[]{new IdentityFormatter()},
-                new Object[]{new LatexCleanupFormatter()},
-                new Object[]{new LatexToUnicodeFormatter()},
-                new Object[]{new LowerCaseFormatter()},
-                new Object[]{new MinifyNameListFormatter()},
-                new Object[]{new NormalizeDateFormatter()},
-                new Object[]{new NormalizeMonthFormatter()},
-                new Object[]{new NormalizeNamesFormatter()},
-                new Object[]{new NormalizePagesFormatter()},
-                new Object[]{new OrdinalsToSuperscriptFormatter()},
-                new Object[]{new ProtectTermsFormatter()},
-                new Object[]{new RegexFormatter()},
-                new Object[]{new RemoveBracesFormatter()},
-                new Object[]{new SentenceCaseFormatter()},
-                new Object[]{new TitleCaseFormatter()},
-                new Object[]{new UnicodeToLatexFormatter()},
-                new Object[]{new UnitsToLatexFormatter()},
-                new Object[]{new UpperCaseFormatter()}
-        );
+       return Stream.of(
+                new CapitalizeFormatter(),
+                new ClearFormatter(),
+                new HtmlToLatexFormatter(),
+                new HtmlToUnicodeFormatter(),
+                new IdentityFormatter(),
+                new LatexCleanupFormatter(),
+                new LatexToUnicodeFormatter(),
+                new LowerCaseFormatter(),
+                new MinifyNameListFormatter(),
+                new NormalizeDateFormatter(),
+                new NormalizeMonthFormatter(),
+                new NormalizeNamesFormatter(),
+                new NormalizePagesFormatter(),
+                new OrdinalsToSuperscriptFormatter(),
+                new ProtectTermsFormatter(protectedTermsLoader),
+                new RegexFormatter(),
+                new RemoveBracesFormatter(),
+                new SentenceCaseFormatter(),
+                new TitleCaseFormatter(),
+                new UnicodeToLatexFormatter(),
+                new UnitsToLatexFormatter(),
+                new UpperCaseFormatter());
+
         // @formatter:on
     }
 }

@@ -53,20 +53,20 @@ public class FieldEditors {
         } else if (fieldExtras.contains(FieldProperty.FILE_EDITOR)) {
             return new LinkedFilesEditor(fieldName, dialogService, databaseContext, taskExecutor, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
-            return new OptionEditor<>(fieldName, new YesNoEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
+            return new OptionEditor<>(new YesNoEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
         } else if (fieldExtras.contains(FieldProperty.MONTH)) {
-            return new OptionEditor<>(fieldName, new MonthEditorViewModel(fieldName, suggestionProvider, databaseContext.getMode(), fieldCheckers));
+            return new OptionEditor<>(new MonthEditorViewModel(fieldName, suggestionProvider, databaseContext.getMode(), fieldCheckers));
         } else if (fieldExtras.contains(FieldProperty.GENDER)) {
-            return new OptionEditor<>(fieldName, new GenderEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
+            return new OptionEditor<>(new GenderEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
         } else if (fieldExtras.contains(FieldProperty.EDITOR_TYPE)) {
-            return new OptionEditor<>(fieldName, new EditorTypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
+            return new OptionEditor<>(new EditorTypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
         } else if (fieldExtras.contains(FieldProperty.PAGINATION)) {
-            return new OptionEditor<>(fieldName, new PaginationEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
+            return new OptionEditor<>(new PaginationEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
         } else if (fieldExtras.contains(FieldProperty.TYPE)) {
             if ("patent".equalsIgnoreCase(entryType)) {
-                return new OptionEditor<>(fieldName, new PatentTypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
+                return new OptionEditor<>(new PatentTypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
             } else {
-                return new OptionEditor<>(fieldName, new TypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
+                return new OptionEditor<>(new TypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
             }
         } else if (fieldExtras.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldExtras.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
             return new LinkedEntriesEditor(fieldName, databaseContext, suggestionProvider, fieldCheckers);

@@ -8,17 +8,15 @@ import java.util.Optional;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
+import org.jabref.gui.SidePaneType;
 import org.jabref.gui.collab.ChangeScanner;
-import org.jabref.gui.collab.FileUpdatePanel;
+import org.jabref.gui.dialogs.AutosaveUIManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;
@@ -103,13 +101,15 @@ public class SaveDatabaseAction extends AbstractWorker {
     @Override
     public void update() {
         if (success) {
-            // Reset title of tab
-            frame.setTabTitle(panel, panel.getTabTitle(),
-                    panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
-            frame.output(Localization.lang("Saved library") + " '"
-                    + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
-            frame.setWindowTitle();
-            frame.updateAllTabTitles();
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                // Reset title of tab
+                frame.setTabTitle(panel, panel.getTabTitle(),
+                        panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
+                frame.output(Localization.lang("Saved library") + " '"
+                        + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
+                frame.setWindowTitle();
+                frame.updateAllTabTitles();
+            });
         } else if (!canceled) {
             if (fileLockedError) {
                 // TODO: user should have the option to override the lock file.
@@ -174,9 +174,6 @@ public class SaveDatabaseAction extends AbstractWorker {
     private boolean saveDatabase(File file, boolean selectedOnly, Charset encoding) throws SaveException {
         SaveSession session;
 
-        // block user input
-        frame.block();
-
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(encoding);
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
@@ -191,7 +188,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             panel.registerUndoableChanges(session);
 
         } catch (UnsupportedCharsetException ex) {
-            JOptionPane.showMessageDialog(frame,
+            JOptionPane.showMessageDialog(null,
                     Localization.lang("Could not save file.")
                             + Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()),
                     Localization.lang("Save library"), JOptionPane.ERROR_MESSAGE);
@@ -209,13 +206,10 @@ public class SaveDatabaseAction extends AbstractWorker {
                 LOGGER.error("A problem occured when trying to save the file", ex);
             }
 
-            JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + ".\n" + ex.getMessage(),
+            JOptionPane.showMessageDialog(null, Localization.lang("Could not save file.") + ".\n" + ex.getMessage(),
                     Localization.lang("Save library"), JOptionPane.ERROR_MESSAGE);
             // FIXME: rethrow anti-pattern
             throw new SaveException("rt");
-        } finally {
-            // re-enable user input
-            frame.unblock();
         }
 
         // handle encoding problems
@@ -230,13 +224,13 @@ public class SaveDatabaseAction extends AbstractWorker {
             builder.add(ta).xy(3, 1);
             builder.add(Localization.lang("What do you want to do?")).xy(1, 3);
             String tryDiff = Localization.lang("Try different encoding");
-            int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Localization.lang("Save library"),
+            int answer = JOptionPane.showOptionDialog(null, builder.getPanel(), Localization.lang("Save library"),
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
                     new String[] {Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
-                Object choice = JOptionPane.showInputDialog(frame, Localization.lang("Select encoding"),
+                Object choice = JOptionPane.showInputDialog(null, Localization.lang("Select encoding"),
                         Localization.lang("Save library"), JOptionPane.QUESTION_MESSAGE, null,
                         Encodings.ENCODINGS_DISPLAYNAMES, encoding);
                 if (choice == null) {
@@ -295,10 +289,8 @@ public class SaveDatabaseAction extends AbstractWorker {
                 .addExtensionFilter(FileType.BIBTEX_DB)
                 .withDefaultExtension(FileType.BIBTEX_DB)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-        DialogService ds = new FXDialogService();
-
-        Optional<Path> path = DefaultTaskExecutor
-                .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
+        DialogService dialogService = frame.getDialogService();
+        Optional<Path> path = dialogService.showFileSaveDialog(fileDialogConfiguration);
         if (path.isPresent()) {
             saveAs(path.get().toFile());
         } else {
@@ -399,7 +391,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         if (panel.isUpdatedExternally()) {
             String[] opts = new String[] {Localization.lang("Review changes"), Localization.lang("Save"),
                     Localization.lang("Cancel")};
-            int answer = JOptionPane.showOptionDialog(panel.frame(),
+            int answer = JOptionPane.showOptionDialog(null,
                     Localization.lang("File has been updated externally. " + "What do you want to do?"),
                     Localization.lang("File updated externally"), JOptionPane.YES_NO_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE, null, opts, opts[0]);
@@ -425,8 +417,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                         scanner.displayResult(resolved -> {
                             if (resolved) {
                                 panel.markExternalChangesAsResolved();
-                                SwingUtilities
-                                        .invokeLater(() -> panel.getSidePaneManager().hide(FileUpdatePanel.class));
+                                DefaultTaskExecutor.runInJavaFXThread(() -> panel.getSidePaneManager().hide(SidePaneType.FILE_UPDATE_NOTIFICATION));
                             } else {
                                 canceled = true;
                             }
@@ -437,14 +428,14 @@ public class SaveDatabaseAction extends AbstractWorker {
                 return true;
             } else { // User indicated to store anyway.
                 if (panel.getBibDatabaseContext().getMetaData().isProtected()) {
-                    JOptionPane.showMessageDialog(frame,
+                    JOptionPane.showMessageDialog(null,
                             Localization
                                     .lang("Library is protected. Cannot save until external changes have been reviewed."),
                             Localization.lang("Protected library"), JOptionPane.ERROR_MESSAGE);
                     canceled = true;
                 } else {
                     panel.markExternalChangesAsResolved();
-                    panel.getSidePaneManager().hide(FileUpdatePanel.class);
+                    panel.getSidePaneManager().hide(SidePaneType.FILE_UPDATE_NOTIFICATION);
                 }
             }
         }

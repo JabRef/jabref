@@ -4,8 +4,11 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TypedBibEntryTest {
 
@@ -17,7 +20,7 @@ public class TypedBibEntryTest {
         e.setField("journal", "abc");
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
-        Assert.assertFalse(typedEntry.hasAllRequiredFields());
+        assertFalse(typedEntry.hasAllRequiredFields());
     }
 
     @Test
@@ -29,7 +32,7 @@ public class TypedBibEntryTest {
         e.setField("year", "2015");
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
-        Assert.assertTrue(typedEntry.hasAllRequiredFields());
+        assertTrue(typedEntry.hasAllRequiredFields());
     }
 
     @Test
@@ -37,7 +40,7 @@ public class TypedBibEntryTest {
         BibEntry e = new BibEntry("articlllleeeee");
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
-        Assert.assertTrue(typedEntry.hasAllRequiredFields());
+        assertTrue(typedEntry.hasAllRequiredFields());
     }
 
     @Test
@@ -45,7 +48,7 @@ public class TypedBibEntryTest {
         BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
-        Assert.assertEquals("InProceedings", typedEntry.getTypeForDisplay());
+        assertEquals("InProceedings", typedEntry.getTypeForDisplay());
     }
 
     @Test
@@ -53,6 +56,6 @@ public class TypedBibEntryTest {
         BibEntry e = new BibEntry("articlllleeeee");
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
-        Assert.assertEquals("Articlllleeeee", typedEntry.getTypeForDisplay());
+        assertEquals("Articlllleeeee", typedEntry.getTypeForDisplay());
     }
 }

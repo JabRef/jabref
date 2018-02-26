@@ -43,7 +43,7 @@ class PreambleEditor extends JabRefDialog {
     private final CloseAction closeAction = new CloseAction();
 
     public PreambleEditor(JabRefFrame baseFrame, BasePanel panel, BibDatabase database) {
-        super(baseFrame, PreambleEditor.class);
+        super(null, PreambleEditor.class);
         this.panel = panel;
         this.database = database;
 
