@@ -134,6 +134,8 @@ import org.jabref.preferences.LastFocusedTabPreferences;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.eventbus.Subscribe;
+import org.eclipse.fx.ui.controls.tabpane.DndTabPane;
+import org.eclipse.fx.ui.controls.tabpane.DndTabPaneFactory;
 import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -205,7 +207,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final Stage mainStage;
     // The sidepane manager takes care of populating the sidepane.
     private SidePaneManager sidePaneManager;
-    private final TabPane tabbedPane = new TabPane();
+    private TabPane tabbedPane;
     private PushToApplications pushApplications;
     private final CountingUndoManager undoManager = new CountingUndoManager();
     private final DialogService dialogService;
@@ -258,6 +260,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         sidePaneManager = new SidePaneManager(Globals.prefs, this);
         sidePane = sidePaneManager.getPane();
 
+        Pane containerPane = DndTabPaneFactory.createDefaultDnDPane(DndTabPaneFactory.FeedbackType.MARKER, null);
+        tabbedPane = (DndTabPane) containerPane.getChildren().get(0);
+
         initLayout();
 
         initActions();
@@ -268,8 +273,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         //WindowLocation pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
         //        JabRefPreferences.SIZE_Y);
         //pw.displayWindowAtStoredLocation();
-
-        tabbedPane.setBorder(null);
 
         /*
          * The following state listener makes sure focus is registered with the
