@@ -190,12 +190,6 @@ public class InternalBibtexFields {
         add(dummy);
 
         // some internal fields ----------------------------------------------
-        dummy = new BibtexSingleField(FieldName.NUMBER_COL, false, 32);
-        dummy.setPrivate();
-        dummy.setWriteable(false);
-        dummy.setDisplayable(false);
-        add(dummy);
-
         dummy = new BibtexSingleField(FieldName.OWNER, false).withProperties(FieldProperty.OWNER);
         dummy.setPrivate();
         add(dummy);

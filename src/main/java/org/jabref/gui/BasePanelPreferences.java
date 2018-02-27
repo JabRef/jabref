@@ -32,7 +32,7 @@ public class BasePanelPreferences {
 
     public static BasePanelPreferences from(JabRefPreferences preferences) {
         BasePanelPreferences basePanelPreferences = new BasePanelPreferences(
-                MainTablePreferences.from(preferences),
+                preferences.getMainTablePreferences(),
                 preferences.getAutoCompletePreferences(),
                 EntryEditorPreferences.from(preferences),
                 Globals.getKeyPrefs(),

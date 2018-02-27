@@ -135,6 +135,8 @@ import org.jabref.preferences.LastFocusedTabPreferences;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.eventbus.Subscribe;
+import org.eclipse.fx.ui.controls.tabpane.DndTabPane;
+import org.eclipse.fx.ui.controls.tabpane.DndTabPaneFactory;
 import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -206,7 +208,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final Stage mainStage;
     // The sidepane manager takes care of populating the sidepane.
     private SidePaneManager sidePaneManager;
-    private final TabPane tabbedPane = new TabPane();
+    private TabPane tabbedPane;
     private PushToApplications pushApplications;
     private final CountingUndoManager undoManager = new CountingUndoManager();
     private final DialogService dialogService;
@@ -259,6 +261,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         sidePaneManager = new SidePaneManager(Globals.prefs, this);
         sidePane = sidePaneManager.getPane();
 
+        Pane containerPane = DndTabPaneFactory.createDefaultDnDPane(DndTabPaneFactory.FeedbackType.MARKER, null);
+        tabbedPane = (DndTabPane) containerPane.getChildren().get(0);
+
         initLayout();
 
         initActions();
@@ -270,8 +275,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         //        JabRefPreferences.SIZE_Y);
         //pw.displayWindowAtStoredLocation();
 
-        tabbedPane.setBorder(null);
-
         /*
          * The following state listener makes sure focus is registered with the
          * correct database when the user switches tabs. Without this,
@@ -279,6 +282,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
          */
         EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), e -> {
             if (e == null) {
+                Globals.stateManager.activeDatabaseProperty().setValue(Optional.empty());
                 return;
             }
 
@@ -590,9 +594,19 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean showing) {
                 if (showing) {
-                    splitPane.setDividerPositions(prefs.getDouble(JabRefPreferences.SIDE_PANE_WIDTH));
-                    EasyBind.subscribe(splitPane.getDividers().get(0).positionProperty(),
-                            position -> prefs.putDouble(JabRefPreferences.SIDE_PANE_WIDTH, position.doubleValue()));
+                    setDividerPosition();
+
+                    EasyBind.subscribe(sidePane.visibleProperty(), visible -> {
+                        if (visible) {
+                            if (!splitPane.getItems().contains(sidePane)) {
+                                splitPane.getItems().add(0, sidePane);
+                                setDividerPosition();
+                            }
+                        } else {
+                            splitPane.getItems().remove(sidePane);
+                        }
+                    });
+
                     mainStage.showingProperty().removeListener(this);
                     observable.removeListener(this);
                 }
@@ -628,6 +642,14 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         statusLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR.darker());
     }
 
+    private void setDividerPosition() {
+        splitPane.setDividerPositions(prefs.getDouble(JabRefPreferences.SIDE_PANE_WIDTH));
+        if (!splitPane.getDividers().isEmpty()) {
+            EasyBind.subscribe(splitPane.getDividers().get(0).positionProperty(),
+                    position -> prefs.putDouble(JabRefPreferences.SIDE_PANE_WIDTH, position.doubleValue()));
+        }
+    }
+
     private Node createToolbar() {
         Pane leftSpacer = new Pane();
         HBox.setHgrow(leftSpacer, Priority.SOMETIMES);
@@ -649,7 +671,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createIconButton(StandardActions.SAVE_LIBRARY, new OldDatabaseCommandWrapper(Actions.SAVE, this, Globals.stateManager)),
 
                 leftSpacer);
-        leftSide.minWidthProperty().bind(sidePane.widthProperty());
+        leftSide.setMinWidth(100);
         leftSide.prefWidthProperty().bind(sidePane.widthProperty());
         leftSide.maxWidthProperty().bind(sidePane.widthProperty());
 
