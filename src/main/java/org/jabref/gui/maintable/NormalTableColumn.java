@@ -20,7 +20,7 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 
-public class StringTableColumn extends MainTableColumn<String> {
+public class NormalTableColumn extends MainTableColumn<String> {
 
     private final List<String> bibtexFields;
 
@@ -31,29 +31,15 @@ public class StringTableColumn extends MainTableColumn<String> {
     private final Optional<BibDatabase> database;
 
     private final LayoutFormatter toUnicode = new LatexToUnicodeFormatter();
+    private final String columnName;
 
-    public StringTableColumn(String columnName) {
+    public NormalTableColumn(String columnName, List<String> bibtexFields, BibDatabase database) {
         super(columnName);
-        this.bibtexFields = Collections.emptyList();
-        this.isIconColumn = false;
-        this.iconLabel = Optional.empty();
-        this.database = Optional.empty();
-    }
-
-    public StringTableColumn(String columnName, List<String> bibtexFields, BibDatabase database) {
-        super(columnName);
+        this.columnName = columnName;
         this.bibtexFields = Collections.unmodifiableList(bibtexFields);
         this.isIconColumn = false;
         this.iconLabel = Optional.empty();
         this.database = Optional.of(database);
-    }
-
-    public StringTableColumn(String columnName, List<String> bibtexFields, JabRefIcon iconLabel) {
-        super(columnName);
-        this.bibtexFields = Collections.unmodifiableList(bibtexFields);
-        this.isIconColumn = true;
-        this.iconLabel = Optional.of(iconLabel);
-        this.database = Optional.empty();
     }
 
     /**
@@ -160,5 +146,9 @@ public class StringTableColumn extends MainTableColumn<String> {
             }
         }
         return (!resolvedFieldContent.equals(plainFieldContent));
+    }
+
+    public String getColumnName() {
+        return columnName;
     }
 }

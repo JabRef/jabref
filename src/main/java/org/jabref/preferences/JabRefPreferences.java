@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
@@ -41,6 +42,8 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorTabList;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.preftabs.ImportSettingsTab;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
@@ -74,9 +77,11 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexSingleField;
 import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
@@ -182,7 +187,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
     public static final String PREFS_EXPORT_PATH = "prefsExportPath";
     public static final String WORKING_DIRECTORY = "workingDirectory";
-    public static final String NUMBER_COL_WIDTH = "numberColWidth";
     public static final String EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CF = "editorEMACSkeyBindingsRebindCF";
@@ -554,7 +558,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(COLUMN_WIDTHS, "75;300;470;60;130;100");
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
-        defaults.put(NUMBER_COL_WIDTH, 32);
         defaults.put(WORKING_DIRECTORY, USER_HOME);
         defaults.put(EXPORT_WORKING_DIRECTORY, USER_HOME);
         // Remembers working directory of last import
@@ -1713,5 +1716,84 @@ public class JabRefPreferences implements PreferencesService {
 
         putStringList(SIDE_PANE_COMPONENT_NAMES, names);
         putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
+    }
+
+    private List<String> createExtraFileColumns() {
+        if (getBoolean(EXTRA_FILE_COLUMNS)) {
+            return getStringList(LIST_OF_FILE_COLUMNS);
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    private List<SpecialField> createSpecialFieldColumns() {
+        if (getBoolean(SPECIALFIELDSENABLED)) {
+            List<SpecialField> fieldsToShow = new ArrayList<>();
+            if (getBoolean(SHOWCOLUMN_RANKING)) {
+                fieldsToShow.add(SpecialField.RANKING);
+            }
+            if (getBoolean(SHOWCOLUMN_RELEVANCE)) {
+                fieldsToShow.add(SpecialField.RELEVANCE);
+            }
+            if (getBoolean(SHOWCOLUMN_QUALITY)) {
+                fieldsToShow.add(SpecialField.QUALITY);
+            }
+
+            if (getBoolean(SHOWCOLUMN_PRIORITY)) {
+                fieldsToShow.add(SpecialField.PRIORITY);
+            }
+
+            if (getBoolean(SHOWCOLUMN_PRINTED)) {
+                fieldsToShow.add(SpecialField.PRINTED);
+            }
+
+            if (getBoolean(SHOWCOLUMN_READ)) {
+                fieldsToShow.add(SpecialField.READ_STATUS);
+            }
+            return fieldsToShow;
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    private Map<String, Double> createColumnWidths() {
+        List<String> columns = getStringList(COLUMN_NAMES);
+        List<Double> widths = getStringList(COLUMN_WIDTHS)
+                .stream()
+                .map(string -> {
+                    try {
+                        return Double.parseDouble(string);
+                    } catch (NumberFormatException e) {
+                        LOGGER.error("Exception while parsing column widths. Choosing default.", e);
+                        return BibtexSingleField.DEFAULT_FIELD_LENGTH;
+                    }
+                })
+                .collect(Collectors.toList());
+
+        Map<String, Double> map = new TreeMap<>();
+        for (int i = 0; i < columns.size(); i++) {
+            map.put(columns.get(i), widths.get(i));
+        }
+        return map;
+    }
+
+    public ColumnPreferences getColumnPreferences() {
+        return new ColumnPreferences(
+                getBoolean(FILE_COLUMN),
+                getBoolean(URL_COLUMN),
+                getBoolean(PREFER_URL_DOI),
+                getBoolean(ARXIV_COLUMN),
+                getStringList(COLUMN_NAMES),
+                createSpecialFieldColumns(),
+                createExtraFileColumns(),
+                createColumnWidths()
+        );
+    }
+
+    public MainTablePreferences getMainTablePreferences() {
+        return new MainTablePreferences(
+                getBoolean(TABLE_SHOW_GRID),
+                getColumnPreferences(),
+                getBoolean(AUTO_RESIZE_MODE));
     }
 }
