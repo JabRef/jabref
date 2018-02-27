@@ -21,7 +21,6 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import org.controlsfx.tools.ValueExtractor;
 
 public class StringDialogController extends AbstractController<StringDialogViewModel> {
 
@@ -34,10 +33,12 @@ public class StringDialogController extends AbstractController<StringDialogViewM
     @FXML private TableColumn<StringViewModel, String> colLabel;
     @FXML private TableColumn<StringViewModel, String> colContent;
     @Inject private StateManager stateManager;
+    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
+
 
     @FXML
     private void initialize() {
-
+        visualizer.setDecoration(new IconValidationDecorator());
         viewModel = new StringDialogViewModel(stateManager);
 
         btnHelp.setGraphic(JabRefIcons.HELP.getGraphicNode());
@@ -48,11 +49,9 @@ public class StringDialogController extends AbstractController<StringDialogViewM
 
         btnRemove.setGraphic(JabRefIcons.REMOVE.getGraphicNode());
         btnRemove.setTooltip(new Tooltip(Localization.lang("Remove string")));
-        ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
-        visualizer.setDecoration(new IconValidationDecorator());
 
         //Register TextfieldTableCell Control for validation
-        ValueExtractor.addObservableValueExtractor(c -> c instanceof TextFieldTableCell, c -> ((TextFieldTableCell<?, String>) c).textProperty());
+        // ValueExtractor.addObservableValueExtractor(c -> c instanceof TextFieldTableCell, c -> ((TextFieldTableCell<?, String>) c).textProperty());
 
         colLabel.setCellFactory(column -> {
 
@@ -80,6 +79,7 @@ public class StringDialogController extends AbstractController<StringDialogViewM
 
         colLabel.setOnEditCommit(
                 (CellEditEvent<StringViewModel, String> cell) -> {
+
                     cell.getRowValue().setLabel(cell.getNewValue());
                 });
         colContent.setOnEditCommit(
@@ -89,6 +89,7 @@ public class StringDialogController extends AbstractController<StringDialogViewM
 
         tblStrings.itemsProperty().bindBidirectional(viewModel.allStringsProperty());
         tblStrings.setEditable(true);
+
 
 
 
