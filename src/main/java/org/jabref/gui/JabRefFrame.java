@@ -278,6 +278,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
          */
         EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), e -> {
             if (e == null) {
+                Globals.stateManager.activeDatabaseProperty().setValue(Optional.empty());
                 return;
             }
 
