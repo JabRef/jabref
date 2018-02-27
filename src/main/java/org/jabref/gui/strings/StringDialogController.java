@@ -78,7 +78,6 @@ public class StringDialogController extends AbstractController<StringDialogViewM
 
         });
 
-
         colLabel.setOnEditCommit(
                 (CellEditEvent<StringViewModel, String> cell) -> {
                     cell.getRowValue().setLabel(cell.getNewValue());
@@ -91,8 +90,7 @@ public class StringDialogController extends AbstractController<StringDialogViewM
         tblStrings.itemsProperty().bindBidirectional(viewModel.allStringsProperty());
         tblStrings.setEditable(true);
 
-        //The problemm is that the viewModel here is not the viewModel of the List
-        //visualizer.initVisualization(viewModel.labelValidation(), colLabel, true);
+
 
     }
 
