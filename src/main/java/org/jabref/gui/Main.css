@@ -1,4 +1,114 @@
-@import url("JabRefColors.css");
+/*
+ * The base css file defining the style that is valid for every pane and dialog.
+ */
+
+.root {
+
+    -jr-base: #2467ab;
+
+    -jr-white: #ffffff;
+    -jr-gray-0: #f2f2f2;
+    -jr-gray-1: #e6e6e6;
+    -jr-gray-2: #808080;
+    -jr-gray-3: #404040;
+    -jr-black: #000;
+
+    -jr-blue: #0abde3;
+    -jr-light-blue: #48dbfb;
+    -jr-purple: #f368e0;
+    -jr-light-purple: #ff9ff3;
+    -jr-green: #10ac84;
+    -jr-light-green: #1dd1a1;
+    -jr-red: #ee5253;
+    -jr-light-red: #ff6b6b;
+    -jr-yellow: #feca57;
+    -jr-orange: #ff9f43;
+    -jr-blue-gray-1: #c8d6e5;
+    -jr-blue-gray-2: #8395a7;
+    -jr-blue-gray-3: #576574;
+    -jr-blue-gray-4: #222f3e;
+
+    -jr-background: -jr-gray-1;
+    -jr-foreground: -jr-white;
+    -jr-toolbar: -jr-gray-0;
+
+    -jr-hover-cell: derive(-jr-yellow, 50%);
+
+    -jr-selected-cell: derive(-jr-yellow, 20%);
+    -jr-info: -jr-light-green;
+    -jr-warn: -jr-orange;
+
+    -jr-error: -jr-light-red;
+    -jr-icon: -jr-base;
+    -jr-separator: derive(-jr-background, 20%);
+
+    -jr-group-hits-bg: -jr-gray-0;
+
+    -jr-tooltip-bg: -jr-blue-gray-1;
+    -jr-tooltip-fg: -jr-black;
+
+    -jr-grayed-text: -jr-gray-2;
+
+    /*
+     * A strong blue to indicate something neutral.
+     */
+    -fx-neutral: #2980b9;
+
+    /*
+     * A strong green to indicate something positive.
+     */
+    -fx-positive: #27ae60;
+
+    /*
+     * A strong red to indicate something negative.
+     */
+    -fx-negative: #c0392b;
+
+    /*
+     * A dark grayish blue to display information (but kind of highlighted).
+     */
+    -fx-info: #c0392b;
+
+    /*
+     * A dark gray to indicate something not so important
+     */
+    -fx-unimportant: #c0392b;
+
+    /*
+     * A light gray for accented background
+     */
+    -fx-accented-background: #2abbc0;
+
+    /*
+     * A darker gray as background
+     */
+    -fx-dark-background: #c07983;
+
+    /*
+     * A strong white as background
+     */
+    -fx-light-background: #436cc0;
+
+    /*
+     * A dark gray for borders
+     */
+    -fx-border: #c0392b;
+
+    /*
+     * A light gray for background for active items in list like elements such as menus, lists, trees, and tables.
+     */
+    -fx-selection-bar: #28c041;
+
+    /*
+     * The base color for the theme
+     */
+    -fx-theme-base: #c0392b;
+
+    /*
+     * A slightly lighter theme-based color for backgrounds of active items (toggle button, selected list item)
+     */
+    -fx-active-background: #c0392b;
+}
 
 .hyperlink {
     -fx-padding: 0;
@@ -21,14 +131,14 @@
 }
 
 .tooltip {
-    -fx-background-color: #616161;
+    -fx-background-color: -jr-tooltip-bg;
     -fx-opacity: 95%;
-    -fx-text-fill: rgba(255, 255, 255, 0.9);
+    -fx-text-fill: -jr-tooltip-fg;
     -fx-font-size: 1em;
 }
 
 .tooltip > TextFlow > Text {
-    -fx-fill: rgba(255, 255, 255, 0.9);
+    /*-fx-fill: rgba(255, 255, 255, 0.9);*/
     -fx-font-size: 1em;
 }
 
@@ -50,11 +160,25 @@
     -fx-shadow-highlight-color: transparent;
     -fx-outer-border: transparent;
     -fx-inner-border: transparent;
-    -fx-focus-color: -fx-active-background;
     -fx-faint-focus-color: transparent;
     -fx-background-color: transparent;
-    -fx-text-background-color: dimgray;
+    -fx-text-background-color: transparent;
     -fx-padding: 0.5em;
+}
+
+.flatButtonNoSpaceBottom .glyph-icon,
+.flatButtonNoSpaceTop .glyph-icon,
+.flatButton .glyph-icon {
+    -fx-fill: -jr-icon;
+    -fx-text-fill: -jr-icon;
+}
+
+.flatButtonNoSpaceBottom:hover .glyph-icon,
+.flatButtonNoSpaceTop:hover .glyph-icon,
+.flatButton:hover .glyph-icon {
+    -fx-fill: derive(-jr-icon, -30%);
+    -fx-text-fill: derive(-jr-icon, -30%);
+    -fx-effect: dropshadow(one-pass-box, -jr-icon, 5, 0, 1, 1);
 }
 
 .flatButton:selected {
@@ -77,17 +201,17 @@
     -fx-background-radius: 0;
 }
 
-.menu-bar > .container > .menu-button > .label {
-    -fx-padding: 0.41777em 0.41777em 0.41777em 0.41777em; /* 5 5 5 5 */
-}
+/*.menu-bar > .container > .menu-button > .label {*/
+    /*-fx-padding: 0.41777em 0.41777em 0.41777em 0.41777em; !* 5 5 5 5 *!*/
+/*}*/
 
-.menu-bar > .menu {
-    -fx-padding: 0.0em 0.666667em 0.0em 0.666667em; /* 0 8 0 8 */
-}
+/*.menu-bar > .menu {*/
+    /*-fx-padding: 0.0em 0.666667em 0.0em 0.666667em; !* 0 8 0 8 *!*/
+/*}*/
 
-.menu-item {
-    -fx-padding: 0.5em 0.41777em 0.5em 0.41777em; /* 6 5 6 5 */
-}
+/*.menu-item {*/
+    /*-fx-padding: 0.5em 0.41777em 0.5em 0.41777em; !* 6 5 6 5 *!*/
+/*}*/
 
 .tab-pane {
     -fx-open-tab-animation: NONE;
@@ -97,26 +221,32 @@
 .tab-pane > .tab-header-area > .headers-region > .tab {
     -fx-background-insets: 0;
     -fx-background-radius: 0;
-    -fx-background-color: -jr-light-gray;
+    /*-fx-background-color: -jr-light-gray;*/
     /*-fx-background-color: -fx-accented-background;*/
-    -fx-border-color: -fx-border;
+    -fx-border-color: -jr-separator;
     -fx-border-width: 0.5 0.5 0.5 0.5;
-    -fx-padding: 0.4em 0.9em 0.4em 0.9em;
+    -fx-padding: 0.3em 0.9em 0.3em 0.9em;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab .tab-label {
-    /*-fx-text-fill: -fx-unimportant;*/
-    -fx-text-fill: -jr-gray;
+    -fx-text-fill: -jr-grayed-text;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected {
-    -fx-background-color: -fx-light-background;
-    -fx-border-color: -fx-active-background;
+    -fx-background-color: -jr-foreground;
+    -fx-border-color: -jr-base;
+    -fx-fill: -jr-base;
+    -fx-text-fill: -jr-base;
     -fx-border-width: 3 0 0 0;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-label {
-    -fx-text-fill: black;
+    -fx-text-fill: -jr-base;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
+    -fx-text-fill: -jr-base;
+    -fx-fill: -jr-base;
 }
 
 .tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
@@ -131,17 +261,18 @@
 
 .tab-pane > .tab-header-area > .headers-region > .tab .glyph-icon {
     -glyph-size: 13px;
-    -fx-text-fill: -fx-unimportant;
-    -fx-fill: -fx-unimportant;
+    -fx-text-fill: -jr-grayed-text;
+    -fx-fill: -jr-grayed-text;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
-    -fx-text-fill: -jr-icon;
-    -fx-fill: -jr-icon;
+    -fx-text-fill: -jr-base;
+    -fx-fill: -jr-base;
 }
 
 .tab-pane > .tab-header-area {
-    -fx-padding: 0.416667em 5 0.0em 0em;
+    /*-fx-padding: 0.416667em 5 0.0em 0em;*/
+    -fx-padding: 0 0 0 0;
 }
 
 .table-view {
@@ -155,7 +286,7 @@
 
 .split-pane > .split-pane-divider {
     -fx-background-color: -jr-separator;
-    -fx-padding: 0 0.15ex 0 0.15ex;
+    -fx-padding: 0 .5 0 .5;
 }
 
 .table-row-cell:hover,
@@ -230,7 +361,8 @@
 }
 
 .text-area:focused .content {
-    -fx-background-color: -fx-active-background, -fx-control-inner-background;
+    /*-fx-background-color: -fx-active-background, -fx-control-inner-background;*/
+    -fx-background-color: -jr-base, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
 }
 
@@ -303,17 +435,21 @@
 }
 
 .sidePaneComponentHeader {
-    -fx-background-color: -fx-dark-background;
+    /*-fx-background-color: -fx-dark-background;*/
+    -fx-background-color: -jr-background;
+    -fx-padding: 0.3em 0.9em 0.3em 0.9em;
+    -fx-fill: -jr-base;
+    -fx-text-fill: -jr-base;
 }
 
 .mainMenu {
-    /*-fx-background-color: derive(-fx-theme-base, 50%);*/
+    -fx-background-color: -jr-background;
 }
 
 .menu-bar > .container > .menu-button:hover,
 .menu-bar > .container > .menu-button:focused,
 .menu-bar > .container > .menu-button:showing {
-    -fx-background: red;
+    -fx-background: derive(-jr-base, 50%);
 }
 
 .mainMenu > .container > .menu-button > .label {
@@ -322,24 +458,21 @@
 }
 
 .mainToolbar {
-    /*-fx-background-color: derive(-fx-theme-base, -10%);*/
     -fx-background-color: -jr-toolbar;
-    -fx-border-color: -jr-separator;
-    -fx-border-width: 0 0 2 0;
+    -fx-border-color: derive(-jr-toolbar, 50%);
+    -fx-border-width: 1 1 1 1;
+    -fx-border-radius: 2 2 2 2;
+    -fx-background-radius: 2 2 2 2;
 }
 
 .mainToolbar .glyph-icon {
     -fx-font-size: 1.7em;
-    -fx-text-fill: blue;
-    -fx-fill: -jr-icon;
 }
 
 .mainToolbar .search-field {
-    /*-fx-background-color: derive(-fx-theme-base, -15%);*/
     -fx-background-color: -jr-white;
 }
 
 .mainToolbar .search-field:focused {
-    /*-fx-background-color: derive(-fx-theme-base, 15%);*/
     -fx-background-color: -jr-white;
 }
