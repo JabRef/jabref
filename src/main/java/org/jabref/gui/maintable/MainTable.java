@@ -73,7 +73,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final BibDatabaseContext database;
     private final UndoManager undoManager;
     // needed to activate/deactivate the listener
-    private PersistenceTableColumnListener tableColumnListener;
+    private PersistenceVisualStateTable tableColumnListener;
 
     private final MainTableDataModel model;
 
@@ -135,9 +135,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         }
          */
 
-        // TODO: store column widths
-        //this.tableColumnListener = new PersistenceTableColumnListener(this);
-        //setWidths();
+        // Store visual state
+        new PersistenceVisualStateTable(this, Globals.prefs);
 
         // TODO: enable DnD
         //setDragEnabled(true);
