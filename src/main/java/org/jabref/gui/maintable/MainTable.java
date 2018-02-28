@@ -288,7 +288,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             event.acceptTransferModes(TransferMode.MOVE);
         }
         if (event.getDragboard().hasFiles()) {
-            event.acceptTransferModes(TransferMode.COPY, TransferMode.LINK);
+            event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
         }
     }
 
@@ -320,21 +320,26 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private void handleOnDragDropped(BibEntryTableViewModel originalItem, DragEvent event) {
 
         boolean success = false;
+
+        TableRow<BibEntryTableViewModel> targetRow = (TableRow<BibEntryTableViewModel>) event.getGestureTarget();
+
+        BibEntry entry = this.getItems().get(targetRow.getIndex()).getEntry();
+
         if (event.getDragboard().hasContent(DataFormat.FILES)) {
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
             System.out.println(files);
 
-            event.getDragboard();
+            if (event.getTransferMode() == TransferMode.MOVE) {
 
-            TableRow<BibEntryTableViewModel> targetRow = (TableRow<BibEntryTableViewModel>) event.getGestureTarget();
-
-            BibEntry entry = this.getItems().get(targetRow.getIndex()).getEntry();
-            success = true;
-            event.setDropCompleted(success);
-
-            fileHandler.addFilesToEntry(entry, files);
-
+                System.out.println("Mode MOVE"); //shift on win or no modifier
+                fileHandler.addFilesToEntry(entry, files);
+                success = true;
+            }
         }
+        if (event.getTransferMode() == TransferMode.LINK) {
+            System.out.println("LINK"); //alt on win
+        }
+
         event.setDropCompleted(success);
         event.consume();
 
@@ -449,7 +454,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public List<BibEntry> getSelectedEntries() {
         return getSelectionModel()
-                .getSelectedItems().stream()
+                .getSelectedItems()
+                .stream()
                 .map(BibEntryTableViewModel::getEntry)
                 .collect(Collectors.toList());
     }
@@ -578,7 +584,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     */
 
     public Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {
-        return model.getEntriesFilteredAndSorted().stream()
+        return model.getEntriesFilteredAndSorted()
+                .stream()
                 .filter(viewModel -> viewModel.getEntry().equals(entry))
                 .findFirst();
     }
