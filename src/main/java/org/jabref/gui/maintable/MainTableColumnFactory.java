@@ -101,7 +101,7 @@ class MainTableColumnFactory {
             // Stored column name will be used as header
             // There might be more than one field to display, e.g., "author/editor" or "date/year" - so split
             String[] fields = columnName.split(FieldName.FIELD_SEPARATOR);
-            StringTableColumn column = new StringTableColumn(columnName, Arrays.asList(fields), database.getDatabase());
+            NormalTableColumn column = new NormalTableColumn(columnName, Arrays.asList(fields), database.getDatabase());
             new ValueTableCellFactory<BibEntryTableViewModel, String>()
                     .withText(text -> text)
                     .install(column);

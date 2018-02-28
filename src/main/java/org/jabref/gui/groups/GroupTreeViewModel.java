@@ -33,6 +33,8 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 
+import org.fxmisc.easybind.EasyBind;
+
 public class GroupTreeViewModel extends AbstractViewModel {
 
     private final ObjectProperty<GroupNodeViewModel> rootGroup = new SimpleObjectProperty<>();
@@ -53,9 +55,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
 
         // Register listener
-        stateManager.activeDatabaseProperty()
-                .addListener((observable, oldValue, newValue) -> onActiveDatabaseChanged(newValue));
-        selectedGroups.addListener((observable, oldValue, newValue) -> onSelectedGroupChanged(newValue));
+        EasyBind.subscribe(stateManager.activeDatabaseProperty(), this::onActiveDatabaseChanged);
+        EasyBind.subscribe(selectedGroups, this::onSelectedGroupChanged);
 
         // Set-up bindings
         filterPredicate
@@ -122,8 +123,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
             rootGroup.setValue(newRoot);
             this.selectedGroups.setAll(
                     stateManager.getSelectedGroup(newDatabase.get()).stream()
-                            .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup))
-                            .collect(Collectors.toList()));
+                                .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup))
+                                .collect(Collectors.toList()));
+        } else {
+            rootGroup.setValue(GroupNodeViewModel.getAllEntriesGroup(new BibDatabaseContext(), stateManager, taskExecutor));
         }
 
         currentDatabase = newDatabase;
