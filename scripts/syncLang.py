@@ -445,9 +445,9 @@ class SyncLang:
             num_keys_missing = len(keys_missing)
             num_keys_obsolete = len(keys_obsolete)
 
-            for missing_key in keys_missing:
+            # for missing_key in keys_missing:
                 # Missing keys are added with main translation by default.
-                keys[missing_key] = main_keys_dict[missing_key]
+                # keys[missing_key] = main_keys_dict[missing_key]
 
             for obsolete_key in keys_obsolete:
                 del keys[obsolete_key]
