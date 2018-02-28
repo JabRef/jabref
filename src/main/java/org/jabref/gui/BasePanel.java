@@ -1562,12 +1562,17 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         if (Globals.prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE)) {
             String title = Localization.lang("Delete entry");
             String message = Localization.lang("Really delete the selected entry?");
+            String okButton = Localization.lang("Delete entry");
+            String cancelButton = Localization.lang("Keep entry");
             if (numberOfEntries > 1) {
                 title = Localization.lang("Delete multiple entries");
                 message = Localization.lang("Really delete the %0 selected entries?", Integer.toString(numberOfEntries));
+                okButton = Localization.lang("Delete entries");
+                cancelButton = Localization.lang("Keep entries");
             }
 
             return dialogService.showConfirmationDialogWithOptOutAndWait(title, message,
+                    okButton, cancelButton,
                     Localization.lang("Disable this confirmation dialog"),
                     optOut -> Globals.prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, !optOut));
         } else {
