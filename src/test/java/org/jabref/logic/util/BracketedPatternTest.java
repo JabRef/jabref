@@ -62,17 +62,17 @@ public class BracketedPatternTest {
     
     @Test
     public void pureauthTest() {
-        BibDatabase another_database = new BibDatabase();
+        BibDatabase anotherDatabase = new BibDatabase();
         BracketedPattern pattern = new BracketedPattern("[pureauth]");
-        assertEquals("Kitsune", pattern.expand(bibentry, another_database));
+        assertEquals("Kitsune", pattern.expand(bibentry, anotherDatabase));
     }
     
     @Test
     public void pureauthNoAuthorTest() {
-        BibDatabase another_database = new BibDatabase();
+        BibDatabase anotherDatabase = new BibDatabase();
         BracketedPattern pattern = new BracketedPattern("[pureauth]");
         bibentry.setField("author", "");
-        assertEquals("", pattern.expand(bibentry, another_database));
+        assertEquals("", pattern.expand(bibentry, anotherDatabase));
     }
 
     @Test
