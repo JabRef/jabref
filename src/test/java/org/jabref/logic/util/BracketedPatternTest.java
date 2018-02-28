@@ -82,8 +82,6 @@ public class BracketedPatternTest {
         assertEquals("2017_Kitsune_213", pattern.expand(bibentry, another_database));
     }
     
-    
-
     @Test
     public void databaseWithStringsExpansionTest() {
         BibDatabase another_database = new BibDatabase();
@@ -206,7 +204,7 @@ public class BracketedPatternTest {
         database.removeEntry(dbentry);
         database.insertEntry(child);
 
-        assertEquals("", BracketedPattern.expandBrackets("[author]", ';', child, database));
-    }
+		assertEquals("", BracketedPattern.expandBrackets("[author]", ';', child, database));
+	}
 
 }
