@@ -38,6 +38,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.fxmisc.easybind.EasyBind;
+import org.fxmisc.easybind.Subscription;
 
 /**
  * GUI component that allows editing of the fields of a BibEntry (i.e. the
@@ -55,6 +56,7 @@ public class EntryEditor extends BorderPane {
     private final CountingUndoManager undoManager;
     private final BasePanel panel;
     private final List<SearchQueryHighlightListener> searchListeners = new ArrayList<>();
+    private Subscription typeSubscription;
     private final List<EntryEditorTab> tabs;
     /**
      * A reference to the entry this editor works on.
@@ -210,7 +212,13 @@ public class EntryEditor extends BorderPane {
      * Sets the entry to edit.
      */
     public void setEntry(BibEntry entry) {
-        this.entry = Objects.requireNonNull(entry);
+        Objects.requireNonNull(entry);
+
+        // remove subscription for old entry if existing
+        if (typeSubscription != null) {
+            typeSubscription.unsubscribe();
+        }
+        this.entry = entry;
 
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             recalculateVisibleTabs();
@@ -223,6 +231,16 @@ public class EntryEditor extends BorderPane {
             selectedTab.notifyAboutFocus(entry);
 
             setupToolBar();
+        });
+
+        // subscribe to type changes for rebuilding the currently visible tab
+        typeSubscription = EasyBind.subscribe(this.entry.typeProperty(), type -> {
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                typeLabel.setText(new TypedBibEntry(entry, bibDatabaseContext.getMode()).getTypeForDisplay());
+                recalculateVisibleTabs();
+                EntryEditorTab selectedTab = (EntryEditorTab) tabbed.getSelectionModel().getSelectedItem();
+                selectedTab.notifyAboutFocus(entry);
+            });
         });
     }
 
@@ -264,4 +282,5 @@ public class EntryEditor extends BorderPane {
             }
         });
     }
+
 }

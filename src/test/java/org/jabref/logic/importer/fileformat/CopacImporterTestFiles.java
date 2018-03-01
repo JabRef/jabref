@@ -36,7 +36,7 @@ public class CopacImporterTestFiles {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws IOException {
+    public void testImportEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(new CopacImporter(), fileName, FILE_ENDING);
     }
 

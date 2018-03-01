@@ -2,7 +2,7 @@ package org.jabref.logic.bibtex.comparator;
 
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertEquals;
 

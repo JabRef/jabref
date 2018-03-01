@@ -2,14 +2,14 @@ package org.jabref.logic.xmp;
 
 import java.util.List;
 
-public class XMPPreferences {
+public class XmpPreferences {
 
     private final boolean useXMPPrivacyFilter;
     private final List<String> xmpPrivacyFilter;
     private final Character keywordSeparator;
 
 
-    public XMPPreferences(boolean useXMPPrivacyFilter, List<String> xmpPrivacyFilter, Character keywordSeparator) {
+    public XmpPreferences(boolean useXMPPrivacyFilter, List<String> xmpPrivacyFilter, Character keywordSeparator) {
         this.useXMPPrivacyFilter = useXMPPrivacyFilter;
         this.xmpPrivacyFilter = xmpPrivacyFilter;
         this.keywordSeparator = keywordSeparator;

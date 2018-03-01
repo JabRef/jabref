@@ -6,10 +6,10 @@ import org.jabref.Globals;
 import org.jabref.JabRefMain;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PreferencesMigrationsTest {
 
@@ -20,7 +20,7 @@ public class PreferencesMigrationsTest {
     private final String[] newStylePatterns = new String[] {"[bibtexkey]",
             "[bibtexkey] - [fulltitle]"};
 
-    @Before
+    @BeforeEach
     public void setUp() {
         prefs = JabRefPreferences.getInstance();
         Globals.prefs = prefs;

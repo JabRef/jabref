@@ -90,10 +90,10 @@ public class ProtectedTermsDialog {
     private boolean okPressed;
     private final ProtectedTermsLoader loader;
 
-    public ProtectedTermsDialog(JabRefFrame frame, ProtectedTermsLoader loader) {
+    public ProtectedTermsDialog(JabRefFrame frame) {
 
         this.frame = Objects.requireNonNull(frame);
-        this.loader = Objects.requireNonNull(loader);
+        this.loader = Globals.protectedTermsLoader;
         init();
 
     }

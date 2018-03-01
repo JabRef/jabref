@@ -198,6 +198,7 @@ public class IconTheme {
         REFRESH(MaterialDesignIcon.REFRESH),
         DELETE_ENTRY(MaterialDesignIcon.DELETE),
         SEARCH(MaterialDesignIcon.MAGNIFY),
+        ADVANCED_SEARCH(Color.CYAN, MaterialDesignIcon.MAGNIFY),
         PREFERENCES(MaterialDesignIcon.SETTINGS),
         HELP(MaterialDesignIcon.HELP_CIRCLE),
         UP(MaterialDesignIcon.CHEVRON_UP),

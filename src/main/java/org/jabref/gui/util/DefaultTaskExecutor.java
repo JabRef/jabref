@@ -1,6 +1,7 @@
 package org.jabref.gui.util;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,6 +36,39 @@ public class DefaultTaskExecutor implements TaskExecutor {
         } catch (InterruptedException | ExecutionException e) {
             LOGGER.error("Problem running in fx thread", e);
             return null;
+        }
+    }
+
+    /**
+     * Runs the specified {@link Runnable} on the JavaFX application thread and waits for completion.
+     *
+     * @param action the {@link Runnable} to run
+     * @throws NullPointerException if {@code action} is {@code null}
+     */
+    public static void runAndWaitInJavaFXThread(Runnable action) {
+        if (action == null)
+            throw new NullPointerException("action");
+
+        // Run synchronously on JavaFX thread
+        if (Platform.isFxApplicationThread()) {
+            action.run();
+            return;
+        }
+
+        // Queue on JavaFX thread and wait for completion
+        final CountDownLatch doneLatch = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            try {
+                action.run();
+            } finally {
+                doneLatch.countDown();
+            }
+        });
+
+        try {
+            doneLatch.await();
+        } catch (InterruptedException e) {
+            LOGGER.error("Problem running action on JavaFX thread", e);
         }
     }
 

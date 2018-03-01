@@ -11,12 +11,14 @@ public class BibTeXMLImporterTestFiles {
 
     private static final String FILE_ENDING = ".xml";
 
+    @SuppressWarnings("unused")
     private static Stream<String> fileNames() throws IOException {
         Predicate<String> fileName = name -> name.startsWith("BibTeXMLImporterTest")
                 && name.endsWith(FILE_ENDING);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
+    @SuppressWarnings("unused")
     private static Stream<String> nonBibTeXMLfileNames() throws IOException {
         Predicate<String> fileName = name -> !name.startsWith("BibTeXMLImporterTest");
         return ImporterTestEngine.getTestFiles(fileName).stream();
@@ -36,7 +38,7 @@ public class BibTeXMLImporterTestFiles {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testImportEntries(String fileName) throws IOException {
+    public void testImportEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(new BibTeXMLImporter(), fileName, FILE_ENDING);
     }
 

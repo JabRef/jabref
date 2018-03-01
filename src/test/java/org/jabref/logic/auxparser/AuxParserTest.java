@@ -17,9 +17,9 @@ import org.jabref.model.auxparser.AuxParserResult;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
@@ -30,12 +30,12 @@ import static org.mockito.Mockito.mock;
 public class AuxParserTest {
     private ImportFormatPreferences importFormatPreferences;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         importFormatPreferences = null;
     }
