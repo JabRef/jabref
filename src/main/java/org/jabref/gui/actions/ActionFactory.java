@@ -59,9 +59,8 @@ public class ActionFactory {
     public Button createIconButton(Action action, Command command) {
         Button button = ActionUtils.createButton(new JabRefAction(action, command, keyBindingRepository), ActionUtils.ActionTextBehavior.HIDE);
         button.getStyleClass().add("flatButton");
-        Tooltip toolTip = new Tooltip(action.getText());
-        Tooltip.install(button, toolTip);
-
+        button.setTooltip(new Tooltip(action.getDescription()));
+        
         // For some reason the graphic is not set correctly, so let's fix this
         button.graphicProperty().unbind();
         action.getIcon().ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
