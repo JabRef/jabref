@@ -6,7 +6,6 @@ import java.util.Optional;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -122,11 +121,12 @@ class AdvancedTab extends JPanel implements PrefsTab {
                 remotePreferences.setPort(newPort);
 
                 if (remotePreferences.useRemoteServer()) {
-                    JOptionPane.showMessageDialog(null,
+
+                    frame.getDialogService().showWarningDialogAndWait(Localization.lang("Remote server port"),
                             Localization.lang("Remote server port")
                                     .concat(" ")
-                                    .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
-                            Localization.lang("Remote server port"), JOptionPane.WARNING_MESSAGE);
+                                    .concat(Localization.lang("You must restart JabRef for this to come into effect.")));
+
                 }
             }
         });

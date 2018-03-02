@@ -16,7 +16,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
@@ -172,14 +171,14 @@ public class PreferencesDialog extends JabRefDialog {
                 try {
                     prefs.importPreferences(fileName.get().toString());
                     updateAfterPreferenceChanges();
-                    JOptionPane.showMessageDialog(PreferencesDialog.this,
-                            Localization.lang("You must restart JabRef for this to come into effect."),
-                            Localization.lang("Import preferences"), JOptionPane.WARNING_MESSAGE);
+
+                    frame.getDialogService().showWarningDialogAndWait(Localization.lang("Import preferences"),
+                            Localization.lang("You must restart JabRef for this to come into effect."));
+
                     this.dispose();
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
-                    JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
-                            Localization.lang("Import preferences"), JOptionPane.ERROR_MESSAGE);
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Import preferences"), ex);
                 }
             }
         });
@@ -196,13 +195,13 @@ public class PreferencesDialog extends JabRefDialog {
                 try {
                     prefs.clear();
                     new SharedDatabasePreferences().clear();
-                    JOptionPane.showMessageDialog(PreferencesDialog.this,
-                            Localization.lang("You must restart JabRef for this to come into effect."),
-                            Localization.lang("Reset preferences"), JOptionPane.WARNING_MESSAGE);
+
+                    frame.getDialogService().showWarningDialogAndWait(Localization.lang("Reset preferences"),
+                            Localization.lang("You must restart JabRef for this to come into effect."));
+
                 } catch (BackingStoreException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
-                    JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
-                            Localization.lang("Reset preferences"), JOptionPane.ERROR_MESSAGE);
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Reset preferences"), ex);
                 }
                 updateAfterPreferenceChanges();
             }

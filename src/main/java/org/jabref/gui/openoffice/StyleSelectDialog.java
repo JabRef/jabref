@@ -167,8 +167,8 @@ class StyleSelectDialog {
             @Override
             public void actionPerformed(ActionEvent event) {
                 if ((table.getRowCount() == 0) || (table.getSelectedRowCount() == 0)) {
-                    JOptionPane.showMessageDialog(diag, Localization.lang("You must select a valid style file."),
-                            Localization.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Style selection"),
+                            Localization.lang("You must select a valid style file."));
                     return;
                 }
                 okPressed = true;
@@ -374,28 +374,28 @@ class StyleSelectDialog {
         @Override
         public String getColumnName(int i) {
             switch (i) {
-            case 0:
-                return Localization.lang("Name");
-            case 1:
-                return Localization.lang("Journals");
-            case 2:
-                return Localization.lang("File");
-            default:
-                return "";
+                case 0:
+                    return Localization.lang("Name");
+                case 1:
+                    return Localization.lang("Journals");
+                case 2:
+                    return Localization.lang("File");
+                default:
+                    return "";
             }
         }
 
         @Override
         public Object getColumnValue(OOBibStyle style, int i) {
             switch (i) {
-            case 0:
-                return style.getName();
-            case 1:
-                return String.join(", ", style.getJournals());
-            case 2:
-                return style.isFromResource() ? Localization.lang("Internal style") : style.getFile().getName();
-            default:
-                return "";
+                case 0:
+                    return style.getName();
+                case 1:
+                    return String.join(", ", style.getJournals());
+                case 2:
+                    return style.isFromResource() ? Localization.lang("Internal style") : style.getFile().getName();
+                default:
+                    return "";
             }
         }
     }
@@ -472,7 +472,8 @@ class StyleSelectDialog {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .addExtensionFilter(FileType.JSTYLE)
                     .withDefaultExtension(FileType.JSTYLE)
-                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                    .build();
 
             browse.addActionListener(e -> {
                 Optional<Path> file = DefaultTaskExecutor
@@ -515,7 +516,8 @@ class StyleSelectDialog {
             addCancelButton.addActionListener(cancelAction);
 
             // Key bindings:
-            bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+            bb.getPanel()
+                    .getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                     .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
             bb.getPanel().getActionMap().put("close", cancelAction);
             pack();

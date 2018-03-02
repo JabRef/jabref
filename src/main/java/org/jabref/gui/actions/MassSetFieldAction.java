@@ -20,7 +20,6 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.undo.UndoableEdit;
@@ -158,8 +157,9 @@ public class MassSetFieldAction extends SimpleCommand {
             // Check that any field name is set
             String fieldText = (String) field.getSelectedItem();
             if ((fieldText == null) || fieldText.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(diag, Localization.lang("You must enter at least one field name"), "",
-                        JOptionPane.ERROR_MESSAGE);
+
+                frame.getDialogService().showErrorDialogAndWait(Localization.lang("You must enter at least one field name"));
+
                 return; // Do not close the dialog.
             }
 
@@ -167,8 +167,9 @@ public class MassSetFieldAction extends SimpleCommand {
             if (rename.isSelected()) {
                 String[] fields = getFieldNames(fieldText);
                 if (fields.length > 1) {
-                    JOptionPane.showMessageDialog(diag, Localization.lang("You can only rename one field at a time"),
-                            "", JOptionPane.ERROR_MESSAGE);
+
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("You can only rename one field at a time"));
+
                     return; // Do not close the dialog.
                 }
             }
@@ -243,8 +244,8 @@ public class MassSetFieldAction extends SimpleCommand {
         NamedCompound compoundEdit = new NamedCompound(Localization.lang("Set field"));
         if (rename.isSelected()) {
             if (fields.length > 1) {
-                JOptionPane.showMessageDialog(diag, Localization.lang("You can only rename one field at a time"), "",
-                        JOptionPane.ERROR_MESSAGE);
+                frame.getDialogService().showErrorDialogAndWait(Localization.lang("You can only rename one field at a time"));
+
                 return; // Do not close the dialog.
             } else {
                 compoundEdit.addEdit(MassSetFieldAction.massRenameField(entryList, fields[0], textFieldRename.getText(),
