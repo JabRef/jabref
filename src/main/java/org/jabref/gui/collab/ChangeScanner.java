@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -38,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ChangeScanner implements Runnable {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeScanner.class);
 
     private final File file;
@@ -94,8 +94,9 @@ public class ChangeScanner implements Runnable {
             });
 
         } else {
-            JOptionPane.showMessageDialog(null, Localization.lang("No actual changes found."),
-                    Localization.lang("External changes"), JOptionPane.INFORMATION_MESSAGE);
+            frame.getDialogService().showInformationDialogAndWait(Localization.lang("External changes"),
+                    Localization.lang("No actual changes found."));
+
             fup.scanResultsResolved(true);
         }
     }
@@ -103,8 +104,11 @@ public class ChangeScanner implements Runnable {
     private void storeTempDatabase() {
         JabRefExecutorService.INSTANCE.execute(() -> {
             try {
-                SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withMakeBackup(false)
-                        .withEncoding(panel.getBibDatabaseContext().getMetaData().getEncoding()
+                SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
+                        .withMakeBackup(false)
+                        .withEncoding(panel.getBibDatabaseContext()
+                                .getMetaData()
+                                .getEncoding()
                                 .orElse(Globals.prefs.getDefaultEncoding()));
 
                 BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
@@ -176,6 +180,7 @@ public class ChangeScanner implements Runnable {
 
     @FunctionalInterface
     public interface DisplayResultCallback {
+
         void scanResultsResolved(boolean resolved);
     }
 }

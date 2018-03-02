@@ -140,7 +140,9 @@ public class SaveDatabaseAction extends AbstractWorker {
 
                 // Save the database
                 success = saveDatabase(panel.getBibDatabaseContext().getDatabaseFile().get(), false,
-                        panel.getBibDatabaseContext().getMetaData().getEncoding()
+                        panel.getBibDatabaseContext()
+                                .getMetaData()
+                                .getEncoding()
                                 .orElse(Globals.prefs.getDefaultEncoding()));
 
                 panel.updateTimeStamp();
@@ -288,7 +290,8 @@ public class SaveDatabaseAction extends AbstractWorker {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(FileType.BIBTEX_DB)
                 .withDefaultExtension(FileType.BIBTEX_DB)
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                .build();
         DialogService dialogService = frame.getDialogService();
         Optional<Path> path = dialogService.showFileSaveDialog(fileDialogConfiguration);
         if (path.isPresent()) {
@@ -428,10 +431,10 @@ public class SaveDatabaseAction extends AbstractWorker {
                 return true;
             } else { // User indicated to store anyway.
                 if (panel.getBibDatabaseContext().getMetaData().isProtected()) {
-                    JOptionPane.showMessageDialog(null,
-                            Localization
-                                    .lang("Library is protected. Cannot save until external changes have been reviewed."),
-                            Localization.lang("Protected library"), JOptionPane.ERROR_MESSAGE);
+
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Protected library"),
+                            Localization.lang("Library is protected. Cannot save until external changes have been reviewed."));
+
                     canceled = true;
                 } else {
                     panel.markExternalChangesAsResolved();

@@ -50,9 +50,8 @@ public class ExportCommand extends SimpleCommand {
         Globals.exportFactory = ExporterFactory.create(Globals.prefs, Globals.journalAbbreviationLoader);
         FileDialogConfiguration fileDialogConfiguration = createExportFileChooser(Globals.exportFactory, Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
         DialogService dialogService = frame.getDialogService();
-        DefaultTaskExecutor.runInJavaFXThread(() ->
-                dialogService.showFileSaveDialog(fileDialogConfiguration)
-                             .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), Globals.exportFactory.getExporters())));
+        DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showFileSaveDialog(fileDialogConfiguration)
+                .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), Globals.exportFactory.getExporters())));
     }
 
     private void export(Path file, FileChooser.ExtensionFilter selectedExtensionFilter, List<Exporter> exporters) {
@@ -82,8 +81,9 @@ public class ExportCommand extends SimpleCommand {
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
-        Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext()
-                                                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+        Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel()
+                .getBibDatabaseContext()
+                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
 
         // Make sure we remember which filter was used, to set
         // the default for next time:
@@ -100,8 +100,11 @@ public class ExportCommand extends SimpleCommand {
                 try {
                     format.export(frame.getCurrentBasePanel().getBibDatabaseContext(),
                             file,
-                            frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getEncoding()
-                                 .orElse(Globals.prefs.getDefaultEncoding()),
+                            frame.getCurrentBasePanel()
+                                    .getBibDatabaseContext()
+                                    .getMetaData()
+                                    .getEncoding()
+                                    .orElse(Globals.prefs.getDefaultEncoding()),
                             finEntries);
                 } catch (Exception ex) {
                     LOGGER.warn("Problem exporting", ex);
@@ -123,9 +126,8 @@ public class ExportCommand extends SimpleCommand {
                 else {
                     frame.output(Localization.lang("Could not save file.") + " - " + errorMessage);
                     // Need to warn the user that saving failed!
-                    JOptionPane.showMessageDialog(null,
-                            Localization.lang("Could not save file.") + "\n" + errorMessage,
-                            Localization.lang("Save library"), JOptionPane.ERROR_MESSAGE);
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file.") + "\n" + errorMessage);
+
                 }
             }
         };

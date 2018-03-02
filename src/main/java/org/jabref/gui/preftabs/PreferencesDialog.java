@@ -80,7 +80,7 @@ public class PreferencesDialog extends JabRefDialog {
         main.setLayout(cardLayout);
 
         List<PrefsTab> tabs = new ArrayList<>();
-        tabs.add(new GeneralTab(prefs));
+        tabs.add(new GeneralTab(frame, prefs));
         tabs.add(new FileTab(frame, prefs));
         tabs.add(new TablePrefsTab(prefs));
         tabs.add(new TableColumnsTab(prefs, parent));
