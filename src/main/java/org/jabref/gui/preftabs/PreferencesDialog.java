@@ -85,7 +85,7 @@ public class PreferencesDialog extends JabRefDialog {
         tabs.add(new FileTab(frame, prefs));
         tabs.add(new TablePrefsTab(prefs));
         tabs.add(new TableColumnsTab(prefs, parent));
-        tabs.add(new PreviewPrefsTab());
+        tabs.add(new PreviewPrefsTab(frame));
         tabs.add(new ExternalTab(frame, this, prefs));
         tabs.add(new GroupsPrefsTab(prefs));
         tabs.add(new EntryEditorPrefsTab(prefs));
@@ -94,9 +94,9 @@ public class PreferencesDialog extends JabRefDialog {
         tabs.add(new ExportSortingPrefsTab(prefs));
         tabs.add(new NameFormatterTab(prefs));
         tabs.add(new XmpPrefsTab(prefs));
-        tabs.add(new NetworkTab(prefs));
-        tabs.add(new AdvancedTab(prefs));
-        tabs.add(new AppearancePrefsTab(prefs));
+        tabs.add(new NetworkTab(frame, prefs));
+        tabs.add(new AdvancedTab(frame, prefs));
+        tabs.add(new AppearancePrefsTab(frame, prefs));
 
         // add all tabs
         tabs.forEach(tab -> main.add((Component) tab, tab.getTabName()));
@@ -161,7 +161,8 @@ public class PreferencesDialog extends JabRefDialog {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .addExtensionFilter(FileType.XML)
                     .withDefaultExtension(FileType.XML)
-                    .withInitialDirectory(getPrefsExportPath()).build();
+                    .withInitialDirectory(getPrefsExportPath())
+                    .build();
             DialogService ds = frame.getDialogService();
 
             Optional<Path> fileName = DefaultTaskExecutor
@@ -186,9 +187,12 @@ public class PreferencesDialog extends JabRefDialog {
         showPreferences.addActionListener(
                 e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs), null).setVisible(true));
         resetPreferences.addActionListener(e -> {
-            if (JOptionPane.showConfirmDialog(PreferencesDialog.this,
+
+            boolean resetPreferencesClicked = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Reset preferences"),
                     Localization.lang("Are you sure you want to reset all settings to default values?"),
-                    Localization.lang("Reset preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                    Localization.lang("Reset preferences"), Localization.lang("Cancel"));
+
+            if (resetPreferencesClicked) {
                 try {
                     prefs.clear();
                     new SharedDatabasePreferences().clear();
@@ -284,7 +288,8 @@ public class PreferencesDialog extends JabRefDialog {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .addExtensionFilter(FileType.XML)
                     .withDefaultExtension(FileType.XML)
-                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                    .build();
             DialogService ds = frame.getDialogService();
             Optional<Path> path = DefaultTaskExecutor
                     .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
@@ -296,8 +301,8 @@ public class PreferencesDialog extends JabRefDialog {
                     Globals.prefs.put(JabRefPreferences.PREFS_EXPORT_PATH, exportFile.toString());
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
-                    JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
-                            Localization.lang("Export preferences"), JOptionPane.WARNING_MESSAGE);
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Export preferences"), ex);
+
                 }
             });
         }

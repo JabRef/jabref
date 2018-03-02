@@ -26,6 +26,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.FXDialogService;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.logic.citationstyle.CitationStyle;
@@ -56,14 +57,15 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     private final JButton btnUp = new JButton(Localization.lang("Up"));
     private final JButton btnDown = new JButton(Localization.lang("Down"));
 
-
     private final JTextArea layout = new JTextArea("", 1, 1);
     private final JButton btnTest = new JButton(Localization.lang("Test"));
     private final JButton btnDefault = new JButton(Localization.lang("Default"));
     private final JScrollPane scrollPane = new JScrollPane(layout);
 
+    private final JabRefFrame frame;
 
-    public PreviewPrefsTab() {
+    public PreviewPrefsTab(JabRefFrame frame) {
+        this.frame = frame;
         setupLogic();
         setupGui();
     }
@@ -97,7 +99,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
             List<Integer> newSelectedIndices = new ArrayList<>();
             for (int oldIndex : chosen.getSelectedIndices()) {
                 boolean alreadyTaken = newSelectedIndices.contains(oldIndex - 1);
-                int newIndex = (oldIndex > 0 && !alreadyTaken) ? oldIndex - 1 : oldIndex;
+                int newIndex = ((oldIndex > 0) && !alreadyTaken) ? oldIndex - 1 : oldIndex;
                 chosenModel.add(newIndex, chosenModel.remove(oldIndex));
                 newSelectedIndices.add(newIndex);
             }
@@ -110,7 +112,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
             for (int i = selectedIndices.length - 1; i >= 0; i--) {
                 int oldIndex = selectedIndices[i];
                 boolean alreadyTaken = newSelectedIndices.contains(oldIndex + 1);
-                int newIndex = (oldIndex < chosenModel.getSize() - 1 && !alreadyTaken) ? oldIndex + 1 : oldIndex;
+                int newIndex = ((oldIndex < (chosenModel.getSize() - 1)) && !alreadyTaken) ? oldIndex + 1 : oldIndex;
                 chosenModel.add(newIndex, chosenModel.remove(oldIndex));
                 newSelectedIndices.add(newIndex);
             }
@@ -118,7 +120,8 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         });
 
         btnDefault.addActionListener(event -> layout.setText(Globals.prefs.getPreviewPreferences()
-                .getPreviewStyleDefault().replace("__NEWLINE__", "\n")));
+                .getPreviewStyleDefault()
+                .replace("__NEWLINE__", "\n")));
 
         btnTest.addActionListener(event -> {
             try {
@@ -127,13 +130,17 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 testPane.setEntry(TestEntry.getTestEntry());
                 JFXPanel container = CustomJFXPanel.wrap(new Scene(testPane));
                 container.setPreferredSize(new Dimension(800, 350));
+
+                //TODO: Add dialog for showing pane
+
                 JOptionPane.showMessageDialog(PreviewPrefsTab.this, container, Localization.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
             } catch (StringIndexOutOfBoundsException exception) {
                 LOGGER.warn("Parsing error.", exception);
-                JOptionPane.showMessageDialog(null,
-                        Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression")
-                                + ".\n" + exception.getMessage(),
-                        Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
+
+                frame.getDialogService().showErrorDialogAndWait(Localization.lang("Parsing error"),
+                        Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression"),
+                        exception);
+
             }
         });
     }
@@ -144,14 +151,21 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 .rows("pref, $lg, fill:pref:grow, $lg, pref:grow, $lg, pref:grow, $lg, pref:grow")
                 .padding(Paddings.DIALOG)
 
-                .addSeparator(Localization.lang("Current Preview")).xyw(1, 1, 5)
-                .add(available).xywh(1, 3, 1, 7)
-                .add(chosen).xywh(5, 3, 1, 7)
+                .addSeparator(Localization.lang("Current Preview"))
+                .xyw(1, 1, 5)
+                .add(available)
+                .xywh(1, 3, 1, 7)
+                .add(chosen)
+                .xywh(5, 3, 1, 7)
 
-                .add(btnRight).xy(3, 3, "fill, bottom")
-                .add(btnLeft).xy(3, 5, "fill, top")
-                .add(btnUp).xy(3, 7, "fill, bottom")
-                .add(btnDown).xy(3, 9, "fill, top")
+                .add(btnRight)
+                .xy(3, 3, "fill, bottom")
+                .add(btnLeft)
+                .xy(3, 5, "fill, top")
+                .add(btnUp)
+                .xy(3, 7, "fill, bottom")
+                .add(btnDown)
+                .xy(3, 9, "fill, top")
                 .build();
 
         JPanel preview = FormBuilder.create()
@@ -159,10 +173,14 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 .rows("pref, $lg, fill:pref:grow")
                 .padding(Paddings.DIALOG)
 
-                .addSeparator(Localization.lang("Preview")).xy(1, 1)
-                .add(btnTest).xy(3, 1)
-                .add(btnDefault).xy(5, 1)
-                .add(scrollPane).xyw(1, 3, 5)
+                .addSeparator(Localization.lang("Preview"))
+                .xy(1, 1)
+                .add(btnTest)
+                .xy(3, 1)
+                .add(btnDefault)
+                .xy(5, 1)
+                .add(scrollPane)
+                .xyw(1, 3, 5)
                 .build();
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -204,6 +222,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         }
 
         discoverCitationStyleWorker = new SwingWorker<List<CitationStyle>, Void>() {
+
             @Override
             protected List<CitationStyle> doInBackground() throws Exception {
                 return CitationStyle.discoverCitationStyles();
