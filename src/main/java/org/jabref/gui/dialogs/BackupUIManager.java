@@ -15,8 +15,7 @@ public class BackupUIManager {
 
     }
 
-    public static void showRestoreBackupDialog(DialogService dlgService, Path originalPath) {
-
+    public static void showRestoreBackupDialog(DialogService dialogService, Path originalPath) {
         String content = new StringBuilder()
                 .append(Localization.lang("A backup file for '%0' was found.", originalPath.getFileName().toString()))
                 .append("\n")
@@ -25,12 +24,12 @@ public class BackupUIManager {
                 .append(Localization.lang("Do you want to recover the library from the backup file?"))
                 .toString();
 
-        boolean okClicked = dlgService.showConfirmationDialogAndWait(
+        boolean restoreClicked = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Backup found"), content,
                 Localization.lang("Restore from backup"),
                 Localization.lang("Ignore backup"));
 
-        if (okClicked) {
+        if (restoreClicked) {
             BackupManager.restoreBackup(originalPath);
         }
 
