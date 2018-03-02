@@ -32,6 +32,7 @@ public class Languages {
         LANGUAGES.put("Turkish", "tr");
         LANGUAGES.put("Vietnamese", "vi");
         LANGUAGES.put("ελληνικά", "el");
+        LANGUAGES.put("Tagalog/Filipino", "tl");
     }
 
     private Languages() {
