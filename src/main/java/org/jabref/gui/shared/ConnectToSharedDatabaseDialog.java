@@ -183,8 +183,8 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
 
                     openSharedDatabase();
                 } catch (JabRefException exception) {
-                    JOptionPane.showMessageDialog(ConnectToSharedDatabaseDialog.this, exception.getMessage(),
-                            Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Warning"), exception);
+
                 }
             }
         };
@@ -471,7 +471,8 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(FileType.BIBTEX_DB)
                 .withDefaultExtension(FileType.BIBTEX_DB)
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                .build();
         DialogService ds = frame.getDialogService();
 
         Optional<Path> path = DefaultTaskExecutor
