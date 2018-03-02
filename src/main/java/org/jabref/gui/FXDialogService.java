@@ -18,6 +18,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Window;
 
 import org.jabref.JabRefGUI;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -38,11 +39,18 @@ import org.controlsfx.dialog.ProgressDialog;
  */
 public class FXDialogService implements DialogService {
 
+    private final Window mainWindow;
+
     /**
      * @deprecated try not to initialize a new dialog service but reuse the one constructed in {@link org.jabref.JabRefMain}.
      */
     @Deprecated
     public FXDialogService() {
+        this(null);
+    }
+
+    public FXDialogService(Window mainWindow) {
+        this.mainWindow = mainWindow;
     }
 
     private static FXDialog createDialog(AlertType type, String title, String content) {
@@ -168,7 +176,7 @@ public class FXDialogService implements DialogService {
     @Override
     public Optional<Path> showFileSaveDialog(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
-        File file = chooser.showSaveDialog(null);
+        File file = chooser.showSaveDialog(mainWindow);
         Optional.ofNullable(chooser.getSelectedExtensionFilter()).ifPresent(fileDialogConfiguration::setSelectedExtensionFilter);
         return Optional.ofNullable(file).map(File::toPath);
     }
@@ -176,7 +184,7 @@ public class FXDialogService implements DialogService {
     @Override
     public Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
-        File file = chooser.showOpenDialog(null);
+        File file = chooser.showOpenDialog(mainWindow);
         Optional.ofNullable(chooser.getSelectedExtensionFilter()).ifPresent(fileDialogConfiguration::setSelectedExtensionFilter);
         return Optional.ofNullable(file).map(File::toPath);
     }
@@ -184,14 +192,14 @@ public class FXDialogService implements DialogService {
     @Override
     public Optional<Path> showDirectorySelectionDialog(DirectoryDialogConfiguration directoryDialogConfiguration) {
         DirectoryChooser chooser = getConfiguredDirectoryChooser(directoryDialogConfiguration);
-        File file = chooser.showDialog(null);
+        File file = chooser.showDialog(mainWindow);
         return Optional.ofNullable(file).map(File::toPath);
     }
 
     @Override
     public List<Path> showFileOpenDialogAndGetMultipleFiles(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
-        List<File> files = chooser.showOpenMultipleDialog(null);
+        List<File> files = chooser.showOpenMultipleDialog(mainWindow);
         return files != null ? files.stream().map(File::toPath).collect(Collectors.toList()) : Collections.emptyList();
     }
 
@@ -212,6 +220,6 @@ public class FXDialogService implements DialogService {
 
     @Override
     public boolean showPrintDialog(PrinterJob job) {
-        return job.showPrintDialog(null);
+        return job.showPrintDialog(mainWindow);
     }
 }

@@ -215,7 +215,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
-        this.dialogService = new FXDialogService();
+        this.dialogService = new FXDialogService(mainStage);
         init();
     }
 
