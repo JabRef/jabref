@@ -20,6 +20,7 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.AbstractView;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
@@ -86,7 +87,7 @@ public class JabRefGUI {
 
         // If the option is enabled, open the last edited libraries, if any.
         if (!isBlank && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
-            openLastEditedDatabases();
+            openLastEditedDatabases(mainStage);
         }
 
         GUIGlobals.init();
@@ -190,7 +191,7 @@ public class JabRefGUI {
         LOGGER.debug("Finished adding panels");
     }
 
-    private void openLastEditedDatabases() {
+    private void openLastEditedDatabases(Stage mainStage) {
         if (Globals.prefs.get(JabRefPreferences.LAST_EDITED) == null) {
             return;
         }
@@ -205,7 +206,7 @@ public class JabRefGUI {
             }
 
             if (BackupManager.checkForBackupFile(dbFile.toPath())) {
-                BackupUIManager.showRestoreBackupDialog(null, dbFile.toPath());
+                BackupUIManager.showRestoreBackupDialog(new FXDialogService(mainStage), dbFile.toPath());
             }
 
             ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,
