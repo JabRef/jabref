@@ -49,7 +49,6 @@ import org.slf4j.LoggerFactory;
 // The action concerned with opening an existing database.
 public class OpenDatabaseAction extends SimpleCommand {
 
-
     public static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
@@ -64,7 +63,6 @@ public class OpenDatabaseAction extends SimpleCommand {
             new CheckForNewEntryTypesAction(),
             // Warning about and handling duplicate BibTeX keys:
             new HandleDuplicateWarnings());
-
 
     private final JabRefFrame frame;
 
@@ -87,6 +85,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
     }
 
+    @Override
     public void execute() {
         List<Path> filesToOpen = new ArrayList<>();
 
@@ -131,7 +130,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         int removed = 0;
 
         // Check if any of the files are already open:
-        for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext(); ) {
+        for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext();) {
             Path file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabs().size(); i++) {
                 BasePanel basePanel = frame.getBasePanelAt(i);
@@ -212,7 +211,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             }
 
             if (BackupManager.checkForBackupFile(fileToLoad)) {
-                BackupUIManager.showRestoreBackupDialog(null, fileToLoad);
+                BackupUIManager.showRestoreBackupDialog(frame.getDialogService(), fileToLoad);
             }
 
             ParserResult result;
@@ -262,10 +261,9 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         return DefaultTaskExecutor.runInJavaFXThread(() -> {
-                    BasePanel basePanel = new BasePanel(frame, BasePanelPreferences.from(Globals.prefs), result.getDatabaseContext(), ExternalFileTypes.getInstance());
-                    frame.addTab(basePanel, raisePanel);
-                    return basePanel;
-                }
-        );
+            BasePanel basePanel = new BasePanel(frame, BasePanelPreferences.from(Globals.prefs), result.getDatabaseContext(), ExternalFileTypes.getInstance());
+            frame.addTab(basePanel, raisePanel);
+            return basePanel;
+        });
     }
 }
