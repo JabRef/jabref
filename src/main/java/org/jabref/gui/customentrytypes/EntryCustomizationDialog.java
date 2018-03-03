@@ -100,7 +100,7 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
         List<String> entryTypes = new ArrayList<>();
         entryTypes.addAll(EntryTypes.getAllTypes(bibDatabaseMode));
 
-        typeComp = new EntryTypeList(frame, entryTypes, bibDatabaseMode);
+        typeComp = new EntryTypeList(frame.getDialogService(), entryTypes, bibDatabaseMode);
         typeComp.addListSelectionListener(this);
         typeComp.addAdditionActionListener(e -> typeComp.selectField(e.getActionCommand()));
         typeComp.addDefaultActionListener(new DefaultListener());

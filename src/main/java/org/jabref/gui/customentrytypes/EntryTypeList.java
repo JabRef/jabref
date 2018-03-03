@@ -11,7 +11,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.jabref.Globals;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
@@ -29,14 +29,14 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
 
     private final JButton def = new JButton(Localization.lang("Default"));
     private final BibDatabaseMode mode;
-    private final JabRefFrame frame;
+    private final DialogService dialogService;
 
     /** Creates a new instance of EntryTypeList
      * @param frame */
-    public EntryTypeList(JabRefFrame frame, List<String> fields, BibDatabaseMode mode) {
+    public EntryTypeList(DialogService dialogService, List<String> fields, BibDatabaseMode mode) {
         super(Localization.lang("Entry types"), fields, fields, false, true);
         this.mode = mode;
-        this.frame = frame;
+        this.dialogService = dialogService;
 
         con.gridx = 0;
         con.gridy = 2;
@@ -65,14 +65,14 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
         if (!testString.equals(s) || (s.indexOf('&') >= 0)) {
             // Report error and exit.
 
-            frame.getDialogService().showErrorDialogAndWait(Localization.lang("Error"),
+            dialogService.showErrorDialogAndWait(Localization.lang("Error"),
                     Localization.lang("Entry type names are not allowed to contain white space or the following "
                             + "characters") + ": # { } ~ , ^ &");
 
             return;
         } else if ("comment".equalsIgnoreCase(s)) {
             // Report error and exit.
-            frame.getDialogService().showErrorDialogAndWait(Localization.lang("Error"),
+            dialogService.showErrorDialogAndWait(Localization.lang("Error"),
                     Localization.lang("The name 'comment' cannot be used as an entry type name."));
 
             return;
@@ -97,11 +97,9 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
             if (type.isPresent() && (type.get() instanceof CustomEntryType)) {
                 listModel.removeElementAt(selected[selected.length - 1 - i]);
             } else {
-                     // This shouldn't happen, since the Remove button should be disabled.
-
-                frame.getDialogService().showErrorDialogAndWait(Localization.lang("Remove entry type"),
+                // This shouldn't happen, since the Remove button should be disabled.
+                dialogService.showErrorDialogAndWait(Localization.lang("Remove entry type"),
                         Localization.lang("This entry type cannot be removed."));
-
             }
         }
     }
