@@ -22,7 +22,6 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -272,9 +271,11 @@ class StyleSelectDialog {
 
         // Create action listener for removing a style, also used for the remove button
         removeAction = actionEvent -> getSelectedStyle().ifPresent(style -> {
-            if (!style.isFromResource() && (JOptionPane.showConfirmDialog(diag,
-                    Localization.lang("Are you sure you want to remove the style?"), Localization.lang("Remove style"),
-                    JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)) {
+            boolean removeStylePressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Remove style"),
+                    Localization.lang("Are you sure you want to remove the style?"),
+                    Localization.lang("Remove style"),
+                    Localization.lang("Cancel"));
+            if (!style.isFromResource() && removeStylePressed) {
                 if (!loader.removeStyle(style)) {
                     LOGGER.info("Problem removing style");
                 }
@@ -285,7 +286,9 @@ class StyleSelectDialog {
         remove.addActionListener(removeAction);
 
         // Add action listener to the "Reload" menu item, which is supposed to reload an external style file
-        reload.addActionListener(actionEvent -> getSelectedStyle().ifPresent(style -> {
+        reload.addActionListener(actionEvent ->
+
+        getSelectedStyle().ifPresent(style -> {
             try {
                 style.ensureUpToDate();
             } catch (IOException e) {

@@ -93,7 +93,7 @@ public class FindFullTextAction extends AbstractWorker {
 
                     return;
                 }
-                DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(),
+                DownloadExternalFile def = new DownloadExternalFile(dialogService,
                         basePanel.getBibDatabaseContext(), entry);
                 try {
                     def.download(result.get(), file -> {
