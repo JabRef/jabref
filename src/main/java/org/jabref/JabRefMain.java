@@ -35,10 +35,10 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JabRef MainClass
@@ -53,9 +53,6 @@ public class JabRefMain extends Application {
 
         launch(arguments);
     }
-
-    private static void start(String[] args) throws IOException {
-        NativeMessagingClient nativeMessagingClient = new StreamNativeMessagingClient(System.in, System.out);
 
     /**
      * Tests if we are running an acceptable Java and terminates JabRef when we are sure the version is not supported.
@@ -103,7 +100,8 @@ public class JabRefMain extends Application {
         }
     }
 
-    private static void start(String[] args) {
+    private static void start(String[] args) throws IOException {
+        NativeMessagingClient nativeMessagingClient = new StreamNativeMessagingClient(System.in, System.out);
         nativeMessagingClient.sendAsync("{\"m\":\"ka\"}");
 
         FallbackExceptionHandler.installExceptionHandler();
