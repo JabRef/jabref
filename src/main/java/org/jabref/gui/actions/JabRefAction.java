@@ -10,13 +10,16 @@ import de.saxsys.mvvmfx.utils.commands.Command;
  */
 class JabRefAction extends org.controlsfx.control.action.Action {
 
+
     public JabRefAction(Action action, KeyBindingRepository keyBindingRepository) {
         super(action.getText());
         action.getIcon()
               .ifPresent(icon -> setGraphic(icon.getGraphicNode()));
         action.getKeyBinding()
               .ifPresent(keyBinding -> setAccelerator(keyBindingRepository.getKeyCombination(keyBinding)));
+
         setLongText(action.getDescription());
+
     }
 
     public JabRefAction(Action action, Command command, KeyBindingRepository keyBindingRepository) {

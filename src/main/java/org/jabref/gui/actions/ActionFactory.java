@@ -5,8 +5,6 @@ import java.util.Objects;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tooltip;
-
 import org.jabref.gui.keyboard.KeyBindingRepository;
 
 import de.saxsys.mvvmfx.utils.commands.Command;
@@ -17,7 +15,7 @@ import org.controlsfx.control.action.ActionUtils;
  */
 public class ActionFactory {
 
-    private KeyBindingRepository keyBindingRepository;
+    private final KeyBindingRepository keyBindingRepository;
 
     public ActionFactory(KeyBindingRepository keyBindingRepository) {
         this.keyBindingRepository = Objects.requireNonNull(keyBindingRepository);
@@ -59,8 +57,7 @@ public class ActionFactory {
     public Button createIconButton(Action action, Command command) {
         Button button = ActionUtils.createButton(new JabRefAction(action, command, keyBindingRepository), ActionUtils.ActionTextBehavior.HIDE);
         button.getStyleClass().add("flatButton");
-        button.setTooltip(new Tooltip(action.getDescription()));
-        
+
         // For some reason the graphic is not set correctly, so let's fix this
         button.graphicProperty().unbind();
         action.getIcon().ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));

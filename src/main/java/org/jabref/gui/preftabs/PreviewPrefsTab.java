@@ -1,7 +1,6 @@
 package org.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -12,23 +11,22 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
 
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
-import org.jabref.gui.customjfx.CustomJFXPanel;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TestEntry;
@@ -62,10 +60,10 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     private final JButton btnDefault = new JButton(Localization.lang("Default"));
     private final JScrollPane scrollPane = new JScrollPane(layout);
 
-    private final JabRefFrame frame;
+    private final DialogService dialogService;
 
-    public PreviewPrefsTab(JabRefFrame frame) {
-        this.frame = frame;
+    public PreviewPrefsTab(DialogService dialogService) {
+        this.dialogService = dialogService;
         setupLogic();
         setupGui();
     }
@@ -125,19 +123,23 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
         btnTest.addActionListener(event -> {
             try {
-                PreviewPanel testPane = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), new FXDialogService());
-                testPane.setFixedLayout(layout.getText());
-                testPane.setEntry(TestEntry.getTestEntry());
-                JFXPanel container = CustomJFXPanel.wrap(new Scene(testPane));
-                container.setPreferredSize(new Dimension(800, 350));
+                DefaultTaskExecutor.runInJavaFXThread(() -> {
 
-                //TODO: Add dialog for showing pane
+                    PreviewPanel testPane = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), new FXDialogService());
+                    testPane.setFixedLayout(layout.getText());
+                    testPane.setEntry(TestEntry.getTestEntry());
 
-                JOptionPane.showMessageDialog(PreviewPrefsTab.this, container, Localization.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
+                    DialogPane pane = new DialogPane();
+                    pane.setContent(testPane);
+
+                    dialogService.showCustomDialogAndWait(Localization.lang("Preview"), pane, ButtonType.OK);
+
+                });
+
             } catch (StringIndexOutOfBoundsException exception) {
                 LOGGER.warn("Parsing error.", exception);
 
-                frame.getDialogService().showErrorDialogAndWait(Localization.lang("Parsing error"),
+                dialogService.showErrorDialogAndWait(Localization.lang("Parsing error"),
                         Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression"),
                         exception);
 

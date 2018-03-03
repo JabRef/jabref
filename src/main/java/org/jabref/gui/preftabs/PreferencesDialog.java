@@ -80,11 +80,11 @@ public class PreferencesDialog extends JabRefDialog {
         main.setLayout(cardLayout);
 
         List<PrefsTab> tabs = new ArrayList<>();
-        tabs.add(new GeneralTab(frame, prefs));
-        tabs.add(new FileTab(frame, prefs));
+        tabs.add(new GeneralTab(frame.getDialogService(), prefs));
+        tabs.add(new FileTab(frame.getDialogService(), prefs));
         tabs.add(new TablePrefsTab(prefs));
         tabs.add(new TableColumnsTab(prefs, parent));
-        tabs.add(new PreviewPrefsTab(frame));
+        tabs.add(new PreviewPrefsTab(frame.getDialogService()));
         tabs.add(new ExternalTab(frame, this, prefs));
         tabs.add(new GroupsPrefsTab(prefs));
         tabs.add(new EntryEditorPrefsTab(prefs));
@@ -94,7 +94,7 @@ public class PreferencesDialog extends JabRefDialog {
         tabs.add(new NameFormatterTab(prefs));
         tabs.add(new XmpPrefsTab(prefs));
         tabs.add(new NetworkTab(frame, prefs));
-        tabs.add(new AdvancedTab(frame, prefs));
+        tabs.add(new AdvancedTab(frame.getDialogService(), prefs));
         tabs.add(new AppearancePrefsTab(frame, prefs));
 
         // add all tabs

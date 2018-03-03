@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.help.HelpFile;
@@ -33,10 +33,10 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final JCheckBox useCaseKeeperOnSearch;
     private final JCheckBox useUnitFormatterOnSearch;
     private final RemotePreferences remotePreferences;
-    private final JabRefFrame frame;
+    private final DialogService dialogService;
 
-    public AdvancedTab(JabRefFrame frame, JabRefPreferences prefs) {
-        this.frame = frame;
+    public AdvancedTab(DialogService dialogService, JabRefPreferences prefs) {
+        this.dialogService = dialogService;
         preferences = prefs;
         remotePreferences = prefs.getRemotePreferences();
 
@@ -122,7 +122,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
                 if (remotePreferences.useRemoteServer()) {
 
-                    frame.getDialogService().showWarningDialogAndWait(Localization.lang("Remote server port"),
+                    dialogService.showWarningDialogAndWait(Localization.lang("Remote server port"),
                             Localization.lang("Remote server port")
                                     .concat(" ")
                                     .concat(Localization.lang("You must restart JabRef for this to come into effect.")));
@@ -159,10 +159,9 @@ class AdvancedTab extends JPanel implements PrefsTab {
             }
         } catch (NumberFormatException ex) {
 
-            frame.getDialogService().showErrorDialogAndWait(Localization.lang("Remote server port"),
+            dialogService.showErrorDialogAndWait(Localization.lang("Remote server port"),
                     Localization.lang("You must enter an integer value in the interval 1025-65535 in the text field for")
-                            + " '" + Localization.lang("Remote server port") + '\'',
-                    ex);
+                            + " '" + Localization.lang("Remote server port") + '\'');
 
             return false;
         }

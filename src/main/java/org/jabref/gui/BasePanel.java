@@ -525,7 +525,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         actions.put(Actions.OPEN_URL, new OpenURLAction());
 
-        actions.put(Actions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(this, frame));
+        actions.put(Actions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(this, frame.getDialogService()));
 
         actions.put(Actions.REPLACE_ALL, (BaseAction) () -> {
             final ReplaceStringDialog rsd = new ReplaceStringDialog(frame);
@@ -657,7 +657,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         actions.put(Actions.REMOVE_FROM_GROUP, new GroupAddRemoveDialog(this, false, false));
         actions.put(Actions.MOVE_TO_GROUP, new GroupAddRemoveDialog(this, true, true));
 
-        actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(frame, this));
+        actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(frame.getDialogService(), this));
     }
 
     /**

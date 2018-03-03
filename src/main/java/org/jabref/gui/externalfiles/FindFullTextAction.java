@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.worker.AbstractWorker;
@@ -35,11 +35,11 @@ public class FindFullTextAction extends AbstractWorker {
 
     private final BasePanel basePanel;
     private final Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
-    private final JabRefFrame frame;
+    private final DialogService dialogService;
 
-    public FindFullTextAction(JabRefFrame frame, BasePanel basePanel) {
+    public FindFullTextAction(DialogService dialogService, BasePanel basePanel) {
         this.basePanel = basePanel;
-        this.frame = frame;
+        this.dialogService = dialogService;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class FindFullTextAction extends AbstractWorker {
             String[] options = new String[] {Localization.lang("Look up full text documents"),
                     Localization.lang("Cancel")};
 
-            boolean getFullTextForAllCliecked = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Look up full text documents"), Localization.lang(
+            boolean getFullTextForAllCliecked = dialogService.showConfirmationDialogAndWait(Localization.lang("Look up full text documents"), Localization.lang(
                     "You are about to look up full text documents for %0 entries.",
                     String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
                     + Localization.lang("JabRef will send at least one request per entry to a publisher.")
@@ -87,7 +87,7 @@ public class FindFullTextAction extends AbstractWorker {
 
                 if (!dir.isPresent()) {
 
-                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Directory not found"),
+                    dialogService.showErrorDialogAndWait(Localization.lang("Directory not found"),
                             Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
                                     + " -> " + Localization.lang("File"));
 
@@ -119,7 +119,7 @@ public class FindFullTextAction extends AbstractWorker {
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined")));
 
                 basePanel.output(message);
-                frame.getDialogService().showErrorDialogAndWait(title, message);
+                dialogService.showErrorDialogAndWait(title, message);
             }
             remove.add(result);
         }
