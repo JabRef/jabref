@@ -12,10 +12,12 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
+import javax.swing.SwingWorker;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -27,12 +29,16 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IntegrityCheckAction extends MnemonicAwareAction {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(IntegrityCheckAction.class);
     private static final String ELLIPSES = "...";
 
     private final JabRefFrame frame;
@@ -48,9 +54,38 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
         IntegrityCheck check = new IntegrityCheck(frame.getCurrentBasePanel().getBibDatabaseContext(),
                 Globals.prefs.getFileDirectoryPreferences(),
                 Globals.prefs.getBibtexKeyPatternPreferences(),
-                Globals.journalAbbreviationLoader
-                        .getRepository(Globals.prefs.getJournalAbbreviationPreferences()));
-        List<IntegrityMessage> messages = check.checkBibtexDatabase();
+                Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
+                Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
+
+        final JDialog integrityDialog = new JDialog(frame, true);
+        integrityDialog.setUndecorated(true);
+        integrityDialog.setLocationRelativeTo(frame);
+        JProgressBar integrityProgressBar = new JProgressBar();
+        integrityProgressBar.setIndeterminate(true);
+        integrityProgressBar.setStringPainted(true);
+        integrityProgressBar.setString(Localization.lang("Checking integrity..."));
+        integrityDialog.add(integrityProgressBar);
+        integrityDialog.pack();
+        SwingWorker<List<IntegrityMessage>, Void> worker = new SwingWorker<List<IntegrityMessage>, Void>() {
+            @Override
+            protected List<IntegrityMessage> doInBackground() {
+                List<IntegrityMessage> messages = check.checkBibtexDatabase();
+                return messages;
+            }
+
+            @Override
+            protected void done() {
+                integrityDialog.dispose();
+            }
+        };
+        worker.execute();
+        integrityDialog.setVisible(true);
+        List<IntegrityMessage> messages = null;
+        try {
+            messages = worker.get();
+        } catch (Exception ex) {
+            LOGGER.error("Integrity check failed.", ex);
+        }
 
         if (messages.isEmpty()) {
             JOptionPane.showMessageDialog(frame.getCurrentBasePanel(), Localization.lang("No problems found."));

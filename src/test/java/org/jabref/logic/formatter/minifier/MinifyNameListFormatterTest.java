@@ -1,8 +1,10 @@
 package org.jabref.logic.formatter.minifier;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
@@ -11,7 +13,7 @@ public class MinifyNameListFormatterTest {
 
     private MinifyNameListFormatter formatter;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         formatter = new MinifyNameListFormatter();
     }
@@ -31,6 +33,6 @@ public class MinifyNameListFormatterTest {
     }
 
     private void expectCorrect(String input, String expected) {
-        Assert.assertEquals(expected, formatter.format(input));
+        assertEquals(expected, formatter.format(input));
     }
 }

@@ -73,6 +73,7 @@ class MSBibEntry {
      *  Matches both single locations (only city) like Berlin and full locations like Stroudsburg, PA, USA <br>
      *  tested using http://www.regexpal.com/
      */
+
     private final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w*)\\s?[,]?\\s?(\\w*)\\b");
 
     public MSBibEntry() {
@@ -358,7 +359,8 @@ class MSBibEntry {
         }
 
         Matcher matcher = ADDRESS_PATTERN.matcher(addressToSplit);
-        if (matcher.matches() && (matcher.groupCount() >= 3)) {
+
+        if (addressToSplit.contains(",") && matcher.matches() && (matcher.groupCount() >= 3)) {
             addField(document, parent, "City", matcher.group(1));
             addField(document, parent, "StateProvince", matcher.group(2));
             addField(document, parent, "CountryRegion", matcher.group(3));

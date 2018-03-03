@@ -9,23 +9,22 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Category(FetcherTests.class)
+@FetcherTest
 public class DBLPFetcherTest {
 
     private DBLPFetcher dblpFetcher;
     private BibEntry entry;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getFieldContentParserPreferences())
@@ -44,7 +43,7 @@ public class DBLPFetcherTest {
         entry.setField(FieldName.YEAR, "2016");
         entry.setField(FieldName.URL,
                 "http://pi.informatik.uni-siegen.de/stt/36_2/./03_Technische_Beitraege/ZEUS2016/beitrag_2.pdf");
-        entry.setField("biburl", "http://dblp.dagstuhl.de/rec/bib/journals/stt/GeigerHL16");
+        entry.setField("biburl", "http://dblp.org/rec/bib/journals/stt/GeigerHL16");
         entry.setField("bibsource", "dblp computer science bibliography, http://dblp.org");
 
     }
@@ -54,7 +53,7 @@ public class DBLPFetcherTest {
         String query = "Process Engine Benchmarking with Betsy in the Context of {ISO/IEC} Quality Standards";
         List<BibEntry> result = dblpFetcher.performSearch(query);
 
-        Assert.assertEquals(Collections.singletonList(entry), result);
+        assertEquals(Collections.singletonList(entry), result);
     }
 
     @Test
@@ -62,7 +61,7 @@ public class DBLPFetcherTest {
         String query = "geiger harrer betsy$ softw.trends"; //-wirtz Negative operators do no longer work,  see issue https://github.com/JabRef/jabref/issues/2890
         List<BibEntry> result = dblpFetcher.performSearch(query);
 
-        Assert.assertEquals(Collections.singletonList(entry), result);
+        assertEquals(Collections.singletonList(entry), result);
     }
 
 }

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.InternalBibtexFields;
@@ -16,21 +17,21 @@ public class FieldCheckers {
 
     private Multimap<String, ValueChecker> fieldChecker;
 
-    public FieldCheckers(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
-        fieldChecker = getAllMap(databaseContext, fileDirectoryPreferences);
+    public FieldCheckers(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences, JournalAbbreviationRepository abbreviationRepository, boolean enforceLegalKey) {
+        fieldChecker = getAllMap(databaseContext, fileDirectoryPreferences, abbreviationRepository, enforceLegalKey);
     }
 
-    private static Multimap<String, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
+    private static Multimap<String, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences, JournalAbbreviationRepository abbreviationRepository, boolean enforceLegalKey) {
         ArrayListMultimap<String, ValueChecker> fieldCheckers = ArrayListMultimap.create(50, 10);
 
         for (String field : InternalBibtexFields.getJournalNameFields()) {
-            fieldCheckers.put(field, new AbbreviationChecker());
+            fieldCheckers.put(field, new AbbreviationChecker(abbreviationRepository));
         }
         for (String field : InternalBibtexFields.getBookNameFields()) {
-            fieldCheckers.put(field, new AbbreviationChecker());
+            fieldCheckers.put(field, new AbbreviationChecker(abbreviationRepository));
         }
         for (String field : InternalBibtexFields.getPersonNameFields()) {
-            fieldCheckers.put(field, new PersonNamesChecker());
+            fieldCheckers.put(field, new PersonNamesChecker(databaseContext));
         }
         fieldCheckers.put(FieldName.BOOKTITLE, new BooktitleChecker());
         fieldCheckers.put(FieldName.TITLE, new BracketChecker());
@@ -46,6 +47,7 @@ public class FieldCheckers {
         fieldCheckers.put(FieldName.PAGES, new PagesChecker(databaseContext));
         fieldCheckers.put(FieldName.URL, new UrlChecker());
         fieldCheckers.put(FieldName.YEAR, new YearChecker());
+        fieldCheckers.put(FieldName.KEY, new ValidBibtexKeyChecker(enforceLegalKey));
 
         return fieldCheckers;
     }

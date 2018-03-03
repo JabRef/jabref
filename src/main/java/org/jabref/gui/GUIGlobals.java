@@ -2,6 +2,7 @@ package org.jabref.gui;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,12 +14,13 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.EmacsKeyBindings;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Static variables for graphics files and keyboard shortcuts.
@@ -43,7 +45,7 @@ public class GUIGlobals {
     public static final Color ENTRY_EDITOR_LABEL_COLOR = new Color(100, 100, 150); // Empty field, blue.
 
     static final Color INACTIVE_TABBED_COLOR = Color.black; // inactive Database
-    private static final Log LOGGER = LogFactory.getLog(GUIGlobals.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GUIGlobals.class);
     private static final Map<String, JLabel> TABLE_ICONS = new HashMap<>(); // Contains table icon mappings. Set up
     static final Color ACTIVE_TABBED_COLOR = ENTRY_EDITOR_LABEL_COLOR.darker(); // active Database (JTabbedPane)
 
@@ -155,6 +157,18 @@ public class GUIGlobals {
 
         GUIGlobals.currentFont = new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY),
                 Globals.prefs.getInt(JabRefPreferences.FONT_STYLE), Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
+
+        // Set WM_CLASS using reflection for certain Un*x window managers
+        if (!OS.WINDOWS && !OS.OS_X) {
+            try {
+                Toolkit xToolkit = Toolkit.getDefaultToolkit();
+                java.lang.reflect.Field awtAppClassNameField = xToolkit.getClass().getDeclaredField("awtAppClassName");
+                awtAppClassNameField.setAccessible(true);
+                awtAppClassNameField.set(xToolkit, "org-jabref-JabRefMain");
+            } catch (Exception e) {
+                // ignore any error since this code only works for certain toolkits
+            }
+        }
 
     }
 

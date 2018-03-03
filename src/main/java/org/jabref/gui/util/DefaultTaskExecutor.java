@@ -1,19 +1,20 @@
 package org.jabref.gui.util;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.function.Consumer;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
-import org.jabref.gui.externalfiles.FileDownloadTask;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.fxmisc.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A very simple implementation of the {@link TaskExecutor} interface.
@@ -21,18 +22,53 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultTaskExecutor implements TaskExecutor {
 
-    private static final Log LOGGER = LogFactory.getLog(DefaultTaskExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTaskExecutor.class);
 
-    private ExecutorService executor = Executors.newFixedThreadPool(5);
+    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(5);
 
     public static <V> V runInJavaFXThread(Callable<V> callable) {
         FutureTask<V> task = new FutureTask<>(callable);
+
         Platform.runLater(task);
+
         try {
             return task.get();
         } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error(e);
+            LOGGER.error("Problem running in fx thread", e);
             return null;
+        }
+    }
+
+    /**
+     * Runs the specified {@link Runnable} on the JavaFX application thread and waits for completion.
+     *
+     * @param action the {@link Runnable} to run
+     * @throws NullPointerException if {@code action} is {@code null}
+     */
+    public static void runAndWaitInJavaFXThread(Runnable action) {
+        if (action == null)
+            throw new NullPointerException("action");
+
+        // Run synchronously on JavaFX thread
+        if (Platform.isFxApplicationThread()) {
+            action.run();
+            return;
+        }
+
+        // Queue on JavaFX thread and wait for completion
+        final CountDownLatch doneLatch = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            try {
+                action.run();
+            } finally {
+                doneLatch.countDown();
+            }
+        });
+
+        try {
+            doneLatch.await();
+        } catch (InterruptedException e) {
+            LOGGER.error("Problem running action on JavaFX thread", e);
         }
     }
 
@@ -41,22 +77,21 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     @Override
-    public <V> void execute(BackgroundTask<V> task) {
-        executor.submit(getJavaFXTask(task));
-    }
-
-    @Override
-    public void execute(FileDownloadTask downloadTask) {
-        executor.submit(downloadTask);
+    public <V> Future<?> execute(BackgroundTask<V> task) {
+        return EXECUTOR.submit(getJavaFXTask(task));
     }
 
     @Override
     public void shutdown() {
-        executor.shutdownNow();
+        EXECUTOR.shutdownNow();
     }
 
     private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
         Task<V> javaTask = new Task<V>() {
+
+            {
+                EasyBind.subscribe(task.progressProperty(), progress -> updateProgress(progress.getWorkDone(), progress.getMax()));
+            }
 
             @Override
             public V call() throws Exception {

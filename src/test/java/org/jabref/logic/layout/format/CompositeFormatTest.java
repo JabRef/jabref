@@ -2,15 +2,15 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class CompositeFormatTest {
 
     @Test
     public void testEmptyComposite() {
         LayoutFormatter f = new CompositeFormat();
-        Assert.assertEquals("No Change", f.format("No Change"));
+        assertEquals("No Change", f.format("No Change"));
     }
 
     @Test
@@ -18,7 +18,7 @@ public class CompositeFormatTest {
         LayoutFormatter f = new CompositeFormat(new LayoutFormatter[] {fieldText -> fieldText + fieldText,
                 fieldText -> "A" + fieldText, fieldText -> "B" + fieldText});
 
-        Assert.assertEquals("BAff", f.format("f"));
+        assertEquals("BAff", f.format("f"));
     }
 
     @Test
@@ -28,9 +28,9 @@ public class CompositeFormatTest {
         LayoutFormatter first = new AuthorOrgSci();
         LayoutFormatter second = new NoSpaceBetweenAbbreviations();
 
-        Assert.assertEquals(second.format(first.format("John Flynn and Sabine Gartska")),
+        assertEquals(second.format(first.format("John Flynn and Sabine Gartska")),
                 f.format("John Flynn and Sabine Gartska"));
-        Assert.assertEquals(second.format(first.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee")),
+        assertEquals(second.format(first.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee")),
                 f.format("Sa Makridakis and Sa Ca Wheelwright and Va Ea McGee"));
     }
 

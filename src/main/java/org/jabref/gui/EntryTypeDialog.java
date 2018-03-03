@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -29,11 +30,10 @@ import org.jabref.Globals;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.bibtex.DuplicateCheck;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
@@ -42,11 +42,11 @@ import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.IEEETranEntryTypes;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.jdesktop.swingx.VerticalLayout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dialog that prompts the user to choose a type for an entry.
@@ -54,7 +54,7 @@ import org.jdesktop.swingx.VerticalLayout;
  */
 public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
-    private static final Log LOGGER = LogFactory.getLog(EntryTypeDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntryTypeDialog.class);
     private static final int COLUMN = 3;
     private final JabRefFrame frame;
     private final CancelAction cancelAction = new CancelAction();
@@ -89,7 +89,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
     private JPanel createEntryGroupsPanel() {
         JPanel panel = new JPanel();
-        panel.setLayout(new VerticalLayout());
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         if (frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
             panel.add(createEntryGroupPanel("biblatex", BiblatexEntryTypes.ALL));
@@ -166,8 +166,8 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
         comboBox = new JComboBox<>();
 
         WebFetchers.getIdBasedFetchers(Globals.prefs.getImportFormatPreferences()).forEach(fetcher -> comboBox.addItem(fetcher.getName()));
-        // set DOI as default
-        comboBox.setSelectedItem(DoiFetcher.NAME);
+
+        comboBox.setSelectedItem(Globals.prefs.get(JabRefPreferences.ID_ENTRY_GENERATOR));
 
         generateButton.addActionListener(action -> {
             fetcherWorker.execute();
@@ -216,7 +216,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
         constraints.fill = GridBagConstraints.NONE;
         jPanel.add(generateButton, constraints);
 
-        jPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("ID-based_entry_generator")));
+        jPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("ID-based entry generator")));
 
         SwingUtilities.invokeLater(() -> idTextField.requestFocus());
 
@@ -287,7 +287,10 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                 generateButton.setEnabled(false);
                 generateButton.setText(Localization.lang("Searching..."));
             });
+
+            Globals.prefs.put(JabRefPreferences.ID_ENTRY_GENERATOR,String.valueOf(comboBox.getSelectedItem()));
             searchID = idTextField.getText().trim();
+            searchID = searchID.replaceAll(" ", "");
             fetcher = WebFetchers.getIdBasedFetchers(Globals.prefs.getImportFormatPreferences()).get(comboBox.getSelectedIndex());
             if (!searchID.isEmpty()) {
                 try {
@@ -319,7 +322,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                         diag.toFront();
                     } else {
                 		// Regenerate CiteKey of imported BibEntry
-                        BibtexKeyPatternUtil.makeAndSetLabel(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern(), frame.getCurrentBasePanel().getDatabase(), bibEntry, Globals.prefs.getBibtexKeyPatternPreferences());
+                        new BibtexKeyGenerator(frame.getCurrentBasePanel().getBibDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(bibEntry);
                         // Update Timestamps
                         if (Globals.prefs.getTimestampPreferences().includeCreatedTimestamp()) {
                             bibEntry.setField(Globals.prefs.getTimestampPreferences().getTimestampField(), Globals.prefs.getTimestampPreferences().now());
@@ -331,7 +334,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                 } else if (searchID.trim().isEmpty()) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("The given search ID was empty."), Localization.lang("Empty search ID"), JOptionPane.WARNING_MESSAGE);
                 } else if (!fetcherException) {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(frame,
                             Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage,

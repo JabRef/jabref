@@ -1,5 +1,6 @@
 package org.jabref.gui.groups;
 
+import java.util.Collections;
 import java.util.List;
 
 import javafx.application.Platform;
@@ -16,8 +17,8 @@ import org.jabref.gui.SidePaneManager;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.MainTableDataModel;
+import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.groups.GroupTreeNode;
@@ -62,9 +63,7 @@ public class GroupSidePane extends SidePaneComponent {
 
         this.frame = frame;
 
-        this.setTitle(Localization.lang("Groups"));
-
-        JFXPanel groupsPane = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+        JFXPanel groupsPane = CustomJFXPanel.create();
 
         add(groupsPane);
         // Execute on JavaFX Application Thread
@@ -85,8 +84,8 @@ public class GroupSidePane extends SidePaneComponent {
 
     private void updateShownEntriesAccordingToSelectedGroups(List<GroupTreeNode> selectedGroups) {
         if ((selectedGroups == null) || selectedGroups.isEmpty()) {
-            // No selected group, nothing to do
-            return;
+            // No selected group, show all entries
+            selectedGroups = Collections.singletonList(new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup()));
         }
 
         final MatcherSet searchRules = MatcherSets.build(

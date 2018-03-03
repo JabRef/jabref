@@ -4,6 +4,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.undo.UndoManager;
+
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
@@ -20,19 +22,19 @@ import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FieldEditors {
 
-    private static final Log LOGGER = LogFactory.getLog(FieldEditors.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FieldEditors.class);
 
-    public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, JabRefPreferences preferences, BibDatabaseContext databaseContext, String entryType, SuggestionProviders suggestionProviders) {
+    public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, JabRefPreferences preferences, BibDatabaseContext databaseContext, String entryType, SuggestionProviders suggestionProviders, UndoManager undoManager) {
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 
         AutoCompleteSuggestionProvider<?> suggestionProvider = getSuggestionProvider(fieldName, suggestionProviders, databaseContext.getMetaData());
 
-        FieldCheckers fieldCheckers = new FieldCheckers(databaseContext, preferences.getFileDirectoryPreferences());
+        FieldCheckers fieldCheckers = new FieldCheckers(databaseContext, preferences.getFileDirectoryPreferences(), journalAbbreviationLoader.getRepository(journalAbbreviationPreferences), preferences.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
 
         if (preferences.getTimestampPreferences().getTimestampField().equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
             if (fieldExtras.contains(FieldProperty.ISO_DATE)) {
@@ -51,20 +53,20 @@ public class FieldEditors {
         } else if (fieldExtras.contains(FieldProperty.FILE_EDITOR)) {
             return new LinkedFilesEditor(fieldName, dialogService, databaseContext, taskExecutor, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
-            return new OptionEditor<>(fieldName, new YesNoEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
+            return new OptionEditor<>(new YesNoEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
         } else if (fieldExtras.contains(FieldProperty.MONTH)) {
-            return new OptionEditor<>(fieldName, new MonthEditorViewModel(fieldName, suggestionProvider, databaseContext.getMode(), fieldCheckers));
+            return new OptionEditor<>(new MonthEditorViewModel(fieldName, suggestionProvider, databaseContext.getMode(), fieldCheckers));
         } else if (fieldExtras.contains(FieldProperty.GENDER)) {
-            return new OptionEditor<>(fieldName, new GenderEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
+            return new OptionEditor<>(new GenderEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
         } else if (fieldExtras.contains(FieldProperty.EDITOR_TYPE)) {
-            return new OptionEditor<>(fieldName, new EditorTypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
+            return new OptionEditor<>(new EditorTypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
         } else if (fieldExtras.contains(FieldProperty.PAGINATION)) {
-            return new OptionEditor<>(fieldName, new PaginationEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
+            return new OptionEditor<>(new PaginationEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
         } else if (fieldExtras.contains(FieldProperty.TYPE)) {
             if ("patent".equalsIgnoreCase(entryType)) {
-                return new OptionEditor<>(fieldName, new PatentTypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
+                return new OptionEditor<>(new PatentTypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
             } else {
-                return new OptionEditor<>(fieldName, new TypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
+                return new OptionEditor<>(new TypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
             }
         } else if (fieldExtras.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldExtras.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
             return new LinkedEntriesEditor(fieldName, databaseContext, suggestionProvider, fieldCheckers);
@@ -72,6 +74,10 @@ public class FieldEditors {
             return new PersonsEditor(fieldName, suggestionProvider, preferences, fieldCheckers);
         } else if (FieldName.KEYWORDS.equals(fieldName)) {
             return new KeywordsEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
+        } else if (fieldExtras.contains(FieldProperty.MULTILINE_TEXT)) {
+            return new MultilineEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
+        } else if (fieldExtras.contains(FieldProperty.KEY)) {
+            return new BibtexKeyEditor(fieldName, preferences, suggestionProvider, fieldCheckers, preferences.getBibtexKeyPatternPreferences(), databaseContext, undoManager);
         }
 
         // default

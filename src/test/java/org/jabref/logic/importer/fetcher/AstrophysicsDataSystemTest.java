@@ -10,25 +10,23 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.jabref.logic.util.OS.NEWLINE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Category(FetcherTests.class)
+@FetcherTest
 public class AstrophysicsDataSystemTest {
 
     private AstrophysicsDataSystem fetcher;
     private BibEntry diezSliceTheoremEntry, famaeyMcGaughEntry, sunWelchEntry, xiongSunEntry, ingersollPollardEntry, luceyPaulEntry;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(
@@ -49,21 +47,21 @@ public class AstrophysicsDataSystemTest {
         diezSliceTheoremEntry.setField("primaryclass", "math-ph");
         diezSliceTheoremEntry.setField("url", "http://adsabs.harvard.edu/abs/2014arXiv1405.2249D");
         diezSliceTheoremEntry.setField("abstract",
-                "A general slice theorem for the action of a Fr$\\backslash$'echet Lie group on a" + NEWLINE
-                        + "Fr$\\backslash$'echet manifolds is established. The Nash-Moser theorem provides the" + NEWLINE
-                        + "fundamental tool to generalize the result of Palais to this" + NEWLINE
-                        + "infinite-dimensional setting. The presented slice theorem is illustrated" + NEWLINE
-                        + "by its application to gauge theories: the action of the gauge" + NEWLINE
-                        + "transformation group admits smooth slices at every point and thus the" + NEWLINE
-                        + "gauge orbit space is stratified by Fr$\\backslash$'echet manifolds. Furthermore, a" + NEWLINE
-                        + "covariant and symplectic formulation of classical field theory is" + NEWLINE
-                        + "proposed and extensively discussed. At the root of this novel framework" + NEWLINE
-                        + "is the incorporation of field degrees of freedom F and spacetime M into" + NEWLINE
-                        + "the product manifold F * M. The induced bigrading of differential forms" + NEWLINE
-                        + "is used in order to carry over the usual symplectic theory to this new" + NEWLINE
-                        + "setting. The examples of the Klein-Gordon field and general Yang-Mills" + NEWLINE
-                        + "theory illustrate that the presented approach conveniently handles the" + NEWLINE
-                        + "occurring symmetries." + NEWLINE);
+                "A general slice theorem for the action of a Fr$\\backslash$'echet Lie group on a "
+                        + "Fr$\\backslash$'echet manifolds is established. The Nash-Moser theorem provides the "
+                        + "fundamental tool to generalize the result of Palais to this "
+                        + "infinite-dimensional setting. The presented slice theorem is illustrated "
+                        + "by its application to gauge theories: the action of the gauge "
+                        + "transformation group admits smooth slices at every point and thus the "
+                        + "gauge orbit space is stratified by Fr$\\backslash$'echet manifolds. Furthermore, a "
+                        + "covariant and symplectic formulation of classical field theory is "
+                        + "proposed and extensively discussed. At the root of this novel framework "
+                        + "is the incorporation of field degrees of freedom F and spacetime M into "
+                        + "the product manifold F * M. The induced bigrading of differential forms "
+                        + "is used in order to carry over the usual symplectic theory to this new "
+                        + "setting. The examples of the Klein-Gordon field and general Yang-Mills "
+                        + "theory illustrate that the presented approach conveniently handles the "
+                        + "occurring symmetries.");
 
         famaeyMcGaughEntry = new BibEntry();
         famaeyMcGaughEntry.setType(BiblatexEntryTypes.ARTICLE);

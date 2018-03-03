@@ -1,6 +1,7 @@
 # This file lists all individuals having contributed content to the repository.
 # For how it is generated, see `scripts/generate-authors.sh`.
 Aaron Chen
+Abhishek Rai
 Adam Rehn
 Admir Obralija
 Adrian Daerr
@@ -19,7 +20,11 @@ Anh Nghia Tran
 Anita Armbruster
 Antonio Ribeiro
 Arno Blouin
+Bartosz J. Kaczkowski
+Bartłomiej Dach
 Behrouz Javanmardi
+Benjamin Köhler
+Berk Gureken
 Bernd Kalbfuss
 Bernhard Tempel
 Brian Quistorff
@@ -41,14 +46,19 @@ Daniel Svärd
 David Gleich
 David Weitzman
 Dennis Tschechlov
+Domenico Cufalo
+Dominik Traczyk
 Dominik Waßenhoven
 Douglas Nassif Roma Junior
 Eduard Braun
 Eduardo Greco
 Egon Willighagen
 Ellen Reitmayr
+Erdem Derebasoglu
+Erdem Derebaşoğlu
 Erik Putrycz
 Ervin Kolenovic
+Ethan Harris
 Fabian Bauer
 Fabian Bieker
 Fabrice Dessaint
@@ -79,6 +89,7 @@ Jeff Kerr
 Jeff Miller
 Jeffrey Kuhn
 Jens Döcke
+Johannes Manner
 John David
 John Relph
 John Zedlewski
@@ -86,6 +97,8 @@ Jonathan Powell
 Jong-Ho Shinn
 Jorge Tornero
 Joshua Ramon Enslin
+Julian Pfeifer
+József Pallagi
 Jörg Lenhard
 Jörg Wegner
 Jörg Zieren
@@ -113,12 +126,14 @@ Martin Kähmer
 Martin Stolle
 Mathias Walter
 Matthias Geiger
+Mattia Bunel
 Mattias Ulbrich
 mcmoody
 Meltem Demirköprü
 Michael
 Michael Beckmann
 Michael Falkenthal
+Michael Lass
 Michael Spiegel
 Michael Wrighton
 Michel Baylac
@@ -139,6 +154,7 @@ Oliver Beckmann
 Oliver Kopp
 Oscar Gustafsson
 Owen Huang
+Patrick Scheibe
 Paul Martin
 payload
 Peter Ansell
@@ -146,6 +162,7 @@ Philip Johnson
 Predrag Milanovic
 Raik Nagel
 Renato Massao
+Richard Schneeman
 Robert Jäschke
 Rolf Starre
 Rudolf Seemann
@@ -158,6 +175,7 @@ Sascha Hunold
 Sascha Zeller
 Saulius Gražulis
 Saverio Mori
+Scott Pogatetz
 Scott Townsend
 Seb Wills
 Shitikanth
@@ -170,6 +188,7 @@ Stefan Robert
 Stefano Gariazzo
 Stephan Lau
 Stephan Rave
+Stéphane Curet
 Sven Jäger
 The Gitter Badger
 Thiago Toledo
@@ -177,7 +196,9 @@ Thomas Arildsen
 Thomas Ilsche
 Thorsten Dahlheimer
 Tim van Rossum
+Tim Würtele
 Tobias Boceck
+Tobias Bouschen
 Tobias Denkinger
 Tobias Diez
 tokkot
@@ -188,6 +209,7 @@ Ulrich Stärk
 Ulrik Stervbo
 Uwe Kuehn
 Vincent W. Yang
+Waida Fan
 Waluyo Adi Siswanto
 Ward Poelmans
 Wenbo Yang
@@ -196,3 +218,4 @@ Yang Zongze
 Yara Grassi Gouffon
 Yifan Peng
 zacmks
+Zhang Liang

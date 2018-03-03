@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import org.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
@@ -26,14 +26,10 @@ import org.jabref.model.entry.Month;
  * Documentation about ISI WOS format:
  * <p>
  * <ul>
- * <li>http://wos.isitrial.com/help/helpprn.html</li>
+ * <li>https://web.archive.org/web/20131031052339/http://wos.isitrial.com/help/helpprn.html</li>
  * </ul>
  * <p>
  * <ul>
- * <li>Check compatibility with other ISI2Bib tools like:
- * http://www-lab.imr.tohoku.ac.jp/~t-nissie/computer/software/isi/ or
- * http://www.tug.org/tex-archive/biblio/bibtex/utils/isi2bibtex/isi2bibtex or
- * http://web.mit.edu/emilio/www/utils.html</li>
  * <li>Deal with capitalization correctly</li>
  * </ul>
  */
@@ -51,8 +47,8 @@ public class IsiImporter extends Importer {
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return FileExtensions.ISI;
+    public FileType getFileType() {
+        return FileType.ISI;
     }
 
     @Override
@@ -330,8 +326,7 @@ public class IsiImporter extends Importer {
     }
 
     private static String parsePages(String value) {
-        int lastDash = value.lastIndexOf('-');
-        return value.substring(0, lastDash) + "--" + value.substring(lastDash + 1);
+        return value.replace("-", "--");
     }
 
     public static String parseMonth(String value) {

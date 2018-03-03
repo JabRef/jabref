@@ -10,7 +10,7 @@ cd "$(dirname "$(readlink -f "$BASH_SOURCE")")/.."
 	# For how it is generated, see `scripts/generate-authors.sh`.
 	EOF
 
-	# old manual entries 
+	# old manual entries
 	read -d '' authors <<-"EOF" || true
 	Michel Baylac
 	Cyrille d'Haese
@@ -54,7 +54,10 @@ cd "$(dirname "$(readlink -f "$BASH_SOURCE")")/.."
 	Bernhard Tempel
 	EOF
 
-	# %aN = author name, %aE = author email
-	echo -e "$authors\n$(git log --format='%aN')" | LC_ALL=C.UTF-8 sort --unique --ignore-case
+    # authors %aN = author name
+
+    # co-authors
+    coauthors=$(git log --grep=Co-authored  | grep "Co-au" | sed "s/.*Co-authored-by: \(.*\) <.*/\1/")
+	echo -e "$authors\n$(git log --format='%aN')\n$coauthors" | LC_ALL=C.UTF-8 sort --unique --ignore-case
 } > AUTHORS
 

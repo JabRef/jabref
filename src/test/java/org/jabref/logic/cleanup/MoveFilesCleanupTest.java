@@ -109,7 +109,7 @@ public class MoveFilesCleanupTest {
         LinkedFile fileField = new LinkedFile("", fileBefore.getAbsolutePath(), "");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
-        cleanup = new MoveFilesCleanup(databaseContext, "\\EntryType", fileDirPrefs,
+        cleanup = new MoveFilesCleanup(databaseContext, "[entrytype]", fileDirPrefs,
                 mock(LayoutFormatterPreferences.class));
         cleanup.cleanup(entry);
 
@@ -121,5 +121,60 @@ public class MoveFilesCleanupTest {
         assertEquals(Optional
                 .of(FileFieldWriter.getStringRepresentation(new LinkedFile("", relativefileDir.toString(), ""))),
                 entry.getField("file"));
+    }
+
+    @Test
+    public void movesFileFromSubfolderWithSubdirPattern() throws IOException {
+        BibEntry local_entry = (BibEntry) entry.clone();
+        local_entry.setField("year", "1989");
+        File subfolder = bibFolder.newFolder();
+        File fileBefore = new File(subfolder, "test.pdf");
+
+        assertTrue(fileBefore.createNewFile());
+        assertTrue(new File(subfolder, "test.pdf").exists());
+
+        LinkedFile fileField = new LinkedFile("", fileBefore.getAbsolutePath(), "");
+        local_entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
+
+        cleanup = new MoveFilesCleanup(databaseContext, "[year]", fileDirPrefs,
+                mock(LayoutFormatterPreferences.class));
+        cleanup.cleanup(local_entry);
+
+        assertFalse(fileBefore.exists());
+        Path after = pdfFolder.toPath().resolve("1989").resolve("test.pdf");
+        Path relativefileDir = pdfFolder.toPath().relativize(after);
+        assertTrue(Files.exists(after));
+
+        assertEquals(Optional
+                .of(FileFieldWriter.getStringRepresentation(new LinkedFile("", relativefileDir.toString(), ""))),
+                local_entry.getField("file"));
+    }
+
+    @Test
+    public void movesFileFromSubfolderWithDeepSubdirPattern() throws IOException {
+        BibEntry local_entry = (BibEntry) entry.clone();
+        local_entry.setField("year", "1989");
+        local_entry.setField("author", "O. Kitsune");
+        File subfolder = bibFolder.newFolder();
+        File fileBefore = new File(subfolder, "test.pdf");
+
+        assertTrue(fileBefore.createNewFile());
+        assertTrue(new File(subfolder, "test.pdf").exists());
+
+        LinkedFile fileField = new LinkedFile("", fileBefore.getAbsolutePath(), "");
+        local_entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
+
+        cleanup = new MoveFilesCleanup(databaseContext, "[entrytype]/[year]/[auth]", fileDirPrefs,
+                mock(LayoutFormatterPreferences.class));
+        cleanup.cleanup(local_entry);
+
+        assertFalse(fileBefore.exists());
+        Path after = pdfFolder.toPath().resolve("Misc").resolve("1989").resolve("Kitsune").resolve("test.pdf");
+        Path relativefileDir = pdfFolder.toPath().relativize(after);
+        assertTrue(Files.exists(after));
+
+        assertEquals(Optional
+                .of(FileFieldWriter.getStringRepresentation(new LinkedFile("", relativefileDir.toString(), ""))),
+                local_entry.getField("file"));
     }
 }

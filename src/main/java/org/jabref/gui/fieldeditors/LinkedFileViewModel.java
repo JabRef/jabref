@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.swing.SwingUtilities;
+import javax.xml.transform.TransformerException;
 
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
@@ -27,38 +28,57 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntryEditor;
+import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.metadata.FileDirectoryPreferences;
 
 import de.jensd.fx.glyphs.GlyphIcons;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static javafx.scene.control.ButtonBar.ButtonData;
 
 public class LinkedFileViewModel extends AbstractViewModel {
 
-    private static final Log LOGGER = LogFactory.getLog(LinkedFileViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileViewModel.class);
 
     private final LinkedFile linkedFile;
     private final BibDatabaseContext databaseContext;
     private final DoubleProperty downloadProgress = new SimpleDoubleProperty(-1);
     private final BooleanProperty downloadOngoing = new SimpleBooleanProperty(false);
     private final BooleanProperty isAutomaticallyFound = new SimpleBooleanProperty(false);
-
-    private final DialogService dialogService = new FXDialogService();
+    private final BooleanProperty canWriteXMPMetadata = new SimpleBooleanProperty(false);
+    private final DialogService dialogService;
     private final BibEntry entry;
+    private final TaskExecutor taskExecutor;
 
-    public LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext) {
+    public LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
+        this(linkedFile, entry, databaseContext, taskExecutor, new FXDialogService());
+    }
+
+    protected LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext,
+                                  TaskExecutor taskExecutor, DialogService dialogService) {
         this.linkedFile = linkedFile;
         this.databaseContext = databaseContext;
         this.entry = entry;
+        this.taskExecutor = taskExecutor;
+        this.dialogService = dialogService;
 
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(100)));
+        canWriteXMPMetadata.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
+    }
+
+    public BooleanProperty canWriteXMPMetadataProperty() {
+        return canWriteXMPMetadata;
     }
 
     public boolean isAutomaticallyFound() {
@@ -183,6 +203,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
             if (confirm) {
                 Optional<Path> fileConflictCheck = pdfCleanup.findExistingFile(linkedFile, entry);
+
                 performRenameWithConflictCheck(file, pdfCleanup, targetFileName, fileConflictCheck);
             }
         } else {
@@ -260,48 +281,68 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
-    public boolean delete() {
-        Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
-        if (file.isPresent()) {
+    public boolean delete(FileDirectoryPreferences prefs) {
+        Optional<Path> file = linkedFile.findIn(databaseContext, prefs);
 
-            ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"));
-
-            ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
-            Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
-                    Localization.lang("Delete '%0'", file.get().toString()),
-                    Localization.lang("Delete the selected file permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk."),
-                    deleteFromEntry, removeFromEntry, ButtonType.CANCEL);
-
-            if (buttonType.isPresent()) {
-                if (buttonType.get().equals(removeFromEntry)) {
-                    return true;
-                }
-                if (buttonType.get().equals(deleteFromEntry)) {
-
-                    try {
-                        Files.delete(file.get());
-                        return true;
-                    } catch (IOException ex) {
-                        dialogService.showErrorDialogAndWait(
-                                Localization.lang("Cannot delete file"),
-                                Localization.lang("File permission error"));
-                        LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
-                    }
-                }
-            } else {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("File not found"),
-                        Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
-                return true;
-            }
+        if (!file.isPresent()) {
+            LOGGER.warn("Could not find file " + linkedFile.getLink());
+            return true;
         }
 
+        ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"), ButtonData.YES);
+        ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
+        Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
+                Localization.lang("Delete '%0'", file.get().toString()),
+                Localization.lang("Delete the selected file permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk."),
+                removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
+
+        if (buttonType.isPresent()) {
+            if (buttonType.get().equals(removeFromEntry)) {
+                return true;
+            }
+
+            if (buttonType.get().equals(deleteFromEntry)) {
+
+                try {
+                    Files.delete(file.get());
+                    return true;
+                } catch (IOException ex) {
+                    dialogService.showErrorDialogAndWait(
+                            Localization.lang("Cannot delete file"),
+                            Localization.lang("File permission error"));
+                    LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
+                }
+            }
+        }
         return false;
     }
 
     public void edit() {
         FileListEntryEditor editor = new FileListEntryEditor(linkedFile, false, true, databaseContext);
         SwingUtilities.invokeLater(() -> editor.setVisible(true, false));
+    }
 
+    public void writeXMPMetadata() {
+        // Localization.lang("Writing XMP-metadata...")
+        BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {
+            Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
+            if (!file.isPresent()) {
+                // TODO: Print error message
+                // Localization.lang("PDF does not exist");
+            } else {
+                try {
+                    XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), Globals.prefs.getXMPPreferences());
+                } catch (IOException | TransformerException ex) {
+                    // TODO: Print error message
+                    // Localization.lang("Error while writing") + " '" + file.toString() + "': " + ex;
+                }
+            }
+            return null;
+        });
+
+        // Localization.lang("Finished writing XMP-metadata.")
+
+        // TODO: Show progress
+        taskExecutor.execute(writeTask);
     }
 }

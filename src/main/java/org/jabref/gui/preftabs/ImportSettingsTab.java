@@ -23,8 +23,8 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class ImportSettingsTab extends JPanel implements PrefsTab {
 
-    public static final String[] DEFAULT_FILENAMEPATTERNS = new String[] {"\\bibtexkey",
-            "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
+    public static final String[] DEFAULT_FILENAMEPATTERNS = new String[] {"[bibtexkey]",
+            "[bibtexkey] - [title]"};
 
     public static final int DEFAULT_STYLE = ImportDialog.CONTENT;
     private static final String[] DEFAULT_FILENAMEPATTERNS_DISPLAY = new String[] {"bibtexkey", "bibtexkey - title",};
@@ -46,10 +46,10 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 
         setLayout(new BorderLayout());
         FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu");
-        radioButtonNoMeta = new JRadioButton(Localization.lang("Create_blank_entry_linking_the_PDF"));
-        radioButtonXmp = new JRadioButton(Localization.lang("Create_entry_based_on_XMP-metadata"));
-        radioButtonPDFcontent = new JRadioButton(Localization.lang("Create_entry_based_on_content"));
-        radioButtononlyAttachPDF = new JRadioButton(Localization.lang("Only_attach_PDF"));
+        radioButtonNoMeta = new JRadioButton(Localization.lang("Create blank entry linking the PDF"));
+        radioButtonXmp = new JRadioButton(Localization.lang("Create entry based on XMP-metadata"));
+        radioButtonPDFcontent = new JRadioButton(Localization.lang("Create entry based on content"));
+        radioButtononlyAttachPDF = new JRadioButton(Localization.lang("Only attach PDF"));
         ButtonGroup bg = new ButtonGroup();
         bg.add(radioButtonNoMeta);
         bg.add(radioButtonXmp);

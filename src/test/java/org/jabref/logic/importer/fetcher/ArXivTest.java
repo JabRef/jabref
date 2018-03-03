@@ -11,28 +11,24 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Category(FetcherTests.class)
+@FetcherTest
 public class ArXivTest {
 
-    @Rule public ExpectedException expectedException = ExpectedException.none();
     private ArXiv finder;
     private BibEntry entry;
     private BibEntry sliceTheoremPaper;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
@@ -57,10 +53,9 @@ public class ArXivTest {
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void findFullTextRejectsNullParameter() throws IOException {
-        finder.findFullText(null);
-        Assert.fail();
+    @Test
+    public void findFullTextRejectsNullParameter() {
+        assertThrows(NullPointerException.class, () -> finder.findFullText(null));
     }
 
     @Test
@@ -75,7 +70,6 @@ public class ArXivTest {
     @Test
     public void findFullTextByEprint() throws IOException {
         entry.setField("eprint", "1603.06570");
-
         assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), finder.findFullText(entry));
     }
 
@@ -111,14 +105,12 @@ public class ArXivTest {
     @Test
     public void notFindFullTextByUnknownDOI() throws IOException {
         entry.setField("doi", "10.1529/unknown");
-
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
     public void notFindFullTextByUnknownId() throws IOException {
         entry.setField("eprint", "1234.12345");
-
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
@@ -126,7 +118,6 @@ public class ArXivTest {
     public void findFullTextByDOINotAvailableInCatalog() throws IOException {
         entry.setField(FieldName.DOI, "10.1016/0370-2693(77)90015-6");
         entry.setField(FieldName.TITLE, "Superspace formulation of supergravity");
-
 
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
@@ -186,9 +177,7 @@ public class ArXivTest {
 
     @Test
     public void searchWithMalformedIdThrowsException() throws Exception {
-        expectedException.expect(FetcherException.class);
-        expectedException.expectMessage("incorrect id format");
-        finder.performSearchById("123412345");
+        assertThrows(FetcherException.class, () -> finder.performSearchById("123412345"));
     }
 
     @Test

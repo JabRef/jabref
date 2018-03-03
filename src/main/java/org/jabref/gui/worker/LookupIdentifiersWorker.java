@@ -15,12 +15,12 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.Identifier;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LookupIdentifiersWorker<T extends Identifier> extends AbstractWorker {
 
-    private static final Log LOGGER = LogFactory.getLog(LookupIdentifiersWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LookupIdentifiersWorker.class);
     private final JabRefFrame frame;
     private final IdFetcher<T> fetcher;
 

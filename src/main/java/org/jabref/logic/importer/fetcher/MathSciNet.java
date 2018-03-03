@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
@@ -25,6 +26,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 
@@ -50,7 +52,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
      */
     @Override
     public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder("http://www.ams.org/mrlookup");
+        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mrlookup");
         uriBuilder.addParameter("format", "bibtex");
 
         entry.getFieldOrAlias(FieldName.TITLE).ifPresent(title -> uriBuilder.addParameter("ti", title));
@@ -63,7 +65,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
     @Override
     public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder("http://www.ams.org/mathscinet/search/publications.html");
+        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/search/publications.html");
         uriBuilder.addParameter("pg7", "ALLF"); // search all fields
         uriBuilder.addParameter("s7", query); // query
         uriBuilder.addParameter("r", "1"); // start index
@@ -74,7 +76,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
     @Override
     public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder("http://www.ams.org/mathscinet/search/publications.html");
+        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/search/publications.html");
         uriBuilder.addParameter("pg1", "MR"); // search MR number
         uriBuilder.addParameter("s1", identifier); // identifier
         uriBuilder.addParameter("fmt", "bibtex"); // BibTeX format
@@ -91,7 +93,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
                     Collectors.joining(OS.NEWLINE));
 
             List<BibEntry> entries = new ArrayList<>();
-            BibtexParser bibtexParser = new BibtexParser(preferences);
+            BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
             Pattern pattern = Pattern.compile("<pre>(?s)(.*)</pre>");
             Matcher matcher = pattern.matcher(response);
             while (matcher.find()) {
@@ -107,6 +109,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         new MoveFieldCleanup("fjournal", FieldName.JOURNAL).cleanup(entry);
         new MoveFieldCleanup("mrclass", FieldName.KEYWORDS).cleanup(entry);
         new FieldFormatterCleanup("mrreviewer", new ClearFormatter()).cleanup(entry);
+        new DoiCleanup().cleanup(entry);
         new FieldFormatterCleanup(FieldName.URL, new ClearFormatter()).cleanup(entry);
 
         // Remove comments: MathSciNet prepends a <pre> html tag

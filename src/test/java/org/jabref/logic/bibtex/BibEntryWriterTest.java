@@ -12,21 +12,25 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.model.util.FileUpdateMonitor;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class BibEntryWriterTest {
 
     private static ImportFormatPreferences importFormatPreferences;
     private BibEntryWriter writer;
+    private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
-    @Before
+    @BeforeEach
     public void setUpWriter() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         LatexFieldFormatterPreferences latexFieldFormatterPreferences = mock(LatexFieldFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -65,11 +69,11 @@ public class BibEntryWriterTest {
     public void writeOtherTypeTest() throws Exception {
         String expected = OS.NEWLINE + "@Other{test," + OS.NEWLINE +
                 "  comment = {testentry}," + OS.NEWLINE +
-                "}"+ OS.NEWLINE;
+                "}" + OS.NEWLINE;
 
         BibEntry entry = new BibEntry();
         entry.setType("other");
-        entry.setField("Comment","testentry");
+        entry.setField("Comment", "testentry");
         entry.setCiteKey("test");
 
         //write out bibtex string
@@ -84,11 +88,11 @@ public class BibEntryWriterTest {
     public void writeReallyunknownTypeTest() throws Exception {
         String expected = OS.NEWLINE + "@Reallyunknowntype{test," + OS.NEWLINE +
                 "  comment = {testentry}," + OS.NEWLINE +
-                "}"+ OS.NEWLINE;
+                "}" + OS.NEWLINE;
 
         BibEntry entry = new BibEntry();
         entry.setType("ReallyUnknownType");
-        entry.setField("Comment","testentry");
+        entry.setField("Comment", "testentry");
         entry.setCiteKey("test");
 
         //write out bibtex string
@@ -111,7 +115,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -135,7 +139,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -159,7 +163,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -195,7 +199,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -232,7 +236,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(expected));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(expected));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -256,7 +260,6 @@ public class BibEntryWriterTest {
         assertEquals(expectedNewEntry, actual);
     }
 
-
     @Test
     public void roundTripWithAppendedNewlines() throws IOException {
         // @formatter:off
@@ -269,7 +272,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -302,7 +305,7 @@ public class BibEntryWriterTest {
 
     private String testSingleWrite(String bibtexEntry) throws IOException {
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -326,7 +329,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -355,7 +358,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -416,14 +419,14 @@ public class BibEntryWriterTest {
         assertEquals(expected, actual);
     }
 
-    @Test(expected = IOException.class)
-    public void writeThrowsErrorIfFieldContainsUnbalancedBraces() throws IOException {
+    @Test
+    public void writeThrowsErrorIfFieldContainsUnbalancedBraces() {
         StringWriter stringWriter = new StringWriter();
 
         BibEntry entry = new BibEntry("article");
         entry.setField("note", "some text with unbalanced { braces");
 
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        assertThrows(IOException.class, () -> writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -439,7 +442,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -464,7 +467,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 

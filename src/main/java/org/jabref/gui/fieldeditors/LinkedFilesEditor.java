@@ -86,6 +86,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             if (dragboard.hasFiles()) {
                 List<LinkedFileViewModel> linkedFiles = dragboard.getFiles().stream().map(File::toPath).map(viewModel::fromFile).collect(Collectors.toList());
                 items.addAll(linkedFiles);
+                success = true;
             }
             event.setDropCompleted(success);
             event.consume();
@@ -148,6 +149,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     private static Node createFileDisplay(LinkedFileViewModel linkedFile) {
         Text icon = MaterialDesignIconFactory.get().createIcon(linkedFile.getTypeIcon());
+        icon.setOnMouseClicked(event -> linkedFile.open());
         Text link = new Text(linkedFile.getLink());
         Text desc = new Text(linkedFile.getDescription());
 
@@ -161,13 +163,19 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         acceptAutoLinkedFile.setOnAction(event -> linkedFile.acceptAsLinked());
         acceptAutoLinkedFile.getStyleClass().setAll("flatButton");
 
+        Button writeXMPMetadata = MaterialDesignIconFactory.get().createIconButton(MaterialDesignIcon.IMPORT);
+        writeXMPMetadata.setTooltip(new Tooltip(Localization.lang("Write BibTeXEntry as XMP-metadata to PDF.")));
+        writeXMPMetadata.visibleProperty().bind(linkedFile.canWriteXMPMetadataProperty());
+        writeXMPMetadata.setOnAction(event -> linkedFile.writeXMPMetadata());
+        writeXMPMetadata.getStyleClass().setAll("flatButton");
+
         HBox container = new HBox(10);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
 
         if (desc.getText().isEmpty()) {
-            container.getChildren().addAll(icon, link, progressIndicator, acceptAutoLinkedFile);
+            container.getChildren().addAll(icon, link, progressIndicator, acceptAutoLinkedFile, writeXMPMetadata);
         } else {
-            container.getChildren().addAll(icon, desc, link, progressIndicator, acceptAutoLinkedFile);
+            container.getChildren().addAll(icon, desc, link, progressIndicator, acceptAutoLinkedFile, writeXMPMetadata);
         }
 
         return container;

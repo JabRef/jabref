@@ -11,23 +11,25 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class LayoutTest {
+
     private static ImportFormatPreferences importFormatPreferences;
     private LayoutFormatterPreferences layoutFormatterPreferences;
 
     /**
      * Initialize Preferences.
      */
-    @Before
+    @BeforeEach
     public void setUp() {
         layoutFormatterPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -46,9 +48,9 @@ public class LayoutTest {
     }
 
     public static BibEntry bibtexString2BibtexEntry(String s) throws IOException {
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(s));
+        ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(new StringReader(s));
         Collection<BibEntry> c = result.getDatabase().getEntries();
-        Assert.assertEquals(1, c.size());
+        assertEquals(1, c.size());
         return c.iterator().next();
     }
 
@@ -62,9 +64,9 @@ public class LayoutTest {
 
     @Test
     public void testLayoutBibtextype() throws IOException {
-        Assert.assertEquals("Unknown", layout("\\bibtextype", "@unknown{bla, author={This\nis\na\ntext}}"));
-        Assert.assertEquals("Article", layout("\\bibtextype", "@article{bla, author={This\nis\na\ntext}}"));
-        Assert.assertEquals("Misc", layout("\\bibtextype", "@misc{bla, author={This\nis\na\ntext}}"));
+        assertEquals("Unknown", layout("\\bibtextype", "@unknown{bla, author={This\nis\na\ntext}}"));
+        assertEquals("Article", layout("\\bibtextype", "@article{bla, author={This\nis\na\ntext}}"));
+        assertEquals("Misc", layout("\\bibtextype", "@misc{bla, author={This\nis\na\ntext}}"));
     }
 
     @Test
@@ -72,12 +74,12 @@ public class LayoutTest {
         String layoutText = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author} ",
                 "@other{bla, author={This\nis\na\ntext}}");
 
-        Assert.assertEquals("This is a text ", layoutText);
+        assertEquals("This is a text ", layoutText);
 
         layoutText = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author}",
                 "@other{bla, author={This\nis\na\ntext}}");
 
-        Assert.assertEquals("This is a text", layoutText);
+        assertEquals("This is a text", layoutText);
     }
 
     @Test
@@ -85,7 +87,7 @@ public class LayoutTest {
         String layoutText = layout("\\begin{author}\\format[NameFormatter]{\\author}\\end{author}",
                 "@other{bla, author={Joe Doe and Jane, Moon}}");
 
-        Assert.assertEquals("Joe Doe, Moon Jane", layoutText);
+        assertEquals("Joe Doe, Moon Jane", layoutText);
     }
 
     @Test
@@ -93,7 +95,7 @@ public class LayoutTest {
         String layoutText = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author} ",
                 "@other{bla, author={This\nis\na\n\ntext}}");
 
-        Assert.assertEquals("This is a text ", layoutText);
+        assertEquals("This is a text ", layoutText);
     }
 
     /**
@@ -107,7 +109,7 @@ public class LayoutTest {
                 "<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>",
                 t1BibtexString());
 
-        Assert.assertEquals(
+        assertEquals(
                 "<font face=\"arial\"><BR><BR><b>Abstract: </b> &ntilde; &ntilde; &iacute; &imath; &imath;</font>",
                 layoutText);
     }
@@ -121,7 +123,7 @@ public class LayoutTest {
         String layoutText = layout("\\begin{file}\\format[WrapFileLinks(\\i. \\d (\\p))]{\\file}\\end{file}",
                 "@other{bla, file={Test file:encrypted.pdf:PDF}}");
 
-        Assert.assertEquals(
+        assertEquals(
                 "1. Test file (" + new File("src/test/resources/pdfs/encrypted.pdf").getCanonicalPath() + ")",
                 layoutText);
     }

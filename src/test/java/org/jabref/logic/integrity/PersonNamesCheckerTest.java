@@ -2,18 +2,23 @@ package org.jabref.logic.integrity;
 
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PersonNamesCheckerTest {
 
-    PersonNamesChecker checker;
+    private PersonNamesChecker checker;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        checker = new PersonNamesChecker();
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        databaseContext.setMode(BibDatabaseMode.BIBTEX);
+        checker = new PersonNamesChecker(databaseContext);
     }
 
     @Test

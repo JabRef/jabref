@@ -1,36 +1,48 @@
-# <Short Title of the Issue>
+# [short title of solved problem and solution]
 
-**UserStory:** <TICKET/ISSUE-NUMBER>
+User Story: [ticket/issue-number] <!-- optional -->
 
-<WRITE ONE SENTENCE DESCRIBING THE PROBLEM. (Optional)>
+[context and problem statement]
+[decision drivers | forces | facing] <!-- optional -->
 
-## Considered Alternatives
+## Considered Options
 
-* <ALTERNATIVE 1>
-* <ALTERNATIVE 2>
-* <ALTERNATIVE 3>
+* [option 1]
+* [option 2]
+* [option 3]
+* ... <!-- numbers of options can vary -->
 
-## Conclusion
+## Decision Outcome
 
-* *Chosen Alternative: <ALTERNATIVE 1>*
-* <FURTHER RATIONALE (Optional)>
+Chosen option: [option 1], because [justification. e.g., only option, which meets k.o. criterion decision driver | which resolves force force | ... | comes out best (see below)].
 
-## Comparison (Optional)
+Positive Consequences: <!-- optional -->
+  - [e.g., improvement of quality attribute satisfaction, follow-up decisions required, ...]
+  - ...
 
-### <ALTERNATIVE 1>
+Negative consequences: <!-- optional -->
+  - [e.g., compromising quality attribute, follow-up decisions required, ...]
+  - ...
 
-* + <ARGUMENT 1 PRO>
-* + <ARGUMENT 2 PRO>
-* - <ARGUMENT 1 CONTRA>
+## Pros and Cons of the Options <!-- optional -->
 
-### <ALTERNATIVE 2>
+### [option 1]
 
-* + <ARGUMENT 1 PRO>
-* + <ARGUMENT 2 PRO>
-* - <ARGUMENT 1 CONTRA>
+* Good, because [argument a]
+* Good, because [argument b]
+* Bad, because [argument c]
+* ... <!-- numbers of pros and cons can vary -->
 
-### <ALTERNATIVE 3>
+### [option 2]
 
-* + <ARGUMENT 1 PRO>
-* + <ARGUMENT 2 PRO>
-* - <ARGUMENT 1 CONTRA>
+* Good, because [argument a]
+* Good, because [argument b]
+* Bad, because [argument c]
+* ... <!-- numbers of pros and cons can vary -->
+
+### [option 3]
+
+* Good, because [argument a]
+* Good, because [argument b]
+* Bad, because [argument c]
+* ... <!-- numbers of pros and cons can vary -->

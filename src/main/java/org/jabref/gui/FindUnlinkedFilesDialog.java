@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.AbstractAction;
@@ -68,6 +67,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.EntryFromFileCreator;
 import org.jabref.gui.importer.EntryFromFileCreatorManager;
 import org.jabref.gui.importer.UnlinkedFilesCrawler;
@@ -83,8 +83,8 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * GUI Dialog for the feature "Find unlinked files".
@@ -100,7 +100,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
     public static final String ACTION_SHORT_DESCRIPTION = Localization
             .lang("Searches for unlinked PDF files on the file system");
 
-    private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FindUnlinkedFilesDialog.class);
     private static final String GLOBAL_PREFS_WORKING_DIRECTORY_KEY = "findUnlinkedFilesWD";
 
     private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";
@@ -168,7 +168,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
         restoreSizeOfDialog();
 
         databaseContext = panel.getDatabaseContext();
-        creatorManager = new EntryFromFileCreatorManager();
+        creatorManager = new EntryFromFileCreatorManager(ExternalFileTypes.getInstance());
         crawler = new UnlinkedFilesCrawler(databaseContext);
 
         lastSelectedDirectory = loadLastSelectedDirectory();
@@ -973,11 +973,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
         List<FileFilter> fileFilterList = creatorManager.getFileFilterList();
 
-        Vector<FileFilter> vector = new Vector<>();
-        for (FileFilter fileFilter : fileFilterList) {
-            vector.add(fileFilter);
-        }
-        comboBoxFileTypeSelection = new JComboBox<>(vector);
+        comboBoxFileTypeSelection = new JComboBox<>(fileFilterList.toArray(new FileFilter[fileFilterList.size()]));
 
         comboBoxFileTypeSelection.setRenderer(new DefaultListCellRenderer() {
 
@@ -1009,15 +1005,14 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
         Iterator<EntryType> iterator = EntryTypes
                 .getAllValues(frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).iterator();
-        Vector<BibtexEntryTypeWrapper> list = new Vector<>();
+        List<BibtexEntryTypeWrapper> list = new ArrayList<>();
         list.add(
                 new BibtexEntryTypeWrapper(null));
         while (iterator.hasNext()) {
             list.add(new BibtexEntryTypeWrapper(iterator.next()));
         }
-        comboBoxEntryTypeSelection = new JComboBox<>(list);
+        comboBoxEntryTypeSelection = new JComboBox<>(list.toArray(new BibtexEntryTypeWrapper[list.size()]));
     }
-
 
     /**
      * Wrapper for displaying the Type {@link BibtexEntryType} in a Combobox.
@@ -1029,7 +1024,6 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
     private static class BibtexEntryTypeWrapper {
 
         private final EntryType entryType;
-
 
         BibtexEntryTypeWrapper(EntryType bibtexType) {
             this.entryType = bibtexType;
@@ -1052,7 +1046,6 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
         private boolean isSelected;
         private final JCheckBox checkbox;
-
 
         public CheckableTreeNode(Object userObject) {
             super(userObject);
@@ -1133,7 +1126,6 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
         public final File file;
         public final int fileCount;
-
 
         public FileNodeWrapper(File aFile) {
             this(aFile, 0);

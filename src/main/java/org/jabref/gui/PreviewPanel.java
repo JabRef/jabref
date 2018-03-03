@@ -1,184 +1,146 @@
 package org.jabref.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Optional;
+import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.JobName;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.event.HyperlinkEvent;
+import javafx.print.PrinterJob;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.TransferMode;
+import javafx.scene.web.WebView;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
-import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.worker.CitationStyleWorker;
+import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
-import org.jabref.logic.exporter.ExportFormats;
+import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Displays an BibEntry using the given layout format.
  */
-public class PreviewPanel extends JPanel implements SearchQueryHighlightListener, EntryContainer {
+public class PreviewPanel extends ScrollPane implements SearchQueryHighlightListener, EntryContainer {
 
-    private static final Log LOGGER = LogFactory.getLog(PreviewPanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewPanel.class);
 
-    /**
-     * The bibtex entry currently shown
-     */
-    private Optional<BibEntry> bibEntry = Optional.empty();
-
-    /**
-     * If a database is set, the preview will attempt to resolve strings in the
-     * previewed entry using that database.
-     */
-    private Optional<BibDatabaseContext> databaseContext = Optional.empty();
+    private final ClipBoardManager clipBoardManager;
+    private final DialogService dialogService;
+    private final KeyBindingRepository keyBindingRepository;
 
     private Optional<BasePanel> basePanel = Optional.empty();
 
     private boolean fixedLayout;
     private Optional<Layout> layout = Optional.empty();
-    private JEditorPaneWithHighlighting previewPane;
-
-    private final JScrollPane scrollPane;
-
-    private final PrintAction printAction = new PrintAction();
-    private final CloseAction closeAction = new CloseAction();
-    private final CopyPreviewAction copyPreviewAction = new CopyPreviewAction();
-
-    private Optional<Pattern> highlightPattern = Optional.empty();
-    private Optional<CitationStyleWorker> citationStyleWorker = Optional.empty();
-
     /**
-     * @param databaseContext
-     *            (may be null) Optionally used to resolve strings and for resolving pdf directories for links.
-     * @param entry
-     *            (may be null) If given this entry is shown otherwise you have
-     *            to call setEntry to make something visible.
-     * @param panel
-     *            (may be null) If not given no toolbar is shown on the right
-     *            hand side.
+     * The entry currently shown
      */
-    public PreviewPanel(BibDatabaseContext databaseContext, BibEntry entry, BasePanel panel) {
-        this(panel, databaseContext);
-        setEntry(entry);
-    }
+    private Optional<BibEntry> bibEntry = Optional.empty();
 
     /**
-     *
-     * @param panel
-     *            (may be null) If not given no toolbar is shown on the right
-     *            hand side.
-     * @param databaseContext
-     *            (may be null) Used for resolving pdf directories for links.
+     * If a database is set, the preview will attempt to resolve strings in the previewed entry using that database.
+     */
+    private Optional<BibDatabaseContext> databaseContext = Optional.empty();
+    private WebView previewView;
+    private Optional<Future<?>> citationStyleFuture = Optional.empty();
+
+    /**
+     * @param panel           (may be null) Only set this if the preview is associated to the main window.
+     * @param databaseContext (may be null) Used for resolving pdf directories for links.
      */
     public PreviewPanel(BasePanel panel, BibDatabaseContext databaseContext) {
-        super(new BorderLayout(), true);
-
         this.databaseContext = Optional.ofNullable(databaseContext);
         this.basePanel = Optional.ofNullable(panel);
+        this.clipBoardManager = new ClipBoardManager();
+        this.dialogService = new FXDialogService();
+        this.keyBindingRepository = Globals.getKeyPrefs();
 
-        createPreviewPane();
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            // Set up scroll pane for preview pane
+            setFitToHeight(true);
+            setFitToWidth(true);
+            previewView = new WebView();
+            setContent(previewView);
+            previewView.setContextMenuEnabled(false);
+            setContextMenu(createPopupMenu());
 
-        if (this.basePanel.isPresent()) {
-            // dropped files handler only created for main window
-            // not for Windows as like the search results window
-            this.previewPane.setTransferHandler(new PreviewPanelTransferHandler(panel.frame(), this, this.previewPane.getTransferHandler()));
-        }
+            if (this.basePanel.isPresent()) {
+                // Handler for drag content of preview to different window
+                // only created for main window (not for windows like the search results dialog)
+                setOnDragDetected(event -> {
+                            Dragboard dragboard = startDragAndDrop(TransferMode.COPY);
+                            ClipboardContent content = new ClipboardContent();
+                            content.putHtml((String) previewView.getEngine().executeScript("window.getSelection().toString()"));
+                            dragboard.setContent(content);
 
-        // Set up scroll pane for preview pane
-        scrollPane = new JScrollPane(previewPane,
-                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setBorder(null);
-
-        add(scrollPane, BorderLayout.CENTER);
-
-        this.createKeyBindings();
-        updateLayout();
+                            event.consume();
+                        }
+                );
+            }
+            createKeyBindings();
+            updateLayout();
+        });
     }
 
     private void createKeyBindings() {
-        ActionMap actionMap = this.getActionMap();
-        InputMap inputMap = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-
-        final String close = "close";
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), close);
-        actionMap.put(close, this.closeAction);
-
-        final String copy = "copy";
-        getInputMap(JComponent.WHEN_FOCUSED).put(Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW), copy);
-        actionMap.put(copy, this.copyPreviewAction);
-    }
-
-    private JPopupMenu createPopupMenu() {
-        JPopupMenu menu = new JPopupMenu();
-        menu.add(this.printAction);
-        menu.add(this.copyPreviewAction);
-        this.basePanel.ifPresent(p -> menu.add(p.frame().getNextPreviewStyleAction()));
-        this.basePanel.ifPresent(p -> menu.add(p.frame().getPreviousPreviewStyleAction()));
-        return menu;
-    }
-
-    private void createPreviewPane() {
-        previewPane = new JEditorPaneWithHighlighting() {
-            @Override
-            public Dimension getPreferredScrollableViewportSize() {
-                return getPreferredSize();
-            }
-
-        };
-        previewPane.setMargin(new Insets(3, 3, 3, 3));
-
-        previewPane.setComponentPopupMenu(createPopupMenu());
-
-        previewPane.setEditable(false);
-        previewPane.setDragEnabled(true); // this has an effect only, if no custom transfer handler is registered. We keep the statement if the transfer handler is removed.
-        previewPane.setContentType("text/html");
-        previewPane.addHyperlinkListener(hyperlinkEvent -> {
-            if ((hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) && PreviewPanel.this.databaseContext
-                    .isPresent()) {
-                try {
-                    String address = hyperlinkEvent.getURL().toString();
-                    JabRefDesktop.openExternalViewer(PreviewPanel.this.databaseContext.get(), address, FieldName.URL);
-                } catch (IOException e) {
-                    LOGGER.warn("Could not open external viewer", e);
+        addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
+            if (keyBinding.isPresent()) {
+                switch (keyBinding.get()) {
+                    case COPY_PREVIEW:
+                        copyPreviewToClipBoard();
+                        event.consume();
+                        break;
+                    case CLOSE_DIALOG:
+                        close();
+                        event.consume();
+                        break;
+                    default:
                 }
             }
         });
+    }
 
+    private ContextMenu createPopupMenu() {
+        MenuItem copyPreview = new MenuItem(Localization.lang("Copy preview"), IconTheme.JabRefIcon.COPY.getGraphicNode());
+        copyPreview.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.COPY_PREVIEW));
+        copyPreview.setOnAction(event -> copyPreviewToClipBoard());
+        MenuItem printEntryPreview = new MenuItem(Localization.lang("Print entry preview"), IconTheme.JabRefIcon.PRINTED.getGraphicNode());
+        printEntryPreview.setOnAction(event -> print());
+        MenuItem previousPreviewLayout = new MenuItem(Localization.menuTitleFX("Previous preview layout"));
+        previousPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.PREVIOUS_PREVIEW_LAYOUT));
+        previousPreviewLayout.setOnAction(event -> basePanel.ifPresent(BasePanel::previousPreviewStyle));
+        MenuItem nextPreviewLayout = new MenuItem(Localization.menuTitleFX("Next preview layout"));
+        nextPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.NEXT_PREVIEW_LAYOUT));
+        nextPreviewLayout.setOnAction(event -> basePanel.ifPresent(BasePanel::nextPreviewStyle));
+
+        ContextMenu menu = new ContextMenu();
+        menu.getItems().add(copyPreview);
+        menu.getItems().add(printEntryPreview);
+        menu.getItems().add(new SeparatorMenuItem());
+        menu.getItems().add(nextPreviewLayout);
+        menu.getItems().add(previousPreviewLayout);
+        return menu;
     }
 
     public void setDatabaseContext(BibDatabaseContext databaseContext) {
@@ -193,32 +155,33 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         this.basePanel = Optional.ofNullable(basePanel);
     }
 
-    public void updateLayout() {
+    public void updateLayout(PreviewPreferences previewPreferences) {
         if (fixedLayout) {
             LOGGER.debug("cannot change the layout because the layout is fixed");
             return;
         }
 
-        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
         String style = previewPreferences.getPreviewCycle().get(previewPreferences.getPreviewCyclePosition());
 
         if (CitationStyle.isCitationStyleFile(style)) {
             if (basePanel.isPresent()) {
                 layout = Optional.empty();
-                CitationStyle citationStyle = CitationStyle.createCitationStyleFromFile(style);
-                if (citationStyle != null) {
+                CitationStyle.createCitationStyleFromFile(style)
+                        .ifPresent(citationStyle -> {
                     basePanel.get().getCitationStyleCache().setCitationStyle(citationStyle);
                     basePanel.get().output(Localization.lang("Preview style changed to: %0", citationStyle.getTitle()));
-                }
+                        });
             }
         } else {
             updatePreviewLayout(previewPreferences.getPreviewStyle());
-            if (basePanel.isPresent()) {
-                basePanel.get().output(Localization.lang("Preview style changed to: %0", Localization.lang("Preview")));
-            }
+            basePanel.ifPresent(panel -> panel.output(Localization.lang("Preview style changed to: %0", Localization.lang("Preview"))));
         }
 
         update();
+    }
+
+    public void updateLayout() {
+        updateLayout(Globals.prefs.getPreviewPreferences());
     }
 
     private void updatePreviewLayout(String layoutFile) {
@@ -235,21 +198,20 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
 
     public void setLayout(Layout layout) {
         this.layout = Optional.ofNullable(layout);
+        update();
     }
 
     public void setEntry(BibEntry newEntry) {
-
         bibEntry.filter(e -> e != newEntry).ifPresent(e -> e.unregisterListener(this));
         bibEntry = Optional.ofNullable(newEntry);
-        bibEntry.ifPresent(e -> e.registerListener(this));
+        newEntry.registerListener(this);
 
         update();
     }
 
-
     /**
-    * Listener for ChangedFieldEvent.
-    */
+     * Listener for ChangedFieldEvent.
+     */
     @SuppressWarnings("unused")
     @Subscribe
     public void listen(FieldChangedEvent fieldChangedEvent) {
@@ -262,11 +224,11 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
     }
 
     public void update() {
-        ExportFormats.entryNumber = 1; // Set entry number in case that is included in the preview layout.
+        ExporterFactory.entryNumber = 1; // Set entry number in case that is included in the preview layout.
 
-        if (citationStyleWorker.isPresent()) {
-            citationStyleWorker.get().cancel(true);
-            citationStyleWorker = Optional.empty();
+        if (citationStyleFuture.isPresent()) {
+            citationStyleFuture.get().cancel(true);
+            citationStyleFuture = Optional.empty();
         }
 
         if (layout.isPresent()) {
@@ -274,130 +236,70 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
             bibEntry.ifPresent(entry -> sb.append(layout.get()
                     .doLayout(entry, databaseContext.map(BibDatabaseContext::getDatabase).orElse(null))));
             setPreviewLabel(sb.toString());
-            markHighlights();
+        } else if (basePanel.isPresent() && bibEntry.isPresent()) {
+            Future<?> citationStyleWorker = BackgroundTask
+                    .wrap(() -> basePanel.get().getCitationStyleCache().getCitationFor(bibEntry.get()))
+                    .onRunning(() -> {
+                        CitationStyle citationStyle = basePanel.get().getCitationStyleCache().getCitationStyle();
+                        setPreviewLabel("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) +
+                                ": " + citationStyle.getTitle() + " ..." + "</i>");
+                    })
+                    .onSuccess(this::setPreviewLabel)
+                    .onFailure(exception -> {
+                        LOGGER.error("Error while generating citation style", exception);
+                        setPreviewLabel(Localization.lang("Error while generating citation style"));
+                    })
+                    .executeWith(Globals.TASK_EXECUTOR);
+            this.citationStyleFuture = Optional.of(citationStyleWorker);
         }
-        else if (basePanel.isPresent()) {
-            citationStyleWorker = Optional.of(new CitationStyleWorker(this, previewPane));
-            citationStyleWorker.get().execute();
-        }
-
     }
 
-    public void markHighlights() {
-        previewPane.highlightPattern(highlightPattern);
-    }
-
-    public void setPreviewLabel(String text) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            previewPane.setText(text);
-            previewPane.revalidate();
-        } else {
-            SwingUtilities.invokeLater(() -> {
-                previewPane.setText(text);
-                previewPane.revalidate();
-            });
-        }
-        this.scrollToTop();
-    }
-
-    private void scrollToTop() {
-        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(0));
+    private void setPreviewLabel(String text) {
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            previewView.getEngine().loadContent(text);
+            this.setHvalue(0);
+        });
     }
 
     @Override
     public void highlightPattern(Optional<Pattern> newPattern) {
-        this.highlightPattern = newPattern;
+        // TODO: Implement that search phrases are highlighted
         update();
-    }
-
-    public Optional<Pattern> getHighlightPattern() {
-        return highlightPattern;
     }
 
     /**
      * this fixes the Layout, the user cannot change it anymore. Useful for testing the styles in the settings
-     * @param parameter should be either a {@link String} (for the old PreviewStyle) or a {@link CitationStyle}.
+     *
+     * @param layout should be either a {@link String} (for the old PreviewStyle) or a {@link CitationStyle}.
      */
-    public PreviewPanel setFixedLayout(Object parameter) {
+    public void setFixedLayout(String layout) {
         this.fixedLayout = true;
-
-        if (parameter instanceof String) {
-            updatePreviewLayout((String) parameter);
-        } else if (parameter instanceof CitationStyle) {
-            layout = Optional.empty();
-            if (basePanel.isPresent()) {
-                basePanel.get().getCitationStyleCache().setCitationStyle((CitationStyle) parameter);
-            }
-        } else {
-            LOGGER.error("unknown style type");
-        }
-        update();
-        return this;
+        updatePreviewLayout(layout);
     }
 
-    class PrintAction extends AbstractAction {
-        public PrintAction() {
-            super(Localization.lang("Print entry preview"), IconTheme.JabRefIcon.PRINTED.getIcon());
-
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Print entry preview"));
+    public void print() {
+        PrinterJob job = PrinterJob.createPrinterJob();
+        boolean proceed = dialogService.showPrintDialog(job);
+        if (!proceed) {
+            return;
         }
 
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-
-            // Background this, as it takes a while.
-            JabRefExecutorService.INSTANCE.execute(() -> {
-                try {
-                    PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
-                    pras.add(new JobName(bibEntry.flatMap(BibEntry::getCiteKeyOptional).orElse("NO ENTRY"), null));
-                    previewPane.print(null, null, true, null, pras, false);
-
-                } catch (PrinterException e) {
-                    // Inform the user... we don't know what to do.
-                    JOptionPane.showMessageDialog(PreviewPanel.this,
-                            Localization.lang("Could not print preview") + ".\n" + e.getMessage(),
-                            Localization.lang("Print entry preview"), JOptionPane.ERROR_MESSAGE);
-                    LOGGER.info("Could not print preview", e);
-                }
-            });
-        }
+        BackgroundTask.wrap(() -> {
+            job.getJobSettings().setJobName(bibEntry.flatMap(BibEntry::getCiteKeyOptional).orElse("NO ENTRY"));
+            previewView.getEngine().print(job);
+            job.endJob();
+            return null;
+        })
+                .onFailure(exception -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), exception))
+                .executeWith(Globals.TASK_EXECUTOR);
     }
 
     public void close() {
         basePanel.ifPresent(BasePanel::hideBottomComponent);
     }
 
-    class CloseAction extends AbstractAction {
-
-        public CloseAction() {
-            super(Localization.lang("Close window"), IconTheme.JabRefIcon.CLOSE.getSmallIcon());
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close window"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            close();
-        }
+    private void copyPreviewToClipBoard() {
+        String previewContent = (String) previewView.getEngine().executeScript("document.documentElement.outerHTML");
+        clipBoardManager.setClipboardContents(previewContent);
     }
-
-    class CopyPreviewAction extends AbstractAction {
-
-        public CopyPreviewAction() {
-            super(Localization.lang("Copy preview"), IconTheme.JabRefIcon.COPY.getSmallIcon());
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Copy preview"));
-            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            previewPane.selectAll();
-            previewPane.copy();
-            previewPane.select(0, -1);
-        }
-    }
-
-    public PrintAction getPrintAction() {
-        return printAction;
-    }
-
 }

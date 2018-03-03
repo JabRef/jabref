@@ -1,7 +1,7 @@
 package org.jabref.logic.layout.format;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case  that verifies the functionalities of the
@@ -19,7 +19,7 @@ public class AuthorLastFirstAbbreviatorTester {
      */
     @Test
     public void testOneAuthorSimpleName() {
-        Assert.assertEquals("Abbreviator Test", "Lastname, N.", abbreviate("Lastname, Name"));
+        assertEquals("Abbreviator Test", "Lastname, N.", abbreviate("Lastname, Name"));
     }
 
     /**
@@ -29,7 +29,7 @@ public class AuthorLastFirstAbbreviatorTester {
      */
     @Test
     public void testOneAuthorCommonName() {
-        Assert.assertEquals("Abbreviator Test", "Lastname, N. M.", abbreviate("Lastname, Name Middlename"));
+        assertEquals("Abbreviator Test", "Lastname, N. M.", abbreviate("Lastname, Name Middlename"));
     }
 
     /**
@@ -42,20 +42,20 @@ public class AuthorLastFirstAbbreviatorTester {
         String result = abbreviate("Lastname, Name Middlename and Sobrenome, Nome Nomedomeio");
         String expectedResult = "Lastname, N. M. and Sobrenome, N. N.";
 
-        Assert.assertEquals("Abbreviator Test", expectedResult, result);
+        assertEquals("Abbreviator Test", expectedResult, result);
     }
 
     @Test
     public void testJrAuthor() {
-        Assert.assertEquals("Other, Jr., A. N.", abbreviate("Other, Jr., Anthony N."));
+        assertEquals("Other, Jr., A. N.", abbreviate("Other, Jr., Anthony N."));
     }
 
     @Test
     public void testFormat() {
-        Assert.assertEquals("", abbreviate(""));
-        Assert.assertEquals("Someone, V. S.", abbreviate("Someone, Van Something"));
-        Assert.assertEquals("Smith, J.", abbreviate("Smith, John"));
-        Assert.assertEquals("von Neumann, J. and Smith, J. and Black Brown, P.",
+        assertEquals("", abbreviate(""));
+        assertEquals("Someone, V. S.", abbreviate("Someone, Van Something"));
+        assertEquals("Smith, J.", abbreviate("Smith, John"));
+        assertEquals("von Neumann, J. and Smith, J. and Black Brown, P.",
                 abbreviate("von Neumann, John and Smith, John and Black Brown, Peter"));
     }
 

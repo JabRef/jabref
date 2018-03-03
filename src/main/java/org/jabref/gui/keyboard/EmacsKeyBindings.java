@@ -25,8 +25,8 @@ import javax.swing.text.Utilities;
 
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Generic class which activates Emacs keybindings for java input {@link
@@ -35,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
  * The inner class actions can also be used independently.
  */
 public class EmacsKeyBindings {
-    private static final Log LOGGER = LogFactory.getLog(EmacsKeyBindings.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmacsKeyBindings.class);
 
     private static final String KILL_LINE_ACTION = "emacs-kill-line";
 

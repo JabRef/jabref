@@ -6,24 +6,23 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-@Category(FetcherTests.class)
+@FetcherTest
 public class DoiFetcherTest {
 
     private DoiFetcher fetcher;
     private BibEntry bibEntryBurd2011, bibEntryDecker2007;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         fetcher = new DoiFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
@@ -71,15 +70,14 @@ public class DoiFetcherTest {
         assertEquals(Optional.of(bibEntryDecker2007), fetchedEntry);
     }
 
-    @Test(expected = FetcherException.class)
-    public void testPerformSearchEmptyDOI() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("");
-        assertEquals(Optional.empty(), fetchedEntry);
+    @Test
+    public void testPerformSearchEmptyDOI() {
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById(""));
     }
 
-    @Test(expected = FetcherException.class)
-    public void testPerformSearchInvalidDOI() throws FetcherException {
-        fetcher.performSearchById("10.1002/9781118257517F");
-        fail();
+    @Test
+    public void testPerformSearchInvalidDOI() {
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("10.1002/9781118257517F"));
+
     }
 }

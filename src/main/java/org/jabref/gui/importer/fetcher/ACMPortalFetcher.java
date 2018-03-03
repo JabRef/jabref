@@ -37,19 +37,19 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ACMPortalFetcher implements PreviewEntryFetcher {
 
-    private static final Log LOGGER = LogFactory.getLog(ACMPortalFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ACMPortalFetcher.class);
 
-    private static final String START_URL = "http://portal.acm.org/";
+    private static final String START_URL = "https://portal.acm.org/";
     private static final String SEARCH_URL_PART = "results.cfm?query=";
     private static final String SEARCH_URL_PART_II = "&dl=";
     private static final String END_URL = "&coll=Portal&short=0";//&start=";
@@ -87,8 +87,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
 
-    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter(
-            new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences()));
+    private final Formatter protectTermsFormatter = new ProtectTermsFormatter(Globals.protectedTermsLoader);
 
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
     private String terms;
@@ -324,7 +323,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 String htmlCode = in.lines().filter(s -> !s.isEmpty()).collect(Collectors.joining());
                 String bibtexString = htmlCode.substring(htmlCode.indexOf(START_BIBTEX_ENTRY),
                         htmlCode.indexOf(END_BIBTEX_ENTRY_HTML));
-                items = new BibtexParser(Globals.prefs.getImportFormatPreferences()).parseEntries(bibtexString);
+                items = new BibtexParser(Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor()).parseEntries(bibtexString);
 
             } catch (IOException | ParseException e) {
                 LOGGER.info("Download of BibTeX information from ACM Portal failed.", e);

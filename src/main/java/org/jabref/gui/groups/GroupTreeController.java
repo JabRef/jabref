@@ -2,6 +2,7 @@ package org.jabref.gui.groups;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,7 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
@@ -41,16 +43,19 @@ import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.groups.AllEntriesGroup;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.fxmisc.easybind.EasyBind;
+import org.reactfx.util.FxTimer;
+import org.reactfx.util.Timer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GroupTreeController extends AbstractController<GroupTreeViewModel> {
 
-    private static final Log LOGGER = LogFactory.getLog(GroupTreeController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeController.class);
 
     @FXML private TreeTableView<GroupNodeViewModel> groupTree;
     @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
@@ -87,7 +92,13 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                 this::updateSelection
         );
 
-        viewModel.filterTextProperty().bind(searchField.textProperty());
+        // We try to to prevent publishing changes in the search field directly to the search task that takes some time
+        // for larger group structures.
+        final Timer searchTask = FxTimer.create(Duration.ofMillis(400), () -> {
+            LOGGER.debug("Run group search " + searchField.getText());
+            viewModel.filterTextProperty().setValue(searchField.textProperty().getValue());
+        });
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
 
         groupTree.rootProperty().bind(
                 EasyBind.map(viewModel.rootGroupProperty(),
@@ -162,6 +173,17 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
             // Simply setting to null is not enough since it would be replaced by the default node on every change
             row.setDisclosureNode(null);
             row.disclosureNodeProperty().addListener((observable, oldValue, newValue) -> row.setDisclosureNode(null));
+
+            // Opens the group's edit window when the group gets double clicked
+            row.setOnMouseClicked((mouseClickedEvent) -> {
+                if (mouseClickedEvent.getButton().equals(MouseButton.PRIMARY)
+                        && (mouseClickedEvent.getClickCount() == 2)) {
+                    GroupNodeViewModel groupToEdit = row.itemProperty().getValue();
+                    if (groupToEdit != null) {
+                        viewModel.editGroup(groupToEdit);
+                    }
+                }
+            });
 
             // Add context menu (only for non-null items)
             row.contextMenuProperty().bind(
@@ -241,12 +263,12 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
     }
 
     private void updateSelection(List<TreeItem<GroupNodeViewModel>> newSelectedGroups) {
-        if (newSelectedGroups == null) {
+        if (newSelectedGroups == null || newSelectedGroups.isEmpty()) {
             viewModel.selectedGroupsProperty().clear();
         } else {
             List<GroupNodeViewModel> list = new ArrayList<>();
             for (TreeItem<GroupNodeViewModel> model : newSelectedGroups) {
-                if (model != null && model.getValue() != null) {
+                if (model != null && model.getValue() != null && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)) {
                     list.add(model.getValue());
                 }
             }

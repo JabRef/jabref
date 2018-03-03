@@ -9,11 +9,11 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RegExpBasedFileFinderTests {
 
@@ -21,7 +21,7 @@ public class RegExpBasedFileFinderTests {
     private BibDatabase database;
     private BibEntry entry;
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         entry = new BibEntry();
@@ -44,7 +44,7 @@ public class RegExpBasedFileFinderTests {
     }
 
     @Test
-    public void testFindFiles() {
+    public void testFindFiles() throws Exception {
         //given
         BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
         localEntry.setCiteKey("pdfInDatabase");
@@ -64,7 +64,45 @@ public class RegExpBasedFileFinderTests {
     }
 
     @Test
-    public void testFindFileInSubdirectory() {
+    public void testYearAuthFirspageFindFiles() throws Exception {
+        //given
+        List<String> extensions = Collections.singletonList("pdf");
+
+        List<Path> dirs = Collections.singletonList(Paths.get(filesDirectory));
+        RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[year]_[auth]_[firstpage].*\\\\.[extension]", ',');
+
+        //when
+        List<Path> result = fileFinder.findAssociatedFiles(entry, dirs, extensions);
+
+        //then
+        assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2003_Hippel_209.pdf")),
+                result);
+    }
+
+    @Test
+    public void testAuthorWithDiacritics() throws Exception {
+        //given
+        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        localEntry.setCiteKey("Grazulis2017");
+        localEntry.setField("year", "2017");
+        localEntry.setField("author", "Gražulis, Saulius and O. Kitsune");
+        localEntry.setField("pages", "726--729");
+
+        List<String> extensions = Collections.singletonList("pdf");
+
+        List<Path> dirs = Collections.singletonList(Paths.get(filesDirectory));
+        RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[year]_[auth]_[firstpage]\\\\.[extension]", ',');
+
+        //when
+        List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
+
+        //then
+        assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2017_Gražulis_726.pdf")),
+                result);
+    }
+
+    @Test
+    public void testFindFileInSubdirectory() throws Exception {
         //given
         BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
         localEntry.setCiteKey("pdfInSubdirectory");
@@ -84,7 +122,7 @@ public class RegExpBasedFileFinderTests {
     }
 
     @Test
-    public void testFindFileNonRecursive() {
+    public void testFindFileNonRecursive() throws Exception {
         //given
         BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
         localEntry.setCiteKey("pdfInSubdirectory");
@@ -99,34 +137,7 @@ public class RegExpBasedFileFinderTests {
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
 
         //then
-        Assert.assertTrue(result.isEmpty());
-    }
-
-    @Test
-    public void testFieldAndFormat() {
-        assertEquals("Eric von Hippel and Georg von Krogh",
-                RegExpBasedFileFinder.getFieldAndFormat("[author]", entry, database, ','));
-
-        assertEquals("Eric von Hippel and Georg von Krogh",
-                RegExpBasedFileFinder.getFieldAndFormat("author", entry, database, ','));
-
-        assertEquals("", RegExpBasedFileFinder.getFieldAndFormat("[unknownkey]", entry, database,
-                ','));
-
-        assertEquals("", RegExpBasedFileFinder.getFieldAndFormat("[:]", entry, database, ','));
-
-        assertEquals("", RegExpBasedFileFinder.getFieldAndFormat("[:lower]", entry, database,
-                ','));
-
-        assertEquals("eric von hippel and georg von krogh",
-                RegExpBasedFileFinder.getFieldAndFormat("[author:lower]", entry, database,
-                        ','));
-
-        assertEquals("HipKro03", RegExpBasedFileFinder.getFieldAndFormat("[bibtexkey]", entry, database,
-                ','));
-
-        assertEquals("HipKro03", RegExpBasedFileFinder.getFieldAndFormat("[bibtexkey:]", entry, database,
-                ','));
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -150,6 +161,11 @@ public class RegExpBasedFileFinderTests {
 
         assertEquals(
                 "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
+                RegExpBasedFileFinder.expandBrackets("[author] have published [fulltitle] in [journal].", entry, database,
+                        ','));
+
+        assertEquals(
+                "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
                 RegExpBasedFileFinder.expandBrackets("[author] have published [title] in [journal].", entry, database,
                         ','));
     }

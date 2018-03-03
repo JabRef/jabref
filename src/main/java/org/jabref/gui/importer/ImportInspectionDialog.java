@@ -3,7 +3,6 @@ package org.jabref.gui.importer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -48,6 +47,9 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
@@ -59,6 +61,7 @@ import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiles.AutoSetLinks;
 import org.jabref.gui.externalfiles.DownloadExternalFile;
@@ -78,7 +81,7 @@ import org.jabref.gui.util.comparator.IconComparator;
 import org.jabref.gui.util.component.CheckBoxMessage;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportInspector;
 import org.jabref.logic.importer.OutputPrinter;
@@ -115,8 +118,8 @@ import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dialog to allow the selection of entries as part of an Import.
@@ -142,7 +145,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class ImportInspectionDialog extends JabRefDialog implements ImportInspector, OutputPrinter {
 
-    private static final Log LOGGER = LogFactory.getLog(ImportInspectionDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportInspectionDialog.class);
     private static final List<String> INSPECTION_FIELDS = Arrays.asList(FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, BibEntry.KEY_FIELD);
     private static final int DUPL_COL = 1;
     private static final int FILE_COL = 2;
@@ -170,7 +173,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
     private final JButton deselectAllDuplicates = new JButton(Localization.lang("Deselect all duplicates"));
     private final JButton stop = new JButton(Localization.lang("Stop"));
     private final PreviewPanel preview;
-    private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
     private final Map<BibEntry, Set<GroupTreeNode>> groupAdditions = new HashMap<>();
     private final JCheckBox autoGenerate = new JCheckBox(Localization.lang("Generate keys"),
             Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION));
@@ -230,7 +232,8 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         centerPan.setLayout(new BorderLayout());
 
         contentPane.setTopComponent(new JScrollPane(glTable));
-        contentPane.setBottomComponent(preview);
+        JFXPanel container = CustomJFXPanel.wrap(new Scene(preview));
+        contentPane.setBottomComponent(container);
 
         centerPan.add(contentPane, BorderLayout.CENTER);
         centerPan.add(progressBar, BorderLayout.SOUTH);
@@ -453,10 +456,8 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             database.insertEntry(entry);
 
             // Generate a unique key:
-            BibtexKeyPatternUtil.makeAndSetLabel(
-                    localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
-                    database, entry,
-                    Globals.prefs.getBibtexKeyPatternPreferences());
+            new BibtexKeyGenerator(localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                    database, Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(entry);
             // Remove the entry from the database again, since we only added it in
             // order to
             // make sure the key was unique:
@@ -497,16 +498,13 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 entry.setId(IdGenerator.next());
                 database.insertEntry(entry);
 
-                BibtexKeyPatternUtil.makeAndSetLabel(
-                        localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
-                        database, entry,
-                        Globals.prefs.getBibtexKeyPatternPreferences());
+                new BibtexKeyGenerator(localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                        database, Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(entry);
                 // Add the generated key to our list:   -- TODO: Why??
                 keys.add(entry.getCiteKeyOptional());
             }
 
             preview.update();
-            preview.repaint();
             // Remove the entries from the database again, since they are not
             // supposed to
             // added yet. They only needed to be in it while we generated the keys,
@@ -956,7 +954,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             if (listEvent.getSourceList().size() == 1) {
                 preview.setEntry(listEvent.getSourceList().get(0));
                 contentPane.setDividerLocation(0.5f);
-                SwingUtilities.invokeLater(() -> preview.scrollRectToVisible(toRect));
             }
         }
     }
@@ -1294,7 +1291,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             // links:
             JDialog diag = new JDialog(ImportInspectionDialog.this, true);
             JabRefExecutorService.INSTANCE
-                    .execute(AutoSetLinks.autoSetLinks(entry, localModel, bibDatabaseContext, e -> {
+                    .execute(AutoSetLinks.autoSetLinks(entry, bibDatabaseContext, e -> {
                         if (e.getID() > 0) {
 
                             entries.getReadWriteLock().writeLock().lock();

@@ -1,9 +1,9 @@
 package org.jabref.model.entry;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -11,13 +11,13 @@ import java.util.stream.Collectors;
  */
 public abstract class BibtexEntryType implements EntryType {
 
-    private final List<String> requiredFields;
-    private final List<String> optionalFields;
+    private final Set<String> requiredFields;
+    private final Set<String> optionalFields;
 
 
     public BibtexEntryType() {
-        requiredFields = new ArrayList<>();
-        optionalFields = new ArrayList<>();
+        requiredFields = new LinkedHashSet<>();
+        optionalFields = new LinkedHashSet<>();
     }
 
     void addAllOptional(String... fieldNames) {
@@ -29,13 +29,13 @@ public abstract class BibtexEntryType implements EntryType {
     }
 
     @Override
-    public List<String> getOptionalFields() {
-        return Collections.unmodifiableList(optionalFields);
+    public Set<String> getOptionalFields() {
+        return Collections.unmodifiableSet(optionalFields);
     }
 
     @Override
-    public List<String> getRequiredFields() {
-        return Collections.unmodifiableList(requiredFields);
+    public Set<String> getRequiredFields() {
+        return Collections.unmodifiableSet(requiredFields);
     }
 
     @Override
@@ -44,13 +44,13 @@ public abstract class BibtexEntryType implements EntryType {
     }
 
     @Override
-    public List<String> getPrimaryOptionalFields() {
+    public Set<String> getPrimaryOptionalFields() {
         return getOptionalFields();
     }
 
     @Override
-    public List<String> getSecondaryOptionalFields() {
-        return getOptionalFields().stream().filter(field -> !isPrimary(field)).collect(Collectors.toList());
+    public Set<String> getSecondaryOptionalFields() {
+        return getOptionalFields().stream().filter(field -> !isPrimary(field)).collect(Collectors.toSet());
     }
 
     private boolean isPrimary(String field) {

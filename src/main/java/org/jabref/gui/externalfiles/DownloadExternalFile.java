@@ -26,8 +26,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class handles the download of an external file. Typically called when the user clicks
@@ -43,7 +43,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DownloadExternalFile {
 
-    private static final Log LOGGER = LogFactory.getLog(DownloadExternalFile.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadExternalFile.class);
 
     private final JabRefFrame frame;
     private final BibDatabaseContext databaseContext;
@@ -310,8 +310,7 @@ public class DownloadExternalFile {
 
     private String getSuggestedFileName(String suffix) {
         String plannedName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry,
-                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader));
+                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
 
         if (!suffix.isEmpty()) {
             plannedName += "." + suffix;

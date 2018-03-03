@@ -195,8 +195,9 @@ public class IntegrityCheckTest {
     @Test
     public void testAbbreviationChecks() {
         for (String field : Arrays.asList("booktitle", "journal")) {
-            assertCorrect(createContext(field, "IEEE SW"));
-            assertWrong(createContext(field, "Proc. of the"));
+            assertCorrect(createContext(field, "IEEE Software"));
+            assertCorrect(createContext(field, ""));
+            assertWrong(createContext(field, "IEEE SW"));
         }
     }
 
@@ -340,7 +341,7 @@ public class IntegrityCheckTest {
         new IntegrityCheck(context,
                 mock(FileDirectoryPreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")))
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true)
                 .checkBibtexDatabase();
 
         assertEquals(clonedEntry, entry);
@@ -378,7 +379,7 @@ public class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FileDirectoryPreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")))
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true)
                 .checkBibtexDatabase();
         assertFalse(messages.toString(), messages.isEmpty());
     }
@@ -387,8 +388,8 @@ public class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FileDirectoryPreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW"))
-                ).checkBibtexDatabase();
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true
+        ).checkBibtexDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
 

@@ -37,9 +37,10 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.util.FileUpdateMonitor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for importing BibTeX-files.
@@ -58,7 +59,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class BibtexParser implements Parser {
 
-    private static final Log LOGGER = LogFactory.getLog(BibtexParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
     private static final Integer LOOKAHEAD = 64;
     private final FieldContentParser fieldContentParser;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
@@ -69,23 +70,12 @@ public class BibtexParser implements Parser {
     private boolean eof;
     private int line = 1;
     private ParserResult parserResult;
+    private MetaDataParser metaDataParser;
 
-
-    public BibtexParser(ImportFormatPreferences importFormatPreferences) {
+    public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
         fieldContentParser = new FieldContentParser(importFormatPreferences.getFieldContentParserPreferences());
-    }
-
-    /**
-     * Shortcut usage to create a Parser and read the input.
-     *
-     * @param in the Reader to read from
-     * @throws IOException
-     * @deprecated inline this method
-     */
-    @Deprecated
-    public static ParserResult parse(Reader in, ImportFormatPreferences importFormatPreferences) throws IOException {
-        return new BibtexParser(importFormatPreferences).parse(in);
+        metaDataParser = new MetaDataParser(fileMonitor);
     }
 
     /**
@@ -94,12 +84,12 @@ public class BibtexParser implements Parser {
      * It is undetermined which entry is returned, so use this in case you know there is only one entry in the string.
      *
      * @param bibtexString
+     * @param fileMonitor
      * @return An Optional<BibEntry>. Optional.empty() if non was found or an error occurred.
      * @throws ParseException
      */
-    public static Optional<BibEntry> singleFromString(String bibtexString,
-            ImportFormatPreferences importFormatPreferences) throws ParseException {
-        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexString);
+    public static Optional<BibEntry> singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) throws ParseException {
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences, fileMonitor).parseEntries(bibtexString);
         if ((entries == null) || entries.isEmpty()) {
             return Optional.empty();
         }
@@ -122,6 +112,10 @@ public class BibtexParser implements Parser {
 
     public List<BibEntry> parseEntries(String bibtexString) throws ParseException {
         return parseEntries(new StringReader(bibtexString));
+    }
+
+    public Optional<BibEntry> parseSingleEntry(String bibtexString) throws ParseException {
+        return parseEntries(bibtexString).stream().findFirst();
     }
 
     /**
@@ -214,7 +208,7 @@ public class BibtexParser implements Parser {
 
         // Instantiate meta data:
         try {
-            parserResult.setMetaData(MetaDataParser.parse(meta, importFormatPreferences.getKeywordSeparator()));
+            parserResult.setMetaData(metaDataParser.parse(meta, importFormatPreferences.getKeywordSeparator()));
         } catch (ParseException exception) {
             parserResult.addException(exception);
         }

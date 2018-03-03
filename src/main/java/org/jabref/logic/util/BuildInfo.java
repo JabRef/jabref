@@ -21,6 +21,8 @@ public class BuildInfo {
     private final String developers;
     private final String year;
     private final String azureInstrumentationKey;
+    private final String minRequiredJavaVersion;
+    private final boolean allowJava9;
 
 
     public BuildInfo() {
@@ -45,6 +47,8 @@ public class BuildInfo {
         year = properties.getProperty("year", "");
         developers = properties.getProperty("developers", "");
         azureInstrumentationKey = properties.getProperty("azureInstrumentationKey", "");
+        minRequiredJavaVersion = properties.getProperty("minRequiredJavaVersion", "1.8");
+        allowJava9 = "true".equals(properties.getProperty("allowJava9", ""));
     }
 
     public Version getVersion() {
@@ -65,5 +69,13 @@ public class BuildInfo {
 
     public String getAzureInstrumentationKey() {
         return azureInstrumentationKey;
+    }
+
+    public String getMinRequiredJavaVersion() {
+        return minRequiredJavaVersion;
+    }
+
+    public boolean isAllowJava9() {
+        return allowJava9;
     }
 }

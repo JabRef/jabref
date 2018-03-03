@@ -3,13 +3,14 @@ package org.jabref.logic.l10n;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -19,6 +20,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.fxml.FXMLLoader;
 
@@ -41,7 +43,7 @@ public class LocalizationParser {
         } else {
             englishKeys = getKeysInPropertiesFile("/l10n/Menu_en.properties");
         }
-        List<String> missingKeys = new LinkedList<>(keysInJavaFiles);
+        List<String> missingKeys = new ArrayList<>(keysInJavaFiles);
         missingKeys.removeAll(englishKeys);
 
         return entries.stream().filter(e -> missingKeys.contains(e.getKey())).collect(
@@ -77,26 +79,38 @@ public class LocalizationParser {
 
     public static Set<LocalizationEntry> findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest type)
             throws IOException {
-        return Files.walk(Paths.get("src/main"))
-                .filter(LocalizationParser::isJavaFile)
-                .flatMap(path -> getLocalizationParametersInJavaFile(path, type).stream())
-                .collect(Collectors.toSet());
+        try (Stream<Path> pathStream = Files.walk(Paths.get("src/main"))) {
+            return pathStream
+                    .filter(LocalizationParser::isJavaFile)
+                    .flatMap(path -> getLocalizationParametersInJavaFile(path, type).stream())
+                    .collect(Collectors.toSet());
+        } catch (UncheckedIOException ioe) {
+            throw new IOException(ioe);
+        }
     }
 
     private static Set<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundleForTest type)
             throws IOException {
-        return Files.walk(Paths.get("src/main"))
-                .filter(LocalizationParser::isJavaFile)
-                .flatMap(path -> getLanguageKeysInJavaFile(path, type).stream())
-                .collect(Collectors.toSet());
+        try (Stream<Path> pathStream = Files.walk(Paths.get("src/main"))) {
+            return pathStream
+                    .filter(LocalizationParser::isJavaFile)
+                    .flatMap(path -> getLanguageKeysInJavaFile(path, type).stream())
+                    .collect(Collectors.toSet());
+        } catch (UncheckedIOException ioe) {
+            throw new IOException(ioe);
+        }
     }
 
     private static Set<LocalizationEntry> findLocalizationEntriesInFxmlFiles(LocalizationBundleForTest type)
             throws IOException {
-        return Files.walk(Paths.get("src/main"))
-                .filter(LocalizationParser::isFxmlFile)
-                .flatMap(path -> getLanguageKeysInFxmlFile(path, type).stream())
-                .collect(Collectors.toSet());
+        try (Stream<Path> pathStream = Files.walk(Paths.get("src/main"))) {
+            return pathStream
+                    .filter(LocalizationParser::isFxmlFile)
+                    .flatMap(path -> getLanguageKeysInFxmlFile(path, type).stream())
+                    .collect(Collectors.toSet());
+        } catch (UncheckedIOException ioe) {
+            throw new IOException(ioe);
+        }
     }
 
     public static SortedSet<String> getKeysInPropertiesFile(String path) {
@@ -113,7 +127,7 @@ public class LocalizationParser {
     public static Properties getProperties(String path) {
         Properties properties = new Properties();
         try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(path);
-                InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+             InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
             properties.load(reader);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -130,7 +144,7 @@ public class LocalizationParser {
     }
 
     private static List<LocalizationEntry> getLanguageKeysInJavaFile(Path path, LocalizationBundleForTest type) {
-        List<LocalizationEntry> result = new LinkedList<>();
+        List<LocalizationEntry> result = new ArrayList<>();
 
         try {
             List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
@@ -141,7 +155,6 @@ public class LocalizationParser {
             for (String key : keys) {
                 result.add(new LocalizationEntry(path, key, type));
             }
-
         } catch (IOException ignore) {
             ignore.printStackTrace();
         }
@@ -150,7 +163,7 @@ public class LocalizationParser {
     }
 
     private static List<LocalizationEntry> getLocalizationParametersInJavaFile(Path path, LocalizationBundleForTest type) {
-        List<LocalizationEntry> result = new LinkedList<>();
+        List<LocalizationEntry> result = new ArrayList<>();
 
         try {
             List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
@@ -161,7 +174,6 @@ public class LocalizationParser {
             for (String key : keys) {
                 result.add(new LocalizationEntry(path, key, type));
             }
-
         } catch (IOException ignore) {
             ignore.printStackTrace();
         }
@@ -173,7 +185,7 @@ public class LocalizationParser {
      * Loads the fxml file and returns all used language resources.
      */
     private static List<LocalizationEntry> getLanguageKeysInFxmlFile(Path path, LocalizationBundleForTest type) {
-        List<String> result = new LinkedList<>();
+        List<String> result = new ArrayList<>();
 
         // Record which keys are requested; we pretend that we have all keys
         ResourceBundle registerUsageResourceBundle = new ResourceBundle() {
@@ -227,7 +239,7 @@ public class LocalizationParser {
         public static List<String> getLanguageKeysInString(String content, LocalizationBundleForTest type) {
             List<String> parameters = getLocalizationParameter(content, type);
 
-            List<String> result = new LinkedList<>();
+            List<String> result = new ArrayList<>();
 
             for (String param : parameters) {
 
@@ -257,7 +269,7 @@ public class LocalizationParser {
                 // escape chars which are not allowed in property file keys
                 String languagePropertyKey = new LocalizationKey(languageKey).getPropertiesKey();
 
-                if (languagePropertyKey.endsWith("_")) {
+                if (languagePropertyKey.endsWith(" ")) {
                     throw new RuntimeException(languageKey + " ends with a space. As this is a localization key, this is illegal!");
                 }
 
@@ -268,14 +280,13 @@ public class LocalizationParser {
                 if (!languagePropertyKey.trim().isEmpty()) {
                     result.add(languagePropertyKey);
                 }
-
             }
 
             return result;
         }
 
         public static List<String> getLocalizationParameter(String content, LocalizationBundleForTest type) {
-            List<String> result = new LinkedList<>();
+            List<String> result = new ArrayList<>();
 
             Matcher matcher;
             if (type == LocalizationBundleForTest.LANG) {
@@ -308,5 +319,4 @@ public class LocalizationParser {
             return result;
         }
     }
-
 }

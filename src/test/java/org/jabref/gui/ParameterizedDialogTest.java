@@ -6,7 +6,7 @@ import java.util.Collection;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 
-import org.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITest;
 
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
@@ -18,7 +18,7 @@ import org.junit.runners.Parameterized;
 import static org.assertj.swing.finder.WindowFinder.findDialog;
 
 @RunWith(Parameterized.class)
-@Category(GUITests.class)
+@Category(GUITest.class)
 public class ParameterizedDialogTest extends AbstractUITest {
 
     private final boolean createDatabase;

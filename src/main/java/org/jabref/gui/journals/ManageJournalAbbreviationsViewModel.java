@@ -24,11 +24,11 @@ import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.preferences.PreferencesService;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class provides a model for managing journal abbreviation lists.
@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
 
-    private final Log logger = LogFactory.getLog(ManageJournalAbbreviationsViewModel.class);
+    private final Logger logger = LoggerFactory.getLogger(ManageJournalAbbreviationsViewModel.class);
     private final SimpleListProperty<AbbreviationsFileViewModel> journalFiles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final SimpleListProperty<AbbreviationViewModel> abbreviations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final SimpleIntegerProperty abbreviationsCount = new SimpleIntegerProperty();
@@ -54,6 +54,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationPreferences abbreviationsPreferences;
     private final JournalAbbreviationLoader journalAbbreviationLoader;
+    private boolean shouldWriteLists = false;
 
     public ManageJournalAbbreviationsViewModel(PreferencesService preferences, DialogService dialogService, TaskExecutor taskExecutor, JournalAbbreviationLoader journalAbbreviationLoader) {
         this.preferences = Objects.requireNonNull(preferences);
@@ -163,7 +164,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      */
     public void addNewFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileExtensions.TXT)
+                .addExtensionFilter(FileType.TXT)
                 .build();
 
         dialogService.showFileSaveDialog(fileDialogConfiguration).ifPresent(this::openFile);
@@ -195,7 +196,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
 
     public void openFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileExtensions.TXT)
+                .addExtensionFilter(FileType.TXT)
                 .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(this::openFile);
@@ -234,6 +235,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         } else {
             abbreviations.add(abbreviationViewModel);
             currentAbbreviation.set(abbreviationViewModel);
+            shouldWriteLists = true;
         }
     }
 
@@ -274,6 +276,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         }
         currentAbbreviation.get().setName(name);
         currentAbbreviation.get().setAbbreviation(abbreviation);
+        shouldWriteLists = true;
     }
 
     /**
@@ -294,6 +297,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
                     currentAbbreviation.set(null);
                 }
                 abbreviations.remove(index);
+                shouldWriteLists = true;
             }
         }
     }
@@ -347,7 +351,11 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      */
     public void saveEverythingAndUpdateAutoCompleter() {
         saveExternalFilesList();
-        saveJournalAbbreviationFiles();
+
+        if (shouldWriteLists) {
+            saveJournalAbbreviationFiles();
+            shouldWriteLists = false;
+        }
 
         // Update journal abbreviation loader
         journalAbbreviationLoader.update(abbreviationsPreferences);

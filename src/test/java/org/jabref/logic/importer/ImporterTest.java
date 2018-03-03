@@ -1,5 +1,6 @@
 package org.jabref.logic.importer;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,7 +24,8 @@ import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.importer.fileformat.SilverPlatterImporter;
-import org.jabref.logic.xmp.XMPPreferences;
+import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,17 +41,26 @@ import static org.mockito.Mockito.when;
 @RunWith(Parameterized.class)
 public class ImporterTest {
 
-    @Parameter
-    public Importer format;
+    @Parameter public Importer format;
 
     @Test(expected = NullPointerException.class)
-    public void isRecognizedFormatWithNullThrowsException() throws IOException {
-        format.isRecognizedFormat(null);
+    public void isRecognizedFormatWithNullForBufferedReaderThrowsException() throws IOException {
+        format.isRecognizedFormat((BufferedReader) null);
     }
 
     @Test(expected = NullPointerException.class)
-    public void importDatabaseWithNullThrowsException() throws IOException {
-        format.importDatabase(null);
+    public void isRecognizedFormatWithNullForStringThrowsException() throws IOException {
+        format.isRecognizedFormat((String) null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void importDatabaseWithNullForBufferedReaderThrowsException() throws IOException {
+        format.importDatabase((BufferedReader) null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void importDatabaseWithNullForStringThrowsException() throws IOException {
+        format.importDatabase((String) null);
     }
 
     @Test
@@ -58,8 +69,8 @@ public class ImporterTest {
     }
 
     @Test
-    public void getExtensionsDoesNotReturnNull() {
-        Assert.assertNotNull(format.getExtensions());
+    public void getFileTypeDoesNotReturnNull() {
+        Assert.assertNotNull(format.getFileType());
     }
 
     @Test
@@ -91,11 +102,11 @@ public class ImporterTest {
         // sorted alphabetically
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        XMPPreferences xmpPreferences = mock(XMPPreferences.class);
+        XmpPreferences xmpPreferences = mock(XmpPreferences.class);
         // @formatter:off
         return Arrays.asList(
                 new Object[]{new BiblioscapeImporter()},
-                new Object[]{new BibtexImporter(importFormatPreferences)},
+                new Object[]{new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor())},
                 new Object[]{new BibTeXMLImporter()},
                 new Object[]{new CopacImporter()},
                 new Object[]{new EndnoteImporter(importFormatPreferences)},

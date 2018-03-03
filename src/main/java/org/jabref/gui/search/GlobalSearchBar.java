@@ -1,11 +1,11 @@
 package org.jabref.gui.search;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
@@ -24,10 +24,13 @@ import javax.swing.SwingUtilities;
 import javafx.css.PseudoClass;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
+import org.jabref.gui.AbstractView;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
@@ -48,19 +51,14 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.search.SearchQueryHighlightObservable;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.SearchPreferences;
 
 import org.fxmisc.easybind.EasyBind;
 
+@SuppressWarnings("Duplicates")
 public class GlobalSearchBar extends JPanel {
-
-    private static final Color NEUTRAL_COLOR = Color.WHITE;
-    private static final Color NO_RESULTS_COLOR = new Color(232, 202, 202);
-    private static final Color RESULTS_FOUND_COLOR = new Color(217, 232, 202);
-    private static final Color ADVANCED_SEARCH_COLOR = new Color(102, 255, 255);
 
     private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
     private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
@@ -81,6 +79,8 @@ public class GlobalSearchBar extends JPanel {
     private SearchResultFrame searchResultFrame;
 
     private SearchDisplayMode searchDisplayMode;
+
+    private JLabel searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getIcon());
 
     /**
      * if this flag is set the searchbar won't be selected after the next search
@@ -188,16 +188,18 @@ public class GlobalSearchBar extends JPanel {
 
         EasyBind.subscribe(searchField.textProperty(), searchText -> performSearch());
 
-        container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+        container = CustomJFXPanel.create();
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-            container.setScene(new Scene(searchField));
+            Scene scene = new Scene(searchField);
+            scene.getStylesheets().add(AbstractView.class.getResource("Main.css").toExternalForm());
+            container.setScene(scene);
             container.addKeyListener(new SearchKeyAdapter());
-
         });
 
         setLayout(new FlowLayout(FlowLayout.RIGHT));
         JToolBar toolBar = new OSXCompatibleToolbar();
         toolBar.setFloatable(false);
+        toolBar.add(searchIcon);
         toolBar.add(container);
         toolBar.add(openCurrentResultsInDialog);
         toolBar.addSeparator();
@@ -244,7 +246,7 @@ public class GlobalSearchBar extends JPanel {
 
         SearchResultFrame searchDialog = new SearchResultFrame(currentBasePanel.frame(),
                 Localization.lang("Search results in library %0 for %1", currentBasePanel.getBibDatabaseContext()
-                        .getDatabaseFile().map(File::getName).orElse(GUIGlobals.UNTITLED_TITLE),
+                                .getDatabaseFile().map(File::getName).orElse(GUIGlobals.UNTITLED_TITLE),
                         this.getSearchQuery().localize()),
                 getSearchQuery(), false);
         List<BibEntry> entries = currentBasePanel.getDatabase().getEntries().stream()
@@ -362,11 +364,12 @@ public class GlobalSearchBar extends JPanel {
     }
 
     public void setAutoCompleter(AutoCompleteSuggestionProvider<Author> searchCompleter) {
-        AutoCompletionTextInputBinding.autoComplete(searchField,
-                searchCompleter,
-                new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
-                new AppendPersonNamesStrategy());
-
+        if (Globals.prefs.getAutoCompletePreferences().shouldAutoComplete()) {
+            AutoCompletionTextInputBinding.autoComplete(searchField,
+                    searchCompleter,
+                    new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
+                    new AppendPersonNamesStrategy());
+        }
     }
 
     public SearchQueryHighlightObservable getSearchQueryHighlightObservable() {
@@ -385,7 +388,7 @@ public class GlobalSearchBar extends JPanel {
         return searchQuery;
     }
 
-    public void updateResults(int matched, String description, boolean grammarBasedSearch) {
+    public void updateResults(int matched, TextFlow description, boolean grammarBasedSearch) {
         if (matched == 0) {
             currentResults.setText(Localization.lang("No results found."));
             searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
@@ -393,7 +396,16 @@ public class GlobalSearchBar extends JPanel {
             currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
             searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
         }
-        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setTooltip(new Tooltip(description)));
+        if (grammarBasedSearch) {
+            searchIcon.setIcon(IconTheme.JabRefIcon.ADVANCED_SEARCH.getIcon());
+        } else {
+            searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
+        }
+        Tooltip tooltip = new Tooltip();
+        tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        tooltip.setGraphic(description);
+        tooltip.setMaxHeight(10);
+        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setTooltip(tooltip));
         openCurrentResultsInDialog.setEnabled(true);
     }
 
@@ -408,7 +420,6 @@ public class GlobalSearchBar extends JPanel {
 
         setDontSelectSearchBar();
         DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchTerm));
-
     }
 
     public void setDontSelectSearchBar() {
@@ -426,13 +437,19 @@ public class GlobalSearchBar extends JPanel {
     private class SearchKeyAdapter extends KeyAdapter {
 
         @Override
-        public void keyPressed(java.awt.event.KeyEvent e) {
+        public void keyPressed(KeyEvent e) {
             switch (e.getKeyCode()) {
+
+                // Clear search bar and select first entry, if available
+                case KeyEvent.VK_ESCAPE:
+                    clearOnEsc();
+                    break;
+
                 //This "hack" prevents that the focus moves out of the field
-                case java.awt.event.KeyEvent.VK_RIGHT:
-                case java.awt.event.KeyEvent.VK_LEFT:
-                case java.awt.event.KeyEvent.VK_UP:
-                case java.awt.event.KeyEvent.VK_DOWN:
+                case KeyEvent.VK_RIGHT:
+                case KeyEvent.VK_LEFT:
+                case KeyEvent.VK_UP:
+                case KeyEvent.VK_DOWN:
                     e.consume();
                     break;
                 default:
@@ -454,6 +471,15 @@ public class GlobalSearchBar extends JPanel {
                         //do nothing
                 }
             }
+        }
+
+        /**
+         * Clears the search bar and select first entry, if available
+         */
+        private void clearOnEsc() {
+            MainTable currentTable = frame.getCurrentBasePanel().getMainTable();
+            clearSearch(frame.getCurrentBasePanel());
+            currentTable.setSelected(0);
         }
     }
 }

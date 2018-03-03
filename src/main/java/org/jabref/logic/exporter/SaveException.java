@@ -47,11 +47,11 @@ public class SaveException extends Exception {
         this.entry = entry;
     }
 
-    public SaveException(Exception base) {
+    public SaveException(Throwable base) {
         this(base.getMessage(), base.getLocalizedMessage());
     }
 
-    public SaveException(Exception base, BibEntry entry) {
+    public SaveException(Throwable base, BibEntry entry) {
         this(base.getMessage(), base.getLocalizedMessage(), entry);
     }
 

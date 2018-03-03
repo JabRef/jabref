@@ -3,9 +3,7 @@
  */
 package org.jabref.logic.importer.fetcher;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -22,15 +20,15 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is responible to get the recommendations from MDL
  */
 public class MrDLibFetcher implements EntryBasedFetcher {
-    private static final Log LOGGER = LogFactory.getLog(MrDLibFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibFetcher.class);
 
     private static final String NAME = "MDL_FETCHER";
     private final String LANGUAGE;
@@ -55,13 +53,13 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             MrDLibImporter importer = new MrDLibImporter();
             ParserResult parserResult = new ParserResult();
             try {
-                if (importer.isRecognizedFormat(new BufferedReader(new StringReader(response)))) {
-                    parserResult = importer.importDatabase(new BufferedReader(new StringReader(response)));
+                if (importer.isRecognizedFormat(response)) {
+                    parserResult = importer.importDatabase(response);
                 } else {
                     // For displaying An ErrorMessage
                     BibEntry errorBibEntry = new BibEntry();
                     errorBibEntry.setField("html_representation",
-                            Localization.lang("Error_while_fetching_from_%0", "Mr.DLib"));
+                            Localization.lang("Error while fetching from %0", "Mr.DLib"));
                     BibDatabase errorBibDataBase = new BibDatabase();
                     errorBibDataBase.insertEntry(errorBibEntry);
                     parserResult = new ParserResult(errorBibDataBase);

@@ -3,10 +3,10 @@ package org.jabref.model.entry;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class FileFieldWriterTest {
 
@@ -112,7 +112,7 @@ public class FileFieldWriterTest {
     @Test
     public void testFileFieldWriterGetStringRepresentation() {
         LinkedFile file = new LinkedFile("test", "X:\\Users\\abc.pdf", "PDF");
-        assertEquals("test:X\\:\\\\Users\\\\abc.pdf:PDF", FileFieldWriter.getStringRepresentation(file));
+        assertEquals("test:X\\:/Users/abc.pdf:PDF", FileFieldWriter.getStringRepresentation(file));
     }
 
 

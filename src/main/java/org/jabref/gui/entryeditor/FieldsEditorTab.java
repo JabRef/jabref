@@ -1,13 +1,14 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import javax.swing.undo.UndoManager;
 
 import javafx.geometry.VPos;
 import javafx.scene.Node;
@@ -21,15 +22,17 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.EntryTypes;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
@@ -37,34 +40,22 @@ import org.jabref.model.entry.InternalBibtexFields;
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
-class FieldsEditorTab extends EntryEditorTab {
+abstract class FieldsEditorTab extends EntryEditorTab {
 
-    private final Region panel;
-    private final List<String> fields;
-    private final EntryEditor parent;
     private final Map<String, FieldEditorFX> editors = new LinkedHashMap<>();
-    private final JabRefFrame frame;
-    private final BasePanel basePanel;
-    private final BibEntry entry;
+    private final boolean isCompressed;
+    private final SuggestionProviders suggestionProviders;
+
     private FieldEditorFX activeField;
+    private final BibDatabaseContext databaseContext;
+    private UndoManager undoManager;
+    private Collection<String> fields;
 
-    public FieldsEditorTab(JabRefFrame frame, BasePanel basePanel, List<String> fields, EntryEditor parent, boolean addKeyField, boolean compressed, BibEntry entry) {
-        this.entry = Objects.requireNonNull(entry);
-        this.fields = new ArrayList<>(Objects.requireNonNull(fields));
-
-        // Add the edit field for Bibtex-key.
-        if (addKeyField) {
-            this.fields.add(BibEntry.KEY_FIELD);
-        }
-
-        this.parent = parent;
-        this.frame = frame;
-        this.basePanel = basePanel;
-
-        panel = setupPanel(frame, basePanel, compressed);
-
-        // The following line makes sure focus cycles inside tab instead of being lost to other parts of the frame:
-        //panel.setFocusCycleRoot(true);
+    public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager) {
+        this.isCompressed = compressed;
+        this.databaseContext = databaseContext;
+        this.suggestionProviders = suggestionProviders;
+        this.undoManager = undoManager;
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -79,42 +70,18 @@ class FieldsEditorTab extends EntryEditorTab {
         return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }
 
-    private Region setupPanel(JabRefFrame frame, BasePanel bPanel, boolean compressed) {
-
-        //setupKeyBindings(panel.getInputMap(JComponent.WHEN_FOCUSED), panel.getActionMap());
-
+    private Region setupPanel(BibEntry entry, boolean compressed, SuggestionProviders suggestionProviders, UndoManager undoManager) {
         editors.clear();
+
+        EntryType entryType = EntryTypes.getTypeOrDefault(entry.getType(), databaseContext.getMode());
+        fields = determineFieldsToShow(entry, entryType);
+
         List<Label> labels = new ArrayList<>();
-
         for (String fieldName : fields) {
-
-            // TODO: Reenable/migrate this
-            // Store the editor for later reference:
-            /*
-            FieldEditor fieldEditor;
-            int defaultHeight;
-            int wHeight = (int) (50.0 * InternalBibtexFields.getFieldWeight(field));
-            if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
-                fieldEditor = new EntryLinkListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent,
-                        true);
-                defaultHeight = 0;
-            } else if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
-                fieldEditor = new EntryLinkListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent,
-                        false);
-                defaultHeight = 0;
-            } else {
-                fieldEditor = new TextArea(field, null, getPrompt(field));
-                //parent.addSearchListener((TextArea) fieldEditor);
-                defaultHeight = fieldEditor.getPane().getPreferredSize().height;
-            }
-
-            Optional<JComponent> extra = parent.getExtra(fieldEditor);
-            */
-
             FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.TASK_EXECUTOR, new FXDialogService(),
                     Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs,
-                    bPanel.getBibDatabaseContext(), entry.getType(),
-                    bPanel.getSuggestionProviders());
+                    databaseContext, entry.getType(),
+                    suggestionProviders, undoManager);
             fieldEditor.bindToEntry(entry);
 
             editors.put(fieldName, fieldEditor);
@@ -122,13 +89,6 @@ class FieldsEditorTab extends EntryEditorTab {
             // TODO: Reenable this
             if (i == 0) {
                 activeField = fieldEditor;
-            }
-            */
-
-            /*
-            // TODO: Reenable this
-            if (!compressed) {
-                fieldEditor.getPane().setPreferredSize(new Dimension(100, Math.max(defaultHeight, wHeight)));
             }
             */
 
@@ -166,14 +126,13 @@ class FieldsEditorTab extends EntryEditorTab {
 
             setRegularRowLayout(gridPane, rows);
         }
-        
+
         if (GUIGlobals.currentFont != null) {
             gridPane.setStyle(
                     "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"
                             + "text-area-foreground: " + convertToHex(GUIGlobals.editorTextColor) + ";"
                             + "text-area-highlight: " + convertToHex(GUIGlobals.activeBackgroundColor) + ";");
         }
-        gridPane.getStylesheets().add("org/jabref/gui/entryeditor/EntryEditor.css");
 
         // Warp everything in a scroll-pane
         ScrollPane scrollPane = new ScrollPane();
@@ -239,72 +198,37 @@ class FieldsEditorTab extends EntryEditorTab {
     }
 
     /**
-     * Only sets the activeField variable but does not focus it.
-     * <p>
-     * If you want to focus it call {@link #focus()} afterwards.
+     * Focuses the given field.
      */
-    public void setActive(String fieldName) {
+    public void requestFocus(String fieldName) {
         if (editors.containsKey(fieldName)) {
             activeField = editors.get(fieldName);
-        }
-    }
-
-    public List<String> getFields() {
-        return Collections.unmodifiableList(fields);
-    }
-
-    public void focus() {
-        if (activeField != null) {
             activeField.requestFocus();
         }
     }
 
-    public boolean updateField(String field, String content) {
-        if (!editors.containsKey(field)) {
-            return false;
-        }
-        // TODO: Reenable or probably better delete this
-        /*
-        FieldEditor fieldEditor = editors.get(field);
-        if (fieldEditor.getText().equals(content)) {
-            return true;
-        }
-
-        // trying to preserve current edit position (fixes SF bug #1285)
-        if (fieldEditor.getTextComponent() instanceof JTextComponent) {
-            int initialCaretPosition = ((JTextComponent) fieldEditor).getCaretPosition();
-            fieldEditor.setText(content);
-            int textLength = fieldEditor.getText().length();
-            if (initialCaretPosition < textLength) {
-                ((JTextComponent) fieldEditor).setCaretPosition(initialCaretPosition);
-            } else {
-                ((JTextComponent) fieldEditor).setCaretPosition(textLength);
-            }
-        } else {
-            fieldEditor.setText(content);
-        }
-        */
-        return true;
-    }
-
-    public EntryEditor getParent() {
-        return parent;
+    @Override
+    public boolean shouldShow(BibEntry entry) {
+        EntryType entryType = EntryTypes.getTypeOrDefault(entry.getType(), databaseContext.getMode());
+        return !determineFieldsToShow(entry, entryType).isEmpty();
     }
 
     @Override
-    public boolean shouldShow() {
-        return !fields.isEmpty();
-    }
-
-    @Override
-    public void requestFocus() {
+    public void handleFocus() {
         if (activeField != null) {
             activeField.requestFocus();
         }
     }
 
     @Override
-    protected void initialize() {
+    protected void bindToEntry(BibEntry entry) {
+        Region panel = setupPanel(entry, isCompressed, suggestionProviders, undoManager);
         setContent(panel);
+    }
+
+    protected abstract Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType);
+
+    public Collection<String> getShownFields() {
+        return fields;
     }
 }

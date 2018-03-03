@@ -13,9 +13,9 @@ import java.util.Optional;
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jsoup.helper.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a convenient interface for ID-based fetcher, which follow the usual three-step procedure:
@@ -25,7 +25,7 @@ import org.jsoup.helper.StringUtil;
  */
 public interface IdBasedParserFetcher extends IdBasedFetcher {
 
-    Log LOGGER = LogFactory.getLog(IdBasedParserFetcher.class);
+    Logger LOGGER = LoggerFactory.getLogger(IdBasedParserFetcher.class);
 
     /**
      * Constructs a URL based on the query.

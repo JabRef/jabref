@@ -11,11 +11,9 @@ import javafx.scene.Scene;
 
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.customjfx.CustomJFXPanel;
-import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.logic.util.OS;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of the FieldEditor backed by a {@link EditorTextArea}.
@@ -23,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class TextArea implements FieldEditor {
 
-    private static final Log LOGGER = LogFactory.getLog(TextArea.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TextArea.class);
 
     private final JFXPanel swingPanel;
 
@@ -38,14 +36,8 @@ public class TextArea implements FieldEditor {
         textArea = new EditorTextArea(content);
         textArea.setPromptText(title);
 
-        swingPanel = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+        swingPanel = CustomJFXPanel.wrap(new Scene(textArea));
         swingPanel.setBackground(GUIGlobals.activeBackgroundColor);
-        DefaultTaskExecutor.runInJavaFXThread(
-                () -> {
-                    Scene scene = new Scene(textArea);
-                    swingPanel.setScene(scene);
-                }
-        );
 
 
         /*
@@ -75,7 +67,7 @@ public class TextArea implements FieldEditor {
 
     @Override
     public void setBackground(Color color) {
-
+        //not needed
     }
 
     @Override
@@ -132,12 +124,12 @@ public class TextArea implements FieldEditor {
 
     @Override
     public void append(String text) {
-
+        // not needed
     }
 
     @Override
     public void setEnabled(boolean enabled) {
-
+        // not needed
     }
 
     @Override
@@ -164,6 +156,6 @@ public class TextArea implements FieldEditor {
 
     @Override
     public void requestFocus() {
-
+        // not needed
     }
 }
