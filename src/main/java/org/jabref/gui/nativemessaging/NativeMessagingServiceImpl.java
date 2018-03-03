@@ -32,6 +32,10 @@ public class NativeMessagingServiceImpl implements NativeMessagingService {
     }
 
     private void handlePushMessage(JSONObject message) {
+        if (message == null) {
+            return;
+        }
+        
         String type = message.optString("type");
         try {
         switch (type) {

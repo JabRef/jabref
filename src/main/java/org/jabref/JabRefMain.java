@@ -1,5 +1,6 @@
 package org.jabref;
 
+import java.io.IOException;
 import java.net.Authenticator;
 
 import javax.swing.JFrame;
@@ -53,7 +54,7 @@ public class JabRefMain extends Application {
         launch(arguments);
     }
 
-    private static void start(String[] args) {
+    private static void start(String[] args) throws IOException {
         NativeMessagingClient nativeMessagingClient = new StreamNativeMessagingClient(System.in, System.out);
 
     /**
@@ -109,7 +110,7 @@ public class JabRefMain extends Application {
 
         JabRefPreferences preferences = JabRefPreferences.getInstance();
 
-        nativeMessagingClient.sendAsync("{\"m\":\"kb\"}");
+        nativeMessagingClient.send("{\"m\":\"kb\"}");
         ensureCorrectJavaVersion();
 
         ProxyPreferences proxyPreferences = preferences.getProxyPreferences();
@@ -118,14 +119,13 @@ public class JabRefMain extends Application {
             Authenticator.setDefault(new ProxyAuthenticator());
         }
 
-        nativeMessagingClient.sendAsync("{\"m\":\"kc\"}");
+        nativeMessagingClient.send("{\"m\":\"kc\"}");
         Globals.prefs = preferences;
         Globals.startBackgroundTasks();
-
-        // Note that the language was already set during the initialization of the preferences and it is safe to
-        // call the next function.
+        nativeMessagingClient.send("{\"m\":\"kd\"}");
+        Localization.setLanguage(preferences.get(JabRefPreferences.LANGUAGE));
         Globals.prefs.setLanguageDependentDefaultValues();
-        nativeMessagingClient.sendAsync("{\"m\":\"ke\"}");
+        nativeMessagingClient.send("{\"m\":\"ke\"}");
 
         // Perform Migrations
         // Perform checks and changes for users with a preference set from an older JabRef version.
@@ -139,7 +139,7 @@ public class JabRefMain extends Application {
         PreferencesMigrations.addCrossRefRelatedFieldsForAutoComplete();
         PreferencesMigrations.upgradeObsoleteLookAndFeels();
 
-        nativeMessagingClient.sendAsync("{\"m\":\"kf\"}");
+        nativeMessagingClient.send("{\"m\":\"kf\"}");
 
         // Update handling of special fields based on preferences
         InternalBibtexFields
@@ -149,12 +149,12 @@ public class JabRefMain extends Application {
         // Update which fields should be treated as numeric, based on preferences:
         InternalBibtexFields.setNumericFields(Globals.prefs.getStringList(JabRefPreferences.NUMERIC_FIELDS));
 
-        nativeMessagingClient.sendAsync("{\"m\":\"kg\"}");
+        nativeMessagingClient.send("{\"m\":\"kg\"}");
 
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
 
-        nativeMessagingClient.sendAsync("{\"m\":\"kh\"}");
+        nativeMessagingClient.send("{\"m\":\"kh\"}");
 
         /* Build list of Import and Export formats */
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
@@ -163,12 +163,12 @@ public class JabRefMain extends Application {
                 preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
         Globals.exportFactory = ExporterFactory.create(Globals.prefs, Globals.journalAbbreviationLoader);
 
-        nativeMessagingClient.sendAsync("{\"m\":\"ki\"}");
+        nativeMessagingClient.send("{\"m\":\"ki\"}");
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());
 
-        nativeMessagingClient.sendAsync("{\"m\":\"kj\"}");
+        nativeMessagingClient.send("{\"m\":\"kj\"}");
 
         // Check for running JabRef
         RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();
@@ -191,22 +191,22 @@ public class JabRefMain extends Application {
             Globals.REMOTE_LISTENER.start();
         }
 
-        nativeMessagingClient.sendAsync("{\"m\":\"kk\"}");
+        nativeMessagingClient.send("{\"m\":\"kk\"}");
 
         // override used newline character with the one stored in the preferences
         // The preferences return the system newline character sequence as default
         OS.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
 
-        nativeMessagingClient.sendAsync("{\"m\":\"kl\"}");
+        nativeMessagingClient.send("{\"m\":\"kl\"}");
 
         JSONObject obj = new JSONObject();
         obj.put("m", new JSONArray().put(args));
-        nativeMessagingClient.sendAsync(obj.toString());
+        nativeMessagingClient.send(obj.toString());
 
         // Process arguments
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);
 
-        nativeMessagingClient.sendAsync("{\"m\":\"ko\"}");
+        nativeMessagingClient.send("{\"m\":\"ko\"}");
 
         // See if we should shut down now
         if (argumentProcessor.shouldShutDown()) {
@@ -216,7 +216,7 @@ public class JabRefMain extends Application {
         }
 
         // Start native messaging
-        nativeMessagingClient.sendAsync("{\"m\":\"hi\"}");
+        nativeMessagingClient.send("{\"m\":\"hi\"}");
         NativeMessagingService messagingService = new NativeMessagingServiceImpl(nativeMessagingClient);
 
         // If not, start GUI
@@ -228,6 +228,13 @@ public class JabRefMain extends Application {
     @Override
     public void start(Stage mainStage) throws Exception {
         Platform.setImplicitExit(false);
-        SwingUtilities.invokeLater(() -> start(arguments));
+        SwingUtilities.invokeLater(() -> {
+            try {
+                                   start(arguments);
+            } catch(IOException e)
+          {
+               System.out.println(e.getMessage());
+          }}
+                );
     }
 }
