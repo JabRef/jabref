@@ -5,8 +5,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.swing.JOptionPane;
-
 import javafx.stage.FileChooser;
 
 import org.jabref.Globals;
@@ -62,9 +60,13 @@ public class ExportCommand extends SimpleCommand {
 
         if (Files.exists(file)) {
             // Warn that the file exists:
-            if (JOptionPane.showConfirmDialog(null,
+
+            boolean overwriteFilePressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Export"),
                     Localization.lang("'%0' exists. Overwrite file?", file.getFileName().toString()),
-                    Localization.lang("Export"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
+                    Localization.lang("Overwrite file"),
+                    Localization.lang("Cancel"));
+
+            if (!overwriteFilePressed) {
                 return;
             }
         }

@@ -234,7 +234,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
-                Optional<Charset> selectedCharSet = frame.getDialogService().showChoiceDialogAndWait(Localization.lang("Save library"), Localization.lang("Select encoding"), encoding, Encodings.getCharsets());
+                Optional<Charset> selectedCharSet = frame.getDialogService().showChoiceDialogAndWait(Localization.lang("Save library"), Localization.lang("Select encoding"), Localization.lang("Save library"), encoding, Encodings.getCharsets());
 
                 if (selectedCharSet.isPresent()) {
 

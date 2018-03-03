@@ -115,9 +115,10 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
     public void openSharedDatabase() {
 
         if (isSharedDatabaseAlreadyPresent()) {
-            JOptionPane.showMessageDialog(ConnectToSharedDatabaseDialog.this,
-                    Localization.lang("You are already connected to a database using entered connection details."),
-                    Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
+
+            frame.getDialogService().showWarningDialogAndWait(Localization.lang("Warning"),
+                    Localization.lang("You are already connected to a database using entered connection details."));
+
             return;
         }
 
@@ -126,10 +127,13 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
             Path localFilePath = Paths.get(fileLocationField.getText());
 
             if (Files.exists(localFilePath) && !Files.isDirectory(localFilePath)) {
-                int answer = JOptionPane.showConfirmDialog(this,
+
+                boolean overwriteFilePressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Existing file"),
                         Localization.lang("'%0' exists. Overwrite file?", localFilePath.getFileName().toString()),
-                        Localization.lang("Existing file"), JOptionPane.YES_NO_OPTION);
-                if (answer == JOptionPane.NO_OPTION) {
+                        Localization.lang("Overwrite file"),
+                        Localization.lang("Cancel"));
+
+                if (!overwriteFilePressed) {
                     fileLocationField.requestFocus();
                     return;
                 }

@@ -68,7 +68,7 @@ public class FXDialogService implements DialogService {
     }
 
     private static FXDialog createDialogWithOptOut(AlertType type, String title, String content,
-                                                   String optOutMessage, Consumer<Boolean> optOutAction) {
+            String optOutMessage, Consumer<Boolean> optOutAction) {
         FXDialog alert = new FXDialog(type, title, true);
         // Need to force the alert to layout in order to grab the graphic as we are replacing the dialog pane with a custom pane
         alert.getDialogPane().applyCss();
@@ -77,6 +77,7 @@ public class FXDialogService implements DialogService {
         // Create a new dialog pane that has a checkbox instead of the hide/show details button
         // Use the supplied callback for the action of the checkbox
         alert.setDialogPane(new DialogPane() {
+
             @Override
             protected Node createDetailsButton() {
                 CheckBox optOut = new CheckBox();
@@ -100,9 +101,10 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
-    public <T> Optional<T> showChoiceDialogAndWait(String title, String content, T defaultChoice, Collection<T> choices)
-    {
+    public <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices) {
         ChoiceDialog<T> choiceDialog = new ChoiceDialog<>(defaultChoice, choices);
+        ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
+        choiceDialog.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, okButtonType);
         choiceDialog.setHeaderText(title);
         choiceDialog.setContentText(content);
         return choiceDialog.showAndWait();
@@ -116,7 +118,6 @@ public class FXDialogService implements DialogService {
         inputDialog.setContentText(content);
         return inputDialog.showAndWait();
     }
-
 
     @Override
     public void showInformationDialogAndWait(String title, String content) {
@@ -173,7 +174,7 @@ public class FXDialogService implements DialogService {
 
     @Override
     public boolean showConfirmationDialogAndWait(String title, String content,
-                                                 String okButtonLabel, String cancelButtonLabel) {
+            String okButtonLabel, String cancelButtonLabel) {
         FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelButtonType = new ButtonType(cancelButtonLabel, ButtonBar.ButtonData.NO);
@@ -183,7 +184,7 @@ public class FXDialogService implements DialogService {
 
     @Override
     public boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
-                                                           String optOutMessage, Consumer<Boolean> optOutAction) {
+            String optOutMessage, Consumer<Boolean> optOutAction) {
         FXDialog alert = createDialogWithOptOut(AlertType.CONFIRMATION, title, content, optOutMessage, optOutAction);
         alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
         return alert.showAndWait().filter(buttonType -> buttonType == ButtonType.YES).isPresent();
@@ -191,8 +192,8 @@ public class FXDialogService implements DialogService {
 
     @Override
     public boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
-                                                           String okButtonLabel, String cancelButtonLabel,
-                                                           String optOutMessage, Consumer<Boolean> optOutAction) {
+            String okButtonLabel, String cancelButtonLabel,
+            String optOutMessage, Consumer<Boolean> optOutAction) {
         FXDialog alert = createDialogWithOptOut(AlertType.CONFIRMATION, title, content, optOutMessage, optOutAction);
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.YES);
         ButtonType cancelButtonType = new ButtonType(cancelButtonLabel, ButtonBar.ButtonData.NO);
