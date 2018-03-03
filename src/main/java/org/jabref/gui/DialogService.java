@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -9,7 +10,10 @@ import javafx.concurrent.Task;
 import javafx.print.PrinterJob;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.TextInputDialog;
+
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
@@ -21,6 +25,14 @@ import org.controlsfx.dialog.ProgressDialog;
  */
 public interface DialogService {
 
+    /**
+     * This will create and display new {@link ChoiceDialog} of type T with a default choice and a collection of possible choices
+    */
+    <T> Optional<T> showChoiceDialogAndWait(String title, String content, T defaultChoice, Collection<T> choices);
+
+    /**
+     * This will create and display new {@link TextInputDialog} with a text fields to enter data
+     */
     Optional<String> showInputDialogAndWait(String title, String content);
 
     /**
@@ -223,4 +235,6 @@ public interface DialogService {
      * @return false if the user opts to cancel printing
      */
     boolean showPrintDialog(PrinterJob job);
+
+
 }

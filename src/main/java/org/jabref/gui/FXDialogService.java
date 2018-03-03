@@ -2,6 +2,7 @@ package org.jabref.gui;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.Region;
@@ -98,12 +100,23 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
+    public <T> Optional<T> showChoiceDialogAndWait(String title, String content, T defaultChoice, Collection<T> choices)
+    {
+        ChoiceDialog<T> choiceDialog = new ChoiceDialog<>(defaultChoice, choices);
+        choiceDialog.setHeaderText(title);
+        choiceDialog.setContentText(content);
+        return choiceDialog.showAndWait();
+
+    }
+
+    @Override
     public Optional<String> showInputDialogAndWait(String title, String content) {
         TextInputDialog inputDialog = new TextInputDialog();
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
         return inputDialog.showAndWait();
     }
+
 
     @Override
     public void showInformationDialogAndWait(String title, String content) {
