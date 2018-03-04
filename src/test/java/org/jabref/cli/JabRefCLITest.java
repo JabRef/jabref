@@ -42,7 +42,7 @@ public class JabRefCLITest {
     public void recognizesNativeMessaging() {
         JabRefCLI cli = new JabRefCLI(new String[]{"C:\\Program Files\\JabRef\\jabref.json", "jabfox@jabref.org"});
 
-        Assert.assertEquals(Collections.emptyList(), cli.getLeftOver());
-        Assert.assertTrue(cli.isNativeMessaging());
+        assertEquals(Collections.emptyList(), cli.getLeftOver());
+        assertTrue(cli.isNativeMessaging());
     }
 }

@@ -101,14 +101,47 @@ public class JabRefMain extends Application {
     }
 
     private static void start(String[] args) throws IOException {
-        NativeMessagingClient nativeMessagingClient = new StreamNativeMessagingClient(System.in, System.out);
-        nativeMessagingClient.sendAsync("{\"m\":\"ka\"}");
+        // Init preferences
+        JabRefPreferences preferences = JabRefPreferences.getInstance();
+        Globals.prefs = preferences;
+
+        // Process arguments
+        ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);
 
         FallbackExceptionHandler.installExceptionHandler();
 
-        JabRefPreferences preferences = JabRefPreferences.getInstance();
+        if (argumentProcessor.isNativeMessaging()) {
+            // Start native messaging
+            NativeMessagingClient nativeMessagingClient = new StreamNativeMessagingClient(System.in, System.out);
+            nativeMessagingClient.addPushListener(jsonObject -> {
+                try {
+                    nativeMessagingClient.send("{\"m\":\"got you\"}");
+                    JSONObject obj = new JSONObject();
+                    obj.put("m", new JSONArray().put(jsonObject));
+                    nativeMessagingClient.send(obj.toString());
+                } catch (IOException e) {
+                    LOGGER.error("Problem sending", e);
+                }
+            });
+            nativeMessagingClient.send("{\"m\":\"kb\"}");
+            JSONObject obj = new JSONObject();
+            obj.put("m", new JSONArray().put(args));
+            nativeMessagingClient.send(obj.toString());
+            NativeMessagingService messagingService = new NativeMessagingServiceImpl(nativeMessagingClient);
 
-        nativeMessagingClient.send("{\"m\":\"kb\"}");
+            RemotePreferences remotePreferences = preferences.getRemotePreferences();
+            Globals.REMOTE_LISTENER.open(new JabRefMessageHandler(), remotePreferences.getPort());
+
+            if (!Globals.REMOTE_LISTENER.isOpen()) {
+                // we are not alone, there is already a server out there, try to contact already running JabRef:
+                if (RemoteListenerClient.sendToActiveJabRefInstance(args, remotePreferences.getPort())) {
+                    // needed to tell JavaFx to stop
+                    Platform.exit();
+                    return;
+                }
+            }
+        }
+
         ensureCorrectJavaVersion();
 
         ProxyPreferences proxyPreferences = preferences.getProxyPreferences();
@@ -117,13 +150,8 @@ public class JabRefMain extends Application {
             Authenticator.setDefault(new ProxyAuthenticator());
         }
 
-        nativeMessagingClient.send("{\"m\":\"kc\"}");
-        Globals.prefs = preferences;
         Globals.startBackgroundTasks();
-        nativeMessagingClient.send("{\"m\":\"kd\"}");
-        Localization.setLanguage(preferences.get(JabRefPreferences.LANGUAGE));
-        Globals.prefs.setLanguageDependentDefaultValues();
-        nativeMessagingClient.send("{\"m\":\"ke\"}");
+
 
         // Perform Migrations
         // Perform checks and changes for users with a preference set from an older JabRef version.
@@ -137,8 +165,6 @@ public class JabRefMain extends Application {
         PreferencesMigrations.addCrossRefRelatedFieldsForAutoComplete();
         PreferencesMigrations.upgradeObsoleteLookAndFeels();
 
-        nativeMessagingClient.send("{\"m\":\"kf\"}");
-
         // Update handling of special fields based on preferences
         InternalBibtexFields
                 .updateSpecialFields(Globals.prefs.getBoolean(JabRefPreferences.SERIALIZESPECIALFIELDS));
@@ -147,12 +173,8 @@ public class JabRefMain extends Application {
         // Update which fields should be treated as numeric, based on preferences:
         InternalBibtexFields.setNumericFields(Globals.prefs.getStringList(JabRefPreferences.NUMERIC_FIELDS));
 
-        nativeMessagingClient.send("{\"m\":\"kg\"}");
-
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
-
-        nativeMessagingClient.send("{\"m\":\"kh\"}");
 
         /* Build list of Import and Export formats */
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
@@ -161,12 +183,8 @@ public class JabRefMain extends Application {
                 preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
         Globals.exportFactory = ExporterFactory.create(Globals.prefs, Globals.journalAbbreviationLoader);
 
-        nativeMessagingClient.send("{\"m\":\"ki\"}");
-
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());
-
-        nativeMessagingClient.send("{\"m\":\"kj\"}");
 
         // Check for running JabRef
         RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();
@@ -189,22 +207,9 @@ public class JabRefMain extends Application {
             Globals.REMOTE_LISTENER.start();
         }
 
-        nativeMessagingClient.send("{\"m\":\"kk\"}");
-
         // override used newline character with the one stored in the preferences
         // The preferences return the system newline character sequence as default
         OS.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
-
-        nativeMessagingClient.send("{\"m\":\"kl\"}");
-
-        JSONObject obj = new JSONObject();
-        obj.put("m", new JSONArray().put(args));
-        nativeMessagingClient.send(obj.toString());
-
-        // Process arguments
-        ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);
-
-        nativeMessagingClient.send("{\"m\":\"ko\"}");
 
         // See if we should shut down now
         if (argumentProcessor.shouldShutDown()) {
@@ -212,10 +217,6 @@ public class JabRefMain extends Application {
             Platform.exit();
             return;
         }
-
-        // Start native messaging
-        nativeMessagingClient.send("{\"m\":\"hi\"}");
-        NativeMessagingService messagingService = new NativeMessagingServiceImpl(nativeMessagingClient);
 
         // If not, start GUI
         SwingUtilities
@@ -227,12 +228,12 @@ public class JabRefMain extends Application {
     public void start(Stage mainStage) throws Exception {
         Platform.setImplicitExit(false);
         SwingUtilities.invokeLater(() -> {
-            try {
-                                   start(arguments);
-            } catch(IOException e)
-          {
-               System.out.println(e.getMessage());
-          }}
-                );
+                    try {
+                        start(arguments);
+                    } catch (IOException e) {
+                        LOGGER.error("Error while starting", e);
+                    }
+                }
+        );
     }
 }

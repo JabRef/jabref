@@ -27,8 +27,8 @@ import com.google.common.base.StandardSystemProperty;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryConfiguration;
 import com.microsoft.applicationinsights.telemetry.SessionState;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Globals {
 
@@ -55,8 +55,8 @@ public class Globals {
      * Manager for the state of the GUI.
      */
     public static StateManager stateManager = new StateManager();
-    private static final Log LOGGER = LogFactory.getLog(Globals.class);
     public static ExporterFactory exportFactory;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Globals.class);
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
     // Background tasks

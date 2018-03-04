@@ -582,6 +582,10 @@ public class ArgumentProcessor {
         return cli.isDisableGui() || cli.isShowVersion() || noGUINeeded;
     }
 
+    public boolean isNativeMessaging() {
+        return cli.isNativeMessaging();
+    }
+
     public enum Mode {
         INITIAL_START, REMOTE_START
     }
