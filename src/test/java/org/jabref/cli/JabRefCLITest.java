@@ -39,10 +39,11 @@ public class JabRefCLITest {
     }
 
     @Test
-    public void recognizesNativeMessaging() {
-        JabRefCLI cli = new JabRefCLI(new String[]{"C:\\Program Files\\JabRef\\jabref.json", "jabfox@jabref.org"});
-
+    public void recognizesImportBibtex() {
+        String bibtex = "@article{test, title=\"test title\"}";
+        JabRefCLI cli = new JabRefCLI(new String[]{"-ib", bibtex});
         assertEquals(Collections.emptyList(), cli.getLeftOver());
-        assertTrue(cli.isNativeMessaging());
+        assertTrue(cli.isBibtexImport());
+        assertEquals(bibtex, cli.getBibtexImport());
     }
 }

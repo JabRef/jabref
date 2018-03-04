@@ -12,10 +12,6 @@ import javafx.application.Platform;
 import javafx.stage.Stage;
 
 import org.jabref.cli.ArgumentProcessor;
-import org.jabref.gui.nativemessaging.NativeMessagingClient;
-import org.jabref.gui.nativemessaging.NativeMessagingService;
-import org.jabref.gui.nativemessaging.NativeMessagingServiceImpl;
-import org.jabref.gui.nativemessaging.StreamNativeMessagingClient;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -35,8 +31,6 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,38 +103,6 @@ public class JabRefMain extends Application {
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);
 
         FallbackExceptionHandler.installExceptionHandler();
-
-        if (argumentProcessor.isNativeMessaging()) {
-            // Start native messaging
-            NativeMessagingClient nativeMessagingClient = new StreamNativeMessagingClient(System.in, System.out);
-            nativeMessagingClient.addPushListener(jsonObject -> {
-                try {
-                    nativeMessagingClient.send("{\"m\":\"got you\"}");
-                    JSONObject obj = new JSONObject();
-                    obj.put("m", new JSONArray().put(jsonObject));
-                    nativeMessagingClient.send(obj.toString());
-                } catch (IOException e) {
-                    LOGGER.error("Problem sending", e);
-                }
-            });
-            nativeMessagingClient.send("{\"m\":\"kb\"}");
-            JSONObject obj = new JSONObject();
-            obj.put("m", new JSONArray().put(args));
-            nativeMessagingClient.send(obj.toString());
-            NativeMessagingService messagingService = new NativeMessagingServiceImpl(nativeMessagingClient);
-
-            RemotePreferences remotePreferences = preferences.getRemotePreferences();
-            Globals.REMOTE_LISTENER.open(new JabRefMessageHandler(), remotePreferences.getPort());
-
-            if (!Globals.REMOTE_LISTENER.isOpen()) {
-                // we are not alone, there is already a server out there, try to contact already running JabRef:
-                if (RemoteListenerClient.sendToActiveJabRefInstance(args, remotePreferences.getPort())) {
-                    // needed to tell JavaFx to stop
-                    Platform.exit();
-                    return;
-                }
-            }
-        }
 
         ensureCorrectJavaVersion();
 
