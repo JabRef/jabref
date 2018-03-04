@@ -112,7 +112,7 @@ public class ProtectedTermsDialog {
         removeButton.setToolTipText(Localization.lang("Remove protected terms file"));
 
         newButton.addActionListener(actionEvent -> {
-            NewProtectedTermsFileDialog newDialog = new NewProtectedTermsFileDialog(diag, loader);
+            NewProtectedTermsFileDialog newDialog = new NewProtectedTermsFileDialog(diag, loader, frame.getDialogService());
             newDialog.setVisible(true);
             tableModel.fireTableDataChanged();
         });
@@ -253,12 +253,10 @@ public class ProtectedTermsDialog {
         // Create action listener for removing a term file, also used for the remove button
         removeAction = actionEvent -> getSelectedTermsList().ifPresent(list -> {
 
-            boolean removeProctedTermsFilePressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Remove protected terms file"),
+            if (!list.isInternalList() && frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Remove protected terms file"),
                     Localization.lang("Are you sure you want to remove the protected terms file?"),
                     Localization.lang("Remove protected terms file"),
-                    Localization.lang("Cancel"));
-
-            if (!list.isInternalList() && removeProctedTermsFilePressed) {
+                    Localization.lang("Cancel"))) {
                 if (!loader.removeProtectedTermsList(list)) {
                     LOGGER.info("Problem removing protected terms file");
                 }

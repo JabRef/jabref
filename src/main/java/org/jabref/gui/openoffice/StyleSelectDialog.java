@@ -271,11 +271,11 @@ class StyleSelectDialog {
 
         // Create action listener for removing a style, also used for the remove button
         removeAction = actionEvent -> getSelectedStyle().ifPresent(style -> {
-            boolean removeStylePressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Remove style"),
+
+            if (!style.isFromResource() && frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Remove style"),
                     Localization.lang("Are you sure you want to remove the style?"),
                     Localization.lang("Remove style"),
-                    Localization.lang("Cancel"));
-            if (!style.isFromResource() && removeStylePressed) {
+                    Localization.lang("Cancel"))) {
                 if (!loader.removeStyle(style)) {
                     LOGGER.info("Problem removing style");
                 }
