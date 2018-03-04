@@ -93,9 +93,9 @@ public class PreferencesDialog extends JabRefDialog {
         tabs.add(new ExportSortingPrefsTab(prefs));
         tabs.add(new NameFormatterTab(prefs));
         tabs.add(new XmpPrefsTab(prefs));
-        tabs.add(new NetworkTab(frame, prefs));
+        tabs.add(new NetworkTab(frame.getDialogService(), prefs));
         tabs.add(new AdvancedTab(frame.getDialogService(), prefs));
-        tabs.add(new AppearancePrefsTab(frame, prefs));
+        tabs.add(new AppearancePrefsTab(frame.getDialogService(), prefs));
 
         // add all tabs
         tabs.forEach(tab -> main.add((Component) tab, tab.getTabName()));

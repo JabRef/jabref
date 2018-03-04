@@ -17,8 +17,8 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
@@ -56,7 +56,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     private final JCheckBox customLAF;
     private final JCheckBox fxFontTweaksLAF;
 
-    private final JabRefFrame frame;
+    private final DialogService dialogService;
 
     static class LookAndFeel {
 
@@ -70,8 +70,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
      *
      * @param prefs a <code>JabRefPreferences</code> value
      */
-    public AppearancePrefsTab(JabRefFrame frame, JabRefPreferences prefs) {
-        this.frame = frame;
+    public AppearancePrefsTab(DialogService dialogService, JabRefPreferences prefs) {
+        this.dialogService = dialogService;
         this.prefs = prefs;
         setLayout(new BorderLayout());
 
@@ -286,7 +286,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             }
 
             if (isRestartRequired) {
-                frame.getDialogService().showWarningDialogAndWait(Localization.lang("Settings"),
+                dialogService.showWarningDialogAndWait(Localization.lang("Settings"),
                         Localization.lang("Some appearance settings you changed require to restart JabRef to come into effect."));
             }
 
@@ -303,7 +303,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             Integer.parseInt(fieldValue);
         } catch (NumberFormatException ex) {
 
-            frame.getDialogService().showErrorDialogAndWait(errorTitle, Localization.lang("You must enter an integer value in the text field for") + " '" + fieldName + "'");
+            dialogService.showErrorDialogAndWait(errorTitle, Localization.lang("You must enter an integer value in the text field for") + " '" + fieldName + "'");
             return false;
         }
         return true;

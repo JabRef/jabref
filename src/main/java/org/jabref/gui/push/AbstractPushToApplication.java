@@ -52,7 +52,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     @Override
-    public void pushEntries(BibDatabase database, List<BibEntry> entries, String keyString, MetaData metaData) {
+    public void pushEntries(BibDatabase database, List<BibEntry> entries, String keyString, MetaData metaData, DialogService dialogServie) {
 
         couldNotConnect = false;
         couldNotCall = false;

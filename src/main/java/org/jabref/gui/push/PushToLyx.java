@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
@@ -67,7 +68,7 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
 
     @Override
     public void pushEntries(BibDatabase database, final List<BibEntry> entries, final String keyString,
-            MetaData metaData) {
+            MetaData metaData, DialogService dialogService) {
 
         couldNotConnect = false;
         couldNotCall = false;

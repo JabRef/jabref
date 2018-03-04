@@ -731,11 +731,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                     // is indicated by the entry's group hit status:
                     if (entry.isGroupHit()) {
 
-                        //  return dialogService.showConfirmationDialogWithOptOutAndWait(title, message,
-                        //okButton, cancelButton,
-                        //Localization.lang("Disable this confirmation dialog"),
-                        // optOut -> Globals.prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, !optOut));
-
                         boolean continuePressed = frame.getDialogService().showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
                                 Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
                                 Localization.lang("Continue"),
@@ -1206,9 +1201,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             }
             BibEntry entry = selectionModel.getSelected().get(0);
 
-
             Optional<String> result = frame.getDialogService().showInputDialogAndWait(Localization.lang("Enter URL"), Localization.lang("Enter URL"));
-
 
             entries.getReadWriteLock().writeLock().lock();
             try {
@@ -1242,7 +1235,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             }
             entry = selectionModel.getSelected().get(0);
             if (!entry.getCiteKeyOptional().isPresent()) {
-
 
                 boolean generateKeyPressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Download file"),
                         Localization.lang("This entry has no BibTeX key. Generate key now?"),
