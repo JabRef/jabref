@@ -66,7 +66,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
         couldNotConnect = false;
         couldNotCall = false;
         notDefined = false;
-        dialogService = dialogService;
+        this.dialogService = dialogService;
 
         initParameters();
         commandPath = Globals.prefs.get(commandPathPreferenceKey);
