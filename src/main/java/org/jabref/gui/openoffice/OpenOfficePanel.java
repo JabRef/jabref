@@ -674,22 +674,22 @@ public class OpenOfficePanel extends AbstractWorker {
     }
 
     private void reportUndefinedParagraphFormat(UndefinedParagraphFormatException ex) {
-        //TODO: Javafx does not support html as far as I know
-
         frame.getDialogService().showErrorDialogAndWait(Localization.lang("Undefined paragraph format"),
-                Localization.lang("Your style file specifies the paragraph format '%0' which is undefined in your current OpenOffice/LibreOffice document.",
-                        ex.getFormatName()) + "\n" +
+                Localization.lang("Your style file specifies the paragraph format '%0', "
+                        + "which is undefined in your current OpenOffice/LibreOffice document.",
+                        ex.getFormatName())
+                        + "\n" +
                         Localization.lang("The paragraph format is controlled by the property 'ReferenceParagraphFormat' or 'ReferenceHeaderParagraphFormat' in the style file."));
 
     }
 
     private void reportUndefinedCharacterFormat(UndefinedCharacterFormatException ex) {
-        //TODO: Javafx does not support html as far as I know
-
         frame.getDialogService().showErrorDialogAndWait(Localization.lang("Undefined character format"),
                 Localization.lang(
-                        "Your style file specifies the character format '%0', which is undefined in your current OpenOffice/LibreOffice document.",
-                        ex.getFormatName()) + "\n"
+                        "Your style file specifies the character format '%0', "
+                                + "which is undefined in your current OpenOffice/LibreOffice document.",
+                        ex.getFormatName())
+                        + "\n"
                         + Localization.lang("The character format is controlled by the citation property 'CitationCharacterFormat' in the style file.")
 
         );

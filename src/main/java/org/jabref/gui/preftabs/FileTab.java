@@ -60,11 +60,9 @@ class FileTab extends JPanel implements PrefsTab {
     private final JRadioButton matchStartsWithKey = new JRadioButton(
             Localization.lang("Autolink files with names starting with the BibTeX key"));
     private final JTextField regExpTextField;
-    private final DialogService dialogService;
 
     public FileTab(DialogService dialogService, JabRefPreferences prefs) {
         this.prefs = prefs;
-        this.dialogService = dialogService;
 
         fileDir = new JTextField(25);
         bibLocAsPrimaryDir = new JCheckBox(Localization.lang("Use the BIB file location as primary file directory"));
