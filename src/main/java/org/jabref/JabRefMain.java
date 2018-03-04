@@ -1,6 +1,5 @@
 package org.jabref;
 
-import java.io.IOException;
 import java.net.Authenticator;
 
 import javax.swing.JFrame;
@@ -94,10 +93,21 @@ public class JabRefMain extends Application {
         }
     }
 
-    private static void start(String[] args) throws IOException {
+    private static void start(String[] args) {
         // Init preferences
         JabRefPreferences preferences = JabRefPreferences.getInstance();
         Globals.prefs = preferences;
+        // Perform Migrations
+        // Perform checks and changes for users with a preference set from an older JabRef version.
+        PreferencesMigrations.upgradePrefsToOrgJabRef();
+        PreferencesMigrations.upgradeSortOrder();
+        PreferencesMigrations.upgradeFaultyEncodingStrings();
+        PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
+        PreferencesMigrations.upgradeImportFileAndDirePatterns();
+        PreferencesMigrations.upgradeStoredCustomEntryTypes();
+        PreferencesMigrations.upgradeKeyBindingsToJavaFX();
+        PreferencesMigrations.addCrossRefRelatedFieldsForAutoComplete();
+        PreferencesMigrations.upgradeObsoleteLookAndFeels();
 
         // Process arguments
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);
@@ -113,19 +123,6 @@ public class JabRefMain extends Application {
         }
 
         Globals.startBackgroundTasks();
-
-
-        // Perform Migrations
-        // Perform checks and changes for users with a preference set from an older JabRef version.
-        PreferencesMigrations.upgradePrefsToOrgJabRef();
-        PreferencesMigrations.upgradeSortOrder();
-        PreferencesMigrations.upgradeFaultyEncodingStrings();
-        PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
-        PreferencesMigrations.upgradeImportFileAndDirePatterns();
-        PreferencesMigrations.upgradeStoredCustomEntryTypes();
-        PreferencesMigrations.upgradeKeyBindingsToJavaFX();
-        PreferencesMigrations.addCrossRefRelatedFieldsForAutoComplete();
-        PreferencesMigrations.upgradeObsoleteLookAndFeels();
 
         // Update handling of special fields based on preferences
         InternalBibtexFields
@@ -189,13 +186,7 @@ public class JabRefMain extends Application {
     @Override
     public void start(Stage mainStage) throws Exception {
         Platform.setImplicitExit(false);
-        SwingUtilities.invokeLater(() -> {
-                    try {
-                        start(arguments);
-                    } catch (IOException e) {
-                        LOGGER.error("Error while starting", e);
-                    }
-                }
+        SwingUtilities.invokeLater(() -> start(arguments)
         );
     }
 }
