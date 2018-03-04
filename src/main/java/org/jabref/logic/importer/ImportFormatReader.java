@@ -1,8 +1,6 @@
 package org.jabref.logic.importer;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -96,20 +94,6 @@ public class ImportFormatReader {
             }
         }
         return Optional.empty();
-    }
-
-    public ParserResult importFromFile(String format, String data) throws ImportException {
-        Optional<Importer> importer = getByCliId(format);
-
-        if (!importer.isPresent()) {
-            throw new ImportException(Localization.lang("Unknown import format") + ": " + format);
-        }
-
-        try {
-            return importer.get().importDatabase(new BufferedReader(new StringReader(data)));
-        } catch (IOException e) {
-            throw new ImportException(e);
-        }
     }
 
     public ParserResult importFromFile(String format, Path file) throws ImportException {

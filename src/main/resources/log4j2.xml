@@ -17,9 +17,9 @@
             <AppenderRef ref="GuiLogger"/>
             <AppenderRef ref="CONSOLE"/>
         </Logger>
-        <Root level="ERROR">
+        <Root level="INFO">
             <AppenderRef ref="CONSOLE"/>
-            <AppenderRef ref="applicationInsightsAppender"/>
+            <AppenderRef ref="applicationInsightsAppender" level="ERROR"/>
         </Root>
     </Loggers>
 </Configuration>
