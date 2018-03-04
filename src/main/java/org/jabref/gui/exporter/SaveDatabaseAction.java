@@ -9,8 +9,8 @@ import java.util.Optional;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;

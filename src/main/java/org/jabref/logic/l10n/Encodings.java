@@ -11,6 +11,9 @@ public class Encodings {
     private static List<Charset> encodingsList = Charset.availableCharsets().values().stream().distinct()
             .collect(Collectors.toList());
 
+    private Encodings() {
+    }
+
     static {
         List<String> encodingsStringList = encodingsList.stream().map(Charset::displayName).distinct()
                 .collect(Collectors.toList());
@@ -20,9 +23,6 @@ public class Encodings {
 
     public static List<Charset> getCharsets() {
         return encodingsList;
-    }
-
-    private Encodings() {
     }
 
 }

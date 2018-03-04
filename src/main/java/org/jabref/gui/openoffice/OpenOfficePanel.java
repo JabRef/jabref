@@ -637,13 +637,10 @@ public class OpenOfficePanel extends AbstractWorker {
         }
 
         // Ask if keys should be generated
-        String[] options = {Localization.lang("Generate keys"), Localization.lang("Cancel")};
-
         boolean citePressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Cite"),
                 Localization.lang("Cannot cite entries without BibTeX keys. Generate keys now?"),
                 Localization.lang("Generate keys"),
                 Localization.lang("Cancel"));
-
 
         BasePanel panel = frame.getCurrentBasePanel();
         if (citePressed && (panel != null)) {
@@ -672,41 +669,30 @@ public class OpenOfficePanel extends AbstractWorker {
     private void showConnectionLostErrorMessage() {
         frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection lost"),
                 Localization.lang("Connection to OpenOffice/LibreOffice has been lost. "
-                + "Please make sure OpenOffice/LibreOffice is running, and try to reconnect."));
+                        + "Please make sure OpenOffice/LibreOffice is running, and try to reconnect."));
 
     }
 
     private void reportUndefinedParagraphFormat(UndefinedParagraphFormatException ex) {
         //TODO: Javafx does not support html as far as I know
-        JOptionPane
-                .showMessageDialog(
-                        null, "<html>"
-                                + Localization.lang(
-                                        "Your style file specifies the paragraph format '%0', "
-                                                + "which is undefined in your current OpenOffice/LibreOffice document.",
-                                        ex.getFormatName())
-                                + "<br>"
-                                + Localization
-                                        .lang("The paragraph format is controlled by the property 'ReferenceParagraphFormat' or 'ReferenceHeaderParagraphFormat' in the style file.")
-                                + "</html>",
-                        "", JOptionPane.ERROR_MESSAGE);
+
+        frame.getDialogService().showErrorDialogAndWait(Localization.lang("Undefined paragraph format"),
+                Localization.lang("Your style file specifies the paragraph format '%0' which is undefined in your current OpenOffice/LibreOffice document.",
+                        ex.getFormatName()) + "\n" +
+                        Localization.lang("The paragraph format is controlled by the property 'ReferenceParagraphFormat' or 'ReferenceHeaderParagraphFormat' in the style file."));
+
     }
 
     private void reportUndefinedCharacterFormat(UndefinedCharacterFormatException ex) {
         //TODO: Javafx does not support html as far as I know
 
-        JOptionPane
-                .showMessageDialog(
-                        null, "<html>"
-                                + Localization.lang(
-                                        "Your style file specifies the character format '%0', "
-                                                + "which is undefined in your current OpenOffice/LibreOffice document.",
-                                        ex.getFormatName())
-                                + "<br>"
-                                + Localization
-                                        .lang("The character format is controlled by the citation property 'CitationCharacterFormat' in the style file.")
-                                + "</html>",
-                        "", JOptionPane.ERROR_MESSAGE);
+        frame.getDialogService().showErrorDialogAndWait(Localization.lang("Undefined character format"),
+                Localization.lang(
+                        "Your style file specifies the character format '%0', which is undefined in your current OpenOffice/LibreOffice document.",
+                        ex.getFormatName()) + "\n"
+                        + Localization.lang("The character format is controlled by the citation property 'CitationCharacterFormat' in the style file.")
+
+        );
     }
 
     private void showSettingsPopup() {

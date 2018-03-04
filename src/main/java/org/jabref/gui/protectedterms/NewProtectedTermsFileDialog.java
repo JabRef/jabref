@@ -63,7 +63,6 @@ public class NewProtectedTermsFileDialog extends JabRefDialog {
                 .withDefaultExtension(FileType.TERMS)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
 
-
         browse.addActionListener(e -> {
             Optional<Path> file = DefaultTaskExecutor
                     .runInJavaFXThread(() -> dialogService.showFileSaveDialog(fileDialogConfiguration));
