@@ -22,7 +22,6 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -167,8 +166,8 @@ class StyleSelectDialog {
             @Override
             public void actionPerformed(ActionEvent event) {
                 if ((table.getRowCount() == 0) || (table.getSelectedRowCount() == 0)) {
-                    JOptionPane.showMessageDialog(diag, Localization.lang("You must select a valid style file."),
-                            Localization.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Style selection"),
+                            Localization.lang("You must select a valid style file."));
                     return;
                 }
                 okPressed = true;
@@ -272,9 +271,11 @@ class StyleSelectDialog {
 
         // Create action listener for removing a style, also used for the remove button
         removeAction = actionEvent -> getSelectedStyle().ifPresent(style -> {
-            if (!style.isFromResource() && (JOptionPane.showConfirmDialog(diag,
-                    Localization.lang("Are you sure you want to remove the style?"), Localization.lang("Remove style"),
-                    JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)) {
+
+            if (!style.isFromResource() && frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Remove style"),
+                    Localization.lang("Are you sure you want to remove the style?"),
+                    Localization.lang("Remove style"),
+                    Localization.lang("Cancel"))) {
                 if (!loader.removeStyle(style)) {
                     LOGGER.info("Problem removing style");
                 }
@@ -285,7 +286,9 @@ class StyleSelectDialog {
         remove.addActionListener(removeAction);
 
         // Add action listener to the "Reload" menu item, which is supposed to reload an external style file
-        reload.addActionListener(actionEvent -> getSelectedStyle().ifPresent(style -> {
+        reload.addActionListener(actionEvent ->
+
+        getSelectedStyle().ifPresent(style -> {
             try {
                 style.ensureUpToDate();
             } catch (IOException e) {
@@ -374,28 +377,28 @@ class StyleSelectDialog {
         @Override
         public String getColumnName(int i) {
             switch (i) {
-            case 0:
-                return Localization.lang("Name");
-            case 1:
-                return Localization.lang("Journals");
-            case 2:
-                return Localization.lang("File");
-            default:
-                return "";
+                case 0:
+                    return Localization.lang("Name");
+                case 1:
+                    return Localization.lang("Journals");
+                case 2:
+                    return Localization.lang("File");
+                default:
+                    return "";
             }
         }
 
         @Override
         public Object getColumnValue(OOBibStyle style, int i) {
             switch (i) {
-            case 0:
-                return style.getName();
-            case 1:
-                return String.join(", ", style.getJournals());
-            case 2:
-                return style.isFromResource() ? Localization.lang("Internal style") : style.getFile().getName();
-            default:
-                return "";
+                case 0:
+                    return style.getName();
+                case 1:
+                    return String.join(", ", style.getJournals());
+                case 2:
+                    return style.isFromResource() ? Localization.lang("Internal style") : style.getFile().getName();
+                default:
+                    return "";
             }
         }
     }
@@ -472,7 +475,8 @@ class StyleSelectDialog {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .addExtensionFilter(FileType.JSTYLE)
                     .withDefaultExtension(FileType.JSTYLE)
-                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                    .build();
 
             browse.addActionListener(e -> {
                 Optional<Path> file = DefaultTaskExecutor
@@ -515,7 +519,8 @@ class StyleSelectDialog {
             addCancelButton.addActionListener(cancelAction);
 
             // Key bindings:
-            bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+            bb.getPanel()
+                    .getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                     .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
             bb.getPanel().getActionMap().put("close", cancelAction);
             pack();

@@ -14,7 +14,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
@@ -191,21 +190,25 @@ public class OpenDatabaseAction extends SimpleCommand {
                 if ((modificationTime.isPresent()) && ((System.currentTimeMillis()
                         - modificationTime.get().toMillis()) > FileBasedLock.LOCKFILE_CRITICAL_AGE)) {
                     // The lock file is fairly old, so we can offer to "steal" the file:
-                    int answer = JOptionPane.showConfirmDialog(null,
-                            "<html>" + Localization.lang("Error opening file") + " '" + fileName + "'. "
-                                    + Localization.lang("File is locked by another JabRef instance.") + "<p>"
+
+                    boolean overWriteFileLockPressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("File locked"),
+                            Localization.lang("Error opening file") + " '" + fileName + "'. "
+                                    + Localization.lang("File is locked by another JabRef instance.") + "\n"
                                     + Localization.lang("Do you want to override the file lock?"),
-                            Localization.lang("File locked"), JOptionPane.YES_NO_OPTION);
-                    if (answer == JOptionPane.YES_OPTION) {
+                            Localization.lang("Overwrite file lock"),
+                            Localization.lang("Cancel"));
+
+                    if (overWriteFileLockPressed) {
                         FileBasedLock.deleteLockFile(file);
                     } else {
                         return;
                     }
                 } else if (!FileBasedLock.waitForFileLock(file)) {
-                    JOptionPane.showMessageDialog(null,
+
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Error"),
                             Localization.lang("Error opening file") + " '" + fileName + "'. "
-                                    + Localization.lang("File is locked by another JabRef instance."),
-                            Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                                    + Localization.lang("File is locked by another JabRef instance."));
+
                     return;
                 }
             }
@@ -226,9 +229,10 @@ public class OpenDatabaseAction extends SimpleCommand {
                     result.getDatabaseContext().clearDatabaseFile(); // do not open the original file
                     result.getDatabase().clearSharedDatabaseID();
                     LOGGER.error("Connection error", e);
-                    JOptionPane.showMessageDialog(null,
-                            e.getMessage() + "\n\n" + Localization.lang("A local copy will be opened."),
-                            Localization.lang("Connection error"), JOptionPane.WARNING_MESSAGE);
+
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection error"),
+                            e.getMessage() + "\n\n" + Localization.lang("A local copy will be opened."));
+
                 }
             }
 

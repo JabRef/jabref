@@ -20,7 +20,6 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.undo.UndoableEdit;
@@ -63,7 +62,6 @@ public class MassSetFieldAction extends SimpleCommand {
     private boolean canceled = true;
     private JCheckBox overwrite;
 
-
     public MassSetFieldAction(JabRefFrame frame) {
         this.frame = frame;
     }
@@ -98,8 +96,8 @@ public class MassSetFieldAction extends SimpleCommand {
         }
 
         set.addChangeListener(e ->
-                // Entering a setText is only relevant if we are setting, not clearing:
-                textFieldSet.setEnabled(set.isSelected()));
+        // Entering a setText is only relevant if we are setting, not clearing:
+        textFieldSet.setEnabled(set.isSelected()));
 
         append.addChangeListener(e -> {
             // Text to append is only required if we are appending:
@@ -109,12 +107,12 @@ public class MassSetFieldAction extends SimpleCommand {
         });
 
         clear.addChangeListener(e ->
-                // Overwrite protection makes no sense if we are clearing the field:
-                overwrite.setEnabled(!clear.isSelected() && !append.isSelected()));
+        // Overwrite protection makes no sense if we are clearing the field:
+        overwrite.setEnabled(!clear.isSelected() && !append.isSelected()));
 
         rename.addChangeListener(e ->
-                // Entering a setText is only relevant if we are renaming
-                textFieldRename.setEnabled(rename.isSelected()));
+        // Entering a setText is only relevant if we are renaming
+        textFieldRename.setEnabled(rename.isSelected()));
 
         overwrite = new JCheckBox(Localization.lang("Overwrite existing field values"), true);
         ButtonGroup bg = new ButtonGroup();
@@ -158,8 +156,9 @@ public class MassSetFieldAction extends SimpleCommand {
             // Check that any field name is set
             String fieldText = (String) field.getSelectedItem();
             if ((fieldText == null) || fieldText.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(diag, Localization.lang("You must enter at least one field name"), "",
-                        JOptionPane.ERROR_MESSAGE);
+
+                frame.getDialogService().showErrorDialogAndWait(Localization.lang("You must enter at least one field name"));
+
                 return; // Do not close the dialog.
             }
 
@@ -167,8 +166,9 @@ public class MassSetFieldAction extends SimpleCommand {
             if (rename.isSelected()) {
                 String[] fields = getFieldNames(fieldText);
                 if (fields.length > 1) {
-                    JOptionPane.showMessageDialog(diag, Localization.lang("You can only rename one field at a time"),
-                            "", JOptionPane.ERROR_MESSAGE);
+
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("You can only rename one field at a time"));
+
                     return; // Do not close the dialog.
                 }
             }
@@ -243,8 +243,7 @@ public class MassSetFieldAction extends SimpleCommand {
         NamedCompound compoundEdit = new NamedCompound(Localization.lang("Set field"));
         if (rename.isSelected()) {
             if (fields.length > 1) {
-                JOptionPane.showMessageDialog(diag, Localization.lang("You can only rename one field at a time"), "",
-                        JOptionPane.ERROR_MESSAGE);
+                frame.getDialogService().showErrorDialogAndWait(Localization.lang("You can only rename one field at a time"));
                 return; // Do not close the dialog.
             } else {
                 compoundEdit.addEdit(MassSetFieldAction.massRenameField(entryList, fields[0], textFieldRename.getText(),
@@ -258,7 +257,7 @@ public class MassSetFieldAction extends SimpleCommand {
             for (String field : fields) {
                 compoundEdit.addEdit(MassSetFieldAction.massSetField(entryList, field,
                         set.isSelected() ? toSet : null,
-                                overwrite.isSelected()));
+                        overwrite.isSelected()));
             }
         }
         compoundEdit.end();

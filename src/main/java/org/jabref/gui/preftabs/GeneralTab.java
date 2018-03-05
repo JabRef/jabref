@@ -13,11 +13,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Encodings;
@@ -51,8 +51,10 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final JComboBox<String> language = new JComboBox<>(LANGUAGES.keySet().toArray(new String[LANGUAGES.keySet().size()]));
     private final JComboBox<Charset> encodings;
     private final JComboBox<BibDatabaseMode> biblatexMode;
+    private final DialogService dialogService;
 
     public class DefaultBibModeRenderer extends DefaultListCellRenderer {
+
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
                 boolean cellHasFocus) {
@@ -62,9 +64,9 @@ class GeneralTab extends JPanel implements PrefsTab {
         }
     }
 
-
-    public GeneralTab(JabRefPreferences prefs) {
+    public GeneralTab(DialogService dialogService, JabRefPreferences prefs) {
         this.prefs = prefs;
+        this.dialogService = dialogService;
         setLayout(new BorderLayout());
 
         biblatexMode = new JComboBox<>(BibDatabaseMode.values());
@@ -204,10 +206,10 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY, enforceLegalKeys.isSelected());
         prefs.setShouldCollectTelemetry(shouldCollectTelemetry.isSelected());
         if (prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE) && !memoryStick.isSelected()) {
-            JOptionPane.showMessageDialog(null, Localization.lang("To disable the memory stick mode"
-                            + " rename or remove the jabref.xml file in the same folder as JabRef."),
-                    Localization.lang("Memory stick mode"),
-                    JOptionPane.INFORMATION_MESSAGE);
+
+            dialogService.showInformationDialogAndWait(Localization.lang("Memory stick mode"),
+                    Localization.lang("To disable the memory stick mode"
+                            + " rename or remove the jabref.xml file in the same folder as JabRef."));
         }
         prefs.putBoolean(JabRefPreferences.MEMORY_STICK_MODE, memoryStick.isSelected());
         prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, confirmDelete.isSelected());
@@ -227,12 +229,11 @@ class GeneralTab extends JPanel implements PrefsTab {
             // Update any defaults that might be language dependent:
             Globals.prefs.setLanguageDependentDefaultValues();
             // Warn about restart needed:
-            JOptionPane.showMessageDialog(null,
+
+            dialogService.showWarningDialogAndWait(Localization.lang("Changed language settings"),
                     Localization.lang("You have changed the language setting.")
                             .concat(" ")
-                            .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
-                    Localization.lang("Changed language settings"),
-                    JOptionPane.WARNING_MESSAGE);
+                            .concat(Localization.lang("You must restart JabRef for this to come into effect.")));
         }
     }
 
@@ -243,10 +244,9 @@ class GeneralTab extends JPanel implements PrefsTab {
             DateTimeFormatter.ofPattern(timeStampFormat.getText());
 
         } catch (IllegalArgumentException ex2) {
-            JOptionPane.showMessageDialog
-                    (null, Localization.lang("The chosen date format for new entries is not valid"),
-                            Localization.lang("Invalid date format"),
-                            JOptionPane.ERROR_MESSAGE);
+            dialogService.showErrorDialogAndWait(Localization.lang("Invalid date format"),
+                    Localization.lang("The chosen date format for new entries is not valid"));
+
             return false;
         }
         return true;

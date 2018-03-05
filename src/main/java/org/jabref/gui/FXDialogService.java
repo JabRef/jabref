@@ -2,6 +2,7 @@ package org.jabref.gui;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.Region;
@@ -66,7 +68,7 @@ public class FXDialogService implements DialogService {
     }
 
     private static FXDialog createDialogWithOptOut(AlertType type, String title, String content,
-                                                   String optOutMessage, Consumer<Boolean> optOutAction) {
+            String optOutMessage, Consumer<Boolean> optOutAction) {
         FXDialog alert = new FXDialog(type, title, true);
         // Need to force the alert to layout in order to grab the graphic as we are replacing the dialog pane with a custom pane
         alert.getDialogPane().applyCss();
@@ -75,6 +77,7 @@ public class FXDialogService implements DialogService {
         // Create a new dialog pane that has a checkbox instead of the hide/show details button
         // Use the supplied callback for the action of the checkbox
         alert.setDialogPane(new DialogPane() {
+
             @Override
             protected Node createDetailsButton() {
                 CheckBox optOut = new CheckBox();
@@ -95,6 +98,17 @@ public class FXDialogService implements DialogService {
         alert.setContentText(content);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         return alert;
+    }
+
+    @Override
+    public <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices) {
+        ChoiceDialog<T> choiceDialog = new ChoiceDialog<>(defaultChoice, choices);
+        ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
+        choiceDialog.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, okButtonType);
+        choiceDialog.setHeaderText(title);
+        choiceDialog.setContentText(content);
+        return choiceDialog.showAndWait();
+
     }
 
     @Override
@@ -160,7 +174,7 @@ public class FXDialogService implements DialogService {
 
     @Override
     public boolean showConfirmationDialogAndWait(String title, String content,
-                                                 String okButtonLabel, String cancelButtonLabel) {
+            String okButtonLabel, String cancelButtonLabel) {
         FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelButtonType = new ButtonType(cancelButtonLabel, ButtonBar.ButtonData.NO);
@@ -170,7 +184,7 @@ public class FXDialogService implements DialogService {
 
     @Override
     public boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
-                                                           String optOutMessage, Consumer<Boolean> optOutAction) {
+            String optOutMessage, Consumer<Boolean> optOutAction) {
         FXDialog alert = createDialogWithOptOut(AlertType.CONFIRMATION, title, content, optOutMessage, optOutAction);
         alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
         return alert.showAndWait().filter(buttonType -> buttonType == ButtonType.YES).isPresent();
@@ -178,8 +192,8 @@ public class FXDialogService implements DialogService {
 
     @Override
     public boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
-                                                           String okButtonLabel, String cancelButtonLabel,
-                                                           String optOutMessage, Consumer<Boolean> optOutAction) {
+            String okButtonLabel, String cancelButtonLabel,
+            String optOutMessage, Consumer<Boolean> optOutAction) {
         FXDialog alert = createDialogWithOptOut(AlertType.CONFIRMATION, title, content, optOutMessage, optOutAction);
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.YES);
         ButtonType cancelButtonType = new ButtonType(cancelButtonLabel, ButtonBar.ButtonData.NO);

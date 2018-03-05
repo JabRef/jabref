@@ -1,10 +1,15 @@
 package org.jabref.gui.push;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefIcon;
 import org.jabref.preferences.JabRefPreferences;
 
 public class PushToTeXstudio extends AbstractPushToApplication implements PushToApplication {
+
+    public PushToTeXstudio(DialogService dialogService) {
+        super(dialogService);
+    }
 
     @Override
     public String getApplicationName() {

@@ -153,6 +153,7 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
         builder.add(Localization.lang("Found more than one OpenOffice/LibreOffice executable.")).xy(1, 1);
         builder.add(Localization.lang("Please choose which one to connect to:")).xy(1, 3);
         builder.add(fileList).xy(1, 5);
+
         int answer = JOptionPane.showConfirmDialog(null, builder.getPanel(),
                 Localization.lang("Choose OpenOffice/LibreOffice executable"), JOptionPane.OK_CANCEL_OPTION);
         if (answer == JOptionPane.CANCEL_OPTION) {

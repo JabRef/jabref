@@ -7,11 +7,11 @@ import java.awt.Insets;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -30,8 +30,10 @@ public class NetworkTab extends JPanel implements PrefsTab {
     private final JPasswordField passwordTextField;
     private final JabRefPreferences preferences;
     private ProxyPreferences oldProxyPreferences;
+    private final DialogService dialogService;
 
-    public NetworkTab(JabRefPreferences preferences) {
+    public NetworkTab(DialogService dialogService, JabRefPreferences preferences) {
+        this.dialogService = dialogService;
         this.preferences = preferences;
 
         setLayout(new BorderLayout());
@@ -158,11 +160,13 @@ public class NetworkTab extends JPanel implements PrefsTab {
         }
         if (!validSetting) {
             if (validAuthenticationSetting) {
-                JOptionPane.showMessageDialog(null, Localization.lang("Please specify both hostname and port"),
-                        Localization.lang("Invalid setting"), JOptionPane.ERROR_MESSAGE);
+
+                dialogService.showErrorDialogAndWait(Localization.lang("Invalid setting"),
+                        Localization.lang("Please specify both hostname and port"));
             } else {
-                JOptionPane.showMessageDialog(null, Localization.lang("Please specify both username and password"),
-                        Localization.lang("Invalid setting"), JOptionPane.ERROR_MESSAGE);
+                dialogService.showErrorDialogAndWait(Localization.lang("Invalid setting"),
+                        Localization.lang("Please specify both username and password"));
+
             }
         }
         return validSetting;
