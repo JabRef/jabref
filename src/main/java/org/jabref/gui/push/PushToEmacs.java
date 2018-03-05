@@ -25,15 +25,12 @@ import org.slf4j.LoggerFactory;
 
 public class PushToEmacs extends AbstractPushToApplication implements PushToApplication {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PushToEmacs.class);
+    private final JTextField additionalParams = new JTextField(30);
+
     public PushToEmacs(DialogService dialogService) {
         super(dialogService);
     }
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PushToEmacs.class);
-
-    private final JTextField additionalParams = new JTextField(30);
-
-
 
     @Override
     public String getApplicationName() {

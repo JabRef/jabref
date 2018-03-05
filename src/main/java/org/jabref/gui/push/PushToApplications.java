@@ -9,11 +9,10 @@ public class PushToApplications {
 
     private final List<PushToApplication> applications;
 
-
     public PushToApplications(DialogService dialogService) {
-    /**
-     * Set up the current available choices:
-     */
+        /**
+         * Set up the current available hoices:
+         */
 
         applications = new ArrayList<>();
 
