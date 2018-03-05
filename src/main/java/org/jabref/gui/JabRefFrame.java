@@ -169,13 +169,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     // Note: GeneralAction's constructor automatically gets translations
     // for the name and message strings.
 
-    private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, Localization.menuTitle("Mark entries"),
-            Localization.lang("Mark entries"), Globals.getKeyPrefs().getKey(KeyBinding.MARK_ENTRIES), IconTheme.JabRefIcons.MARK_ENTRIES.getIcon());
-    private final JMenu markSpecific = JabRefFrame.subMenu(Localization.menuTitle("Mark specific color"));
-    private final AbstractAction unmark = new GeneralAction(Actions.UNMARK_ENTRIES,
-            Localization.menuTitle("Unmark entries"), Localization.lang("Unmark entries"),
-            Globals.getKeyPrefs().getKey(KeyBinding.UNMARK_ENTRIES), IconTheme.JabRefIcons.UNMARK_ENTRIES.getIcon());
-    private final AbstractAction unmarkAll = new GeneralAction(Actions.UNMARK_ALL, Localization.menuTitle("Unmark all"));
     private final AbstractAction toggleRelevance = new GeneralAction(
             new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getCommand(),
             new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getMenuString(),
@@ -852,16 +845,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 new SeparatorMenuItem()
 
         );
-        /*
-        edit.add(mark);
-        for (int i = 0; i < EntryMarker.MAX_MARKING_LEVEL; i++) {
-            markSpecific.add(new MarkEntriesAction(this, i).getMenuItem());
-        }
-        edit.add(markSpecific);
-        edit.add(unmark);
-        edit.add(unmarkAll);
-        edit.addSeparator();
-        */
+
         /* TODO
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
             boolean menuitem = false;

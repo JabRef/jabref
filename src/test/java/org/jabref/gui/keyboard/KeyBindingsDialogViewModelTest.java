@@ -45,7 +45,7 @@ public class KeyBindingsDialogViewModelTest {
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.COPY, shortcutKeyEvent));
         model.setNewBindingForCurrent(shortcutKeyEvent);
         KeyCombination combination = KeyCombination.keyCombination(keyBindingRepository.get(KeyBinding.COPY).get());
-        assertFalse(keyBindingRepository.checkKeyCombinationEquality(combination, shortcutKeyEvent));
+        assertFalse(KeyBindingRepository.checkKeyCombinationEquality(combination, shortcutKeyEvent));
         model.saveKeyBindings();
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.COPY, shortcutKeyEvent));
     }
@@ -63,7 +63,7 @@ public class KeyBindingsDialogViewModelTest {
         KeyCombination combination = KeyCombination
                 .keyCombination(keyBindingRepository.get(KeyBinding.IMPORT_INTO_NEW_DATABASE).get());
 
-        assertTrue(keyBindingRepository.checkKeyCombinationEquality(combination, shortcutKeyEvent));
+        assertTrue(KeyBindingRepository.checkKeyCombinationEquality(combination, shortcutKeyEvent));
 
         model.saveKeyBindings();
 
@@ -90,9 +90,9 @@ public class KeyBindingsDialogViewModelTest {
 
         KeyCombination combination = KeyCombination.keyCombination(keyBindingRepository.get(KeyBinding.CLEANUP).get());
 
-        assertTrue(keyBindingRepository.checkKeyCombinationEquality(combination, shortcutKeyEvent));
+        assertTrue(KeyBindingRepository.checkKeyCombinationEquality(combination, shortcutKeyEvent));
 
-        assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyCombination.valueOf(KeyBinding.CLEANUP.getDefaultKeyBinding()), shortcutKeyEvent));
+        assertFalse(KeyBindingRepository.checkKeyCombinationEquality(KeyCombination.valueOf(KeyBinding.CLEANUP.getDefaultKeyBinding()), shortcutKeyEvent));
     }
 
     @Test
@@ -111,16 +111,16 @@ public class KeyBindingsDialogViewModelTest {
 
     @Test
     public void testSaveNewSpecialKeysKeyBindingsToPreferences() {
-        setKeyBindingViewModel(KeyBinding.UNMARK_ENTRIES);
+        setKeyBindingViewModel(KeyBinding.ABBREVIATE);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "F1", "F1", KeyCode.F1, true, false, false,
                 false);
 
-        assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.UNMARK_ENTRIES, shortcutKeyEvent));
+        assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
         model.setNewBindingForCurrent(shortcutKeyEvent);
 
         model.saveKeyBindings();
 
-        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.UNMARK_ENTRIES, shortcutKeyEvent));
+        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
     }
 
     @Test

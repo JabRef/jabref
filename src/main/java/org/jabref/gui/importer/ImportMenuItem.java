@@ -16,9 +16,7 @@ import javax.swing.JOptionPane;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.EntryMarker;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;
@@ -232,11 +230,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 // set timestamp and owner
                 UpdateField.setAutomaticFields(entries, Globals.prefs.getUpdateFieldPreferences()); // set timestamp and owner
 
-                boolean markEntries = !openInNew && EntryMarker.shouldMarkEntries();
                 for (BibEntry entry : entries) {
-                    if (markEntries) {
-                        EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
-                    }
                     database.insertEntry(entry);
                 }
             }

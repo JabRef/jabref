@@ -43,8 +43,6 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final JCheckBox useTimeStamp;
     private final JCheckBox updateTimeStamp;
     private final JCheckBox overwriteTimeStamp;
-    private final JCheckBox markImportedEntries;
-    private final JCheckBox unmarkAllEntriesBeforeImporting;
     private final JTextField defOwnerField;
 
     private final JTextField timeStampFormat;
@@ -87,8 +85,6 @@ class GeneralTab extends JPanel implements PrefsTab {
         enforceLegalKeys = new JCheckBox(Localization.lang("Enforce legal characters in BibTeX keys"));
         confirmDelete = new JCheckBox(Localization.lang("Show confirmation dialog when deleting entries"));
 
-        markImportedEntries = new JCheckBox(Localization.lang("Mark entries imported into an existing library"));
-        unmarkAllEntriesBeforeImporting = new JCheckBox(Localization.lang("Unmark all entries before importing new entries into an existing library"));
         defOwnerField = new JTextField();
         timeStampFormat = new JTextField();
         timeStampField = new JTextField();
@@ -138,10 +134,6 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(updateTimeStamp, 11);
         builder.nextLine();
 
-        builder.append(markImportedEntries, 13);
-        builder.nextLine();
-        builder.append(unmarkAllEntriesBeforeImporting, 13);
-        builder.nextLine();
         builder.append(shouldCollectTelemetry, 13);
         builder.nextLine();
         JLabel lab;
@@ -180,8 +172,6 @@ class GeneralTab extends JPanel implements PrefsTab {
         timeStampFormat.setText(prefs.get(JabRefPreferences.TIME_STAMP_FORMAT));
         timeStampField.setText(prefs.get(JabRefPreferences.TIME_STAMP_FIELD));
         inspectionWarnDupli.setSelected(prefs.getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION));
-        markImportedEntries.setSelected(prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
-        unmarkAllEntriesBeforeImporting.setSelected(prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING));
         if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
             biblatexMode.setSelectedItem(BibDatabaseMode.BIBLATEX);
         } else {
@@ -229,8 +219,6 @@ class GeneralTab extends JPanel implements PrefsTab {
         // Update name of the time stamp field based on preferences
         InternalBibtexFields.updateTimeStampField(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD));
         prefs.setDefaultEncoding((Charset) encodings.getSelectedItem());
-        prefs.putBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES, markImportedEntries.isSelected());
-        prefs.putBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, unmarkAllEntriesBeforeImporting.isSelected());
         prefs.putBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE, biblatexMode.getSelectedItem() == BibDatabaseMode.BIBLATEX);
 
         if (!LANGUAGES.get(language.getSelectedItem()).equals(prefs.get(JabRefPreferences.LANGUAGE))) {

@@ -61,13 +61,11 @@ import javax.swing.text.StyledDocument;
 import org.jabref.Globals;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.EntryMarker;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.component.OverlayPanel;
@@ -478,15 +476,8 @@ public class TextInputDialog extends JabRefDialog {
             return false;
         } else {
             UpdateField.setAutomaticFields(importedEntries, false, false, Globals.prefs.getUpdateFieldPreferences());
-            boolean markEntries = EntryMarker.shouldMarkEntries();
 
-            for (BibEntry e : importedEntries) {
-                if (markEntries) {
-                    EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
-                }
-
-                frame.getCurrentBasePanel().insertEntry(e);
-            }
+            importedEntries.forEach(entry -> frame.getCurrentBasePanel().insertEntry(entry));
             return true;
         }
     }
