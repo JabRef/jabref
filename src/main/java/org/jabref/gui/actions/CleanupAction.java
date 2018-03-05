@@ -12,7 +12,6 @@ import org.jabref.gui.cleanup.CleanupPresetPanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.util.component.CheckBoxMessage;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.CleanupWorker;
@@ -73,15 +72,15 @@ public class CleanupAction extends AbstractWorker {
         cleanupPreset.storeInPreferences(preferences);
 
         if (cleanupPreset.isRenamePDF() && Globals.prefs.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
-            CheckBoxMessage cbm = new CheckBoxMessage(
+
+            boolean autogeneratePressed = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Autogenerate PDF Names"),
                     Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
-                    Localization.lang("Disable this confirmation dialog"), false);
-            int answer = JOptionPane.showConfirmDialog(null, cbm, Localization.lang("Autogenerate PDF Names"),
-                    JOptionPane.YES_NO_OPTION);
-            if (cbm.isSelected()) {
-                Globals.prefs.putBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN, false);
-            }
-            if (answer == JOptionPane.NO_OPTION) {
+                    Localization.lang("Autogenerate PDF Names"),
+                    Localization.lang("Cancel"),
+                    Localization.lang("Disable this confirmation dialog"),
+                    optOut -> Globals.prefs.putBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN, !optOut));
+
+            if (!autogeneratePressed) {
                 canceled = true;
                 return;
             }
@@ -117,15 +116,15 @@ public class CleanupAction extends AbstractWorker {
         }
         String message;
         switch (modifiedEntriesCount) {
-        case 0:
-            message = Localization.lang("No entry needed a clean up");
-            break;
-        case 1:
-            message = Localization.lang("One entry needed a clean up");
-            break;
-        default:
-            message = Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
-            break;
+            case 0:
+                message = Localization.lang("No entry needed a clean up");
+                break;
+            case 1:
+                message = Localization.lang("One entry needed a clean up");
+                break;
+            default:
+                message = Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
+                break;
         }
         panel.output(message);
     }

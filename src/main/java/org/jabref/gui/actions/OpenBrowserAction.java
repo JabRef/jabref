@@ -16,5 +16,4 @@ public class OpenBrowserAction extends SimpleCommand {
 
     }
 
-
 }

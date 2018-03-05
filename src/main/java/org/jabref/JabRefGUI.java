@@ -20,6 +20,8 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.AbstractView;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
@@ -41,7 +43,6 @@ import org.jabref.preferences.JabRefPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class JabRefGUI {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
@@ -51,12 +52,14 @@ public class JabRefGUI {
     private final boolean isBlank;
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
+    private final DialogService dialogService;
 
     private final String focusedFile;
 
     public JabRefGUI(Stage mainStage, List<ParserResult> argsDatabases, boolean isBlank) {
         this.bibDatabases = argsDatabases;
         this.isBlank = isBlank;
+        this.dialogService = new FXDialogService(mainStage);
 
         // passed file (we take the first one) should be focused
         focusedFile = argsDatabases.stream().findFirst().flatMap(ParserResult::getFile).map(File::getAbsolutePath)
@@ -159,12 +162,11 @@ public class JabRefGUI {
         });
 
         for (ParserResult pr : failed) {
-            String message = "<html>" + Localization.lang("Error opening file '%0'.", pr.getFile().get().getName())
-                    + "<p>"
-                    + pr.getErrorMessage() + "</html>";
+            String message = Localization.lang("Error opening file '%0'.", pr.getFile().get().getName()) + "\n"
+                    + pr.getErrorMessage();
 
-            JOptionPane.showMessageDialog(null, message, Localization.lang("Error opening file"),
-                    JOptionPane.ERROR_MESSAGE);
+            dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
+
         }
 
         // Display warnings, if any
@@ -206,7 +208,7 @@ public class JabRefGUI {
             }
 
             if (BackupManager.checkForBackupFile(dbFile.toPath())) {
-                BackupUIManager.showRestoreBackupDialog(null, dbFile.toPath());
+                BackupUIManager.showRestoreBackupDialog(dialogService, dbFile.toPath());
             }
 
             ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,
@@ -264,11 +266,11 @@ public class JabRefGUI {
                     // also set system l&f as default
                     Globals.prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, systemLookFeel);
                     // notify the user
-                    JOptionPane.showMessageDialog(null,
-                            Localization
-                                    .lang("Unable to find the requested look and feel and thus the default one is used."),
-                            Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
+
                     LOGGER.warn("Unable to find requested look and feel", e);
+                    dialogService.showWarningDialogAndWait(Localization.lang("Warning"),
+                            Localization.lang("Unable to find the requested look and feel and thus the default one is used."));
+
                 }
             }
 

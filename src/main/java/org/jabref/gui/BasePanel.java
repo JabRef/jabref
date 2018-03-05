@@ -84,7 +84,6 @@ import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.component.CheckBoxMessage;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.gui.worker.CallBack;
 import org.jabref.gui.worker.CitationStyleToClipboardWorker;
@@ -349,8 +348,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         actions.put(Actions.CUT, (BaseAction) mainTable::cut);
 
-        //when you modify this action be sure to adjust Actions.CUT,
-        //they are the same except of the Localization, delete confirmation and Actions.COPY call
         actions.put(Actions.DELETE, (BaseAction) () -> delete(false));
 
         // The action for pasting entries or cell contents.
@@ -422,15 +419,16 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                     // if we're going to override some cite keys warn the user about it
                 } else if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
                     if (entries.parallelStream().anyMatch(BibEntry::hasCiteKey)) {
-                        CheckBoxMessage cbm = new CheckBoxMessage(
+
+                        boolean overwriteKeysPressed = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Overwrite keys"),
                                 Localization.lang("One or more keys will be overwritten. Continue?"),
-                                Localization.lang("Disable this confirmation dialog"), false);
-                        final int answer = JOptionPane.showConfirmDialog(null, cbm,
-                                Localization.lang("Overwrite keys"), JOptionPane.YES_NO_OPTION);
-                        Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !cbm.isSelected());
+                                Localization.lang("Overwrite keys"),
+                                Localization.lang("Cancel"),
+                                Localization.lang("Disable this confirmation dialog"),
+                                optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !optOut));
 
                         // The user doesn't want to overide cite keys
-                        if (answer == JOptionPane.NO_OPTION) {
+                        if (!overwriteKeysPressed) {
                             canceled = true;
                             return;
                         }
@@ -527,7 +525,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         actions.put(Actions.OPEN_URL, new OpenURLAction());
 
-        actions.put(Actions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(this));
+        actions.put(Actions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(this, frame.getDialogService()));
 
         actions.put(Actions.REPLACE_ALL, (BaseAction) () -> {
             final ReplaceStringDialog rsd = new ReplaceStringDialog(frame);
@@ -559,47 +557,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         /*     actions.put(Actions.DUPLI_CHECK,
                 (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(new DuplicateSearch(BasePanel.this)));
         */
-
-        // TODO
-        //actions.put(Actions.MARK_ENTRIES, new MarkEntriesAction(frame, 0));
-
-        actions.put(Actions.UNMARK_ENTRIES, (BaseAction) () -> {
-            try {
-                List<BibEntry> bes = mainTable.getSelectedEntries();
-                if (bes.isEmpty()) {
-                    output(Localization.lang("This operation requires one or more entries to be selected."));
-                    return;
-                }
-                NamedCompound ce = new NamedCompound(Localization.lang("Unmark entries"));
-                for (BibEntry be : bes) {
-                    EntryMarker.unmarkEntry(be, false, bibDatabaseContext.getDatabase(), ce);
-                }
-                ce.end();
-                getUndoManager().addEdit(ce);
-                markBaseChanged();
-                String outputStr;
-                if (bes.size() == 1) {
-                    outputStr = Localization.lang("Unmarked selected entry");
-                } else {
-                    outputStr = Localization.lang("Unmarked all %0 selected entries", Integer.toString(bes.size()));
-                }
-                output(outputStr);
-            } catch (Throwable ex) {
-                LOGGER.warn("Could not unmark", ex);
-            }
-        });
-
-        actions.put(Actions.UNMARK_ALL, (BaseAction) () -> {
-            NamedCompound ce = new NamedCompound(Localization.lang("Unmark all"));
-
-            for (BibEntry be : bibDatabaseContext.getDatabase().getEntries()) {
-                EntryMarker.unmarkEntry(be, false, bibDatabaseContext.getDatabase(), ce);
-            }
-            ce.end();
-            getUndoManager().addEdit(ce);
-            markBaseChanged();
-            output(Localization.lang("Unmarked all entries"));
-        });
 
         // Note that we can't put the number of entries that have been reverted into the undoText as the concrete number cannot be injected
         actions.put(new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getCommand(),
@@ -659,7 +616,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         actions.put(Actions.REMOVE_FROM_GROUP, new GroupAddRemoveDialog(this, false, false));
         actions.put(Actions.MOVE_TO_GROUP, new GroupAddRemoveDialog(this, true, true));
 
-        actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this));
+        actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(frame.getDialogService(), this));
     }
 
     /**
@@ -968,6 +925,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                     new String[] {Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
 
             if (answer == JOptionPane.NO_OPTION) {
+
                 // The user wants to use another encoding.
                 Object choice = JOptionPane.showInputDialog(null, Localization.lang("Select encoding"), SAVE_DATABASE,
                         JOptionPane.QUESTION_MESSAGE, null, Encodings.ENCODINGS_DISPLAYNAMES, enc);
@@ -1562,22 +1520,21 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
     public boolean showDeleteConfirmationDialog(int numberOfEntries) {
         if (Globals.prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE)) {
-            String msg;
-            msg = Localization.lang("Really delete the selected entry?");
             String title = Localization.lang("Delete entry");
+            String message = Localization.lang("Really delete the selected entry?");
+            String okButton = Localization.lang("Delete entry");
+            String cancelButton = Localization.lang("Keep entry");
             if (numberOfEntries > 1) {
-                msg = Localization.lang("Really delete the %0 selected entries?", Integer.toString(numberOfEntries));
                 title = Localization.lang("Delete multiple entries");
+                message = Localization.lang("Really delete the %0 selected entries?", Integer.toString(numberOfEntries));
+                okButton = Localization.lang("Delete entries");
+                cancelButton = Localization.lang("Keep entries");
             }
 
-            CheckBoxMessage cb = new CheckBoxMessage(msg, Localization.lang("Disable this confirmation dialog"), false);
-
-            int answer = JOptionPane.showConfirmDialog(null, cb, title, JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE);
-            if (cb.isSelected()) {
-                Globals.prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, false);
-            }
-            return answer == JOptionPane.YES_OPTION;
+            return dialogService.showConfirmationDialogWithOptOutAndWait(title, message,
+                    okButton, cancelButton,
+                    Localization.lang("Disable this confirmation dialog"),
+                    optOut -> Globals.prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, !optOut));
         } else {
             return true;
         }
@@ -1963,8 +1920,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         @Override
         public void action() {
             try {
-
-                JComponent focused = Globals.getFocusListener().getFocused();
                 getUndoManager().redo();
                 markBaseChanged();
                 frame.output(Localization.lang("Redo"));

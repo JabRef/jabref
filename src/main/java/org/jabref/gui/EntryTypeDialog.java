@@ -20,7 +20,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -331,13 +330,13 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
                     dispose();
                 } else if (searchID.trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, Localization.lang("The given search ID was empty."), Localization.lang("Empty search ID"), JOptionPane.WARNING_MESSAGE);
+                    frame.getDialogService().showWarningDialogAndWait(Localization.lang("Empty search ID"),
+                            Localization.lang("The given search ID was empty."));
                 } else if (!fetcherException) {
-                    JOptionPane.showMessageDialog(null, Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("No files found.",
+                            Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage));
                 } else {
-                    JOptionPane.showMessageDialog(null,
-                            Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage,
-                            Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Error"), Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage);
                 }
                 fetcherWorker = new FetcherWorker();
                 SwingUtilities.invokeLater(() -> {

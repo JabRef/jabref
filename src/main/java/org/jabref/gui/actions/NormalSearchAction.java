@@ -1,6 +1,5 @@
 package org.jabref.gui.actions;
 
-
 public class NormalSearchAction extends SimpleCommand {
 
     @Override

@@ -41,7 +41,7 @@ public class CustomJFXPanel extends JFXPanel {
     }
 
     public static JFXPanel wrap(Scene scene) {
-        JFXPanel container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+        JFXPanel container = new JFXPanel();
         scene.getStylesheets().add(AbstractView.class.getResource("Main.css").toExternalForm());
         DefaultTaskExecutor.runInJavaFXThread(() -> container.setScene(scene));
         return container;
