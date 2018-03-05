@@ -207,9 +207,7 @@ public class IconTheme {
         COMMENT(MaterialDesignIcon.COMMENT),
         REDO(MaterialDesignIcon.REDO),
         UNDO(MaterialDesignIcon.UNDO),
-        MARK_ENTRIES(MaterialDesignIcon.BOOKMARK),
         MARKER(MaterialDesignIcon.MARKER),
-        UNMARK_ENTRIES(MaterialDesignIcon.BOOKMARK_OUTLINE),
         REFRESH(MaterialDesignIcon.REFRESH),
         DELETE_ENTRY(MaterialDesignIcon.DELETE),
         SEARCH(MaterialDesignIcon.MAGNIFY),
@@ -296,12 +294,11 @@ public class IconTheme {
         BLOG(MaterialDesignIcon.RSS), /* css: rss */
         GLOBAL_SEARCH(MaterialDesignIcon.EARTH), /* css: earth */
         DATE_PICKER(MaterialDesignIcon.CALENDAR), /* css: calendar */
-        DEFAULT_GROUP_ICON(MaterialDesignIcon.LABEL_OUTLINE), /* css: label-outline */
+        DEFAULT_GROUP_ICON_COLORED(MaterialDesignIcon.CHECKBOX_BLANK_CIRCLE),
+        DEFAULT_GROUP_ICON(MaterialDesignIcon.LABEL_OUTLINE),
         ALL_ENTRIES_GROUP_ICON(DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON),
         IMPORT_EXPORT(MaterialDesignIcon.SWAP_VERTICAL),
-        CLOSE_JABREF(MaterialDesignIcon.GLASSDOOR),
-        // STILL MISSING:
-        GROUP_REGULAR(Color.RED, MaterialDesignIcon.SYNC);
+        CLOSE_JABREF(MaterialDesignIcon.GLASSDOOR);
 
         private final JabRefIcon icon;
 
@@ -337,6 +334,11 @@ public class IconTheme {
             return icon.disabled();
         }
 
+        @Override
+        public JabRefIcon withColor(javafx.scene.paint.Color color) {
+            return icon.withColor(color);
+        }
+
         private class InternalFileIcon implements JabRefIcon {
 
             private final ImageIcon imageIcon;
@@ -363,6 +365,11 @@ public class IconTheme {
             @Override
             public JabRefIcon disabled() {
                 throw new NotImplementedException("Cannot create disabled version of a file-based icon");
+            }
+
+            @Override
+            public JabRefIcon withColor(javafx.scene.paint.Color color) {
+                throw new NotImplementedException("Cannot create colored version of a file-based icon");
             }
         }
 
