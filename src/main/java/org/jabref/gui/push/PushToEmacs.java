@@ -25,11 +25,15 @@ import org.slf4j.LoggerFactory;
 
 public class PushToEmacs extends AbstractPushToApplication implements PushToApplication {
 
+    public PushToEmacs(DialogService dialogService) {
+        super(dialogService);
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToEmacs.class);
 
     private final JTextField additionalParams = new JTextField(30);
 
-    private DialogService dialogService;
+
 
     @Override
     public String getApplicationName() {
@@ -63,12 +67,11 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
     }
 
     @Override
-    public void pushEntries(BibDatabase database, List<BibEntry> entries, String keys, MetaData metaData, DialogService dialogService) {
+    public void pushEntries(BibDatabase database, List<BibEntry> entries, String keys, MetaData metaData) {
 
         couldNotConnect = false;
         couldNotCall = false;
         notDefined = false;
-        this.dialogService = dialogService;
 
         initParameters();
         commandPath = Globals.prefs.get(commandPathPreferenceKey);

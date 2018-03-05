@@ -25,9 +25,11 @@ import org.slf4j.LoggerFactory;
 public class PushToVim extends AbstractPushToApplication implements PushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToVim.class);
-
     private final JTextField vimServer = new JTextField(30);
-    private DialogService dialogService;
+
+    public PushToVim(DialogService dialogService) {
+        super(dialogService);
+    }
 
     @Override
     public String getApplicationName() {
@@ -61,12 +63,11 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
     }
 
     @Override
-    public void pushEntries(BibDatabase database, List<BibEntry> entries, String keys, MetaData metaData, DialogService dialogService) {
+    public void pushEntries(BibDatabase database, List<BibEntry> entries, String keys, MetaData metaData) {
 
         couldNotConnect = false;
         couldNotCall = false;
         notDefined = false;
-        this.dialogService = dialogService;
 
         initParameters();
         commandPath = Globals.prefs.get(commandPathPreferenceKey);
@@ -78,9 +79,9 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
 
         try {
             String[] com = new String[] {commandPath, "--servername",
-                Globals.prefs.get(JabRefPreferences.VIM_SERVER), "--remote-send",
-                "<C-\\><C-N>a" + getCiteCommand() +
-                        "{" + keys + "}"};
+                    Globals.prefs.get(JabRefPreferences.VIM_SERVER), "--remote-send",
+                    "<C-\\><C-N>a" + getCiteCommand() +
+                            "{" + keys + "}"};
 
             final Process p = Runtime.getRuntime().exec(com);
 

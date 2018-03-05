@@ -28,6 +28,10 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToLyx.class);
 
+    public PushToLyx(DialogService dialogService) {
+        super(dialogService);
+    }
+
     @Override
     public String getApplicationName() {
         return "LyX/Kile";
@@ -67,8 +71,7 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
     }
 
     @Override
-    public void pushEntries(BibDatabase database, final List<BibEntry> entries, final String keyString,
-            MetaData metaData, DialogService dialogService) {
+    public void pushEntries(BibDatabase database, final List<BibEntry> entries, final String keyString, MetaData metaData) {
 
         couldNotConnect = false;
         couldNotCall = false;

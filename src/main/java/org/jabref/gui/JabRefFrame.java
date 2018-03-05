@@ -577,7 +577,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private void initLayout() {
         setProgressBarVisible(false);
 
-        pushApplications = new PushToApplications();
+        pushApplications = new PushToApplications(this.getDialogService());
 
         BorderPane head = new BorderPane();
         head.setTop(createMenu());
@@ -677,7 +677,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         HBox rightSide = new HBox (
                 factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE)),
                 factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(Actions.DELETE)),
-                
+
                 factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
                 factory.createIconButton(StandardActions.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, Globals.stateManager)),
                 factory.createIconButton(StandardActions.CUT, new EditAction(Actions.CUT)),

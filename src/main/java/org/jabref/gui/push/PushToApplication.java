@@ -5,7 +5,6 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefIcon;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -49,7 +48,7 @@ public interface PushToApplication {
      * @param entries
      * @param metaData
      */
-    void pushEntries(BibDatabase database, List<BibEntry> entries, String keyString, MetaData metaData, DialogService dialogService);
+    void pushEntries(BibDatabase database, List<BibEntry> entries, String keyString, MetaData metaData);
 
     /**
      * Reporting etc., this method is called on the event dispatch thread after pushEntries() returns.
