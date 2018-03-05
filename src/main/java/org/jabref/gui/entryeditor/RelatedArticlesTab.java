@@ -20,9 +20,9 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class RelatedArticlesTab extends EntryEditorTab {
 
-    private final JabRefPreferences preferences;
+    private final EntryEditorPreferences preferences;
 
-    public RelatedArticlesTab(JabRefPreferences preferences) {
+    public RelatedArticlesTab(EntryEditorPreferences preferences) {
         setText(Localization.lang("Related articles"));
         setTooltip(new Tooltip(Localization.lang("Related articles")));
         this.preferences = preferences;
@@ -81,7 +81,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        return preferences.getBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS);
+        return preferences.shouldShowRecommendationsTab();
     }
 
     @Override

@@ -14,6 +14,7 @@ import java.util.prefs.BackingStoreException;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -23,7 +24,6 @@ import javax.swing.ListSelectionModel;
 import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -65,7 +65,7 @@ public class PreferencesDialog extends JabRefDialog {
     private final JButton resetPreferences = new JButton(Localization.lang("Reset preferences"));
 
     public PreferencesDialog(JabRefFrame parent) {
-        super(parent, Localization.lang("JabRef preferences"), false, PreferencesDialog.class);
+        super((JFrame) null, Localization.lang("JabRef preferences"), false, PreferencesDialog.class);
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         frame = parent;
 
@@ -162,7 +162,7 @@ public class PreferencesDialog extends JabRefDialog {
                     .addExtensionFilter(FileType.XML)
                     .withDefaultExtension(FileType.XML)
                     .withInitialDirectory(getPrefsExportPath()).build();
-            DialogService ds = new FXDialogService();
+            DialogService ds = frame.getDialogService();
 
             Optional<Path> fileName = DefaultTaskExecutor
                     .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
@@ -184,7 +184,7 @@ public class PreferencesDialog extends JabRefDialog {
         });
 
         showPreferences.addActionListener(
-                e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs), frame).setVisible(true));
+                e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs), null).setVisible(true));
         resetPreferences.addActionListener(e -> {
             if (JOptionPane.showConfirmDialog(PreferencesDialog.this,
                     Localization.lang("Are you sure you want to reset all settings to default values?"),
@@ -285,7 +285,7 @@ public class PreferencesDialog extends JabRefDialog {
                     .addExtensionFilter(FileType.XML)
                     .withDefaultExtension(FileType.XML)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-            DialogService ds = new FXDialogService();
+            DialogService ds = frame.getDialogService();
             Optional<Path> path = DefaultTaskExecutor
                     .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
 

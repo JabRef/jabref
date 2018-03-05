@@ -43,7 +43,7 @@ class PreambleEditor extends JabRefDialog {
     private final CloseAction closeAction = new CloseAction();
 
     public PreambleEditor(JabRefFrame baseFrame, BasePanel panel, BibDatabase database) {
-        super(baseFrame, PreambleEditor.class);
+        super(null, PreambleEditor.class);
         this.panel = panel;
         this.database = database;
 
@@ -174,7 +174,7 @@ class PreambleEditor extends JabRefDialog {
     class UndoAction extends AbstractAction {
 
         public UndoAction() {
-            super("Undo", IconTheme.JabRefIcon.UNDO.getIcon());
+            super("Undo", IconTheme.JabRefIcons.UNDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Undo");
         }
 
@@ -187,7 +187,7 @@ class PreambleEditor extends JabRefDialog {
     class RedoAction extends AbstractAction {
 
         public RedoAction() {
-            super("Redo", IconTheme.JabRefIcon.REDO.getIcon());
+            super("Redo", IconTheme.JabRefIcons.REDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Redo");
         }
 

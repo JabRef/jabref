@@ -31,6 +31,7 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
 import org.jabref.Globals;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.util.component.DiffHighlightingTextPane;
@@ -183,7 +184,7 @@ public class MergeEntries {
         // Setup a PreviewPanel and a Bibtex source box for the merged entry
         mainPanel.add(boldFontLabel(Localization.lang("Merged entry")), CELL_CONSTRAINTS.xyw(1, 6, 6));
 
-        entryPreview = new PreviewPanel(null, null);
+        entryPreview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), new FXDialogService());
         entryPreview.setEntry(mergedEntry);
         JFXPanel container = CustomJFXPanel.wrap(new Scene(entryPreview));
         mainPanel.add(container, CELL_CONSTRAINTS.xyw(1, 8, 6));

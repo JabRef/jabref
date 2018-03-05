@@ -24,14 +24,19 @@
     -fx-info: #2c3e50;
 
     /*
+     * A dark gray to indicate something not so important
+     */
+    -fx-unimportant: #595959;
+
+    /*
      * A light gray for accented background
      */
     -fx-accented-background: #dadad8;
 
     /*
-     * A dark gray as background
+     * A darker gray as background
      */
-    -fx-dark-background: #757575;
+    -fx-dark-background: #aaaaaa;
 
     /*
      * A strong white as background
@@ -39,10 +44,24 @@
     -fx-light-background: #ffffff;
 
     /*
-     * A strong blue for backgrounds of active items (toggle button, selected list item)
+     * A dark gray for borders
      */
-    -fx-active-background: #6A9FCD;
+    -fx-border: #868786;
 
+    /*
+     * A light gray for background for active items in list like elements such as menus, lists, trees, and tables.
+     */
+    -fx-selection-bar: #e5e5e5;
+
+    /*
+     * The base color for the theme
+     */
+    -fx-theme-base: #4d4673;
+
+    /*
+     * A slightly lighter theme-based color for backgrounds of active items (toggle button, selected list item)
+     */
+    -fx-active-background: derive(-fx-theme-base, 20%);
 }
 
 .hyperlink {
@@ -56,14 +75,13 @@
     -fx-text-fill: -fx-accent;
 }
 
- .icon {
- 	-fx-font-family: 'Material Design Icons';
-	-fx-font-size: 16.0;
- }
+.icon {
+    -fx-font-family: 'Material Design Icons';
+    -fx-font-size: 16.0;
+}
 
 .glyph-icon {
-    -fx-font-size: 20.0;
-    -glyph-size: 20.0;
+    -fx-font-size: 1em;
 }
 
 .tooltip {
@@ -96,7 +114,7 @@
     -fx-shadow-highlight-color: transparent;
     -fx-outer-border: transparent;
     -fx-inner-border: transparent;
-    -fx-focus-color: #6A9FCD;
+    -fx-focus-color: -fx-active-background;
     -fx-faint-focus-color: transparent;
     -fx-background-color: transparent;
     -fx-text-background-color: dimgray;
@@ -115,4 +133,270 @@
 
 .flatButtonNoSpaceTop {
     -fx-padding: -0.1em 0.5em 0.5em 0.5em;
+}
+
+.menu-bar {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+.menu-bar > .container > .menu-button > .label {
+    -fx-padding: 0.41777em 0.41777em 0.41777em 0.41777em; /* 5 5 5 5 */
+}
+
+.menu-bar > .menu {
+    -fx-padding: 0.0em 0.666667em 0.0em 0.666667em; /* 0 8 0 8 */
+}
+
+.menu-item {
+    -fx-padding: 0.5em 0.41777em 0.5em 0.41777em; /* 6 5 6 5 */
+}
+
+.tab-pane {
+    -fx-open-tab-animation: NONE;
+    -fx-close-tab-animation: NONE;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: -fx-accented-background;
+    -fx-border-color: -fx-border;
+    -fx-border-width: 0.5 0.5 0.5 0.5;
+    -fx-padding: 0.4em 0.9em 0.4em 0.9em;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab .tab-label {
+    -fx-text-fill: -fx-unimportant;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: -fx-light-background;
+    -fx-border-color: -fx-active-background;
+    -fx-border-width: 3 0 0 0;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-label {
+    -fx-text-fill: black;
+}
+
+.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+    -fx-border-width: 0;
+    -fx-border-insets: 0;
+    -fx-border-radius: 0;
+}
+
+.tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: -fx-accented-background;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab .glyph-icon {
+    -glyph-size: 13px;
+    -fx-text-fill: -fx-unimportant;
+    -fx-fill: -fx-unimportant;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
+    -fx-text-fill: black;
+    -fx-fill: black;
+}
+
+.tab-pane > .tab-header-area {
+    -fx-padding: 0.416667em 5 0.0em 0em;
+}
+
+.table-view {
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.table-view:focused {
+    -fx-background-insets: 0;
+}
+
+.split-pane > .split-pane-divider {
+    -fx-background-color: -fx-accented-background;
+    -fx-padding: 0 0.15ex 0 0.15ex;
+}
+
+.table-row-cell:hover,
+.tree-table-row-cell:hover {
+    -fx-background-color: lightgrey;
+}
+
+.table-row-cell:selected,
+.tree-table-row-cell:selected {
+    -fx-background-color: -fx-active-background;
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+.tree-table-row-cell:selected > .tree-table-cell > .glyph-icon {
+    -fx-fill: white;
+    -fx-text-fill: white;
+}
+
+.table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:selected,
+.tree-table-view > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell .tree-table-cell:selected {
+    -fx-border-color: transparent;
+    -fx-background-insets: 0;
+}
+
+/* Selected rows */
+.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.tree-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected,
+.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell:filled:selected,
+.tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell:filled:selected,
+.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:selected,
+.tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell .tree-table-cell:selected {
+    -fx-background: -fx-selection-bar;
+    -fx-table-cell-border-color: transparent;
+}
+
+/* Selected when control is not focused */
+.list-cell:filled:selected,
+.tree-cell:filled:selected,
+.table-row-cell:filled:selected,
+.tree-table-row-cell:filled:selected,
+.table-row-cell:filled > .table-cell:selected,
+.tree-table-row-cell:filled > .tree-table-cell:selected {
+    -fx-background: -fx-selection-bar;
+    -fx-table-cell-border-color: transparent;
+}
+
+.scroll-pane,
+.split-pane {
+    -fx-background-insets: 0, 0;
+    -fx-padding: 0;
+}
+
+.text-input {
+    -fx-background-color: #cacbca, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+}
+
+.text-input:focused {
+    -fx-background-color: -fx-active-background, -fx-control-inner-background;
+    -fx-background-insets: 0, 2;
+}
+
+.text-area {
+    -fx-background-color: white;
+}
+
+.text-area .content {
+    -fx-background-color: #cacbca, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-padding: 0.333333em 0.583em 0.333333em 0.583em;
+}
+
+.text-area:focused .content {
+    -fx-background-color: -fx-active-background, -fx-control-inner-background;
+    -fx-background-insets: 0, 2;
+}
+
+.date-picker > .text-field:focused {
+    -fx-background-color: -fx-active-background, -fx-control-inner-background;
+    -fx-background-insets: 0, 2;
+}
+
+.scroll-bar {
+    -fx-background-color: transparent;
+    -fx-opacity: 0;
+}
+
+.scroll-bar:horizontal .track,
+.scroll-bar:vertical .track {
+    -fx-background-color: derive(#868786, 20%);
+    -fx-opacity: 0.2;
+    -fx-background-radius: 0em;
+}
+
+.scroll-bar:horizontal .thumb,
+.scroll-bar:vertical .thumb {
+    -fx-background-color: derive(#757575, 60%);
+    -fx-background-insets: 0, 0, 0;
+    -fx-background-radius: 0em;
+}
+
+.scroll-bar .thumb:hover,
+.scroll-bar .thumb:pressed {
+    -fx-background-color: derive(black, 70%);
+}
+
+/* Hide increment and decrement buttons */
+.scroll-bar > .increment-button,
+.scroll-bar > .decrement-button {
+    -fx-background-color: null;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+/* Hide increment and decrement arrows */
+.scroll-bar:horizontal > .decrement-button > .decrement-arrow,
+.scroll-bar:horizontal > .increment-button > .increment-arrow,
+.scroll-bar:vertical > .decrement-button > .decrement-arrow,
+.scroll-bar:vertical > .increment-button > .increment-arrow {
+    -fx-background-color: null;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-shape: null;
+    -fx-padding: 0;
+}
+
+/* Need some padding since otherwise no scroll-bar is displayed at all */
+.scroll-bar:horizontal > .decrement-button > .decrement-arrow {
+    -fx-padding: 0.333em 0.167em 0.333em 0.167em; /* 4 2 4 2 */
+}
+
+.scroll-bar:vertical > .decrement-button > .decrement-arrow {
+    -fx-padding: 0em 0.333em 0em 0.333em; /* 2 4 2 4 */
+}
+
+/* Only show scrollbars for hovered elements */
+.list-view:hover .scroll-bar,
+.tree-view:hover .scroll-bar,
+.table-view:hover .scroll-bar,
+.tree-table-view:hover .scroll-bar,
+.text-input:hover .scroll-bar {
+    -fx-opacity: 1;
+}
+
+.sidePaneComponentHeader {
+    -fx-background-color: -fx-dark-background;
+}
+
+.mainMenu {
+    -fx-background-color: derive(-fx-theme-base, -10%);
+}
+
+.menu-bar > .container > .menu-button:hover,
+.menu-bar > .container > .menu-button:focused,
+.menu-bar > .container > .menu-button:showing {
+    -fx-background: derive(-fx-theme-base, 10%);
+}
+
+.mainMenu > .container > .menu-button > .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.mainToolbar {
+    -fx-background-color: derive(-fx-theme-base, -10%);
+}
+
+.mainToolbar .glyph-icon {
+    -fx-font-size: 1.7em;
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+.mainToolbar .search-field {
+    -fx-background-color: derive(-fx-theme-base, -15%);
+}
+
+.mainToolbar .search-field:focused {
+    -fx-background-color: derive(-fx-theme-base, 15%);
 }

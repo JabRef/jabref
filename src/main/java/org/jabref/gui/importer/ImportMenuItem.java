@@ -17,7 +17,6 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.EntryMarker;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -92,13 +91,12 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
 
-            DialogService ds = new FXDialogService();
+            DialogService ds = frame.getDialogService();
 
             filenames = DefaultTaskExecutor
                     .runInJavaFXThread(() -> ds.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));
 
             if (!filenames.isEmpty()) {
-                frame.block();
                 frame.output(Localization.lang("Starting import"));
                 fileOk = true;
 
@@ -163,12 +161,12 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 } else {
                     // Import in a specific format was specified. Check if we have stored error information:
                     if (importError == null) {
-                        JOptionPane.showMessageDialog(frame,
+                        JOptionPane.showMessageDialog(null,
                                 Localization
                                         .lang("No entries found. Please make sure you are using the correct import filter."),
                                 Localization.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
                     } else {
-                        JOptionPane.showMessageDialog(frame, importError.getMessage(),
+                        JOptionPane.showMessageDialog(null, importError.getMessage(),
                                 Localization.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
@@ -178,18 +176,15 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     frame.output(
                             Localization.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
                 } else {
-                    final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
+                    final BasePanel panel = frame.getCurrentBasePanel();
 
-                    ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"),
-                            openInNew);
+                    ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"), false);
                     diag.addEntries(bibtexResult.getDatabase().getEntries());
                     diag.entryListComplete();
-                    diag.setLocationRelativeTo(frame);
                     diag.setVisible(true);
                     diag.toFront();
                 }
             }
-            frame.unblock();
         }
     }
 

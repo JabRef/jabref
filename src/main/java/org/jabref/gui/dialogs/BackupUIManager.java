@@ -17,7 +17,7 @@ public class BackupUIManager {
     }
 
     public static void showRestoreBackupDialog(JFrame frame, Path originalPath) {
-        int answer = JOptionPane.showConfirmDialog(frame,
+        int answer = JOptionPane.showConfirmDialog(null,
                 new StringBuilder()
                     .append(Localization.lang("A backup file for '%0' was found.", originalPath.getFileName().toString()))
                     .append("\n")

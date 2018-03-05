@@ -38,6 +38,13 @@ import org.controlsfx.dialog.ProgressDialog;
  */
 public class FXDialogService implements DialogService {
 
+    /**
+     * @deprecated try not to initialize a new dialog service but reuse the one constructed in {@link org.jabref.JabRefMain}.
+     */
+    @Deprecated
+    public FXDialogService() {
+    }
+
     private static FXDialog createDialog(AlertType type, String title, String content) {
         FXDialog alert = new FXDialog(type, title, true);
         alert.setHeaderText(null);
@@ -76,6 +83,14 @@ public class FXDialogService implements DialogService {
     public void showErrorDialogAndWait(String message, Throwable exception) {
         ExceptionDialog exceptionDialog = new ExceptionDialog(exception);
         exceptionDialog.setHeaderText(message);
+        exceptionDialog.showAndWait();
+    }
+
+    @Override
+    public void showErrorDialogAndWait(String title, String content, Throwable exception) {
+        ExceptionDialog exceptionDialog = new ExceptionDialog(exception);
+        exceptionDialog.setHeaderText(title);
+        exceptionDialog.setContentText(content);
         exceptionDialog.showAndWait();
     }
 

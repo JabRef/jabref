@@ -1,17 +1,9 @@
 package org.jabref.gui.maintable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
-
-import org.jabref.Globals;
-import org.jabref.model.entry.FieldName;
-import org.jabref.preferences.JabRefPreferences;
 
 /**
  * Listens for TableColumnModelEvents to keep track of changes made to the
@@ -46,6 +38,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
      * update columns names and their width, store it in the global prefs.
      */
     private void updateColumnPrefs() {
+        /*
         final int columnCount = mainTable.getColumnCount();
         List<String> storedColumns = new ArrayList<>(columnCount - 1);
         List<String> columnsWidths = new ArrayList<>(columnCount - 1);
@@ -69,6 +62,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
 
         // width of the number ("#") column
         Globals.prefs.putInt(JabRefPreferences.NUMBER_COL_WIDTH, ncWidth);
+        */
     }
 
     /**

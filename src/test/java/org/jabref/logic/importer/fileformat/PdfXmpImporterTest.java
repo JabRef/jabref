@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.FileType;
-import org.jabref.logic.xmp.XMPPreferences;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +35,7 @@ public class PdfXmpImporterTest {
 
     @BeforeEach
     public void setUp() {
-        importer = new PdfXmpImporter(mock(XMPPreferences.class));
+        importer = new PdfXmpImporter(mock(XmpPreferences.class));
     }
 
     @Test

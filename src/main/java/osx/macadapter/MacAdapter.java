@@ -13,7 +13,6 @@ import com.apple.eawt.AppEvent.PreferencesEvent;
 import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.AppReOpenedListener;
 import com.apple.eawt.Application;
-import com.apple.eawt.FullScreenUtilities;
 import com.apple.eawt.OpenFilesHandler;
 import com.apple.eawt.PreferencesHandler;
 import com.apple.eawt.QuitHandler;
@@ -30,7 +29,6 @@ public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler
         Application.getApplication().setPreferencesHandler(this);
         Application.getApplication().setQuitHandler(this);
         Application.getApplication().addAppEventListener(this);
-        FullScreenUtilities.setWindowCanFullScreen(parentFrame, true);
     }
 
     @Override
@@ -75,7 +73,7 @@ public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler
             return;
         }
 
-        parentFrame.showPreferencesDialog();
+        //  parentFrame.showPreferencesDialog();
     }
 
     @Override

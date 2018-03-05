@@ -95,8 +95,8 @@ public class SearchResultFrame {
 
     private final JabRefFrame frame;
     private JFrame searchResultFrame;
-    private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
-    private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
+    private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcons.FILE.getSmallIcon());
+    private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcons.WWW.getSmallIcon());
 
     private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
@@ -126,7 +126,7 @@ public class SearchResultFrame {
         searchResultFrame.setTitle(title);
         searchResultFrame.setIconImages(IconTheme.getLogoSet());
 
-        preview = new PreviewPanel(null, null);
+        preview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), frame.getDialogService());
 
         sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, FieldName.AUTHOR));
         model = (DefaultEventTableModel<BibEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,
@@ -360,13 +360,13 @@ public class SearchResultFrame {
                     cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
                     break;
                 case DATABASE_COL: {
-                    int width = InternalBibtexFields.getFieldLength(FieldName.AUTHOR);
-                    cm.getColumn(i).setPreferredWidth(width);
+                    Double width = InternalBibtexFields.getFieldLength(FieldName.AUTHOR);
+                    cm.getColumn(i).setPreferredWidth(width.intValue());
                     break;
                 }
                 default: {
-                    int width = InternalBibtexFields.getFieldLength(FIELDS[i - PAD]);
-                    cm.getColumn(i).setPreferredWidth(width);
+                    Double width = InternalBibtexFields.getFieldLength(FIELDS[i - PAD]);
+                    cm.getColumn(i).setPreferredWidth(width.intValue());
                     break;
                 }
             }
@@ -404,7 +404,7 @@ public class SearchResultFrame {
         BasePanel basePanel = entryHome.get(entry);
         frame.showBasePanel(basePanel);
         basePanel.requestFocus();
-        basePanel.highlightEntry(entry);
+        basePanel.clearAndSelect(entry);
     }
 
     public void dispose() {
@@ -519,7 +519,7 @@ public class SearchResultFrame {
                         description = flEntry.getLink();
                     }
                     menu.add(new ExternalFileMenuItem(p.frame(), entry, description, flEntry.getLink(),
-                            flEntry.getType().get().getIcon(), p.getBibDatabaseContext(), flEntry.getType()));
+                            flEntry.getType().get().getIcon().getSmallIcon(), p.getBibDatabaseContext(), flEntry.getType()));
                     count++;
                 }
 
@@ -589,9 +589,9 @@ public class SearchResultFrame {
                         fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
                         if (tmpModel.getRowCount() > 0) {
                             if (tmpModel.getEntry(0).getType().isPresent()) {
-                                fileLabel.setIcon(tmpModel.getEntry(0).getType().get().getIcon());
+                                fileLabel.setIcon(tmpModel.getEntry(0).getType().get().getIcon().getSmallIcon());
                             } else {
-                                fileLabel.setIcon(IconTheme.JabRefIcon.FILE.getSmallIcon());
+                                fileLabel.setIcon(IconTheme.JabRefIcons.FILE.getSmallIcon());
                             }
                         }
                         return fileLabel;

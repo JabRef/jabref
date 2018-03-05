@@ -19,6 +19,7 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -34,8 +35,6 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
 import org.jabref.Globals;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -92,8 +91,8 @@ class StyleSelectDialog {
     private final JMenuItem show = new JMenuItem(Localization.lang("View"));
     private final JMenuItem remove = new JMenuItem(Localization.lang("Remove"));
     private final JMenuItem reload = new JMenuItem(Localization.lang("Reload"));
-    private final JButton addButton = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
-    private final JButton removeButton = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
+    private final JButton addButton = new JButton(IconTheme.JabRefIcons.ADD_NOBOX.getIcon());
+    private final JButton removeButton = new JButton(IconTheme.JabRefIcons.REMOVE_NOBOX.getIcon());
     private PreviewPanel preview;
     private ActionListener removeAction;
 
@@ -134,7 +133,7 @@ class StyleSelectDialog {
 
         // Create a preview panel for previewing styles
         // Must be done before creating the table to avoid NPEs
-        preview = new PreviewPanel(null, null);
+        preview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), frame.getDialogService());
         // Use the test entry from the Preview settings tab in Preferences:
         preview.setEntry(prevEntry);
 
@@ -142,7 +141,7 @@ class StyleSelectDialog {
         updateStyles();
 
         // Build dialog
-        diag = new JDialog(frame, Localization.lang("Select style"), true);
+        diag = new JDialog((JFrame) null, Localization.lang("Select style"), true);
 
         FormBuilder builder = FormBuilder.create();
         builder.layout(new FormLayout("fill:pref:grow, 4dlu, left:pref, 4dlu, left:pref",
@@ -469,11 +468,10 @@ class StyleSelectDialog {
                     .addExtensionFilter(FileType.JSTYLE)
                     .withDefaultExtension(FileType.JSTYLE)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-            DialogService ds = new FXDialogService();
 
             browse.addActionListener(e -> {
                 Optional<Path> file = DefaultTaskExecutor
-                        .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
+                        .runInJavaFXThread(() -> frame.getDialogService().showFileOpenDialog(fileDialogConfiguration));
                 file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
             });
 

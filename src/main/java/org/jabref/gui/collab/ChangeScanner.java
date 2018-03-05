@@ -81,8 +81,7 @@ public class ChangeScanner implements Runnable {
     public void displayResult(final DisplayResultCallback fup) {
         if (changes.getChildCount() > 0) {
             SwingUtilities.invokeLater(() -> {
-                ChangeDisplayDialog changeDialog = new ChangeDisplayDialog(frame, panel, databaseInTemp.getDatabase(), changes);
-                changeDialog.setLocationRelativeTo(frame);
+                ChangeDisplayDialog changeDialog = new ChangeDisplayDialog(null, panel, databaseInTemp.getDatabase(), changes);
                 changeDialog.setVisible(true);
                 fup.scanResultsResolved(changeDialog.isOkPressed());
                 if (changeDialog.isOkPressed()) {
@@ -92,7 +91,7 @@ public class ChangeScanner implements Runnable {
             });
 
         } else {
-            JOptionPane.showMessageDialog(frame, Localization.lang("No actual changes found."),
+            JOptionPane.showMessageDialog(null, Localization.lang("No actual changes found."),
                     Localization.lang("External changes"), JOptionPane.INFORMATION_MESSAGE);
             fup.scanResultsResolved(true);
         }

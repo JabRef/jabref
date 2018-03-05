@@ -23,7 +23,8 @@ import javafx.scene.control.ButtonType;
 import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefIcon;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -34,14 +35,13 @@ import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.xmp.XMPUtil;
+import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.strings.StringUtil;
 
-import de.jensd.fx.glyphs.GlyphIcons;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,17 +61,12 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final BibEntry entry;
     private final TaskExecutor taskExecutor;
 
-    public LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
-        this(linkedFile, entry, databaseContext, taskExecutor, new FXDialogService());
-    }
-
-    protected LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext,
-                                  TaskExecutor taskExecutor, DialogService dialogService) {
+    public LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext, DialogService dialogService, TaskExecutor taskExecutor) {
         this.linkedFile = linkedFile;
         this.databaseContext = databaseContext;
         this.entry = entry;
-        this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
 
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(100)));
         canWriteXMPMetadata.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
@@ -109,6 +104,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
         return linkedFile.getDescription();
     }
 
+    public String getDescriptionAndLink() {
+        if (StringUtil.isBlank(linkedFile.getDescription())) {
+            return linkedFile.getLink();
+        } else {
+            return linkedFile.getDescription() + " (" + linkedFile.getLink() + ")";
+        }
+    }
+
     public Optional<Path> findIn(List<Path> directories) {
         return linkedFile.findIn(directories);
     }
@@ -117,8 +120,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
      * TODO: Be a bit smarter and try to infer correct icon, for example using {@link
      * org.jabref.gui.externalfiletype.ExternalFileTypes#getExternalFileTypeByName(String)}
      */
-    public GlyphIcons getTypeIcon() {
-        return MaterialDesignIcon.FILE_PDF;
+    public JabRefIcon getTypeIcon() {
+        return IconTheme.JabRefIcons.PDF_FILE;
     }
 
     public void markAsAutomaticallyFound() {
@@ -140,9 +143,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void open() {
         try {
             Optional<ExternalFileType> type = ExternalFileTypes.getInstance().fromLinkedFile(linkedFile, true);
-            JabRefDesktop.openExternalFileAnyFormat(databaseContext, linkedFile.getLink(), type);
+            boolean successful = JabRefDesktop.openExternalFileAnyFormat(databaseContext, linkedFile.getLink(), type);
+            if (!successful) {
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("File not found"),
+                        Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+            }
         } catch (IOException e) {
-            LOGGER.warn("Cannot open selected file.", e);
+            dialogService.showErrorDialogAndWait(Localization.lang("Error opening file '%0'.", getLink()), e);
         }
     }
 
@@ -331,7 +339,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 // Localization.lang("PDF does not exist");
             } else {
                 try {
-                    XMPUtil.writeXMP(file.get(), entry, databaseContext.getDatabase(), Globals.prefs.getXMPPreferences());
+                    XmpUtilWriter.writeXmp(file.get(), entry, databaseContext.getDatabase(), Globals.prefs.getXMPPreferences());
                 } catch (IOException | TransformerException ex) {
                     // TODO: Print error message
                     // Localization.lang("Error while writing") + " '" + file.toString() + "': " + ex;

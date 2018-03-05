@@ -15,13 +15,12 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -45,18 +44,21 @@ class CustomExportDialog extends JabRefDialog {
     private final JTextField name = new JTextField(60);
     private final JTextField layoutFile = new JTextField(60);
     private final JTextField extension = new JTextField(60);
+    private JabRefFrame frame;
     private boolean okPressed;
 
     public CustomExportDialog(final JabRefFrame parent, final String exporterName, final String layoutFileName,
             final String extensionName) {
         this(parent);
+        frame = parent;
         name.setText(exporterName);
         layoutFile.setText(layoutFileName);
         extension.setText(extensionName);
     }
 
     public CustomExportDialog(final JabRefFrame parent) {
-        super(parent, Localization.lang("Edit custom export"), true, CustomExportDialog.class);
+        super((JFrame) null, Localization.lang("Edit custom export"), true, CustomExportDialog.class);
+        frame = parent;
         ActionListener okListener = e -> {
             Path layoutFileDir = Paths.get(layoutFile.getText()).getParent();
             if (layoutFileDir != null) {
@@ -95,10 +97,9 @@ class CustomExportDialog extends JabRefDialog {
                 .addExtensionFilter(FileType.LAYOUT)
                 .withDefaultExtension(FileType.LAYOUT)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY)).build();
-        DialogService ds = new FXDialogService();
         browse.addActionListener(
-                e -> DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration))
-                        .ifPresent(f -> layoutFile.setText(f.toAbsolutePath().toString())));
+                e -> DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showFileOpenDialog(fileDialogConfiguration))
+                                        .ifPresent(f -> layoutFile.setText(f.toAbsolutePath().toString())));
 
         AbstractAction cancelAction = new AbstractAction() {
 
@@ -177,7 +178,6 @@ class CustomExportDialog extends JabRefDialog {
 
         setSize(700, 200);
 
-        setLocationRelativeTo(parent);
     }
 
     public boolean okPressed() {

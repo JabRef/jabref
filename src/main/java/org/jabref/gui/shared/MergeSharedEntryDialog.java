@@ -7,6 +7,7 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -36,7 +37,7 @@ public class MergeSharedEntryDialog {
         this.dbmsSynchronizer = dbmsSynchronizer;
         this.localBibEntry = localBibEntry;
         this.sharedBibEntry = sharedBibEntry;
-        this.mergeDialog = new JDialog(jabRefFrame, Localization.lang("Update refused"), true);
+        this.mergeDialog = new JDialog((JFrame) null, Localization.lang("Update refused"), true);
         this.mergeEntries = new MergeEntries(sharedBibEntry, localBibEntry, Localization.lang("Shared entry"),
                 Localization.lang("Local entry"), bibDatabaseMode);
     }
@@ -85,7 +86,6 @@ public class MergeSharedEntryDialog {
             }
         });
 
-        mergeDialog.setLocationRelativeTo(jabRefFrame);
         mergeDialog.pack();
         mergeDialog.setVisible(true);
     }

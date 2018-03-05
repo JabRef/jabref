@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
+import org.jabref.gui.AbstractView;
 import org.jabref.gui.customjfx.support.InputMethodSupport;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.util.OS;
@@ -40,7 +41,8 @@ public class CustomJFXPanel extends JFXPanel {
     }
 
     public static JFXPanel wrap(Scene scene) {
-        JFXPanel container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+        JFXPanel container = new JFXPanel();
+        scene.getStylesheets().add(AbstractView.class.getResource("Main.css").toExternalForm());
         DefaultTaskExecutor.runInJavaFXThread(() -> container.setScene(scene));
         return container;
     }

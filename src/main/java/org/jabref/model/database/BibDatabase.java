@@ -47,7 +47,7 @@ public class BibDatabase {
     /**
      * State attributes
      */
-    private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
+    private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));
     private final Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
     /**
      * this is kept in sync with the database (upon adding/removing an entry, it is updated as well)

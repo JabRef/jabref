@@ -32,11 +32,11 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
     }
 
     protected Node createErrorNode() {
-        return IconTheme.JabRefIcon.ERROR.getGraphicNode();
+        return IconTheme.JabRefIcons.ERROR.getGraphicNode();
     }
 
     protected Node createWarningNode() {
-        return IconTheme.JabRefIcon.WARNING.getGraphicNode();
+        return IconTheme.JabRefIcons.WARNING.getGraphicNode();
     }
 
     public Node createDecorationNode(ValidationMessage message) {

@@ -20,6 +20,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -36,7 +37,6 @@ import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -79,9 +79,9 @@ public class ProtectedTermsDialog {
     private final JMenuItem remove = new JMenuItem(Localization.lang("Remove"));
     private final JMenuItem reload = new JMenuItem(Localization.lang("Reload"));
     private final JMenuItem enabled = new JCheckBoxMenuItem(Localization.lang("Enabled"));
-    private final JButton loadButton = new JButton(IconTheme.JabRefIcon.OPEN.getIcon());
-    private final JButton removeButton = new JButton(IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
-    private final JButton newButton = new JButton(IconTheme.JabRefIcon.NEW.getIcon());
+    private final JButton loadButton = new JButton(IconTheme.JabRefIcons.OPEN.getIcon());
+    private final JButton removeButton = new JButton(IconTheme.JabRefIcons.DELETE_ENTRY.getIcon());
+    private final JButton newButton = new JButton(IconTheme.JabRefIcons.NEW.getIcon());
     private ActionListener removeAction;
 
     private final JButton ok = new JButton(Localization.lang("OK"));
@@ -122,7 +122,7 @@ public class ProtectedTermsDialog {
         setupTable();
 
         // Build dialog
-        diag = new JDialog(frame, Localization.lang("Manage protected terms files"), true);
+        diag = new JDialog((JFrame) null, Localization.lang("Manage protected terms files"), true);
 
         FormBuilder builder = FormBuilder.create();
         builder.layout(new FormLayout("fill:pref:grow, 4dlu, left:pref, 4dlu, left:pref, 4dlu, left:pref",
@@ -434,7 +434,7 @@ public class ProtectedTermsDialog {
                     .addExtensionFilter(FileType.TERMS)
                     .withDefaultExtension(FileType.TERMS)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-            DialogService ds = new FXDialogService();
+            DialogService ds = frame.getDialogService();
 
             browse.addActionListener(e -> {
                 Optional<Path> file = DefaultTaskExecutor

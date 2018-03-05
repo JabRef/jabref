@@ -31,11 +31,11 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
-import javax.swing.JTable;
 import javax.swing.UIManager;
 
 import org.jabref.JabRefException;
 import org.jabref.JabRefMain;
+import org.jabref.gui.SidePaneType;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -70,7 +70,7 @@ import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
-import org.jabref.logic.xmp.XMPPreferences;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -110,7 +110,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String NAMES_FIRST_LAST = "namesFf";
     public static final String BIBLATEX_DEFAULT_MODE = "biblatexMode";
     public static final String NAMES_AS_IS = "namesAsIs";
-    public static final String ENTRY_EDITOR_HEIGHT = "entryEditorHeight";
+    public static final String ENTRY_EDITOR_HEIGHT = "entryEditorHeightFX";
     public static final String AUTO_RESIZE_MODE = "autoResizeMode";
     public static final String WINDOW_MAXIMISED = "windowMaximised";
     public static final String USE_DEFAULT_LOOK_AND_FEEL = "useDefaultLookAndFeel";
@@ -272,7 +272,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String USE_OWNER = "useOwner";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
     public static final String SHOW_FILE_LINKS_UPGRADE_WARNING = "showFileLinksUpgradeWarning";
-    public static final String SIDE_PANE_WIDTH = "sidePaneWidth";
+    public static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
     public static final String LAST_USED_EXPORT = "lastUsedExport";
     public static final String FLOAT_MARKED_ENTRIES = "floatMarkedEntries";
     public static final String CITE_COMMAND = "citeCommand";
@@ -407,7 +407,7 @@ public class JabRefPreferences implements PreferencesService {
     // Preview
     private static final String CYCLE_PREVIEW_POS = "cyclePreviewPos";
     private static final String CYCLE_PREVIEW = "cyclePreview";
-    private static final String PREVIEW_PANEL_HEIGHT = "previewPanelHeight";
+    private static final String PREVIEW_PANEL_HEIGHT = "previewPanelHeightFX";
     private static final String PREVIEW_STYLE = "previewStyle";
     private static final String PREVIEW_ENABLED = "previewEnabled";
 
@@ -437,7 +437,7 @@ public class JabRefPreferences implements PreferencesService {
     private final Preferences prefs;
     private GlobalBibtexKeyPattern keyPattern;
     // Object containing info about customized entry editor tabs.
-    private EntryEditorTabList tabList;
+    private Map<String, List<String>> tabList;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -511,8 +511,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SIZE_X, 1024);
         defaults.put(SIZE_Y, 768);
         defaults.put(WINDOW_MAXIMISED, Boolean.FALSE);
-        defaults.put(AUTO_RESIZE_MODE, JTable.AUTO_RESIZE_ALL_COLUMNS);
-        defaults.put(ENTRY_EDITOR_HEIGHT, 400);
+        defaults.put(AUTO_RESIZE_MODE, Boolean.TRUE);
+        defaults.put(ENTRY_EDITOR_HEIGHT, 0.65);
         defaults.put(TABLE_COLOR_CODES_ON, Boolean.FALSE);
         defaults.put(TABLE_RESOLVED_COLOR_CODES_ON, Boolean.FALSE);
         defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
@@ -642,7 +642,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(FIELD_EDITOR_TEXT_COLOR, "0:0:0");
 
         // default icon colors
-        defaults.put(ICON_ENABLED_COLOR, "79:95:143");
+        defaults.put(ICON_ENABLED_COLOR, "0:0:0");
         defaults.put(ICON_DISABLED_COLOR, "200:200:200");
 
         defaults.put(INCOMPLETE_ENTRY_BACKGROUND, "250:175:175");
@@ -729,7 +729,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(FLOAT_MARKED_ENTRIES, Boolean.TRUE);
 
         defaults.put(LAST_USED_EXPORT, "");
-        defaults.put(SIDE_PANE_WIDTH, -1);
+        defaults.put(SIDE_PANE_WIDTH, 0.15);
 
         defaults.put(IMPORT_INSPECTION_DIALOG_WIDTH, 650);
         defaults.put(IMPORT_INSPECTION_DIALOG_HEIGHT, 650);
@@ -805,7 +805,7 @@ public class JabRefPreferences implements PreferencesService {
         // preview
         defaults.put(CYCLE_PREVIEW, "Preview;" + CitationStyle.DEFAULT);
         defaults.put(CYCLE_PREVIEW_POS, 0);
-        defaults.put(PREVIEW_PANEL_HEIGHT, 200);
+        defaults.put(PREVIEW_PANEL_HEIGHT, 0.65);
         defaults.put(PREVIEW_ENABLED, Boolean.TRUE);
         defaults.put(PREVIEW_STYLE,
                 "<font face=\"sans-serif\">"
@@ -940,6 +940,27 @@ public class JabRefPreferences implements PreferencesService {
         storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().getAsStringList(OS.NEWLINE)));
     }
 
+    public Map<SidePaneType, Integer> getSidePanePreferredPositions() {
+        Map<SidePaneType, Integer> preferredPositions = new HashMap<>();
+
+        List<String> componentNames = getStringList(SIDE_PANE_COMPONENT_NAMES);
+        List<String> componentPositions = getStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);
+
+        for (int i = 0; i < componentNames.size(); ++i) {
+            String name = componentNames.get(i);
+            try {
+                SidePaneType type = Enum.valueOf(SidePaneType.class, name);
+                preferredPositions.put(type, Integer.parseInt(componentPositions.get(i)));
+            } catch (NumberFormatException e) {
+                LOGGER.debug("Invalid number format for side pane component '" + name + "'", e);
+            } catch (IllegalArgumentException e) {
+                LOGGER.debug("Following component is not a side pane: '" + name + "'", e);
+            }
+        }
+
+        return preferredPositions;
+    }
+
     public int getFontSizeFX() {
         // Decrease font size by 3 since JavaFX has default font size of 9, while Swing uses 12
         return getInt(MENU_FONT_SIZE) - 3;
@@ -1027,6 +1048,10 @@ public class JabRefPreferences implements PreferencesService {
         return prefs.getInt(key, getIntDefault(key));
     }
 
+    public double getDouble(String key) {
+        return prefs.getDouble(key, getDoubleDefault(key));
+    }
+
     public int getIntDefault(String key) {
         if (key.equals(JabRefPreferences.MENU_FONT_SIZE)) {
             Integer menuFontSize = (Integer) defaults.get(key);
@@ -1040,6 +1065,10 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
+    private double getDoubleDefault(String key) {
+        return ((Number) defaults.get(key)).doubleValue();
+    }
+
     public void put(String key, String value) {
         prefs.put(key, value);
     }
@@ -1050,6 +1079,10 @@ public class JabRefPreferences implements PreferencesService {
 
     public void putInt(String key, int value) {
         prefs.putInt(key, value);
+    }
+
+    public void putDouble(String key, double value) {
+        prefs.putDouble(key, value);
     }
 
     public void remove(String key) {
@@ -1292,7 +1325,11 @@ public class JabRefPreferences implements PreferencesService {
             try {
                 return this.getBoolean(key);
             } catch (ClassCastException e2) {
-                return this.getInt(key);
+                try {
+                    return this.getInt(key);
+                } catch (ClassCastException e3) {
+                    return this.getDouble(key);
+                }
             }
         }
     }
@@ -1310,7 +1347,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    public EntryEditorTabList getEntryEditorTabList() {
+    public Map<String, List<String>> getEntryEditorTabList() {
         if (tabList == null) {
             updateEntryEditorTabList();
         }
@@ -1318,7 +1355,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void updateEntryEditorTabList() {
-        tabList = new EntryEditorTabList();
+        tabList = EntryEditorTabList.create(this);
     }
 
     /**
@@ -1438,8 +1475,8 @@ public class JabRefPreferences implements PreferencesService {
                 getFileLinkPreferences(), journalAbbreviationLoader);
     }
 
-    public XMPPreferences getXMPPreferences() {
-        return new XMPPreferences(getBoolean(USE_XMP_PRIVACY_FILTER), getStringList(XMP_PRIVACY_FILTERS),
+    public XmpPreferences getXMPPreferences() {
+        return new XmpPreferences(getBoolean(USE_XMP_PRIVACY_FILTER), getStringList(XMP_PRIVACY_FILTERS),
                 getKeywordDelimiter());
     }
 
@@ -1466,7 +1503,7 @@ public class JabRefPreferences implements PreferencesService {
     public JabRefPreferences storePreviewPreferences(PreviewPreferences previewPreferences) {
         putInt(CYCLE_PREVIEW_POS, previewPreferences.getPreviewCyclePosition());
         putStringList(CYCLE_PREVIEW, previewPreferences.getPreviewCycle());
-        putInt(PREVIEW_PANEL_HEIGHT, previewPreferences.getPreviewPanelHeight());
+        putDouble(PREVIEW_PANEL_HEIGHT, previewPreferences.getPreviewPanelDividerPosition().doubleValue());
         put(PREVIEW_STYLE, previewPreferences.getPreviewStyle());
         putBoolean(PREVIEW_ENABLED, previewPreferences.isPreviewPanelEnabled());
         return this;
@@ -1475,7 +1512,7 @@ public class JabRefPreferences implements PreferencesService {
     public PreviewPreferences getPreviewPreferences() {
         int cyclePos = getInt(CYCLE_PREVIEW_POS);
         List<String> cycle = getStringList(CYCLE_PREVIEW);
-        int panelHeight = getInt(PREVIEW_PANEL_HEIGHT);
+        double panelHeight = getDouble(PREVIEW_PANEL_HEIGHT);
         String style = get(PREVIEW_STYLE);
         String styleDefault = (String) defaults.get(PREVIEW_STYLE);
         boolean enabled = getBoolean(PREVIEW_ENABLED);
@@ -1662,5 +1699,19 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(AUTOCOMPLETER_LAST_FIRST, autoCompletePreferences.getOnlyCompleteLastFirst());
         putBoolean(AUTOCOMPLETER_FIRST_LAST, autoCompletePreferences.getOnlyCompleteFirstLast());
         putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteFields());
+    }
+
+    public void storeSidePanePreferredPositions(Map<SidePaneType, Integer> preferredPositions) {
+        // Split the map into a pair of parallel String lists suitable for storage
+        List<String> names = preferredPositions.keySet().stream()
+                                               .map(Enum::toString)
+                                               .collect(Collectors.toList());
+
+        List<String> positions = preferredPositions.values().stream()
+                                                   .map(integer -> Integer.toString(integer))
+                                                   .collect(Collectors.toList());
+
+        putStringList(SIDE_PANE_COMPONENT_NAMES, names);
+        putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
     }
 }

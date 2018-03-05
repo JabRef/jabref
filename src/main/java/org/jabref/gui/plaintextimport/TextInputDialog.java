@@ -62,7 +62,6 @@ import org.jabref.Globals;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.EntryMarker;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -138,7 +137,7 @@ public class TextInputDialog extends JabRefDialog {
 
 
     public TextInputDialog(JabRefFrame frame, BibEntry bibEntry) {
-        super(frame, true, TextInputDialog.class);
+        super(null, true, TextInputDialog.class);
 
         this.frame = Objects.requireNonNull(frame);
 
@@ -526,7 +525,7 @@ public class TextInputDialog extends JabRefDialog {
 
         public PasteAction() {
             super(Localization.lang("Paste"), Localization.lang("Paste from clipboard"),
-                    IconTheme.JabRefIcon.PASTE.getIcon());
+                    IconTheme.JabRefIcons.PASTE.getIcon());
         }
 
         @Override
@@ -549,7 +548,7 @@ public class TextInputDialog extends JabRefDialog {
     private class LoadAction extends BasicAction {
 
         public LoadAction() {
-            super(Localization.lang("Open"), Localization.lang("Open file"), IconTheme.JabRefIcon.OPEN.getIcon());
+            super(Localization.lang("Open"), Localization.lang("Open file"), IconTheme.JabRefIcons.OPEN.getIcon());
         }
 
         @Override
@@ -559,7 +558,7 @@ public class TextInputDialog extends JabRefDialog {
                         .addExtensionFilter(FileType.TXT)
                         .withDefaultExtension(FileType.TXT)
                         .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-                DialogService ds = new FXDialogService();
+                DialogService ds = frame.getDialogService();
 
                 Optional<Path> path = DefaultTaskExecutor
                         .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
@@ -584,7 +583,7 @@ public class TextInputDialog extends JabRefDialog {
     private class ClearAction extends BasicAction {
 
         public ClearAction() {
-            super(Localization.lang("Clear"), Localization.lang("Clear inputarea"), IconTheme.JabRefIcon.NEW.getIcon());
+            super(Localization.lang("Clear"), Localization.lang("Clear inputarea"), IconTheme.JabRefIcons.NEW.getIcon());
         }
 
         @Override
@@ -626,8 +625,8 @@ public class TextInputDialog extends JabRefDialog {
 
         private final Font baseFont;
         private final Font usedFont;
-        private final Icon okIcon = IconTheme.JabRefIcon.PLAIN_TEXT_IMPORT_DONE.getSmallIcon();
-        private final Icon needIcon = IconTheme.JabRefIcon.PLAIN_TEXT_IMPORT_TODO.getSmallIcon();
+        private final Icon okIcon = IconTheme.JabRefIcons.PLAIN_TEXT_IMPORT_DONE.getSmallIcon();
+        private final Icon needIcon = IconTheme.JabRefIcons.PLAIN_TEXT_IMPORT_TODO.getSmallIcon();
         private final Color requiredColor = Globals.prefs.getColor(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND);
         private final Color optionalColor = Globals.prefs.getColor(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND);
 

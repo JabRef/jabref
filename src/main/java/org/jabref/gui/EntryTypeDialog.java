@@ -66,7 +66,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
     public EntryTypeDialog(JabRefFrame frame) {
         // modal dialog
-        super(frame, true, EntryTypeDialog.class);
+        super(null, true, EntryTypeDialog.class);
 
         this.frame = frame;
 
@@ -312,12 +312,11 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                     final BibEntry bibEntry = result.get();
                     if ((DuplicateCheck.containsDuplicate(frame.getCurrentBasePanel().getDatabase(), bibEntry, frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).isPresent())) {
                 		//If there are duplicates starts ImportInspectionDialog
-                        final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
+                        final BasePanel panel = frame.getCurrentBasePanel();
 
                         ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"), false);
                         diag.addEntry(bibEntry);
                         diag.entryListComplete();
-                        diag.setLocationRelativeTo(frame);
                         diag.setVisible(true);
                         diag.toFront();
                     } else {
@@ -332,11 +331,11 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
                     dispose();
                 } else if (searchID.trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("The given search ID was empty."), Localization.lang("Empty search ID"), JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(null, Localization.lang("The given search ID was empty."), Localization.lang("Empty search ID"), JOptionPane.WARNING_MESSAGE);
                 } else if (!fetcherException) {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(null, Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(frame,
+                    JOptionPane.showMessageDialog(null,
                             Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage,
                             Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 }

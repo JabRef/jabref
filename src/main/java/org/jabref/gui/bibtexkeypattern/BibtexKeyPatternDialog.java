@@ -10,6 +10,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
@@ -32,7 +33,7 @@ public class BibtexKeyPatternDialog extends JabRefDialog {
 
 
     public BibtexKeyPatternDialog(JabRefFrame parent, BasePanel panel) {
-        super(parent, Localization.lang("BibTeX key patterns"), true, BibtexKeyPatternDialog.class);
+        super((JFrame) null, Localization.lang("BibTeX key patterns"), true, BibtexKeyPatternDialog.class);
         this.bibtexKeyPatternPanel = new BibtexKeyPatternPanel(panel);
         setPanel(panel);
         init();

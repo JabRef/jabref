@@ -1,43 +1,35 @@
 package org.jabref.gui.menus;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 
 import org.jabref.JabRefExecutorService;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.preferences.JabRefPreferences;
 
-public class FileHistoryMenu extends JMenu implements ActionListener {
+public class FileHistoryMenu extends Menu {
 
     private final FileHistory history;
     private final JabRefFrame frame;
-    private final JabRefPreferences prefs;
+    private final JabRefPreferences preferences;
+    private final DialogService dialogService;
 
-    public FileHistoryMenu(JabRefPreferences prefs, JabRefFrame frame) {
-        String name = Localization.menuTitle("Recent libraries");
-        int i = name.indexOf('&');
-        if (i >= 0) {
-            setText(name.substring(0, i) + name.substring(i + 1));
-            char mnemonic = Character.toUpperCase(name.charAt(i + 1));
-            setMnemonic((int) mnemonic);
-        } else {
-            setText(name);
-        }
+    public FileHistoryMenu(JabRefPreferences preferences, JabRefFrame frame) {
+        setText(Localization.menuTitle("Recent libraries"));
 
         this.frame = frame;
-        this.prefs = prefs;
-        history = prefs.getFileHistory();
+        this.preferences = preferences;
+        this.dialogService = frame.getDialogService();
+        history = preferences.getFileHistory();
         if (history.isEmpty()) {
-            setEnabled(false);
+            setDisable(true);
         } else {
             setItems();
         }
@@ -52,44 +44,36 @@ public class FileHistoryMenu extends JMenu implements ActionListener {
     public void newFile(String filename) {
         history.newFile(filename);
         setItems();
-        if (!isEnabled()) {
-            setEnabled(true);
-        }
+        setDisable(false);
     }
 
     private void setItems() {
-        removeAll();
+        getItems().clear();
         for (int count = 0; count < history.size(); count++) {
             addItem(history.getFileName(count), count + 1);
         }
     }
 
-    private void addItem(String filename, int num) {
+    private void addItem(String fileName, int num) {
         String number = Integer.toString(num);
-        JMenuItem item = new JMenuItem(number + ". " + filename);
-        char mnemonic = Character.toUpperCase(number.charAt(0));
-        item.setMnemonic((int) mnemonic);
-        item.addActionListener(this);
-        add(item);
-        //history.addFirst(item);
+        MenuItem item = new MenuItem(number + ". " + fileName);
+        item.setOnAction(event -> openFile(fileName));
+        getItems().add(item);
     }
 
     public void storeHistory() {
-        prefs.storeFileHistory(history);
+        preferences.storeFileHistory(history);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        String name = ((JMenuItem) e.getSource()).getText();
-        int pos = name.indexOf(' ');
-        name = name.substring(pos + 1);
-        final Path fileToOpen = Paths.get(name);
+    public void openFile(String fileName) {
+        final Path fileToOpen = Paths.get(fileName);
 
         // the existence check has to be done here (and not in open.openIt) as we have to call "removeItem" if the file does not exist
         if (!Files.exists(fileToOpen)) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("File not found") + ": " + fileToOpen.getFileName(),
-                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-            history.removeItem(name);
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("File not found"),
+                    Localization.lang("File not found") + ": " + fileToOpen.getFileName());
+            history.removeItem(fileName);
             setItems();
             return;
         }

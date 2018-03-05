@@ -20,6 +20,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -148,8 +149,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
      *                    created.
      */
     public GroupDialog(JabRefFrame jabrefFrame, AbstractGroup editedGroup) {
-        super(jabrefFrame, (editedGroup == null) ? Localization.lang("Add group") : Localization.lang("Edit group"),
-                true, GroupDialog.class);
+        super((JFrame) null, Localization.lang("Edit group"), true, GroupDialog.class);
 
         // set default values (overwritten if editedGroup != null)
         keywordGroupSearchField.setText(jabrefFrame.prefs().get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
@@ -327,7 +327,6 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
         setResizable(false);
         updateComponents();
         setLayoutForSelectedGroup();
-        setLocationRelativeTo(jabrefFrame);
 
         // add listeners
         ItemListener radioButtonItemListener = e -> {

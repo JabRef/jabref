@@ -13,6 +13,7 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -52,7 +53,7 @@ public class ExportCustomizationDialog extends JabRefDialog {
 
     public ExportCustomizationDialog(final JabRefFrame frame) {
 
-        super(frame, Localization.lang("Manage custom exports"), false, ExportCustomizationDialog.class);
+        super((JFrame) null, Localization.lang("Manage custom exports"), false, ExportCustomizationDialog.class);
         DefaultEventTableModel<List<String>> tableModel = new DefaultEventTableModel<>(
                 Globals.prefs.customExports.getSortedList(), new ExportTableFormat());
         JTable table = new JTable(tableModel);
@@ -154,7 +155,6 @@ public class ExportCustomizationDialog extends JabRefDialog {
         getContentPane().add(main, BorderLayout.CENTER);
         getContentPane().add(buttons, BorderLayout.SOUTH);
         pack();
-        setLocationRelativeTo(frame);
         table.requestFocus();
     }
 

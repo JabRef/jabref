@@ -10,10 +10,10 @@ import org.jabref.gui.IconTheme;
 public class UnknownExternalFileType extends ExternalFileType {
 
     public UnknownExternalFileType(String name) {
-        super(name, "", "", "", "unknown", IconTheme.JabRefIcon.FILE.getSmallIcon());
+        super(name, "", "", "", "unknown", IconTheme.JabRefIcons.FILE);
     }
 
     public UnknownExternalFileType(String name, String extension) {
-        super(name, extension, "", "", "unknown", IconTheme.JabRefIcon.FILE.getSmallIcon());
+        super(name, extension, "", "", "unknown", IconTheme.JabRefIcons.FILE);
     }
 }

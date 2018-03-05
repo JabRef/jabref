@@ -14,6 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 
+import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
@@ -36,6 +37,7 @@ public class StateManager {
     private final ReadOnlyListWrapper<GroupTreeNode> activeGroups = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<BibDatabaseContext, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
+    private final ObjectProperty<Optional<SearchQuery>> activeSearchQuery = new SimpleObjectProperty<>(Optional.empty());
 
     public StateManager() {
         MonadicBinding<BibDatabaseContext> currentDatabase = EasyBind.map(activeDatabase, database -> database.orElse(null));
@@ -44,6 +46,10 @@ public class StateManager {
 
     public ObjectProperty<Optional<BibDatabaseContext>> activeDatabaseProperty() {
         return activeDatabase;
+    }
+
+    public ObjectProperty<Optional<SearchQuery>> activeSearchQueryProperty() {
+        return activeSearchQuery;
     }
 
     public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {
@@ -79,5 +85,13 @@ public class StateManager {
     public List<BibEntry> getEntriesInCurrentDatabase() {
         return OptionalUtil.flatMap(activeDatabase.get(), BibDatabaseContext::getEntries)
                 .collect(Collectors.toList());
+    }
+
+    public void clearSearchQuery() {
+        activeSearchQuery.setValue(Optional.empty());
+    }
+
+    public void setSearchQuery(SearchQuery searchQuery) {
+        activeSearchQuery.setValue(Optional.of(searchQuery));
     }
 }

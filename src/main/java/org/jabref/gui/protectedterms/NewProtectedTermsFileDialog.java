@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
@@ -38,6 +39,7 @@ public class NewProtectedTermsFileDialog extends JabRefDialog {
     private final JCheckBox enabled = new JCheckBox(Localization.lang("Enabled"));
     private boolean addOKPressed;
     private final ProtectedTermsLoader loader;
+    private JFrame parent;
 
     public NewProtectedTermsFileDialog(JDialog parent, ProtectedTermsLoader loader) {
         super(parent, Localization.lang("New protected terms file"), true, NewProtectedTermsFileDialog.class);
@@ -47,10 +49,9 @@ public class NewProtectedTermsFileDialog extends JabRefDialog {
     }
 
     public NewProtectedTermsFileDialog(JabRefFrame mainFrame, ProtectedTermsLoader loader) {
-        super(mainFrame, Localization.lang("New protected terms file"), true, NewProtectedTermsFileDialog.class);
+        super((JFrame) null, Localization.lang("New protected terms file"), true, NewProtectedTermsFileDialog.class);
         this.loader = loader;
         setupDialog();
-        setLocationRelativeTo(mainFrame);
     }
 
     private void setupDialog() {

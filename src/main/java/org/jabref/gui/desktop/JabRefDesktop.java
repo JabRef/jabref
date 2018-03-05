@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
@@ -132,26 +133,16 @@ public class JabRefDesktop {
      */
     public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext, String link,
             final Optional<ExternalFileType> type) throws IOException {
-        boolean httpLink = false;
 
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
-            httpLink = true;
+            openExternalFilePlatformIndependent(type, link);
+            return true;
         }
 
-        // For other platforms we'll try to find the file type:
-        Path file = null;
-        if (!httpLink) {
-            Optional<Path> tmp = FileHelper.expandFilename(databaseContext, link,
-                    Globals.prefs.getFileDirectoryPreferences());
-            if (tmp.isPresent()) {
-                file = tmp.get();
-            }
-        }
-
-        // Check if we have arrived at a file type, and either an http link or an existing file:
-        if (httpLink || ((file != null) && Files.exists(file) && (type.isPresent()))) {
+        Optional<Path> file = FileHelper.expandFilename(databaseContext, link, Globals.prefs.getFileDirectoryPreferences());
+        if (file.isPresent() && Files.exists(file.get()) && (type.isPresent())) {
             // Open the file:
-            String filePath = httpLink ? link : file.toString();
+            String filePath = file.get().toString();
             openExternalFilePlatformIndependent(type, filePath);
             return true;
         } else {
@@ -184,7 +175,7 @@ public class JabRefDesktop {
         String[] options = new String[] {Localization.lang("Define '%0'", fileType.getName()),
                 Localization.lang("Change file type"), Localization.lang("Cancel")};
         String defOption = options[0];
-        int answer = JOptionPane.showOptionDialog(frame,
+        int answer = JOptionPane.showOptionDialog(null,
                 Localization.lang("This external link is of the type '%0', which is undefined. What do you want to do?",
                         fileType.getName()),
                 Localization.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
@@ -194,9 +185,10 @@ public class JabRefDesktop {
             return false;
         } else if (answer == JOptionPane.YES_OPTION) {
             // User wants to define the new file type. Show the dialog:
-            ExternalFileType newType = new ExternalFileType(fileType.getName(), fileType.getExtension(), "", "", "new",
-                    IconTheme.JabRefIcon.FILE.getSmallIcon());
-            ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(frame, newType);
+
+            ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "", "new", IconTheme.JabRefIcons.FILE);
+            ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor((JFrame) null, newType);
+
             editor.setVisible(true);
             if (editor.okPressed()) {
                 // Get the old list of types, add this one, and update the list in prefs:
@@ -292,7 +284,7 @@ public class JabRefDesktop {
             String openManually = Localization.lang("Please open %0 manually.", url);
             String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
             JabRefGUI.getMainFrame().output(couldNotOpenBrowser);
-            JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(), couldNotOpenBrowser + "\n" + openManually + "\n" +
+            JOptionPane.showMessageDialog(null, couldNotOpenBrowser + "\n" + openManually + "\n" +
                     copiedToClipboard, couldNotOpenBrowser, JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -334,7 +326,7 @@ public class JabRefDesktop {
                 } catch (IOException exception) {
                     LOGGER.error("Open console", exception);
 
-                    JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(),
+                    JOptionPane.showMessageDialog(null,
                             Localization.lang("Error occured while executing the command \"%0\".", commandLoggingText),
                             Localization.lang("Open console") + " - " + Localization.lang("Error"),
                             JOptionPane.ERROR_MESSAGE);
