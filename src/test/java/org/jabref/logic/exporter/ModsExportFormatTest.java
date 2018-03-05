@@ -27,21 +27,19 @@ public class ModsExportFormatTest {
     public Charset charset;
     private ModsExporter modsExportFormat;
     private BibDatabaseContext databaseContext;
-    private BibtexImporter bibtexImporter;
     private Path tempFile;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
-    private Path importFile;
 
     @Before
     public void setUp() throws Exception {
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         modsExportFormat = new ModsExporter();
-        bibtexImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+        new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
         tempFile = testFolder.newFile().toPath();
-        importFile = Paths.get(ModsExportFormatTest.class.getResource("ModsExportFormatTestAllFields.bib").toURI());
+        Paths.get(ModsExportFormatTest.class.getResource("ModsExportFormatTestAllFields.bib").toURI());
     }
 
     @Test

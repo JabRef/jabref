@@ -51,19 +51,9 @@ public class IconTheme {
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(
             IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
 
-    // Christmas edition
-    //public static final Color DEFAULT_COLOR = new Color(0x155115);
-    //public static final Color DEFAULT_DISABLED_COLOR = new Color(0x990000);
-    private static Font FONT_16;
-    private static javafx.scene.text.Font FX_FONT;
-
     static {
         try (InputStream stream = getMaterialDesignIconsStream()) {
             FONT = Font.createFont(Font.TRUETYPE_FONT, stream);
-            FONT_16 = FONT.deriveFont(Font.PLAIN, 16f);
-            try (InputStream stream2 = getMaterialDesignIconsStream()) {
-                FX_FONT = javafx.scene.text.Font.loadFont(stream2, JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_LARGE));
-            }
         } catch (FontFormatException | IOException e) {
             LOGGER.warn("Error loading font", e);
         }
@@ -92,14 +82,14 @@ public class IconTheme {
         return getImageFX("jabrefIcon48");
     }
 
-    /**
+    /*
      * Constructs an {@link Image} for the image representing the given function, in the resource
      * file listing images.
      *
      * @param name The name of the icon, such as "open", "save", "saveAs" etc.
      * @return The {@link Image} for the function.
      */
-    public static Image getImageFX(String name) {
+    private static Image getImageFX(String name) {
         return new Image(getIconUrl(name).toString());
     }
 
