@@ -349,8 +349,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         actions.put(Actions.CUT, (BaseAction) mainTable::cut);
 
-        //when you modify this action be sure to adjust Actions.CUT,
-        //they are the same except of the Localization, delete confirmation and Actions.COPY call
         actions.put(Actions.DELETE, (BaseAction) () -> delete(false));
 
         // The action for pasting entries or cell contents.
@@ -1521,22 +1519,21 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
     public boolean showDeleteConfirmationDialog(int numberOfEntries) {
         if (Globals.prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE)) {
-            String msg;
-            msg = Localization.lang("Really delete the selected entry?");
             String title = Localization.lang("Delete entry");
+            String message = Localization.lang("Really delete the selected entry?");
+            String okButton = Localization.lang("Delete entry");
+            String cancelButton = Localization.lang("Keep entry");
             if (numberOfEntries > 1) {
-                msg = Localization.lang("Really delete the %0 selected entries?", Integer.toString(numberOfEntries));
                 title = Localization.lang("Delete multiple entries");
+                message = Localization.lang("Really delete the %0 selected entries?", Integer.toString(numberOfEntries));
+                okButton = Localization.lang("Delete entries");
+                cancelButton = Localization.lang("Keep entries");
             }
 
-            CheckBoxMessage cb = new CheckBoxMessage(msg, Localization.lang("Disable this confirmation dialog"), false);
-
-            int answer = JOptionPane.showConfirmDialog(null, cb, title, JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE);
-            if (cb.isSelected()) {
-                Globals.prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, false);
-            }
-            return answer == JOptionPane.YES_OPTION;
+            return dialogService.showConfirmationDialogWithOptOutAndWait(title, message,
+                    okButton, cancelButton,
+                    Localization.lang("Disable this confirmation dialog"),
+                    optOut -> Globals.prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, !optOut));
         } else {
             return true;
         }

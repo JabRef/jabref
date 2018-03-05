@@ -41,7 +41,6 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibtexSingleField;
-import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -58,7 +57,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private boolean tableChanged;
     private final JTable colSetup;
     private int rowCount = -1;
-    private int ncWidth = -1;
     private final List<TableRow> tableRows = new ArrayList<>(10);
     private final JabRefFrame frame;
 
@@ -118,9 +116,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             @Override
             public Object getValueAt(int row, int column) {
                 int internalRow = row;
-                if (internalRow == 0) {
-                    return column == 0 ? FieldName.NUMBER_COL : String.valueOf(ncWidth);
-                }
                 internalRow--;
                 if (internalRow >= tableRows.size()) {
                     return "";
@@ -162,11 +157,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 // Make sure the vector is long enough.
                 while (row >= tableRows.size()) {
                     tableRows.add(new TableRow("", -1));
-                }
-
-                if ((row == 0) && (col == 1)) {
-                    ncWidth = Integer.parseInt(value.toString());
-                    return;
                 }
 
                 TableRow rowContent = tableRows.get(row - 1);
@@ -332,45 +322,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         add(pan, BorderLayout.CENTER);
     }
 
-    /*** end: special fields ***/
-
-    static class TableRow {
-
-        private String name;
-        private double length;
-
-        public TableRow() {
-            name = "";
-            length = BibtexSingleField.DEFAULT_FIELD_LENGTH;
-        }
-
-        public TableRow(String name) {
-            this.name = name;
-            length = BibtexSingleField.DEFAULT_FIELD_LENGTH;
-        }
-
-        public TableRow(String name, int length) {
-            this.name = name;
-            this.length = length;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public double getLength() {
-            return length;
-        }
-
-        public void setLength(int length) {
-            this.length = length;
-        }
-    }
-
     @Override
     public void setValues() {
         fileColumn.setSelected(prefs.getBoolean(JabRefPreferences.FILE_COLUMN));
@@ -438,14 +389,51 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         List<String> lengths = prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS);
         for (int i = 0; i < names.size(); i++) {
             if (i < lengths.size()) {
-                tableRows.add(new TableRow(names.get(i), Integer.parseInt(lengths.get(i))));
+                tableRows.add(new TableRow(names.get(i), Double.parseDouble(lengths.get(i))));
             } else {
                 tableRows.add(new TableRow(names.get(i)));
             }
         }
         rowCount = tableRows.size() + 5;
-        ncWidth = prefs.getInt(JabRefPreferences.NUMBER_COL_WIDTH);
+    }
 
+    /*** end: special fields ***/
+
+    static class TableRow {
+
+        private String name;
+        private double length;
+
+        public TableRow() {
+            name = "";
+            length = BibtexSingleField.DEFAULT_FIELD_LENGTH;
+        }
+
+        public TableRow(String name) {
+            this.name = name;
+            length = BibtexSingleField.DEFAULT_FIELD_LENGTH;
+        }
+
+        public TableRow(String name, double length) {
+            this.name = name;
+            this.length = length;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public double getLength() {
+            return length;
+        }
+
+        public void setLength(int length) {
+            this.length = length;
+        }
     }
 
     class DeleteRowAction extends AbstractAction {
@@ -769,7 +757,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             List<String> names = new ArrayList<>(tableRows.size());
             List<String> widths = new ArrayList<>(tableRows.size());
 
-            prefs.putInt(JabRefPreferences.NUMBER_COL_WIDTH, ncWidth);
             for (TableRow tr : tableRows) {
                 names.add(tr.getName().toLowerCase(Locale.ROOT));
                 widths.add(String.valueOf(tr.getLength()));
