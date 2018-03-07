@@ -1,10 +1,14 @@
 package org.jabref.gui.actions;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
+import javax.swing.JScrollPane;
 
+import javafx.embed.swing.SwingNode;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
@@ -60,52 +64,59 @@ public class CleanupAction extends AbstractWorker {
     @Override
     public void run() {
 
-        SwingUtilities.invokeLater(() -> {
+        if (canceled) {
+            return;
+        }
+        CleanupPresetPanel presetPanel = new CleanupPresetPanel(panel.getBibDatabaseContext(),
+                CleanupPreset.loadFromPreferences(preferences));
 
-            if (canceled) {
-                return;
-            }
-            CleanupPresetPanel presetPanel = new CleanupPresetPanel(panel.getBibDatabaseContext(),
-                    CleanupPreset.loadFromPreferences(preferences));
+        SwingNode node = new SwingNode();
+        presetPanel.getScrollPane().setVisible(true);
 
-            int choice = showDialog(presetPanel);
+        JScrollPane scrollPane = presetPanel.getScrollPane();
+        node.setContent(scrollPane);
+        node.setVisible(true);
 
-            if (choice != JOptionPane.OK_OPTION) {
+        DialogPane pane = new DialogPane();
+        pane.setContent(node);
+        pane.setPrefSize(600, 600);
+
+        Optional<ButtonType> ok = dialogService.showCustomDialogAndWait(Localization.lang("Cleanup entries"), pane, ButtonType.OK, ButtonType.CANCEL);
+
+        if (!ok.isPresent() || ((ok.isPresent() && (ok.get() == ButtonType.CANCEL)))) {
+            canceled = true;
+            return;
+        }
+        CleanupPreset cleanupPreset = presetPanel.getCleanupPreset();
+        cleanupPreset.storeInPreferences(preferences);
+
+        if (cleanupPreset.isRenamePDF() && Globals.prefs.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
+
+            boolean autogeneratePressed = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Autogenerate PDF Names"),
+                    Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
+                    Localization.lang("Autogenerate PDF Names"),
+                    Localization.lang("Cancel"),
+                    Localization.lang("Disable this confirmation dialog"),
+                    optOut -> Globals.prefs.putBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN, !optOut)));
+
+            if (!autogeneratePressed) {
                 canceled = true;
                 return;
             }
-            CleanupPreset cleanupPreset = presetPanel.getCleanupPreset();
-            cleanupPreset.storeInPreferences(preferences);
+        }
 
-            if (cleanupPreset.isRenamePDF() && Globals.prefs.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
+        for (BibEntry entry : panel.getSelectedEntries()) {
+            // undo granularity is on entry level
+            NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entry"));
 
-                boolean autogeneratePressed = DefaultTaskExecutor.runInJavaFXThread(()->dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Autogenerate PDF Names"),
-                        Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
-                        Localization.lang("Autogenerate PDF Names"),
-                        Localization.lang("Cancel"),
-                        Localization.lang("Disable this confirmation dialog"),
-                        optOut -> Globals.prefs.putBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN, !optOut)));
+            doCleanup(cleanupPreset, entry, ce);
 
-                if (!autogeneratePressed) {
-                    canceled = true;
-                    return;
-                }
+            ce.end();
+            if (ce.hasEdits()) {
+                modifiedEntriesCount++;
+                panel.getUndoManager().addEdit(ce);
             }
-
-            for (BibEntry entry : panel.getSelectedEntries()) {
-                // undo granularity is on entry level
-                NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entry"));
-
-                doCleanup(cleanupPreset, entry, ce);
-
-                ce.end();
-                if (ce.hasEdits()) {
-                    modifiedEntriesCount++;
-                    panel.getUndoManager().addEdit(ce);
-                }
-            }
-
-        });
+        }
 
     }
 
