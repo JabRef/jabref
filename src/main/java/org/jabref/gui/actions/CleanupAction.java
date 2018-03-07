@@ -53,8 +53,7 @@ public class CleanupAction extends AbstractWorker {
         canceled = false;
         modifiedEntriesCount = 0;
         if (panel.getSelectedEntries().isEmpty()) { // None selected. Inform the user to select entries first.
-            JOptionPane.showMessageDialog(null, Localization.lang("First select entries to clean up."),
-                    Localization.lang("Cleanup entry"), JOptionPane.INFORMATION_MESSAGE);
+            dialogService.showInformationDialogAndWait(Localization.lang("Cleanup entry"), Localization.lang("First select entries to clean up."));
             canceled = true;
             return;
         }
