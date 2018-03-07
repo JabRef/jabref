@@ -669,13 +669,13 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         PushToApplicationButton pushToExternal = new PushToApplicationButton(this, pushApplications.getApplications());
         HBox rightSide = new HBox (
                 factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE)),
-                factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(Actions.DELETE)),
+                factory.createIconButton(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, Globals.stateManager)),
 
                 factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
                 factory.createIconButton(StandardActions.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, Globals.stateManager)),
-                factory.createIconButton(StandardActions.CUT, new EditAction(Actions.CUT)),
-                factory.createIconButton(StandardActions.COPY, new EditAction(Actions.COPY)),
-                factory.createIconButton(StandardActions.PASTE, new EditAction(Actions.PASTE)),
+                factory.createIconButton(StandardActions.CUT, new OldDatabaseCommandWrapper(Actions.CUT, this, Globals.stateManager)),
+                factory.createIconButton(StandardActions.COPY, new OldDatabaseCommandWrapper(Actions.COPY, this, Globals.stateManager)),
+                factory.createIconButton(StandardActions.PASTE, new OldDatabaseCommandWrapper(Actions.PASTE, this, Globals.stateManager)),
 
                 factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, Globals.stateManager)),
                 factory.createIconButton(pushToExternal.getMenuAction(), pushToExternal),
