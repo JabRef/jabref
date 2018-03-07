@@ -9,6 +9,7 @@ import javax.swing.JScrollPane;
 import javafx.embed.swing.SwingNode;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
