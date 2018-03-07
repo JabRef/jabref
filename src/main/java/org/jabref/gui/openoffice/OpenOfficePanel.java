@@ -25,7 +25,6 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
@@ -359,7 +358,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private void connect(boolean autoDetect) {
         if (autoDetect) {
-            DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(diag, preferences);
+            DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(diag, preferences, frame.getDialogService());
 
             if (!officeInstallation.isInstalled()) {
                 frame.getDialogService().showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"));
@@ -380,7 +379,7 @@ public class OpenOfficePanel extends AbstractWorker {
             loadOpenOfficeJars(Paths.get(preferences.getInstallationPath()));
 
             // Show progress dialog:
-            progressDialog = new DetectOpenOfficeInstallation(diag, preferences)
+            progressDialog = new DetectOpenOfficeInstallation(diag, preferences, frame.getDialogService())
                     .showProgressDialog(diag, Localization.lang("Connecting"), Localization.lang("Please wait..."));
             getWorker().run(); // Do the actual connection, using Spin to get off the EDT.
             progressDialog.dispose();
@@ -556,10 +555,11 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private void pushEntries(boolean inParenthesisIn, boolean withText, boolean addPageInfo) {
         if (!ooBase.isConnectedToDocument()) {
-            JOptionPane.showMessageDialog(null,
-                    Localization.lang("Not connected to any Writer document. Please"
-                            + " make sure a document is open, and use the 'Select Writer document' button to connect to it."),
-                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+
+            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(
+                    Localization.lang("Error pushing entries"), Localization.lang("Not connected to any Writer document. Please"
+                            + " make sure a document is open, and use the 'Select Writer document' button to connect to it.")));
+
             return;
         }
 
@@ -591,10 +591,11 @@ public class OpenOfficePanel extends AbstractWorker {
                     ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, withText, pageInfo,
                             preferences.syncWhenCiting());
                 } catch (FileNotFoundException ex) {
-                    JOptionPane.showMessageDialog(null,
-                            Localization
-                                    .lang("You must select either a valid style file, or use one of the default styles."),
-                            Localization.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
+
+                    DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(
+                            Localization.lang("No valid style file defined"),
+                            Localization.lang("You must select either a valid style file, or use one of the default styles.")));
+
                     LOGGER.warn("Problem with style file", ex);
                 } catch (ConnectionLostException ex) {
                     showConnectionLostErrorMessage();
@@ -667,24 +668,24 @@ public class OpenOfficePanel extends AbstractWorker {
     }
 
     private void showConnectionLostErrorMessage() {
-        frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection lost"),
+        DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection lost"),
                 Localization.lang("Connection to OpenOffice/LibreOffice has been lost. "
-                        + "Please make sure OpenOffice/LibreOffice is running, and try to reconnect."));
+                        + "Please make sure OpenOffice/LibreOffice is running, and try to reconnect.")));
 
     }
 
     private void reportUndefinedParagraphFormat(UndefinedParagraphFormatException ex) {
-        frame.getDialogService().showErrorDialogAndWait(Localization.lang("Undefined paragraph format"),
+        DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(Localization.lang("Undefined paragraph format"),
                 Localization.lang("Your style file specifies the paragraph format '%0', "
                         + "which is undefined in your current OpenOffice/LibreOffice document.",
                         ex.getFormatName())
                         + "\n" +
-                        Localization.lang("The paragraph format is controlled by the property 'ReferenceParagraphFormat' or 'ReferenceHeaderParagraphFormat' in the style file."));
+                        Localization.lang("The paragraph format is controlled by the property 'ReferenceParagraphFormat' or 'ReferenceHeaderParagraphFormat' in the style file.")));
 
     }
 
     private void reportUndefinedCharacterFormat(UndefinedCharacterFormatException ex) {
-        frame.getDialogService().showErrorDialogAndWait(Localization.lang("Undefined character format"),
+        DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(Localization.lang("Undefined character format"),
                 Localization.lang(
                         "Your style file specifies the character format '%0', "
                                 + "which is undefined in your current OpenOffice/LibreOffice document.",
@@ -692,7 +693,7 @@ public class OpenOfficePanel extends AbstractWorker {
                         + "\n"
                         + Localization.lang("The character format is controlled by the citation property 'CitationCharacterFormat' in the style file.")
 
-        );
+        ));
     }
 
     private void showSettingsPopup() {
