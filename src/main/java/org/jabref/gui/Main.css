@@ -5,7 +5,13 @@
     hover colors for the main menu. It generally defines the look of JabRef. The highlighting colors below should
     work nicely with this base color
     */
-    -jr-theme: #2467ab;
+
+    /*-jr-theme: #2467ab;*/
+
+    /* This theme is the original JabRef dark blue color */
+    -jr-theme: #50618F;
+    /* The base gray. Most gray-tones in the application are derived from this color. */
+    -jr-base: #eee;
 
     -jr-white: #ffffff;
     -jr-gray-00: #f5f5f5;
@@ -39,7 +45,7 @@
     -jr-selected-cell: derive(-jr-yellow, 5%);
 
     /* Background-color of the toolbar */
-    -jr-toolbar: -jr-gray-00;
+    -jr-toolbar: derive(-jr-base, 80%);
 
     /* All icons on toolbars or next to inputs */
     -jr-icon: -jr-theme;
@@ -57,33 +63,12 @@
     -jr-tooltip-fg: -jr-black;
 
 
-    /* Please ignore the next lines. Was for testing */
-    /*-jr-active: -jr-theme;*/
-    /*-jr-background: -jr-gray-0;*/
-    /*-jr-foreground: -jr-white;*/
-    /*-fx-active-background: -jr-active;*/
-    /*-fx-selection-bar: -jr-active;*/
-    /*-jr-separator: derive(-jr-background, 20%);*/
-    /*-jr-grayed-text: -jr-gray-2;*/
-    /*-fx-border: -jr-separator;*/
-    /*-fx-dark-background: -jr-gray-3;*/
-    /*-fx-theme-base: -jr-base;*/
-    /*-fx-neutral: -jr-blue;*/
-    /*-fx-positive: -jr-green;*/
-    /*-fx-negative: -jr-red;*/
-    /*-fx-info: -jr-base;*/
-    /*-fx-unimportant: -jr-gray-2;*/
-    /*-fx-accented-background: -jr-gray-1;*/
-    /*-fx-light-background: -jr-background;*/
-    /*-fx-control-inner-background: #ffffff;*/
-
-
     /*
      Here are redefinitions of the default properties of modena. They should in principle all be derived from the
      above colors. Goal should be to make as few as possible direct color-changes to elements and only do this for
      very specific purposes.
      */
-    -fx-base: -jr-gray-0;
+    -fx-base: -jr-base;
 
     /* A very light grey used for the background of windows.  See also
      * -fx-text-background-color, which should be used as the -fx-text-fill
@@ -111,7 +96,7 @@
      * -fx-selection-bar-text for text on top of -fx-selection-bar
      */
     -fx-dark-text-color: -jr-black;
-    -fx-mid-text-color: -jr-gray-3;
+    -fx-mid-text-color: derive(-jr-base, -50%);
     -fx-light-text-color: -jr-white;
 
     /* A bright blue for highlighting/accenting objects.  For example: selected
@@ -135,6 +120,112 @@
      * set -fx-color to -fx-pressed-base.
      */
     -fx-color: -fx-base;
+
+    -fx-hover-base: derive(-fx-base,30%);
+
+    /* A little darker than -fx-base and used as the -fx-color for the
+     * "armed" pseudoclass state.
+     *
+     * TODO: should this be renamed to -fx-armed-base?
+     */
+    -fx-pressed-base: derive(-fx-base,-6%);
+
+    /* The color to use for -fx-text-fill when text is to be painted on top of
+     * a background filled with the -fx-background color.
+     */
+    -fx-text-background-color: -fx-dark-text-color;
+
+    /* A little darker than -fx-color and used to draw boxes around objects such
+     * as progress bars, scroll bars, scroll panes, trees, tables, and lists.
+     */
+    -fx-box-border: derive(-fx-color,-5%);
+
+    /* Darker than -fx-background and used to draw boxes around text boxes and
+     * password boxes.
+     */
+    -fx-text-box-border: derive(-fx-background, -15%);
+
+    /* Lighter than -fx-background and used to provide a small highlight when
+     * needed on top of -fx-background. This is never a shadow in Modena but
+     * keep -fx-shadow-highlight-color name to be compatible with Caspian.
+     */
+    -fx-shadow-highlight-color: rgba(255,255,255,0.07) 70%;
+
+    /* A gradient that goes from a little darker than -fx-color on the top to
+     * even more darker than -fx-color on the bottom.  Typically is the second
+     * color in the -fx-background-color list as the small thin border around
+     * a control. It is typically the same size as the control (i.e., insets
+     * are 0).
+     */
+    -fx-outer-border: derive(-fx-color,-5%);
+
+    /* A gradient that goes from a bit lighter than -fx-color on the top to
+     * a little darker at the bottom.  Typically is the third color in the
+     * -fx-background-color list as a thin highlight inside the outer border.
+     * Insets are typically 1.
+     */
+    -fx-inner-border: derive(-fx-color,65%);
+    -fx-inner-border-horizontal: derive(-fx-color,65%);
+    -fx-inner-border-bottomup: derive(-fx-color,65%);
+
+    /*-fx-inner-border: red;*/
+    /*-fx-inner-border-horizontal: green;*/
+    /*-fx-inner-border-bottomup: blue;*/
+
+    /* A gradient that goes from a little lighter than -fx-color at the top to
+     * a little darker than -fx-color at the bottom and is used to fill the
+     * body of many controls such as buttons.
+     */
+    -fx-body-color: derive(-fx-color,20%);
+    -fx-body-color-bottomup: derive(-fx-color,20%);
+    -fx-body-color-to-right: derive(-fx-color,20%);
+
+    /* The color to use as -fx-text-fill when painting text on top of
+     * backgrounds filled with -fx-base, -fx-color, and -fx-body-color.
+     */
+    -fx-text-base-color: -fx-dark-text-color  46%;
+
+    /* The color to use as -fx-text-fill when painting text on top of
+     * backgrounds filled with -fx-control-inner-background.
+     */
+    -fx-text-inner-color: -fx-dark-text-color;
+
+    /* The color to use for small mark-like objects such as checks on check
+     * boxes, filled in circles in radio buttons, arrows on scroll bars, etc.
+     */
+    -fx-mark-color: white 30%;
+
+    /* The small thin light "shadow" for mark-like objects. Typically used in
+     * conjunction with -fx-mark-color with an insets of 1 0 -1 0. */
+    -fx-mark-highlight-color: derive(-fx-color,80%);
+
+    /* Background for items in list like things such as menus, lists, trees,
+     * and tables. */
+    -fx-selection-bar: -fx-accent;
+
+    /* Background color to use for selection of list cells etc. This is when
+     * the control doesn't have focus or the row of a previously selected item. */
+    -fx-selection-bar-non-focused: lightgrey;
+
+    /* The color to use as -fx-text-fill when painting text on top of
+     * backgrounds filled with -fx-selection-bar.
+     *
+     * TODO: this can be removed
+     */
+    -fx-selection-bar-text: -fx-text-background-color;
+
+    /* These are needed for Popup */
+    -fx-background-color: inherit;
+    -fx-background-radius: inherit;
+    -fx-background-insets: inherit;
+    -fx-padding: inherit;
+
+    /** Focus line for keyboard focus traversal on cell based controls */
+    -fx-cell-focus-inner-border: derive(-fx-selection-bar,30%);
+
+
+    -fx-focused-text-base-color : -fx-dark-text-color;
+    -fx-focused-mark-color : -fx-focused-text-base-color;
 
 }
 
@@ -227,7 +318,7 @@
 }
 
 .menu-bar {
-    /*-fx-background-color: -jr-background;*/
+    -fx-background-color: -fx-body-color;
     -fx-background-insets: 0;
     -fx-background-radius: 0;
 }
@@ -252,19 +343,25 @@
 .tab-pane > .tab-header-area > .headers-region > .tab {
     -fx-background-insets: 0;
     -fx-background-radius: 0;
-    /*-fx-background-color: -jr-light-gray;*/
+    /*-fx-background-color: green;*/
     /*-fx-background-color: -fx-accented-background;*/
-    /*-fx-border-color: -jr-separator;*/
+    -fx-border-color: -fx-outer-border;
     -fx-border-width: 0.5 0.5 0.5 0.5;
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab .tab-label {
-    /*-fx-text-fill: -jr-grayed-text;*/
+    -fx-text-fill: -fx-mid-text-color;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .control-buttons-tab {
+    -fx-border-color: -jr-theme;
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected {
-    -fx-background-color: -fx-control-inner-background;
+    /*-fx-background-color: -fx-control-inner-background;*/
     -fx-border-color: -jr-theme;
     -fx-fill: -jr-theme;
     -fx-text-fill: -jr-theme;
@@ -288,10 +385,6 @@
     -fx-effect: dropshadow(one-pass-box, -jr-icon, 5, 0, 1, 1);
 }
 
-/*.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-label .tab-close-button{*/
-    /*-fx-text-fill: -jr-theme;*/
-/*}*/
-
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
     -fx-text-fill: -jr-theme;
@@ -305,13 +398,13 @@
 }
 
 .tab-pane > .tab-header-area > .tab-header-background {
-    /*-fx-background-color: -jr-background;*/
+    -fx-background-color: -fx-outer-border;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab .glyph-icon {
     -glyph-size: 13px;
-    /*-fx-text-fill: -jr-grayed-text;*/
-    /*-fx-fill: -jr-grayed-text;*/
+    -fx-text-fill: -fx-mid-text-color;
+    -fx-fill: -fx-mid-text-color;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
@@ -390,7 +483,7 @@
 }
 
 .text-input {
-    /*-fx-background-color: -jr-separator, -fx-control-inner-background;*/
+    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
     -fx-background-insets: 0, 1;
 }
 
@@ -526,9 +619,11 @@
     -fx-font-size: 1.7em;
 }
 
-/*.mainToolbar .search-field {*/
-    /*-fx-background-color: -jr-white;*/
-/*}*/
+.mainToolbar .search-field .glyph-icon {
+    -fx-fill: -jr-icon;
+    -fx-text-fill: -jr-icon;
+}
+
 
 /*.mainToolbar .search-field:focused {*/
     /*-fx-background-color: -jr-white;*/
