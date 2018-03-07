@@ -54,7 +54,7 @@ public class ExportToClipboardAction extends AbstractWorker {
         List<Exporter> exporters = new ArrayList<>(Globals.exportFactory.getExporters());
 
         Optional<Exporter> selectedExporter = frame.getDialogService().showChoiceDialogAndWait(Localization.lang("Export"), Localization.lang("Select export format"),
-                Localization.lang("Export"), null, exporters);
+                                                                                               Localization.lang("Export"), null, exporters);
 
         if (!selectedExporter.isPresent()) {
             return;
@@ -66,8 +66,8 @@ public class ExportToClipboardAction extends AbstractWorker {
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
         Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel()
-                .getBibDatabaseContext()
-                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+                                                .getBibDatabaseContext()
+                                                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
 
         Path tmp = null;
         try {
@@ -79,18 +79,18 @@ public class ExportToClipboardAction extends AbstractWorker {
 
             // Write to file:
             exporter.export(panel.getBibDatabaseContext(), tmp,
-                    panel.getBibDatabaseContext()
-                            .getMetaData()
-                            .getEncoding()
-                            .orElse(Globals.prefs.getDefaultEncoding()),
-                    entries);
+                            panel.getBibDatabaseContext()
+                                 .getMetaData()
+                                 .getEncoding()
+                                 .orElse(Globals.prefs.getDefaultEncoding()),
+                            entries);
             // Read the file and put the contents on the clipboard:
             StringBuilder sb = new StringBuilder();
             try (Reader reader = new InputStreamReader(Files.newInputStream(tmp, StandardOpenOption.DELETE_ON_CLOSE),
-                    panel.getBibDatabaseContext()
-                            .getMetaData()
-                            .getEncoding()
-                            .orElse(Globals.prefs.getDefaultEncoding()))) {
+                                                       panel.getBibDatabaseContext()
+                                                            .getMetaData()
+                                                            .getEncoding()
+                                                            .orElse(Globals.prefs.getDefaultEncoding()))) {
                 int s;
                 while ((s = reader.read()) != -1) {
                     sb.append((char) s);
@@ -101,8 +101,8 @@ public class ExportToClipboardAction extends AbstractWorker {
             };
             RtfTransferable rs = new RtfTransferable(sb.toString());
             Toolkit.getDefaultToolkit()
-                    .getSystemClipboard()
-                    .setContents(rs, owner);
+                   .getSystemClipboard()
+                   .setContents(rs, owner);
             message = Localization.lang("Entries exported to clipboard") + ": " + entries.size();
 
         } catch (Exception e) {
