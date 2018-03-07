@@ -1,6 +1,6 @@
 .text-area {
-    -fx-text-fill: text-area-foreground;
-    -fx-control-inner-background: text-area-background;
+    /*-fx-text-fill: text-area-foreground;*/
+    /*-fx-control-inner-background: text-area-background;*/
 }
 
 .text-area *.text {
@@ -10,12 +10,12 @@
 .editorPane {
     -fx-hgap: 10;
     -fx-vgap: 6;
-    -fx-background-color: -jr-white;
+    /*-fx-background-color: -jr-white;*/
     -fx-padding: 5 5 5 15;
 }
 
 .date-picker > .date-picker-display-node {
-    -fx-text-fill: text-area-foreground;
+    /*-fx-text-fill: text-area-foreground;*/
     -fx-text-origin: baseline;
 }
 
@@ -24,12 +24,12 @@
 }
 
 .combo-box > *.text {
-    -fx-text-fill: text-area-foreground;
+    /*-fx-text-fill: text-area-foreground;*/
     -fx-text-origin: baseline;
 }
 
 .list-cell:odd {
-    -fx-background: text-area-background;
+    /*-fx-background: text-area-background;*/
 }
 
 /* Selected rows */
@@ -48,7 +48,7 @@
 .tree-table-row-cell:filled:selected,
 .table-row-cell:filled > .table-cell:selected,
 .tree-table-row-cell:filled > .tree-table-cell:selected {
-    -fx-background: -fx-selection-bar-non-focused;
+    -fx-background: -fx-selection-bar;
 }
 /* focused cell (keyboard navigation) */
 .list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:focused,
@@ -101,7 +101,7 @@
 
 
 .tool-bar {
-    -fx-background-color: -jr-toolbar;
+    /*-fx-background-color: -jr-toolbar;*/
     -fx-background-insets: 0;
     /*-fx-border-color: -jr-gray-1;*/
     /*-fx-border-width: 1 1 1 1;*/
@@ -113,7 +113,7 @@
 
 
 .tool-bar > .container > .separator {
-    -fx-background-color: -jr-separator;
+    /*-fx-background-color: -jr-separator;*/
 }
 
 .tool-bar .glyph-icon {

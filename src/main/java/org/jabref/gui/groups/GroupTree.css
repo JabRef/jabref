@@ -1,5 +1,5 @@
 .tree-table-view, .tree-table-row-cell {
-    -fx-background-color: -jr-white;
+    -fx-background-color: -fx-control-inner-background;
     -fx-table-cell-border-color: transparent; /* hide grid lines */
 }
 
@@ -61,7 +61,7 @@
 
 .tree-table-row-cell:root {
     -fx-border-width: 0 0 1 0;
-    -fx-border-color: -jr-separator;
+    -fx-border-color: -fx-outer-border;
 }
 
 .tree-table-row-cell:root > .tree-table-cell {
@@ -106,13 +106,12 @@
 }
 
 #barBottom {
-    /*-fx-background-color: -br-base;*/
-    /*-fx-border-color: -jr-separator;*/
-    -fx-border-width: 1 1 1 1;
+    -fx-border-color: -fx-outer-border;
+    -fx-border-width: 0 0 1 0;
     -fx-padding: 0em 1em 0em 1em;
 }
 
 #barBottom .glyph-icon {
-    -fx-fill: -jr-base;
+    -fx-fill: -jr-icon;
     -fx-font-size: 2em;
 }
