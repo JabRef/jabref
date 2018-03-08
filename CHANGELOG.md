@@ -51,6 +51,7 @@ The new default removes the linked file from the entry instead of deleting the f
 - We fixed an issue where not all bibtex/biblatex fields would be exported as latex-free to MS-Office XML [koppor#284](https://github.com/koppor/jabref/issues/284)
 - We fixed an issue where linked files would be deleted from bibliography entries despite choosing the "Cancel" option in the dialog menu.
 - We fixed the name of the group editing window to "Add group" instead of "Edit Group" when adding a new group. [koppor#277](https://github.com/koppor/jabref/issues/277)
+- We fixed an issue where the "Copy linked files" dialog produced an error when the entry had no file [#3818](https://github.com/JabRef/jabref/issues/3818)
 
 ### Removed
 - We removed the [Look and Feels from JGoodies](http://www.jgoodies.com/freeware/libraries/looks/), because the open source version is not compatible with Java 9.
