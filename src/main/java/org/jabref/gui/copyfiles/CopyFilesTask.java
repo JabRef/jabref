@@ -38,7 +38,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
     private final long totalFilesCount;
     private final List<BibEntry> entries;
     private final List<CopyFilesResultItemViewModel> results = new ArrayList<>();
-    private Optional<Path> newPath;
+    private Optional<Path> newPath = Optional.empty();
     private int numberSucessful;
     private int totalFilesCounter;
 
@@ -54,8 +54,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
     }
 
     @Override
-    protected List<CopyFilesResultItemViewModel> call()
-            throws InterruptedException, IOException {
+    protected List<CopyFilesResultItemViewModel> call() throws InterruptedException, IOException {
 
         updateMessage(Localization.lang("Copying files..."));
         updateProgress(0, totalFilesCount);
@@ -104,9 +103,6 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
             }
             updateMessage(Localization.lang("Finished copying"));
 
-            if (newPath == null) {
-                return results;
-            }
             String sucessMessage = Localization.lang("Copied %0 files of %1 sucessfully to %2", Integer.toString(numberSucessful), Integer.toString(totalFilesCounter), newPath.map(Path::getParent).map(Path::toString).orElse(""));
             updateMessage(sucessMessage);
             bw.write(sucessMessage);

@@ -53,7 +53,6 @@ public class CopyFilesAction extends AbstractAction {
     private void startServiceAndshowProgessDialog(Task<List<CopyFilesResultItemViewModel>> exportService) {
 
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-
             dialogService.showCanceableProgressDialogAndWait(exportService);
         });
 
@@ -64,8 +63,6 @@ public class CopyFilesAction extends AbstractAction {
     }
 
     private void showDialog(List<CopyFilesResultItemViewModel> data) {
-
-
         CopyFilesDialogView dlg = new CopyFilesDialogView(databaseContext, new CopyFilesResultListDependency(data));
         dlg.show();
     }
