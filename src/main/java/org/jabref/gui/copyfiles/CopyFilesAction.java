@@ -52,13 +52,20 @@ public class CopyFilesAction extends AbstractAction {
 
     private void startServiceAndshowProgessDialog(Task<List<CopyFilesResultItemViewModel>> exportService) {
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showCanceableProgressDialogAndWait(exportService));
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
 
-        exportService.run(); //Run kinda blocks, so we just show the result dialog wgeb run is ready
-        DefaultTaskExecutor.runInJavaFXThread(() -> showDialog(exportService.getValue()));
+            dialogService.showCanceableProgressDialogAndWait(exportService);
+        });
+
+        exportService.run();
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            showDialog(exportService.getValue());
+        });
     }
 
     private void showDialog(List<CopyFilesResultItemViewModel> data) {
+
+
         CopyFilesDialogView dlg = new CopyFilesDialogView(databaseContext, new CopyFilesResultListDependency(data));
         dlg.show();
     }

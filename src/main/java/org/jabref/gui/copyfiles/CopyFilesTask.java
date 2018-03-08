@@ -103,6 +103,10 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
                 }
             }
             updateMessage(Localization.lang("Finished copying"));
+
+            if (newPath == null) {
+                return results;
+            }
             String sucessMessage = Localization.lang("Copied %0 files of %1 sucessfully to %2", Integer.toString(numberSucessful), Integer.toString(totalFilesCounter), newPath.map(Path::getParent).map(Path::toString).orElse(""));
             updateMessage(sucessMessage);
             bw.write(sucessMessage);
