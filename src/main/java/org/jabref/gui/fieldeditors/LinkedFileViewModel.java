@@ -18,6 +18,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.Globals;
@@ -44,8 +45,6 @@ import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static javafx.scene.control.ButtonBar.ButtonData;
 
 public class LinkedFileViewModel extends AbstractViewModel {
 
@@ -195,10 +194,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
         if ((file.isPresent()) && Files.exists(file.get())) {
-            RenamePdfCleanup pdfCleanup = new RenamePdfCleanup(false,
-                    databaseContext,
+            RenamePdfCleanup pdfCleanup = new RenamePdfCleanup(false, databaseContext,
                     Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileNamePattern(),
-                    Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
                     Globals.prefs.getFileDirectoryPreferences(), linkedFile);
 
             String targetFileName = pdfCleanup.getTargetFileName(linkedFile, entry);
@@ -270,8 +267,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
             // Linked file exists, so move it
             MoveFilesCleanup moveFiles = new MoveFilesCleanup(databaseContext,
                     Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern(),
-                    Globals.prefs.getFileDirectoryPreferences(),
-                    Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader), linkedFile);
+                                                              Globals.prefs.getFileDirectoryPreferences(),
+                                                              linkedFile);
+
 
             boolean confirm = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Move file"),
@@ -316,8 +314,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     return true;
                 } catch (IOException ex) {
                     dialogService.showErrorDialogAndWait(
-                            Localization.lang("Cannot delete file"),
-                            Localization.lang("File permission error"));
+                                                         Localization.lang("Cannot delete file"),
+                                                         Localization.lang("File permission error"));
                     LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
                 }
             }

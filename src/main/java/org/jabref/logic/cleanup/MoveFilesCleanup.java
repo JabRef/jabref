@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
@@ -35,19 +34,18 @@ public class MoveFilesCleanup implements CleanupJob {
 
     private LinkedFile singleFileFieldCleanup;
 
-    // FIXME: remove unused parameter 'layoutPrefs' later S.G.
     public MoveFilesCleanup(BibDatabaseContext databaseContext, String fileDirPattern,
-            FileDirectoryPreferences fileDirectoryPreferences, LayoutFormatterPreferences layoutPrefs) {
+                            FileDirectoryPreferences fileDirectoryPreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.fileDirPattern = Objects.requireNonNull(fileDirPattern);
         this.fileDirectoryPreferences = Objects.requireNonNull(fileDirectoryPreferences);
     }
 
     public MoveFilesCleanup(BibDatabaseContext databaseContext, String fileDirPattern,
-            FileDirectoryPreferences fileDirectoryPreferences, LayoutFormatterPreferences prefs,
-            LinkedFile field) {
+                            FileDirectoryPreferences fileDirectoryPreferences,
+                            LinkedFile field) {
 
-        this(databaseContext, fileDirPattern, fileDirectoryPreferences, prefs);
+        this(databaseContext, fileDirPattern, fileDirectoryPreferences);
         this.singleFileFieldCleanup = field;
     }
 
@@ -74,7 +72,7 @@ public class MoveFilesCleanup implements CleanupJob {
             fileList = Arrays.asList(singleFileFieldCleanup);
             //Add all other except the current selected file
             newFileList = entry.getFiles().stream().filter(name -> !name.equals(singleFileFieldCleanup))
-                    .collect(Collectors.toList());
+                               .collect(Collectors.toList());
         } else {
             newFileList = new ArrayList<>();
             fileList = entry.getFiles();
@@ -116,7 +114,7 @@ public class MoveFilesCleanup implements CleanupJob {
                 LinkedFile newFileEntry = fileEntry;
                 if (!oldFileName.equals(newTargetFile.toString())) {
                     newFileEntry = new LinkedFile(fileEntry.getDescription(), newEntryFilePath,
-                            fileEntry.getFileType());
+                                                  fileEntry.getFileType());
                     changed = true;
                 }
                 newFileList.add(newFileEntry);

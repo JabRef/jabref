@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -31,7 +30,6 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DragAndDropDataFormats;
-import org.jabref.gui.EntryMarker;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiles.NewDroppedFileHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -85,28 +83,28 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final NewDroppedFileHandler fileHandler;
 
     public MainTable(MainTableDataModel model, JabRefFrame frame,
-            BasePanel panel, BibDatabaseContext database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
+                     BasePanel panel, BibDatabaseContext database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
         super();
 
         this.model = model;
         this.database = Objects.requireNonNull(database);
         this.undoManager = panel.getUndoManager();
 
-        fileHandler = new NewDroppedFileHandler(database, externalFileTypes, Globals.prefs.getFileDirectoryPreferences());
+        fileHandler = new NewDroppedFileHandler(database, externalFileTypes, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern());
 
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
-                .withOnMouseClickedEvent((entry, event) -> {
-                    if (event.getClickCount() == 2) {
-                        panel.showAndEdit(entry.getEntry());
-                    }
-                })
-                .withContextMenu(entry1 -> RightClickMenu.create(entry1, keyBindingRepository, panel, Globals.getKeyPrefs()))
-                .setOnDragDetected(this::handleOnDragDetected)
-                .setOnDragDropped(this::handleOnDragDropped)
-                .setOnDragOver(this::handleOnDragOver)
-                .setOnMouseDragEntered(this::handleOnDragEntered)
-                .install(this);
+                                                              .withOnMouseClickedEvent((entry, event) -> {
+                                                                  if (event.getClickCount() == 2) {
+                                                                      panel.showAndEdit(entry.getEntry());
+                                                                  }
+                                                              })
+                                                              .withContextMenu(entry1 -> RightClickMenu.create(entry1, keyBindingRepository, panel, Globals.getKeyPrefs()))
+                                                              .setOnDragDetected(this::handleOnDragDetected)
+                                                              .setOnDragDropped(this::handleOnDragDropped)
+                                                              .setOnDragOver(this::handleOnDragOver)
+                                                              .setOnMouseDragEntered(this::handleOnDragEntered)
+                                                              .install(this);
         if (preferences.resizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
         }
@@ -166,12 +164,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public void clearAndSelect(BibEntry bibEntry) {
-        findEntry(bibEntry)
-                .ifPresent(entry -> {
-                    getSelectionModel().clearSelection();
-                    getSelectionModel().select(entry);
-                    scrollTo(entry);
-                });
+        findEntry(bibEntry).ifPresent(entry -> {
+                               getSelectionModel().clearSelection();
+                               getSelectionModel().select(entry);
+                               scrollTo(entry);
+                           });
     }
 
     public void copy() {
@@ -331,9 +328,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 fileHandler.addFilesToEntry(entry, files);
                 success = true;
             }
-        }
-        if (event.getTransferMode() == TransferMode.LINK) {
-            System.out.println("LINK"); //alt on win
+            if (event.getTransferMode() == TransferMode.LINK) {
+                System.out.println("LINK"); //alt on win
+                fileHandler.addToEntryAndMoveToFileDir(entry, files);
+                success = true;
+
+            }
+            if (event.getTransferMode() == TransferMode.COPY) {
+
+            }
         }
 
         event.setDropCompleted(success);
@@ -436,10 +439,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public List<BibEntry> getSelectedEntries() {
         return getSelectionModel()
-                .getSelectedItems()
-                .stream()
-                .map(BibEntryTableViewModel::getEntry)
-                .collect(Collectors.toList());
+                                  .getSelectedItems()
+                                  .stream()
+                                  .map(BibEntryTableViewModel::getEntry)
+                                  .collect(Collectors.toList());
     }
 
     /**
@@ -567,9 +570,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {
         return model.getEntriesFilteredAndSorted()
-                .stream()
-                .filter(viewModel -> viewModel.getEntry().equals(entry))
-                .findFirst();
+                    .stream()
+                    .filter(viewModel -> viewModel.getEntry().equals(entry))
+                    .findFirst();
     }
 
     private boolean matches(int row, Matcher<BibEntry> m) {
@@ -612,23 +615,23 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     public static void updateRenderers() {
 
         MainTable.defRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND),
-                Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
+                                                    Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
         Color sel = MainTable.defRenderer.getTableCellRendererComponent(new JTable(), "", true, false, 0, 0).getBackground();
         MainTable.reqRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND), Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
         MainTable.optRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND), Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
         MainTable.resolvedRenderer = new GeneralRenderer(
-                Globals.prefs.getColor(JabRefPreferences.TABLE_RESOLVED_FIELD_BACKGROUND),
-                Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
+                                                         Globals.prefs.getColor(JabRefPreferences.TABLE_RESOLVED_FIELD_BACKGROUND),
+                                                         Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
         MainTable.incRenderer = new IncompleteRenderer();
         MainTable.compRenderer = new CompleteRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND));
         MainTable.grayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor(JabRefPreferences.GRAYED_OUT_BACKGROUND));
         MainTable.veryGrayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_BACKGROUND));
         MainTable.grayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.GRAYED_OUT_BACKGROUND),
-                Globals.prefs.getColor(JabRefPreferences.GRAYED_OUT_TEXT), MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.GRAYED_OUT_BACKGROUND),
-                        sel));
+                                                          Globals.prefs.getColor(JabRefPreferences.GRAYED_OUT_TEXT), MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.GRAYED_OUT_BACKGROUND),
+                                                                                                                                         sel));
         MainTable.veryGrayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_BACKGROUND),
-                Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_TEXT), MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_BACKGROUND),
-                        sel));
+                                                              Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_TEXT), MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_BACKGROUND),
+                                                                                                                                                  sel));
     }
 
     private static Color mixColors(Color one, Color two) {

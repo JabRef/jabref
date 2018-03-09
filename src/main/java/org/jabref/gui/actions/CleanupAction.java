@@ -3,7 +3,6 @@ package org.jabref.gui.actions;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 
 import javafx.embed.swing.SwingNode;
@@ -149,16 +148,6 @@ public class CleanupAction extends AbstractWorker {
         panel.output(message);
     }
 
-    private int showDialog(CleanupPresetPanel presetPanel) {
-
-        String dialogTitle = Localization.lang("Cleanup entries");
-
-        Object[] messages = {Localization.lang("What would you like to clean up?"), presetPanel.getScrollPane()};
-
-        return JOptionPane.showConfirmDialog(null, messages, dialogTitle, JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
-
-    }
 
     /**
      * Runs the cleanup on the entry and records the change.

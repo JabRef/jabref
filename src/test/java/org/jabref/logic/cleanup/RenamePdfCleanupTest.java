@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -19,7 +18,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -32,7 +30,6 @@ public class RenamePdfCleanupTest {
     private BibEntry entry;
 
     private FileDirectoryPreferences fileDirPrefs;
-    private LayoutFormatterPreferences layoutFormatterPreferences;
 
     @Before
     public void setUp() throws Exception {
@@ -44,7 +41,6 @@ public class RenamePdfCleanupTest {
         when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(true); //Set Biblocation as Primary Directory, otherwise the tmp folders won't be cleaned up correctly
         entry = new BibEntry();
         entry.setCiteKey("Toot");
-        layoutFormatterPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     /**
@@ -57,8 +53,7 @@ public class RenamePdfCleanupTest {
         LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                mock(LayoutFormatterPreferences.class), fileDirPrefs);
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPrefs);
         cleanup.cleanup(entry);
 
         LinkedFile newFileField = new LinkedFile("", "Toot.tmp", "");
@@ -71,16 +66,17 @@ public class RenamePdfCleanupTest {
         File tempFile = testFolder.newFile("Toot.tmp");
 
         entry.setField("title", "test title");
-        entry.setField("file", FileFieldWriter.getStringRepresentation(Arrays.asList(new LinkedFile("", "", ""),
-                new LinkedFile("", tempFile.getAbsolutePath(), ""), new LinkedFile("", "", ""))));
+        entry.setField("file",
+                       FileFieldWriter.getStringRepresentation(Arrays.asList(new LinkedFile("", "", ""),
+                                                                             new LinkedFile("", tempFile.getAbsolutePath(), ""),
+                                                                             new LinkedFile("", "", ""))));
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                mock(LayoutFormatterPreferences.class), fileDirPrefs);
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPrefs);
         cleanup.cleanup(entry);
 
         assertEquals(
-                Optional.of(FileFieldWriter.getStringRepresentation(new LinkedFile("", "Toot - test title.tmp", ""))),
-                entry.getField("file"));
+                     Optional.of(FileFieldWriter.getStringRepresentation(new LinkedFile("", "Toot - test title.tmp", ""))),
+                     entry.getField("file"));
     }
 
     @Test
@@ -92,8 +88,7 @@ public class RenamePdfCleanupTest {
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                mock(LayoutFormatterPreferences.class), fileDirPrefs);
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPrefs);
         cleanup.cleanup(entry);
 
         LinkedFile newFileField = new LinkedFile("", "Toot - test title.tmp", "");
@@ -108,9 +103,7 @@ public class RenamePdfCleanupTest {
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                layoutFormatterPreferences,
-                fileDirPrefs);
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPrefs);
         cleanup.cleanup(entry);
 
         LinkedFile newFileField = new LinkedFile("", "Toot - test title.pdf", "PDF");
@@ -124,9 +117,7 @@ public class RenamePdfCleanupTest {
         LinkedFile fileField = new LinkedFile("", "Toot.pdf", "PDF");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
         entry.setField("title", "test title");
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                layoutFormatterPreferences,
-                fileDirPrefs, fileField);
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPrefs, fileField);
 
         cleanup.cleanup(entry);
 
@@ -140,9 +131,7 @@ public class RenamePdfCleanupTest {
         String fileNamePattern = "[bibtexkey] - [fulltitle]";
         testFolder.newFile("Toot.pdf");
         LinkedFile fileField = new LinkedFile("", "Toot.pdf", "PDF");
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                layoutFormatterPreferences,
-                fileDirPrefs);
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPrefs);
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
