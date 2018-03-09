@@ -19,12 +19,12 @@ Style-checks are done for each pull request and installing this cody style confi
 
 # Eclipse:
 
-In case the Eclipse style needs to be adjusted for the eclipse.gradle file:
+The Eclipse code formatter style is stored in the `eclipse.gradle` file and gets imported automatically.
+In case the formatter style needs to be adapted, configure it and export in in eclipse.
 
-1. Export the style file xml
-2. Open the style file in an editor which supports RegEx search and replacement
-3. Enter for search regex: `<setting id="(org\.eclipse\.jdt\.core\.formatter\.[a-zA-Z_0-9\.]*)"\s*value="([a-zA-Z@0-9\s_:]*)"\/>`
-4. Enter for replacement regex: `\1=\2`
-5. Remove the lines with jdt.compiler by hand
-6. Escape `@formatter:on` and `@formatter:off` with`@formatter\\:on` and `@formatter\\:off`
-7. Replace existing lines in eclipse.gradle starting with `org.eclipse.jdt.core.formatter`
+1. Right click on the eclipse project "JabRef"
+2. Select "Export > General > Preferences"
+3. Select "Java Code Style preferences"
+4. Choose output file
+5. Compare the formatter settings in the epf file with the ones in the eclipse.gradle file (`org.eclipse.jdt.core.formatter.`)
+6. Replace the Eclipse Code Style.epf with the exported epf file
