@@ -54,8 +54,6 @@ public class FindFullTextAction extends AbstractWorker {
     @Override
     public void run() {
         if (basePanel.getSelectedEntries().size() >= WARNING_LIMIT) {
-            String[] options = new String[] {Localization.lang("Look up full text documents"),
-                    Localization.lang("Cancel")};
 
             boolean getFullTextForAllCliecked = dialogService.showConfirmationDialogAndWait(Localization.lang("Look up full text documents"), Localization.lang(
                     "You are about to look up full text documents for %0 entries.",
@@ -119,7 +117,7 @@ public class FindFullTextAction extends AbstractWorker {
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined")));
 
                 basePanel.output(message);
-                dialogService.showErrorDialogAndWait(title, message);
+                DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(title, message));
             }
             remove.add(result);
         }

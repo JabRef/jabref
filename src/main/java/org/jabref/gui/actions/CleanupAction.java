@@ -1,8 +1,14 @@
 package org.jabref.gui.actions;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+
+import javafx.embed.swing.SwingNode;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -47,8 +53,7 @@ public class CleanupAction extends AbstractWorker {
         canceled = false;
         modifiedEntriesCount = 0;
         if (panel.getSelectedEntries().isEmpty()) { // None selected. Inform the user to select entries first.
-            JOptionPane.showMessageDialog(null, Localization.lang("First select entries to clean up."),
-                    Localization.lang("Cleanup entry"), JOptionPane.INFORMATION_MESSAGE);
+            dialogService.showInformationDialogAndWait(Localization.lang("Cleanup entry"), Localization.lang("First select entries to clean up."));
             canceled = true;
             return;
         }
@@ -58,13 +63,27 @@ public class CleanupAction extends AbstractWorker {
 
     @Override
     public void run() {
+
         if (canceled) {
             return;
         }
         CleanupPresetPanel presetPanel = new CleanupPresetPanel(panel.getBibDatabaseContext(),
                 CleanupPreset.loadFromPreferences(preferences));
-        int choice = showDialog(presetPanel);
-        if (choice != JOptionPane.OK_OPTION) {
+
+        SwingNode node = new SwingNode();
+        presetPanel.getScrollPane().setVisible(true);
+
+        JScrollPane scrollPane = presetPanel.getScrollPane();
+        node.setContent(scrollPane);
+        node.setVisible(true);
+
+        DialogPane pane = new DialogPane();
+        pane.setContent(node);
+        pane.setPrefSize(600, 600);
+
+        Optional<ButtonType> ok = dialogService.showCustomDialogAndWait(Localization.lang("Cleanup entries"), pane, ButtonType.OK, ButtonType.CANCEL);
+
+        if (!ok.isPresent() || ((ok.isPresent() && (ok.get() == ButtonType.CANCEL)))) {
             canceled = true;
             return;
         }
@@ -73,12 +92,12 @@ public class CleanupAction extends AbstractWorker {
 
         if (cleanupPreset.isRenamePDF() && Globals.prefs.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
 
-            boolean autogeneratePressed = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Autogenerate PDF Names"),
+            boolean autogeneratePressed = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Autogenerate PDF Names"),
                     Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
                     Localization.lang("Autogenerate PDF Names"),
                     Localization.lang("Cancel"),
                     Localization.lang("Disable this confirmation dialog"),
-                    optOut -> Globals.prefs.putBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN, !optOut));
+                    optOut -> Globals.prefs.putBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN, !optOut)));
 
             if (!autogeneratePressed) {
                 canceled = true;
@@ -98,6 +117,7 @@ public class CleanupAction extends AbstractWorker {
                 panel.getUndoManager().addEdit(ce);
             }
         }
+
     }
 
     @Override
@@ -130,10 +150,14 @@ public class CleanupAction extends AbstractWorker {
     }
 
     private int showDialog(CleanupPresetPanel presetPanel) {
+
         String dialogTitle = Localization.lang("Cleanup entries");
+
         Object[] messages = {Localization.lang("What would you like to clean up?"), presetPanel.getScrollPane()};
+
         return JOptionPane.showConfirmDialog(null, messages, dialogTitle, JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
+
     }
 
     /**

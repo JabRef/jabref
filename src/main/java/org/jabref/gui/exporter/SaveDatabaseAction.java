@@ -7,10 +7,14 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
 
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
@@ -41,8 +45,6 @@ import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -217,23 +219,25 @@ public class SaveDatabaseAction extends AbstractWorker {
         // handle encoding problems
         boolean success = true;
         if (!session.getWriter().couldEncodeAll()) {
-            FormBuilder builder = FormBuilder.create()
-                    .layout(new FormLayout("left:pref, 4dlu, fill:pref", "pref, 4dlu, pref"));
-            JTextArea ta = new JTextArea(session.getWriter().getProblemCharacters());
-            ta.setEditable(false);
-            builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters:",
-                    session.getEncoding().displayName())).xy(1, 1);
-            builder.add(ta).xy(3, 1);
-            builder.add(Localization.lang("What do you want to do?")).xy(1, 3);
-            String tryDiff = Localization.lang("Try different encoding");
 
-            //TODO: Old Swing panel
-            int answer = JOptionPane.showOptionDialog(null, builder.getPanel(), Localization.lang("Save library"),
-                    JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                    new String[] {Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
+            DialogPane pane = new DialogPane();
+            TextArea area = new TextArea(session.getWriter().getProblemCharacters());
+            VBox vbox = new VBox();
+            vbox.getChildren().addAll(
+                    new Text(Localization.lang("The chosen encoding '%0' could not encode the following characters:",
+                            session.getEncoding().displayName())),
+                    area,
+                    new Text(Localization.lang("What do you want to do?"))
 
-            if (answer == JOptionPane.NO_OPTION) {
-                // The user wants to use another encoding.
+            );
+            pane.setContent(vbox);
+
+            ButtonType tryDiff = new ButtonType(Localization.lang("Try different encoding"), ButtonData.OTHER);
+            ButtonType save = new ButtonType(Localization.lang("Save"), ButtonData.APPLY);
+
+            Optional<ButtonType> clickedBtn = frame.getDialogService().showCustomDialogAndWait(Localization.lang("Save library"), pane, save, tryDiff, ButtonType.CANCEL);
+
+            if (clickedBtn.isPresent() && clickedBtn.get().equals(tryDiff)) {
                 Optional<Charset> selectedCharSet = frame.getDialogService().showChoiceDialogAndWait(Localization.lang("Save library"), Localization.lang("Select encoding"), Localization.lang("Save library"), encoding, Encodings.getCharsets());
 
                 if (selectedCharSet.isPresent()) {

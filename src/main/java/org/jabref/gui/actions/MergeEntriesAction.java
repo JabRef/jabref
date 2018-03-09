@@ -13,7 +13,7 @@ public class MergeEntriesAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        MergeEntriesDialog dlg = new MergeEntriesDialog(jabRefFrame.getCurrentBasePanel());
+        MergeEntriesDialog dlg = new MergeEntriesDialog(jabRefFrame.getCurrentBasePanel(), jabRefFrame.getDialogService());
         dlg.setVisible(true);
     }
 
