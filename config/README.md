@@ -22,9 +22,9 @@ Style-checks are done for each pull request and installing this cody style confi
 In case the Eclipse style needs to be adjusted for the eclipse.gradle file:
 
 1. Export the style file xml
-2. Open the Style file in an editor which supports RegEx search and replacement
+2. Open the style file in an editor which supports RegEx search and replacement
 3. Enter for search regex: `<setting id="(org\.eclipse\.jdt\.core\.formatter\.[a-zA-Z_0-9\.]*)"\s*value="([a-zA-Z@0-9\s_:]*)"\/>`
 4. Enter for replacement regex: `\1=\2`
-5. Remove the lines with jdt.compiler from hand
+5. Remove the lines with jdt.compiler by hand
 6. Escape `@formatter:on` and `@formatter:off` with`@formatter\\:on` and `@formatter\\:off`
 7. Replace existing lines in eclipse.gradle starting with `org.eclipse.jdt.core.formatter`
