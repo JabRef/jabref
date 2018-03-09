@@ -100,12 +100,12 @@ public class MonthTest {
     public void parseReturnsEmptyOptionalForEmptyInput() {
         assertEquals(Optional.empty(), Month.parse(""));
     }
-    
+
     @Test
     public void parseCorrectlyByShortNameGerman() {
         assertEquals(Optional.of(Month.JANUARY), Month.parse("Jan"));
         assertEquals(Optional.of(Month.FEBRUARY), Month.parse("Feb"));
-        assertEquals(Optional.of(Month.MARCH), Month.parse("M‰r"));
+        assertEquals(Optional.of(Month.MARCH), Month.parse("M√§r"));
         assertEquals(Optional.of(Month.MARCH), Month.parse("Mae"));
         assertEquals(Optional.of(Month.APRIL), Month.parse("Apr"));
         assertEquals(Optional.of(Month.MAY), Month.parse("Mai"));
@@ -122,7 +122,7 @@ public class MonthTest {
     public void parseCorrectlyByFullNameGerman() {
         assertEquals(Optional.of(Month.JANUARY), Month.parse("Januar"));
         assertEquals(Optional.of(Month.FEBRUARY), Month.parse("Februar"));
-        assertEquals(Optional.of(Month.MARCH), Month.parse("M‰rz"));
+        assertEquals(Optional.of(Month.MARCH), Month.parse("M√§rz"));
         assertEquals(Optional.of(Month.MARCH), Month.parse("Maerz"));
         assertEquals(Optional.of(Month.APRIL), Month.parse("April"));
         assertEquals(Optional.of(Month.MAY), Month.parse("Mai"));
@@ -134,12 +134,12 @@ public class MonthTest {
         assertEquals(Optional.of(Month.NOVEMBER), Month.parse("November"));
         assertEquals(Optional.of(Month.DECEMBER), Month.parse("Dezember"));
     }
-    
+
     @Test
     public void parseCorrectlyByShortNameGermanLowercase() {
     	assertEquals(Optional.of(Month.JANUARY), Month.parse("jan"));
         assertEquals(Optional.of(Month.FEBRUARY), Month.parse("feb"));
-        assertEquals(Optional.of(Month.MARCH), Month.parse("m‰r"));
+        assertEquals(Optional.of(Month.MARCH), Month.parse("m√§r"));
         assertEquals(Optional.of(Month.MARCH), Month.parse("mae"));
         assertEquals(Optional.of(Month.APRIL), Month.parse("apr"));
         assertEquals(Optional.of(Month.MAY), Month.parse("mai"));

@@ -8,6 +8,8 @@ import java.util.Optional;
 
 import org.jabref.model.strings.StringUtil;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Represents a Month of the Year.
  */
@@ -88,7 +90,7 @@ public enum Month {
         if (testString.length() > 3) {
             testString = testString.substring(0, 3);
         }
-        
+
         Optional<Month> month = Month.getMonthByShortName(testString);
         if (month.isPresent()) {
             return month;
@@ -110,19 +112,19 @@ public enum Month {
     /**
      * Parses a month having the string in German standard form such as
      * "Oktober" or in German short form such as "Okt"
-     * 
+     *
      * @param value,
      *            a String that represents a month in German form
      * @return the corresponding month instance, empty if input is not in German
      *         form
      */
     private static Optional<Month> parseGermanShortMonth(String value) {
-        if ("Mae".equalsIgnoreCase(value) || "Maerz".equalsIgnoreCase(value)) {
+        if ("Mae".equalsIgnoreCase(value) || "Maerz".equalsIgnoreCase(value) || "Mär".equalsIgnoreCase(value)) {
             return Month.getMonthByNumber(3);
         }
 
         try {
-            YearMonth yearMonth = YearMonth.parse("1969-" + value, 
+            YearMonth yearMonth = YearMonth.parse("1969-" + StringUtils.capitalize(value),
             		DateTimeFormatter.ofPattern("yyyy-MMM", Locale.GERMAN));
             return Month.getMonthByNumber(yearMonth.getMonthValue());
         } catch (DateTimeParseException e) {
