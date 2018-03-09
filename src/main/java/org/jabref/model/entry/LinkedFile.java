@@ -28,6 +28,19 @@ public class LinkedFile implements Serializable {
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", "", "");
     //We have to mark these properties as transient because they can't be serialized directly
     private transient StringProperty description = new SimpleStringProperty();
+
+    public StringProperty descriptionProperty() {
+        return description;
+    }
+
+    public StringProperty linkProperty() {
+        return link;
+    }
+
+    public StringProperty fileTypeProperty() {
+        return fileType;
+    }
+
     private transient StringProperty link = new SimpleStringProperty();
     private transient StringProperty fileType = new SimpleStringProperty();
 

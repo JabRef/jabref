@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,6 +18,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 
@@ -25,6 +27,8 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.externalfiles.DownloadExternalFile;
+import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntryEditor;
@@ -33,12 +37,15 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 import de.jensd.fx.glyphs.GlyphIcons;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
@@ -73,7 +80,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
 
-        downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(100)));
+        downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
         canWriteXMPMetadata.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
     }
 
@@ -97,12 +104,12 @@ public class LinkedFileViewModel extends AbstractViewModel {
         return downloadProgress;
     }
 
-    public LinkedFile getFile() {
-        return linkedFile;
+    public StringProperty linkProperty() {
+        return linkedFile.linkProperty();
     }
 
-    public String getLink() {
-        return linkedFile.getLink();
+    public StringProperty descriptionProperty() {
+        return linkedFile.descriptionProperty();
     }
 
     public String getDescription() {
@@ -344,5 +351,114 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         // TODO: Show progress
         taskExecutor.execute(writeTask);
+    }
+
+    public void download() {
+        if (!linkedFile.isOnlineLink()) {
+            throw new UnsupportedOperationException("In order to download the file it has to be an online link");
+        }
+
+        try {
+            URLDownload urlDownload = new URLDownload(linkedFile.getLink());
+            Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
+            String suggestedTypeName = suggestedType.map(ExternalFileType::getName).orElse("");
+            linkedFile.setFileType(suggestedTypeName);
+            List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+
+            Path destination = constructSuggestedPath(suggestedType, fileDirectories);
+
+            BackgroundTask<Void> downloadTask = new FileDownloadTask(urlDownload.getSource(), destination)
+                    .onSuccess(event -> {
+                        LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, fileDirectories);
+                        linkedFile.setLink(newLinkedFile.getLink());
+                        linkedFile.setFileType(newLinkedFile.getFileType());
+                    })
+                    .onFailure(ex -> dialogService.showErrorDialogAndWait("", ex));
+
+            downloadProgress.bind(downloadTask.workDonePercentageProperty());
+            taskExecutor.execute(downloadTask);
+        } catch (MalformedURLException exception) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Invalid URL"),
+                    exception);
+        }
+    }
+
+    private Path constructSuggestedPath(Optional<ExternalFileType> suggestedType, List<Path> fileDirectories) {
+        String suffix = suggestedType.map(ExternalFileType::getExtension).orElse("");
+        String suggestedName = getSuggestedFileName(suffix);
+        Path directory;
+        if (fileDirectories.isEmpty()) {
+            directory = null;
+        } else {
+            directory = fileDirectories.get(0);
+        }
+        final Path suggestDir = directory == null ? Paths.get(System.getProperty("user.home")) : directory;
+        return suggestDir.resolve(suggestedName);
+    }
+
+    private Optional<ExternalFileType> inferFileType(URLDownload urlDownload) {
+        Optional<ExternalFileType> suggestedType = inferFileTypeFromMimeType(urlDownload);
+
+        // If we did not find a file type from the MIME type, try based on extension:
+        if (!suggestedType.isPresent()) {
+            suggestedType = inferFileTypeFromURL(urlDownload.getSource().toExternalForm());
+        }
+        return suggestedType;
+    }
+
+    private Optional<ExternalFileType> inferFileTypeFromMimeType(URLDownload urlDownload) {
+        try {
+            // TODO: what if this takes long time?
+            String mimeType = urlDownload.getMimeType(); // Read MIME type
+            if (mimeType != null) {
+                LOGGER.debug("MIME Type suggested: " + mimeType);
+                return ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(mimeType);
+            } else {
+                return Optional.empty();
+            }
+        } catch (IOException ex) {
+            LOGGER.debug("Error while inferring MIME type for URL " + urlDownload.getSource(), ex);
+            return Optional.empty();
+        }
+    }
+
+    private Optional<ExternalFileType> inferFileTypeFromURL(String url) {
+        String extension = DownloadExternalFile.getSuffix(url);
+        if (extension != null) {
+            return ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private String getSuggestedFileName(String suffix) {
+        String plannedName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry,
+                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
+
+        if (!suffix.isEmpty()) {
+            plannedName += "." + suffix;
+        }
+
+        /*
+        * [ 1548875 ] download pdf produces unsupported filename
+        *
+        * http://sourceforge.net/tracker/index.php?func=detail&aid=1548875&group_id=92314&atid=600306
+        * FIXME: rework this! just allow alphanumeric stuff or so?
+        * https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx#naming_conventions
+        * http://superuser.com/questions/358855/what-characters-are-safe-in-cross-platform-file-names-for-linux-windows-and-os
+        * https://support.apple.com/en-us/HT202808
+        */
+        if (OS.WINDOWS) {
+            plannedName = plannedName.replaceAll("\\?|\\*|\\<|\\>|\\||\\\"|\\:|\\.$|\\[|\\]", "");
+        } else if (OS.OS_X) {
+            plannedName = plannedName.replace(":", "");
+        }
+
+        return plannedName;
+    }
+
+    public LinkedFile getFile() {
+        return linkedFile;
     }
 }
