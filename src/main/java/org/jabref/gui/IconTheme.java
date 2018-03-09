@@ -33,6 +33,7 @@ import org.jabref.gui.util.ColorUtil;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.preferences.JabRefPreferences;
 
+import de.jensd.fx.glyphs.GlyphIcons;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
@@ -60,6 +61,8 @@ public class IconTheme {
     }
 
     private static InputStream getMaterialDesignIconsStream() {
+        // TODO: The next line loads the additional JabRef-Icons. Most certainly wrong at this place
+        javafx.scene.text.Font.loadFont(FontBasedIcon.class.getResource("/fonts/JabRefMaterialDesign.ttf").toExternalForm(), 7);
         return FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf");
     }
 
@@ -261,12 +264,12 @@ public class IconTheme {
         FILE_POWERPOINT(MaterialDesignIcon.FILE_POWERPOINT), /*css: file-powerpoint */
         FILE_TEXT(MaterialDesignIcon.FILE_DOCUMENT), /*css: file-document */
         FILE_MULTIPLE(MaterialDesignIcon.FILE_MULTIPLE), /*css: file-multiple */
-        FILE_OPENOFFICE(IconTheme.getImage("openoffice")),
-        APPLICATION_EMACS(IconTheme.getImage("emacs")),
-        APPLICATION_LYX(IconTheme.getImage("lyx")),
-        APPLICATION_TEXSTUDIO(IconTheme.getImage("texstudio")),
-        APPLICATION_TEXMAKER(IconTheme.getImage("texmaker")),
-        APPLICATION_VIM(IconTheme.getImage("vim")),
+        FILE_OPENOFFICE(JabRefMaterialDesignIcon.OPEN_OFFICE),
+        APPLICATION_EMACS(JabRefMaterialDesignIcon.EMACS),
+        APPLICATION_LYX(JabRefMaterialDesignIcon.LYX),
+        APPLICATION_TEXSTUDIO(JabRefMaterialDesignIcon.TEX_STUDIO),
+        APPLICATION_TEXMAKER(JabRefMaterialDesignIcon.TEX_MAKER),
+        APPLICATION_VIM(JabRefMaterialDesignIcon.VIM),
         APPLICATION_WINEDT(IconTheme.getImage("winedt")),
         KEY_BINDINGS(MaterialDesignIcon.KEYBOARD), /*css: keyboard */
         FIND_DUPLICATES(MaterialDesignIcon.CODE_EQUAL), /*css: code-equal */
@@ -292,7 +295,7 @@ public class IconTheme {
 
         private final JabRefIcon icon;
 
-        JabRefIcons(MaterialDesignIcon... icons) {
+        JabRefIcons(GlyphIcons... icons) {
             icon = new InternalMaterialDesignIcon(icons);
         }
 
