@@ -20,41 +20,40 @@ public class RegexFormatterTest {
     @Test
     public void spacesReplacedCorrectly() {
         String regexInput = "(\" \",\"-\")";
-        formatter.setRegex(regexInput);
+        RegexFormatter.setRegex(regexInput);
         assertEquals("replace-all-spaces", formatter.format("replace all spaces"));
     }
 
     @Test
     public void protectedSpacesNotReplacedInSingleProtectedBlock() {
         String regexInput = "(\" \",\"-\")";
-        formatter.setRegex(regexInput);
+        RegexFormatter.setRegex(regexInput);
         assertEquals("replace-spaces-{not these ones}", formatter.format("replace spaces {not these ones}"));
     }
 
     @Test
     public void protectedSpacesNotReplacedInTwoProtectedBlocks() {
         String regexInput = "(\" \",\"-\")";
-        formatter.setRegex(regexInput);
+        RegexFormatter.setRegex(regexInput);
         assertEquals("replace-spaces-{not these ones}-{or these ones}-but-these-ones", formatter.format("replace spaces {not these ones} {or these ones} but these ones"));
     }
 
     @Test
     public void escapedBracesAreNotReplaced() {
         String regexInput = "(\" \",\"-\")";
-        formatter.setRegex(regexInput);
+        RegexFormatter.setRegex(regexInput);
         assertEquals("replace-spaces-\\{-these-ones\\}-and-these-ones", formatter.format("replace spaces \\{ these ones\\} and these ones"));
     }
 
     @Test
     public void escapedBracesAreNotReplacedInTwoCases() {
         String regexInput = "(\" \",\"-\")";
-        formatter.setRegex(regexInput);
+        RegexFormatter.setRegex(regexInput);
         assertEquals("replace-spaces-\\{-these-ones\\},-these-ones,-and-\\{-these-ones\\}", formatter.format("replace spaces \\{ these ones\\}, these ones, and \\{ these ones\\}"));
     }
 
     @Test
     public void escapedBracesAreNotReplacedAndProtectionStillWorks() {
-        String regexInput = "(\" \",\"-\")";
         assertEquals("replace-spaces-{not these ones},-these-ones,-and-\\{-these-ones\\}", formatter.format("replace spaces {not these ones}, these ones, and \\{ these ones\\}"));
     }
 
@@ -62,6 +61,4 @@ public class RegexFormatterTest {
     public void formatExample() {
         assertEquals("Please-replace-the-spaces", formatter.format(formatter.getExampleInput()));
     }
-
-
 }

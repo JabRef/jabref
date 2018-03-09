@@ -9,10 +9,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.swing.JOptionPane;
-
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.worker.AbstractWorker;
@@ -36,9 +35,11 @@ public class FindFullTextAction extends AbstractWorker {
 
     private final BasePanel basePanel;
     private final Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
+    private final DialogService dialogService;
 
-    public FindFullTextAction(BasePanel basePanel) {
+    public FindFullTextAction(DialogService dialogService, BasePanel basePanel) {
         this.basePanel = basePanel;
+        this.dialogService = dialogService;
     }
 
     @Override
@@ -53,18 +54,16 @@ public class FindFullTextAction extends AbstractWorker {
     @Override
     public void run() {
         if (basePanel.getSelectedEntries().size() >= WARNING_LIMIT) {
-            String[] options = new String[] {Localization.lang("Look up full text documents"),
-                    Localization.lang("Cancel")};
-            int answer = JOptionPane.showOptionDialog(null,
-                    Localization.lang(
-                            "You are about to look up full text documents for %0 entries.",
-                            String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
-                            + Localization.lang("JabRef will send at least one request per entry to a publisher.")
-                            + "\n"
-                            + Localization.lang("Do you still want to continue?"),
-                    Localization.lang("Look up full text documents"), JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-            if (answer != JOptionPane.OK_OPTION) {
+
+            boolean getFullTextForAllCliecked = dialogService.showConfirmationDialogAndWait(Localization.lang("Look up full text documents"), Localization.lang(
+                    "You are about to look up full text documents for %0 entries.",
+                    String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
+                    + Localization.lang("JabRef will send at least one request per entry to a publisher.")
+                    + "\n"
+                    + Localization.lang("Do you still want to continue?"), Localization.lang("Look up full text documents"),
+                    Localization.lang("Cancel"));
+
+            if (!getFullTextForAllCliecked) {
                 basePanel.output(Localization.lang("Operation canceled."));
                 return;
             }
@@ -85,13 +84,14 @@ public class FindFullTextAction extends AbstractWorker {
                 Optional<Path> dir = basePanel.getBibDatabaseContext().getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences());
 
                 if (!dir.isPresent()) {
-                    JOptionPane.showMessageDialog(null,
+
+                    dialogService.showErrorDialogAndWait(Localization.lang("Directory not found"),
                             Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
-                                    + " -> " + Localization.lang("File"),
-                            Localization.lang("Directory not found"), JOptionPane.ERROR_MESSAGE);
+                                    + " -> " + Localization.lang("File"));
+
                     return;
                 }
-                DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(),
+                DownloadExternalFile def = new DownloadExternalFile(dialogService,
                         basePanel.getBibDatabaseContext(), entry);
                 try {
                     def.download(result.get(), file -> {
@@ -117,7 +117,7 @@ public class FindFullTextAction extends AbstractWorker {
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined")));
 
                 basePanel.output(message);
-                JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
+                DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(title, message));
             }
             remove.add(result);
         }

@@ -17,11 +17,11 @@ env:
   global:
     - GRADLE_OPTS=-Dorg.gradle.daemon=false
   matrix:
+    - TEST_SUITE=checkstyle
     - TEST_SUITE=check OPTIONS=modernizer
     - TEST_SUITE=fetcherTest
     - TEST_SUITE=databaseTest
     - TEST_SUITE=guiTest
-    - TEST_SUITE=checkstyle
     - TEST_SUITE=codecov
     - DEPENDENCY_UPDATES=check
 
@@ -60,6 +60,7 @@ after_failure:
 branches:
   only:
     - master
+    - maintable-beta
 
 # cache gradle dependencies
 # https://docs.travis-ci.com/user/languages/java#Caching

@@ -66,14 +66,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private static GeneralRenderer grayedOutRenderer;
     private static GeneralRenderer veryGrayedOutRenderer;
 
-    private static List<GeneralRenderer> markedRenderers;
-
     private static IncompleteRenderer incRenderer;
     private static CompleteRenderer compRenderer;
     private static CompleteRenderer grayedOutNumberRenderer;
     private static CompleteRenderer veryGrayedOutNumberRenderer;
-
-    private static List<CompleteRenderer> markedNumberRenderers;
 
     private final BasePanel panel;
     //private final boolean tableColorCodes;
@@ -413,14 +409,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         else if (column == 0) {
             if (isComplete(row)) {
                 MainTable.compRenderer.setNumber(row);
-                int marking = isMarked(row);
-                if (marking > 0) {
-                    marking = Math.min(marking, EntryMarker.MARK_COLOR_LEVELS);
-                    renderer = MainTable.markedNumberRenderers.get(marking - 1);
-                    MainTable.markedNumberRenderers.get(marking - 1).setNumber(row);
-                } else {
-                    renderer = MainTable.compRenderer;
-                }
+                renderer = MainTable.compRenderer;
             } else {
                 // Return a renderer with red background if the entry is incomplete.
                 MainTable.incRenderer.setNumber(row);
@@ -435,13 +424,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             } else if (status == CellRendererMode.RESOLVED) {
                 renderer = MainTable.resolvedRenderer;
             }
-        }
-
-        // For MARKED feature:
-        int marking = isMarked(row);
-        if ((column != 0) && (marking > 0)) {
-            marking = Math.min(marking, EntryMarker.MARK_COLOR_LEVELS);
-            renderer = MainTable.markedRenderers.get(marking - 1);
         }
 
         return renderer;
@@ -604,15 +586,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         return true;
     }
 
-    private int isMarked(int row) {
-        Optional<BibEntry> bibEntry = getBibEntry(row);
-
-        if (bibEntry.isPresent()) {
-            return EntryMarker.isMarked(bibEntry.get());
-        }
-        return 0;
-    }
-
     private Optional<BibEntry> getBibEntry(int row) {
         try {
             return Optional.of(model.getEntriesFilteredAndSorted().get(row).getEntry());
@@ -656,16 +629,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         MainTable.veryGrayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_BACKGROUND),
                 Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_TEXT), MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_BACKGROUND),
                         sel));
-
-        MainTable.markedRenderers = new ArrayList<>(EntryMarker.MARK_COLOR_LEVELS);
-        MainTable.markedNumberRenderers = new ArrayList<>(EntryMarker.MARK_COLOR_LEVELS);
-        for (int i = 0; i < EntryMarker.MARK_COLOR_LEVELS; i++) {
-            Color c = Globals.prefs.getColor(JabRefPreferences.MARKED_ENTRY_BACKGROUND + i);
-            MainTable.markedRenderers.add(new GeneralRenderer(c, Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT),
-                    MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.MARKED_ENTRY_BACKGROUND + i), sel)));
-            MainTable.markedNumberRenderers.add(new CompleteRenderer(c));
-        }
-
     }
 
     private static Color mixColors(Color one, Color two) {

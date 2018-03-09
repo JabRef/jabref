@@ -1,23 +1,17 @@
 package org.jabref.gui.openoffice;
 
 import java.awt.BorderLayout;
-import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -29,23 +23,22 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-
 /**
  * Tools for automatically detecting OpenOffice or LibreOffice installations.
  */
 public class DetectOpenOfficeInstallation extends AbstractWorker {
 
     private final OpenOfficePreferences preferences;
-
     private final JDialog parent;
+    private final DialogService dialogService;
+
     private boolean foundPaths;
     private JDialog progressDialog;
 
-    public DetectOpenOfficeInstallation(JDialog parent, OpenOfficePreferences preferences) {
+    public DetectOpenOfficeInstallation(JDialog parent, OpenOfficePreferences preferences, DialogService dialogService) {
         this.parent = parent;
         this.preferences = preferences;
+        this.dialogService = dialogService;
     }
 
     public boolean isInstalled() {
@@ -76,16 +69,15 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
     }
 
     private Optional<Path> selectInstallationPath() {
-        final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
-        JOptionPane.showMessageDialog(parent,
-                Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."),
-                Localization.lang("Could not find OpenOffice/LibreOffice installation"),
-                JOptionPane.INFORMATION_MESSAGE);
 
-        DialogService ds = new FXDialogService();
+        final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
+
+        DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showInformationDialogAndWait(Localization.lang("Could not find OpenOffice/LibreOffice installation"),
+                Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually.")));
         DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(nativeDesktop.getApplicationDirectory()).build();
-        Optional<Path> path = DefaultTaskExecutor.runInJavaFXThread(() -> ds.showDirectorySelectionDialog(dirDialogConfiguration));
+                .withInitialDirectory(nativeDesktop.getApplicationDirectory())
+                .build();
+        Optional<Path> path = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showDirectorySelectionDialog(dirDialogConfiguration));
 
         if (path.isPresent()) {
             return path;
@@ -141,25 +133,15 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
         if (installDirs.size() == 1) {
             return Optional.of(installDirs.get(0).toAbsolutePath());
         }
-        // Otherwise more than one installation was found, select among them
-        DefaultListModel<File> mod = new DefaultListModel<>();
-        for (Path tmpfile : installDirs) {
-            mod.addElement(tmpfile.toFile());
-        }
-        JList<File> fileList = new JList<>(mod);
-        fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        fileList.setSelectedIndex(0);
-        FormBuilder builder = FormBuilder.create().layout(new FormLayout("pref:grow", "pref, 2dlu, pref, 4dlu, pref"));
-        builder.add(Localization.lang("Found more than one OpenOffice/LibreOffice executable.")).xy(1, 1);
-        builder.add(Localization.lang("Please choose which one to connect to:")).xy(1, 3);
-        builder.add(fileList).xy(1, 5);
-        int answer = JOptionPane.showConfirmDialog(null, builder.getPanel(),
-                Localization.lang("Choose OpenOffice/LibreOffice executable"), JOptionPane.OK_CANCEL_OPTION);
-        if (answer == JOptionPane.CANCEL_OPTION) {
-            return Optional.empty();
-        } else {
-            return Optional.of(fileList.getSelectedValue().toPath());
-        }
+
+        String content = Localization.lang("Found more than one OpenOffice/LibreOffice executable.")
+                + "\n" + Localization.lang("Please choose which one to connect to:");
+
+        Optional<Path> selectedPath = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showChoiceDialogAndWait(
+                Localization.lang("Choose OpenOffice/LibreOffice executable"),
+                content, Localization.lang("Use selected instance"), null, installDirs));
+
+        return selectedPath;
     }
 
     public JDialog showProgressDialog(JDialog progressParent, String title, String message) {

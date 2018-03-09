@@ -183,13 +183,22 @@ public class GroupNodeViewModel {
     public JabRefIcon getIcon() {
         Optional<String> iconName = groupNode.getGroup().getIconName();
         return iconName.flatMap(this::parseIcon)
-                .orElse(IconTheme.JabRefIcons.DEFAULT_GROUP_ICON);
+                       .orElseGet(this::createDefaultIcon);
+    }
+
+    private JabRefIcon createDefaultIcon() {
+        Optional<Color> color = groupNode.getGroup().getColor();
+        if (color.isPresent()) {
+            return IconTheme.JabRefIcons.DEFAULT_GROUP_ICON_COLORED.withColor(color.get());
+        } else {
+            return IconTheme.JabRefIcons.DEFAULT_GROUP_ICON_COLORED.withColor(Color.web("#8a8a8a"));
+        }
     }
 
     private Optional<JabRefIcon> parseIcon(String iconCode) {
         return Enums.getIfPresent(MaterialDesignIcon.class, iconCode.toUpperCase(Locale.ENGLISH))
-                .toJavaUtil()
-                .map(icon -> new InternalMaterialDesignIcon(getColor(), icon));
+                    .toJavaUtil()
+                    .map(icon -> new InternalMaterialDesignIcon(getColor(), icon));
     }
 
     public ObservableList<GroupNodeViewModel> getChildren() {
