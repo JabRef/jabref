@@ -4,9 +4,9 @@ import java.util.function.Function;
 
 import org.jabref.Globals;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -36,7 +36,7 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.journalAbbreviationLoader;
         } else if (clazz == StateManager.class) {
             return Globals.stateManager;
-        } else if (clazz == DefaultFileUpdateMonitor.class) {
+        } else if (clazz == FileUpdateMonitor.class) {
             return Globals.getFileUpdateMonitor();
         } else {
             try {
