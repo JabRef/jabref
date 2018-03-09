@@ -12,12 +12,12 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
@@ -56,6 +56,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     private final JCheckBox customLAF;
     private final JCheckBox fxFontTweaksLAF;
 
+    private final DialogService dialogService;
+
     static class LookAndFeel {
 
         public static Set<String> getAvailableLookAndFeels() {
@@ -68,7 +70,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
      *
      * @param prefs a <code>JabRefPreferences</code> value
      */
-    public AppearancePrefsTab(JabRefPreferences prefs) {
+    public AppearancePrefsTab(DialogService dialogService, JabRefPreferences prefs) {
+        this.dialogService = dialogService;
         this.prefs = prefs;
         setLayout(new BorderLayout());
 
@@ -283,10 +286,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             }
 
             if (isRestartRequired) {
-                JOptionPane.showMessageDialog(
-                        null,
-                        Localization.lang("Some appearance settings you changed require to restart JabRef to come into effect."),
-                        Localization.lang("Settings"), JOptionPane.WARNING_MESSAGE);
+                dialogService.showWarningDialogAndWait(Localization.lang("Settings"),
+                        Localization.lang("Some appearance settings you changed require to restart JabRef to come into effect."));
             }
 
             prefs.putInt(JabRefPreferences.TABLE_ROW_PADDING, padding);
@@ -301,9 +302,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             // Test if the field value is a number:
             Integer.parseInt(fieldValue);
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null,
-                    Localization.lang("You must enter an integer value in the text field for") + " '" + fieldName + "'",
-                    errorTitle, JOptionPane.ERROR_MESSAGE);
+
+            dialogService.showErrorDialogAndWait(errorTitle, Localization.lang("You must enter an integer value in the text field for") + " '" + fieldName + "'");
             return false;
         }
         return true;

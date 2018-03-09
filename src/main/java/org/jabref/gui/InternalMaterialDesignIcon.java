@@ -71,6 +71,11 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
         return new InternalMaterialDesignIcon(ColorUtil.toFX(IconTheme.DEFAULT_DISABLED_COLOR), icons);
     }
 
+    @Override
+    public JabRefIcon withColor(Color color) {
+        return new InternalMaterialDesignIcon(color, icons);
+    }
+
     public String getCode() {
         return this.unicode;
     }

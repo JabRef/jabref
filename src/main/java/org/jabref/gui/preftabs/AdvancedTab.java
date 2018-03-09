@@ -6,11 +6,11 @@ import java.util.Optional;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.help.HelpFile;
@@ -33,9 +33,10 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final JCheckBox useCaseKeeperOnSearch;
     private final JCheckBox useUnitFormatterOnSearch;
     private final RemotePreferences remotePreferences;
+    private final DialogService dialogService;
 
-
-    public AdvancedTab(JabRefPreferences prefs) {
+    public AdvancedTab(DialogService dialogService, JabRefPreferences prefs) {
+        this.dialogService = dialogService;
         preferences = prefs;
         remotePreferences = prefs.getRemotePreferences();
 
@@ -45,9 +46,8 @@ class AdvancedTab extends JPanel implements PrefsTab {
         useCaseKeeperOnSearch = new JCheckBox(Localization.lang("Add {} to specified title words on search to keep the correct case"));
         useUnitFormatterOnSearch = new JCheckBox(Localization.lang("Format units by adding non-breaking separators and keeping the correct case on search"));
 
-        FormLayout layout = new FormLayout
-                ("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu",//, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
-                        "");
+        FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu", //, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
+                "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         JPanel pan = new JPanel();
 
@@ -121,10 +121,12 @@ class AdvancedTab extends JPanel implements PrefsTab {
                 remotePreferences.setPort(newPort);
 
                 if (remotePreferences.useRemoteServer()) {
-                    JOptionPane.showMessageDialog(null,
-                            Localization.lang("Remote server port").concat(" ")
-                                    .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
-                            Localization.lang("Remote server port"), JOptionPane.WARNING_MESSAGE);
+
+                    dialogService.showWarningDialogAndWait(Localization.lang("Remote server port"),
+                            Localization.lang("Remote server port")
+                                    .concat(" ")
+                                    .concat(Localization.lang("You must restart JabRef for this to come into effect.")));
+
                 }
             }
         });
@@ -156,10 +158,11 @@ class AdvancedTab extends JPanel implements PrefsTab {
                 throw new NumberFormatException();
             }
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null,
+
+            dialogService.showErrorDialogAndWait(Localization.lang("Remote server port"),
                     Localization.lang("You must enter an integer value in the interval 1025-65535 in the text field for")
-                            + " '" + Localization.lang("Remote server port") + '\'',
-                    Localization.lang("Remote server port"), JOptionPane.ERROR_MESSAGE);
+                            + " '" + Localization.lang("Remote server port") + '\'');
+
             return false;
         }
     }

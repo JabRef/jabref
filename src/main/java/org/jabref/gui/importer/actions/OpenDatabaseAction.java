@@ -14,7 +14,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
@@ -49,7 +48,6 @@ import org.slf4j.LoggerFactory;
 // The action concerned with opening an existing database.
 public class OpenDatabaseAction extends SimpleCommand {
 
-
     public static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
@@ -64,7 +62,6 @@ public class OpenDatabaseAction extends SimpleCommand {
             new CheckForNewEntryTypesAction(),
             // Warning about and handling duplicate BibTeX keys:
             new HandleDuplicateWarnings());
-
 
     private final JabRefFrame frame;
 
@@ -87,6 +84,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
     }
 
+    @Override
     public void execute() {
         List<Path> filesToOpen = new ArrayList<>();
 
@@ -131,7 +129,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         int removed = 0;
 
         // Check if any of the files are already open:
-        for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext(); ) {
+        for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext();) {
             Path file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabs().size(); i++) {
                 BasePanel basePanel = frame.getBasePanelAt(i);
@@ -192,27 +190,31 @@ public class OpenDatabaseAction extends SimpleCommand {
                 if ((modificationTime.isPresent()) && ((System.currentTimeMillis()
                         - modificationTime.get().toMillis()) > FileBasedLock.LOCKFILE_CRITICAL_AGE)) {
                     // The lock file is fairly old, so we can offer to "steal" the file:
-                    int answer = JOptionPane.showConfirmDialog(null,
-                            "<html>" + Localization.lang("Error opening file") + " '" + fileName + "'. "
-                                    + Localization.lang("File is locked by another JabRef instance.") + "<p>"
+
+                    boolean overWriteFileLockPressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("File locked"),
+                            Localization.lang("Error opening file") + " '" + fileName + "'. "
+                                    + Localization.lang("File is locked by another JabRef instance.") + "\n"
                                     + Localization.lang("Do you want to override the file lock?"),
-                            Localization.lang("File locked"), JOptionPane.YES_NO_OPTION);
-                    if (answer == JOptionPane.YES_OPTION) {
+                            Localization.lang("Overwrite file lock"),
+                            Localization.lang("Cancel"));
+
+                    if (overWriteFileLockPressed) {
                         FileBasedLock.deleteLockFile(file);
                     } else {
                         return;
                     }
                 } else if (!FileBasedLock.waitForFileLock(file)) {
-                    JOptionPane.showMessageDialog(null,
+
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Error"),
                             Localization.lang("Error opening file") + " '" + fileName + "'. "
-                                    + Localization.lang("File is locked by another JabRef instance."),
-                            Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                                    + Localization.lang("File is locked by another JabRef instance."));
+
                     return;
                 }
             }
 
             if (BackupManager.checkForBackupFile(fileToLoad)) {
-                BackupUIManager.showRestoreBackupDialog(null, fileToLoad);
+                BackupUIManager.showRestoreBackupDialog(frame.getDialogService(), fileToLoad);
             }
 
             ParserResult result;
@@ -227,9 +229,10 @@ public class OpenDatabaseAction extends SimpleCommand {
                     result.getDatabaseContext().clearDatabaseFile(); // do not open the original file
                     result.getDatabase().clearSharedDatabaseID();
                     LOGGER.error("Connection error", e);
-                    JOptionPane.showMessageDialog(null,
-                            e.getMessage() + "\n\n" + Localization.lang("A local copy will be opened."),
-                            Localization.lang("Connection error"), JOptionPane.WARNING_MESSAGE);
+
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection error"),
+                            e.getMessage() + "\n\n" + Localization.lang("A local copy will be opened."));
+
                 }
             }
 
@@ -262,10 +265,9 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         return DefaultTaskExecutor.runInJavaFXThread(() -> {
-                    BasePanel basePanel = new BasePanel(frame, BasePanelPreferences.from(Globals.prefs), result.getDatabaseContext(), ExternalFileTypes.getInstance());
-                    frame.addTab(basePanel, raisePanel);
-                    return basePanel;
-                }
-        );
+            BasePanel basePanel = new BasePanel(frame, BasePanelPreferences.from(Globals.prefs), result.getDatabaseContext(), ExternalFileTypes.getInstance());
+            frame.addTab(basePanel, raisePanel);
+            return basePanel;
+        });
     }
 }

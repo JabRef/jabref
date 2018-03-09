@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
@@ -26,6 +27,10 @@ import org.slf4j.LoggerFactory;
 public class PushToLyx extends AbstractPushToApplication implements PushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToLyx.class);
+
+    public PushToLyx(DialogService dialogService) {
+        super(dialogService);
+    }
 
     @Override
     public String getApplicationName() {
@@ -66,8 +71,7 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
     }
 
     @Override
-    public void pushEntries(BibDatabase database, final List<BibEntry> entries, final String keyString,
-            MetaData metaData) {
+    public void pushEntries(BibDatabase database, final List<BibEntry> entries, final String keyString, MetaData metaData) {
 
         couldNotConnect = false;
         couldNotCall = false;

@@ -91,6 +91,11 @@
     -fx-background-color: #5e5f5e;
 }
 
+.tool-bar .glyph-icon {
+    -glyph-size: 18px;
+    -fx-font-size: 2em;
+}
+
 .warning-icon {
     -fx-fill: #ffb500;
 }

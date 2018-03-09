@@ -8,8 +8,6 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
 
-import javax.swing.JOptionPane;
-
 import javafx.stage.FileChooser;
 
 import org.jabref.Globals;
@@ -61,9 +59,9 @@ public class ImportCommand extends SimpleCommand {
 
     private void doImport(Path file, SortedSet<Importer> importers, FileChooser.ExtensionFilter selectedExtensionFilter) {
         if (!Files.exists(file)) {
-            JOptionPane.showMessageDialog(null,
-                    Localization.lang("File not found") + ": '" + file.getFileName() + "'.",
-                    Localization.lang("Import"), JOptionPane.ERROR_MESSAGE);
+            frame.getDialogService().showErrorDialogAndWait(Localization.lang("Import"),
+                    Localization.lang("File not found") + ": '" + file.getFileName() + "'.");
+
             return;
         }
         Optional<Importer> format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);

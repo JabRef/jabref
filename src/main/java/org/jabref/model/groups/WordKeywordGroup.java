@@ -51,7 +51,7 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
     }
 
     @Override
-    public List<FieldChange> add(List<BibEntry> entriesToAdd) {
+    public List<FieldChange> add(Collection<BibEntry> entriesToAdd) {
         Objects.requireNonNull(entriesToAdd);
 
         List<FieldChange> changes = new ArrayList<>();
