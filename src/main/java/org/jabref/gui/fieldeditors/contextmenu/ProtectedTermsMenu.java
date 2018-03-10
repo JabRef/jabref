@@ -67,7 +67,7 @@ class ProtectedTermsMenu extends Menu {
         externalFiles.getItems().add(new SeparatorMenuItem());
         MenuItem addToNewFileItem = new MenuItem(Localization.lang("New") + "...");
         addToNewFileItem.setOnAction(event -> {
-            NewProtectedTermsFileDialog dialog = new NewProtectedTermsFileDialog(JabRefGUI.getMainFrame(),
+            NewProtectedTermsFileDialog dialog = new NewProtectedTermsFileDialog(JabRefGUI.getMainFrame().getDialogService(),
                     loader);
 
             SwingUtilities.invokeLater(() -> {

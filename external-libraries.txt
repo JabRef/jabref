@@ -80,6 +80,11 @@ Project: Application Insights SDK for Java
 URL:     https://github.com/Microsoft/ApplicationInsights-Java
 License: MIT
 
+Id:      com.sibvisions.external.jvxfx:DnDTabPane
+Project: Drag'n'Drop TabPane
+URL:     https://github.com/sibvisions/javafx.DndTabPane
+License: EPL-1.0
+
 Id:      commons-cli:commons-cli
 Project: Apache Commons CLI
 URL:     http://commons.apache.org/cli/

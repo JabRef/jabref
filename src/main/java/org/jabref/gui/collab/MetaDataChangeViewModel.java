@@ -10,19 +10,14 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.metadata.MetaData;
 
-/**
- *
- */
 class MetaDataChangeViewModel extends ChangeViewModel {
 
     private final InfoPane infoPane = new InfoPane();
     private final JScrollPane sp = new JScrollPane(infoPane);
-    private final MetaData originalMetaData;
     private final MetaData newMetaData;
 
-    public MetaDataChangeViewModel(MetaData originalMetaData, MetaDataDiff metaDataDiff) {
+    public MetaDataChangeViewModel(MetaDataDiff metaDataDiff) {
         super(Localization.lang("Metadata change"));
-        this.originalMetaData = originalMetaData;
         this.newMetaData = metaDataDiff.getNewMetaData();
 
         infoPane.setText("<html>" + Localization.lang("Metadata change") + "</html>");

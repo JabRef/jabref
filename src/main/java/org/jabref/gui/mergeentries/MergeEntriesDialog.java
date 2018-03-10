@@ -4,10 +4,10 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
@@ -35,10 +35,11 @@ public class MergeEntriesDialog extends JabRefDialog {
     private final BasePanel panel;
 
     private final CellConstraints cc = new CellConstraints();
+    private final DialogService dialogService;
 
-    public MergeEntriesDialog(BasePanel panel) {
+    public MergeEntriesDialog(BasePanel panel, DialogService dialogService) {
         super((JFrame) null, MERGE_ENTRIES, true, MergeEntriesDialog.class);
-
+        this.dialogService = dialogService;
         this.panel = panel;
 
         // Start setting up the dialog
@@ -54,9 +55,10 @@ public class MergeEntriesDialog extends JabRefDialog {
 
         // Check if there are two entries selected
         if (selected.size() != 2) { // None selected. Inform the user to select entries first.
-            JOptionPane.showMessageDialog(null,
-                    Localization.lang("You have to choose exactly two entries to merge."),
-                    MERGE_ENTRIES, JOptionPane.INFORMATION_MESSAGE);
+
+            dialogService.showInformationDialogAndWait(Localization.lang("Merge entries"),
+                    Localization.lang("You have to choose exactly two entries to merge."));
+
             this.dispose();
             return;
         }

@@ -131,6 +131,8 @@ dependencies {
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.6'
     compile 'org.fxmisc.richtext:richtextfx:0.8.2'
+    compile 'com.sibvisions.external.jvxfx:dndtabpane:0.1'
+
 
     // Cannot be updated to 9.*.* until Jabref works with Java 9
     compile 'org.controlsfx:controlsfx:8.40.15-SNAPSHOT'

@@ -22,7 +22,6 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -113,7 +112,7 @@ public class ProtectedTermsDialog {
         removeButton.setToolTipText(Localization.lang("Remove protected terms file"));
 
         newButton.addActionListener(actionEvent -> {
-            NewProtectedTermsFileDialog newDialog = new NewProtectedTermsFileDialog(diag, loader);
+            NewProtectedTermsFileDialog newDialog = new NewProtectedTermsFileDialog(diag, loader, frame.getDialogService());
             newDialog.setVisible(true);
             tableModel.fireTableDataChanged();
         });
@@ -254,10 +253,10 @@ public class ProtectedTermsDialog {
         // Create action listener for removing a term file, also used for the remove button
         removeAction = actionEvent -> getSelectedTermsList().ifPresent(list -> {
 
-            if (!list.isInternalList() && (JOptionPane.showConfirmDialog(diag,
+            if (!list.isInternalList() && frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Remove protected terms file"),
                     Localization.lang("Are you sure you want to remove the protected terms file?"),
                     Localization.lang("Remove protected terms file"),
-                    JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)) {
+                    Localization.lang("Cancel"))) {
                 if (!loader.removeProtectedTermsList(list)) {
                     LOGGER.info("Problem removing protected terms file");
                 }
@@ -309,30 +308,30 @@ public class ProtectedTermsDialog {
         @Override
         public String getColumnName(int i) {
             switch (i) {
-            case 0:
-                return Localization.lang("Enabled");
-            case 1:
-                return Localization.lang("Description");
-            case 2:
-                return Localization.lang("File");
-            default:
-                return "";
+                case 0:
+                    return Localization.lang("Enabled");
+                case 1:
+                    return Localization.lang("Description");
+                case 2:
+                    return Localization.lang("File");
+                default:
+                    return "";
             }
         }
 
         @Override
         public Object getValueAt(int row, int column) {
             switch (column) {
-            case 0:
-                return loader.getProtectedTermsLists().get(row).isEnabled();
-            case 1:
-                return loader.getProtectedTermsLists().get(row).getDescription();
-            case 2:
-                ProtectedTermsList list = loader.getProtectedTermsLists().get(row);
-                return list.isInternalList() ? Localization.lang("Internal list") + " - " + list.getLocation() : list
-                        .getLocation();
-            default:
-                return "";
+                case 0:
+                    return loader.getProtectedTermsLists().get(row).isEnabled();
+                case 1:
+                    return loader.getProtectedTermsLists().get(row).getDescription();
+                case 2:
+                    ProtectedTermsList list = loader.getProtectedTermsLists().get(row);
+                    return list.isInternalList() ? Localization.lang("Internal list") + " - " + list.getLocation() : list
+                            .getLocation();
+                default:
+                    return "";
             }
         }
 
@@ -344,14 +343,14 @@ public class ProtectedTermsDialog {
         @Override
         public Class<?> getColumnClass(int column) {
             switch (column) {
-            case 0:
-                return Boolean.class;
-            case 1:
-                return String.class;
-            case 2:
-                return String.class;
-            default:
-                return String.class;
+                case 0:
+                    return Boolean.class;
+                case 1:
+                    return String.class;
+                case 2:
+                    return String.class;
+                default:
+                    return String.class;
             }
         }
 

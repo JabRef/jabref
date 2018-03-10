@@ -31,8 +31,6 @@ public class PreferencesMigrations {
      * Migrate all preferences from net/sf/jabref to org/jabref
      */
     public static void upgradePrefsToOrgJabRef() {
-
-        JabRefPreferences prefs = Globals.prefs;
         Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
         try {
             if (mainPrefsNode.childrenNames().length != 0) {
@@ -173,7 +171,6 @@ public class PreferencesMigrations {
                     prefs.put(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, oldDefault);
                     LOGGER.info("Upgraded old default key generator pattern '" + oldDefault + "' to new version.");
                 }
-
             }
             //Pref node already exists do not migrate from previous version
             if (mainPrefsNode.nodeExists(JabRefPreferences.BIBTEX_KEY_PATTERNS_NODE)) {
@@ -198,16 +195,16 @@ public class PreferencesMigrations {
      * Migrate Import File Name and Directory name Patterns from versions <=4.0 to new BracketedPatterns
      */
     private static void migrateFileImportPattern(String oldStylePattern, String newStylePattern,
-            JabRefPreferences prefs, Preferences mainPrefsNode) {
+                                                 JabRefPreferences prefs, Preferences mainPrefsNode) {
         String preferenceFileNamePattern = mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null);
 
         if (preferenceFileNamePattern != null &&
-            oldStylePattern.equals(preferenceFileNamePattern)) {
+                oldStylePattern.equals(preferenceFileNamePattern)) {
             // Upgrade the old-style File Name pattern to new one:
             mainPrefsNode.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
             LOGGER.info("migrated old style " + JabRefPreferences.IMPORT_FILENAMEPATTERN +
-                        " value \"" + oldStylePattern + "\" to new value \"" +
-                        newStylePattern + "\" in the preference file");
+                    " value \"" + oldStylePattern + "\" to new value \"" +
+                    newStylePattern + "\" in the preference file");
 
             if (prefs.hasKey(JabRefPreferences.IMPORT_FILENAMEPATTERN)) {
                 // Update also the key in the current application settings, if necessary:
@@ -215,8 +212,8 @@ public class PreferencesMigrations {
                 if (oldStylePattern.equals(fileNamePattern)) {
                     prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
                     LOGGER.info("migrated old style " + JabRefPreferences.IMPORT_FILENAMEPATTERN +
-                                " value \"" + oldStylePattern + "\" to new value \"" +
-                                newStylePattern + "\" in the running application");
+                            " value \"" + oldStylePattern + "\" to new value \"" +
+                            newStylePattern + "\" in the running application");
                 }
             }
         }
@@ -231,9 +228,9 @@ public class PreferencesMigrations {
         // Check for prefs node for Version <= 4.0
         if (mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null) != null) {
 
-            String[] oldStylePatterns = new String[] {"\\bibtexkey",
+            String[] oldStylePatterns = new String[]{"\\bibtexkey",
                     "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
-            String[] newStylePatterns = new String[] {"[bibtexkey]",
+            String[] newStylePatterns = new String[]{"[bibtexkey]",
                     "[bibtexkey] - [fulltitle]"};
             for (int i = 0; i < oldStylePatterns.length; i++) {
                 migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
@@ -257,7 +254,6 @@ public class PreferencesMigrations {
         List<String> keys = prefs.getStringList(JabRefPreferences.BINDINGS);
         keys.replaceAll(replaceKeys);
         prefs.putStringList(JabRefPreferences.BINDINGS, keys);
-
     }
 
     public static void addCrossRefRelatedFieldsForAutoComplete() {
@@ -286,7 +282,7 @@ public class PreferencesMigrations {
         JabRefPreferences prefs = Globals.prefs;
         String currentLandF = prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
         if ("com.jgoodies.looks.windows.WindowsLookAndFeel".equals(currentLandF) ||
-                "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel".equals(currentLandF) ) {
+                "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel".equals(currentLandF)) {
             if (OS.WINDOWS) {
                 String windowsLandF = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
                 prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, windowsLandF);
@@ -298,5 +294,4 @@ public class PreferencesMigrations {
             }
         }
     }
-
 }
