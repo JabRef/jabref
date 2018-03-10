@@ -23,7 +23,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
@@ -61,7 +60,6 @@ import org.jabref.gui.externalfiles.WriteXMPActionWorker;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.filelist.AttachFileAction;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
@@ -177,9 +175,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     // Used to track whether the base has changed since last save.
     private BibEntry showing;
 
-    // in switching between entries.
-    private PreambleEditor preambleEditor;
-    // Keeps track of the preamble dialog if it is open.
     private StringDialog stringDialog;
     private SuggestionProviders suggestionProviders;
 
@@ -361,17 +356,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         actions.put(Actions.SELECT_ALL, (BaseAction) mainTable.getSelectionModel()::selectAll);
 
-        // The action for opening the preamble editor
-        actions.put(Actions.EDIT_PREAMBLE, (BaseAction) () -> {
-            if (preambleEditor == null) {
-                PreambleEditor form = new PreambleEditor(frame, BasePanel.this, bibDatabaseContext.getDatabase());
-                form.setVisible(true);
-                preambleEditor = form;
-            } else {
-                preambleEditor.setVisible(true);
-            }
-        });
-
         // The action for opening the string editor
         actions.put(Actions.EDIT_STRINGS, (BaseAction) () -> {
             if (stringDialog == null) {
@@ -519,7 +503,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 .openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null)));
 
         actions.put(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, (BaseAction) () -> {
-            DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext()
+            DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel()
+                    .getBibDatabaseContext()
                     .getDBMSSynchronizer();
             dbmsSynchronizer.pullChanges();
         });
@@ -875,7 +860,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         SaveSession session;
         final String SAVE_DATABASE = Localization.lang("Save library");
         try {
-            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(enc)
+            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
+                    .withEncoding(enc)
                     .withSaveType(saveType);
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
                     FileSaveSession::new);
@@ -1066,7 +1052,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         mainTable.addSelectionListener(listEvent -> Globals.stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
 
         // Update entry editor and preview according to selected entries
-        mainTable.addSelectionListener(event -> mainTable.getSelectedEntries().stream()
+        mainTable.addSelectionListener(event -> mainTable.getSelectedEntries()
+                .stream()
                 .findFirst()
                 .ifPresent(entry -> {
                     preview.setEntry(entry);
@@ -1228,12 +1215,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         searchAutoCompleter = new PersonNameSuggestionProvider(InternalBibtexFields.getPersonNameFields());
         for (BibEntry entry : bibDatabaseContext.getDatabase().getEntries()) {
             searchAutoCompleter.indexEntry(entry);
-        }
-    }
-
-    public void updatePreamble() {
-        if (preambleEditor != null) {
-            preambleEditor.updatePreamble();
         }
     }
 
@@ -1476,10 +1457,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
     public BibDatabase getDatabase() {
         return bibDatabaseContext.getDatabase();
-    }
-
-    public void preambleEditorClosing() {
-        preambleEditor = null;
     }
 
     public void stringsClosing() {
@@ -1844,16 +1821,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         @Override
         public void action() {
             try {
-                JComponent focused = Globals.getFocusListener().getFocused();
-                if ((focused != null) && (focused instanceof FieldEditor) && focused.hasFocus()) {
-                    // User is currently editing a field:
-                    // Check if it is the preamble:
-
-                    FieldEditor fieldEditor = (FieldEditor) focused;
-                    if ((preambleEditor != null) && (fieldEditor.equals(preambleEditor.getFieldEditor()))) {
-                        preambleEditor.storeCurrentEdit();
-                    }
-                }
                 getUndoManager().undo();
                 markBaseChanged();
                 frame.output(Localization.lang("Undo"));
@@ -1891,9 +1858,11 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
                     List<LinkedFile> files = bes.get(0).getFiles();
 
-                    Optional<LinkedFile> linkedFile = files.stream().filter(file -> (FieldName.URL.equalsIgnoreCase(file.getFileType())
-                            || FieldName.PS.equalsIgnoreCase(file.getFileType())
-                            || FieldName.PDF.equalsIgnoreCase(file.getFileType()))).findFirst();
+                    Optional<LinkedFile> linkedFile = files.stream()
+                            .filter(file -> (FieldName.URL.equalsIgnoreCase(file.getFileType())
+                                    || FieldName.PS.equalsIgnoreCase(file.getFileType())
+                                    || FieldName.PDF.equalsIgnoreCase(file.getFileType())))
+                            .findFirst();
 
                     if (linkedFile.isPresent()) {
 
@@ -1954,7 +1923,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .withDefaultExtension(FileType.BIBTEX_DB)
                     .addExtensionFilter(FileType.BIBTEX_DB)
-                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                    .build();
 
             Optional<Path> chosenFile = dialogService.showFileSaveDialog(fileDialogConfiguration);
             if (chosenFile.isPresent()) {

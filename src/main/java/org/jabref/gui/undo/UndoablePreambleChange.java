@@ -16,7 +16,6 @@ public class UndoablePreambleChange extends AbstractUndoableJabRefEdit {
     private final String newValue;
     private final BasePanel panel;
 
-
     public UndoablePreambleChange(BibDatabase base, BasePanel panel,
             String oldValue, String newValue) {
         this.base = base;
@@ -38,8 +37,6 @@ public class UndoablePreambleChange extends AbstractUndoableJabRefEdit {
         // Revert the change.
         base.setPreamble(oldValue);
 
-        // If the preamble editor is open, update it.
-        panel.updatePreamble();
     }
 
     @Override
@@ -48,9 +45,6 @@ public class UndoablePreambleChange extends AbstractUndoableJabRefEdit {
 
         // Redo the change.
         base.setPreamble(newValue);
-
-        // If the preamble editor is open, update it.
-        panel.updatePreamble();
 
     }
 
