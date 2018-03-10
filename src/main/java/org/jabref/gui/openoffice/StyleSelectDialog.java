@@ -31,11 +31,14 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumnModel;
 
 import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+
 import org.jabref.Globals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -129,9 +132,11 @@ class StyleSelectDialog {
 
         // Create a preview panel for previewing styles
         // Must be done before creating the table to avoid NPEs
-        preview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), frame.getDialogService());
-        // Use the test entry from the Preview settings tab in Preferences:
-        preview.setEntry(prevEntry);
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            preview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), frame.getDialogService());
+            // Use the test entry from the Preview settings tab in Preferences:
+            preview.setEntry(prevEntry);
+        });
 
         setupTable();
         updateStyles();
@@ -147,7 +152,7 @@ class StyleSelectDialog {
         builder.add(new JScrollPane(table)).xyw(1, 3, 5);
         builder.add(addButton).xy(3, 5);
         builder.add(removeButton).xy(5, 5);
-        JFXPanel container = new JFXPanel();
+        JFXPanel container = CustomJFXPanel.wrap(new Scene(preview));
         builder.add(container).xyw(1, 7, 5);
         builder.padding("5dlu, 5dlu, 5dlu, 5dlu");
 
