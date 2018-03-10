@@ -44,8 +44,8 @@ class PreambleEditor extends SimpleCommand {
             if (!database.getPreamble().orElse("").equals(toSet)) {
 
                 panel.getUndoManager().addEdit(
-                        new UndoablePreambleChange(database, panel, database.getPreamble().orElse(null), toSet));
-                frame.getCurrentBasePanel().getDatabase().setPreamble(toSet);
+                        new UndoablePreambleChange(database, database.getPreamble().orElse(null), toSet));
+                database.setPreamble(toSet);
 
                 panel.markBaseChanged();
             }
