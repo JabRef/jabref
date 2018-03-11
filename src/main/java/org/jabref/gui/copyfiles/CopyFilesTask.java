@@ -39,7 +39,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
     private final long totalFilesCount;
     private final List<BibEntry> entries;
     private final List<CopyFilesResultItemViewModel> results = new ArrayList<>();
-    private Optional<Path> newPath;
+    private Optional<Path> newPath = Optional.empty();
     private int numberSucessful;
     private int totalFilesCounter;
 
