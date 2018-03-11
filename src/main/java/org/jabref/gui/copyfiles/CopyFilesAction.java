@@ -63,6 +63,10 @@ public class CopyFilesAction extends AbstractAction {
     }
 
     private void showDialog(List<CopyFilesResultItemViewModel> data) {
+        if (data.isEmpty()) {
+            dialogService.showInformationDialogAndWait(Localization.lang("Copy linked files to folder..."), Localization.lang("No linked files found for export."));
+            return;
+        }
         CopyFilesDialogView dlg = new CopyFilesDialogView(databaseContext, new CopyFilesResultListDependency(data));
         dlg.show();
     }
