@@ -27,7 +27,6 @@ import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinder;
-import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.ExporterFactory;
@@ -248,7 +247,6 @@ public class PreferencesDialog extends JabRefDialog {
         Globals.prefs.flush();
 
         setVisible(false);
-        MainTable.updateRenderers();
         GUIGlobals.updateEntryEditorColors();
         frame.setupAllTables();
         frame.output(Localization.lang("Preferences recorded."));

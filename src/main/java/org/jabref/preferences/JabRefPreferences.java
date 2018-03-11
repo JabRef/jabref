@@ -201,33 +201,12 @@ public class JabRefPreferences implements PreferencesService {
     public static final String PREFER_URL_DOI = "preferUrlDoi";
     public static final String URL_COLUMN = "urlColumn";
     // Colors
-    public static final String TABLE_COLOR_CODES_ON = "tableColorCodesOn";
-    public static final String TABLE_RESOLVED_COLOR_CODES_ON = "tableResolvedColorCodesOn";
-    public static final String INCOMPLETE_ENTRY_BACKGROUND = "incompleteEntryBackground";
     public static final String FIELD_EDITOR_TEXT_COLOR = "fieldEditorTextColor";
     public static final String ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR = "activeFieldEditorBackgroundColor";
     public static final String INVALID_FIELD_BACKGROUND_COLOR = "invalidFieldBackgroundColor";
     public static final String VALID_FIELD_BACKGROUND_COLOR = "validFieldBackgroundColor";
-    public static final String MARKED_ENTRY_BACKGROUND5 = "markedEntryBackground5";
-    public static final String MARKED_ENTRY_BACKGROUND4 = "markedEntryBackground4";
-    public static final String MARKED_ENTRY_BACKGROUND3 = "markedEntryBackground3";
-    public static final String MARKED_ENTRY_BACKGROUND2 = "markedEntryBackground2";
-    public static final String MARKED_ENTRY_BACKGROUND1 = "markedEntryBackground1";
-    public static final String MARKED_ENTRY_BACKGROUND0 = "markedEntryBackground0";
-    public static final String VERY_GRAYED_OUT_TEXT = "veryGrayedOutText";
-    public static final String VERY_GRAYED_OUT_BACKGROUND = "veryGrayedOutBackground";
-    public static final String GRAYED_OUT_TEXT = "grayedOutText";
-    public static final String GRAYED_OUT_BACKGROUND = "grayedOutBackground";
-    public static final String GRID_COLOR = "gridColor";
-    public static final String TABLE_TEXT = "tableText";
-    public static final String TABLE_OPT_FIELD_BACKGROUND = "tableOptFieldBackground";
-    public static final String TABLE_REQ_FIELD_BACKGROUND = "tableReqFieldBackground";
-    public static final String TABLE_RESOLVED_FIELD_BACKGROUND = "tableResolvedFieldBackground";
-    public static final String TABLE_BACKGROUND = "tableBackground";
     public static final String ICON_ENABLED_COLOR = "iconEnabledColor";
     public static final String ICON_DISABLED_COLOR = "iconDisabledColor";
-    public static final String TABLE_SHOW_GRID = "tableShowGrid";
-    public static final String TABLE_ROW_PADDING = "tableRowPadding";
     public static final String MENU_FONT_SIZE = "menuFontSize";
     public static final String OVERRIDE_DEFAULT_FONTS = "overrideDefaultFonts";
     public static final String FONT_SIZE = "fontSize";
@@ -512,8 +491,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(WINDOW_MAXIMISED, Boolean.FALSE);
         defaults.put(AUTO_RESIZE_MODE, Boolean.TRUE);
         defaults.put(ENTRY_EDITOR_HEIGHT, 0.65);
-        defaults.put(TABLE_COLOR_CODES_ON, Boolean.FALSE);
-        defaults.put(TABLE_RESOLVED_COLOR_CODES_ON, Boolean.FALSE);
         defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
         defaults.put(NAMES_FIRST_LAST, Boolean.FALSE); // "Show 'Firstname Lastname'"
         defaults.put(NAMES_NATBIB, Boolean.TRUE); // "Natbib style"
@@ -615,25 +592,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(MENU_FONT_SIZE, UNSET_MENU_FONT_SIZE);
         defaults.put(ICON_SIZE_LARGE, 24);
         defaults.put(ICON_SIZE_SMALL, 16);
-        defaults.put(TABLE_ROW_PADDING, 9);
-        defaults.put(TABLE_SHOW_GRID, Boolean.FALSE);
         // Main table color settings:
-        defaults.put(TABLE_BACKGROUND, "255:255:255");
-        defaults.put(TABLE_REQ_FIELD_BACKGROUND, "230:235:255");
-        defaults.put(TABLE_OPT_FIELD_BACKGROUND, "230:255:230");
-        defaults.put(TABLE_RESOLVED_FIELD_BACKGROUND, "240:240:240");
-        defaults.put(TABLE_TEXT, "0:0:0");
-        defaults.put(GRID_COLOR, "210:210:210");
-        defaults.put(GRAYED_OUT_BACKGROUND, "210:210:210");
-        defaults.put(GRAYED_OUT_TEXT, "40:40:40");
-        defaults.put(VERY_GRAYED_OUT_BACKGROUND, "180:180:180");
-        defaults.put(VERY_GRAYED_OUT_TEXT, "40:40:40");
-        defaults.put(MARKED_ENTRY_BACKGROUND0, "255:255:180");
-        defaults.put(MARKED_ENTRY_BACKGROUND1, "255:220:180");
-        defaults.put(MARKED_ENTRY_BACKGROUND2, "255:180:160");
-        defaults.put(MARKED_ENTRY_BACKGROUND3, "255:120:120");
-        defaults.put(MARKED_ENTRY_BACKGROUND4, "255:75:75");
-        defaults.put(MARKED_ENTRY_BACKGROUND5, "220:255:220");
         defaults.put(VALID_FIELD_BACKGROUND_COLOR, "255:255:255");
         defaults.put(INVALID_FIELD_BACKGROUND_COLOR, "255:0:0");
         defaults.put(ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR, "220:220:255");
@@ -642,8 +601,6 @@ public class JabRefPreferences implements PreferencesService {
         // default icon colors
         defaults.put(ICON_ENABLED_COLOR, "0:0:0");
         defaults.put(ICON_DISABLED_COLOR, "200:200:200");
-
-        defaults.put(INCOMPLETE_ENTRY_BACKGROUND, "250:175:175");
 
         defaults.put(URL_COLUMN, Boolean.TRUE);
         defaults.put(PREFER_URL_DOI, Boolean.FALSE);
@@ -1782,7 +1739,6 @@ public class JabRefPreferences implements PreferencesService {
 
     public MainTablePreferences getMainTablePreferences() {
         return new MainTablePreferences(
-                getBoolean(TABLE_SHOW_GRID),
                 getColumnPreferences(),
                 getBoolean(AUTO_RESIZE_MODE));
     }
