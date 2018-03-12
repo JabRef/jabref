@@ -32,7 +32,6 @@ For more details refer to the [field mapping help page](http://help.jabref.org/e
 - We improved file saving so that hard links are now preserved when a save is performed [#2633](https://github.com/JabRef/jabref/issues/2633)
 - We changed the default dialog option when removing a [file link](http://help.jabref.org/en/FileLinks#adding-external-links-to-an-entry) from an entry.
 The new default removes the linked file from the entry instead of deleting the file from disk. [#3679](https://github.com/JabRef/jabref/issues/3679)
-- The group editing window can now also be called by double-clicking the group to be edited. [koppor#277](https://github.com/koppor/jabref/issues/277)
 - The magnifier icon at the search shows the [search mode](https://help.jabref.org/en/Search#search-modes) again. [#3535](https://github.com/JabRef/jabref/issues/3535)
 - We added a new cleanup operation that replaces ligatures with their expanded form. [#3613](https://github.com/JabRef/jabref/issues/3613)
 - We added the function to parse German month names. [#3536](https://github.com/JabRef/jabref/pull/3536)
