@@ -59,6 +59,8 @@ Then, each weak do `choco upgrade all` to ensure all tooling is uptodate.
 
 * [Cmder] - bundles ConEmu plus clink
 
+### Tools for working with XMP
+- Validate XMP: http://www.pdflib.com/knowledge-base/xmp-metadata/free-xmp-validator/
 
 ### Some useful keyboard shortcuts
 
