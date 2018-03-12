@@ -1,6 +1,5 @@
 package org.jabref.gui.exporter;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,18 +57,6 @@ public class ExportCommand extends SimpleCommand {
             FileUtil.addExtension(file, selectedExtension);
         }
 
-        if (Files.exists(file)) {
-            // Warn that the file exists:
-
-            boolean overwriteFilePressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Export"),
-                    Localization.lang("'%0' exists. Overwrite file?", file.getFileName().toString()),
-                    Localization.lang("Overwrite file"),
-                    Localization.lang("Cancel"));
-
-            if (!overwriteFilePressed) {
-                return;
-            }
-        }
         final Exporter format = FileFilterConverter.getExporter(selectedExtensionFilter, exporters).orElseThrow(() -> new IllegalStateException("User didn't selected a file type for the extension"));
         List<BibEntry> entries;
         if (selectedOnly) {
@@ -89,8 +76,8 @@ public class ExportCommand extends SimpleCommand {
 
         // Make sure we remember which filter was used, to set
         // the default for next time:
-        Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, format.getId());
-        Globals.prefs.put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, file.getParent().getFileName().toString());
+        Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, format.getDescription());
+        Globals.prefs.put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, file.getParent().toString());
 
         final List<BibEntry> finEntries = entries;
         AbstractWorker exportWorker = new AbstractWorker() {

@@ -217,7 +217,6 @@ class StringDialog extends JabRefDialog {
             TableColumnModel cm = getColumnModel();
             cm.getColumn(0).setPreferredWidth(800);
             cm.getColumn(1).setPreferredWidth(2000);
-            sp.getViewport().setBackground(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND));
             getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
             getActionMap().put("close", closeAction);
             getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");

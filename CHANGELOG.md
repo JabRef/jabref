@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Added "*.*" (any file type) to the Import File Filter Dialog. [#3757] (https://github.com/JabRef/jabref/issues/3757)
 - Abbreviate journal names functionality is now running parallel, increasing performance significantly. [#2831] (https://github.com/JabRef/jabref/issues/2831)
 - Changed order of items in context menu [#298] (https://github.com/koppor/jabref/issues/298)
 - Changed ID-based entry generator to store the last used fetcher. [#2796] (https://github.com/JabRef/jabref/issues/2796)
@@ -33,10 +34,12 @@ For more details refer to the [field mapping help page](http://help.jabref.org/e
 - We improved file saving so that hard links are now preserved when a save is performed [#2633](https://github.com/JabRef/jabref/issues/2633)
 - We changed the default dialog option when removing a [file link](http://help.jabref.org/en/FileLinks#adding-external-links-to-an-entry) from an entry.
 The new default removes the linked file from the entry instead of deleting the file from disk. [#3679](https://github.com/JabRef/jabref/issues/3679)
-- The group editing window can now also be called by double-clicking the group to be edited. [koppor#277](https://github.com/koppor/jabref/issues/277)
 - The magnifier icon at the search shows the [search mode](https://help.jabref.org/en/Search#search-modes) again. [#3535](https://github.com/JabRef/jabref/issues/3535)
 - We added a new cleanup operation that replaces ligatures with their expanded form. [#3613](https://github.com/JabRef/jabref/issues/3613)
+- We added the function to parse German month names. [#3536](https://github.com/JabRef/jabref/pull/3536)
 - Pressing <kbd>ESC</kbd> while searching will clear the search field and select the first entry, if available, in the table. [koppor#293](https://github.com/koppor/jabref/issues/293)
+- We changed the metadata reading and writing. DublinCore is now the only metadata format, JabRef supports. (https://github.com/JabRef/jabref/pull/3710)
+- We added another CLI functionality for reading and writing metadata to pdfs. (see https://github.com/JabRef/jabref/pull/3756 and see http://help.jabref.org/en/CommandLine)
 
 ### Fixed
 - We fixed several performance problems with the management of journal abbreviations [#3323](https://github.com/JabRef/jabref/issues/3323)
@@ -50,6 +53,7 @@ The new default removes the linked file from the entry instead of deleting the f
 - We fixed an issue where not all bibtex/biblatex fields would be exported as latex-free to MS-Office XML [koppor#284](https://github.com/koppor/jabref/issues/284)
 - We fixed an issue where linked files would be deleted from bibliography entries despite choosing the "Cancel" option in the dialog menu.
 - We fixed the name of the group editing window to "Add group" instead of "Edit Group" when adding a new group. [koppor#277](https://github.com/koppor/jabref/issues/277)
+- We fixed an issue where the "Copy linked files" dialog produced an error when the entry had no file [#3818](https://github.com/JabRef/jabref/issues/3818)
 
 ### Removed
 - We removed the [Look and Feels from JGoodies](http://www.jgoodies.com/freeware/libraries/looks/), because the open source version is not compatible with Java 9.

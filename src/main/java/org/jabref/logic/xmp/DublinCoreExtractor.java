@@ -17,7 +17,6 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
 import org.jabref.model.strings.StringUtil;
 
-import com.microsoft.applicationinsights.agent.internal.common.StringUtils;
 import org.apache.xmpbox.DateConverter;
 import org.apache.xmpbox.schema.DublinCoreSchema;
 
@@ -108,7 +107,7 @@ public class DublinCoreExtractor {
      */
     private void extractDOI() {
         String identifier = dcSchema.getIdentifier();
-        if (!StringUtils.isNullOrEmpty(identifier)) {
+        if (!StringUtil.isNullOrEmpty(identifier)) {
             bibEntry.setField(FieldName.DOI, identifier);
         }
     }
@@ -157,7 +156,7 @@ public class DublinCoreExtractor {
      */
     private void extractRights() {
         String rights = dcSchema.getRights();
-        if (!StringUtils.isNullOrEmpty(rights)) {
+        if (!StringUtil.isNullOrEmpty(rights)) {
             bibEntry.setField("rights", rights);
         }
     }
@@ -170,7 +169,7 @@ public class DublinCoreExtractor {
      */
     private void extractSource() {
         String source = dcSchema.getSource();
-        if (!StringUtils.isNullOrEmpty(source)) {
+        if (!StringUtil.isNullOrEmpty(source)) {
             bibEntry.setField("source", source);
         }
     }
@@ -210,7 +209,7 @@ public class DublinCoreExtractor {
         List<String> types = dcSchema.getTypes();
         if ((types != null) && !types.isEmpty()) {
             String type = types.get(0);
-            if (!StringUtils.isNullOrEmpty(type)) {
+            if (!StringUtil.isNullOrEmpty(type)) {
                 bibEntry.setType(type);
             }
         }
