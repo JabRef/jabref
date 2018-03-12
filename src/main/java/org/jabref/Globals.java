@@ -1,5 +1,6 @@
 package org.jabref;
 
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.util.Optional;
 import java.util.UUID;
@@ -80,7 +81,7 @@ public class Globals {
         Globals.fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
 
-        if (Globals.prefs.shouldCollectTelemetry()) {
+        if (Globals.prefs.shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
             startTelemetryClient();
         }
     }

@@ -193,26 +193,6 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
             }
         }
-        withModule("com.microsoft.azure:applicationinsights-core") { ComponentSelection selection ->
-            if (selection.candidate.version.equals("1.0.10")) {
-                selection.reject("Version 1.0.10 is broken... waiting for 1.0.11")
-            }
-        }
-        withModule("com.microsoft.azure:applicationinsights-logging-log4j2") { ComponentSelection selection ->
-            if (selection.candidate.version.equals("1.0.10")) {
-                selection.reject("Version 1.0.10 is broken... waiting for 1.0.11")
-            }
-        }
-        withModule("com.microsoft.azure:applicationinsights-core") { ComponentSelection selection ->
-            if (selection.candidate.version.equals("2.0.0-BETA")) {
-                selection.reject("Version 2.0.0-BETA is broken... waiting for a working version... see #3561")
-            }
-        }
-        withModule("com.microsoft.azure:applicationinsights-logging-log4j2") { ComponentSelection selection ->
-            if (selection.candidate.version.equals("2.0.0-BETA")) {
-                selection.reject("Version 2.0.0-BETA is broken... waiting for a working version... see #3561")
-            }
-        }
         withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /2.*/) {
                 selection.reject("Cannot be upgraded to version 2")
