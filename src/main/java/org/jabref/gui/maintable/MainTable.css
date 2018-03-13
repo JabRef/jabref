@@ -2,6 +2,7 @@
     -fx-border-width: 0;
     -fx-padding: 0;
     -fx-border-insets: 0;
+    -fx-table-cell-border-color: transparent;
     /*-fx-background-color: -jr-foreground;*/
 }
 
