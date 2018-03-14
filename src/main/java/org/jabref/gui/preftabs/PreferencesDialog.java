@@ -171,13 +171,13 @@ public class PreferencesDialog extends JabRefDialog {
                     prefs.importPreferences(fileName.get().toString());
                     updateAfterPreferenceChanges();
 
-                    frame.getDialogService().showWarningDialogAndWait(Localization.lang("Import preferences"),
-                            Localization.lang("You must restart JabRef for this to come into effect."));
+                    DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showWarningDialogAndWait(Localization.lang("Import preferences"),
+                            Localization.lang("You must restart JabRef for this to come into effect.")));
 
                     this.dispose();
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
-                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Import preferences"), ex);
+                    DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(Localization.lang("Import preferences"), ex));
                 }
             }
         });
@@ -186,21 +186,21 @@ public class PreferencesDialog extends JabRefDialog {
                 e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs), null).setVisible(true));
         resetPreferences.addActionListener(e -> {
 
-            boolean resetPreferencesClicked = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Reset preferences"),
+            boolean resetPreferencesClicked = DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Reset preferences"),
                     Localization.lang("Are you sure you want to reset all settings to default values?"),
-                    Localization.lang("Reset preferences"), Localization.lang("Cancel"));
+                    Localization.lang("Reset preferences"), Localization.lang("Cancel")));
 
             if (resetPreferencesClicked) {
                 try {
                     prefs.clear();
                     new SharedDatabasePreferences().clear();
 
-                    frame.getDialogService().showWarningDialogAndWait(Localization.lang("Reset preferences"),
-                            Localization.lang("You must restart JabRef for this to come into effect."));
+                    DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showWarningDialogAndWait(Localization.lang("Reset preferences"),
+                            Localization.lang("You must restart JabRef for this to come into effect.")));
 
                 } catch (BackingStoreException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
-                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Reset preferences"), ex);
+                    DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(Localization.lang("Reset preferences"), ex));
                 }
                 updateAfterPreferenceChanges();
             }

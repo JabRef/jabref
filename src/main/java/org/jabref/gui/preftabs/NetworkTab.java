@@ -12,6 +12,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -161,11 +162,11 @@ public class NetworkTab extends JPanel implements PrefsTab {
         if (!validSetting) {
             if (validAuthenticationSetting) {
 
-                dialogService.showErrorDialogAndWait(Localization.lang("Invalid setting"),
-                        Localization.lang("Please specify both hostname and port"));
+                DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Invalid setting"),
+                        Localization.lang("Please specify both hostname and port")));
             } else {
-                dialogService.showErrorDialogAndWait(Localization.lang("Invalid setting"),
-                        Localization.lang("Please specify both username and password"));
+                DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Invalid setting"),
+                        Localization.lang("Please specify both username and password")));
 
             }
         }

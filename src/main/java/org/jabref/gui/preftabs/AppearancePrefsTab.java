@@ -18,6 +18,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
@@ -35,7 +36,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     private final JabRefPreferences prefs;
 
     private final JCheckBox overrideFonts;
-    private Font usedFont = GUIGlobals.currentFont;
+    private final Font usedFont = GUIGlobals.currentFont;
     private int oldMenuFontSize;
     private int oldSmallIconSize;
     private int oldLargeIconSize;
@@ -236,8 +237,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             }
 
             if (isRestartRequired) {
-                dialogService.showWarningDialogAndWait(Localization.lang("Settings"),
-                        Localization.lang("Some appearance settings you changed require to restart JabRef to come into effect."));
+               DefaultTaskExecutor.runInJavaFXThread(()-> dialogService.showWarningDialogAndWait(Localization.lang("Settings"),
+                        Localization.lang("Some appearance settings you changed require to restart JabRef to come into effect.")));
             }
         } catch (NumberFormatException ex) {
             // should not happen as values are checked beforehand
@@ -251,7 +252,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             Integer.parseInt(fieldValue);
         } catch (NumberFormatException ex) {
 
-            dialogService.showErrorDialogAndWait(errorTitle, Localization.lang("You must enter an integer value in the text field for") + " '" + fieldName + "'");
+            DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(errorTitle, Localization.lang("You must enter an integer value in the text field for") + " '" + fieldName + "'"));
             return false;
         }
         return true;
