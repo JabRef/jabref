@@ -521,7 +521,7 @@ public class DroppedFileHandler {
     private boolean doCopy(String fileName, String toFile, NamedCompound edits) {
 
         List<String> dirs = panel.getBibDatabaseContext()
-                                 .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {

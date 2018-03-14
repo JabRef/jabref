@@ -1,6 +1,5 @@
 package org.jabref.gui.maintable;
 
-import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -61,28 +60,28 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final NewDroppedFileHandler fileHandler;
 
     public MainTable(MainTableDataModel model, JabRefFrame frame,
-                     BasePanel panel, BibDatabaseContext database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
+            BasePanel panel, BibDatabaseContext database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
         super();
 
         this.model = model;
         this.database = Objects.requireNonNull(database);
         this.undoManager = panel.getUndoManager();
 
-        fileHandler = new NewDroppedFileHandler(database, externalFileTypes, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern());
+        fileHandler = new NewDroppedFileHandler(frame.getDialogService(), database, externalFileTypes, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern());
 
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
-                                                              .withOnMouseClickedEvent((entry, event) -> {
-                                                                  if (event.getClickCount() == 2) {
-                                                                      panel.showAndEdit(entry.getEntry());
-                                                                  }
-                                                              })
-                                                              .withContextMenu(entry1 -> RightClickMenu.create(entry1, keyBindingRepository, panel, Globals.getKeyPrefs()))
-                                                              .setOnDragDetected(this::handleOnDragDetected)
-                                                              .setOnDragDropped(this::handleOnDragDropped)
-                                                              .setOnDragOver(this::handleOnDragOver)
-                                                              .setOnMouseDragEntered(this::handleOnDragEntered)
-                                                              .install(this);
+                .withOnMouseClickedEvent((entry, event) -> {
+                    if (event.getClickCount() == 2) {
+                        panel.showAndEdit(entry.getEntry());
+                    }
+                })
+                .withContextMenu(entry1 -> RightClickMenu.create(entry1, keyBindingRepository, panel, Globals.getKeyPrefs()))
+                .setOnDragDetected(this::handleOnDragDetected)
+                .setOnDragDropped(this::handleOnDragDropped)
+                .setOnDragOver(this::handleOnDragOver)
+                .setOnMouseDragEntered(this::handleOnDragEntered)
+                .install(this);
         if (preferences.resizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
         }
@@ -132,10 +131,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public void clearAndSelect(BibEntry bibEntry) {
         findEntry(bibEntry).ifPresent(entry -> {
-                               getSelectionModel().clearSelection();
-                               getSelectionModel().select(entry);
-                               scrollTo(entry);
-                           });
+            getSelectionModel().clearSelection();
+            getSelectionModel().select(entry);
+            scrollTo(entry);
+        });
     }
 
     public void copy() {
@@ -317,10 +316,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public List<BibEntry> getSelectedEntries() {
         return getSelectionModel()
-                                  .getSelectedItems()
-                                  .stream()
-                                  .map(BibEntryTableViewModel::getEntry)
-                                  .collect(Collectors.toList());
+                .getSelectedItems()
+                .stream()
+                .map(BibEntryTableViewModel::getEntry)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -402,7 +401,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {
-        return model.getEntriesFiltered().stream()
+        return model.getEntriesFilteredAndSorted()
+                .stream()
                 .filter(viewModel -> viewModel.getEntry().equals(entry))
                 .findFirst();
     }
