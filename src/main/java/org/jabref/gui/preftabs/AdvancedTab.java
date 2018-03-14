@@ -13,6 +13,7 @@ import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.remote.JabRefMessageHandler;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -122,10 +123,10 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
                 if (remotePreferences.useRemoteServer()) {
 
-                    dialogService.showWarningDialogAndWait(Localization.lang("Remote server port"),
+                    DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showWarningDialogAndWait(Localization.lang("Remote server port"),
                             Localization.lang("Remote server port")
                                     .concat(" ")
-                                    .concat(Localization.lang("You must restart JabRef for this to come into effect.")));
+                                    .concat(Localization.lang("You must restart JabRef for this to come into effect."))));
 
                 }
             }
@@ -159,9 +160,9 @@ class AdvancedTab extends JPanel implements PrefsTab {
             }
         } catch (NumberFormatException ex) {
 
-            dialogService.showErrorDialogAndWait(Localization.lang("Remote server port"),
+           DefaultTaskExecutor.runInJavaFXThread(()-> dialogService.showErrorDialogAndWait(Localization.lang("Remote server port"),
                     Localization.lang("You must enter an integer value in the interval 1025-65535 in the text field for")
-                            + " '" + Localization.lang("Remote server port") + '\'');
+                            + " '" + Localization.lang("Remote server port") + '\''));
 
             return false;
         }

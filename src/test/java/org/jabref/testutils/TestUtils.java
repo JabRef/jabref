@@ -3,15 +3,9 @@ package org.jabref.testutils;
 import org.jabref.JabRefGUI;
 import org.jabref.JabRefMain;
 
-/**
- * UtilsClass for UnitTests.
- *
- * @author kahlert, cordes
- */
 public class TestUtils {
 
-    public static final String PATH_TO_TEST_BIBTEX = "src/test/resources/org/jabref/bibtexFiles/test.bib";
-
+    private static final String PATH_TO_TEST_BIBTEX = "src/test/resources/org/jabref/bibtexFiles/test.bib";
 
     /**
      * Initialize JabRef. Can be cleaned up with

@@ -132,9 +132,11 @@ class StyleSelectDialog {
 
         // Create a preview panel for previewing styles
         // Must be done before creating the table to avoid NPEs
-        preview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), frame.getDialogService());
-        // Use the test entry from the Preview settings tab in Preferences:
-        preview.setEntry(prevEntry);
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            preview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), frame.getDialogService());
+            // Use the test entry from the Preview settings tab in Preferences:
+            preview.setEntry(prevEntry);
+        });
 
         setupTable();
         updateStyles();

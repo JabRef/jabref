@@ -1,6 +1,5 @@
 package org.jabref;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -18,9 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Responsible for managing of all threads (except Swing threads) in JabRef
+ * Responsible for managing of all threads (except GUI threads) in JabRef
  */
-public class JabRefExecutorService implements Executor {
+public class JabRefExecutorService {
 
     public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefExecutorService.class);
@@ -43,7 +41,6 @@ public class JabRefExecutorService implements Executor {
     private JabRefExecutorService() {
     }
 
-    @Override
     public void execute(Runnable command) {
         Objects.requireNonNull(command);
         executorService.execute(command);
@@ -52,37 +49,18 @@ public class JabRefExecutorService implements Executor {
     public void executeAndWait(Runnable command) {
         Objects.requireNonNull(command);
         Future<?> future = executorService.submit(command);
-        while (true) {
-            try {
-                future.get();
-                return;
-            } catch (InterruptedException ignored) {
-                // Ignored
-            } catch (ExecutionException e) {
-                LOGGER.error("Problem executing command", e);
-            }
-        }
-    }
-
-    public boolean executeAndWait(Callable<?> command) {
-        Objects.requireNonNull(command);
-        Future<?> future = executorService.submit(command);
-        while (true) {
-            try {
-                future.get();
-                return true;
-            } catch (InterruptedException ignored) {
-                // Ignored
-            } catch (ExecutionException e) {
-                LOGGER.error("Problem executing command", e);
-                return false;
-            }
+        try {
+            future.get();
+        } catch (InterruptedException ignored) {
+            // Ignored
+        } catch (ExecutionException e) {
+            LOGGER.error("Problem executing command", e);
         }
     }
 
     /**
      * Executes a callable task that provides a return value after the calculation is done.
-     * 
+     *
      * @param command The task to execute.
      * @return A Future object that provides the returning value.
      */
@@ -92,25 +70,19 @@ public class JabRefExecutorService implements Executor {
     }
 
     /**
-     * Executes a collection of callable tasks and returns a List of the resulting Future objects after the calculation is done. 
-     * 
+     * Executes a collection of callable tasks and returns a List of the resulting Future objects after the calculation is done.
+     *
      * @param tasks The tasks to execute
      * @return A List of Future objects that provide the returning values.
      */
     public <T> List<Future<T>> executeAll(Collection<Callable<T>> tasks) {
         Objects.requireNonNull(tasks);
-        List<Future<T>> futures = new ArrayList<>();
         try {
-            futures = executorService.invokeAll(tasks);
+            return executorService.invokeAll(tasks);
         } catch (InterruptedException exception) {
-            LOGGER.error("Unable to execute tasks", exception);
+            // Ignored
             return Collections.emptyList();
         }
-        return futures;
-    }
-
-    public void executeInterruptableTask(final Runnable runnable) {
-        this.lowPriorityExecutorService.execute(runnable);
     }
 
     public void executeInterruptableTask(final Runnable runnable, String taskName) {
@@ -121,15 +93,12 @@ public class JabRefExecutorService implements Executor {
         Objects.requireNonNull(runnable);
 
         Future<?> future = lowPriorityExecutorService.submit(runnable);
-        while (true) {
-            try {
-                future.get();
-                return;
-            } catch (InterruptedException ignored) {
-                // Ignored
-            } catch (ExecutionException e) {
-                LOGGER.error("Problem executing command", e);
-            }
+        try {
+            future.get();
+        } catch (InterruptedException ignored) {
+            // Ignored
+        } catch (ExecutionException e) {
+            LOGGER.error("Problem executing command", e);
         }
     }
 
@@ -163,13 +132,13 @@ public class JabRefExecutorService implements Executor {
         // timer doesn't need to be canceled as it is run in daemon mode, which ensures that it is stopped if the application is shut down
     }
 
-    class NamedRunnable implements Runnable {
+    private class NamedRunnable implements Runnable {
 
         private final String name;
 
         private final Runnable task;
 
-        public NamedRunnable(String name, Runnable runnable) {
+        private NamedRunnable(String name, Runnable runnable) {
             this.name = name;
             this.task = runnable;
         }

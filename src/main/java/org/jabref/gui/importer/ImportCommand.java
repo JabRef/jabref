@@ -29,6 +29,7 @@ public class ImportCommand extends SimpleCommand {
 
     private final JabRefFrame frame;
     private final boolean openInNew;
+    private final DialogService dialogService;
 
     /**
      * @param openInNew Indicate whether the entries should import into a new database or into the currently open one.
@@ -36,6 +37,7 @@ public class ImportCommand extends SimpleCommand {
     public ImportCommand(JabRefFrame frame, boolean openInNew) {
         this.frame = frame;
         this.openInNew = openInNew;
+        this.dialogService = frame.getDialogService();
     }
 
     @Override
@@ -43,14 +45,15 @@ public class ImportCommand extends SimpleCommand {
         SortedSet<Importer> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
         List<FileType> extensions = importers.stream().map(Importer::getFileType)
                                              .collect(Collectors.toList());
-        FileChooser.ExtensionFilter allImports = FileFilterConverter.forAllImporters(importers);
 
+        FileChooser.ExtensionFilter allImports = FileFilterConverter.forAllImporters(importers);
+        FileChooser.ExtensionFilter anyFile = new FileChooser.ExtensionFilter(Localization.lang("Any file"), "*.*");
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(anyFile)
                 .addExtensionFilter(allImports)
                 .addExtensionFilters(extensions)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY))
                 .build();
-        DialogService dialogService = frame.getDialogService();
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             dialogService.showFileOpenDialog(fileDialogConfiguration)
                          .ifPresent(path -> doImport(path, importers, fileDialogConfiguration.getSelectedExtensionFilter()));
@@ -59,7 +62,7 @@ public class ImportCommand extends SimpleCommand {
 
     private void doImport(Path file, SortedSet<Importer> importers, FileChooser.ExtensionFilter selectedExtensionFilter) {
         if (!Files.exists(file)) {
-            frame.getDialogService().showErrorDialogAndWait(Localization.lang("Import"),
+            dialogService.showErrorDialogAndWait(Localization.lang("Import"),
                     Localization.lang("File not found") + ": '" + file.getFileName() + "'.");
 
             return;

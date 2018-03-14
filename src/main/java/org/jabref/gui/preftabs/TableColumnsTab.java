@@ -37,6 +37,7 @@ import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibtexSingleField;
@@ -704,10 +705,10 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 (oldSyncKeyWords != newSyncKeyWords) ||
                 (oldWriteSpecialFields != newWriteSpecialFields);
         if (restartRequired) {
-            frame.getDialogService().showWarningDialogAndWait(Localization.lang("Changed special field settings"),
+            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showWarningDialogAndWait(Localization.lang("Changed special field settings"),
                     Localization.lang("You have changed settings for special fields.")
                             .concat(" ")
-                            .concat(Localization.lang("You must restart JabRef for this to come into effect.")));
+                            .concat(Localization.lang("You must restart JabRef for this to come into effect."))));
 
         }
 

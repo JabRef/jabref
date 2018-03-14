@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -19,6 +18,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
@@ -35,12 +35,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
 
-    private final JCheckBox colorCodes;
-    private final JCheckBox resolvedColorCodes;
     private final JCheckBox overrideFonts;
-    private final JCheckBox showGrid;
-    private final ColorSetupPanel colorPanel;
-    private Font usedFont = GUIGlobals.currentFont;
+    private final Font usedFont = GUIGlobals.currentFont;
     private int oldMenuFontSize;
     private int oldSmallIconSize;
     private int oldLargeIconSize;
@@ -48,7 +44,6 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     private final JTextField fontSize;
     private final JTextField largeIconsTextField;
     private final JTextField smallIconsTextField;
-    private final JTextField rowPadding;
     // look and feel
     private final JComboBox<String> classNamesLAF;
     private String currentLAF = "";
@@ -78,21 +73,11 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         // Font sizes:
         fontSize = new JTextField(5);
 
-        // Row padding size:
-        rowPadding = new JTextField(5);
-
         // Icon sizes:
         largeIconsTextField = new JTextField(5);
         smallIconsTextField = new JTextField(5);
 
-        colorCodes = new JCheckBox(
-                Localization.lang("Color codes for required and optional fields"));
-
-        resolvedColorCodes = new JCheckBox(Localization.lang("Color code for resolved fields"));
-
         overrideFonts = new JCheckBox(Localization.lang("Override default font settings"));
-
-        showGrid = new JCheckBox(Localization.lang("Show gridlines"));
 
         FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
@@ -104,8 +89,6 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         classNamesLAF = new JComboBox<>(lookAndFeels.toArray(new String[lookAndFeels.size()]));
         classNamesLAF.setEditable(true);
         customLAF.addChangeListener(e -> classNamesLAF.setEnabled(((JCheckBox) e.getSource()).isSelected()));
-
-        colorPanel = new ColorSetupPanel(colorCodes, resolvedColorCodes, showGrid);
 
         // only the default L&F shows the OSX specific first drop-down menu
         if (!OS.OS_X) {
@@ -165,24 +148,6 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         builder.append(generalPanel);
         builder.nextLine();
 
-        builder.appendSeparator(Localization.lang("Table appearance"));
-        JPanel p2 = new JPanel();
-        p2.add(new JLabel(Localization.lang("Table row height padding") + ":"));
-        p2.add(rowPadding);
-        builder.append(p2);
-        builder.nextLine();
-        builder.append(colorCodes);
-        builder.nextLine();
-        builder.append(resolvedColorCodes);
-        builder.nextLine();
-        builder.append(showGrid);
-        builder.nextLine();
-        JButton fontButton = new JButton(Localization.lang("Set table font"));
-        builder.append(fontButton);
-        builder.nextLine();
-        builder.appendSeparator(Localization.lang("Table and entry editor colors"));
-        builder.append(colorPanel);
-
         JPanel upper = new JPanel();
         JPanel sort = new JPanel();
         JPanel namesp = new JPanel();
@@ -196,9 +161,6 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         overrideFonts.addActionListener(e -> fontSize.setEnabled(overrideFonts.isSelected()));
         overrideFonts.addActionListener(e -> largeIconsTextField.setEnabled(overrideFonts.isSelected()));
         overrideFonts.addActionListener(e -> smallIconsTextField.setEnabled(overrideFonts.isSelected()));
-
-        fontButton.addActionListener(
-                e -> new FontSelectorDialog(null, usedFont).getSelectedFont().ifPresent(x -> usedFont = x));
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -215,10 +177,6 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         classNamesLAF.setSelectedItem(currentLAF);
         classNamesLAF.setEnabled(!useDefaultLAF);
 
-        colorCodes.setSelected(prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON));
-        resolvedColorCodes.setSelected(prefs.getBoolean(JabRefPreferences.TABLE_RESOLVED_COLOR_CODES_ON));
-        rowPadding.setText(String.valueOf(prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING)));
-
         oldOverrideFontSize = prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS);
         oldMenuFontSize = prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
         oldLargeIconSize = prefs.getInt(JabRefPreferences.ICON_SIZE_LARGE);
@@ -232,8 +190,6 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         fontSize.setEnabled(overrideFonts.isSelected());
         smallIconsTextField.setEnabled(overrideFonts.isSelected());
         largeIconsTextField.setEnabled(overrideFonts.isSelected());
-        showGrid.setSelected(prefs.getBoolean(JabRefPreferences.TABLE_SHOW_GRID));
-        colorPanel.setValues();
     }
 
     @Override
@@ -251,20 +207,15 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK, fxFontTweaksLAF.isSelected());
         isRestartRequired |= oldFxTweakValue != fxFontTweaksLAF.isSelected();
 
-        prefs.putBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON, colorCodes.isSelected());
-        prefs.putBoolean(JabRefPreferences.TABLE_RESOLVED_COLOR_CODES_ON, resolvedColorCodes.isSelected());
         prefs.put(JabRefPreferences.FONT_FAMILY, usedFont.getFamily());
         prefs.putInt(JabRefPreferences.FONT_STYLE, usedFont.getStyle());
         prefs.putInt(JabRefPreferences.FONT_SIZE, usedFont.getSize());
         prefs.putBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS, overrideFonts.isSelected());
         GUIGlobals.currentFont = usedFont;
-        colorPanel.storeSettings();
-        prefs.putBoolean(JabRefPreferences.TABLE_SHOW_GRID, showGrid.isSelected());
         try {
             int size = Integer.parseInt(fontSize.getText());
             int smallIconSize = Integer.parseInt(smallIconsTextField.getText());
             int largeIconSize = Integer.parseInt(largeIconsTextField.getText());
-            int padding = Integer.parseInt(rowPadding.getText());
             if (overrideFonts.isSelected()) {
                 if (size != oldMenuFontSize) {
                     prefs.putInt(JabRefPreferences.MENU_FONT_SIZE, size);
@@ -286,11 +237,9 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             }
 
             if (isRestartRequired) {
-                dialogService.showWarningDialogAndWait(Localization.lang("Settings"),
-                        Localization.lang("Some appearance settings you changed require to restart JabRef to come into effect."));
+               DefaultTaskExecutor.runInJavaFXThread(()-> dialogService.showWarningDialogAndWait(Localization.lang("Settings"),
+                        Localization.lang("Some appearance settings you changed require to restart JabRef to come into effect.")));
             }
-
-            prefs.putInt(JabRefPreferences.TABLE_ROW_PADDING, padding);
         } catch (NumberFormatException ex) {
             // should not happen as values are checked beforehand
             LOGGER.error("Invalid data value, integer expected", ex);
@@ -303,7 +252,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             Integer.parseInt(fieldValue);
         } catch (NumberFormatException ex) {
 
-            dialogService.showErrorDialogAndWait(errorTitle, Localization.lang("You must enter an integer value in the text field for") + " '" + fieldName + "'");
+            DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(errorTitle, Localization.lang("You must enter an integer value in the text field for") + " '" + fieldName + "'"));
             return false;
         }
         return true;
@@ -322,13 +271,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             return false;
         }
 
-        if (!validateIntegerField(Localization.lang("Size of small icons"), smallIconsTextField.getText(),
-                Localization.lang("Invalid setting"))) {
-            return false;
-        }
-
-        // Test if row padding is a number:
-        return validateIntegerField(Localization.lang("Table row height padding"), rowPadding.getText(),
+        return validateIntegerField(Localization.lang("Size of small icons"), smallIconsTextField.getText(),
                 Localization.lang("Invalid setting"));
     }
 

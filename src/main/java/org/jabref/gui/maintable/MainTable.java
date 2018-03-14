@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.JTable;
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
@@ -35,21 +34,16 @@ import org.jabref.gui.externalfiles.NewDroppedFileHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.renderer.CompleteRenderer;
-import org.jabref.gui.renderer.GeneralRenderer;
-import org.jabref.gui.renderer.IncompleteRenderer;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.util.LocalDragboard;
 import org.jabref.gui.util.ViewModelTableRowFactory;
-import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-import ca.odell.glazedlists.matchers.Matcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,27 +51,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTable.class);
 
-    private static GeneralRenderer defRenderer;
-    private static GeneralRenderer reqRenderer;
-    private static GeneralRenderer optRenderer;
-    private static GeneralRenderer resolvedRenderer;
-    private static GeneralRenderer grayedOutRenderer;
-    private static GeneralRenderer veryGrayedOutRenderer;
-
-    private static IncompleteRenderer incRenderer;
-    private static CompleteRenderer compRenderer;
-    private static CompleteRenderer grayedOutNumberRenderer;
-    private static CompleteRenderer veryGrayedOutNumberRenderer;
-
     private final BasePanel panel;
-    //private final boolean tableColorCodes;
-    //private final boolean tableResolvedColorCodes;
 
     private final ScrollPane pane;
     private final BibDatabaseContext database;
     private final UndoManager undoManager;
-    // needed to activate/deactivate the listener
-    private PersistenceVisualStateTable tableColumnListener;
 
     private final MainTableDataModel model;
     private final NewDroppedFileHandler fileHandler;
@@ -125,14 +103,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         pane.setFitToWidth(true);
 
         this.pane.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
-        // TODO: Color
-        //tableColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON);
-        //tableResolvedColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_RESOLVED_COLOR_CODES_ON);
-        //pane.getViewport().setBackground(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND));
-        //setGridColor(Globals.prefs.getColor(JabRefPreferences.GRID_COLOR));
-        if (!preferences.showGrid()) {
-            this.setStyle("-fx-table-cell-border-color: transparent;");
-        }
 
         // TODO: Tooltip for column header
         /*
@@ -153,9 +123,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         //TransferHandler xfer = new EntryTableTransferHandler(this, frame, panel);
         //setTransferHandler(xfer);
         //pane.setTransferHandler(xfer);
-
-        // Todo: Set default sort order
-        // setupComparatorChooser();
 
         // TODO: Float marked entries
         //model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
@@ -182,18 +149,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 LOGGER.error("Error while copying selected entries to clipboard", e);
             }
         }
-    }
-
-    // Enum used to define how a cell should be rendered.
-    private enum CellRendererMode {
-        REQUIRED,
-        RESOLVED,
-        OPTIONAL,
-        OTHER
-    }
-
-    static {
-        //MainTable.updateRenderers();
     }
 
     public void cut() {
@@ -356,83 +311,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         return model;
     }
 
-    /*
-    // TODO: if the content of the cell is bigger than the cell itself render it as the tooltip
-    @Override
-    public String getToolTipText(MouseEvent e) {
-        String toolTipText = super.getToolTipText(e);
-        Point p = e.getPoint();
-        int col = columnAtPoint(p);
-        int row = rowAtPoint(p);
-
-        Rectangle bounds = getCellRect(row, col, false);
-        Dimension d = prepareRenderer(getCellRenderer(row, col), row, col).getPreferredSize();
-        // if the content of the cell is bigger than the cell itself render it as the tooltip (thus throwing the original tooltip away)
-        if ((d != null) && (d.width > bounds.width) && (getValueAt(row, col) != null)) {
-            toolTipText = getValueAt(row, col).toString();
-        }
-        return toolTipText;
-    }
-
-    // TODO: Support float mode
-    @Override
-    public TableCellRenderer getCellRenderer(int row, int column) {
-
-        int score = -3;
-        DefaultTableCellRenderer renderer = MainTable.defRenderer;
-
-        if ((model.getSearchState() != MainTableDataModel.DisplayOption.FLOAT)
-                || matches(row, SearchMatcher.INSTANCE)) {
-            score++;
-        }
-        if ((model.getGroupingState() != MainTableDataModel.DisplayOption.FLOAT)
-                || matches(row, GroupMatcher.INSTANCE)) {
-            score += 2;
-        }
-
-        // Now, a grayed out renderer is for entries with -1, and
-        // a very grayed out one for entries with -2
-        if (score < -1) {
-            if (column == 0) {
-                MainTable.veryGrayedOutNumberRenderer.setNumber(row);
-                renderer = MainTable.veryGrayedOutNumberRenderer;
-            } else {
-                renderer = MainTable.veryGrayedOutRenderer;
-            }
-        }
-        else if (score == -1) {
-            if (column == 0) {
-                MainTable.grayedOutNumberRenderer.setNumber(row);
-                renderer = MainTable.grayedOutNumberRenderer;
-            } else {
-                renderer = MainTable.grayedOutRenderer;
-            }
-        }
-
-        else if (column == 0) {
-            if (isComplete(row)) {
-                MainTable.compRenderer.setNumber(row);
-                renderer = MainTable.compRenderer;
-            } else {
-                // Return a renderer with red background if the entry is incomplete.
-                MainTable.incRenderer.setNumber(row);
-                renderer = MainTable.incRenderer;
-            }
-        } else if (tableColorCodes || tableResolvedColorCodes) {
-            CellRendererMode status = getCellStatus(row, column, tableResolvedColorCodes);
-            if (status == CellRendererMode.REQUIRED) {
-                renderer = MainTable.reqRenderer;
-            } else if (status == CellRendererMode.OPTIONAL) {
-                renderer = MainTable.optRenderer;
-            } else if (status == CellRendererMode.RESOLVED) {
-                renderer = MainTable.resolvedRenderer;
-            }
-        }
-
-        return renderer;
-    }
-    */
-
     public BibEntry getEntryAt(int row) {
         return model.getEntriesFilteredAndSorted().get(row).getEntry();
     }
@@ -453,29 +331,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
      */
     private void setupComparatorChooser() {
         // TODO: Proper sorting
+
         /*
-        // First column:
-        List<Comparator> comparators = comparatorChooser.getComparatorsForColumn(0);
-        comparators.clear();
-        comparators.add(new FirstColumnComparator(panel.getBibDatabaseContext()));
-
-        for (int i = 1; i < tableFormat.getColumnCount(); i++) {
-            MainTableColumn tableColumn = tableFormat.getTableColumn(i);
-
-            comparators = comparatorChooser.getComparatorsForColumn(i);
-            comparators.clear();
-
-            if (SpecialField.RANKING.getFieldName().equals(tableColumn.getColumnName())) {
-                comparators.add(new RankingFieldComparator());
-            } else if (tableColumn.isIconColumn()) {
-                comparators.add(new IconComparator(tableColumn.getBibtexFields()));
-            } else {
-                comparators = comparatorChooser.getComparatorsForColumn(i);
-                comparators.clear();
-                comparators.add(new FieldComparator(tableFormat.getColumnName(i).toLowerCase(Locale.ROOT)));
-            }
-        }
-
         // Set initial sort columns:
 
         // Default sort order:
@@ -543,98 +400,18 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         });
         */
     }
-    /*
-    // TODO: Reenable background coloring of fields (required/optional/...)
-    private CellRendererMode getCellStatus(int row, int col, boolean checkResolved) {
-        try {
-            BibEntry be = getEntryAt(row);
-            if (checkResolved && tableFormat.getTableColumn(col).isResolved(be)) {
-                return CellRendererMode.RESOLVED;
-            }
-            Optional<EntryType> type = EntryTypes.getType(be.getType(), panel.getBibDatabaseContext().getMode());
-            if (type.isPresent()) {
-                String columnName = getColumnName(col).toLowerCase(Locale.ROOT);
-                if (columnName.equals(BibEntry.KEY_FIELD) || type.get().getRequiredFieldsFlat().contains(columnName)) {
-                    return CellRendererMode.REQUIRED;
-                }
-                if (type.get().getOptionalFields().contains(columnName)) {
-                    return CellRendererMode.OPTIONAL;
-                }
-            }
-            return CellRendererMode.OTHER;
-        } catch (NullPointerException ex) {
-            return CellRendererMode.OTHER;
-        }
-    }
-    */
 
-    public Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {
-        return model.getEntriesFilteredAndSorted()
-                    .stream()
-                    .filter(viewModel -> viewModel.getEntry().equals(entry))
-                    .findFirst();
-    }
-
-    private boolean matches(int row, Matcher<BibEntry> m) {
-        return getBibEntry(row).map(m::matches).orElse(false);
-    }
-
-    private boolean isComplete(int row) {
-        Optional<BibEntry> bibEntry = getBibEntry(row);
-
-        if (bibEntry.isPresent()) {
-            TypedBibEntry typedEntry = new TypedBibEntry(bibEntry.get(), panel.getBibDatabaseContext());
-            return typedEntry.hasAllRequiredFields();
-        }
-        return true;
-    }
-
-    private Optional<BibEntry> getBibEntry(int row) {
-        try {
-            return Optional.of(model.getEntriesFilteredAndSorted().get(row).getEntry());
-        } catch (IndexOutOfBoundsException e) {
-            return Optional.empty();
-        }
+    private Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {
+        return model.getEntriesFiltered().stream()
+                .filter(viewModel -> viewModel.getEntry().equals(entry))
+                .findFirst();
     }
 
     /**
      * Repaints the table with the most recent font configuration
      */
     public void updateFont() {
-        /*
         // TODO: Font & padding customization
-        setFont(GUIGlobals.currentFont);
-        int maxOfIconsAndFontSize = Math.max(GUIGlobals.currentFont.getSize(), Globals.prefs.getInt(JabRefPreferences.ICON_SIZE_SMALL));
-        setRowHeight(Globals.prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING) + maxOfIconsAndFontSize);
-        // Update Table header with new settings
-        this.getTableHeader().setDefaultRenderer(new MainTableHeaderRenderer(this.getTableHeader().getDefaultRenderer()));
-        this.getTableHeader().resizeAndRepaint();
-        */
-    }
-
-    public static void updateRenderers() {
-
-        MainTable.defRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND),
-                                                    Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
-        Color sel = MainTable.defRenderer.getTableCellRendererComponent(new JTable(), "", true, false, 0, 0).getBackground();
-        MainTable.reqRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND), Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
-        MainTable.optRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND), Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
-        MainTable.resolvedRenderer = new GeneralRenderer(
-                                                         Globals.prefs.getColor(JabRefPreferences.TABLE_RESOLVED_FIELD_BACKGROUND),
-                                                         Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
-        MainTable.incRenderer = new IncompleteRenderer();
-        MainTable.compRenderer = new CompleteRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND));
-        MainTable.grayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor(JabRefPreferences.GRAYED_OUT_BACKGROUND));
-        MainTable.veryGrayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_BACKGROUND));
-        MainTable.grayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.GRAYED_OUT_BACKGROUND),
-                                                          Globals.prefs.getColor(JabRefPreferences.GRAYED_OUT_TEXT), MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.GRAYED_OUT_BACKGROUND),
-                                                                                                                                         sel));
-        MainTable.veryGrayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_BACKGROUND),
-                                                              Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_TEXT), MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_BACKGROUND),
-                                                                                                                                                  sel));
-    }
-
-    private static Color mixColors(Color one, Color two) {
-        return new Color((one.getRed() + two.getRed()) / 2, (one.getGreen() + two.getGreen()) / 2, (one.getBlue() + two.getBlue()) / 2);
+        // setFont(GUIGlobals.currentFont);
     }
 }

@@ -1,12 +1,10 @@
 package org.jabref.gui.maintable;
 
 public class MainTablePreferences {
-    private final boolean showGrid;
     private final ColumnPreferences columnPreferences;
     private final boolean resizeColumnsToFit;
 
-    public MainTablePreferences(boolean showGrid, ColumnPreferences columnPreferences, boolean resizeColumnsToFit) {
-        this.showGrid = showGrid;
+    public MainTablePreferences(ColumnPreferences columnPreferences, boolean resizeColumnsToFit) {
         this.columnPreferences = columnPreferences;
         this.resizeColumnsToFit = resizeColumnsToFit;
     }
@@ -18,9 +16,5 @@ public class MainTablePreferences {
     public boolean resizeColumnsToFit() {
 
         return resizeColumnsToFit;
-    }
-
-    public boolean showGrid() {
-        return showGrid;
     }
 }

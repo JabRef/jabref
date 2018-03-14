@@ -31,6 +31,7 @@ import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.util.comparator.RankingFieldComparator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -183,6 +184,10 @@ class MainTableColumnFactory {
             }
         }
         column.setCellValueFactory(cellData -> cellData.getValue().getSpecialField(specialField));
+
+        if (specialField == SpecialField.RANKING) {
+            column.setComparator(new RankingFieldComparator());
+        }
 
         return column;
     }

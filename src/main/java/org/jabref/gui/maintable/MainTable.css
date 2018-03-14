@@ -3,6 +3,7 @@
     -fx-padding: 0;
     -fx-border-insets: 0;
     -fx-background-color: -fx-light-background;
+    -fx-table-cell-border-color: transparent;
 }
 
 .table-view .column-header-background {
