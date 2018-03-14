@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class ThemeLoader {
 
     private static final String pathDefaultMainCss = AbstractView.class.getResource("Main.css").toExternalForm();
-    Logger LOGGER = LoggerFactory.getLogger(ThemeLoader.class);
+    private Logger LOGGER = LoggerFactory.getLogger(ThemeLoader.class);
     private final FileUpdateMonitor fileUpdateMonitor;
 
     public ThemeLoader(FileUpdateMonitor fileUpdateMonitor) {
