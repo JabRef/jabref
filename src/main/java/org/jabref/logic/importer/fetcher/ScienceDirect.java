@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +54,16 @@ public class ScienceDirect implements FulltextFetcher {
                             .referrer("http://www.google.com")
                             .ignoreHttpErrors(true).get();
 
+                    // Retrieve PDF link from meta data (most recent)
+                    Elements metaLinks = html.getElementsByAttributeValue("name", "citation_pdf_url");
+
+                    if (!metaLinks.isEmpty()) {
+                        String link = metaLinks.first().attr("content");
+                        return Optional.of(new URL(link));
+                    }
+
                     // Retrieve PDF link (old page)
+                    // TODO: can possibly be removed
                     Element link = html.getElementById("pdfLink");
 
                     if (link != null) {
@@ -62,6 +72,7 @@ public class ScienceDirect implements FulltextFetcher {
                         return pdfLink;
                     }
                     // Retrieve PDF link (new page)
+                    // TODO: can possibly be removed
                     String url = html.getElementsByClass("pdf-download-btn-link").attr("href");
 
                     if (url != null) {
