@@ -48,7 +48,8 @@ public class ThemeLoader {
                 );
             });
         } catch (URISyntaxException | IOException e) {
-            LOGGER.error("Could not watch css file for changes " + cssUrl, e);
+            // If the resources are part of a .jar bundle, then we cannot get the path (as a path in the file system) in the way above; so just ignore the exception
+            LOGGER.debug("Could not watch css file for changes " + cssUrl, e);
         }
     }
 
