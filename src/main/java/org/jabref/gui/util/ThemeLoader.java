@@ -37,19 +37,21 @@ public class ThemeLoader {
     private void installCss(Scene scene, String cssUrl) {
         scene.getStylesheets().add(0, cssUrl);
         try {
-            Path cssFile = Paths.get(new URL(cssUrl).toURI());
-            fileUpdateMonitor.addListenerForFile(cssFile, () -> {
-                LOGGER.info("Reload css file " + cssFile);
+            // If the resources are part of a .jar bundle, then we don't want to watch it for changes
+            if (!cssUrl.startsWith("jar:")) {
+                Path cssFile = Paths.get(new URL(cssUrl).toURI());
+                fileUpdateMonitor.addListenerForFile(cssFile, () -> {
+                    LOGGER.info("Reload css file " + cssFile);
 
-                DefaultTaskExecutor.runInJavaFXThread(() -> {
-                            scene.getStylesheets().remove(cssUrl);
-                            scene.getStylesheets().add(0, cssUrl);
-                        }
-                );
-            });
+                    DefaultTaskExecutor.runInJavaFXThread(() -> {
+                                scene.getStylesheets().remove(cssUrl);
+                                scene.getStylesheets().add(0, cssUrl);
+                            }
+                    );
+                });
+            }
         } catch (URISyntaxException | IOException e) {
-            // If the resources are part of a .jar bundle, then we cannot get the path (as a path in the file system) in the way above; so just ignore the exception
-            LOGGER.debug("Could not watch css file for changes " + cssUrl, e);
+            LOGGER.error("Could not watch css file for changes " + cssUrl, e);
         }
     }
 
