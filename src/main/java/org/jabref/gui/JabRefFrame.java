@@ -104,8 +104,6 @@ import org.jabref.gui.keyboard.KeyBindingAction;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.menus.RightClickMenu;
-import org.jabref.gui.openoffice.OpenOfficePanel;
-import org.jabref.gui.openoffice.OpenOfficeSidePanel;
 import org.jabref.gui.preftabs.PreferencesDialog;
 import org.jabref.gui.protectedterms.ProtectedTermsDialog;
 import org.jabref.gui.push.PushToApplicationButton;
@@ -460,7 +458,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private PushToApplicationButton pushExternalButton;
     private PushToApplications pushApplications;
     private GeneralFetcher generalFetcher;
-    private OpenOfficePanel openOfficePanel;
+    // TODO: temporarily removed, Libre Office
+    //private OpenOfficePanel openOfficePanel;
     private GroupSidePane groupSidePane;
     private int previousTabCount = -1;
     private JMenu newSpec;
@@ -634,7 +633,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             groupSidePane.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
             previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
             generalFetcher.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GeneralFetcher.class));
-            openOfficePanel.getToggleAction().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
+            // TODO: temporarily removed, Libre Office
+            //openOfficePanel.getToggleAction().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
             Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
             setWindowTitle();
             editModeAction.initName();
@@ -727,7 +727,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         sidePaneManager = new SidePaneManager(this);
 
         groupSidePane = new GroupSidePane(this, sidePaneManager);
-        openOfficePanel = new OpenOfficePanel(this, sidePaneManager);
+        // TODO: removed, JDK 9, LibreOffice
+        //openOfficePanel = new OpenOfficePanel(this, sidePaneManager);
         generalFetcher = new GeneralFetcher(this, sidePaneManager);
 
         sidePaneManager.register(groupSidePane);
@@ -1232,7 +1233,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         tools.add(newSubDatabaseAction);
         tools.add(writeXmpAction);
-        tools.add(new JCheckBoxMenuItem(openOfficePanel.getToggleAction()));
+        // TODO: temporarily removed (LibreOffice - Java 9)
+        //tools.add(new JCheckBoxMenuItem(openOfficePanel.getToggleAction()));
         tools.add(pushExternalButton.getMenuAction());
         tools.addSeparator();
         tools.add(openFolder);
@@ -1408,11 +1410,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private void initActions() {
         openDatabaseOnlyActions.clear();
+        // TODO: temporarily removed OpenOffice Panel, (Java 9 incompatibility)
         openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save, copyPreview,
                 saveAs, saveSelectedAs, saveSelectedAsPlain, editModeAction, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
                 unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, copyKeyAndLink, editPreamble, editStrings,
                 groupSidePane.getToggleAction(), makeKeyAction, normalSearch, generalFetcher.getToggleAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
-                sendAsEmail, downloadFullText, lookupIdentifiers, writeXmpAction, openOfficePanel.getToggleAction(), findUnlinkedFiles, addToGroup, removeFromGroup,
+                sendAsEmail, downloadFullText, lookupIdentifiers, writeXmpAction, /*openOfficePanel.getToggleAction(),*/ findUnlinkedFiles, addToGroup, removeFromGroup,
                 moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
                 dupliCheck, autoSetFile, newEntryAction, newSpec, customizeAction, plainTextImport, getMassSetField(), getManageKeywords(),
                 pushExternalButton.getMenuAction(), closeDatabaseAction, getNextPreviewStyleAction(), getPreviousPreviewStyleAction(), checkIntegrity,

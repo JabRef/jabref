@@ -385,7 +385,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
     private void expandTree(JTree currentTree, TreePath parent, boolean expand) {
         TreeNode node = (TreeNode) parent.getLastPathComponent();
         if (node.getChildCount() >= 0) {
-            for (Enumeration<TreeNode> e = node.children(); e.hasMoreElements();) {
+            for (Enumeration<? extends TreeNode> e = node.children(); e.hasMoreElements();) {
                 TreePath path = parent.pathByAddingChild(e.nextElement());
                 expandTree(currentTree, path, expand);
             }
@@ -627,14 +627,19 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
      */
     private List<File> getFileListFromNode(CheckableTreeNode node) {
         List<File> filesList = new ArrayList<>();
-        Enumeration<CheckableTreeNode> children = node.depthFirstEnumeration();
+        Enumeration<TreeNode> children = node.depthFirstEnumeration();
         List<CheckableTreeNode> nodesToRemove = new ArrayList<>();
-        for (CheckableTreeNode child : Collections.list(children)) {
-            if (child.isLeaf() && child.isSelected()) {
-                File nodeFile = ((FileNodeWrapper) child.getUserObject()).file;
+        for (TreeNode child : Collections.list(children)) {
+            if (!(child instanceof CheckableTreeNode)) {
+                continue;
+            }
+            CheckableTreeNode checkableChild = (CheckableTreeNode) child;
+
+            if (child.isLeaf() && checkableChild.isSelected()) {
+                File nodeFile = ((FileNodeWrapper) checkableChild.getUserObject()).file;
                 if ((nodeFile != null) && nodeFile.isFile()) {
                     filesList.add(nodeFile);
-                    nodesToRemove.add(child);
+                    nodesToRemove.add(checkableChild);
                 }
             }
         }
@@ -1064,9 +1069,10 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
         public void setSelected(boolean bSelected) {
             isSelected = bSelected;
-            Enumeration<CheckableTreeNode> tmpChildren = this.children();
-            for (CheckableTreeNode child : Collections.list(tmpChildren)) {
-                child.setSelected(bSelected);
+            // TODO: Java 9: Generics are stronger?
+            Enumeration<TreeNode> tmpChildren = this.children();
+            for (TreeNode child : Collections.list(tmpChildren)) {
+                ((CheckableTreeNode) child).setSelected(bSelected);
             }
 
         }

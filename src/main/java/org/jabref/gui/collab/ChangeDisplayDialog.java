@@ -18,6 +18,7 @@ import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefDialog;
@@ -86,12 +87,14 @@ class ChangeDisplayDialog extends JabRefDialog implements TreeSelectionListener 
             // Perform all accepted changes:
             // Store all edits in an Undoable object:
             NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
-            Enumeration<ChangeViewModel> enumer = root.children();
+            // TODO: Java 9: Generics are stricter?
+            Enumeration<TreeNode> enumer = root.children();
             boolean anyDisabled = false;
-            for (ChangeViewModel c : Collections.list(enumer)) {
+            for (TreeNode c : Collections.list(enumer)) {
+                ChangeViewModel model = (ChangeViewModel) c;
                 boolean allAccepted = false;
-                if (c.isAcceptable() && c.isAccepted()) {
-                    allAccepted = c.makeChange(panel, localSecondary, ce);
+                if (model.isAcceptable() && model.isAccepted()) {
+                    allAccepted = model.makeChange(panel, localSecondary, ce);
                 }
 
                 if (!allAccepted) {

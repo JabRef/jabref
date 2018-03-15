@@ -22,9 +22,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 
-import com.sun.javafx.application.PlatformImpl;
+//import com.sun.javafx.application.PlatformImpl;
 
 public class LocalizationParser {
 
@@ -207,14 +208,16 @@ public class LocalizationParser {
             }
         };
 
-        PlatformImpl.startup(() -> {
+        // TODO: removed access to internal API: Why was it used?
+        Platform.startup(() -> {
         });
         try {
             FXMLLoader loader = new FXMLLoader(path.toUri().toURL(), registerUsageResourceBundle);
             // We don't want to initialize controller
             loader.setControllerFactory(controllerType -> null);
             // Don't check if root is null (needed for custom controls, where the root value is normally set in the FXMLLoader)
-            loader.impl_setStaticLoad(true);
+            // TODO: removed access to internal API.
+//            loader.impl_setStaticLoad(true);
             loader.load();
         } catch (IOException ignore) {
             ignore.printStackTrace();

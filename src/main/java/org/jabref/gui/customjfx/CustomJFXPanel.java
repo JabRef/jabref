@@ -10,7 +10,7 @@ import org.jabref.gui.customjfx.support.InputMethodSupport;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.util.OS;
 
-import com.sun.javafx.embed.EmbeddedSceneInterface;
+//import com.sun.javafx.embed.EmbeddedSceneInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,18 +61,19 @@ public class CustomJFXPanel extends JFXPanel {
             insertionIndex = e.getCaret().getInsertionIndex();
         }
 
-        EmbeddedSceneInterface myScencePeer = null;
-        try {
-            //the variable must be named different to the original, otherwise reflection does not find the right ones
-            myScencePeer = (EmbeddedSceneInterface) scenePeerField.get(this);
-        } catch (IllegalArgumentException | IllegalAccessException ex) {
-            LOGGER.error("Could not access scenePeer Field", ex);
-        }
+        // TODO: temporarily removed as this is internal API
+//        EmbeddedSceneInterface myScencePeer = null;
+//        try {
+//            //the variable must be named different to the original, otherwise reflection does not find the right ones
+//            myScencePeer = (EmbeddedSceneInterface) scenePeerField.get(this);
+//        } catch (IllegalArgumentException | IllegalAccessException ex) {
+            LOGGER.error("Could not access scenePeer Field"/*, ex*/);
+//        }
 
-        myScencePeer.inputMethodEvent(
-                javafx.scene.input.InputMethodEvent.INPUT_METHOD_TEXT_CHANGED,
-                InputMethodSupport.inputMethodEventComposed(t, e.getCommittedCharacterCount()),
-                t.substring(0, e.getCommittedCharacterCount()),
-                insertionIndex);
+//        myScencePeer.inputMethodEvent(
+//                javafx.scene.input.InputMethodEvent.INPUT_METHOD_TEXT_CHANGED,
+//                InputMethodSupport.inputMethodEventComposed(t, e.getCommittedCharacterCount()),
+//                t.substring(0, e.getCommittedCharacterCount()),
+//                insertionIndex);
     }
 }
