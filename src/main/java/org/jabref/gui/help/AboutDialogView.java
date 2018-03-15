@@ -16,7 +16,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory;
+// TODO: temporarily removed SVG library
+//import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory;
 
 public class AboutDialogView extends BaseDialog<Void> {
 
@@ -44,7 +45,7 @@ public class AboutDialogView extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new AboutDialogViewModel(dialogService, clipBoardManager, buildInfo);
 
-        SvgImageLoaderFactory.install();
+        //SvgImageLoaderFactory.install();
         Image icon = new Image(this.getClass().getResourceAsStream("/icons/jabref.svg"));
         iconImage.setImage(icon);
         textAreaVersions.setText(viewModel.getVersionInfo());

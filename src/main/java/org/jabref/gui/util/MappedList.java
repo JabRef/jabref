@@ -79,6 +79,11 @@ public final class MappedList<A, B> extends TransformationList<A, B> {
     }
 
     @Override
+    public int getViewIndex(int index) {
+        throw new UnsupportedOperationException(); // TODO: method was added in Java 9. Provide implementation?
+    }
+
+    @Override
     public A get(int index) {
         return backingList.get(index);
     }

@@ -89,26 +89,36 @@ public class PostgreSQLProcessor extends DBMSProcessor {
     @Override
     public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
         // Disable cleanup output of ThreadedHousekeeper
-        Logger.getLogger(ThreadedHousekeeper.class.getName()).setLevel(Level.SEVERE);
 
-        this.listener = new PostgresSQLNotificationListener(dbmsSynchronizer);
-
-        PGDataSource dataSource = new PGDataSource();
+        // TODO: this one is strange
+        /*
+        /home/florian/jabref/src/main/java/org/jabref/logic/shared/PostgreSQLProcessor.java:98: error: cannot access Referenceable
         dataSource.setHost(connectionProperties.getHost());
-        dataSource.setPort(connectionProperties.getPort());
-        dataSource.setDatabase(connectionProperties.getDatabase());
-        dataSource.setUser(connectionProperties.getUser());
-        dataSource.setPassword(connectionProperties.getPassword());
+                  ^
+        class file for javax.naming.Referenceable not found
+        */
 
-        try {
-            pgConnection = (PGConnection) dataSource.getConnection();
-            pgConnection.createStatement().execute("LISTEN jabrefLiveUpdate");
-            // Do not use `new PostgresSQLNotificationListener(...)` as the object has to exist continuously!
-            // Otherwise the listener is going to be deleted by GC.
-            pgConnection.addNotificationListener(listener);
-        } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
-        }
+//        LOGGER.error("Notification listener disabled for now.");
+//        Logger.getLogger(ThreadedHousekeeper.class.getName()).setLevel(Level.SEVERE);
+//
+//        this.listener = new PostgresSQLNotificationListener(dbmsSynchronizer);
+//
+//        PGDataSource dataSource = new PGDataSource();
+//        dataSource.setHost(connectionProperties.getHost());
+//        dataSource.setPort(connectionProperties.getPort());
+//        dataSource.setDatabase(connectionProperties.getDatabase());
+//        dataSource.setUser(connectionProperties.getUser());
+//        dataSource.setPassword(connectionProperties.getPassword());
+//
+//        try {
+//            pgConnection = (PGConnection) dataSource.getConnection();
+//            pgConnection.createStatement().execute("LISTEN jabrefLiveUpdate");
+//            // Do not use `new PostgresSQLNotificationListener(...)` as the object has to exist continuously!
+//            // Otherwise the listener is going to be deleted by GC.
+//            pgConnection.addNotificationListener(listener);
+//        } catch (SQLException e) {
+//            LOGGER.error("SQL Error: ", e);
+//        }
     }
 
     @Override

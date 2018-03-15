@@ -15,6 +15,7 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.TreeNode;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
@@ -74,10 +75,12 @@ class EntryChangeViewModel extends ChangeViewModel {
     public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
         boolean allAccepted = true;
 
-        Enumeration<ChangeViewModel> e = children();
-        for (ChangeViewModel c : Collections.list(e)) {
-            if (c.isAcceptable() && c.isAccepted()) {
-                c.makeChange(panel, secondary, undoEdit);
+        // TODO: Java 9: Generics are stronger?
+        Enumeration<javax.swing.tree.TreeNode> e = children();
+        for (javax.swing.tree.TreeNode c : Collections.list(e)) {
+            ChangeViewModel model = (ChangeViewModel) c;
+            if (model.isAcceptable() && model.isAccepted()) {
+                model.makeChange(panel, secondary, undoEdit);
             } else {
                 allAccepted = false;
             }

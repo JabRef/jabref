@@ -8,10 +8,9 @@ import java.util.function.Supplier;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.skin.TextAreaSkin;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-
-import com.sun.javafx.scene.control.skin.TextAreaSkin;
 
 public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable {
 
@@ -31,19 +30,20 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
         // Should behave as a normal text field with respect to TAB behaviour
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.TAB) {
-                TextAreaSkin skin = (TextAreaSkin) getSkin();
-                if (event.isShiftDown()) {
-                    // Shift + Tab > previous text area
-                    skin.getBehavior().traversePrevious();
-                } else {
-                    if (event.isControlDown()) {
-                        // Ctrl + Tab > insert tab
-                        skin.getBehavior().callAction("InsertTab");
-                    } else {
-                        // Tab > next text area
-                        skin.getBehavior().traverseNext();
-                    }
-                }
+                // TODO: temporarily removed, as this is internal API
+//                TextAreaSkin skin = (TextAreaSkin) getSkin();
+//                if (event.isShiftDown()) {
+//                    // Shift + Tab > previous text area
+//                    skin.getBehavior().traversePrevious();
+//                } else {
+//                    if (event.isControlDown()) {
+//                        // Ctrl + Tab > insert tab
+//                        skin.getBehavior().callAction("InsertTab");
+//                    } else {
+//                        // Tab > next text area
+//                        skin.getBehavior().traverseNext();
+//                    }
+//                }
                 event.consume();
             }
         });
@@ -56,11 +56,12 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
      */
     public void addToContextMenu(Supplier<List<MenuItem>> items) {
         TextAreaSkin customContextSkin = new TextAreaSkin(this) {
-            @Override
-            public void populateContextMenu(ContextMenu contextMenu) {
-                super.populateContextMenu(contextMenu);
-                contextMenu.getItems().addAll(0, items.get());
-            }
+            // TODO: temporarily removed, internal API
+//            @Override
+//            public void populateContextMenu(ContextMenu contextMenu) {
+//                super.populateContextMenu(contextMenu);
+//                contextMenu.getItems().addAll(0, items.get());
+//            }
         };
         setSkin(customContextSkin);
     }
