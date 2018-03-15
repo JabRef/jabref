@@ -58,7 +58,7 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
     @Test
     @Override
     public void searchByIdSuccessfulWithLongISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0134685997");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9780134685991");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
@@ -71,7 +71,7 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setField("title", "Fundamentals of Business Process Management");
         bibEntry.setField("publisher", "Springer Berlin Heidelberg");
         bibEntry.setField("year", "2015");
-        bibEntry.setField("author", "Dumas, Marlon and Rosa, Marcello La and Mendling, Jan and Reijers, Hajo A.");
+        bibEntry.setField("author", "Marlon Dumas and Marcello La Rosa and Jan Mendling and Hajo A. Reijers");
         bibEntry.setField("date", "2015-04-12");
         bibEntry.setField("ean", "9783642434730");
         bibEntry.setField("isbn", "3642434738");
