@@ -105,7 +105,7 @@ dependencies {
     compile "org.libreoffice:unoil:5.4.2"
 
     compile 'com.github.bkromhout:java-diff-utils:2.1.1'
-    compile 'info.debatty:java-string-similarity:1.0.1'
+    compile 'info.debatty:java-string-similarity:1.1.0'
 
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
@@ -114,13 +114,13 @@ dependencies {
     compile 'org.antlr:antlr4-runtime:4.7.1'
 
     // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
-    compile 'mysql:mysql-connector-java:5.1.45'
+    compile 'mysql:mysql-connector-java:5.1.46'
 
     compile 'com.impossibl.pgjdbc-ng:pgjdbc-ng:0.7.1'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
-    compile 'com.google.guava:guava:24.0-jre'
+    compile 'com.google.guava:guava:24.1-jre'
 
     // JavaFX stuff
     compile 'com.airhacks:afterburner.fx:1.7.0'
@@ -142,10 +142,10 @@ dependencies {
 
     // >1.8.0-beta is required for java 9 compatibility
     compile 'org.slf4j:slf4j-api:1.8.0-beta1'
-    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.10.0'
-    compile 'org.apache.logging.log4j:log4j-jcl:2.10.0'
-    compile 'org.apache.logging.log4j:log4j-api:2.10.0'
-    compile 'org.apache.logging.log4j:log4j-core:2.10.0'
+    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.0'
+    compile 'org.apache.logging.log4j:log4j-jcl:2.11.0'
+    compile 'org.apache.logging.log4j:log4j-api:2.11.0'
+    compile 'org.apache.logging.log4j:log4j-core:2.11.0'
 
     // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
@@ -162,9 +162,9 @@ dependencies {
     testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
     testRuntime 'org.junit.vintage:junit-vintage-engine:5.1.0'
     testCompile 'org.junit.platform:junit-platform-launcher:1.1.0'
-    testRuntime 'org.apache.logging.log4j:log4j-core:2.10.0'
-    testRuntime 'org.apache.logging.log4j:log4j-jul:2.10.0'
-    testCompile 'org.mockito:mockito-core:2.15.0'
+    testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
+    testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
+    testCompile 'org.mockito:mockito-core:2.16.0'
     testCompile 'com.github.tomakehurst:wiremock:2.15.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
