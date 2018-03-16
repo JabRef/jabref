@@ -87,7 +87,8 @@ public enum KeyBinding {
     UNABBREVIATE("Unabbreviate", Localization.lang("Unabbreviate"), "ctrl+alt+shift+A", KeyBindingCategory.TOOLS),
     UNDO("Undo", Localization.lang("Undo"), "ctrl+Z", KeyBindingCategory.EDIT),
     WEB_SEARCH("Web search", Localization.lang("Web search"), "alt+4", KeyBindingCategory.SEARCH),
-    WRITE_XMP("Write XMP", Localization.lang("Write XMP"), "F6", KeyBindingCategory.TOOLS);
+    WRITE_XMP("Write XMP", Localization.lang("Write XMP"), "F6", KeyBindingCategory.TOOLS),
+    CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "ESCAPE", KeyBindingCategory.SEARCH);
 
     private final String constant;
     private final String localization;

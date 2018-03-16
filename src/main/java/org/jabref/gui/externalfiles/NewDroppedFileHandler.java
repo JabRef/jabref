@@ -78,8 +78,13 @@ public class NewDroppedFileHandler {
                         bibDatabaseContext.getDatabase().insertEntries(xmpEntriesInFile);
                         for (BibEntry entry : xmpEntriesInFile) {
 
+
                         }
+
                     }
+                    //PdfContentImporter
+                    //List<BibEntry> result = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
+
                 } catch (IOException e) {
                     LOGGER.warn("Problem reading XMP", e);
                 }
