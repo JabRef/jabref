@@ -27,7 +27,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldListCell;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
@@ -135,7 +134,7 @@ public class GlobalSearchBar extends HBox {
         */
 
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
-        addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+        searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 if (keyBinding.get().equals(KeyBinding.GLOBAL_SEARCH)) {
@@ -143,10 +142,12 @@ public class GlobalSearchBar extends HBox {
                     searchPreferences.setGlobalSearch(globalSearch.isSelected());
                     updateOpenCurrentResultsTooltip(globalSearch.isSelected());
                     focus();
+                    event.consume();
                 } else if (keyBinding.get().equals(KeyBinding.CLEAR_SEARCH)) {
                     // Clear search and select first entry, if available
                     clearSearch();
                     frame.getCurrentBasePanel().getMainTable().getSelectionModel().selectFirst();
+                    event.consume();
                 }
             }
         });
@@ -211,7 +212,7 @@ public class GlobalSearchBar extends HBox {
                 searchField,
                 currentResults
         );
-      
+
         this.setAlignment(Pos.CENTER_LEFT);
     }
 
@@ -509,14 +510,17 @@ public class GlobalSearchBar extends HBox {
             }
         }
 
+        @Override
         public Node getNode() {
             return this.container;
         }
 
+        @Override
         public AutoCompletePopup<T> getSkinnable() {
             return this.control;
         }
 
+        @Override
         public void dispose() {
         }
     }
