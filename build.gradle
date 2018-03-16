@@ -139,10 +139,10 @@ dependencies {
 
     // >1.8.0-beta is required for java 9 compatibility
     compile 'org.slf4j:slf4j-api:1.8.0-beta1'
-    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.10.0'
-    compile 'org.apache.logging.log4j:log4j-jcl:2.10.0'
-    compile 'org.apache.logging.log4j:log4j-api:2.10.0'
-    compile 'org.apache.logging.log4j:log4j-core:2.10.0'
+    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.0'
+    compile 'org.apache.logging.log4j:log4j-jcl:2.11.0'
+    compile 'org.apache.logging.log4j:log4j-api:2.11.0'
+    compile 'org.apache.logging.log4j:log4j-core:2.11.0'
 
     // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
@@ -159,8 +159,8 @@ dependencies {
     testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
     testRuntime 'org.junit.vintage:junit-vintage-engine:5.1.0'
     testCompile 'org.junit.platform:junit-platform-launcher:1.1.0'
-    testRuntime 'org.apache.logging.log4j:log4j-core:2.10.0'
-    testRuntime 'org.apache.logging.log4j:log4j-jul:2.10.0'
+    testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
+    testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
     testCompile 'org.mockito:mockito-core:2.16.0'
     testCompile 'com.github.tomakehurst:wiremock:2.15.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
