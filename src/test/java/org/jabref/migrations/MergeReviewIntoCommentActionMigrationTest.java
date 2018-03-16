@@ -1,10 +1,9 @@
-package org.jabref.logic.importer.migrations;
+package org.jabref.migrations;
 
 import java.util.Collections;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.migrations.MergeReviewIntoCommentMigration;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
