@@ -12,17 +12,16 @@ import javafx.scene.control.DialogPane;
 import org.jabref.gui.AbstractReturnDialogView;
 import org.jabref.gui.FXDialog;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.LinkedFile;
 
 public class LinkedFileEditDialogView extends AbstractReturnDialogView<Boolean> {
 
-    public LinkedFileEditDialogView(LinkedFile linkedFile) {
+    public LinkedFileEditDialogView(LinkedFilesWrapper linkedFile) {
         super(createContext(linkedFile));
     }
 
-    private static Function<String, Object> createContext(LinkedFile linkedFile) {
+    private static Function<String, Object> createContext(LinkedFilesWrapper linkedFilesWrapper) {
         Map<String, Object> context = new HashMap<>();
-        context.put("linkedFile", linkedFile);
+        context.put("linkedFilesWrapper", linkedFilesWrapper);
         return context::get;
     }
 
@@ -36,6 +35,6 @@ public class LinkedFileEditDialogView extends AbstractReturnDialogView<Boolean> 
         dialog.getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
         dialog.setResizable(true);
         Optional<ButtonType> buttonPressed = dialog.showAndWait();
-        return buttonPressed.equals(Optional.of(ButtonType.YES));
+        return buttonPressed.equals(Optional.of(ButtonType.APPLY));
     }
 }

@@ -11,14 +11,9 @@ import org.jabref.gui.AbstractController;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.model.entry.LinkedFile;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+public class LinkedFileEditDialogController extends AbstractController<LinkedFilesEditDialogViewModel> {
 
-public class LinkedFileEditDialogController extends AbstractController<FileListDialogViewModel> {
-
-    private static final Log LOGGER = LogFactory.getLog(LinkedFileEditDialogController.class);
 
     @FXML private TextField link;
     @FXML private TextField description;
@@ -26,11 +21,11 @@ public class LinkedFileEditDialogController extends AbstractController<FileListD
 
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
-    @Inject private LinkedFile linkedFile;
+    @Inject private LinkedFilesWrapper linkedFilesWrapper;
 
     @FXML
     private void initialize() {
-        viewModel = new FileListDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), dialogService);
+        viewModel = new LinkedFilesEditDialogViewModel(linkedFilesWrapper.getLinkedFile(), stateManager.getActiveDatabase().get(), dialogService);
         fileType.itemsProperty().bindBidirectional(viewModel.externalFileTypeProperty());
         description.textProperty().bindBidirectional(viewModel.descriptionProperty());
         link.textProperty().bindBidirectional(viewModel.linkProperty());

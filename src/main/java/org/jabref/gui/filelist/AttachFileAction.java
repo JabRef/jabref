@@ -22,10 +22,18 @@ public class AttachFileAction implements BaseAction {
             return;
         }
         BibEntry entry = panel.getSelectedEntries().get(0);
-        LinkedFile linkedFile = new LinkedFile("", "", "");
-        LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(linkedFile);
+        LinkedFile linkedFile = new LinkedFile("test", "st", "pdf");
+        LinkedFilesWrapper wrapper = new LinkedFilesWrapper();
+        wrapper.setLinkedFile(linkedFile);
+        LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(wrapper);
 
-        DefaultTaskExecutor.runInJavaFXThread((Runnable) dialog::showAndWait);
+        boolean applyPressed = DefaultTaskExecutor.runInJavaFXThread(() -> dialog.showAndWait());
+        if (applyPressed) {
+            LinkedFilesEditDialogViewModel model = (LinkedFilesEditDialogViewModel) dialog.getController().get().getViewModel();
+            linkedFile = model.getNewLinkedFile();
+            entry.addFile(linkedFile);
+
+        }
         //
 
         /*   FileListEntryEditor editor = new FileListEntryEditor(flEntry, false, true,

@@ -27,7 +27,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
-public class FileListDialogViewModel extends AbstractViewModel {
+public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
     private final StringProperty linkProperty = new SimpleStringProperty("");
@@ -37,13 +37,11 @@ public class FileListDialogViewModel extends AbstractViewModel {
     private final BibDatabaseContext database;
     private final DialogService dialogService;
 
-    private final LinkedFile linkedFile;
-
-    public FileListDialogViewModel(LinkedFile linkedFile, BibDatabaseContext database, DialogService dialogService) {
-        this.linkedFile = linkedFile;
+    public LinkedFilesEditDialogViewModel(LinkedFile linkedFile, BibDatabaseContext database, DialogService dialogService) {
         this.database = database;
         this.dialogService = dialogService;
         externalfilesTypes.set(FXCollections.observableArrayList(ExternalFileTypes.getInstance().getExternalFileTypeSelection()));
+        setValues(linkedFile);
     }
 
     private void checkExtension() {
@@ -64,28 +62,27 @@ public class FileListDialogViewModel extends AbstractViewModel {
     public void openBrowseDialog() {
         String fileText = linkProperty().get();
 
-        Optional<Path> file = FileHelper.expandFilename(database, fileText,
-                Globals.prefs.getFileDirectoryPreferences());
+        Optional<Path> file = FileHelper.expandFilename(database, fileText, Globals.prefs.getFileDirectoryPreferences());
 
         Path workingDir = file.orElse(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)));
         String fileName = Paths.get(fileText).getFileName().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(workingDir)
-                .withInitialFileName(fileName).build();
+                                                                                               .withInitialDirectory(workingDir)
+                                                                                               .withInitialFileName(fileName)
+                                                                                               .build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
-                .ifPresent(path -> {
-            // Store the directory for next time:
-                    Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, path.toString());
+                     .ifPresent(path -> {
+                         // Store the directory for next time:
+                         Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, path.toString());
 
-            // If the file is below the file directory, make the path relative:
-                    List<Path> fileDirectories = database
-                    .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
-                    path = FileUtil.shortenFileName(path, fileDirectories);
+                         // If the file is below the file directory, make the path relative:
+                         List<Path> fileDirectories = database.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+                         path = FileUtil.shortenFileName(path, fileDirectories);
 
-                    linkProperty().set(path.toString());
-            checkExtension();
-        });
+                         linkProperty().set(path.toString());
+                         checkExtension();
+                     });
     }
 
     //
@@ -119,4 +116,10 @@ public class FileListDialogViewModel extends AbstractViewModel {
     public ObjectProperty<ExternalFileType> getSelectedExternalFileType() {
         return selectedExternalFileType;
     }
+
+    public LinkedFile getNewLinkedFile() {
+        return new LinkedFile(descriptionProperty.getValue(), linkProperty.getValue(), selectedExternalFileType.getValue().toString());
+
+    }
+
 }
