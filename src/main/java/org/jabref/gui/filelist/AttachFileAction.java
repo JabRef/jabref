@@ -32,7 +32,6 @@ public class AttachFileAction implements BaseAction {
             LinkedFilesEditDialogViewModel model = (LinkedFilesEditDialogViewModel) dialog.getController().get().getViewModel();
             linkedFile = model.getNewLinkedFile();
             entry.addFile(linkedFile);
-
         }
         //
 
