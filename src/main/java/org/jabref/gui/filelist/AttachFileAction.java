@@ -22,7 +22,7 @@ public class AttachFileAction implements BaseAction {
             return;
         }
         BibEntry entry = panel.getSelectedEntries().get(0);
-        LinkedFile linkedFile = new LinkedFile("test", "st", "pdf");
+        LinkedFile linkedFile = new LinkedFile("", "", "");
         LinkedFilesWrapper wrapper = new LinkedFilesWrapper();
         wrapper.setLinkedFile(linkedFile);
         LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(wrapper);

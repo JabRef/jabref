@@ -68,8 +68,10 @@ import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntry;
-import org.jabref.gui.filelist.FileListEntryEditor;
 import org.jabref.gui.filelist.FileListTableModel;
+import org.jabref.gui.filelist.LinkedFileEditDialogView;
+import org.jabref.gui.filelist.LinkedFilesEditDialogViewModel;
+import org.jabref.gui.filelist.LinkedFilesWrapper;
 import org.jabref.gui.groups.GroupTreeNodeViewModel;
 import org.jabref.gui.groups.UndoableChangeEntriesOfGroup;
 import org.jabref.gui.help.HelpAction;
@@ -1315,18 +1317,19 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 return;
             }
             entry = selectionModel.getSelected().get(0);
-            LinkedFile flEntry = new LinkedFile("", "", "");
-            FileListEntryEditor editor = new FileListEntryEditor(flEntry, false, true, bibDatabaseContext, true);
-            editor.setVisible(true, true);
-            if (editor.okPressed()) {
-                entries.getReadWriteLock().writeLock().lock();
-                try {
-                    entry.addFile(flEntry);
-                } finally {
-                    entries.getReadWriteLock().writeLock().unlock();
-                }
-                glTable.repaint();
+            LinkedFile linkedFile = new LinkedFile("", "", "");
+
+            LinkedFilesWrapper wrapper = new LinkedFilesWrapper();
+            wrapper.setLinkedFile(linkedFile);
+            LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(wrapper);
+
+            boolean applyPressed = DefaultTaskExecutor.runInJavaFXThread(() -> dialog.showAndWait());
+            if (applyPressed) {
+                LinkedFilesEditDialogViewModel model = (LinkedFilesEditDialogViewModel) dialog.getController().get().getViewModel();
+                linkedFile = model.getNewLinkedFile();
+                entry.addFile(linkedFile);
             }
+
         }
 
         @Override
