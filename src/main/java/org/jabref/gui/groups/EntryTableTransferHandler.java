@@ -172,12 +172,15 @@ public class EntryTableTransferHandler extends TransferHandler {
     @Override
     public void exportAsDrag(JComponent comp, InputEvent e, int action) {
         if (e instanceof MouseEvent) {
+            // TODO: Reimplement drag & drop
+            /*
             int columnIndex = entryTable.columnAtPoint(((MouseEvent) e).getPoint());
             int modelIndex = entryTable.getColumnModel().getColumn(columnIndex).getModelIndex();
             if (entryTable.isFileColumn(modelIndex)) {
                 LOGGER.info("Dragging file");
                 draggingFile = true;
             }
+            */
         }
         super.exportAsDrag(comp, e, DnDConstants.ACTION_LINK);
     }
@@ -321,7 +324,7 @@ public class EntryTableTransferHandler extends TransferHandler {
      */
     private void loadOrImportFiles(List<String> fileNames, int dropRow) {
 
-        OpenDatabaseAction openAction = new OpenDatabaseAction(frame, false);
+        OpenDatabaseAction openAction = new OpenDatabaseAction(frame);
         List<String> notBibFiles = new ArrayList<>();
         List<String> bibFiles = new ArrayList<>();
         for (String fileName : fileNames) {

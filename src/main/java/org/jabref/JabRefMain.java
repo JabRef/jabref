@@ -4,7 +4,6 @@ import java.net.Authenticator;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -13,7 +12,6 @@ import javafx.stage.Stage;
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.exporter.ExporterFactory;
-import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
@@ -45,12 +43,6 @@ public class JabRefMain extends Application {
     public static void main(String[] args) {
         arguments = args;
         launch(arguments);
-    }
-
-    @Override
-    public void start(Stage mainStage) throws Exception {
-        Platform.setImplicitExit(false);
-        SwingUtilities.invokeLater(() -> start(arguments));
     }
 
     /**
@@ -89,7 +81,7 @@ public class JabRefMain extends Application {
                 versionError.append(Localization.lang("Note that currently, JabRef does not run with Java 9."));
             }
             final JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame, versionError, Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, versionError, Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
             frame.dispose();
 
             // We exit on Java 9 error since this will definitely not work
@@ -99,7 +91,8 @@ public class JabRefMain extends Application {
         }
     }
 
-    private static void start(String[] args) {
+    @Override
+    public void start(Stage mainStage) throws Exception {
         FallbackExceptionHandler.installExceptionHandler();
 
         JabRefPreferences preferences = JabRefPreferences.getInstance();
@@ -151,7 +144,6 @@ public class JabRefMain extends Application {
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());
-        ProtectTermsFormatter.setProtectedTermsLoader(Globals.protectedTermsLoader);
 
         // Check for running JabRef
         RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();
@@ -160,7 +152,7 @@ public class JabRefMain extends Application {
 
             if (!Globals.REMOTE_LISTENER.isOpen()) {
                 // we are not alone, there is already a server out there, try to contact already running JabRef:
-                if (RemoteListenerClient.sendToActiveJabRefInstance(args, remotePreferences.getPort())) {
+                if (RemoteListenerClient.sendToActiveJabRefInstance(arguments, remotePreferences.getPort())) {
                     // We have successfully sent our command line options through the socket to another JabRef instance.
                     // So we assume it's all taken care of, and quit.
                     LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
@@ -179,7 +171,7 @@ public class JabRefMain extends Application {
         OS.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
 
         // Process arguments
-        ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);
+        ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START);
 
         // See if we should shut down now
         if (argumentProcessor.shouldShutDown()) {
@@ -189,8 +181,7 @@ public class JabRefMain extends Application {
         }
 
         // If not, start GUI
-        SwingUtilities
-                .invokeLater(() -> new JabRefGUI(argumentProcessor.getParserResults(),
-                        argumentProcessor.isBlank()));
+        new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank());
     }
+
 }

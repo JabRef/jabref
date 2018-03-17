@@ -20,7 +20,7 @@ import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.ExternalFileTypeEditor;
 import org.jabref.gui.push.PushToApplication;
-import org.jabref.gui.push.PushToApplicationButton;
+import org.jabref.gui.push.PushToApplicationSettingsDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
@@ -29,9 +29,8 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 class ExternalTab extends JPanel implements PrefsTab {
-    private final JabRefPreferences prefs;
 
-    private final JabRefFrame frame;
+    private final JabRefPreferences prefs;
 
     private final JTextField emailSubject;
     private final JTextField citeCommand;
@@ -51,13 +50,12 @@ class ExternalTab extends JPanel implements PrefsTab {
 
     public ExternalTab(JabRefFrame frame, PreferencesDialog prefsDiag, JabRefPreferences prefs) {
         this.prefs = prefs;
-        this.frame = frame;
+
         setLayout(new BorderLayout());
 
         JButton editFileTypes = new JButton(Localization.lang("Manage external file types"));
         citeCommand = new JTextField(25);
         editFileTypes.addActionListener(ExternalFileTypeEditor.getAction(prefsDiag));
-
 
         defaultConsole = new JRadioButton(Localization.lang("Use default terminal emulator"));
         executeConsole = new JRadioButton(Localization.lang("Execute command") + ":");
@@ -72,15 +70,13 @@ class ExternalTab extends JPanel implements PrefsTab {
         sumatraReaderPath = new JTextField();
         browseSumatraReader = new JButton(Localization.lang("Browse"));
 
-
-        JLabel commandDescription = new JLabel(Localization.lang(
-                "Note: Use the placeholder %0 for the location of the opened library file.", "%DIR"));
+        JLabel commandDescription = new JLabel(Localization.lang("Note: Use the placeholder %0 for the location of the opened library file.", "%DIR"));
 
         ButtonGroup consoleOptions = new ButtonGroup();
         consoleOptions.add(defaultConsole);
         consoleOptions.add(executeConsole);
 
-        ButtonGroup  readerOptions = new ButtonGroup();
+        ButtonGroup readerOptions = new ButtonGroup();
         readerOptions.add(adobeAcrobatReader);
 
         JPanel pdfOptionPanel = new JPanel(new GridBagLayout());
@@ -124,7 +120,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         pdfOptionPanel.add(adobeAcrobatReader, pdfLayoutConstrains);
 
         pdfLayoutConstrains.gridx = 1;
-        pdfOptionPanel.add(adobeAcrobatReaderPath,pdfLayoutConstrains);
+        pdfOptionPanel.add(adobeAcrobatReaderPath, pdfLayoutConstrains);
 
         pdfLayoutConstrains.gridx = 2;
         pdfOptionPanel.add(browseAdobeAcrobatReader, pdfLayoutConstrains);
@@ -134,7 +130,7 @@ class ExternalTab extends JPanel implements PrefsTab {
             browseSumatraReader.addActionListener(e -> showSumatraChooser());
             pdfLayoutConstrains.gridy = 1;
             pdfLayoutConstrains.gridx = 0;
-            pdfOptionPanel.add(sumatraReader,pdfLayoutConstrains);
+            pdfOptionPanel.add(sumatraReader, pdfLayoutConstrains);
 
             pdfLayoutConstrains.gridx = 1;
             pdfOptionPanel.add(sumatraReaderPath, pdfLayoutConstrains);
@@ -201,9 +197,8 @@ class ExternalTab extends JPanel implements PrefsTab {
     }
 
     private void addSettingsButton(final PushToApplication pt, JPanel p) {
-        JButton button = new JButton(Localization.lang("Settings for %0", pt.getApplicationName()),
-                pt.getIcon());
-        button.addActionListener(e -> PushToApplicationButton.showSettingsDialog(frame, pt, pt.getSettingsPanel()));
+        JButton button = new JButton(Localization.lang("Settings for %0", pt.getApplicationName()), pt.getIcon().getIcon());
+        button.addActionListener(e -> PushToApplicationSettingsDialog.showSettingsDialog(null, pt, pt.getSettingsPanel()));
         p.add(button);
     }
 
@@ -290,8 +285,7 @@ class ExternalTab extends JPanel implements PrefsTab {
     private void readerSelected() {
         if (adobeAcrobatReader.isSelected()) {
             prefs.put(JabRefPreferences.USE_PDF_READER, adobeAcrobatReaderPath.getText());
-        }
-        else if (sumatraReader.isSelected()) {
+        } else if (sumatraReader.isSelected()) {
             prefs.put(JabRefPreferences.USE_PDF_READER, sumatraReaderPath.getText());
         }
     }

@@ -15,24 +15,26 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
+import org.jabref.gui.util.ColorUtil;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
+import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,19 +51,9 @@ public class IconTheme {
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(
             IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
 
-    // Christmas edition
-    //public static final Color DEFAULT_COLOR = new Color(0x155115);
-    //public static final Color DEFAULT_DISABLED_COLOR = new Color(0x990000);
-    private static Font FONT_16;
-    private static javafx.scene.text.Font FX_FONT;
-
     static {
         try (InputStream stream = getMaterialDesignIconsStream()) {
             FONT = Font.createFont(Font.TRUETYPE_FONT, stream);
-            FONT_16 = FONT.deriveFont(Font.PLAIN, 16f);
-            try (InputStream stream2 = getMaterialDesignIconsStream()) {
-                FX_FONT = javafx.scene.text.Font.loadFont(stream2, JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_LARGE));
-            }
         } catch (FontFormatException | IOException e) {
             LOGGER.warn("Error loading font", e);
         }
@@ -72,7 +64,7 @@ public class IconTheme {
     }
 
     public static javafx.scene.paint.Color getDefaultColor() {
-        return javafx.scene.paint.Color.rgb(DEFAULT_COLOR.getRed(), DEFAULT_COLOR.getGreen(), DEFAULT_COLOR.getBlue(), DEFAULT_COLOR.getAlpha() / 255.0);
+        return ColorUtil.toFX(DEFAULT_COLOR);
     }
 
     /**
@@ -90,14 +82,14 @@ public class IconTheme {
         return getImageFX("jabrefIcon48");
     }
 
-    /**
+    /*
      * Constructs an {@link Image} for the image representing the given function, in the resource
      * file listing images.
      *
      * @param name The name of the icon, such as "open", "save", "saveAs" etc.
      * @return The {@link Image} for the function.
      */
-    public static Image getImageFX(String name) {
+    private static Image getImageFX(String name) {
         return new Image(getIconUrl(name).toString());
     }
 
@@ -167,7 +159,20 @@ public class IconTheme {
         return jabrefLogos;
     }
 
-    public enum JabRefIcon {
+    public static List<Image> getLogoSetFX() {
+        List<Image> jabrefLogos = new ArrayList<>();
+        jabrefLogos.add(new Image(getIconUrl("jabrefIcon16").toString()));
+        jabrefLogos.add(new Image(getIconUrl("jabrefIcon20").toString()));
+        jabrefLogos.add(new Image(getIconUrl("jabrefIcon32").toString()));
+        jabrefLogos.add(new Image(getIconUrl("jabrefIcon40").toString()));
+        jabrefLogos.add(new Image(getIconUrl("jabrefIcon48").toString()));
+        jabrefLogos.add(new Image(getIconUrl("jabrefIcon64").toString()));
+        jabrefLogos.add(new Image(getIconUrl("jabrefIcon128").toString()));
+
+        return jabrefLogos;
+    }
+
+    public enum JabRefIcons implements JabRefIcon {
 
         ADD(MaterialDesignIcon.PLUS_BOX),
         ADD_NOBOX(MaterialDesignIcon.PLUS),
@@ -192,12 +197,11 @@ public class IconTheme {
         COMMENT(MaterialDesignIcon.COMMENT),
         REDO(MaterialDesignIcon.REDO),
         UNDO(MaterialDesignIcon.UNDO),
-        MARK_ENTRIES(MaterialDesignIcon.BOOKMARK),
         MARKER(MaterialDesignIcon.MARKER),
-        UNMARK_ENTRIES(MaterialDesignIcon.BOOKMARK_OUTLINE),
         REFRESH(MaterialDesignIcon.REFRESH),
         DELETE_ENTRY(MaterialDesignIcon.DELETE),
         SEARCH(MaterialDesignIcon.MAGNIFY),
+        ADVANCED_SEARCH(Color.CYAN, MaterialDesignIcon.MAGNIFY),
         PREFERENCES(MaterialDesignIcon.SETTINGS),
         HELP(MaterialDesignIcon.HELP_CIRCLE),
         UP(MaterialDesignIcon.CHEVRON_UP),
@@ -257,6 +261,13 @@ public class IconTheme {
         FILE_POWERPOINT(MaterialDesignIcon.FILE_POWERPOINT), /*css: file-powerpoint */
         FILE_TEXT(MaterialDesignIcon.FILE_DOCUMENT), /*css: file-document */
         FILE_MULTIPLE(MaterialDesignIcon.FILE_MULTIPLE), /*css: file-multiple */
+        FILE_OPENOFFICE(IconTheme.getImage("openoffice")),
+        APPLICATION_EMACS(IconTheme.getImage("emacs")),
+        APPLICATION_LYX(IconTheme.getImage("lyx")),
+        APPLICATION_TEXSTUDIO(IconTheme.getImage("texstudio")),
+        APPLICATION_TEXMAKER(IconTheme.getImage("texmaker")),
+        APPLICATION_VIM(IconTheme.getImage("vim")),
+        APPLICATION_WINEDT(IconTheme.getImage("winedt")),
         KEY_BINDINGS(MaterialDesignIcon.KEYBOARD), /*css: keyboard */
         FIND_DUPLICATES(MaterialDesignIcon.CODE_EQUAL), /*css: code-equal */
         PULL(MaterialDesignIcon.SOURCE_PULL), /*source-pull*/
@@ -273,47 +284,97 @@ public class IconTheme {
         BLOG(MaterialDesignIcon.RSS), /* css: rss */
         GLOBAL_SEARCH(MaterialDesignIcon.EARTH), /* css: earth */
         DATE_PICKER(MaterialDesignIcon.CALENDAR), /* css: calendar */
-        DEFAULT_GROUP_ICON(MaterialDesignIcon.LABEL_OUTLINE), /* css: label-outline */
+        DEFAULT_GROUP_ICON_COLORED(MaterialDesignIcon.CHECKBOX_BLANK_CIRCLE),
+        DEFAULT_GROUP_ICON(MaterialDesignIcon.LABEL_OUTLINE),
         ALL_ENTRIES_GROUP_ICON(DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON),
-        // STILL MISSING:
-        GROUP_REGULAR(Color.RED, MaterialDesignIcon.SYNC);
+        IMPORT_EXPORT(MaterialDesignIcon.SWAP_VERTICAL),
+        CLOSE_JABREF(MaterialDesignIcon.GLASSDOOR);
 
-        private final List<MaterialDesignIcon> icons;
-        private final Color color;
-        private final String unicode;
+        private final JabRefIcon icon;
 
-        JabRefIcon(MaterialDesignIcon... icons) {
-            this(IconTheme.DEFAULT_COLOR, icons);
+        JabRefIcons(MaterialDesignIcon... icons) {
+            icon = new InternalMaterialDesignIcon(icons);
         }
 
-        JabRefIcon(Color color, MaterialDesignIcon... icons) {
-            this.icons = Arrays.asList(icons);
-            this.color = color;
-            this.unicode = Arrays.stream(icons).map(MaterialDesignIcon::unicode).collect(Collectors.joining());
+        JabRefIcons(Color color, MaterialDesignIcon... icons) {
+            icon = new InternalMaterialDesignIcon(color, icons);
         }
 
-        public FontBasedIcon getIcon() {
-            return new FontBasedIcon(this.unicode, this.color);
+        JabRefIcons(ImageIcon imageIcon) {
+            icon = new InternalFileIcon(imageIcon);
         }
 
-        public List<MaterialDesignIcon> getUnderlyingIcons() {
-            return icons;
+        @Override
+        public Icon getIcon() {
+            return icon.getIcon();
         }
 
-        public MaterialDesignIcon getUnderlyingIcon() {
-            return icons.get(0);
+        @Override
+        public Icon getSmallIcon() {
+            return icon.getSmallIcon();
         }
 
-        public FontBasedIcon getSmallIcon() {
-            return new FontBasedIcon(this.unicode, this.color, JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL));
-        }
-
+        @Override
         public Node getGraphicNode() {
-            return new MaterialDesignIconView(this.icons.get(0));
+            return icon.getGraphicNode();
         }
 
-        public String getCode() {
-            return this.unicode;
+        @Override
+        public JabRefIcon disabled() {
+            return icon.disabled();
+        }
+
+        @Override
+        public JabRefIcon withColor(javafx.scene.paint.Color color) {
+            return icon.withColor(color);
+        }
+
+        private class InternalFileIcon implements JabRefIcon {
+
+            private final ImageIcon imageIcon;
+
+            InternalFileIcon(ImageIcon imageIcon) {
+                this.imageIcon = imageIcon;
+            }
+
+            @Override
+            public Icon getIcon() {
+                return imageIcon;
+            }
+
+            @Override
+            public Icon getSmallIcon() {
+                return imageIcon;
+            }
+
+            @Override
+            public Node getGraphicNode() {
+                return new ImageView(new Image(imageIcon.getDescription()));
+            }
+
+            @Override
+            public JabRefIcon disabled() {
+                throw new NotImplementedException("Cannot create disabled version of a file-based icon");
+            }
+
+            @Override
+            public JabRefIcon withColor(javafx.scene.paint.Color color) {
+                throw new NotImplementedException("Cannot create colored version of a file-based icon");
+            }
+        }
+
+        public Button asButton() {
+            Button button = new Button();
+            button.setGraphic(getGraphicNode());
+            button.getStyleClass().add("flatButton");
+            return button;
+        }
+
+        public ToggleButton asToggleButton() {
+            ToggleButton button = new ToggleButton();
+            button.setGraphic(getGraphicNode());
+            button.getStyleClass().add("flatButton");
+            return button;
         }
     }
 

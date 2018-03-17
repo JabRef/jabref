@@ -19,7 +19,6 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -38,10 +37,10 @@ import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibtexSingleField;
-import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -58,7 +57,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private boolean tableChanged;
     private final JTable colSetup;
     private int rowCount = -1;
-    private int ncWidth = -1;
     private final List<TableRow> tableRows = new ArrayList<>(10);
     private final JabRefFrame frame;
 
@@ -92,48 +90,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private boolean oldSyncKeyWords;
     private boolean oldWriteSpecialFields;
 
-
-    /*** end: special fields ***/
-
-    static class TableRow {
-
-        private String name;
-        private int length;
-
-
-        public TableRow() {
-            name = "";
-            length = BibtexSingleField.DEFAULT_FIELD_LENGTH;
-        }
-
-        public TableRow(String name) {
-            this.name = name;
-            length = BibtexSingleField.DEFAULT_FIELD_LENGTH;
-        }
-
-        public TableRow(String name, int length) {
-            this.name = name;
-            this.length = length;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public int getLength() {
-            return length;
-        }
-
-        public void setLength(int length) {
-            this.length = length;
-        }
-    }
-
-
     /**
      * Customization of external program paths.
      *
@@ -159,13 +115,11 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             @Override
             public Object getValueAt(int row, int column) {
                 int internalRow = row;
-                if (internalRow == 0) {
-                    return column == 0 ? FieldName.NUMBER_COL : String.valueOf(ncWidth);
-                }
                 internalRow--;
-                if (internalRow >= tableRows.size()) {
+                if ((internalRow == -1) || (internalRow >= tableRows.size())) {
                     return "";
                 }
+
                 TableRow rowContent = tableRows.get(internalRow);
                 if (rowContent == null) {
                     return "";
@@ -174,14 +128,13 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 if (column == 0) {
                     return rowContent.getName();
                 } else {
-                    return rowContent.getLength() > 0 ? Integer.toString(rowContent.getLength()) : "";
+                    return rowContent.getLength() > 0 ? Double.toString(rowContent.getLength()) : "";
                 }
             }
 
             @Override
             public String getColumnName(int col) {
-                return col == 0 ? Localization.lang("Field name") :
-                    Localization.lang("Column width");
+                return col == 0 ? Localization.lang("Field name") : Localization.lang("Column width");
             }
 
             @Override
@@ -205,11 +158,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                     tableRows.add(new TableRow("", -1));
                 }
 
-                if ((row == 0) && (col == 1)) {
-                    ncWidth = Integer.parseInt(value.toString());
-                    return;
-                }
-
                 TableRow rowContent = tableRows.get(row - 1);
 
                 if (col == 0) {
@@ -217,8 +165,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                     if ("".equals(getValueAt(row, 1))) {
                         setValueAt(String.valueOf(BibtexSingleField.DEFAULT_FIELD_LENGTH), row, 1);
                     }
-                }
-                else {
+                } else {
                     if (value == null) {
                         rowContent.setLength(-1);
                     } else {
@@ -234,15 +181,13 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         cm.getColumn(0).setPreferredWidth(140);
         cm.getColumn(1).setPreferredWidth(80);
 
-        FormLayout layout = new FormLayout
-                ("1dlu, 8dlu, left:pref, 4dlu, fill:pref","");
+        FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         JPanel pan = new JPanel();
         JPanel tabPanel = new JPanel();
         tabPanel.setLayout(new BorderLayout());
-        JScrollPane sp = new JScrollPane
-                (colSetup, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane sp = new JScrollPane(colSetup, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         colSetup.setPreferredScrollableViewportSize(new Dimension(250, 200));
         sp.setMinimumSize(new Dimension(250, 300));
         tabPanel.add(sp, BorderLayout.CENTER);
@@ -397,8 +342,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 }
             }
             listOfFileColumns.setSelectedIndices(indicesToSelect);
-        }
-        else {
+        } else {
             listOfFileColumns.setSelectedIndices(new int[] {});
         }
 
@@ -440,20 +384,57 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         List<String> lengths = prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS);
         for (int i = 0; i < names.size(); i++) {
             if (i < lengths.size()) {
-                tableRows.add(new TableRow(names.get(i), Integer.parseInt(lengths.get(i))));
+                tableRows.add(new TableRow(names.get(i), Double.parseDouble(lengths.get(i))));
             } else {
                 tableRows.add(new TableRow(names.get(i)));
             }
         }
         rowCount = tableRows.size() + 5;
-        ncWidth = prefs.getInt(JabRefPreferences.NUMBER_COL_WIDTH);
+    }
 
+    /*** end: special fields ***/
+
+    static class TableRow {
+
+        private String name;
+        private double length;
+
+        public TableRow() {
+            name = "";
+            length = BibtexSingleField.DEFAULT_FIELD_LENGTH;
+        }
+
+        public TableRow(String name) {
+            this.name = name;
+            length = BibtexSingleField.DEFAULT_FIELD_LENGTH;
+        }
+
+        public TableRow(String name, double length) {
+            this.name = name;
+            this.length = length;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public double getLength() {
+            return length;
+        }
+
+        public void setLength(int length) {
+            this.length = length;
+        }
     }
 
     class DeleteRowAction extends AbstractAction {
 
         public DeleteRowAction() {
-            super("Delete row", IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
+            super("Delete row", IconTheme.JabRefIcons.REMOVE_NOBOX.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete rows"));
         }
 
@@ -483,7 +464,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class AddRowAction extends AbstractAction {
 
         public AddRowAction() {
-            super("Add row", IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
+            super("Add row", IconTheme.JabRefIcons.ADD_NOBOX.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Insert rows"));
         }
 
@@ -534,7 +515,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class MoveRowUpAction extends AbstractMoveRowAction {
 
         public MoveRowUpAction() {
-            super("Up", IconTheme.JabRefIcon.UP.getIcon());
+            super("Up", IconTheme.JabRefIcons.UP.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Move up"));
         }
 
@@ -567,7 +548,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class MoveRowDownAction extends AbstractMoveRowAction {
 
         public MoveRowDownAction() {
-            super("Down", IconTheme.JabRefIcon.DOWN.getIcon());
+            super("Down", IconTheme.JabRefIcons.DOWN.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Down"));
         }
 
@@ -614,12 +595,14 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             final HashMap<String, Integer> map = new HashMap<>();
 
             // first element (#) not inside tableRows
-            for (int i = 1; i < panel.getMainTable().getColumnCount(); i++) {
-                String name = panel.getMainTable().getColumnName(i);
+            /*
+            for (TableColumn<BibEntry, ?> column : panel.getMainTable().getColumns()) {
+                String name = column.getText();
                 if ((name != null) && !name.isEmpty()) {
                     map.put(name.toLowerCase(Locale.ROOT), i);
                 }
             }
+            */
             Collections.sort(tableRows, (o1, o2) -> {
                 Integer n1 = map.get(o1.getName());
                 Integer n2 = map.get(o2.getName());
@@ -647,6 +630,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             if (panel == null) {
                 return;
             }
+            /*
             TableColumnModel colMod = panel.getMainTable().getColumnModel();
             colSetup.setValueAt(String.valueOf(colMod.getColumn(0).getWidth()), 0, 1);
             for (int i = 1; i < colMod.getColumnCount(); i++) {
@@ -669,10 +653,10 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 colSetup.revalidate();
                 colSetup.repaint();
             }
+            */
 
         }
     }
-
 
     /**
      * Store changes to table preferences. This method is called when
@@ -721,12 +705,11 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 (oldSyncKeyWords != newSyncKeyWords) ||
                 (oldWriteSpecialFields != newWriteSpecialFields);
         if (restartRequired) {
-            JOptionPane.showMessageDialog(null,
+            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showWarningDialogAndWait(Localization.lang("Changed special field settings"),
                     Localization.lang("You have changed settings for special fields.")
-                    .concat(" ")
-                    .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
-                    Localization.lang("Changed special field settings"),
-                    JOptionPane.WARNING_MESSAGE);
+                            .concat(" ")
+                            .concat(Localization.lang("You must restart JabRef for this to come into effect."))));
+
         }
 
         // restart required implies that the settings have been changed
@@ -766,12 +749,9 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             // Then we make arrays
             List<String> names = new ArrayList<>(tableRows.size());
             List<String> widths = new ArrayList<>(tableRows.size());
-            List<Integer> nWidths = new ArrayList<>(tableRows.size());
 
-            prefs.putInt(JabRefPreferences.NUMBER_COL_WIDTH, ncWidth);
             for (TableRow tr : tableRows) {
                 names.add(tr.getName().toLowerCase(Locale.ROOT));
-                nWidths.add(tr.getLength());
                 widths.add(String.valueOf(tr.getLength()));
             }
 

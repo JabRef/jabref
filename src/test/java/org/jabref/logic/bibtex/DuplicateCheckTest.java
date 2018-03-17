@@ -5,12 +5,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DuplicateCheckTest {
 
@@ -19,7 +19,7 @@ public class DuplicateCheckTest {
     private BibEntry simpleInbook;
     private BibEntry simpleIncollection;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         simpleArticle = new BibEntry(BibtexEntryTypes.ARTICLE.getName())
                 .withField(FieldName.AUTHOR, "Single Author")

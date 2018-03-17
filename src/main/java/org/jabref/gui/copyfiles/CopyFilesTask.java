@@ -15,6 +15,7 @@ import java.util.function.BiFunction;
 import javafx.concurrent.Task;
 
 import org.jabref.Globals;
+import org.jabref.gui.actions.CopyFilesAction;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
@@ -38,7 +39,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
     private final long totalFilesCount;
     private final List<BibEntry> entries;
     private final List<CopyFilesResultItemViewModel> results = new ArrayList<>();
-    private Optional<Path> newPath;
+    private Optional<Path> newPath = Optional.empty();
     private int numberSucessful;
     private int totalFilesCounter;
 
@@ -54,8 +55,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
     }
 
     @Override
-    protected List<CopyFilesResultItemViewModel> call()
-            throws InterruptedException, IOException {
+    protected List<CopyFilesResultItemViewModel> call() throws InterruptedException, IOException {
 
         updateMessage(Localization.lang("Copying files..."));
         updateProgress(0, totalFilesCount);
@@ -103,6 +103,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
                 }
             }
             updateMessage(Localization.lang("Finished copying"));
+
             String sucessMessage = Localization.lang("Copied %0 files of %1 sucessfully to %2", Integer.toString(numberSucessful), Integer.toString(totalFilesCounter), newPath.map(Path::getParent).map(Path::toString).orElse(""));
             updateMessage(sucessMessage);
             bw.write(sucessMessage);

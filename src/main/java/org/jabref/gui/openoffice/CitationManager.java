@@ -14,6 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -59,7 +60,7 @@ class CitationManager {
 
     public CitationManager(final JabRefFrame frame, OOBibBase ooBase)
             throws NoSuchElementException, WrappedTargetException, UnknownPropertyException {
-        diag = new JDialog(frame, Localization.lang("Manage citations"), true);
+        diag = new JDialog((JFrame) null, Localization.lang("Manage citations"), true);
         this.ooBase = ooBase;
 
         list = new BasicEventList<>();
@@ -94,7 +95,7 @@ class CitationManager {
             } catch (UnknownPropertyException | NotRemoveableException | PropertyExistException | IllegalTypeException |
                     IllegalArgumentException ex) {
                 LOGGER.warn("Problem modifying citation", ex);
-                JOptionPane.showMessageDialog(frame, Localization.lang("Problem modifying citation"));
+                JOptionPane.showMessageDialog(null, Localization.lang("Problem modifying citation"));
             }
             diag.dispose();
         });

@@ -6,43 +6,17 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
 
-import javax.swing.Icon;
-import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
-import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelMode;
-import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.PreviewPanel;
-import org.jabref.gui.actions.CopyDoiUrlAction;
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditor;
-import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
-import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.filelist.FileListEntry;
-import org.jabref.gui.filelist.FileListTableModel;
-import org.jabref.gui.menus.RightClickMenu;
-import org.jabref.gui.specialfields.SpecialFieldMenuAction;
-import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
-import org.jabref.gui.specialfields.SpecialFieldViewModel;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.specialfields.SpecialField;
-import org.jabref.model.entry.specialfields.SpecialFieldValue;
 
+import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
@@ -74,7 +48,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     public MainTableSelectionListener(BasePanel panel, MainTable table) {
         this.table = table;
         this.panel = panel;
-        this.tableRows = table.getTableModel().getTableRows();
+        this.tableRows = new BasicEventList<>();
         preview = panel.getPreviewPanel();
     }
 
@@ -101,6 +75,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
 
         if (newSelected != null) {
+            // TODO: Update entry editor / preview on selection change
+            /*
             final BasePanelMode mode = panel.getMode(); // What is the panel already showing?
             if ((mode == BasePanelMode.WILL_SHOW_EDITOR) || (mode == BasePanelMode.SHOWING_EDITOR)) {
                 panel.showAndEdit(newSelected);
@@ -109,6 +85,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 // Either nothing or a preview was shown. Update the preview.
                 updatePreview(newSelected);
             }
+            */
         }
     }
 
@@ -126,6 +103,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             t.start();
             return;
         }
+        /*
         EventList<BibEntry> list = table.getSelected();
         // Check if the entry to preview is still selected:
         if ((list.size() != 1) || (list.get(0) != toShow)) {
@@ -136,28 +114,13 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             panel.showPreview(toShow);
             workingOnPreview = false;
         });
-    }
-
-    public void editSignalled() {
-        if (table.getSelected().size() == 1) {
-            editSignalled(table.getSelected().get(0));
-        }
-    }
-
-    public void editSignalled(BibEntry entry) {
-        panel.showAndEdit(entry);
+        */
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        // First find the column and row on which the user has clicked.
-        final int col = table.columnAtPoint(e.getPoint());
-        final int row = table.rowAtPoint(e.getPoint());
-
-        // get the MainTableColumn which is currently visible at col
-        int modelIndex = table.getColumnModel().getColumn(col).getModelIndex();
-        MainTableColumn modelColumn = table.getMainTableColumn(modelIndex);
-
+        // TODO: Right-click menu for special columns
+        /*
         // Check if the user has right-clicked. If so, open the right-click menu.
         if (e.isPopupTrigger() || (e.getButton() == MouseEvent.BUTTON3)) {
             if ((modelColumn == null) || !modelColumn.isIconColumn()) {
@@ -168,6 +131,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 showIconRightClickMenu(e, row, modelColumn);
             }
         }
+        */
     }
 
     @Override
@@ -177,14 +141,14 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
+        /*
         // First find the column on which the user has clicked.
         final int row = table.rowAtPoint(e.getPoint());
 
         // A double click on an entry should open the entry's editor.
         if (e.getClickCount() == 2) {
             BibEntry toShow = tableRows.get(row);
-            editSignalled(toShow);
+            panel.showAndEdit(toShow);
             return;
         }
 
@@ -269,6 +233,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     .ifPresent(crossref -> panel.getDatabase().getEntryByKey(crossref).ifPresent(entry -> panel.highlightEntry(entry)));
         }
         panel.frame().updateEnabledState();
+        */
     }
 
     /**
@@ -279,6 +244,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
      * @param columnName the name of the specialfield column
      */
     private void handleSpecialFieldLeftClick(MouseEvent e, String columnName) {
+        /*
         if ((e.getClickCount() == 1)) {
             SpecialField.getSpecialFieldInstanceFromFieldName(columnName).ifPresent(field -> {
                 // special field found
@@ -294,6 +260,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 }
             });
         }
+        */
     }
 
     /**
@@ -303,12 +270,14 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
      * @param row The row where the event occurred.
      */
     private void processPopupTrigger(MouseEvent e, int row) {
+        /*
         int selRow = table.getSelectedRow();
         if ((selRow == -1) || !table.isRowSelected(table.rowAtPoint(e.getPoint()))) {
             table.setRowSelectionInterval(row, row);
         }
         RightClickMenu rightClickMenu = new RightClickMenu(JabRefGUI.getMainFrame(), panel);
         rightClickMenu.show(table, e.getX(), e.getY());
+        */
     }
 
     /**
@@ -325,6 +294,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         JPopupMenu menu = new JPopupMenu();
         boolean showDefaultPopup = true;
 
+        /*
         // See if this is a simple file link field, or if it is a file-list
         // field that can specify a list of links:
         if (!column.getBibtexFields().isEmpty()) {
@@ -343,9 +313,16 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                         if ((description == null) || (description.trim().isEmpty())) {
                             description = flEntry.getLink();
                         }
+
+                        Optional<ExternalFileType> fileType = flEntry.getType();
+
+                        // file type might be unknown
+                        if (!fileType.isPresent()) {
+                            String fileExtension = FileUtil.getFileExtension(flEntry.getLink()).orElse("");
+                            fileType = Optional.of(new UnknownExternalFileType(fileExtension.toUpperCase(), fileExtension));
+                        }
                         menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry.getLink(),
-                                flEntry.getType().get().getIcon(), panel.getBibDatabaseContext(),
-                                flEntry.getType()));
+                                fileType.get().getIcon(), panel.getBibDatabaseContext(), fileType));
                         showDefaultPopup = false;
                     }
                 } else {
@@ -378,9 +355,11 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 menu.show(table, e.getX(), e.getY());
             }
         }
+        */
     }
 
     public void entryEditorClosing(EntryEditor editor) {
+        /*
         if (Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled()) {
             panel.showPreview(editor.getEntry());
         } else {
@@ -388,6 +367,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             panel.adjustSplitter();
         }
         table.requestFocus();
+        */
     }
 
     @Override
@@ -408,6 +388,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
      */
     @Override
     public void keyTyped(KeyEvent e) {
+        /*
         if ((!e.isActionKey()) && Character.isLetterOrDigit(e.getKeyChar())
                 && (e.getModifiers() == 0)) {
             long time = System.currentTimeMillis();
@@ -456,6 +437,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             lastPressedCount = 0;
         }
         panel.frame().updateEnabledState();
+        */
     }
 
     @Override

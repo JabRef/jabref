@@ -75,18 +75,8 @@ public class Localization {
             LOGGER.error("Menu entries are not initialized");
             setLanguage("en");
         }
-        return lookup(localizedMenuTitles, "menu item", key, params);
-    }
-
-    /**
-     * Return the translated string for usage in JavaFX menus.
-     *
-     * @implNote This is only a temporary workaround. In the long term, the & sign should be removed from the language
-     * files.
-     */
-    public static String menuTitleFX(String key, String... params) {
         // Remove & sign, which is not used by JavaFX to signify the shortcut
-        return menuTitle(key, params).replace("&", "");
+        return lookup(localizedMenuTitles, "menu item", key, params).replace("&", "");
     }
 
     /**
@@ -224,9 +214,11 @@ public class Localization {
             lookup = lookupMap;
         }
 
+        @Override
         public final Object handleGetObject(String key) {
             Objects.requireNonNull(key);
-            return lookup.get(key);
+            return Optional.ofNullable(lookup.get(key))
+                           .orElse(key);
         }
 
         @Override
@@ -241,7 +233,8 @@ public class Localization {
 
         @Override
         public boolean containsKey(String key) {
-            return (key != null) && lookup.containsKey(key);
+            // Pretend we have every key
+            return true;
         }
     }
 }

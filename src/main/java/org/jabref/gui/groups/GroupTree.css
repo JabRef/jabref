@@ -76,20 +76,6 @@
     -fx-padding: 0.45em 0.2em 0.45em 0.2em;
 }
 
-.tree-table-row-cell:hover {
-    -fx-background-color: lightgrey;
-}
-
-.tree-table-row-cell:selected {
-    -fx-background-color: #6A9FCD;
-    -fx-text-fill: white;
-    -fx-fill: white;
-}
-
-.tree-table-row-cell:selected > .tree-table-cell > .icon {
-    -fx-fill: white;
-}
-
 .tree-table-row-cell:selected > .tree-table-cell > .tree-disclosure-node > .arrow {
     -fx-background-color: white;
 }
@@ -126,13 +112,6 @@
     -fx-padding: 0em 1em 0em 1em;
 }
 
-.flatButton {
-    -fx-shadow-highlight-color: transparent;
-    -fx-outer-border: transparent;
-    -fx-inner-border: transparent;
-    -fx-focus-color: #6A9FCD;
-    -fx-faint-focus-color: transparent;
-    -fx-background-color: transparent;
-    -fx-text-background-color: dimgray;
-    -fx-padding: 0.5em;
+#barBottom .glyph-icon {
+    -fx-font-size: 2em;
 }

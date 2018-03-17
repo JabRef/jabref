@@ -125,8 +125,8 @@ class FieldSetComponent extends JPanel {
         con.gridwidth = 1;
         if (arrows) {
             con.weightx = 0;
-            up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
-            down = new JButton(IconTheme.JabRefIcon.DOWN.getSmallIcon());
+            up = new JButton(IconTheme.JabRefIcons.UP.getSmallIcon());
+            down = new JButton(IconTheme.JabRefIcons.DOWN.getSmallIcon());
             up.addActionListener(e -> move(-1));
             down.addActionListener(e -> move(1));
             up.setToolTipText(Localization.lang("Move up"));

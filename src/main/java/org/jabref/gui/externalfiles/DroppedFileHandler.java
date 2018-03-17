@@ -35,7 +35,7 @@ import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.xmp.XMPUtil;
+import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -228,7 +228,7 @@ public class DroppedFileHandler {
 
         List<BibEntry> xmpEntriesInFile;
         try {
-            xmpEntriesInFile = XMPUtil.readXMP(fileName, Globals.prefs.getXMPPreferences());
+            xmpEntriesInFile = XmpUtilReader.readXmp(fileName, Globals.prefs.getXMPPreferences());
         } catch (IOException e) {
             LOGGER.warn("Problem reading XMP", e);
             return false;
@@ -252,7 +252,7 @@ public class DroppedFileHandler {
         contentPanel.add(confirmationMessage, BorderLayout.NORTH);
         contentPanel.add(entriesPanel, BorderLayout.CENTER);
 
-        int reply = JOptionPane.showConfirmDialog(frame, contentPanel,
+        int reply = JOptionPane.showConfirmDialog(null, contentPanel,
                 Localization.lang("XMP-metadata found in PDF: %0", fileName), JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 
@@ -304,7 +304,7 @@ public class DroppedFileHandler {
             for (BibEntry aXmpEntriesInFile : xmpEntriesInFile) {
 
                 aXmpEntriesInFile.setId(IdGenerator.next());
-                edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), aXmpEntriesInFile, panel));
+                edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), aXmpEntriesInFile));
                 panel.getDatabase().insertEntry(aXmpEntriesInFile);
                 doLink(aXmpEntriesInFile, fileType, destFilename, true, edits);
 
@@ -378,7 +378,7 @@ public class DroppedFileHandler {
 
         try {
             Object[] messages = {Localization.lang("How would you like to link to '%0'?", linkFileName), optionsPanel};
-            int reply = JOptionPane.showConfirmDialog(frame, messages, dialogTitle, JOptionPane.OK_CANCEL_OPTION,
+            int reply = JOptionPane.showConfirmDialog(null, messages, dialogTitle, JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
             if (reply == JOptionPane.OK_OPTION) {
                 // store user's choice
@@ -480,7 +480,7 @@ public class DroppedFileHandler {
             Path destFile = dir.get().resolve(destFilename);
 
             if (Files.exists(destFile)) {
-                int answer = JOptionPane.showConfirmDialog(frame,
+                int answer = JOptionPane.showConfirmDialog(null,
                         Localization.lang("'%0' exists. Overwrite file?", destFile.toString()),
                         Localization.lang("Overwrite file?"), JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.NO_OPTION) {
@@ -499,7 +499,7 @@ public class DroppedFileHandler {
             if (FileUtil.renameFile(fromFile, destFile, true)) {
                 return true;
             } else {
-                JOptionPane.showMessageDialog(frame,
+                JOptionPane.showMessageDialog(null,
                         Localization.lang("Could not move file '%0'.", destFile.toString())
                                 + Localization.lang("Please move the file manually and link in place."),
                         Localization.lang("Move file failed"), JOptionPane.ERROR_MESSAGE);
@@ -521,7 +521,7 @@ public class DroppedFileHandler {
     private boolean doCopy(String fileName, String toFile, NamedCompound edits) {
 
         List<String> dirs = panel.getBibDatabaseContext()
-                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+                                 .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {
@@ -544,7 +544,7 @@ public class DroppedFileHandler {
         }
 
         if (Files.exists(destFile)) {
-            int answer = JOptionPane.showConfirmDialog(frame,
+            int answer = JOptionPane.showConfirmDialog(null,
                     Localization.lang("'%0' exists. Overwrite file?", destFile.toString()),
                     Localization.lang("File exists"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (answer == JOptionPane.NO_OPTION) {

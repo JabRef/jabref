@@ -14,6 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -51,7 +52,7 @@ public class FetcherPreviewDialog extends JabRefDialog implements OutputPrinter 
 
 
     public FetcherPreviewDialog(JabRefFrame frame, int warningLimit, int tableRowHeight) {
-        super(frame, Localization.lang("Title"), true, FetcherPreviewDialog.class);
+        super((JFrame) null, Localization.lang("Title"), true, FetcherPreviewDialog.class);
         this.frame = frame;
         this.warningLimit = warningLimit;
 

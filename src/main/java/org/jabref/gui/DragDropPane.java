@@ -124,14 +124,14 @@ class DragDropPane extends JTabbedPane {
     static class MarkerPane extends JPanel {
 
         private Point locationP;
-        private final IconTheme.JabRefIcon moveTabArrow;
+        private final JabRefIcon moveTabArrow;
 
 
         public MarkerPane() {
             setOpaque(false);
 
             // Sets the marker fontIcon
-            moveTabArrow = IconTheme.JabRefIcon.MOVE_TAB_ARROW;
+            moveTabArrow = IconTheme.JabRefIcons.MOVE_TAB_ARROW;
         }
 
         @Override
@@ -141,7 +141,7 @@ class DragDropPane extends JTabbedPane {
             g2.setComposite(AlphaComposite.getInstance(
                     AlphaComposite.SRC_OVER, 0.9f)); // Set transparency
             g.setFont(IconTheme.FONT.deriveFont(Font.BOLD, 24f));
-            g.drawString(moveTabArrow.getCode(), locationP.x - (moveTabArrow.getIcon().getIconWidth() / 2),
+            moveTabArrow.getSmallIcon().paintIcon(this, g, locationP.x - (moveTabArrow.getIcon().getIconWidth() / 2),
                     locationP.y + (moveTabArrow.getIcon().getIconHeight() / 2));
 
         }

@@ -20,8 +20,8 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -36,7 +36,6 @@ import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -79,9 +78,9 @@ public class ProtectedTermsDialog {
     private final JMenuItem remove = new JMenuItem(Localization.lang("Remove"));
     private final JMenuItem reload = new JMenuItem(Localization.lang("Reload"));
     private final JMenuItem enabled = new JCheckBoxMenuItem(Localization.lang("Enabled"));
-    private final JButton loadButton = new JButton(IconTheme.JabRefIcon.OPEN.getIcon());
-    private final JButton removeButton = new JButton(IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
-    private final JButton newButton = new JButton(IconTheme.JabRefIcon.NEW.getIcon());
+    private final JButton loadButton = new JButton(IconTheme.JabRefIcons.OPEN.getIcon());
+    private final JButton removeButton = new JButton(IconTheme.JabRefIcons.DELETE_ENTRY.getIcon());
+    private final JButton newButton = new JButton(IconTheme.JabRefIcons.NEW.getIcon());
     private ActionListener removeAction;
 
     private final JButton ok = new JButton(Localization.lang("OK"));
@@ -90,10 +89,10 @@ public class ProtectedTermsDialog {
     private boolean okPressed;
     private final ProtectedTermsLoader loader;
 
-    public ProtectedTermsDialog(JabRefFrame frame, ProtectedTermsLoader loader) {
+    public ProtectedTermsDialog(JabRefFrame frame) {
 
         this.frame = Objects.requireNonNull(frame);
-        this.loader = Objects.requireNonNull(loader);
+        this.loader = Globals.protectedTermsLoader;
         init();
 
     }
@@ -113,7 +112,7 @@ public class ProtectedTermsDialog {
         removeButton.setToolTipText(Localization.lang("Remove protected terms file"));
 
         newButton.addActionListener(actionEvent -> {
-            NewProtectedTermsFileDialog newDialog = new NewProtectedTermsFileDialog(diag, loader);
+            NewProtectedTermsFileDialog newDialog = new NewProtectedTermsFileDialog(diag, loader, frame.getDialogService());
             newDialog.setVisible(true);
             tableModel.fireTableDataChanged();
         });
@@ -122,7 +121,7 @@ public class ProtectedTermsDialog {
         setupTable();
 
         // Build dialog
-        diag = new JDialog(frame, Localization.lang("Manage protected terms files"), true);
+        diag = new JDialog((JFrame) null, Localization.lang("Manage protected terms files"), true);
 
         FormBuilder builder = FormBuilder.create();
         builder.layout(new FormLayout("fill:pref:grow, 4dlu, left:pref, 4dlu, left:pref, 4dlu, left:pref",
@@ -254,10 +253,10 @@ public class ProtectedTermsDialog {
         // Create action listener for removing a term file, also used for the remove button
         removeAction = actionEvent -> getSelectedTermsList().ifPresent(list -> {
 
-            if (!list.isInternalList() && (JOptionPane.showConfirmDialog(diag,
+            if (!list.isInternalList() && frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Remove protected terms file"),
                     Localization.lang("Are you sure you want to remove the protected terms file?"),
                     Localization.lang("Remove protected terms file"),
-                    JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)) {
+                    Localization.lang("Cancel"))) {
                 if (!loader.removeProtectedTermsList(list)) {
                     LOGGER.info("Problem removing protected terms file");
                 }
@@ -309,30 +308,30 @@ public class ProtectedTermsDialog {
         @Override
         public String getColumnName(int i) {
             switch (i) {
-            case 0:
-                return Localization.lang("Enabled");
-            case 1:
-                return Localization.lang("Description");
-            case 2:
-                return Localization.lang("File");
-            default:
-                return "";
+                case 0:
+                    return Localization.lang("Enabled");
+                case 1:
+                    return Localization.lang("Description");
+                case 2:
+                    return Localization.lang("File");
+                default:
+                    return "";
             }
         }
 
         @Override
         public Object getValueAt(int row, int column) {
             switch (column) {
-            case 0:
-                return loader.getProtectedTermsLists().get(row).isEnabled();
-            case 1:
-                return loader.getProtectedTermsLists().get(row).getDescription();
-            case 2:
-                ProtectedTermsList list = loader.getProtectedTermsLists().get(row);
-                return list.isInternalList() ? Localization.lang("Internal list") + " - " + list.getLocation() : list
-                        .getLocation();
-            default:
-                return "";
+                case 0:
+                    return loader.getProtectedTermsLists().get(row).isEnabled();
+                case 1:
+                    return loader.getProtectedTermsLists().get(row).getDescription();
+                case 2:
+                    ProtectedTermsList list = loader.getProtectedTermsLists().get(row);
+                    return list.isInternalList() ? Localization.lang("Internal list") + " - " + list.getLocation() : list
+                            .getLocation();
+                default:
+                    return "";
             }
         }
 
@@ -344,14 +343,14 @@ public class ProtectedTermsDialog {
         @Override
         public Class<?> getColumnClass(int column) {
             switch (column) {
-            case 0:
-                return Boolean.class;
-            case 1:
-                return String.class;
-            case 2:
-                return String.class;
-            default:
-                return String.class;
+                case 0:
+                    return Boolean.class;
+                case 1:
+                    return String.class;
+                case 2:
+                    return String.class;
+                default:
+                    return String.class;
             }
         }
 
@@ -434,7 +433,7 @@ public class ProtectedTermsDialog {
                     .addExtensionFilter(FileType.TERMS)
                     .withDefaultExtension(FileType.TERMS)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-            DialogService ds = new FXDialogService();
+            DialogService ds = frame.getDialogService();
 
             browse.addActionListener(e -> {
                 Optional<Path> file = DefaultTaskExecutor

@@ -10,41 +10,39 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+
+import javafx.embed.swing.SwingNode;
+import javafx.scene.Node;
+import javafx.scene.layout.Priority;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.SidePaneComponent;
 import org.jabref.gui.SidePaneManager;
+import org.jabref.gui.SidePaneType;
+import org.jabref.gui.actions.Action;
 import org.jabref.logic.l10n.Localization;
 
 public class FileUpdatePanel extends SidePaneComponent implements ActionListener, ChangeScanner.DisplayResultCallback {
 
     private final SidePaneManager manager;
+    private ChangeScanner scanner;
+    private File file;
+    private BasePanel panel;
 
-    private final ChangeScanner scanner;
+    public FileUpdatePanel(SidePaneManager manager) {
+        super(manager, IconTheme.JabRefIcons.SAVE, Localization.lang("File changed"));
 
-
-    public FileUpdatePanel(BasePanel panel, SidePaneManager manager, File file, ChangeScanner scanner) {
-        super(manager, IconTheme.JabRefIcon.SAVE.getIcon(), Localization.lang("File changed"));
-        close.setEnabled(false);
-        this.panel = panel;
         this.manager = manager;
+    }
+
+    public void showForFile(BasePanel panel, File file, ChangeScanner scanner) {
+        this.file = file;
+        this.panel = panel;
         this.scanner = scanner;
 
-        JPanel main = new JPanel();
-        main.setLayout(new BorderLayout());
-
-        JLabel message = new JLabel("<html><center>"
-                + Localization.lang("The file<BR>'%0'<BR>has been modified<BR>externally!", file.getName())
-                + "</center></html>", SwingConstants.CENTER);
-
-        main.add(message, BorderLayout.CENTER);
-        JButton test = new JButton(Localization.lang("Review changes"));
-        main.add(test, BorderLayout.SOUTH);
-        main.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
-
-        add(main, BorderLayout.CENTER);
-        test.addActionListener(this);
+        this.show();
     }
 
     /**
@@ -56,23 +54,44 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
         return panel;
     }
 
-    /**
-     * Unregister when this component closes. We need that to avoid showing
-     * two such external change warnings at the same time, only the latest one.
-     */
     @Override
-    public void componentClosing() {
-        manager.unregisterComponent(FileUpdatePanel.class);
+    public Priority getResizePolicy() {
+        return Priority.NEVER;
     }
 
     @Override
-    public int getRescalingWeight() {
-        return 0;
-    }
-
-    @Override
-    public ToggleAction getToggleAction() {
+    public ToggleCommand getToggleCommand() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Action getToggleAction() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected Node createContentPane() {
+        JPanel main = new JPanel();
+        main.setLayout(new BorderLayout());
+
+        JLabel message = new JLabel("<html><center>"
+                + Localization.lang("The file<BR>'%0'<BR>has been modified<BR>externally!", file.getName())
+                + "</center></html>", SwingConstants.CENTER);
+
+        main.add(message, BorderLayout.CENTER);
+        JButton reviewChanges = new JButton(Localization.lang("Review changes"));
+        reviewChanges.addActionListener(this);
+        main.add(reviewChanges, BorderLayout.SOUTH);
+        main.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
+        SwingNode swingNode = new SwingNode();
+        SwingUtilities.invokeLater(() -> swingNode.setContent(main));
+        return swingNode;
+    }
+
+    @Override
+    public SidePaneType getType() {
+        return SidePaneType.FILE_UPDATE_NOTIFICATION;
     }
 
     /**
@@ -103,7 +122,7 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
     @Override
     public void scanResultsResolved(boolean resolved) {
         if (resolved) {
-            manager.hideComponent(this);
+            manager.hide(this.getType());
             panel.markExternalChangesAsResolved();
         }
     }

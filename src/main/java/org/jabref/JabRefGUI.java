@@ -1,6 +1,5 @@
 package org.jabref;
 
-import java.awt.Frame;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,10 +14,18 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.FontUIResource;
 
+import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+import org.jabref.gui.AbstractView;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.autosaveandbackup.BackupUIManager;
+import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
@@ -29,7 +36,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
@@ -46,18 +52,20 @@ public class JabRefGUI {
     private final boolean isBlank;
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
+    private final DialogService dialogService;
 
     private final String focusedFile;
 
-    public JabRefGUI(List<ParserResult> argsDatabases, boolean isBlank) {
+    public JabRefGUI(Stage mainStage, List<ParserResult> argsDatabases, boolean isBlank) {
         this.bibDatabases = argsDatabases;
         this.isBlank = isBlank;
+        this.dialogService = new FXDialogService(mainStage);
 
         // passed file (we take the first one) should be focused
         focusedFile = argsDatabases.stream().findFirst().flatMap(ParserResult::getFile).map(File::getAbsolutePath)
                 .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
 
-        openWindow();
+        openWindow(mainStage);
         JabRefGUI.checkForNewVersion(false);
     }
 
@@ -67,13 +75,7 @@ public class JabRefGUI {
         new VersionWorker(JabRefGUI.getMainFrame(), manualExecution, currentVersion, toBeIgnored).execute();
     }
 
-    private void openWindow() {
-
-        // This property is set to make the Mac OSX Java VM move the menu bar to the top of the screen
-        if (OS.OS_X) {
-            System.setProperty("apple.laf.useScreenMenuBar", "true");
-        }
-
+    private void openWindow(Stage mainStage) {
         // Set antialiasing on everywhere. This only works in JRE >= 1.5.
         // Or... it doesn't work, period.
         // TODO test and maybe remove this! I found this commented out with no additional info ( payload@lavabit.com )
@@ -94,7 +96,7 @@ public class JabRefGUI {
         GUIGlobals.init();
 
         LOGGER.debug("Initializing frame");
-        JabRefGUI.mainFrame = new JabRefFrame();
+        JabRefGUI.mainFrame = new JabRefFrame(mainStage);
 
         // Add all bibDatabases databases to the frame:
         boolean first = false;
@@ -118,7 +120,7 @@ public class JabRefGUI {
                         pr.getDatabase().clearSharedDatabaseID();
 
                         LOGGER.error("Connection error", e);
-                        JOptionPane.showMessageDialog(mainFrame,
+                        JOptionPane.showMessageDialog(null,
                                 e.getMessage() + "\n\n" + Localization.lang("A local copy will be opened."),
                                 Localization.lang("Connection error"), JOptionPane.WARNING_MESSAGE);
                     }
@@ -144,18 +146,27 @@ public class JabRefGUI {
         // state. This needs to be set after the window has been made visible, so we
         // do it here:
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-            JabRefGUI.getMainFrame().setExtendedState(Frame.MAXIMIZED_BOTH);
+            mainStage.setMaximized(true);
         }
 
-        JabRefGUI.getMainFrame().setVisible(true);
+        Scene scene = new Scene(JabRefGUI.mainFrame, 800, 800);
+        scene.getStylesheets().add(AbstractView.class.getResource("Main.css").toExternalForm());
+        mainStage.setTitle(JabRefFrame.FRAME_TITLE);
+        mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
+        mainStage.setScene(scene);
+        mainStage.show();
+
+        mainStage.setOnCloseRequest(event -> {
+            mainFrame.quit();
+            Platform.exit();
+        });
 
         for (ParserResult pr : failed) {
-            String message = "<html>" + Localization.lang("Error opening file '%0'.", pr.getFile().get().getName())
-                    + "<p>"
-                    + pr.getErrorMessage() + "</html>";
+            String message = Localization.lang("Error opening file '%0'.", pr.getFile().get().getName()) + "\n"
+                    + pr.getErrorMessage();
 
-            JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(), message, Localization.lang("Error opening file"),
-                    JOptionPane.ERROR_MESSAGE);
+            dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
+
         }
 
         // Display warnings, if any
@@ -180,10 +191,6 @@ public class JabRefGUI {
         }
 
         LOGGER.debug("Finished adding panels");
-
-        if (!bibDatabases.isEmpty()) {
-            JabRefGUI.getMainFrame().getCurrentBasePanel().getMainTable().requestFocus();
-        }
     }
 
     private void openLastEditedDatabases() {
@@ -201,7 +208,7 @@ public class JabRefGUI {
             }
 
             if (BackupManager.checkForBackupFile(dbFile.toPath())) {
-                BackupUIManager.showRestoreBackupDialog(mainFrame, dbFile.toPath());
+                BackupUIManager.showRestoreBackupDialog(dialogService, dbFile.toPath());
             }
 
             ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,
@@ -259,11 +266,11 @@ public class JabRefGUI {
                     // also set system l&f as default
                     Globals.prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, systemLookFeel);
                     // notify the user
-                    JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(),
-                            Localization
-                                    .lang("Unable to find the requested look and feel and thus the default one is used."),
-                            Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
+
                     LOGGER.warn("Unable to find requested look and feel", e);
+                    dialogService.showWarningDialogAndWait(Localization.lang("Warning"),
+                            Localization.lang("Unable to find the requested look and feel and thus the default one is used."));
+
                 }
             }
 
@@ -301,5 +308,4 @@ public class JabRefGUI {
     public static void setMainFrame(JabRefFrame mainFrame) {
         JabRefGUI.mainFrame = mainFrame;
     }
-
 }

@@ -19,8 +19,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -41,7 +39,6 @@ import com.jgoodies.forms.layout.FormLayout;
 class FileTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
-    private final JabRefFrame frame;
 
     private final JCheckBox backup;
     private final JCheckBox localAutoSave;
@@ -64,9 +61,8 @@ class FileTab extends JPanel implements PrefsTab {
             Localization.lang("Autolink files with names starting with the BibTeX key"));
     private final JTextField regExpTextField;
 
-    public FileTab(JabRefFrame frame, JabRefPreferences prefs) {
+    public FileTab(DialogService dialogService, JabRefPreferences prefs) {
         this.prefs = prefs;
-        this.frame = frame;
 
         fileDir = new JTextField(25);
         bibLocAsPrimaryDir = new JCheckBox(Localization.lang("Use the BIB file location as primary file directory"));
@@ -139,11 +135,10 @@ class FileTab extends JPanel implements PrefsTab {
         JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(e -> {
 
-            DialogService ds = new FXDialogService();
             DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                     .withInitialDirectory(Paths.get(fileDir.getText())).build();
 
-            DefaultTaskExecutor.runInJavaFXThread(() -> ds.showDirectorySelectionDialog(dirDialogConfiguration))
+            DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showDirectorySelectionDialog(dirDialogConfiguration))
                     .ifPresent(f -> fileDir.setText(f.toString()));
 
         });
@@ -235,15 +230,15 @@ class FileTab extends JPanel implements PrefsTab {
 
         String newline;
         switch (newlineSeparator.getSelectedIndex()) {
-        case 0:
-            newline = "\r";
-            break;
-        case 2:
-            newline = "\n";
-            break;
-        default:
-            newline = "\r\n";
-            break;
+            case 0:
+                newline = "\r";
+                break;
+            case 2:
+                newline = "\n";
+                break;
+            default:
+                newline = "\r\n";
+                break;
         }
         prefs.put(JabRefPreferences.NEWLINE, newline);
         // we also have to change Globals variable as globals is not a getter, but a constant
@@ -271,7 +266,7 @@ class FileTab extends JPanel implements PrefsTab {
         if (!valid) {
             String content = String.format("%s -> %s %n %n %s: %n %s", Localization.lang("File"),
                     Localization.lang("Main file directory"), Localization.lang("Directory not found"), path);
-            JOptionPane.showMessageDialog(this.frame, content, Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, content, Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         }
         return valid;
     }

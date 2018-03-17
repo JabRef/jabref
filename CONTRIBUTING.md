@@ -48,6 +48,8 @@ Your contribution is considered being made under [MIT license](https://tldrlegal
 
 ### Write a good commit message
 See [good commit message] or [commit guidelines section of Pro Git].
+The first line of your commit message is automatically taken as title for the pull-request.
+All other lines make up the body of the pull request. Add the words `fixes #xxx` to your PR to auto-close the corresponding issue.
 
 
 ### Test your code

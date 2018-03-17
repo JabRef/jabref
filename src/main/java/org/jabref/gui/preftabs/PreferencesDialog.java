@@ -14,8 +14,8 @@ import java.util.prefs.BackingStoreException;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
@@ -23,12 +23,10 @@ import javax.swing.ListSelectionModel;
 import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinder;
-import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.ExporterFactory;
@@ -65,7 +63,7 @@ public class PreferencesDialog extends JabRefDialog {
     private final JButton resetPreferences = new JButton(Localization.lang("Reset preferences"));
 
     public PreferencesDialog(JabRefFrame parent) {
-        super(parent, Localization.lang("JabRef preferences"), false, PreferencesDialog.class);
+        super((JFrame) null, Localization.lang("JabRef preferences"), false, PreferencesDialog.class);
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         frame = parent;
 
@@ -81,11 +79,11 @@ public class PreferencesDialog extends JabRefDialog {
         main.setLayout(cardLayout);
 
         List<PrefsTab> tabs = new ArrayList<>();
-        tabs.add(new GeneralTab(prefs));
-        tabs.add(new FileTab(frame, prefs));
+        tabs.add(new GeneralTab(frame.getDialogService(), prefs));
+        tabs.add(new FileTab(frame.getDialogService(), prefs));
         tabs.add(new TablePrefsTab(prefs));
         tabs.add(new TableColumnsTab(prefs, parent));
-        tabs.add(new PreviewPrefsTab());
+        tabs.add(new PreviewPrefsTab(frame.getDialogService()));
         tabs.add(new ExternalTab(frame, this, prefs));
         tabs.add(new GroupsPrefsTab(prefs));
         tabs.add(new EntryEditorPrefsTab(prefs));
@@ -94,9 +92,9 @@ public class PreferencesDialog extends JabRefDialog {
         tabs.add(new ExportSortingPrefsTab(prefs));
         tabs.add(new NameFormatterTab(prefs));
         tabs.add(new XmpPrefsTab(prefs));
-        tabs.add(new NetworkTab(prefs));
-        tabs.add(new AdvancedTab(prefs));
-        tabs.add(new AppearancePrefsTab(prefs));
+        tabs.add(new NetworkTab(frame.getDialogService(), prefs));
+        tabs.add(new AdvancedTab(frame.getDialogService(), prefs));
+        tabs.add(new AppearancePrefsTab(frame.getDialogService(), prefs));
 
         // add all tabs
         tabs.forEach(tab -> main.add((Component) tab, tab.getTabName()));
@@ -161,8 +159,9 @@ public class PreferencesDialog extends JabRefDialog {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .addExtensionFilter(FileType.XML)
                     .withDefaultExtension(FileType.XML)
-                    .withInitialDirectory(getPrefsExportPath()).build();
-            DialogService ds = new FXDialogService();
+                    .withInitialDirectory(getPrefsExportPath())
+                    .build();
+            DialogService ds = frame.getDialogService();
 
             Optional<Path> fileName = DefaultTaskExecutor
                     .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
@@ -171,34 +170,37 @@ public class PreferencesDialog extends JabRefDialog {
                 try {
                     prefs.importPreferences(fileName.get().toString());
                     updateAfterPreferenceChanges();
-                    JOptionPane.showMessageDialog(PreferencesDialog.this,
-                            Localization.lang("You must restart JabRef for this to come into effect."),
-                            Localization.lang("Import preferences"), JOptionPane.WARNING_MESSAGE);
+
+                    DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showWarningDialogAndWait(Localization.lang("Import preferences"),
+                            Localization.lang("You must restart JabRef for this to come into effect.")));
+
                     this.dispose();
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
-                    JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
-                            Localization.lang("Import preferences"), JOptionPane.ERROR_MESSAGE);
+                    DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(Localization.lang("Import preferences"), ex));
                 }
             }
         });
 
         showPreferences.addActionListener(
-                e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs), frame).setVisible(true));
+                e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs), null).setVisible(true));
         resetPreferences.addActionListener(e -> {
-            if (JOptionPane.showConfirmDialog(PreferencesDialog.this,
+
+            boolean resetPreferencesClicked = DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Reset preferences"),
                     Localization.lang("Are you sure you want to reset all settings to default values?"),
-                    Localization.lang("Reset preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                    Localization.lang("Reset preferences"), Localization.lang("Cancel")));
+
+            if (resetPreferencesClicked) {
                 try {
                     prefs.clear();
                     new SharedDatabasePreferences().clear();
-                    JOptionPane.showMessageDialog(PreferencesDialog.this,
-                            Localization.lang("You must restart JabRef for this to come into effect."),
-                            Localization.lang("Reset preferences"), JOptionPane.WARNING_MESSAGE);
+
+                    DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showWarningDialogAndWait(Localization.lang("Reset preferences"),
+                            Localization.lang("You must restart JabRef for this to come into effect.")));
+
                 } catch (BackingStoreException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
-                    JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
-                            Localization.lang("Reset preferences"), JOptionPane.ERROR_MESSAGE);
+                    DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(Localization.lang("Reset preferences"), ex));
                 }
                 updateAfterPreferenceChanges();
             }
@@ -245,7 +247,6 @@ public class PreferencesDialog extends JabRefDialog {
         Globals.prefs.flush();
 
         setVisible(false);
-        MainTable.updateRenderers();
         GUIGlobals.updateEntryEditorColors();
         frame.setupAllTables();
         frame.output(Localization.lang("Preferences recorded."));
@@ -284,8 +285,9 @@ public class PreferencesDialog extends JabRefDialog {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .addExtensionFilter(FileType.XML)
                     .withDefaultExtension(FileType.XML)
-                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-            DialogService ds = new FXDialogService();
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                    .build();
+            DialogService ds = frame.getDialogService();
             Optional<Path> path = DefaultTaskExecutor
                     .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
 
@@ -296,8 +298,8 @@ public class PreferencesDialog extends JabRefDialog {
                     Globals.prefs.put(JabRefPreferences.PREFS_EXPORT_PATH, exportFile.toString());
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
-                    JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
-                            Localization.lang("Export preferences"), JOptionPane.WARNING_MESSAGE);
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Export preferences"), ex);
+
                 }
             });
         }

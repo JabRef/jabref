@@ -14,7 +14,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
+import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.Assertions;
@@ -47,9 +49,13 @@ public class ImporterTestEngine {
         Assertions.assertFalse(importer.isRecognizedFormat(getPath(fileName), StandardCharsets.UTF_8));
     }
 
-    public static void testImportEntries(Importer importer, String fileName, String fileType) throws IOException {
-        List<BibEntry> entries = importer.importDatabase(getPath(fileName), StandardCharsets.UTF_8).getDatabase()
-                .getEntries();
+    public static void testImportEntries(Importer importer, String fileName, String fileType) throws IOException, ImportException {
+        ParserResult parserResult = importer.importDatabase(getPath(fileName), StandardCharsets.UTF_8);
+        if (parserResult.isInvalid()) {
+            throw new ImportException(parserResult.getErrorMessage());
+        }
+        List<BibEntry> entries = parserResult.getDatabase()
+                                             .getEntries();
         BibEntryAssert.assertEquals(ImporterTestEngine.class, fileName.replaceAll(fileType, ".bib"), entries);
     }
 

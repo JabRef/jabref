@@ -1,5 +1,6 @@
 package org.jabref.model.groups;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public interface GroupEntryChanger {
      * @return If this group or one or more entries was/were modified as a
      * result of this operation, a list of changes is returned.
      */
-    List<FieldChange> add(List<BibEntry> entriesToAdd);
+    List<FieldChange> add(Collection<BibEntry> entriesToAdd);
 
     default List<FieldChange> add(BibEntry entryToAdd) {
         return add(Collections.singletonList(entryToAdd));

@@ -22,7 +22,6 @@ import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import org.jabref.logic.formatter.casechanger.CapitalizeFormatter;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
-import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import org.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
@@ -32,23 +31,22 @@ import org.jabref.model.cleanup.Formatter;
 
 public class Formatters {
 
-    public static final List<Formatter> CONVERTERS = Arrays.asList(
+    private static final List<Formatter> CONVERTERS = Arrays.asList(
             new HtmlToLatexFormatter(),
             new HtmlToUnicodeFormatter(),
             new LatexToUnicodeFormatter(),
             new UnicodeToLatexFormatter()
     );
 
-    public static final List<Formatter> CASE_CHANGERS = Arrays.asList(
+    private static final List<Formatter> CASE_CHANGERS = Arrays.asList(
             new CapitalizeFormatter(),
             new LowerCaseFormatter(),
-            new ProtectTermsFormatter(),
             new SentenceCaseFormatter(),
             new TitleCaseFormatter(),
             new UpperCaseFormatter()
     );
 
-    public static final List<Formatter> OTHERS = Arrays.asList(
+    private static final List<Formatter> OTHERS = Arrays.asList(
             new ClearFormatter(),
             new LatexCleanupFormatter(),
             new MinifyNameListFormatter(),
@@ -63,8 +61,6 @@ public class Formatters {
             new EscapeUnderscoresFormatter()
     );
 
-    public static final List<Formatter> ALL = new ArrayList<>();
-
     private static final String REGEX = "regex";
 
     private static final int LENGTH_OF_REGEX_PREFIX = REGEX.length();
@@ -72,16 +68,43 @@ public class Formatters {
     private Formatters() {
     }
 
+    public static final List<Formatter> getConverters() {
+        List<Formatter> converters = new ArrayList<>();
+        converters.addAll(CONVERTERS);
+        return converters;
+    }
+
+    public static final List<Formatter> getCaseChangers() {
+        List<Formatter> caseChangers = new ArrayList<>();
+        caseChangers.addAll(CASE_CHANGERS);
+        return caseChangers;
+    }
+
+    public static final List<Formatter> getOthers() {
+        List<Formatter> others = new ArrayList<>();
+        others.addAll(OTHERS);
+        return others;
+    }
+
+    public static final List<Formatter> getAll() {
+        List<Formatter> all = new ArrayList<>();
+        all.addAll(CONVERTERS);
+        all.addAll(CASE_CHANGERS);
+        all.addAll(OTHERS);
+        return all;
+    }
+
     public static Optional<Formatter> getFormatterForModifier(String modifier) {
         Objects.requireNonNull(modifier);
         Optional<Formatter> formatter;
+        List<Formatter> all = getAll();
 
         if (modifier.matches("regex.*")) {
             String regex = modifier.substring(LENGTH_OF_REGEX_PREFIX);
             RegexFormatter.setRegex(regex);
-            formatter = ALL.stream().filter(f -> f.getKey().equals("regex")).findAny();
+            formatter = all.stream().filter(f -> f.getKey().equals("regex")).findAny();
         } else {
-            formatter = ALL.stream().filter(f -> f.getKey().equals(modifier)).findAny();
+            formatter = all.stream().filter(f -> f.getKey().equals(modifier)).findAny();
         }
         if (formatter.isPresent()) {
             return formatter;
@@ -96,9 +119,4 @@ public class Formatters {
         }
     }
 
-    static {
-        ALL.addAll(CONVERTERS);
-        ALL.addAll(CASE_CHANGERS);
-        ALL.addAll(OTHERS);
-    }
 }

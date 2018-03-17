@@ -19,7 +19,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
+import javax.swing.JFrame;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.undo.UndoableEdit;
@@ -45,7 +45,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * * Input field name
  * * Either set field, or clear field.
  */
-public class MassSetFieldAction extends MnemonicAwareAction {
+public class MassSetFieldAction extends SimpleCommand {
 
     private final JabRefFrame frame;
     private JDialog diag;
@@ -62,14 +62,12 @@ public class MassSetFieldAction extends MnemonicAwareAction {
     private boolean canceled = true;
     private JCheckBox overwrite;
 
-
     public MassSetFieldAction(JabRefFrame frame) {
-        putValue(Action.NAME, Localization.menuTitle("Set/clear/append/rename fields") + "...");
         this.frame = frame;
     }
 
     private void createDialog() {
-        diag = new JDialog(frame, Localization.lang("Set/clear/append/rename fields"), true);
+        diag = new JDialog((JFrame) null, Localization.lang("Set/clear/append/rename fields"), true);
 
         field = new JComboBox<>();
         field.setEditable(true);
@@ -98,8 +96,8 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         }
 
         set.addChangeListener(e ->
-                // Entering a setText is only relevant if we are setting, not clearing:
-                textFieldSet.setEnabled(set.isSelected()));
+        // Entering a setText is only relevant if we are setting, not clearing:
+        textFieldSet.setEnabled(set.isSelected()));
 
         append.addChangeListener(e -> {
             // Text to append is only required if we are appending:
@@ -109,12 +107,12 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         });
 
         clear.addChangeListener(e ->
-                // Overwrite protection makes no sense if we are clearing the field:
-                overwrite.setEnabled(!clear.isSelected() && !append.isSelected()));
+        // Overwrite protection makes no sense if we are clearing the field:
+        overwrite.setEnabled(!clear.isSelected() && !append.isSelected()));
 
         rename.addChangeListener(e ->
-                // Entering a setText is only relevant if we are renaming
-                textFieldRename.setEnabled(rename.isSelected()));
+        // Entering a setText is only relevant if we are renaming
+        textFieldRename.setEnabled(rename.isSelected()));
 
         overwrite = new JCheckBox(Localization.lang("Overwrite existing field values"), true);
         ButtonGroup bg = new ButtonGroup();
@@ -158,8 +156,9 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             // Check that any field name is set
             String fieldText = (String) field.getSelectedItem();
             if ((fieldText == null) || fieldText.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(diag, Localization.lang("You must enter at least one field name"), "",
-                        JOptionPane.ERROR_MESSAGE);
+
+                frame.getDialogService().showErrorDialogAndWait(Localization.lang("You must enter at least one field name"));
+
                 return; // Do not close the dialog.
             }
 
@@ -167,8 +166,9 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             if (rename.isSelected()) {
                 String[] fields = getFieldNames(fieldText);
                 if (fields.length > 1) {
-                    JOptionPane.showMessageDialog(diag, Localization.lang("You can only rename one field at a time"),
-                            "", JOptionPane.ERROR_MESSAGE);
+
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("You can only rename one field at a time"));
+
                     return; // Do not close the dialog.
                 }
             }
@@ -207,7 +207,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void execute() {
         BasePanel bp = frame.getCurrentBasePanel();
         if (bp == null) {
             return;
@@ -220,7 +220,6 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         canceled = true;
         prepareDialog(!entries.isEmpty());
         if (diag != null) {
-            diag.setLocationRelativeTo(frame);
             diag.setVisible(true);
         }
         if (canceled) {
@@ -244,8 +243,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         NamedCompound compoundEdit = new NamedCompound(Localization.lang("Set field"));
         if (rename.isSelected()) {
             if (fields.length > 1) {
-                JOptionPane.showMessageDialog(diag, Localization.lang("You can only rename one field at a time"), "",
-                        JOptionPane.ERROR_MESSAGE);
+                frame.getDialogService().showErrorDialogAndWait(Localization.lang("You can only rename one field at a time"));
                 return; // Do not close the dialog.
             } else {
                 compoundEdit.addEdit(MassSetFieldAction.massRenameField(entryList, fields[0], textFieldRename.getText(),
@@ -259,7 +257,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             for (String field : fields) {
                 compoundEdit.addEdit(MassSetFieldAction.massSetField(entryList, field,
                         set.isSelected() ? toSet : null,
-                                overwrite.isSelected()));
+                        overwrite.isSelected()));
             }
         }
         compoundEdit.end();

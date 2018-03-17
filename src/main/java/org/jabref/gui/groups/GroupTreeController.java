@@ -111,7 +111,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         mainColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
         mainColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
                 .withText(GroupNodeViewModel::getDisplayName)
-                .withIcon(GroupNodeViewModel::getIcon, GroupNodeViewModel::getColor)
+                .withIcon(GroupNodeViewModel::getIcon)
                 .withTooltip(GroupNodeViewModel::getDescription));
 
         // Number of hits
@@ -172,7 +172,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
             // Simply setting to null is not enough since it would be replaced by the default node on every change
             row.setDisclosureNode(null);
             row.disclosureNodeProperty().addListener((observable, oldValue, newValue) -> row.setDisclosureNode(null));
-
+            
             // Add context menu (only for non-null items)
             row.contextMenuProperty().bind(
                     EasyBind.monadic(row.itemProperty())

@@ -67,6 +67,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.EntryFromFileCreator;
 import org.jabref.gui.importer.EntryFromFileCreatorManager;
 import org.jabref.gui.importer.UnlinkedFilesCrawler;
@@ -89,15 +90,6 @@ import org.slf4j.LoggerFactory;
  * GUI Dialog for the feature "Find unlinked files".
  */
 public class FindUnlinkedFilesDialog extends JabRefDialog {
-
-    /**
-     * Keys to be used for referencing this Action.
-     */
-    public static final String ACTION_COMMAND = "findUnlinkedFiles";
-    public static final String ACTION_MENU_TITLE = Localization.menuTitle("Find unlinked files...");
-
-    public static final String ACTION_SHORT_DESCRIPTION = Localization
-            .lang("Searches for unlinked PDF files on the file system");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FindUnlinkedFilesDialog.class);
     private static final String GLOBAL_PREFS_WORKING_DIRECTORY_KEY = "findUnlinkedFilesWD";
@@ -160,14 +152,15 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
     private boolean checkBoxWhyIsThereNoGetSelectedStupidSwing;
 
-    public FindUnlinkedFilesDialog(Frame owner, JabRefFrame frame, BasePanel panel) {
+    public FindUnlinkedFilesDialog(Frame owner, JabRefFrame frame) {
         super(owner, Localization.lang("Find unlinked files"), true, FindUnlinkedFilesDialog.class);
         this.frame = frame;
 
         restoreSizeOfDialog();
 
-        databaseContext = panel.getDatabaseContext();
-        creatorManager = new EntryFromFileCreatorManager();
+        databaseContext = frame.getCurrentBasePanel().getDatabaseContext();
+        creatorManager = new EntryFromFileCreatorManager(ExternalFileTypes.getInstance());
+
         crawler = new UnlinkedFilesCrawler(databaseContext);
 
         lastSelectedDirectory = loadLastSelectedDirectory();
@@ -586,7 +579,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-        DialogService ds = new FXDialogService();
+        DialogService ds = frame.getDialogService();
         /**
          * Stores the selected directory.
          */
@@ -987,7 +980,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
                 if (value instanceof EntryFromFileCreator) {
                     EntryFromFileCreator creator = (EntryFromFileCreator) value;
                     if (creator.getExternalFileType() != null) {
-                        label.setIcon(creator.getExternalFileType().getIcon());
+                        label.setIcon(creator.getExternalFileType().getIcon().getSmallIcon());
                     }
                 }
                 return label;
