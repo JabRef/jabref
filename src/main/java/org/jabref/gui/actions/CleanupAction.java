@@ -6,9 +6,7 @@ import java.util.Optional;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 
-import javafx.embed.swing.SwingNode;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -70,20 +68,12 @@ public class CleanupAction extends AbstractWorker {
         CleanupPresetPanel presetPanel = new CleanupPresetPanel(panel.getBibDatabaseContext(),
                 CleanupPreset.loadFromPreferences(preferences));
 
-        SwingNode node = new SwingNode();
         presetPanel.getScrollPane().setVisible(true);
-
         JScrollPane scrollPane = presetPanel.getScrollPane();
-        node.setContent(scrollPane);
-        node.setVisible(true);
 
-        DialogPane pane = new DialogPane();
-        pane.setContent(node);
-        pane.setPrefSize(600, 600);
+        Optional<ButtonType> ok = dialogService.showCustomSwingDialogAndWait(Localization.lang("Cleanup entries"), scrollPane, 600, 600, ButtonType.OK, ButtonType.CANCEL);
 
-        Optional<ButtonType> ok = dialogService.showCustomDialogAndWait(Localization.lang("Cleanup entries"), pane, ButtonType.OK, ButtonType.CANCEL);
-
-        if (!ok.isPresent() || ((ok.isPresent() && (ok.get() == ButtonType.CANCEL)))) {
+        if (!ok.isPresent() || ok.get() == ButtonType.CANCEL) {
             canceled = true;
             return;
         }
