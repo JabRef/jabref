@@ -41,6 +41,18 @@ public class LinkedFile implements Serializable {
         this(description, Objects.requireNonNull(link).toString(), fileType);
     }
 
+    public StringProperty descriptionProperty() {
+        return description;
+    }
+
+    public StringProperty linkProperty() {
+        return link;
+    }
+
+    public StringProperty fileTypeProperty() {
+        return fileType;
+    }
+
     public String getFileType() {
         return fileType.get();
     }
