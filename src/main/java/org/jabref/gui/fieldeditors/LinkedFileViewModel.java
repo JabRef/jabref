@@ -76,6 +76,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final XmpPreferences xmpPreferences;
     private final String fileNamePattern;
 
+    /**
+     * @deprecated use {@link #LinkedFileViewModel(LinkedFile, BibEntry, BibDatabaseContext, TaskExecutor, DialogService, JabRefPreferences, JournalAbbreviationLoader)} instead
+     */
     @Deprecated
     public LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
         this(linkedFile, entry, databaseContext, taskExecutor, new FXDialogService(), Globals.prefs, Globals.journalAbbreviationLoader);
