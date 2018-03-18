@@ -26,10 +26,10 @@ public abstract class BackgroundTask<V> {
     private Consumer<Exception> onException;
     private Runnable onFinished;
     private ObjectProperty<BackgroundProgress> progress = new SimpleObjectProperty<>(new BackgroundProgress(0, 0));
-    private DoubleProperty workDone = new SimpleDoubleProperty(0);
+    private DoubleProperty workDonePercentage = new SimpleDoubleProperty(0);
 
     public BackgroundTask() {
-        workDone.bind(EasyBind.map(progressProperty(), BackgroundTask.BackgroundProgress::getWorkDone));
+        workDonePercentage.bind(EasyBind.map(progress, BackgroundTask.BackgroundProgress::getWorkDonePercentage));
     }
 
     public static <V> BackgroundTask<V> wrap(Callable<V> callable) {
@@ -41,12 +41,12 @@ public abstract class BackgroundTask<V> {
         };
     }
 
-    public double getWorkDone() {
-        return workDone.get();
+    public double getWorkDonePercentage() {
+        return workDonePercentage.get();
     }
 
-    public DoubleProperty workDoneProperty() {
-        return workDone;
+    public DoubleProperty workDonePercentageProperty() {
+        return workDonePercentage;
     }
 
     public BackgroundProgress getProgress() {
@@ -130,7 +130,6 @@ public abstract class BackgroundTask<V> {
         private final double max;
 
         public BackgroundProgress(double workDone, double max) {
-
             this.workDone = workDone;
             this.max = max;
         }
@@ -141,6 +140,14 @@ public abstract class BackgroundTask<V> {
 
         public double getMax() {
             return max;
+        }
+
+        public double getWorkDonePercentage() {
+            if (max == 0) {
+                return 0;
+            } else {
+                return workDone / max;
+            }
         }
     }
 }

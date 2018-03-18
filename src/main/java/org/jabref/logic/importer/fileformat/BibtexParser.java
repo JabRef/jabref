@@ -58,8 +58,8 @@ import org.slf4j.LoggerFactory;
  * Can be used stand-alone.
  */
 public class BibtexParser implements Parser {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
+
     private static final Integer LOOKAHEAD = 64;
     private final FieldContentParser fieldContentParser;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();

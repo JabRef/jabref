@@ -18,6 +18,7 @@ import org.apache.http.client.utils.URIBuilder;
  * Fetcher for ISBN using http://www.ebook.de.
  */
 public class IsbnViaEbookDeFetcher extends AbstractIsbnFetcher {
+    private static final String BASE_URL = "http://www.ebook.de/de/tools/isbn2bibtex";
 
     public IsbnViaEbookDeFetcher(ImportFormatPreferences importFormatPreferences) {
         super(importFormatPreferences);
@@ -31,7 +32,7 @@ public class IsbnViaEbookDeFetcher extends AbstractIsbnFetcher {
     @Override
     public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         this.ensureThatIsbnIsValid(identifier);
-        URIBuilder uriBuilder = new URIBuilder("http://www.ebook.de/de/tools/isbn2bibtex");
+        URIBuilder uriBuilder = new URIBuilder(BASE_URL);
         uriBuilder.addParameter("isbn", identifier);
         return uriBuilder.build().toURL();
     }
