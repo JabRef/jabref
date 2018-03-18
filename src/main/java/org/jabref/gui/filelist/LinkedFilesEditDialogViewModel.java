@@ -67,21 +67,21 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         String fileName = Paths.get(fileText).getFileName().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                               .withInitialDirectory(workingDir)
-                                                                                               .withInitialFileName(fileName)
-                                                                                               .build();
-        dialogService.showFileOpenDialog(fileDialogConfiguration)
-                     .ifPresent(path -> {
-                         // Store the directory for next time:
-                         Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, path.toString());
+        .withInitialDirectory(workingDir)
+        .withInitialFileName(fileName)
+        .build();
 
-                         // If the file is below the file directory, make the path relative:
-                         List<Path> fileDirectories = database.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
-                         path = FileUtil.shortenFileName(path, fileDirectories);
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> {
+            // Store the directory for next time:
+            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, path.toString());
 
-                         linkProperty().set(path.toString());
-                         checkExtension();
-                     });
+            // If the file is below the file directory, make the path relative:
+            List<Path> fileDirectories = database.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+            path = FileUtil.shortenFileName(path, fileDirectories);
+
+            linkProperty().set(path.toString());
+            checkExtension();
+        });
     }
 
     //
