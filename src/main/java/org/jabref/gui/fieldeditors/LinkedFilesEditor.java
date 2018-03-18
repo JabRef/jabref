@@ -41,6 +41,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.preferences.JabRefPreferences;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
@@ -50,8 +51,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     @FXML private final LinkedFilesEditorViewModel viewModel;
     @FXML private ListView<LinkedFileViewModel> listView;
 
-    public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
-        this.viewModel = new LinkedFilesEditorViewModel(fieldName, suggestionProvider, dialogService, databaseContext, taskExecutor, fieldCheckers);
+    public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, JabRefPreferences preferences) {
+        this.viewModel = new LinkedFilesEditorViewModel(fieldName, suggestionProvider, dialogService, databaseContext, taskExecutor, fieldCheckers, preferences);
 
         ControlHelper.loadFXMLForControl(this);
 
@@ -150,8 +151,10 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     private static Node createFileDisplay(LinkedFileViewModel linkedFile) {
         Node icon = linkedFile.getTypeIcon().getGraphicNode();
         icon.setOnMouseClicked(event -> linkedFile.open());
-        Text link = new Text(linkedFile.getLink());
-        Text desc = new Text(linkedFile.getDescription());
+        Text link = new Text();
+        link.textProperty().bind(linkedFile.linkProperty());
+        Text desc = new Text();
+        desc.textProperty().bind(linkedFile.descriptionProperty());
 
         ProgressBar progressIndicator = new ProgressBar();
         progressIndicator.progressProperty().bind(linkedFile.downloadProgressProperty());
@@ -242,6 +245,9 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         MenuItem openFolder = new MenuItem(Localization.lang("Open folder"));
         openFolder.setOnAction(event -> linkedFile.openFolder());
 
+        MenuItem download = new MenuItem(Localization.lang("Download file"));
+        download.setOnAction(event -> linkedFile.download());
+
         MenuItem renameFile = new MenuItem(Localization.lang("Rename file"));
         renameFile.setOnAction(event -> linkedFile.rename());
         renameFile.setDisable(linkedFile.getFile().isOnlineLink());
@@ -261,6 +267,9 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         menu.getItems().add(new SeparatorMenuItem());
         menu.getItems().addAll(openFile, openFolder);
         menu.getItems().add(new SeparatorMenuItem());
+        if (linkedFile.getFile().isOnlineLink()) {
+            menu.getItems().add(download);
+        }
         menu.getItems().addAll(renameFile, moveFile, deleteLink, deleteFile);
 
         return menu;
