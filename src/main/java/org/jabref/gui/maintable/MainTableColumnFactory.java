@@ -240,9 +240,9 @@ class MainTableColumnFactory {
                         .withGraphic(this::createFileIcon)
                         .withMenu(this::createFileMenu)
                         .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
-                            if (event.getButton() == MouseButton.PRIMARY && linkedFiles.size() == 1) {
+                            if ((event.getButton() == MouseButton.PRIMARY) && (linkedFiles.size() == 1)) {
                                 // Only one linked file -> open directly
-                                LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFiles.get(0), entry.getEntry(), database, dialogService, Globals.TASK_EXECUTOR);
+                                                                                     LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFiles.get(0), entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs, Globals.journalAbbreviationLoader);
                                 linkedFileViewModel.open();
                             }
                         })
@@ -258,7 +258,7 @@ class MainTableColumnFactory {
         ContextMenu contextMenu = new ContextMenu();
 
         for (LinkedFile linkedFile : linkedFiles) {
-            LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, entry.getEntry(), database, dialogService, Globals.TASK_EXECUTOR);
+            LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs, Globals.journalAbbreviationLoader);
 
             MenuItem menuItem = new MenuItem(linkedFileViewModel.getDescriptionAndLink(), linkedFileViewModel.getTypeIcon().getGraphicNode());
             menuItem.setOnAction(event -> linkedFileViewModel.open());

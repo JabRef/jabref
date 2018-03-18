@@ -51,7 +51,7 @@ public class FieldEditors {
         } else if (fieldExtras.contains(FieldProperty.OWNER)) {
             return new OwnerEditor(fieldName, preferences, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.FILE_EDITOR)) {
-            return new LinkedFilesEditor(fieldName, dialogService, databaseContext, taskExecutor, suggestionProvider, fieldCheckers, preferences);
+            return new LinkedFilesEditor(fieldName, dialogService, databaseContext, taskExecutor, suggestionProvider, fieldCheckers, preferences, journalAbbreviationLoader);
         } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
             return new OptionEditor<>(new YesNoEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
         } else if (fieldExtras.contains(FieldProperty.MONTH)) {
