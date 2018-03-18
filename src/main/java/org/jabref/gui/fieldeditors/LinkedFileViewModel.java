@@ -37,7 +37,6 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.io.FileUtil;
@@ -76,8 +75,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                                BibDatabaseContext databaseContext,
                                TaskExecutor taskExecutor,
                                DialogService dialogService,
-                               JabRefPreferences preferences,
-                               JournalAbbreviationLoader abbreviationLoader) {
+                               JabRefPreferences preferences) {
 
         this.linkedFile = linkedFile;
         this.databaseContext = databaseContext;
@@ -88,7 +86,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         xmpPreferences = preferences.getXMPPreferences();
         fileNamePattern = preferences.get(JabRefPreferences.IMPORT_FILENAMEPATTERN);
         fileDirectoryPreferences = preferences.getFileDirectoryPreferences();
-        fileDirPattern = preferences.getCleanupPreferences(abbreviationLoader).getFileDirPattern();
+        fileDirPattern = preferences.get(JabRefPreferences.IMPORT_FILEDIRPATTERN);
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
         canWriteXMPMetadata.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
     }
