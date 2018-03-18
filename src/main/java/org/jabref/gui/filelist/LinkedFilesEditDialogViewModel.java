@@ -45,7 +45,6 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     }
 
     private void checkExtension() {
-
         if (!linkProperty.getValueSafe().isEmpty()) {
 
             // Check if this looks like a remote link:
