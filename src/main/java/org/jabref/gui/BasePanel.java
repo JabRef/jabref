@@ -60,7 +60,6 @@ import org.jabref.gui.externalfiles.WriteXMPActionWorker;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.filelist.AttachFileAction;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.groups.GroupAddRemoveDialog;
@@ -483,7 +482,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         actions.put(Actions.MERGE_DATABASE, new AppendDatabaseAction(frame, this));
 
-        actions.put(Actions.ADD_FILE_LINK, new AttachFileAction(this));
 
         actions.put(Actions.OPEN_EXTERNAL_FILE, (BaseAction) () -> openExternalFile());
 
