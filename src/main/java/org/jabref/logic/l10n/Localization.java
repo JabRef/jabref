@@ -132,8 +132,8 @@ public class Localization {
      * @param locale Localization to use.
      */
     private static void createResourceBundles(Locale locale) {
-        ResourceBundle messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
-        ResourceBundle menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
+        ResourceBundle messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale/*, new EncodingControl(StandardCharsets.UTF_8)*/);
+        ResourceBundle menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale/*, new EncodingControl(StandardCharsets.UTF_8)*/);
         Objects.requireNonNull(messages, "Could not load " + RESOURCE_PREFIX + " resource.");
         Objects.requireNonNull(menuTitles, "Could not load " + MENU_RESOURCE_PREFIX + " resource.");
         localizedMenuTitles = new LocalizationBundle(createLookupMap(menuTitles));
