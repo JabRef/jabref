@@ -27,13 +27,12 @@ public class TestArchitectureTests {
     private static final String CLASS_ORG_JABREF_PREFERENCES_TEST = "JabRefPreferencesTest";
     private static final String CLASS_ORG_JABREF_PREFERENCES_MIGRATIONS_TEST = "PreferencesMigrationsTest";
     private static final String CLASS_ORG_JABREF_UPDATE_TIMESTAMP_LISTENER_TEST = "UpdateTimestampListenerTest";
-    private static final String CLASS_ORG_JABREF_ENTRY_EDITOR_TEST = "SourceTabTest";
     private static final String CLASS_ORG_JABREF_ENTRY_EDITOR_TEST = "EntryEditorTest";
     private static final String CLASS_ORG_JABREF_LINKED_FILE_VIEW_MODEL_TEST = "LinkedFileViewModelTest";
 
     private final String forbiddenPackage;
 
-    private List<String> exceptions;
+    private final List<String> exceptions;
 
     public TestArchitectureTests(String forbiddenPackage) {
         this.forbiddenPackage = forbiddenPackage;
