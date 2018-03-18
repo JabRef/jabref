@@ -6,6 +6,7 @@ import java.util.function.Function;
 import javafx.scene.Parent;
 import javafx.stage.Stage;
 
+import org.jabref.Globals;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.FXMLView;
@@ -28,7 +29,7 @@ public class AbstractView extends FXMLView {
         Parent view = super.getView();
 
         // Add our base css file
-        view.getStylesheets().add(0, AbstractDialogView.class.getResource("Main.css").toExternalForm());
+        Globals.getThemeLoader().installBaseCss(view);
 
         // Notify controller about the stage, where it is displayed
         view.sceneProperty().addListener((observable, oldValue, newValue) -> {
