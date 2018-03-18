@@ -18,7 +18,6 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import org.jabref.gui.AbstractView;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
@@ -150,7 +149,7 @@ public class JabRefGUI {
         }
 
         Scene scene = new Scene(JabRefGUI.mainFrame, 800, 800);
-        scene.getStylesheets().add(AbstractView.class.getResource("Main.css").toExternalForm());
+        Globals.getThemeLoader().installBaseCss(scene);
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
         mainStage.setScene(scene);

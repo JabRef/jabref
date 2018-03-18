@@ -6,8 +6,6 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import javax.swing.JOptionPane;
-
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -198,7 +196,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
             frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file.")
                     + Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()));
-            throw ex;
+            throw new SaveException(ex.getMessage(), ex);
         } catch (SaveException ex) {
             if (ex == SaveException.FILE_LOCKED) {
                 throw ex;
@@ -211,8 +209,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 LOGGER.error("A problem occured when trying to save the file", ex);
             }
 
-            JOptionPane.showMessageDialog(null, Localization.lang("Could not save file.") + ".\n" + ex.getMessage(),
-                    Localization.lang("Save library"), JOptionPane.ERROR_MESSAGE);
+            frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             throw ex;
         }
 
@@ -248,30 +245,30 @@ public class SaveDatabaseAction extends AbstractWorker {
                     success = false;
                 }
             }
+        }
 
-            // backup file?
-            try {
-                if (success) {
-                    session.commit(file.toPath());
-                    // Make sure to remember which encoding we used.
-                    panel.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
-                } else {
-                    session.cancel();
-                }
-            } catch (SaveException e) {
-                LOGGER.debug("Problems saving during backup creationg", e);
-                boolean saveWithoutBackupClicked = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Unable to create backup"),
-                        Localization.lang("Save failed during backup creation") + ". " + Localization.lang("Save without backup?"),
-                        Localization.lang("Save without backup"), Localization.lang("Cancel"));
+        // backup file?
+        try {
+            if (success) {
+                session.commit(file.toPath());
+                // Make sure to remember which encoding we used.
+                panel.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
+            } else {
+                session.cancel();
+            }
+        } catch (SaveException e) {
+            LOGGER.debug("Problems saving during backup creationg", e);
+            boolean saveWithoutBackupClicked = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Unable to create backup"),
+                    Localization.lang("Save failed during backup creation") + ". " + Localization.lang("Save without backup?"),
+                    Localization.lang("Save without backup"), Localization.lang("Cancel"));
 
-                if (saveWithoutBackupClicked) {
-                    session.setUseBackup(false);
+            if (saveWithoutBackupClicked) {
+                session.setUseBackup(false);
 
-                    session.commit(file.toPath());
-                    panel.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
-                } else {
-                    success = false;
-                }
+                session.commit(file.toPath());
+                panel.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
+            } else {
+                success = false;
             }
         }
 

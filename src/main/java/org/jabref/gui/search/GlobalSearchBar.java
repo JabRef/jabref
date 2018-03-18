@@ -134,13 +134,21 @@ public class GlobalSearchBar extends HBox {
         */
 
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
-        addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+        searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
-            if (keyBinding.isPresent() && keyBinding.get().equals(KeyBinding.GLOBAL_SEARCH)) {
-                globalSearch.setSelected(true);
-                searchPreferences.setGlobalSearch(globalSearch.isSelected());
-                updateOpenCurrentResultsTooltip(globalSearch.isSelected());
-                focus();
+            if (keyBinding.isPresent()) {
+                if (keyBinding.get().equals(KeyBinding.GLOBAL_SEARCH)) {
+                    globalSearch.setSelected(true);
+                    searchPreferences.setGlobalSearch(globalSearch.isSelected());
+                    updateOpenCurrentResultsTooltip(globalSearch.isSelected());
+                    focus();
+                    event.consume();
+                } else if (keyBinding.get().equals(KeyBinding.CLEAR_SEARCH)) {
+                    // Clear search and select first entry, if available
+                    clearSearch();
+                    frame.getCurrentBasePanel().getMainTable().getSelectionModel().selectFirst();
+                    event.consume();
+                }
             }
         });
 
@@ -204,6 +212,7 @@ public class GlobalSearchBar extends HBox {
                 searchField,
                 currentResults
         );
+
         this.setAlignment(Pos.CENTER_LEFT);
     }
 
@@ -501,14 +510,17 @@ public class GlobalSearchBar extends HBox {
             }
         }
 
+        @Override
         public Node getNode() {
             return this.container;
         }
 
+        @Override
         public AutoCompletePopup<T> getSkinnable() {
             return this.control;
         }
 
+        @Override
         public void dispose() {
         }
     }

@@ -1,4 +1,4 @@
-package org.jabref.logic.migrations;
+package org.jabref.migrations;
 
 import java.util.List;
 import java.util.Objects;

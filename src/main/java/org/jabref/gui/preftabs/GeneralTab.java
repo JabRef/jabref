@@ -19,6 +19,7 @@ import javax.swing.JTextField;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
@@ -207,9 +208,9 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.setShouldCollectTelemetry(shouldCollectTelemetry.isSelected());
         if (prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE) && !memoryStick.isSelected()) {
 
-            dialogService.showInformationDialogAndWait(Localization.lang("Memory stick mode"),
+            DefaultTaskExecutor.runInJavaFXThread(()->dialogService.showInformationDialogAndWait(Localization.lang("Memory stick mode"),
                     Localization.lang("To disable the memory stick mode"
-                            + " rename or remove the jabref.xml file in the same folder as JabRef."));
+                            + " rename or remove the jabref.xml file in the same folder as JabRef.")));
         }
         prefs.putBoolean(JabRefPreferences.MEMORY_STICK_MODE, memoryStick.isSelected());
         prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, confirmDelete.isSelected());
@@ -230,10 +231,10 @@ class GeneralTab extends JPanel implements PrefsTab {
             Globals.prefs.setLanguageDependentDefaultValues();
             // Warn about restart needed:
 
-            dialogService.showWarningDialogAndWait(Localization.lang("Changed language settings"),
+            DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showWarningDialogAndWait(Localization.lang("Changed language settings"),
                     Localization.lang("You have changed the language setting.")
                             .concat(" ")
-                            .concat(Localization.lang("You must restart JabRef for this to come into effect.")));
+                            .concat(Localization.lang("You must restart JabRef for this to come into effect."))));
         }
     }
 
@@ -244,8 +245,8 @@ class GeneralTab extends JPanel implements PrefsTab {
             DateTimeFormatter.ofPattern(timeStampFormat.getText());
 
         } catch (IllegalArgumentException ex2) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Invalid date format"),
-                    Localization.lang("The chosen date format for new entries is not valid"));
+            DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Invalid date format"),
+                    Localization.lang("The chosen date format for new entries is not valid")));
 
             return false;
         }
