@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
  */
 public class ThemeLoader {
 
-    private static final String pathDefaultMainCss = AbstractView.class.getResource("Main.css").toExternalForm();
-    private static final String cssSystemProperty = System.getProperty("jabref.main.css");
+    private static final String DEFAULT_PATH_MAIN_CSS = AbstractView.class.getResource("Main.css").toExternalForm();
+    private static final String CSS_SYSTEM_PROPERTY = System.getProperty("jabref.main.css");
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeLoader.class);
     private final FileUpdateMonitor fileUpdateMonitor;
 
@@ -44,9 +44,9 @@ public class ThemeLoader {
      * Changes in the css file lead to a redraw of the scene using the new css file.
      */
     public void installBaseCss(Scene scene) {
-        String pathToMainCss = pathDefaultMainCss;
-        if (cssSystemProperty != null) {
-            final Path path = Paths.get(cssSystemProperty);
+        String pathToMainCss = DEFAULT_PATH_MAIN_CSS;
+        if (CSS_SYSTEM_PROPERTY != null) {
+            final Path path = Paths.get(CSS_SYSTEM_PROPERTY);
             if ("Main.css".matches(path.getFileName().toString()) && Files.isReadable(path)) {
                 pathToMainCss = path.toUri().toString();
             }
@@ -59,7 +59,7 @@ public class ThemeLoader {
         try {
             // If -Djabref.main.css is defined and the resources are not part of a .jar bundle,
             // we watch the file for changes and turn on live reloading
-            if (!cssUrl.startsWith("jar:") && cssSystemProperty != null) {
+            if (!cssUrl.startsWith("jar:") && CSS_SYSTEM_PROPERTY != null) {
                 Path cssFile = Paths.get(new URL(cssUrl).toURI());
                 LOGGER.info("Enabling live reloading of " + cssFile);
                 fileUpdateMonitor.addListenerForFile(cssFile, () -> {
@@ -82,6 +82,6 @@ public class ThemeLoader {
      */
     @Deprecated
     public void installBaseCss(Parent control) {
-        control.getStylesheets().add(0, pathDefaultMainCss);
+        control.getStylesheets().add(0, DEFAULT_PATH_MAIN_CSS);
     }
 }
