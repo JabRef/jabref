@@ -972,7 +972,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                             return;
                         }
                         FileListEntry fl = tableModel.getEntry(0);
-                        (new ExternalFileMenuItem(frame, entry, "", fl.getLink(), null, panel.getBibDatabaseContext(),
+                        (new ExternalFileMenuItem(frame, "", fl.getLink(), null, panel.getBibDatabaseContext(),
                                 fl.getType())).actionPerformed(null);
                     }
                 } else { // Must be URL_COL
@@ -1030,7 +1030,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 if ((description == null) || (description.trim().isEmpty())) {
                     description = flEntry.getLink();
                 }
-                menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry.getLink(),
+                menu.add(new ExternalFileMenuItem(panel.frame(), description, flEntry.getLink(),
                         flEntry.getType().get().getIcon().getSmallIcon(), panel.getBibDatabaseContext(), flEntry.getType()));
                 count++;
             }

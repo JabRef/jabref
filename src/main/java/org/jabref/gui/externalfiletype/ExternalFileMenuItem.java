@@ -7,12 +7,12 @@ import java.util.Optional;
 
 import javax.swing.Icon;
 import javax.swing.JMenuItem;
+
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileHelper;
 
 import org.slf4j.Logger;
@@ -27,27 +27,25 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalFileMenuItem.class);
 
-    private final BibEntry entry;
     private final String link;
     private final BibDatabaseContext databaseContext;
     private Optional<ExternalFileType> fileType;
     private final JabRefFrame frame;
     private String fieldName;
 
-    public ExternalFileMenuItem(JabRefFrame frame, BibEntry entry, String name, String link, Icon icon,
+    public ExternalFileMenuItem(JabRefFrame frame, String name, String link, Icon icon,
                                 BibDatabaseContext databaseContext, Optional<ExternalFileType> fileType) {
         super(name, icon);
         this.frame = frame;
-        this.entry = entry;
         this.link = link;
         this.databaseContext = databaseContext;
         this.fileType = fileType;
         addActionListener(this);
     }
 
-    public ExternalFileMenuItem(JabRefFrame frame, BibEntry entry, String name, String link, Icon icon,
+    public ExternalFileMenuItem(JabRefFrame frame, String name, String link, Icon icon,
                                 BibDatabaseContext databaseContext, String fieldName) {
-        this(frame, entry, name, link, icon, databaseContext, Optional.empty());
+        this(frame, name, link, icon, databaseContext, Optional.empty());
         this.fieldName = fieldName;
     }
 
@@ -84,13 +82,12 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
             // application link. If that link is referred by the error message, we can assume
             // that the problem is in the open-with-application setting:
             if ((fileType.isPresent()) && (!fileType.get().getOpenWithApplication().isEmpty())
-                && ex.getMessage().contains(fileType.get().getOpenWithApplication())) {
+            && ex.getMessage().contains(fileType.get().getOpenWithApplication())) {
 
                 DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(Localization.lang("Could not open link"),
-                                                                                                            Localization.lang("Unable to open link. "
-                                                                                                                + "The application '%0' associated with the file type '%1' could not be called.",
-                                                                                                                              fileType.get().getOpenWithApplication(),
-                                                                                                                              fileType.get().getName())));
+                Localization.lang("Unable to open link. " + "The application '%0' associated with the file type '%1' could not be called.",
+                fileType.get().getOpenWithApplication(),
+                fileType.get().getName())));
 
                 return false;
             }
