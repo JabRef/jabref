@@ -12,6 +12,7 @@ import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreviewPreferences;
+import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.RETURNS_MOCKS;
 import static org.mockito.Mockito.mock;
 
+@GUITest
 @ExtendWith(ApplicationExtension.class)
 public class BasePanelTest {
 

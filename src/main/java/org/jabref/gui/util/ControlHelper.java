@@ -29,7 +29,9 @@ public class ControlHelper {
             fxmlLoader.load();
 
             // Add our base css file
-            Globals.getThemeLoader().installBaseCss(control);
+            if (Globals.getThemeLoader() != null) {
+                Globals.getThemeLoader().installBaseCss(control);
+            }
 
         } catch (IOException exception) {
             LOGGER.error("Problem loading fxml for control", exception);
