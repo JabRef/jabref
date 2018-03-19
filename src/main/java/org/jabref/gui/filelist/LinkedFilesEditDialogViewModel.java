@@ -14,7 +14,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -26,6 +25,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
@@ -36,10 +36,12 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     private final ObjectProperty<ExternalFileType> selectedExternalFileType = new SimpleObjectProperty<>();
     private final BibDatabaseContext database;
     private final DialogService dialogService;
+    private final PreferencesService preferences;
 
-    public LinkedFilesEditDialogViewModel(LinkedFile linkedFile, BibDatabaseContext database, DialogService dialogService) {
+    public LinkedFilesEditDialogViewModel(LinkedFile linkedFile, BibDatabaseContext database, DialogService dialogService, PreferencesService preferences2) {
         this.database = database;
         this.dialogService = dialogService;
+        this.preferences = preferences2;
         externalfilesTypes.set(FXCollections.observableArrayList(ExternalFileTypes.getInstance().getExternalFileTypeSelection()));
         setValues(linkedFile);
     }
@@ -61,9 +63,9 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     public void openBrowseDialog() {
         String fileText = linkProperty().get();
 
-        Optional<Path> file = FileHelper.expandFilename(database, fileText, Globals.prefs.getFileDirectoryPreferences());
+        Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.getFileDirectoryPreferences());
 
-        Path workingDir = file.orElse(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)));
+        Path workingDir = file.orElse(Paths.get(preferences.get(JabRefPreferences.WORKING_DIRECTORY)));
         String fileName = Paths.get(fileText).getFileName().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -73,10 +75,10 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> {
             // Store the directory for next time:
-            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, path.toString());
+            preferences.put(JabRefPreferences.WORKING_DIRECTORY, path.toString());
 
             // If the file is below the file directory, make the path relative:
-            List<Path> fileDirectories = database.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+            List<Path> fileDirectories = database.getFileDirectoriesAsPaths(preferences.getFileDirectoryPreferences());
             path = FileUtil.shortenFileName(path, fileDirectories);
 
             linkProperty().set(path.toString());

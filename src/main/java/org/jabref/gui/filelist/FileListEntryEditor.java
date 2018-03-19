@@ -61,7 +61,9 @@ import org.slf4j.LoggerFactory;
  *
  * For use when downloading files, this class also offers a progress bar and a "Downloading..."
  * label that can be hidden when the download is complete.
+ * @deprecated Use {@link LinkedFileEditDialogView}
  */
+@Deprecated
 public class FileListEntryEditor {
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
