@@ -122,8 +122,6 @@ public class RightClickMenu {
         return command;
     }
 
-
-
     private static OldCommandWrapper getFetchEntryData(BasePanel panel) {
         OldCommandWrapper command = new OldCommandWrapper(Actions.MERGE_WITH_FETCHED_ENTRY, panel);
         command.setExecutable(isAnyFieldSetForSelectedEntry(FetchAndMergeEntry.SUPPORTED_FIELDS, panel));
