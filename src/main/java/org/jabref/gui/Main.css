@@ -104,7 +104,7 @@
 
     /* A bright blue for highlighting/accenting objects.  For example: selected
      * text; selected items in menus, lists, trees, and tables; progress bars */
-    -fx-accent: derive(-jr-theme, 90%);
+    -fx-accent: derive(-jr-theme, 50%);
 
     /* Default buttons color, this is similar to accent but more subtle */
     -fx-default-button: derive(-fx-accent, 50%);
