@@ -92,7 +92,6 @@
 .tree-table-row-cell > .tree-table-cell > .tree-disclosure-node > .arrow {
     -fx-max-height: 0.5em;
     -fx-max-width: 0.5em;
-    /*-fx-background-color: -jr-icon;*/
     -fx-padding: 0.333333em 0.229em 0.333333em 0.229em; /* 4 */
     -fx-shape: "m64,416l96,96l256,-256l-256,-256l-96,96l160,160l-160,160z";
 }

@@ -11,7 +11,7 @@
     /* This theme is the original JabRef dark blue color */
     -jr-theme: #50618F;
     /* The base gray. Most gray-tones in the application are derived from this color. */
-    -jr-base: #eee;
+    -jr-base: #f0f0f0;
 
     -jr-white: #ffffff;
     -jr-gray-00: #f5f5f5;
@@ -62,6 +62,9 @@
     -jr-tooltip-bg: -jr-info;
     -jr-tooltip-fg: -jr-black;
 
+    /* Consistent size for headers of tab-pane and side-panels*/
+    -jr-header-height: 3em;
+
 
     /*
      Here are redefinitions of the default properties of modena. They should in principle all be derived from the
@@ -96,7 +99,7 @@
      * -fx-selection-bar-text for text on top of -fx-selection-bar
      */
     -fx-dark-text-color: -jr-black;
-    -fx-mid-text-color: derive(-jr-base, -50%);
+    -fx-mid-text-color: derive(-jr-base, -60%);
     -fx-light-text-color: -jr-white;
 
     /* A bright blue for highlighting/accenting objects.  For example: selected
@@ -193,11 +196,12 @@
     /* The color to use for small mark-like objects such as checks on check
      * boxes, filled in circles in radio buttons, arrows on scroll bars, etc.
      */
-    -fx-mark-color: white 30%;
+    -fx-mark-color: -jr-theme;
 
     /* The small thin light "shadow" for mark-like objects. Typically used in
      * conjunction with -fx-mark-color with an insets of 1 0 -1 0. */
-    -fx-mark-highlight-color: derive(-fx-color,80%);
+    -fx-mark-highlight-color: transparent;
+    /*-fx-mark-highlight-color: derive(-fx-color,80%);*/
 
     /* Background for items in list like things such as menus, lists, trees,
      * and tables. */
@@ -226,6 +230,7 @@
 
     -fx-focused-text-base-color : -fx-dark-text-color;
     -fx-focused-mark-color : -fx-focused-text-base-color;
+
 
 }
 
@@ -348,6 +353,8 @@
     -fx-border-color: -fx-outer-border;
     -fx-border-width: 0.5 0.5 0.5 0.5;
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
+    -fx-pref-height: -jr-header-height;
+
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab .tab-label {
@@ -581,8 +588,13 @@
     -fx-fill: -jr-theme;
     -fx-text-fill: -jr-theme;
     -fx-font-weight: bold;
+    -fx-pref-height: -jr-header-height;
+
 }
 
+.sidePaneComponentHeader .glyph-icon{
+    -fx-font-size: 16px;
+}
 /*.mainMenu {*/
     /*-fx-background-color: -jr-background;*/
 /*}*/
@@ -624,7 +636,10 @@
     -fx-text-fill: -jr-icon;
 }
 
+/* The little arrow that shows up when not all tool-bar icons fit into the tool-bar.
+We want to have a look that matches our icons in the tool-bar */
+.mainToolbar .tool-bar-overflow-button:hover > .arrow {
+    -fx-background-color: -fx-mark-highlight-color, derive(-jr-icon, -30%);
+    -fx-effect: dropshadow(one-pass-box, -jr-icon, 5, 0, 1, 1);
+}
 
-/*.mainToolbar .search-field:focused {*/
-    /*-fx-background-color: -jr-white;*/
-/*}*/

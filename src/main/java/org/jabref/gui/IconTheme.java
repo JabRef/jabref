@@ -177,23 +177,23 @@ public class IconTheme {
 
     public enum JabRefIcons implements JabRefIcon {
 
-        ADD(MaterialDesignIcon.PLUS_BOX),
+        ADD(MaterialDesignIcon.PLUS_CIRCLE_OUTLINE),
         ADD_NOBOX(MaterialDesignIcon.PLUS),
-        ADD_ENTRY(MaterialDesignIcon.TOOLTIP_OUTLINE_PLUS),
+        ADD_ENTRY(MaterialDesignIcon.BOOKMARK_PLUS),
         EDIT_ENTRY(MaterialDesignIcon.TOOLTIP_EDIT),
         EDIT_STRINGS(MaterialDesignIcon.TOOLTIP_TEXT),
         FOLDER(MaterialDesignIcon.FOOD_FORK_DRINK),
         REMOVE(MaterialDesignIcon.MINUS_BOX),
         REMOVE_NOBOX(MaterialDesignIcon.MINUS),
-        FILE(MaterialDesignIcon.FILE),
+        FILE(MaterialDesignIcon.FILE_OUTLINE),
         PDF_FILE(MaterialDesignIcon.FILE_PDF),
         DOI(MaterialDesignIcon.BARCODE_SCAN),
         DUPLICATE(MaterialDesignIcon.CONTENT_DUPLICATE),
         EDIT(MaterialDesignIcon.PENCIL),
-        NEW(MaterialDesignIcon.FILE_OUTLINE),
+        NEW(MaterialDesignIcon.FOLDER_PLUS),
         SAVE(MaterialDesignIcon.CONTENT_SAVE),
         SAVE_ALL(MaterialDesignIcon.CONTENT_SAVE_ALL),
-        CLOSE(MaterialDesignIcon.CLOSE),
+        CLOSE(MaterialDesignIcon.CLOSE_CIRCLE),
         PASTE(MaterialDesignIcon.CONTENT_PASTE),
         CUT(MaterialDesignIcon.CONTENT_CUT),
         COPY(MaterialDesignIcon.CONTENT_COPY),
@@ -207,8 +207,8 @@ public class IconTheme {
         ADVANCED_SEARCH(Color.CYAN, MaterialDesignIcon.MAGNIFY),
         PREFERENCES(MaterialDesignIcon.SETTINGS),
         HELP(MaterialDesignIcon.HELP_CIRCLE),
-        UP(MaterialDesignIcon.CHEVRON_UP),
-        DOWN(MaterialDesignIcon.CHEVRON_DOWN),
+        UP(MaterialDesignIcon.ARROW_UP),
+        DOWN(MaterialDesignIcon.ARROW_DOWN),
         LEFT(MaterialDesignIcon.ARROW_LEFT_BOLD),
         RIGHT(MaterialDesignIcon.ARROW_RIGHT_BOLD),
         SOURCE(MaterialDesignIcon.CODE_BRACES),
@@ -287,7 +287,7 @@ public class IconTheme {
         BLOG(MaterialDesignIcon.RSS), /* css: rss */
         GLOBAL_SEARCH(MaterialDesignIcon.EARTH), /* css: earth */
         DATE_PICKER(MaterialDesignIcon.CALENDAR), /* css: calendar */
-        DEFAULT_GROUP_ICON_COLORED(MaterialDesignIcon.CHECKBOX_BLANK_CIRCLE),
+        DEFAULT_GROUP_ICON_COLORED(MaterialDesignIcon.MENU_RIGHT),
         DEFAULT_GROUP_ICON(MaterialDesignIcon.LABEL_OUTLINE),
         ALL_ENTRIES_GROUP_ICON(DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON),
         IMPORT_EXPORT(MaterialDesignIcon.SWAP_VERTICAL),

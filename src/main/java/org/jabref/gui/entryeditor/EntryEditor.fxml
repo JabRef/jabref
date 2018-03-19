@@ -16,7 +16,7 @@
         <ToolBar orientation="VERTICAL">
             <Button styleClass="flatButton,narrow" onAction="#close">
                 <graphic>
-                    <MaterialDesignIconView glyphName="CLOSE"/>
+                    <MaterialDesignIconView glyphName="CLOSE_CIRCLE"/>
                 </graphic>
                 <tooltip>
                     <Tooltip text="%Close window"/>
@@ -58,7 +58,7 @@
             <Separator/>
             <Button styleClass="flatButtonNoSpaceBottom,narrow" onAction="#navigateToPreviousEntry">
                 <graphic>
-                    <MaterialDesignIconView glyphName="CHEVRON_UP"/>
+                    <MaterialDesignIconView glyphName="ARROW_UP"/>
                 </graphic>
                 <tooltip>
                     <Tooltip text="%Previous entry"/>
@@ -66,7 +66,7 @@
             </Button>
             <Button styleClass="flatButtonNoSpaceTop,narrow" onAction="#navigateToNextEntry">
                 <graphic>
-                    <MaterialDesignIconView glyphName="CHEVRON_DOWN"/>
+                    <MaterialDesignIconView glyphName="ARROW_DOWN"/>
                 </graphic>
                 <tooltip>
                     <Tooltip text="%Next entry"/>
