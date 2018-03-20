@@ -175,6 +175,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     }
 
     public void setIcon(JabRefIcon icon) {
+        Objects.requireNonNull(icon);
         this.icon = icon;
         label.setIcon(this.icon.getSmallIcon());
     }

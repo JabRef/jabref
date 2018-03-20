@@ -12,6 +12,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -61,6 +62,7 @@ public class Globals {
     // Background tasks
     private static GlobalFocusListener focusListener;
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
+    private static ThemeLoader themeLoader;
     private static TelemetryClient telemetryClient;
 
     private Globals() {
@@ -80,6 +82,8 @@ public class Globals {
 
         Globals.fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
+
+        themeLoader = new ThemeLoader(fileUpdateMonitor);
 
         if (Globals.prefs.shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
             startTelemetryClient();
@@ -129,5 +133,9 @@ public class Globals {
 
     public static Optional<TelemetryClient> getTelemetryClient() {
         return Optional.ofNullable(telemetryClient);
+    }
+
+    public static ThemeLoader getThemeLoader() {
+        return themeLoader;
     }
 }

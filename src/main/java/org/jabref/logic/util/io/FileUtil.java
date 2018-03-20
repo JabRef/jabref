@@ -260,7 +260,7 @@ public class FileUtil {
      * @param fileNamePattern the filename pattern
      * @param prefs           the layout preferences
      * @return a suggested fileName
-     * @Deprecated use String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern ) instead.
+     * @deprecated use String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern ) instead.
      */
     @Deprecated
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern,
@@ -297,7 +297,7 @@ public class FileUtil {
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
         String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
 
-        if ((targetName == null) || targetName.isEmpty()) {
+        if (targetName.isEmpty()) {
             targetName = entry.getCiteKeyOptional().orElse("default");
         }
 
@@ -315,11 +315,9 @@ public class FileUtil {
      * @return a suggested fileName
      */
     public static String createDirNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
-        String targetName = null;
+        String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
 
-        targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
-
-        if ((targetName == null) || targetName.isEmpty()) {
+        if (targetName.isEmpty()) {
             targetName = entry.getCiteKeyOptional().orElse("default");
         }
 

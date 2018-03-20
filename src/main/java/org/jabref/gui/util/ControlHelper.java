@@ -5,7 +5,7 @@ import java.io.IOException;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 
-import org.jabref.gui.AbstractView;
+import org.jabref.Globals;
 import org.jabref.logic.l10n.Localization;
 
 import org.slf4j.Logger;
@@ -29,9 +29,9 @@ public class ControlHelper {
             fxmlLoader.load();
 
             // Add our base css file
-            control.getStylesheets().add(0, AbstractView.class.getResource("Main.css").toExternalForm());
-
-            // Add language resource
+            if (Globals.getThemeLoader() != null) {
+                Globals.getThemeLoader().installBaseCss(control);
+            }
 
         } catch (IOException exception) {
             LOGGER.error("Problem loading fxml for control", exception);
