@@ -17,8 +17,9 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <?import org.controlsfx.control.MasterDetailPane?>
-
-<ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="fileAnnotationTab" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTabController">
+<ScrollPane xmlns:fx="http://javafx.com/fxml/1" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER"
+            styleClass="fileAnnotationTab" xmlns="http://javafx.com/javafx/8.0.112"
+            fx:controller="org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTabView">
     <MasterDetailPane dividerPosition="0.6">
         <masterNode>
             <BorderPane>

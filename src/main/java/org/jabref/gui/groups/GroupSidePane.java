@@ -12,6 +12,8 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.airhacks.afterburner.views.ViewLoader;
+
 /**
  * The groups side pane.
  */
@@ -46,7 +48,9 @@ public class GroupSidePane extends SidePaneComponent {
 
     @Override
     protected Node createContentPane() {
-        return new GroupTreeView().getView();
+        return ViewLoader.view(GroupTreeView.class)
+                         .load()
+                         .getView();
     }
 
     @Override

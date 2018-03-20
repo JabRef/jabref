@@ -7,8 +7,8 @@
 <?import javafx.scene.control.TreeTableColumn?>
 <?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.BorderPane?>
-
-<DialogPane minHeight="450.0" minWidth="375.0" prefHeight="450.0" prefWidth="407.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.keyboard.KeyBindingsDialogController">
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" minHeight="450.0" minWidth="375.0" prefHeight="450.0" prefWidth="407.0"
+            xmlns="http://javafx.com/javafx/8.0.65" fx:controller="org.jabref.gui.keyboard.KeyBindingsDialogView">
    <content>
       <BorderPane prefHeight="428.0" prefWidth="402.0">
          <bottom>

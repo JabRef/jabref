@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.effect.Reflection?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-
-<DialogPane prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.help.AboutDialogController">
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="600.0"
+            xmlns="http://javafx.com/javafx/8.0.65" fx:controller="org.jabref.gui.help.AboutDialogView">
 	<content>
 		<BorderPane>
 			<center>
@@ -85,7 +84,8 @@
 								</ScrollPane>
 							</children>
 						</HBox>
-						<TextArea fx:id="textAreaVersions" styleClass="info-sections" editable="false" prefHeight="100.0" prefWidth="200.0" text="" />       					
+                        <TextArea fx:id="textAreaVersions" styleClass="info-sections" editable="false"
+                                  prefHeight="100.0" prefWidth="200.0" text=""/>
 					</children>
 				</VBox>
 			</center>

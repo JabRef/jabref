@@ -12,7 +12,9 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
-<DialogPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.journals.ManageJournalAbbreviationsController">
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="600.0"
+            xmlns="http://javafx.com/javafx/8.0.65"
+            fx:controller="org.jabref.gui.journals.ManageJournalAbbreviationsView">
    <content>
       <BorderPane prefHeight="200.0" prefWidth="200.0">
          <center>
