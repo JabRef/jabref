@@ -1510,7 +1510,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             entryEditor.setEntry(entry);
             newEntryShowing(entry);
         }
-        DefaultTaskExecutor.runInJavaFXThread(() -> entryEditor.requestFocus());
+        entryEditor.requestFocus();
         adjustSplitter();
     }
 
