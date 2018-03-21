@@ -11,7 +11,9 @@ import javax.swing.undo.UndoManager;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Pane;
 
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -38,8 +40,6 @@ import org.jabref.preferences.JabRefPreferences;
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import org.controlsfx.control.NotificationPane;
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,10 +49,12 @@ public class SourceTab extends EntryEditorTab {
     private final LatexFieldFormatterPreferences fieldFormatterPreferences;
     private final BibDatabaseMode mode;
     private final JabRefPreferences preferences;
-    private UndoManager undoManager;
+    private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator(sourceIsValid);
-    private FileUpdateMonitor fileMonitor;
+    private final FileUpdateMonitor fileMonitor;
+    private final Pane pane = new Pane();
+    private final TextArea codeArea = new TextArea();
 
     public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, JabRefPreferences preferences, FileUpdateMonitor fileMonitor) {
         this.mode = bibDatabaseContext.getMode();
@@ -63,6 +65,8 @@ public class SourceTab extends EntryEditorTab {
         this.fieldFormatterPreferences = fieldFormatterPreferences;
         this.preferences = preferences;
         this.fileMonitor = fileMonitor;
+
+        pane.getChildren().add(codeArea);
     }
 
     private static String getSourceString(BibEntry entry, BibDatabaseMode type, LatexFieldFormatterPreferences fieldFormatterPreferences) throws IOException {
@@ -73,13 +77,6 @@ public class SourceTab extends EntryEditorTab {
         return stringWriter.getBuffer().toString();
     }
 
-    private CodeArea createSourceEditor() {
-        CodeArea codeArea = new CodeArea();
-        codeArea.setWrapText(true);
-        codeArea.lookup(".styled-text-area").setStyle("-fx-font-size: " + preferences.getFontSizeFX() + "pt;");
-        return codeArea;
-    }
-
     @Override
     public boolean shouldShow(BibEntry entry) {
         return true;
@@ -87,9 +84,8 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        CodeArea codeArea = createSourceEditor();
-        VirtualizedScrollPane<CodeArea> node = new VirtualizedScrollPane<>(codeArea);
-        NotificationPane notificationPane = new NotificationPane(node);
+
+        NotificationPane notificationPane = new NotificationPane(pane);
         notificationPane.setShowFromTop(false);
         sourceValidator.getValidationStatus().getMessages().addListener((ListChangeListener<ValidationMessage>) c -> {
             if (sourceValidator.getValidationStatus().isValid()) {
@@ -115,10 +111,11 @@ public class SourceTab extends EntryEditorTab {
                 }
             });
         });
+
     }
 
     private void storeSource(String text) {
-        if (currentEntry == null || text.isEmpty()) {
+        if ((currentEntry == null) || text.isEmpty()) {
             return;
         }
 
