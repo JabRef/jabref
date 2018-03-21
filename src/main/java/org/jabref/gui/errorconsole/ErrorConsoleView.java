@@ -31,7 +31,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class ErrorConsoleView extends Dialog<Void> {
 
-    private final ErrorConsoleViewModel viewModel;
+    private ErrorConsoleViewModel viewModel;
 
     @FXML private Button copyLogButton;
     @FXML private Button clearLogButton;
@@ -53,11 +53,11 @@ public class ErrorConsoleView extends Dialog<Void> {
                                    .getView();
         this.getDialogPane().setContent(content);
 
-        viewModel = new ErrorConsoleViewModel(dialogService, clipBoardManager, buildInfo);
     }
 
     @FXML
     private void initialize() {
+        viewModel = new ErrorConsoleViewModel(dialogService, clipBoardManager, buildInfo);
         messagesListView.setCellFactory(createCellFactory());
         messagesListView.itemsProperty().bind(viewModel.allMessagesDataProperty());
         messagesListView.scrollTo(viewModel.allMessagesDataProperty().getSize() - 1);

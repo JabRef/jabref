@@ -59,4 +59,14 @@ public class DefaultInjector implements PresenterFactory {
 
         return Injector.instantiatePresenter(clazz, injectionContext);
     }
+
+    @Override
+    public void injectMembers(Object instance, Function<String, Object> injectionContext) {
+        LOGGER.debug("Inject into " + instance.getClass().getName());
+
+        // Use our own method to construct dependencies
+        Injector.setInstanceSupplier(DefaultInjector::createDependency);
+
+        Injector.injectMembers(instance, injectionContext);
+    }
 }

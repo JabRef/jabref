@@ -85,6 +85,7 @@ configurations {
 }
 
 dependencies {
+    // Include all jar-files in the 'lib' folder as dependencies
     compile fileTree(dir: 'lib', includes: ['*.jar'])
 
     compile 'com.jgoodies:jgoodies-common:1.8.1'
