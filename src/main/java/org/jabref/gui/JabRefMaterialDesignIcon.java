@@ -15,13 +15,15 @@ import de.jensd.fx.glyphs.GlyphIcons;
  */
 public enum JabRefMaterialDesignIcon implements GlyphIcons {
 
-    VIM("\u0041"),
-    TEX_STUDIO("\u0042"),
-    TEX_MAKER("\u0043"),
-    OPEN_OFFICE("\u0044"),
-    LYX("\u0045"),
-    EMACS("\u0046"),
-    ARXIV("\u0047");
+    TEX_STUDIO("\ue900"),
+    TEX_MAKER("\ue901"),
+    EMACS("\ue902"),
+    OPEN_OFFICE("\ue903"),
+    VIM("\ue904"),
+    LYX("\ue905"),
+    WINEDT("\ue906"),
+    ARXIV("\ue907");
+
 
     private final String unicode;
 
