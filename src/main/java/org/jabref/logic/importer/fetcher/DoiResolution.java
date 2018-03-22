@@ -77,6 +77,7 @@ public class DoiResolution implements FulltextFetcher {
                     if (type.getMimeType().startsWith("application/pdf")) {
                         return Optional.of(new URL(type.getUrl()));
                     }
+                    LOGGER.warn("DoiResolution fetcher failed: ", type);
                 } catch (IOException e) {
                     LOGGER.warn("DoiResolution fetcher failed: ", e);
                 }
