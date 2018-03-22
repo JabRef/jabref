@@ -7,11 +7,10 @@ import de.jensd.fx.glyphs.GlyphIcons;
  * contains icons that are not available in MaterialDesignIcons.
  *
  * @implNote The glyphs of the ttf (speak: the icons) were created with Illustrator and a template from the material design icons
- * web-page. The art boards for each icon was exported as SVG and then converted with glypher.com. The final TTF font is
- * located in the resource folder.
- *
- * {@see /jabref/src/main/resources/fonts/JabRefMaterialDesign.ttf}
- * {@see https://materialdesignicons.com/custom}
+ * web-page. The art boards for each icon was exported as SVG and then converted with <a href="https://icomoon.io/app">
+ * IcoMoon</a>. The final TTF font is located in the resource folder.
+ * @see <a href="https://github.com/JabRef/jabref/wiki/Custom-SVG-Icons-for-JabRef">Tutorial on our Wiki</a>
+ * @see <a href="https://materialdesignicons.com/custom">Material Design Icon custom page</a>
  */
 public enum JabRefMaterialDesignIcon implements GlyphIcons {
 
@@ -20,9 +19,12 @@ public enum JabRefMaterialDesignIcon implements GlyphIcons {
     EMACS("\ue902"),
     OPEN_OFFICE("\ue903"),
     VIM("\ue904"),
-    LYX("\ue905"),
-    WINEDT("\ue906"),
-    ARXIV("\ue907");
+    VIM_ALTERNATIVE("\ue905"),
+    LYX("\ue906"),
+    WINEDT("\ue907"),
+    ARXIV("\ue908"),
+    COPY("\ue909"),
+    PASTE("\ue90a");
 
 
     private final String unicode;
