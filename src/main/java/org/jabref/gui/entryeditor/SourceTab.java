@@ -13,8 +13,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.Region;
-
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
@@ -82,12 +80,10 @@ public class SourceTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         TextArea codeArea = new TextArea();
-        codeArea.setPrefHeight(300);
-        codeArea.setMaxHeight(Region.USE_PREF_SIZE);
+
 
         javafx.scene.control.ScrollPane scrollPane = new javafx.scene.control.ScrollPane(codeArea);
         NotificationPane notificationPane = new NotificationPane(scrollPane);
-        scrollPane.setMaxHeight(codeArea.getMaxHeight());
 
         notificationPane.setShowFromTop(false);
         sourceValidator.getValidationStatus().getMessages().addListener((ListChangeListener<ValidationMessage>) c -> {

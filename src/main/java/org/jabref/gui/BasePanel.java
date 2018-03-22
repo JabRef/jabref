@@ -1086,7 +1086,8 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     private boolean saveDatabase(File file, boolean selectedOnly, Charset enc,
-            SavePreferences.DatabaseSaveType saveType) throws SaveException {
+                                 SavePreferences.DatabaseSaveType saveType)
+            throws SaveException {
         SaveSession session;
         frame.block();
         final String SAVE_DATABASE = Localization.lang("Save library");
@@ -1500,20 +1501,21 @@ public class BasePanel extends JPanel implements ClipboardOwner {
      * @param entry The entry to edit.
      */
     public void showAndEdit(BibEntry entry) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            if (mode == BasePanelMode.SHOWING_EDITOR) {
-                Globals.prefs.putInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT, splitPane.getHeight() - splitPane.getDividerLocation());
-            }
-            mode = BasePanelMode.SHOWING_EDITOR;
-            splitPane.setBottomComponent(entryEditorContainer);
 
+        if (mode == BasePanelMode.SHOWING_EDITOR) {
+            Globals.prefs.putInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT, splitPane.getHeight() - splitPane.getDividerLocation());
+        }
+        mode = BasePanelMode.SHOWING_EDITOR;
+        splitPane.setBottomComponent(entryEditorContainer);
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
             if (entry != getShowing()) {
                 entryEditor.setEntry(entry);
                 newEntryShowing(entry);
             }
             entryEditor.requestFocus();
-            adjustSplitter();
+
         });
+        adjustSplitter();
     }
 
     /**
