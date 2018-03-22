@@ -421,17 +421,12 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     private Optional<ExternalFileType> inferFileTypeFromMimeType(URLDownload urlDownload) {
-        try {
-            // TODO: what if this takes long time?
-            String mimeType = urlDownload.getMimeType(); // Read MIME type
-            if (mimeType != null) {
-                LOGGER.debug("MIME Type suggested: " + mimeType);
-                return ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(mimeType);
-            } else {
-                return Optional.empty();
-            }
-        } catch (IOException ex) {
-            LOGGER.debug("Error while inferring MIME type for URL " + urlDownload.getSource(), ex);
+        // TODO: what if this takes long time?
+        String mimeType = urlDownload.getMimeType();
+        if (mimeType != null) {
+            LOGGER.debug("MIME Type suggested: " + mimeType);
+            return ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(mimeType);
+        } else {
             return Optional.empty();
         }
     }
