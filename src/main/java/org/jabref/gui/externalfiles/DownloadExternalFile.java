@@ -155,16 +155,9 @@ public class DownloadExternalFile {
 
         URLDownload udl = new URLDownload(url);
 
-        try {
-            // TODO: what if this takes long time?
-            // TODO: stop editor dialog if this results in an error:
-            mimeType = udl.getMimeType(); // Read MIME type
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": " + ex.getMessage(),
-                    Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
-            LOGGER.info("Error while downloading " + "'" + res + "'", ex);
-            return;
-        }
+        // TODO: what if this takes long time?
+        // TODO: stop editor dialog if this results in an error:
+        mimeType = udl.getMimeType(); // Read MIME type
         final URL urlF = url;
         final URLDownload udlF = udl;
 
