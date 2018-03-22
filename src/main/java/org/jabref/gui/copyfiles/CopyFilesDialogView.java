@@ -2,13 +2,12 @@ package org.jabref.gui.copyfiles;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -17,7 +16,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 
-public class CopyFilesDialogView extends Dialog<Void> {
+public class CopyFilesDialogView extends BaseDialog<Void> {
 
     @FXML private TableView<CopyFilesResultItemViewModel> tvResult;
     @FXML private TableColumn<CopyFilesResultItemViewModel, MaterialDesignIcon> colStatus;
@@ -29,10 +28,9 @@ public class CopyFilesDialogView extends Dialog<Void> {
         this.setTitle(Localization.lang("Result"));
         this.setResizable(true);
 
-        Parent content = ViewLoader.view(this)
-                                   .load()
-                                   .getView();
-        this.getDialogPane().setContent(content);
+        ViewLoader.view(this)
+                  .load()
+                  .setAsContent(this.getDialogPane());
 
         viewModel = new CopyFilesDialogViewModel(results);
     }

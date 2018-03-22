@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import javax.swing.JComponent;
-
 import javafx.concurrent.Task;
 import javafx.print.PrinterJob;
 import javafx.scene.control.Alert;
@@ -164,17 +162,6 @@ public interface DialogService {
      * @return Optional with the pressed Button as ButtonType
      */
     Optional<ButtonType> showCustomDialogAndWait(String title, DialogPane contentPane, ButtonType... buttonTypes);
-
-    /**
-     * This will create and display a new dialog showing a custom Swing {@link JComponent}
-     * and using custom {@link ButtonType}s.
-     *
-     * @return Optional with the pressed Button as ButtonType
-     * @deprecated convert dialog to JavaFX instead
-     */
-    @Deprecated
-    Optional<ButtonType> showCustomSwingDialogAndWait(String title, JComponent content, int prefWidth, int prefHeight, ButtonType... buttonTypes);
-
 
     /**
      * Shows a custom dialog and returns the result.

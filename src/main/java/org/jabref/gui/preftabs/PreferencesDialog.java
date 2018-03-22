@@ -14,16 +14,23 @@ import java.util.prefs.BackingStoreException;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.layout.Region;
 
 import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.ExporterFactory;
@@ -36,6 +43,7 @@ import org.jabref.preferences.JabRefPreferencesFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined in
  * separate classes. Tabs MUST implement the PrefsTab interface, since this
@@ -45,25 +53,37 @@ import org.slf4j.LoggerFactory;
  * With this design, it should be very easy to add new tabs later.
  *
  */
-public class PreferencesDialog {
+public class PreferencesDialog extends BaseDialog<Void> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesDialog.class);
 
     private final JPanel main;
 
-    private final JPanel mainPanel;
     private final DialogService dialogService;
-
     private final JabRefFrame frame;
+    private final JabRefPreferences prefs;
 
     public PreferencesDialog(JabRefFrame parent) {
-        JabRefPreferences prefs = JabRefPreferences.getInstance();
+        setTitle(Localization.lang("JabRef preferences"));
+        getDialogPane().setPrefSize(1000, 800);
+        getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        setResizable(true);
+
+        ButtonType save = new ButtonType(Localization.lang("Save"), ButtonBar.ButtonData.APPLY);
+        getDialogPane().getButtonTypes().setAll(save, ButtonType.CANCEL);
+        ControlHelper.setAction(save, getDialogPane(), event -> storeAllSettings());
+
+        prefs = JabRefPreferences.getInstance();
         frame = parent;
         dialogService = frame.getDialogService();
 
         main = new JPanel();
-        mainPanel = new JPanel();
 
+        ControlHelper.setSwingContent(getDialogPane(), constructSwingContent());
+    }
+
+    private JComponent constructSwingContent() {
+        JPanel mainPanel = new JPanel();
         final CardLayout cardLayout = new CardLayout();
         main.setLayout(cardLayout);
 
@@ -71,12 +91,12 @@ public class PreferencesDialog {
         tabs.add(new GeneralTab(dialogService, prefs));
         tabs.add(new FileTab(dialogService, prefs));
         tabs.add(new TablePrefsTab(prefs));
-        tabs.add(new TableColumnsTab(prefs, parent));
+        tabs.add(new TableColumnsTab(prefs, frame));
         tabs.add(new PreviewPrefsTab(dialogService));
         tabs.add(new ExternalTab(frame, this, prefs));
         tabs.add(new GroupsPrefsTab(prefs));
         tabs.add(new EntryEditorPrefsTab(prefs));
-        tabs.add(new BibtexKeyPatternPrefTab(prefs, parent.getCurrentBasePanel()));
+        tabs.add(new BibtexKeyPatternPrefTab(prefs, frame.getCurrentBasePanel()));
         tabs.add(new ImportSettingsTab(prefs));
         tabs.add(new ExportSortingPrefsTab(prefs));
         tabs.add(new NameFormatterTab(prefs));
@@ -184,9 +204,7 @@ public class PreferencesDialog {
         });
 
         setValues();
-    }
 
-    public JPanel getMainPanel() {
         return mainPanel;
     }
 
@@ -199,18 +217,18 @@ public class PreferencesDialog {
     }
 
     private String getPrefsExportPath() {
-        return Globals.prefs.get(JabRefPreferences.PREFS_EXPORT_PATH);
+        return prefs.get(JabRefPreferences.PREFS_EXPORT_PATH);
     }
 
     private void updateAfterPreferenceChanges() {
         setValues();
 
-        Globals.exportFactory = ExporterFactory.create(Globals.prefs, Globals.journalAbbreviationLoader);
+        Globals.exportFactory = ExporterFactory.create(prefs, Globals.journalAbbreviationLoader);
 
-        Globals.prefs.updateEntryEditorTabList();
+        prefs.updateEntryEditorTabList();
     }
 
-    public void storeAllSettings() {
+    private void storeAllSettings() {
         // First check that all tabs are ready to close:
         Component[] preferenceTabs = main.getComponents();
         for (Component tab : preferenceTabs) {
@@ -222,7 +240,7 @@ public class PreferencesDialog {
         for (Component tab : preferenceTabs) {
             ((PrefsTab) tab).storeSettings();
         }
-        Globals.prefs.flush();
+        prefs.flush();
 
         GUIGlobals.updateEntryEditorColors();
         frame.setupAllTables();
@@ -252,17 +270,16 @@ public class PreferencesDialog {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .addExtensionFilter(FileType.XML)
                     .withDefaultExtension(FileType.XML)
-                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                    .withInitialDirectory(prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                     .build();
-            DialogService ds = dialogService;
             Optional<Path> path = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
+                    .runInJavaFXThread(() -> dialogService.showFileSaveDialog(fileDialogConfiguration));
 
             path.ifPresent(exportFile -> {
                 try {
                     storeAllSettings();
-                    Globals.prefs.exportPreferences(exportFile.toString());
-                    Globals.prefs.put(JabRefPreferences.PREFS_EXPORT_PATH, exportFile.toString());
+                    prefs.exportPreferences(exportFile.toString());
+                    prefs.put(JabRefPreferences.PREFS_EXPORT_PATH, exportFile.toString());
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
                     dialogService.showErrorDialogAndWait(Localization.lang("Export preferences"), ex);

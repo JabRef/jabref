@@ -22,7 +22,6 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
-import org.jabref.gui.AbstractController;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
@@ -31,7 +30,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import org.fxmisc.easybind.EasyBind;
 
-public class FileAnnotationTabView extends AbstractController<FileAnnotationTabViewModel> {
+public class FileAnnotationTabView {
 
     @FXML public ComboBox<Path> files;
     @FXML public ListView<FileAnnotationViewModel> annotationList;
@@ -41,16 +40,22 @@ public class FileAnnotationTabView extends AbstractController<FileAnnotationTabV
     @FXML public TextArea content;
     @FXML public TextArea marking;
     @FXML public GridPane grid;
+    private final BibEntry entry;
+    private final FileAnnotationCache fileAnnotationCache;
+    private FileAnnotationTabViewModel viewModel;
 
     @Inject
     private FileUpdateMonitor fileMonitor;
 
     public FileAnnotationTabView(BibEntry entry, FileAnnotationCache fileAnnotationCache) {
-        viewModel = new FileAnnotationTabViewModel(fileAnnotationCache, entry, fileMonitor);
+        this.entry = entry;
+        this.fileAnnotationCache = fileAnnotationCache;
     }
 
     @FXML
     public void initialize() {
+        viewModel = new FileAnnotationTabViewModel(fileAnnotationCache, entry, fileMonitor);
+
         // Set-up files list
         files.getItems().setAll(viewModel.filesProperty().get());
         files.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.notifyNewSelectedFile(newValue));

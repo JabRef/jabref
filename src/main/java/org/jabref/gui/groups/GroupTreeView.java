@@ -33,7 +33,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
 import org.jabref.Globals;
-import org.jabref.gui.AbstractController;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
@@ -52,7 +51,7 @@ import org.reactfx.util.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GroupTreeView extends AbstractController<GroupTreeViewModel> {
+public class GroupTreeView {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeView.class);
 
@@ -65,6 +64,7 @@ public class GroupTreeView extends AbstractController<GroupTreeViewModel> {
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
+    private GroupTreeViewModel viewModel;
 
     private static void removePseudoClasses(TreeTableRow<GroupNodeViewModel> row, PseudoClass... pseudoClasses) {
         for (PseudoClass pseudoClass : pseudoClasses) {

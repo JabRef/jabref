@@ -4,9 +4,9 @@ import javax.inject.Inject;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TextField;
@@ -15,6 +15,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.OnlyIntegerFormatter;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -23,7 +24,7 @@ import org.jabref.model.entry.LinkedFile;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class DocumentViewerView extends Dialog<Void> {
+public class DocumentViewerView extends BaseDialog<Void> {
 
     @FXML private ScrollBar scrollBar;
     @FXML private ComboBox<LinkedFile> fileChoice;
@@ -42,13 +43,13 @@ public class DocumentViewerView extends Dialog<Void> {
         this.initModality(Modality.NONE);
         this.setResizable(true);
 
-        Parent content = ViewLoader.view(this)
-                                   .load()
-                                   .getView();
-        this.getDialogPane().setContent(content);
+        ViewLoader.view(this)
+                  .load()
+                  .setAsContent(this.getDialogPane());
 
-        //TODO?: Remove button bar at bottom
-        //dialogPane.getChildren().removeIf(node -> node instanceof ButtonBar);
+        // Remove button bar at bottom, but add close button to keep the dialog closable by clicking the "x" window symbol
+        getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        getDialogPane().getChildren().removeIf(node -> node instanceof ButtonBar);
     }
 
     @FXML

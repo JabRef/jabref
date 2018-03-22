@@ -4,10 +4,8 @@ import javax.inject.Inject;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableCell;
@@ -19,6 +17,7 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -31,7 +30,7 @@ import com.airhacks.afterburner.views.ViewLoader;
  * This class controls the user interface of the journal abbreviations dialog.
  * The ui elements and their layout are defined in the fxml file.
  */
-public class ManageJournalAbbreviationsView extends Dialog<Void> {
+public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
 
     @FXML public Label loadingLabel;
     @FXML public ProgressIndicator progressIndicator;
@@ -55,10 +54,9 @@ public class ManageJournalAbbreviationsView extends Dialog<Void> {
         this.setTitle(Localization.lang("Journal abbreviations"));
         this.setResizable(true);
 
-        Parent content = ViewLoader.view(this)
-                                   .load()
-                                   .getView();
-        this.getDialogPane().setContent(content);
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
     }
 
     @FXML

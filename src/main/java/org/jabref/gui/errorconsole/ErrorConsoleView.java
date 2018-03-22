@@ -6,10 +6,8 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -17,6 +15,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.util.Callback;
 
 import org.jabref.gui.ClipBoardManager;
@@ -24,18 +23,20 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class ErrorConsoleView extends Dialog<Void> {
+public class ErrorConsoleView extends BaseDialog<Void> {
 
     private ErrorConsoleViewModel viewModel;
 
-    @FXML private Button copyLogButton;
-    @FXML private Button clearLogButton;
-    @FXML private Button createIssueButton;
+    @FXML private ButtonType copyLogButton;
+    @FXML private ButtonType clearLogButton;
+    @FXML private ButtonType createIssueButton;
     @FXML private ListView<LogEventViewModel> messagesListView;
     @FXML private Label descriptionLabel;
 
@@ -47,12 +48,15 @@ public class ErrorConsoleView extends Dialog<Void> {
     public ErrorConsoleView() {
         this.setTitle(Localization.lang("Event log"));
         this.setResizable(true);
+        this.initModality(Modality.NONE);
 
-        Parent content = ViewLoader.view(this)
-                                   .load()
-                                   .getView();
-        this.getDialogPane().setContent(content);
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
 
+        ControlHelper.setAction(copyLogButton, getDialogPane(), event -> copyLog());
+        ControlHelper.setAction(clearLogButton, getDialogPane(), event -> clearLog());
+        ControlHelper.setAction(createIssueButton, getDialogPane(), event -> createIssue());
     }
 
     @FXML
@@ -131,8 +135,4 @@ public class ErrorConsoleView extends Dialog<Void> {
         viewModel.reportIssue();
     }
 
-    @FXML
-    private void closeErrorDialog() {
-        close();
-    }
 }

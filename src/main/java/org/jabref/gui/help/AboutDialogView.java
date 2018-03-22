@@ -3,22 +3,24 @@ package org.jabref.gui.help;
 import javax.inject.Inject;
 
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
-import javafx.scene.control.Dialog;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory;
 
-public class AboutDialogView extends Dialog<Void> {
+public class AboutDialogView extends BaseDialog<Void> {
 
+    @FXML private ButtonType copyVersionButton;
     @FXML protected ImageView iconImage;
     @Inject private DialogService dialogService;
     @Inject private ClipBoardManager clipBoardManager;
@@ -30,10 +32,11 @@ public class AboutDialogView extends Dialog<Void> {
     public AboutDialogView() {
         this.setTitle(Localization.lang("About JabRef"));
 
-        Parent content = ViewLoader.view(this)
-                                   .load()
-                                   .getView();
-        this.getDialogPane().setContent(content);
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
+
+        ControlHelper.setAction(copyVersionButton, getDialogPane(), event -> copyVersionToClipboard());
     }
 
     @FXML
@@ -44,11 +47,6 @@ public class AboutDialogView extends Dialog<Void> {
         Image icon = new Image(this.getClass().getResourceAsStream("/icons/jabref.svg"));
         iconImage.setImage(icon);
         textAreaVersions.setText(viewModel.getVersionInfo());
-    }
-
-    @FXML
-    private void closeAboutDialog() {
-        close();
     }
 
     @FXML

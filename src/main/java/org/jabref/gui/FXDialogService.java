@@ -9,11 +9,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
-
 import javafx.concurrent.Task;
-import javafx.embed.swing.SwingNode;
 import javafx.print.PrinterJob;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -222,19 +218,6 @@ public class FXDialogService implements DialogService {
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.setResizable(true);
         return alert.showAndWait();
-    }
-
-    @Override
-    public Optional<ButtonType> showCustomSwingDialogAndWait(String title, JComponent content, int prefWidth, int prefHeight, ButtonType... buttonTypes) {
-        SwingNode node = new SwingNode();
-        SwingUtilities.invokeLater(() -> node.setContent(content));
-        node.setVisible(true);
-
-        DialogPane pane = new DialogPane();
-        pane.setContent(node);
-        pane.setPrefSize(prefWidth, prefHeight);
-
-        return showCustomDialogAndWait(title, pane, buttonTypes);
     }
 
     @Override

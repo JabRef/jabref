@@ -3,17 +3,17 @@ package org.jabref.gui.keyboard;
 import javax.inject.Inject;
 
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
-import javafx.scene.control.Dialog;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
-import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefIcon;
+import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -22,8 +22,10 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import org.fxmisc.easybind.EasyBind;
 
-public class KeyBindingsDialogView extends Dialog<Void> {
+public class KeyBindingsDialogView extends BaseDialog<Void> {
 
+    @FXML private ButtonType resetButton;
+    @FXML private ButtonType saveButton;
     @FXML private TreeTableView<KeyBindingViewModel> keyBindingsTable;
     @FXML private TreeTableColumn<KeyBindingViewModel, String> actionColumn;
     @FXML private TreeTableColumn<KeyBindingViewModel, String> shortcutColumn;
@@ -36,16 +38,15 @@ public class KeyBindingsDialogView extends Dialog<Void> {
 
     public KeyBindingsDialogView() {
         this.setTitle(Localization.lang("Key bindings"));
+        this.getDialogPane().setPrefSize(375, 475);
         this.setResizable(true);
 
-        Stage stage = (Stage) this.getDialogPane().getScene().getWindow();
-        stage.setMinHeight(475);
-        stage.setMinWidth(375);
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
 
-        Parent content = ViewLoader.view(this)
-                                   .load()
-                                   .getView();
-        this.getDialogPane().setContent(content);
+        ControlHelper.setAction(resetButton, getDialogPane(), event -> setDefaultBindings());
+        ControlHelper.setAction(saveButton, getDialogPane(), event -> saveKeyBindingsAndCloseDialog());
     }
 
     @FXML

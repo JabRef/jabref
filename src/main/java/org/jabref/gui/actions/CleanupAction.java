@@ -4,14 +4,12 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-
-import javafx.scene.control.ButtonType;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.cleanup.CleanupDialog;
 import org.jabref.gui.cleanup.CleanupPresetPanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -65,19 +63,14 @@ public class CleanupAction extends AbstractWorker {
         if (canceled) {
             return;
         }
-        CleanupPresetPanel presetPanel = new CleanupPresetPanel(panel.getBibDatabaseContext(),
-                CleanupPreset.loadFromPreferences(preferences));
+        CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), CleanupPreset.loadFromPreferences(preferences));
 
-        presetPanel.getScrollPane().setVisible(true);
-        JScrollPane scrollPane = presetPanel.getScrollPane();
-
-        Optional<ButtonType> ok = dialogService.showCustomSwingDialogAndWait(Localization.lang("Cleanup entries"), scrollPane, 600, 600, ButtonType.OK, ButtonType.CANCEL);
-
-        if (!ok.isPresent() || ok.get() == ButtonType.CANCEL) {
+        Optional<CleanupPreset> chosenPreset = cleanupDialog.showAndWait();
+        if (!chosenPreset.isPresent()) {
             canceled = true;
             return;
         }
-        CleanupPreset cleanupPreset = presetPanel.getCleanupPreset();
+        CleanupPreset cleanupPreset = chosenPreset.get();
         cleanupPreset.storeInPreferences(preferences);
 
         if (cleanupPreset.isRenamePDF() && Globals.prefs.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
