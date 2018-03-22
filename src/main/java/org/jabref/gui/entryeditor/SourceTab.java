@@ -13,7 +13,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.Pane;
 
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -81,10 +80,11 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        Pane pane = new Pane();
         TextArea codeArea = new TextArea();
-        pane.getChildren().add(codeArea);
-        NotificationPane notificationPane = new NotificationPane(pane);
+        javafx.scene.control.ScrollPane scrollPane = new javafx.scene.control.ScrollPane(codeArea);
+        scrollPane.autosize();
+        NotificationPane notificationPane = new NotificationPane(scrollPane);
+
         notificationPane.setShowFromTop(false);
         sourceValidator.getValidationStatus().getMessages().addListener((ListChangeListener<ValidationMessage>) c -> {
             if (sourceValidator.getValidationStatus().isValid()) {
@@ -98,10 +98,10 @@ public class SourceTab extends EntryEditorTab {
         // Store source for every change in the source code
         // and update source code for every change of entry field values
         BindingsHelper.bindContentBidirectional(entry.getFieldsObservable(), codeArea.textProperty(), this::storeSource, fields -> {
-            DefaultTaskExecutor.runInJavaFXThread(() -> {
+            DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
                 codeArea.clear();
                 try {
-                    codeArea.appendText(getSourceString(entry, mode, fieldFormatterPreferences));
+                    codeArea.setText(getSourceString(entry, mode, fieldFormatterPreferences));
                 } catch (IOException ex) {
                     codeArea.setEditable(false);
                     codeArea.appendText(ex.getMessage() + "\n\n" +
