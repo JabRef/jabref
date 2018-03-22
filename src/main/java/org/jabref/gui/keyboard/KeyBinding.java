@@ -12,7 +12,7 @@ public enum KeyBinding {
     CLEANUP("Cleanup", Localization.lang("Cleanup entries"), "alt+F8", KeyBindingCategory.QUALITY),
     CLOSE_DATABASE("Close library", Localization.lang("Close library"), "ctrl+W", KeyBindingCategory.FILE),
     CLOSE_DIALOG("Close dialog", Localization.lang("Close dialog"), "ESCAPE", KeyBindingCategory.FILE),
-    CLOSE_ENTRY_EDITOR("Close entry editor", Localization.lang("Close entry editor"), "ESC", KeyBindingCategory.VIEW),
+    CLOSE_ENTRY_EDITOR("Close entry editor", Localization.lang("Close entry editor"), "Esc", KeyBindingCategory.VIEW),
     COPY("Copy", Localization.lang("Copy"), "ctrl+C", KeyBindingCategory.EDIT),
     COPY_TITLE("Copy title", Localization.lang("Copy title"), "ctrl+shift+alt+T", KeyBindingCategory.EDIT),
     COPY_CITE_BIBTEX_KEY("Copy \\cite{BibTeX key}", Localization.lang("Copy \\cite{BibTeX key}"), "ctrl+K", KeyBindingCategory.EDIT),
