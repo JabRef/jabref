@@ -53,8 +53,6 @@ public class SourceTab extends EntryEditorTab {
     private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator(sourceIsValid);
     private final FileUpdateMonitor fileMonitor;
-    private final Pane pane = new Pane();
-    private final TextArea codeArea = new TextArea();
 
     public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, JabRefPreferences preferences, FileUpdateMonitor fileMonitor) {
         this.mode = bibDatabaseContext.getMode();
@@ -66,7 +64,6 @@ public class SourceTab extends EntryEditorTab {
         this.preferences = preferences;
         this.fileMonitor = fileMonitor;
 
-        pane.getChildren().add(codeArea);
     }
 
     private static String getSourceString(BibEntry entry, BibDatabaseMode type, LatexFieldFormatterPreferences fieldFormatterPreferences) throws IOException {
@@ -84,7 +81,9 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-
+        Pane pane = new Pane();
+        TextArea codeArea = new TextArea();
+        pane.getChildren().add(codeArea);
         NotificationPane notificationPane = new NotificationPane(pane);
         notificationPane.setShowFromTop(false);
         sourceValidator.getValidationStatus().getMessages().addListener((ListChangeListener<ValidationMessage>) c -> {
@@ -99,7 +98,7 @@ public class SourceTab extends EntryEditorTab {
         // Store source for every change in the source code
         // and update source code for every change of entry field values
         BindingsHelper.bindContentBidirectional(entry.getFieldsObservable(), codeArea.textProperty(), this::storeSource, fields -> {
-            DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
                 codeArea.clear();
                 try {
                     codeArea.appendText(getSourceString(entry, mode, fieldFormatterPreferences));
