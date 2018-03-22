@@ -87,6 +87,7 @@ public class SourceTab extends EntryEditorTab {
 
         javafx.scene.control.ScrollPane scrollPane = new javafx.scene.control.ScrollPane(codeArea);
         NotificationPane notificationPane = new NotificationPane(scrollPane);
+        scrollPane.setMaxHeight(codeArea.getMaxHeight());
 
         notificationPane.setShowFromTop(false);
         sourceValidator.getValidationStatus().getMessages().addListener((ListChangeListener<ValidationMessage>) c -> {
