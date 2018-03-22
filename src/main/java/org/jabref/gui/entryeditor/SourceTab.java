@@ -81,8 +81,9 @@ public class SourceTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         TextArea codeArea = new TextArea();
+        codeArea.setPrefHeight(100);
         javafx.scene.control.ScrollPane scrollPane = new javafx.scene.control.ScrollPane(codeArea);
-        scrollPane.autosize();
+
         NotificationPane notificationPane = new NotificationPane(scrollPane);
 
         notificationPane.setShowFromTop(false);

@@ -585,9 +585,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                 .openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null)));
 
         actions.put(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, (BaseAction) () -> {
-            DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel()
-                    .getBibDatabaseContext()
-                    .getDBMSSynchronizer();
+            DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBMSSynchronizer();
             dbmsSynchronizer.pullChanges();
         });
 
