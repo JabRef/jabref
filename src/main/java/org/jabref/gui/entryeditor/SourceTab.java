@@ -11,6 +11,7 @@ import javax.swing.undo.UndoManager;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 
@@ -81,9 +82,7 @@ public class SourceTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         TextArea codeArea = new TextArea();
-
-
-        javafx.scene.control.ScrollPane scrollPane = new javafx.scene.control.ScrollPane(codeArea);
+        ScrollPane scrollPane = new ScrollPane(codeArea);
         NotificationPane notificationPane = new NotificationPane(scrollPane);
 
         notificationPane.setShowFromTop(false);
