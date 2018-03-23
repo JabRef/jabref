@@ -269,7 +269,7 @@ public class IconTheme {
         APPLICATION_LYX(JabRefMaterialDesignIcon.LYX),
         APPLICATION_TEXSTUDIO(JabRefMaterialDesignIcon.TEX_STUDIO),
         APPLICATION_TEXMAKER(JabRefMaterialDesignIcon.TEX_MAKER),
-        APPLICATION_VIM(JabRefMaterialDesignIcon.VIM_ALTERNATIVE),
+        APPLICATION_VIM(JabRefMaterialDesignIcon.VIM),
         APPLICATION_WINEDT(JabRefMaterialDesignIcon.WINEDT),
         KEY_BINDINGS(MaterialDesignIcon.KEYBOARD), /*css: keyboard */
         FIND_DUPLICATES(MaterialDesignIcon.CODE_EQUAL), /*css: code-equal */

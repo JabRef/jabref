@@ -19,12 +19,11 @@ public enum JabRefMaterialDesignIcon implements GlyphIcons {
     EMACS("\ue902"),
     OPEN_OFFICE("\ue903"),
     VIM("\ue904"),
-    VIM_ALTERNATIVE("\ue905"),
-    LYX("\ue906"),
-    WINEDT("\ue907"),
-    ARXIV("\ue908"),
-    COPY("\ue909"),
-    PASTE("\ue90a");
+    LYX("\ue905"),
+    WINEDT("\ue906"),
+    ARXIV("\ue907"),
+    COPY("\ue908"),
+    PASTE("\ue909");
 
 
     private final String unicode;
