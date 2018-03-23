@@ -26,9 +26,18 @@ import org.controlsfx.dialog.ProgressDialog;
 public interface DialogService {
 
     /**
-     * This will create and display new {@link ChoiceDialog} of type T with a default choice (can be null) and a collection of possible choices
+     * This will create and display new {@link ChoiceDialog} of type T with a default choice and a collection of possible choices
+     *
+     * @implNote The implementation should accept {@code null} for {@code defaultChoice}, but callers should use {@link #showChoiceDialogAndWait(String, String, String, Collection)}.
     */
     <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices);
+
+    /**
+     * This will create and display new {@link ChoiceDialog} of type T with a collection of possible choices
+     */
+    default <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, Collection<T> choices) {
+        return showChoiceDialogAndWait(title, content, okButtonLabel, null, choices);
+    }
 
     /**
      * This will create and display new {@link TextInputDialog} with a text fields to enter data
