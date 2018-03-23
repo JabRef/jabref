@@ -47,8 +47,8 @@ public class CopyFilesAction extends SimpleCommand {
             dialogService.showInformationDialogAndWait(Localization.lang("Copy linked files to folder..."), Localization.lang("No linked files found for export."));
             return;
         }
-        CopyFilesDialogView dlg = new CopyFilesDialogView(databaseContext, new CopyFilesResultListDependency(data));
-        dlg.show();
+        CopyFilesDialogView dialog = new CopyFilesDialogView(databaseContext, new CopyFilesResultListDependency(data));
+        dialog.show();
     }
 
     @Override

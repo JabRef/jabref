@@ -112,7 +112,7 @@ public class Localization {
     }
 
     /**
-     * Public access to the messages bundle for classes like AbstractView.
+     * Returns the messages bundle, e.g. to load FXML files correctly translated.
      *
      * @return The internally cashed bundle.
      */

@@ -33,8 +33,3 @@
 .custom-buttons {
 	-fx-padding: 5.0px;
 }
-
-.dialog-pane *.button-bar {
-	-fx-max-height: 0.0;
-	-fx-pref-height: 0.0;
-}
