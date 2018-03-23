@@ -85,10 +85,6 @@ public class GlobalSearchBar extends HBox {
     private SearchResultFrame searchResultFrame;
 
     private SearchDisplayMode searchDisplayMode;
-    /**
-     * if this flag is set the searchbar won't be selected after the next search
-     */
-    private boolean dontSelectSearchBar;
 
     public GlobalSearchBar(JabRefFrame frame) {
         super();
@@ -314,12 +310,6 @@ public class GlobalSearchBar extends HBox {
         openCurrentResultsInDialog.setDisable(true);
 
         Globals.stateManager.clearSearchQuery();
-
-        if (dontSelectSearchBar) {
-            dontSelectSearchBar = false;
-            return;
-        }
-        focus();
     }
 
     public void performSearch() {
@@ -436,12 +426,7 @@ public class GlobalSearchBar extends HBox {
             return;
         }
 
-        setDontSelectSearchBar();
         DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchTerm));
-    }
-
-    public void setDontSelectSearchBar() {
-        this.dontSelectSearchBar = true;
     }
 
     private void updateOpenCurrentResultsTooltip(boolean globalSearchEnabled) {

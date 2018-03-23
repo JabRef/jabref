@@ -54,7 +54,7 @@ public class ExportToClipboardAction extends AbstractWorker {
         List<Exporter> exporters = new ArrayList<>(Globals.exportFactory.getExporters());
 
         Optional<Exporter> selectedExporter = frame.getDialogService().showChoiceDialogAndWait(Localization.lang("Export"), Localization.lang("Select export format"),
-                                                                                               Localization.lang("Export"), null, exporters);
+                Localization.lang("Export"), exporters);
 
         if (!selectedExporter.isPresent()) {
             return;
