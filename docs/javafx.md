@@ -75,6 +75,15 @@ public AboutDialogView(Dependency dependency) {
                   .setAsDialogPane(this);
 }
 ````
+- Dialogs should use [setResultConverter](https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/Dialog.html#setResultConverter-javafx.util.Callback-) to convert the data entered in the dialog to the desired result. This conversion should be done by the view model and not the controller.
+````java
+setResultConverter(button -> {
+    if (button == ButtonType.OK) {
+        return viewModel.getData();
+    }
+    return null;
+});
+````
 - The initialize method may use data-binding to connect the ui-controls and the `ViewModel`. However, it is recommended to do as much binding as possible directly in the FXML-file.
 ````java
 @FXML
