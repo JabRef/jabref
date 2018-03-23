@@ -4,7 +4,7 @@ This is archived by dividing JabRef into different layers, each having a clear r
 - The _Model_ contains the business logic and data structures. These aspects are again encapsulated in the _logic_ and _model_ package, respectively.
 - The _View_ controls the appearance and structure of the UI. It is usually defined in a _FXML_ file. 
 - _View model_ converts the data from logic and model in a form that is easily usable in the gui. Thus it controls the state of the View. Moreover, the ViewModel contains all the logic needed to change the current state of the UI or perform an action. These actions are usually passed down to the _logic_ package, after some data validation. The important aspect is that the ViewModel contains all the ui-related logic but does *not* have direct access to the controls defined in the View. Hence, the ViewModel can easily be tested by unit tests.
-- The _Controller_ initializes the view model and binds it to the view. In an ideal world all the binding would already be done directly in the FXML. But JavaFX's binding expressions are not yet powerful enough to accomplish this. It is important to keep in mind that the Controller should be as minimalistic as possible. Especially one should resist the temptation to validate inputs in the controller. The ViewModel should handle data validation!
+- The _Controller_ initializes the view model and binds it to the view. In an ideal world all the binding would already be done directly in the FXML. But JavaFX's binding expressions are not yet powerful enough to accomplish this. It is important to keep in mind that the Controller should be as minimalistic as possible. Especially one should resist the temptation to validate inputs in the controller. The ViewModel should handle data validation! It is often convenient to load the FXML file directly from the controller.  
 
 The only class which access model and logic classes is the ViewModel. Controller and View have only access the ViewModel and never the backend. The ViewModel does not know the Controller or View.
 
@@ -42,14 +42,14 @@ public void shutdown() {
     heading.set("Goodbye!");
 }
 ````
-### Controller:
+### View - Controller:
 - The "code-behind" part of the view, which binds the `View` to the `ViewModel`.
 
-- 
+- The usual convention is that the controller ends on the suffix `*View`. Dialogs should derive from `BaseDialog`.
 ````java
-public class AboutDialogController extends AbstractController<AboutDialogViewModel>
+public class AboutDialogView extends BaseDialog<Void>
 ````
-- 
+- You get access to nodes in the FXML file by declaring them with the `@FXML` annotation.
 ````java
 @FXML protected Button helloButton;
 @FXML protected ImageView iconImage;
@@ -58,15 +58,29 @@ public class AboutDialogController extends AbstractController<AboutDialogViewMod
 ````java
 @Inject private DialogService dialogService;
 ````
-- 
+- It is convenient to load the FXML-view directly from the controller class. 
+The FXML file is loaded using `ViewLoader` based on the name of the class passed to `view`. To make this convention-over-configuration approach work, both the FXML file and the View class should have the same name and should be located in the same package.
+Note that fields annotated with `@FXML` or `@Inject` only become accessible after `ViewLoader.load()` is called.
+a `View` class that loads the FXML file. 
 ````java
-@FXML
-private void initialize() {
-    viewModel = new AboutDialogViewModel(dialogService, clipBoardManager, buildInfo);
+private Dependency dependency;
+
+public AboutDialogView(Dependency dependency) {
+        this.dependency = dependency;
+
+        this.setTitle(Localization.lang("About JabRef"));
+
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
 }
 ````
 - The initialize method may use data-binding to connect the ui-controls and the `ViewModel`. However, it is recommended to do as much binding as possible directly in the FXML-file.
 ````java
+@FXML
+private void initialize() {
+    viewModel = new AboutDialogViewModel(dialogService, dependency, ...);
+
     helloLabel.textProperty().bind(viewModel.helloMessageProperty());
 ````
 
@@ -78,25 +92,8 @@ private void openJabrefWebsite() {
 }
 ````
 
-- The current stage can be received using `getStage()`, which is helpful to close the current dialog `getStage().close()`.
-
-### View:
-The view consists of two parts:
-- a FXML file "MyDialog.fxml" which defines the structure and the layout of the UI. It is recommended to use a graphical design tools like [SceneBuilder](http://gluonhq.com/labs/scene-builder/) to edit the FXML file. The tool [Scenic View](http://fxexperience.com/scenic-view/) is very helpful in debugging styling issues.
-- a `View` class that loads the FXML file. The fxml file is loaded automatically using the same name as the class. To make this convention-over-configuration approach work, both the FXML file and the View class should have the same name and should be located in the same package.
-
-- For dialogs, we simply derive from `AbstractDialogView` and implement the `show` method.
-````java
-public class MyDialogView extends AbstractDialogView {
-
-    @Override
-    public void show() {
-        FXDialog myDialog = new FXDialog(AlertType.INFORMATION, Localization.lang("My first dialog"));
-        myDialog.setDialogPane((DialogPane) this.getView());
-        myDialog.show();
-    }
-}
-````
+### View - FXML:
+The view consists a FXML file `MyDialog.fxml` which defines the structure and the layout of the UI. Moreover, the FXML file may be accompanied by a style file that should have the same name as the FXML file but with a `css` ending, e.g., `MyDialog.css`. It is recommended to use a graphical design tools like [SceneBuilder](http://gluonhq.com/labs/scene-builder/) to edit the FXML file. The tool [Scenic View](http://fxexperience.com/scenic-view/) is very helpful in debugging styling issues.
 
 # Resources:
 - [curated list of awesome JavaFX frameworks, libraries, books and etc...](https://github.com/mhrimaz/AwesomeJavaFX)
