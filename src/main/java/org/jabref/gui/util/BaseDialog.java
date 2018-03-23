@@ -14,7 +14,7 @@ public class BaseDialog<T> extends Dialog<T> {
     protected BaseDialog() {
         getDialogPane().getScene().setOnKeyPressed(event -> {
             KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
-            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE_DIALOG, event)) {
+            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
                 close();
             }
         });

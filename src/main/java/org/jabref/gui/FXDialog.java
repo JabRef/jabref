@@ -59,7 +59,7 @@ public class FXDialog extends Alert {
 
         dialogWindow.getScene().setOnKeyPressed(event -> {
             KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
-            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE_DIALOG, event)) {
+            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
                 dialogWindow.close();
             }
         });
