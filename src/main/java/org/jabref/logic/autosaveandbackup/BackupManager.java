@@ -15,6 +15,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.FileSaveSession;
 import org.jabref.logic.exporter.SaveException;
@@ -123,6 +124,19 @@ public class BackupManager {
             new BibtexDatabaseWriter<>(FileSaveSession::new).saveDatabase(bibDatabaseContext, savePreferences).commit
                     (backupPath);
         } catch (SaveException e) {
+            logIfCritical(e);
+        }
+    }
+
+    private void logIfCritical(SaveException e) {
+        Throwable innermostCause = e;
+        while (innermostCause.getCause() != null) {
+            innermostCause = innermostCause.getCause();
+        }
+        boolean isErrorInField = innermostCause instanceof InvalidFieldValueException;
+
+        // do not print errors in field values into the log during autosave
+        if (!isErrorInField) {
             LOGGER.error("Error while saving file.", e);
         }
     }
