@@ -1800,7 +1800,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         @Subscribe
         public void listen(EntryChangedEvent entryChangedEvent) {
-            frame.getGlobalSearchBar().setDontSelectSearchBar();
             frame.getGlobalSearchBar().performSearch();
         }
 
