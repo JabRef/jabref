@@ -84,4 +84,9 @@ public class DoiResolution implements FulltextFetcher {
         }
         return pdfLink;
     }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.ORIGINAL;
+    }
 }

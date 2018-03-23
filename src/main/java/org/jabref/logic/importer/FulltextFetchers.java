@@ -3,20 +3,19 @@ package org.jabref.logic.importer;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -58,73 +57,51 @@ public class FulltextFetchers {
 
         ExecutorService executor = Executors.newCachedThreadPool();
         try {
-            // First try publisher access
-            FulltextFetcher authority = new DoiResolution();
+            List<Future<FetcherResult>> result = new ArrayList<>();
+            try {
+                result = executor.invokeAll(getCallables(clonedEntry, finders), 10, TimeUnit.SECONDS);
+            } catch (InterruptedException ignore) {}
 
-            Optional<URL> pdfUrl = findFirst(executor, Arrays.asList(getCallable(clonedEntry, authority)));
-            if (pdfUrl.isPresent()) {
-                return pdfUrl;
-            }
-            // All other available fetchers
-            pdfUrl = findFirst(executor, getCallables(clonedEntry, finders));
-            if (pdfUrl.isPresent()) {
-                return pdfUrl;
-            }
+            return result.stream()
+                    .map(future -> {
+                        try {
+                            return future.get();
+                        } catch (InterruptedException | ExecutionException | CancellationException ignore) {
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .peek(f -> System.out.println("AlL" + f.trust +  " " + f.source))
+                    .filter(f -> f.source != null)
+                    .peek(f -> System.out.println("URL: " + f.trust +  " " + f.source))
+                    .sorted(Comparator.comparingInt(f -> f.trust.ordinal()))
+                    .peek(f -> System.out.println("SORT: " + f.trust +  " " + f.source))
+                    .map(f -> f.source)
+                    .findFirst();
         } finally {
             shutdownAndAwaitTermination(executor);
         }
-        return Optional.empty();
     }
 
-    private Callable<Optional<URL>> getCallable(BibEntry entry, FulltextFetcher fetcher) {
+    private Callable<FetcherResult> getCallable(BibEntry entry, FulltextFetcher fetcher) {
             return () -> {
                 try {
                     Optional<URL> result = fetcher.findFullText(entry);
 
                     if (result.isPresent() && new URLDownload(result.get().toString()).isPdf()) {
-                        return result;
+                        return new FetcherResult(fetcher.getTrustLevel(), result.get());
                     }
                 } catch (IOException | FetcherException e) {
                     LOGGER.debug("Failed to find fulltext PDF at given URL", e);
                 }
-                return Optional.empty();
+                return null;
             };
     }
 
-    private List<Callable<Optional<URL>>> getCallables(BibEntry entry, List<FulltextFetcher> fetchers) {
+    private List<Callable<FetcherResult>> getCallables(BibEntry entry, List<FulltextFetcher> fetchers) {
         return fetchers.stream()
                 .map(f -> getCallable(entry, f))
                 .collect(Collectors.toList());
-    }
-
-    private Optional<URL> findFirst(ExecutorService executor, List<Callable<Optional<URL>>> solvers) {
-        CompletionService<Optional<URL>> service = new ExecutorCompletionService<>(executor);
-        List<Future<Optional<URL>>> futures = solvers.stream()
-                .map(callable -> service.submit(callable))
-                .collect(Collectors.toList());
-
-        Optional<URL> result = Optional.empty();
-        try {
-            // check all fetcher results
-            for (int i = 0; i < futures.size(); i++) {
-                try {
-                    Optional<URL> link = service.take().get();
-
-                    if (link.isPresent()) {
-                        result = link;
-                        break;
-                    }
-                } catch (InterruptedException ignore) {
-
-                } catch (ExecutionException e) {
-                    LOGGER.warn("Error during fetcher execution: " + e.getMessage());
-                }
-            }
-        } finally {
-            futures.stream().forEach(f -> f.cancel(true));
-        }
-
-        return result;
     }
 
     private void shutdownAndAwaitTermination(ExecutorService pool) {

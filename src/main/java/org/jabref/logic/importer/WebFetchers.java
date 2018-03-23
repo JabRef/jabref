@@ -122,6 +122,8 @@ public class WebFetchers {
 
     public static List<FulltextFetcher> getFullTextFetchers(ImportFormatPreferences importFormatPreferences) {
         List<FulltextFetcher> fetchers = new ArrayList<>();
+        // Original
+        fetchers.add(new DoiResolution());
         // Publishers
         fetchers.add(new ScienceDirect());
         fetchers.add(new SpringerLink());
