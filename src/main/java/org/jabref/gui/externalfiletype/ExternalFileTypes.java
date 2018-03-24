@@ -3,6 +3,7 @@ package org.jabref.gui.externalfiletype;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -25,7 +26,7 @@ public class ExternalFileTypes {
     // The only instance of this class:
     private static ExternalFileTypes singleton;
     // Map containing all registered external file types:
-    private final Set<ExternalFileType> externalFileTypes = new TreeSet<>();
+    private final Set<ExternalFileType> externalFileTypes = new TreeSet<>(Comparator.comparing(ExternalFileType::getName));
 
     private final ExternalFileType HTML_FALLBACK_TYPE = StandardExternalFileType.URL;
 
@@ -130,7 +131,7 @@ public class ExternalFileTypes {
     public void setExternalFileTypes(List<ExternalFileType> types) {
 
         // First find a list of the default types:
-        List<ExternalFileType> defTypes = getDefaultExternalFileTypes();
+        List<ExternalFileType> defTypes = new ArrayList<>(getDefaultExternalFileTypes());
         // Make a list of types that are unchanged:
         List<ExternalFileType> unchanged = new ArrayList<>();
 
@@ -196,7 +197,7 @@ public class ExternalFileTypes {
      */
     private void updateExternalFileTypes() {
         // First get a list of the default file types as a starting point:
-        List<ExternalFileType> types = getDefaultExternalFileTypes();
+        List<ExternalFileType> types = new ArrayList<>(getDefaultExternalFileTypes());
         // If no changes have been stored, simply use the defaults:
         if (Globals.prefs.get(JabRefPreferences.EXTERNAL_FILE_TYPES, null) == null) {
             externalFileTypes.clear();

@@ -6,13 +6,12 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
@@ -25,6 +24,7 @@ import org.jabref.gui.desktop.os.Linux;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.desktop.os.OSX;
 import org.jabref.gui.desktop.os.Windows;
+import org.jabref.gui.externalfiletype.CustomExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypeEntryEditor;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -146,7 +146,13 @@ public class JabRefDesktop {
             openExternalFilePlatformIndependent(type, filePath);
             return true;
         } else {
-            // No file matched the name, or we did not know the file type.
+            // No file matched the name, try to open it directly using the given app
+            if (type.isPresent()) {
+                openExternalFilePlatformIndependent(type, link);
+                return true;
+            }
+
+            // Run out of ideas what to do...
             return false;
         }
     }
@@ -186,8 +192,8 @@ public class JabRefDesktop {
         } else if (answer == JOptionPane.YES_OPTION) {
             // User wants to define the new file type. Show the dialog:
 
-            ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "", "new", IconTheme.JabRefIcons.FILE);
-            ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor((JFrame) null, newType);
+            CustomExternalFileType newType = new CustomExternalFileType(fileType.getName(), "", "", "", "new", IconTheme.JabRefIcons.FILE);
+            ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(newType);
 
             editor.setVisible(true);
             if (editor.okPressed()) {
@@ -195,7 +201,7 @@ public class JabRefDesktop {
                 List<ExternalFileType> fileTypes = new ArrayList<>(
                         ExternalFileTypes.getInstance().getExternalFileTypeSelection());
                 fileTypes.add(newType);
-                Collections.sort(fileTypes);
+                fileTypes.sort(Comparator.comparing(ExternalFileType::getName));
                 ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);
                 // Finally, open the file:
                 return openExternalFileAnyFormat(databaseContext, link, Optional.of(newType));

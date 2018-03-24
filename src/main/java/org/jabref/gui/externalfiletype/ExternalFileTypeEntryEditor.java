@@ -1,6 +1,7 @@
 package org.jabref.gui.externalfiletype;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.nio.file.Path;
@@ -11,7 +12,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -38,8 +38,6 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class ExternalFileTypeEntryEditor {
 
-    private JFrame fParent;
-    private JDialog dParent;
     private JDialog diag;
     private final JTextField extension = new JTextField();
     private final JTextField name = new JTextField();
@@ -77,13 +75,7 @@ public class ExternalFileTypeEntryEditor {
         });
     };
 
-    public ExternalFileTypeEntryEditor(JFrame parent, CustomExternalFileType entry) {
-        fParent = parent;
-        init(entry);
-    }
-
-    public ExternalFileTypeEntryEditor(JDialog parent, CustomExternalFileType entry) {
-        dParent = parent;
+    public ExternalFileTypeEntryEditor(CustomExternalFileType entry) {
         init(entry);
     }
 
@@ -176,22 +168,12 @@ public class ExternalFileTypeEntryEditor {
             title = newFileTitle;
         }
 
-        if (dParent == null) {
-            diag = new JDialog(fParent, title, true);
-        } else {
-            diag = new JDialog(dParent, title, true);
-        }
+        diag = new JDialog((Dialog) null, title, true);
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
 
         browseBut.addActionListener(browsePressed);
-
-        if (dParent == null) {
-            diag.setLocationRelativeTo(fParent);
-        } else {
-            diag.setLocationRelativeTo(dParent);
-        }
 
         setValues(entry);
     }
