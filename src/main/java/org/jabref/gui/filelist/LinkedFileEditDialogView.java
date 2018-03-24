@@ -28,17 +28,18 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
 
     @Inject private PreferencesService preferences;
 
-    private final LinkedFilesEditDialogViewModel viewModel;
+    private LinkedFilesEditDialogViewModel viewModel;
+
+    private final LinkedFile linkedFile;
 
     public LinkedFileEditDialogView(LinkedFilesWrapper wrapper) {
+        this.linkedFile = wrapper.getLinkedFile();
 
         ViewLoader.view(this)
                   .load()
                   .setAsContent(this.getDialogPane());
 
         this.getDialogPane().getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
-
-        viewModel = new LinkedFilesEditDialogViewModel(wrapper.getLinkedFile(), stateManager.getActiveDatabase().get(), dialogService, preferences);
 
         this.setResultConverter(button -> {
             if (button == ButtonType.APPLY) {
@@ -51,6 +52,8 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
 
     @FXML
     private void initialize() {
+
+        viewModel = new LinkedFilesEditDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), dialogService, preferences);
         fileType.itemsProperty().bindBidirectional(viewModel.externalFileTypeProperty());
         description.textProperty().bindBidirectional(viewModel.descriptionProperty());
         link.textProperty().bindBidirectional(viewModel.linkProperty());

@@ -28,11 +28,12 @@ public class CopyFilesDialogView extends BaseDialog<Void> {
         this.setTitle(Localization.lang("Result"));
         this.setResizable(true);
 
+        viewModel = new CopyFilesDialogViewModel(results);
+
         ViewLoader.view(this)
                   .load()
                   .setAsContent(this.getDialogPane());
 
-        viewModel = new CopyFilesDialogViewModel(results);
     }
 
     @FXML

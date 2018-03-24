@@ -48,7 +48,7 @@ public class CopyFilesAction extends SimpleCommand {
             return;
         }
         CopyFilesDialogView dialog = new CopyFilesDialogView(databaseContext, new CopyFilesResultListDependency(data));
-        dialog.show();
+        dialog.showAndWait();
     }
 
     @Override
