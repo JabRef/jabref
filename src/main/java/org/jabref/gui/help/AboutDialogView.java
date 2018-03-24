@@ -22,7 +22,7 @@ public class AboutDialogView extends BaseDialog<Void> {
 
     @FXML private ButtonType copyVersionButton;
     @FXML private TextArea textAreaVersions;
-    @FXML protected ImageView iconImage;
+    @FXML private ImageView iconImage;
 
     @Inject private DialogService dialogService;
     @Inject private ClipBoardManager clipBoardManager;
