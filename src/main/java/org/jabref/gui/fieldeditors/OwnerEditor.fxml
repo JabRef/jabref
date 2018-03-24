@@ -5,12 +5,13 @@
 <?import javafx.scene.layout.HBox?>
 <?import org.jabref.gui.fieldeditors.EditorTextArea?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112">
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
+         fx:controller="org.jabref.gui.fieldeditors.OwnerEditor">
     <EditorTextArea fx:id="textArea" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
     <Button onAction="#setOwner"
             styleClass="flatButton">
         <graphic>
-            <JabRefIconView icon="OWNER"/>
+            <JabRefIconView glyph="OWNER"/>
         </graphic>
         <tooltip>
             <Tooltip text="%Set current user name as owner."/>

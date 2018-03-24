@@ -7,12 +7,13 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112">
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
+         fx:controller="org.jabref.gui.fieldeditors.LinkedFilesEditor">
     <ListView fx:id="listView" prefHeight="0" HBox.hgrow="ALWAYS" maxHeight="100"/>
     <Button onAction="#addNewFile"
             styleClass="flatButton">
         <graphic>
-            <JabRefIconView icon="NEW_FILE"/>
+            <JabRefIconView glyph="NEW_FILE"/>
         </graphic>
         <tooltip>
             <Tooltip text="%Open"/>
@@ -21,8 +22,7 @@
     <Button onAction="#fetchFulltext" styleClass="flatButton">
         <graphic>
             <StackPane>
-                <!-- TODO: use WEB_SEARCH instead as soon as it is available -->
-                <JabRefIconView icon="FETCH_FULLTEXT"
+                <JabRefIconView glyph="FETCH_FULLTEXT"
                                 visible="${controller.viewModel.fulltextLookupInProgress == false}"/>
                 <ProgressIndicator maxHeight="12.0" maxWidth="12.0"
                                    visible="${controller.viewModel.fulltextLookupInProgress}"/>
@@ -36,7 +36,7 @@
             onAction="#addFromURL"
             styleClass="flatButton">
         <graphic>
-            <JabRefIconView icon="DOWNLOAD"/>
+            <JabRefIconView glyph="DOWNLOAD"/>
         </graphic>
         <tooltip>
             <Tooltip text="%Download from URL"/>

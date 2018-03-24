@@ -17,7 +17,7 @@
         <ToolBar orientation="VERTICAL">
             <Button styleClass="flatButton,narrow" onAction="#close">
                 <graphic>
-                    <JabRefIconView icon="CLOSE"/>
+                    <JabRefIconView glyph="CLOSE"/>
                 </graphic>
                 <tooltip>
                     <Tooltip text="%Close window"/>
@@ -34,7 +34,7 @@
             <Pane prefHeight="10" VBox.vgrow="ALWAYS"/>
             <Button fx:id="typeChangeButton" styleClass="flatButton,narrow">
                 <graphic>
-                    <JabRefIconView icon="ENTRY_TYPE"/>
+                    <JabRefIconView glyph="ENTRY_TYPE"/>
                 </graphic>
                 <tooltip>
                     <Tooltip text="%Change entry type"/>
@@ -42,7 +42,7 @@
             </Button>
             <Button fx:id="fetcherButton" styleClass="flatButton,narrow">
                 <graphic>
-                    <JabRefIconView icon="REFRESH"/>
+                    <JabRefIconView glyph="REFRESH"/>
                 </graphic>
                 <tooltip>
                     <Tooltip text="%Update with bibliographic information from the web"/>
@@ -50,7 +50,7 @@
             </Button>
             <Button styleClass="flatButton,narrow" onAction="#deleteEntry">
                 <graphic>
-                    <JabRefIconView icon="DELETE_ENTRY"/>
+                    <JabRefIconView glyph="DELETE_ENTRY"/>
                 </graphic>
                 <tooltip>
                     <Tooltip text="%Delete entry"/>
@@ -59,7 +59,7 @@
             <Separator/>
             <Button styleClass="flatButtonNoSpaceBottom,narrow" onAction="#navigateToPreviousEntry">
                 <graphic>
-                    <JabRefIconView icon="PREVIOUS_UP"/>
+                    <JabRefIconView glyph="PREVIOUS_UP"/>
                 </graphic>
                 <tooltip>
                     <Tooltip text="%Previous entry"/>
@@ -67,7 +67,7 @@
             </Button>
             <Button styleClass="flatButtonNoSpaceTop,narrow" onAction="#navigateToNextEntry">
                 <graphic>
-                    <JabRefIconView icon="NEXT_DOWN"/>
+                    <JabRefIconView glyph="NEXT_DOWN"/>
                 </graphic>
                 <tooltip>
                     <Tooltip text="%Next entry"/>

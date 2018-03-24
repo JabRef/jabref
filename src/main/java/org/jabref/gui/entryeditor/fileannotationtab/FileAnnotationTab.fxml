@@ -69,7 +69,7 @@
                     <Pane HBox.hgrow="ALWAYS" />
                     <Button onAction="#copy" styleClass="flatButton">
                         <graphic>
-                            <JabRefIconView icon="COPY"/>
+                            <JabRefIconView glyph="COPY"/>
                         </graphic>
                         <cursor>
                            <Cursor fx:constant="HAND" />

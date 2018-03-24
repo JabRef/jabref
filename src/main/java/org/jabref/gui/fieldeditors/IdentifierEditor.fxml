@@ -7,12 +7,13 @@
 <?import javafx.scene.layout.StackPane?>
 <?import org.jabref.gui.fieldeditors.EditorTextArea?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112">
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
+         fx:controller="org.jabref.gui.fieldeditors.IdentifierEditor">
     <EditorTextArea fx:id="textArea" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
     <Button disable="${controller.viewModel.validIdentifierIsNotPresent}" onAction="#openExternalLink"
             styleClass="flatButton">
         <graphic>
-            <JabRefIconView icon="OPEN_LINK"/>
+            <JabRefIconView glyph="OPEN_LINK"/>
         </graphic>
         <tooltip>
             <Tooltip text="%Open" />
@@ -22,7 +23,7 @@
             visible="${controller.viewModel.idFetcherAvailable}" managed="${controller.viewModel.idFetcherAvailable}">
         <graphic>
             <StackPane>
-                <JabRefIconView icon="LOOKUP_IDENTIFIER"
+                <JabRefIconView glyph="LOOKUP_IDENTIFIER"
                                 visible="${controller.viewModel.identifierLookupInProgress == false}"/>
                 <ProgressIndicator maxHeight="12.0" maxWidth="12.0"
                                    visible="${controller.viewModel.identifierLookupInProgress}"/>
@@ -33,7 +34,7 @@
             onAction="#fetchInformationByIdentifier"
             styleClass="flatButton">
         <graphic>
-            <JabRefIconView icon="FETCH_BY_IDENTIFIER"/>
+            <JabRefIconView glyph="FETCH_BY_IDENTIFIER"/>
         </graphic>
     </Button>
 </fx:root>
