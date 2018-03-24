@@ -11,7 +11,7 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefIcon;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.RecursiveTreeItem;

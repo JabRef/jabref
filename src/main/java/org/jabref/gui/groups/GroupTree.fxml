@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
-<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import org.jabref.gui.icon.JabRefIconView?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="150.0" styleClass="groupsPane"
             xmlns="http://javafx.com/javafx/8.0.112" fx:controller="org.jabref.gui.groups.GroupTreeView">
@@ -33,7 +33,7 @@
                     <Button fx:id="newGroupButton" onAction="#addNewGroup" styleClass="flatButton"
                             ButtonBar.buttonData="LEFT">
                         <graphic>
-                            <MaterialDesignIconView glyphName="PLUS" glyphSize="18"/>
+                            <JabRefIconView glyph="NEW_GROUP" glyphSize="18"/>
                         </graphic>
                         <tooltip>
                             <Tooltip text="%New group"/>

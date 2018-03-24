@@ -1,8 +1,8 @@
 package org.jabref.gui.push;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefIcon;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.preferences.JabRefPreferences;
 
 public class PushToTeXstudio extends AbstractPushToApplication implements PushToApplication {

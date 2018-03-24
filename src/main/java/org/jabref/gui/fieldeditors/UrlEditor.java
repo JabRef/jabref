@@ -7,10 +7,11 @@ import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
-import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
+
+import com.airhacks.afterburner.views.ViewLoader;
 
 public class UrlEditor extends HBox implements FieldEditorFX {
 
@@ -20,7 +21,9 @@ public class UrlEditor extends HBox implements FieldEditorFX {
     public UrlEditor(String fieldName, DialogService dialogService, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, JabRefPreferences preferences) {
         this.viewModel = new UrlEditorViewModel(fieldName, suggestionProvider, dialogService, fieldCheckers);
 
-        ControlHelper.loadFXMLForControl(this);
+        ViewLoader.view(this)
+                  .root(this)
+                  .load();
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
 

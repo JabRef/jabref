@@ -9,6 +9,8 @@ import javafx.scene.layout.Priority;
 
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 
 public abstract class SidePaneComponent {
 

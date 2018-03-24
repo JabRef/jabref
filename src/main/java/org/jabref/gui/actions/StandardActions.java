@@ -2,8 +2,8 @@ package org.jabref.gui.actions;
 
 import java.util.Optional;
 
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefIcon;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;

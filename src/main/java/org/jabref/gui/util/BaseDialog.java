@@ -5,7 +5,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import org.jabref.Globals;
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 

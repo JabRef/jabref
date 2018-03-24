@@ -16,7 +16,7 @@ import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;

@@ -7,9 +7,9 @@ import javax.swing.undo.UndoManager;
 
 import javafx.scene.Node;
 
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
