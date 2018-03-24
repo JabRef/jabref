@@ -1,7 +1,7 @@
 package org.jabref.gui.externalfiletype;
 
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.JabRefIcon;
+import org.jabref.gui.icon.JabRefIcon;
 
 /**
  * Unknown external file type.

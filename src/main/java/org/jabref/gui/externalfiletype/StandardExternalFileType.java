@@ -1,7 +1,7 @@
 package org.jabref.gui.externalfiletype;
 
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefIcon;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
 
 public enum StandardExternalFileType implements ExternalFileType {
