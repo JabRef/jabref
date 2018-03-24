@@ -19,7 +19,6 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
 
-
     @FXML private TextField link;
     @FXML private TextField description;
     @FXML private ComboBox<ExternalFileType> fileType;
@@ -28,6 +27,7 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
     @Inject private StateManager stateManager;
 
     @Inject private PreferencesService preferences;
+
     private final LinkedFilesEditDialogViewModel viewModel;
 
     public LinkedFileEditDialogView(LinkedFilesWrapper wrapper) {
@@ -48,7 +48,6 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
             }
         });
     }
-
 
     @FXML
     private void initialize() {
