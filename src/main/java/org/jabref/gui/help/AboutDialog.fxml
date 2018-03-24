@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.effect.Reflection?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="600.0"
+            xmlns="http://javafx.com/javafx/8.0.65" fx:controller="org.jabref.gui.help.AboutDialogView">
+    <content>
+        <VBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER">
+            <HBox alignment="CENTER_LEFT">
+                <VBox alignment="CENTER_LEFT" spacing="1.0" styleClass="about-top" HBox.hgrow="NEVER">
+                    <Label alignment="CENTER" contentDisplay="CENTER"
+                           onMouseClicked="#copyVersionToClipboard" styleClass="about-heading"
+                           text="${controller.viewModel.heading}" textFill="#2c3e50"
+                           wrapText="true">
+                        <cursor>
+                            <Cursor fx:constant="HAND"/>
+                        </cursor>
+                        <tooltip>
+                            <Tooltip text="%Copy Version"/>
+                        </tooltip>
+                    </Label>
+                    <Label styleClass="dev-heading" fx:id="devVersionLabel"
+                           visible="${controller.viewModel.isDevelopmentVersion}"
+                           managed="${controller.viewModel.isDevelopmentVersion}"
+                           text="${controller.viewModel.developmentVersion}"/>
+                    <Hyperlink styleClass="top-padding" onAction="#openChangeLog"
+                               text="%What's new in this version?"/>
+                    <Label styleClass="filler"/>
+                    <HBox alignment="CENTER_LEFT">
+                        <Label styleClass="space-after" text="${controller.viewModel.license}"
+                               wrapText="true"/>
+                        <Hyperlink onAction="#openLicense" text="MIT"/>
+                    </HBox>
+                    <Hyperlink onAction="#openExternalLibrariesWebsite" text="%Used libraries"/>
+                    <HBox alignment="CENTER_LEFT">
+                        <Label styleClass="space-after" text="%Want to help?" wrapText="true"/>
+                        <Hyperlink onAction="#openDonation" text="%Make a donation"/>
+                        <Label styleClass="space" text="%or" wrapText="true"/>
+                        <Hyperlink onAction="#openGithub" text="%get involved"/>
+                        <Label text="."/>
+                    </HBox>
+                </VBox>
+                <BorderPane BorderPane.alignment="CENTER" HBox.hgrow="ALWAYS">
+                    <center>
+                        <ImageView fx:id="iconImage" fitHeight="140.0" fitWidth="140.0"
+                                   onMouseClicked="#openJabrefWebsite" pickOnBounds="true"
+                                   preserveRatio="true" BorderPane.alignment="CENTER">
+                            <cursor>
+                                <Cursor fx:constant="HAND"/>
+                            </cursor>
+                            <effect>
+                                <Reflection fraction="0.15"/>
+                            </effect>
+                        </ImageView>
+                    </center>
+                    <bottom>
+                    </bottom>
+                </BorderPane>
+            </HBox>
+            <Label styleClass="sub-heading" text="%Developers">
+            </Label>
+            <Label alignment="CENTER" styleClass="info-sections" text="${controller.viewModel.developers}"
+                   textAlignment="JUSTIFY" wrapText="true"/>
+            <Label styleClass="sub-heading" text="%Authors">
+            </Label>
+            <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+                <ScrollPane fitToWidth="true">
+                    <Label styleClass="info-sections" text="${controller.viewModel.authors}"
+                           textAlignment="JUSTIFY" wrapText="true" BorderPane.alignment="CENTER"/>
+                </ScrollPane>
+            </HBox>
+            <TextArea fx:id="textAreaVersions" styleClass="info-sections" editable="false"
+                      prefHeight="100.0" prefWidth="200.0"/>
+        </VBox>
+    </content>
+    <header>
+    </header>
+    <ButtonType fx:id="copyVersionButton" text="%Copy Version"/>
+    <ButtonType fx:constant="CLOSE"/>
+</DialogPane>

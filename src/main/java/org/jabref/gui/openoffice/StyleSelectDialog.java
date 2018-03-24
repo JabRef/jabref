@@ -34,7 +34,6 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
 import org.jabref.Globals;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
@@ -42,6 +41,8 @@ import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.externalfiletype.UnknownExternalFileType;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -52,6 +53,7 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.TestEntry;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -144,10 +146,9 @@ class StyleSelectDialog {
 
         FormBuilder builder = FormBuilder.create();
         builder.layout(new FormLayout("fill:pref:grow, 4dlu, left:pref, 4dlu, left:pref",
-                                      "pref, 4dlu, 100dlu:grow, 4dlu, pref, 4dlu, fill:100dlu"));
-        builder.add(Localization.lang("Select one of the available styles or add a style file from disk.")).xyw(1,
-                                                                                                                1,
-                                                                                                                5);
+                "pref, 4dlu, 100dlu:grow, 4dlu, pref, 4dlu, fill:100dlu"));
+        builder.add(Localization.lang("Select one of the available styles or add a style file from disk.")).xyw(1, 1,
+                5);
         builder.add(new JScrollPane(table)).xyw(1, 3, 5);
         builder.add(addButton).xy(3, 5);
         builder.add(removeButton).xy(5, 5);
@@ -163,7 +164,7 @@ class StyleSelectDialog {
             public void actionPerformed(ActionEvent event) {
                 if ((table.getRowCount() == 0) || (table.getSelectedRowCount() == 0)) {
                     frame.getDialogService().showErrorDialogAndWait(Localization.lang("Style selection"),
-                                                                    Localization.lang("You must select a valid style file."));
+                            Localization.lang("You must select a valid style file."));
                     return;
                 }
                 okPressed = true;
@@ -200,7 +201,7 @@ class StyleSelectDialog {
         diag.pack();
 
         WindowLocation pw = new WindowLocation(diag, JabRefPreferences.STYLES_POS_X, JabRefPreferences.STYLES_POS_Y,
-                                               JabRefPreferences.STYLES_SIZE_X, JabRefPreferences.STYLES_SIZE_Y);
+                JabRefPreferences.STYLES_SIZE_X, JabRefPreferences.STYLES_SIZE_Y);
         pw.displayWindowAtStoredLocation();
     }
 
@@ -209,7 +210,7 @@ class StyleSelectDialog {
         EventList<OOBibStyle> sortedStyles = new SortedList<>(styles);
 
         tableModel = (DefaultEventTableModel<OOBibStyle>) GlazedListsSwing
-                                                                          .eventTableModelWithThreadProxyList(sortedStyles, new StyleTableFormat());
+                .eventTableModelWithThreadProxyList(sortedStyles, new StyleTableFormat());
         table = new JTable(tableModel);
         TableColumnModel cm = table.getColumnModel();
         cm.getColumn(0).setPreferredWidth(100);
@@ -217,7 +218,7 @@ class StyleSelectDialog {
         cm.getColumn(2).setPreferredWidth(80);
 
         selectionModel = (DefaultEventSelectionModel<OOBibStyle>) GlazedListsSwing
-                                                                                  .eventSelectionModelWithThreadProxyList(sortedStyles);
+                .eventSelectionModelWithThreadProxyList(sortedStyles);
         table.setSelectionModel(selectionModel);
         table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.addMouseListener(new MouseAdapter() {
@@ -251,9 +252,12 @@ class StyleSelectDialog {
             Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
             String link = style.getPath();
             try {
-
-                JabRefDesktop.openExternalFileAnyFormat(frame.getCurrentBasePanel().getDatabaseContext(), link, type);
-
+                if (type.isPresent()) {
+                    JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), link, type);
+                } else {
+                    JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new BibDatabaseContext(), link,
+                            new UnknownExternalFileType("jstyle"));
+                }
             } catch (IOException e) {
                 LOGGER.warn("Problem open style file editor", e);
             }
@@ -266,9 +270,9 @@ class StyleSelectDialog {
         removeAction = actionEvent -> getSelectedStyle().ifPresent(style -> {
 
             if (!style.isFromResource() && frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Remove style"),
-                                                                                                  Localization.lang("Are you sure you want to remove the style?"),
-                                                                                                  Localization.lang("Remove style"),
-                                                                                                  Localization.lang("Cancel"))) {
+                    Localization.lang("Are you sure you want to remove the style?"),
+                    Localization.lang("Remove style"),
+                    Localization.lang("Cancel"))) {
                 if (!loader.removeStyle(style)) {
                     LOGGER.info("Problem removing style");
                 }
@@ -466,14 +470,14 @@ class StyleSelectDialog {
 
             JButton browse = new JButton(Localization.lang("Browse"));
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                                   .addExtensionFilter(FileType.JSTYLE)
-                                                                                                   .withDefaultExtension(FileType.JSTYLE)
-                                                                                                   .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
-                                                                                                   .build();
+                    .addExtensionFilter(FileType.JSTYLE)
+                    .withDefaultExtension(FileType.JSTYLE)
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                    .build();
 
             browse.addActionListener(e -> {
                 Optional<Path> file = DefaultTaskExecutor
-                                                         .runInJavaFXThread(() -> frame.getDialogService().showFileOpenDialog(fileDialogConfiguration));
+                        .runInJavaFXThread(() -> frame.getDialogService().showFileOpenDialog(fileDialogConfiguration));
                 file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
             });
 
@@ -513,8 +517,8 @@ class StyleSelectDialog {
 
             // Key bindings:
             bb.getPanel()
-              .getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-              .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+                    .getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+                    .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
             bb.getPanel().getActionMap().put("close", cancelAction);
             pack();
             setLocationRelativeTo(diag);

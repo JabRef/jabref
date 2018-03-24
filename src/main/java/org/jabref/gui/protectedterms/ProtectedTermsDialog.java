@@ -35,12 +35,14 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.externalfiletype.UnknownExternalFileType;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -50,6 +52,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -232,8 +235,12 @@ public class ProtectedTermsDialog {
                     // Fall back to ".txt"
                     Optional<ExternalFileType> txtType = ExternalFileTypes.getInstance()
                             .getExternalFileTypeByExt("txt");
-                    JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), fileName, type);
-
+                    if (txtType.isPresent()) {
+                        JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), fileName, txtType);
+                    } else {
+                        JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new BibDatabaseContext(), fileName,
+                                new UnknownExternalFileType("terms"));
+                    }
                 }
             } catch (IOException e) {
                 LOGGER.warn("Problem open protected terms file editor", e);
@@ -426,9 +433,11 @@ public class ProtectedTermsDialog {
                     .addExtensionFilter(FileType.TERMS)
                     .withDefaultExtension(FileType.TERMS)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+            DialogService ds = frame.getDialogService();
 
             browse.addActionListener(e -> {
-                Optional<Path> file = DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showFileOpenDialog(fileDialogConfiguration));
+                Optional<Path> file = DefaultTaskExecutor
+                        .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
                 file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
             });
 

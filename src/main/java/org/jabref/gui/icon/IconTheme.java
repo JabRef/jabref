@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.icon;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -288,6 +288,24 @@ public class IconTheme {
         DEFAULT_GROUP_ICON(MaterialDesignIcon.LABEL_OUTLINE),
         ALL_ENTRIES_GROUP_ICON(DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON),
         IMPORT_EXPORT(MaterialDesignIcon.SWAP_VERTICAL),
+        PREVIOUS_LEFT(MaterialDesignIcon.CHEVRON_LEFT),
+        PREVIOUS_UP(MaterialDesignIcon.CHEVRON_UP),
+        NEXT_RIGHT(MaterialDesignIcon.CHEVRON_RIGHT),
+        NEXT_DOWN(MaterialDesignIcon.CHEVRON_DOWN),
+        FIT_WIDTH(MaterialDesignIcon.ARROW_EXPAND_ALL),
+        FIT_SINGLE_PAGE(MaterialDesignIcon.NOTE),
+        ZOOM_OUT(MaterialDesignIcon.MAGNIFY_MINUS),
+        ZOOM_IN(MaterialDesignIcon.MAGNIFY_PLUS),
+        ENTRY_TYPE(MaterialDesignIcon.PENCIL),
+        NEW_GROUP(MaterialDesignIcon.PLUS),
+        OPEN_LINK(MaterialDesignIcon.OPEN_IN_NEW),
+        LOOKUP_IDENTIFIER(MaterialDesignIcon.MAGNIFY), // TODO: use WEB_SEARCH instead as soon as it is available
+        FETCH_FULLTEXT(MaterialDesignIcon.MAGNIFY), // TODO: use WEB_SEARCH instead as soon as it is available
+        FETCH_BY_IDENTIFIER(MaterialDesignIcon.CLIPBOARD_ARROW_DOWN),
+        TOGGLE_ABBREVIATION(MaterialDesignIcon.TEXT_SHADOW),
+        NEW_FILE(MaterialDesignIcon.PLUS),
+        DOWNLOAD(MaterialDesignIcon.DOWNLOAD),
+        OWNER(MaterialDesignIcon.ACCOUNT),
         CLOSE_JABREF(MaterialDesignIcon.GLASSDOOR);
 
         private final JabRefIcon icon;
@@ -329,6 +347,16 @@ public class IconTheme {
             return icon.withColor(color);
         }
 
+        @Override
+        public String unicode() {
+            return icon.unicode();
+        }
+
+        @Override
+        public String fontFamily() {
+            return icon.fontFamily();
+        }
+
         private class InternalFileIcon implements JabRefIcon {
 
             private final ImageIcon imageIcon;
@@ -360,6 +388,21 @@ public class IconTheme {
             @Override
             public JabRefIcon withColor(javafx.scene.paint.Color color) {
                 throw new NotImplementedException("Cannot create colored version of a file-based icon");
+            }
+
+            @Override
+            public String name() {
+                throw new NotImplementedException("Cannot get name of a file-based icon");
+            }
+
+            @Override
+            public String unicode() {
+                throw new NotImplementedException("Cannot get unicode of a file-based icon");
+            }
+
+            @Override
+            public String fontFamily() {
+                throw new NotImplementedException("Cannot get font family of a file-based icon");
             }
         }
 

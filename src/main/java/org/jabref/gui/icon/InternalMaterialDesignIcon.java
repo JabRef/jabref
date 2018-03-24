@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.icon;
 
 import java.util.Arrays;
 import java.util.List;
@@ -78,5 +78,20 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
 
     public String getCode() {
         return this.unicode;
+    }
+
+    @Override
+    public String name() {
+        return null;
+    }
+
+    @Override
+    public String unicode() {
+        return icons.get(0).unicode();
+    }
+
+    @Override
+    public String fontFamily() {
+        return icons.get(0).fontFamily();
     }
 }

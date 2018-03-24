@@ -24,8 +24,6 @@ import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefIcon;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiles.FileDownloadTask;

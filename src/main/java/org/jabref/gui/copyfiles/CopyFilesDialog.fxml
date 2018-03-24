@@ -6,8 +6,9 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
-
-<DialogPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="484.0" prefWidth="604.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.copyfiles.CopyFilesDialogController">
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" minHeight="-Infinity" minWidth="-Infinity" prefHeight="484.0"
+            prefWidth="604.0" xmlns="http://javafx.com/javafx/8.0.141"
+            fx:controller="org.jabref.gui.copyfiles.CopyFilesDialogView">
    <content>
       <BorderPane>
          <center>

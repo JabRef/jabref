@@ -9,9 +9,9 @@ import javax.swing.undo.UndoManager;
 
 import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.JabRefIcon;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.model.FieldChange;
