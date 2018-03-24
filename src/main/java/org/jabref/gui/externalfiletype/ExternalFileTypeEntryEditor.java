@@ -22,7 +22,7 @@ import javax.swing.event.DocumentListener;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;

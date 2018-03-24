@@ -6,9 +6,9 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.JabRefGUI;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.pdfimport.PdfImporter;
 import org.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;

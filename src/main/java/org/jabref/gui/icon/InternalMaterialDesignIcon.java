@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.icon;
 
 import java.util.Arrays;
 import java.util.List;

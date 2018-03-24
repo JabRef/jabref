@@ -18,6 +18,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.web.WebView;
 
 import org.jabref.Globals;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.BackgroundTask;

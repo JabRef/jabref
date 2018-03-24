@@ -11,7 +11,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 
-import org.jabref.gui.JabRefIcon;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.database.BibDatabase;

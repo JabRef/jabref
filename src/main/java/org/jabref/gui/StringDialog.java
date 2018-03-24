@@ -33,6 +33,7 @@ import javax.swing.undo.CompoundEdit;
 import org.jabref.Globals;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.undo.UndoableInsertString;
 import org.jabref.gui.undo.UndoableRemoveString;

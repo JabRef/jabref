@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.JabRefIcon;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.worker.LookupIdentifiersWorker;
 import org.jabref.logic.importer.IdFetcher;
