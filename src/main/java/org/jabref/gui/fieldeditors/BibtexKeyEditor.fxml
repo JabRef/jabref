@@ -4,13 +4,13 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import org.jabref.gui.fieldeditors.EditorTextArea?>
-<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112">
     <EditorTextArea fx:id="textArea" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
     <Button onAction="#generateKey"
             styleClass="flatButton">
         <graphic>
-            <MaterialDesignIconView glyphName="KEY_VARIANT"/>
+            <JabRefIconView icon="MAKE_KEY"/>
         </graphic>
         <tooltip>
             <Tooltip text="%Generate BibTeX key"/>

@@ -4,13 +4,13 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import org.jabref.gui.fieldeditors.EditorTextArea?>
-<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112">
     <EditorTextArea fx:id="textArea" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
     <Button disable="${controller.viewModel.validUrlIsNotPresent}" onAction="#openExternalLink"
             styleClass="flatButton">
         <graphic>
-            <MaterialDesignIconView glyphName="OPEN_IN_NEW"/>
+            <JabRefIconView icon="OPEN_LINK"/>
         </graphic>
         <tooltip>
             <Tooltip text="%Open"/>

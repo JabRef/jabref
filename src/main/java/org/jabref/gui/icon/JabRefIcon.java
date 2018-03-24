@@ -5,7 +5,9 @@ import javax.swing.Icon;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 
-public interface JabRefIcon {
+import de.jensd.fx.glyphs.GlyphIcons;
+
+public interface JabRefIcon extends GlyphIcons {
     Icon getIcon();
 
     Icon getSmallIcon();

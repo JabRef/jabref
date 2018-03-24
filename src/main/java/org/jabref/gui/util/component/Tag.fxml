@@ -5,7 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
-<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112" styleClass="tag">
     <Label fx:id="text">
         <HBox.margin>
@@ -16,7 +16,7 @@
             styleClass="flatButton"
             onAction="#removeButtonClicked">
         <graphic>
-            <MaterialDesignIconView glyphName="CLOSE"/>
+            <JabRefIconView icon="CLOSE"/>
         </graphic>
         <tooltip>
             <Tooltip text="%Remove"/>

@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import org.jabref.gui.icon.JabRefIconView?>
 <?import org.controlsfx.control.MasterDetailPane?>
 <ScrollPane xmlns:fx="http://javafx.com/fxml/1" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER"
             styleClass="fileAnnotationTab" xmlns="http://javafx.com/javafx/8.0.112"
@@ -69,11 +69,11 @@
                     <Pane HBox.hgrow="ALWAYS" />
                     <Button onAction="#copy" styleClass="flatButton">
                         <graphic>
-                            <MaterialDesignIconView glyphName="CONTENT_COPY">
+                            <JabRefIconView icon="COPY"/>
+                        </graphic>
                         <cursor>
                            <Cursor fx:constant="HAND" />
-                        </cursor></MaterialDesignIconView>
-                        </graphic>
+                        </cursor>
                         <tooltip>
                             <Tooltip text="%Copy to clipboard" />
                         </tooltip>
