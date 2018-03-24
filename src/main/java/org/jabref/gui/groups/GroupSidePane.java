@@ -3,12 +3,12 @@ package org.jabref.gui.groups;
 import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.SidePaneComponent;
 import org.jabref.gui.SidePaneManager;
 import org.jabref.gui.SidePaneType;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 

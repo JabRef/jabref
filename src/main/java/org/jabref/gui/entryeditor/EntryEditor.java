@@ -28,7 +28,6 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.EntryFetchAndMergeWorker;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.help.HelpFile;
@@ -39,6 +38,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.airhacks.afterburner.views.ViewLoader;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.Subscription;
 
@@ -81,9 +81,11 @@ public class EntryEditor extends BorderPane {
         this.fileMonitor = fileMonitor;
         this.dialogService = dialogService;
 
-        ControlHelper.loadFXMLForControl(this);
+        ViewLoader.view(this)
+                  .root(this)
+                  .load();
 
-        getStylesheets().add(EntryEditor.class.getResource("EntryEditor.css").toExternalForm());
+        //getStylesheets().add(EntryEditor.class.getResource("EntryEditor.css").toExternalForm());
         if (GUIGlobals.currentFont != null) {
             setStyle(
                     "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"

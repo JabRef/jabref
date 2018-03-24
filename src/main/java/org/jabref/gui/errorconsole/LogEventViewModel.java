@@ -3,8 +3,8 @@ package org.jabref.gui.errorconsole;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefIcon;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.util.OS;
 
 import com.google.common.base.Throwables;
