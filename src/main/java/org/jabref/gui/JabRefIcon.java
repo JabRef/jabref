@@ -15,4 +15,6 @@ public interface JabRefIcon {
     JabRefIcon disabled();
 
     JabRefIcon withColor(Color color);
+
+    String name();
 }

@@ -53,7 +53,7 @@ public class ExternalFileTypeEntryEditor {
     private final String editFileTitle = Localization.lang("Edit file type");
     private final String newFileTitle = Localization.lang("Add new file type");
 
-    private ExternalFileType entry;
+    private CustomExternalFileType entry;
     private boolean okPressed;
 
     private final ActionListener browsePressed = e -> {
@@ -77,17 +77,17 @@ public class ExternalFileTypeEntryEditor {
         });
     };
 
-    public ExternalFileTypeEntryEditor(JFrame parent, ExternalFileType entry) {
+    public ExternalFileTypeEntryEditor(JFrame parent, CustomExternalFileType entry) {
         fParent = parent;
         init(entry);
     }
 
-    public ExternalFileTypeEntryEditor(JDialog parent, ExternalFileType entry) {
+    public ExternalFileTypeEntryEditor(JDialog parent, CustomExternalFileType entry) {
         dParent = parent;
         init(entry);
     }
 
-    private void init(ExternalFileType inEntry) {
+    private void init(CustomExternalFileType inEntry) {
         entry = inEntry;
         icon.setText(null);
 
@@ -196,7 +196,7 @@ public class ExternalFileTypeEntryEditor {
         setValues(entry);
     }
 
-    public void setEntry(ExternalFileType entry) {
+    public void setEntry(CustomExternalFileType entry) {
         this.entry = entry;
         if (entry.getName().isEmpty()) {
             diag.setTitle(newFileTitle);
@@ -226,7 +226,7 @@ public class ExternalFileTypeEntryEditor {
         }
     }
 
-    private void storeSettings(ExternalFileType fileTypeEntry) {
+    private void storeSettings(CustomExternalFileType fileTypeEntry) {
         fileTypeEntry.setName(name.getText().trim());
         fileTypeEntry.setMimeType(mimeType.getText().trim());
         // Set extension, but remove initial dot if user has added that:

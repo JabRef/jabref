@@ -6,9 +6,9 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.JabRefGUI;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.pdfimport.PdfImporter;
 import org.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
@@ -28,11 +28,8 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
     }
 
     private static ExternalFileType getPDFExternalFileType(ExternalFileTypes externalFileTypes) {
-        Optional<ExternalFileType> pdfFileType = externalFileTypes.getExternalFileTypeByExt("pdf");
-        if (!pdfFileType.isPresent()) {
-            return new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall", IconTheme.JabRefIcons.PDF_FILE);
-        }
-        return pdfFileType.get();
+        return externalFileTypes.getExternalFileTypeByExt("pdf")
+                                .orElse(StandardExternalFileType.PDF);
     }
 
     /**

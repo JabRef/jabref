@@ -2,6 +2,7 @@ package org.jabref.gui.externalfiletype;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -9,8 +10,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.jabref.Globals;
-import org.jabref.gui.IconTheme;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
@@ -28,7 +27,7 @@ public class ExternalFileTypes {
     // Map containing all registered external file types:
     private final Set<ExternalFileType> externalFileTypes = new TreeSet<>();
 
-    private final ExternalFileType HTML_FALLBACK_TYPE = new ExternalFileType("URL", "html", "text/html", "", "www", IconTheme.JabRefIcons.WWW);
+    private final ExternalFileType HTML_FALLBACK_TYPE = StandardExternalFileType.URL;
 
     private ExternalFileTypes() {
         updateExternalFileTypes();
@@ -42,38 +41,7 @@ public class ExternalFileTypes {
     }
 
     public static List<ExternalFileType> getDefaultExternalFileTypes() {
-        List<ExternalFileType> list = new ArrayList<>();
-        list.add(new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall", IconTheme.JabRefIcons.PDF_FILE));
-        list.add(new ExternalFileType("PostScript", "ps", "application/postscript", "evince", "psSmall", IconTheme.JabRefIcons.FILE));
-        list.add(new ExternalFileType("Word", "doc", "application/msword", "oowriter", "openoffice", IconTheme.JabRefIcons.FILE_WORD));
-        list.add(new ExternalFileType("Word 2007+", "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "oowriter", "openoffice", IconTheme.JabRefIcons.FILE_WORD));
-        list.add(new ExternalFileType(Localization.lang("OpenDocument text"), "odt", "application/vnd.oasis.opendocument.text", "oowriter", "openoffice", IconTheme.JabRefIcons.FILE_OPENOFFICE));
-        list.add(new ExternalFileType("Excel", "xls", "application/excel", "oocalc", "openoffice", IconTheme.JabRefIcons.FILE_EXCEL));
-        list.add(new ExternalFileType("Excel 2007+", "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "oocalc", "openoffice", IconTheme.JabRefIcons.FILE_EXCEL));
-        list.add(new ExternalFileType(Localization.lang("OpenDocument spreadsheet"), "ods", "application/vnd.oasis.opendocument.spreadsheet", "oocalc", "openoffice", IconTheme.JabRefIcons.FILE_OPENOFFICE));
-        list.add(new ExternalFileType("PowerPoint", "ppt", "application/vnd.ms-powerpoint", "ooimpress", "openoffice", IconTheme.JabRefIcons.FILE_POWERPOINT));
-        list.add(new ExternalFileType("PowerPoint 2007+", "pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "ooimpress", "openoffice", IconTheme.JabRefIcons.FILE_POWERPOINT));
-        list.add(new ExternalFileType(Localization.lang("OpenDocument presentation"), "odp", "application/vnd.oasis.opendocument.presentation", "ooimpress", "openoffice", IconTheme.JabRefIcons.FILE_OPENOFFICE));
-        list.add(new ExternalFileType("Rich Text Format", "rtf", "application/rtf", "oowriter", "openoffice", IconTheme.JabRefIcons.FILE_TEXT));
-        list.add(new ExternalFileType(Localization.lang("%0 image", "PNG"), "png", "image/png", "gimp", "picture", IconTheme.JabRefIcons.PICTURE));
-        list.add(new ExternalFileType(Localization.lang("%0 image", "GIF"), "gif", "image/gif", "gimp", "picture", IconTheme.JabRefIcons.PICTURE));
-        list.add(new ExternalFileType(Localization.lang("%0 image", "JPG"), "jpg", "image/jpeg", "gimp", "picture", IconTheme.JabRefIcons.PICTURE));
-        list.add(new ExternalFileType("Djvu", "djvu", "image/vnd.djvu", "evince", "psSmall", IconTheme.JabRefIcons.FILE));
-        list.add(new ExternalFileType("Text", "txt", "text/plain", "emacs", "emacs", IconTheme.JabRefIcons.FILE_TEXT));
-        list.add(new ExternalFileType("LaTeX", "tex", "application/x-latex", "emacs", "emacs", IconTheme.JabRefIcons.FILE_TEXT));
-        list.add(new ExternalFileType("CHM", "chm", "application/mshelp", "gnochm", "www", IconTheme.JabRefIcons.WWW));
-        list.add(new ExternalFileType(Localization.lang("%0 image", "TIFF"), "tiff", "image/tiff", "gimp", "picture", IconTheme.JabRefIcons.PICTURE));
-        list.add(new ExternalFileType("URL", "html", "text/html", "firefox", "www", IconTheme.JabRefIcons.WWW));
-        list.add(new ExternalFileType("MHT", "mht", "multipart/related", "firefox", "www", IconTheme.JabRefIcons.WWW));
-        list.add(new ExternalFileType("ePUB", "epub", "application/epub+zip", "firefox", "www", IconTheme.JabRefIcons.WWW));
-
-        // On all OSes there is a generic application available to handle file opening,
-        // so we don't need the default application settings anymore:
-        for (ExternalFileType type : list) {
-            type.setOpenWith("");
-        }
-
-        return list;
+        return Arrays.asList(StandardExternalFileType.values());
     }
 
     public Set<ExternalFileType> getExternalFileTypeSelection() {
@@ -202,7 +170,7 @@ public class ExternalFileTypes {
         String[][] array = new String[types.size() + defTypes.size()][];
         int i = 0;
         for (ExternalFileType type : types) {
-            array[i] = type.getStringArrayRepresentation();
+            array[i] = getStringArrayRepresentation(type);
             i++;
         }
         for (ExternalFileType type : defTypes) {
@@ -210,6 +178,17 @@ public class ExternalFileTypes {
             i++;
         }
         Globals.prefs.put(JabRefPreferences.EXTERNAL_FILE_TYPES, FileFieldWriter.encodeStringArray(array));
+    }
+
+    /**
+     * Return a String array representing this file type. This is used for storage into
+     * Preferences, and the same array can be used to construct the file type later,
+     * using the String[] constructor.
+     *
+     * @return A String[] containing all information about this file type.
+     */
+    private String[] getStringArrayRepresentation(ExternalFileType type) {
+        return new String[]{type.getName(), type.getExtension(), type.getMimeType(), type.getOpenWithApplication(), type.getIcon().name()};
     }
 
     /**
@@ -243,7 +222,7 @@ public class ExternalFileTypes {
                 }
             } else {
                 // A new or modified entry type. Construct it from the string array:
-                ExternalFileType type = ExternalFileType.buildFromArgs(val);
+                ExternalFileType type = CustomExternalFileType.buildFromArgs(val);
                 // Check if there is a default type with the same name. If so, this is a
                 // modification of that type, so remove the default one:
                 ExternalFileType toRemove = null;

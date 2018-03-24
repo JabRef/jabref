@@ -361,6 +361,11 @@ public class IconTheme {
             public JabRefIcon withColor(javafx.scene.paint.Color color) {
                 throw new NotImplementedException("Cannot create colored version of a file-based icon");
             }
+
+            @Override
+            public String name() {
+                throw new NotImplementedException("Cannot get name of a file-based icon");
+            }
         }
 
         public Button asButton() {

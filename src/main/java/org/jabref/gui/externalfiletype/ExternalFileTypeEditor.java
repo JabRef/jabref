@@ -8,7 +8,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -78,10 +78,8 @@ public class ExternalFileTypeEditor extends JabRefDialog {
     private void setValues() {
         fileTypes.clear();
         Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
-        for (ExternalFileType type : types) {
-            fileTypes.add(type.copy());
-        }
-        Collections.sort(fileTypes);
+        fileTypes.addAll(types);
+        fileTypes.sort(Comparator.comparing(ExternalFileType::getName));
     }
 
     /**
@@ -115,7 +113,7 @@ public class ExternalFileTypeEditor extends JabRefDialog {
             List<ExternalFileType> list = ExternalFileTypes.getDefaultExternalFileTypes();
             fileTypes.clear();
             fileTypes.addAll(list);
-            Collections.sort(fileTypes);
+            fileTypes.sort(Comparator.comparing(ExternalFileType::getName));
             //Globals.prefs.resetExternalFileTypesToDefault();
             //setValues();
             tableModel.fireTableDataChanged();
@@ -124,7 +122,7 @@ public class ExternalFileTypeEditor extends JabRefDialog {
 
         add.addActionListener(e -> {
             // Generate a new file type:
-            ExternalFileType type = new ExternalFileType("", "", "", "", "new",
+            CustomExternalFileType type = new CustomExternalFileType("", "", "", "", "new",
                     IconTheme.JabRefIcons.FILE);
             // Show the file type editor:
             getEditor(type).setVisible(true);
@@ -209,10 +207,17 @@ public class ExternalFileTypeEditor extends JabRefDialog {
     }
 
     private ExternalFileTypeEntryEditor getEditor(ExternalFileType type) {
-        if (entryEditor == null) {
-            entryEditor = new ExternalFileTypeEntryEditor(ExternalFileTypeEditor.this, type);
+        CustomExternalFileType typeForEdit;
+        if (type instanceof CustomExternalFileType) {
+            typeForEdit = (CustomExternalFileType) type;
         } else {
-            entryEditor.setEntry(type);
+            typeForEdit = new CustomExternalFileType(type);
+        }
+
+        if (entryEditor == null) {
+            entryEditor = new ExternalFileTypeEntryEditor(ExternalFileTypeEditor.this, typeForEdit);
+        } else {
+            entryEditor.setEntry(typeForEdit);
         }
         return entryEditor;
     }
