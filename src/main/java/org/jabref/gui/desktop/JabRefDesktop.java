@@ -15,25 +15,16 @@ import javax.swing.JOptionPane;
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.ClipBoardManager;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.os.DefaultDesktop;
 import org.jabref.gui.desktop.os.Linux;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.desktop.os.OSX;
 import org.jabref.gui.desktop.os.Windows;
 import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.externalfiletype.ExternalFileTypeEntryEditor;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.externalfiletype.UnknownExternalFileType;
-import org.jabref.gui.filelist.FileListEntry;
-import org.jabref.gui.filelist.FileListEntryEditor;
-import org.jabref.gui.filelist.FileListTableModel;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Eprint;
@@ -83,7 +74,7 @@ public class JabRefDesktop {
                 if ("pdf".equalsIgnoreCase(split[split.length - 1])) {
                     fieldName = FieldName.PDF;
                 } else if ("ps".equalsIgnoreCase(split[split.length - 1])
-                    || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
+                           || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
                     fieldName = FieldName.PS;
                 }
             }
@@ -167,7 +158,6 @@ public class JabRefDesktop {
         }
     }
 
-
     /**
      * Opens a file browser of the folder of the given file. If possible, the file is selected
      * @param fileLink the location of the file
@@ -210,7 +200,7 @@ public class JabRefDesktop {
             JabRefGUI.getMainFrame().output(couldNotOpenBrowser);
             JOptionPane.showMessageDialog(null,
                                           couldNotOpenBrowser + "\n" + openManually + "\n" +
-                                              copiedToClipboard,
+                                                copiedToClipboard,
                                           couldNotOpenBrowser,
                                           JOptionPane.ERROR_MESSAGE);
         }

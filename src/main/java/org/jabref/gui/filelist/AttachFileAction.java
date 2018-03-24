@@ -34,8 +34,8 @@ public class AttachFileAction extends SimpleCommand {
         BibEntry entry = panel.getSelectedEntries().get(0);
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-        .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
-        .build();
+                                                                                               .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                                                                                               .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
             LinkedFile newLinkedFile = new LinkedFile("", newFile.toString(), "");
@@ -44,20 +44,19 @@ public class AttachFileAction extends SimpleCommand {
             wrapper.setLinkedFile(newLinkedFile);
             LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(wrapper);
 
-            boolean applyPressed = dialog.showAndWait();
-            if (applyPressed) {
-                LinkedFilesEditDialogViewModel model = (LinkedFilesEditDialogViewModel) dialog.getController().get().getViewModel();
-                newLinkedFile = model.getNewLinkedFile();
+            Optional<LinkedFile> editedLinkeDfile = dialog.showAndWait();
+            editedLinkeDfile.ifPresent(file -> {
 
-                Optional<FieldChange> fieldChange = entry.addFile(newLinkedFile);
+                Optional<FieldChange> fieldChange = entry.addFile(file);
 
                 if (fieldChange.isPresent()) {
                     UndoableFieldChange ce = new UndoableFieldChange(entry, FieldName.FILE,
-                    entry.getField(FieldName.FILE).orElse(null), fieldChange.get().getNewValue());
+                                                                     entry.getField(FieldName.FILE).orElse(null),
+                                                                     fieldChange.get().getNewValue());
                     panel.getUndoManager().addEdit(ce);
                     panel.markBaseChanged();
                 }
-            }
+            });
         });
     }
 }

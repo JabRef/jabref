@@ -1,40 +1,66 @@
 package org.jabref.gui.filelist;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
+import javax.inject.Inject;
 
-import javafx.scene.control.Alert.AlertType;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogPane;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 
-import org.jabref.gui.AbstractReturnDialogView;
-import org.jabref.gui.FXDialog;
-import org.jabref.logic.l10n.Localization;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.util.BaseDialog;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.preferences.PreferencesService;
 
-public class LinkedFileEditDialogView extends AbstractReturnDialogView<Boolean> {
+import com.airhacks.afterburner.views.ViewLoader;
 
-    public LinkedFileEditDialogView(LinkedFilesWrapper linkedFile) {
-        super(createContext(linkedFile));
+public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
+
+
+    @FXML private TextField link;
+    @FXML private TextField description;
+    @FXML private ComboBox<ExternalFileType> fileType;
+
+    @Inject private DialogService dialogService;
+    @Inject private StateManager stateManager;
+
+    @Inject private PreferencesService preferences;
+    private final LinkedFilesEditDialogViewModel viewModel;
+
+    public LinkedFileEditDialogView(LinkedFilesWrapper wrapper) {
+
+        ViewLoader.view(this)
+                  .load()
+                  .setAsContent(this.getDialogPane());
+
+        this.getDialogPane().getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
+
+        viewModel = new LinkedFilesEditDialogViewModel(wrapper.getLinkedFile(), stateManager.getActiveDatabase().get(), dialogService, preferences);
+
+        this.setResultConverter(button -> {
+            if (button == ButtonType.APPLY) {
+                return viewModel.getNewLinkedFile();
+            } else {
+                return null;
+            }
+        });
     }
 
-    private static Function<String, Object> createContext(LinkedFilesWrapper linkedFilesWrapper) {
-        Map<String, Object> context = new HashMap<>();
-        context.put("linkedFilesWrapper", linkedFilesWrapper);
-        return context::get;
+
+    @FXML
+    private void initialize() {
+        fileType.itemsProperty().bindBidirectional(viewModel.externalFileTypeProperty());
+        description.textProperty().bindBidirectional(viewModel.descriptionProperty());
+        link.textProperty().bindBidirectional(viewModel.linkProperty());
+        fileType.valueProperty().bindBidirectional(viewModel.getSelectedExternalFileType());
     }
 
-    /**
-     * @return true if the user accepts the change
-     */
-    @Override
-    public Boolean showAndWait() {
-        FXDialog dialog = new FXDialog(AlertType.INFORMATION, Localization.lang("Edit linked file"));
-        dialog.setDialogPane((DialogPane) this.getView());
-        dialog.getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
-        dialog.setResizable(true);
-        Optional<ButtonType> buttonPressed = dialog.showAndWait();
-        return buttonPressed.equals(Optional.of(ButtonType.APPLY));
+    @FXML
+    private void openBrowseDialog(ActionEvent event) {
+        viewModel.openBrowseDialog();
+        link.requestFocus();
     }
 }
