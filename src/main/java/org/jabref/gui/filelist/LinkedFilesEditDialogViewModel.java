@@ -98,7 +98,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         if (fileType.isPresent() && !(fileType.get() instanceof UnknownExternalFileType)) {
             selectedExternalFileType.setValue(fileType.get());
         } else if ((linkedFile.getLink() != null) && (!linkedFile.getLink().isEmpty())) {
-            checkExtension();
+            setExternalFileTypeByExtension(linkedFile.getLink());
         }
     }
 
