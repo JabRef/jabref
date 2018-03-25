@@ -122,10 +122,7 @@ public class WebFetchers {
 
     public static List<FulltextFetcher> getFullTextFetchers(ImportFormatPreferences importFormatPreferences) {
         List<FulltextFetcher> fetchers = new ArrayList<>();
-
-        // Ordering is important, authorities first!
-        // Publisher
-        fetchers.add(new DoiResolution());
+        // Publishers
         fetchers.add(new ScienceDirect());
         fetchers.add(new SpringerLink());
         fetchers.add(new ACS());
