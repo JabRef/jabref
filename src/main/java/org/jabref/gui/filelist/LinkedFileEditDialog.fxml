@@ -10,12 +10,12 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<DialogPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="150.0" prefWidth="536.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.filelist.LinkedFileEditDialogView">
+<DialogPane minHeight="-Infinity" prefHeight="150.0" prefWidth="536.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.filelist.LinkedFileEditDialogView">
    <content>
       <GridPane>
         <columnConstraints>
           <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="200.0" />
+          <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="200.0" />
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="108.0" />
         </columnConstraints>
         <rowConstraints>
@@ -24,29 +24,17 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-               <Label minWidth="95.0" text="%Link">
-                   <padding>
-                       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                   </padding>
-               </Label>
+               <Label minWidth="95.0" text="%Link" />
                <TextField fx:id="link" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
-               <Label text="Description" GridPane.rowIndex="1">
-                   <padding>
-                       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                   </padding>
-               </Label>
+               <Label text="Description" GridPane.rowIndex="1" />
                <TextField fx:id="description" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
             <ComboBox fx:id="fileType" minHeight="-Infinity" prefWidth="150.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />
-            <Button mnemonicParsing="false" onAction="#openBrowseDialog" text="%Browse" GridPane.columnIndex="2">
+            <Button id="browse" mnemonicParsing="false" onAction="#openBrowseDialog" text="%Browse" GridPane.columnIndex="2">
                <GridPane.margin>
                   <Insets left="10.0" />
                </GridPane.margin>
             </Button>
-            <Label text="Filetype" GridPane.rowIndex="2">
-               <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-               </padding>
-            </Label>
+            <Label text="Filetype" GridPane.rowIndex="2" />
          </children>
       </GridPane>
    </content>

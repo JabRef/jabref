@@ -24,39 +24,40 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
-    private final StringProperty linkProperty = new SimpleStringProperty("");
-    private final StringProperty descriptionProperty = new SimpleStringProperty("");
-    private final ListProperty<ExternalFileType> externalfilesTypes = new SimpleListProperty<>(FXCollections.emptyObservableList());
+    private final StringProperty link = new SimpleStringProperty("");
+    private final StringProperty description = new SimpleStringProperty("");
+    private final ListProperty<ExternalFileType> allExternalFileTypes = new SimpleListProperty<>(FXCollections.emptyObservableList());
     private final ObjectProperty<ExternalFileType> selectedExternalFileType = new SimpleObjectProperty<>();
     private final BibDatabaseContext database;
     private final DialogService dialogService;
     private final PreferencesService preferences;
+    private final ExternalFileTypes externalFileTypes;
 
-    public LinkedFilesEditDialogViewModel(LinkedFile linkedFile, BibDatabaseContext database, DialogService dialogService, PreferencesService preferences2) {
+    public LinkedFilesEditDialogViewModel(LinkedFile linkedFile, BibDatabaseContext database, DialogService dialogService, PreferencesService preferences, ExternalFileTypes externalFileTypes) {
         this.database = database;
         this.dialogService = dialogService;
-        this.preferences = preferences2;
-        externalfilesTypes.set(FXCollections.observableArrayList(ExternalFileTypes.getInstance().getExternalFileTypeSelection()));
+        this.preferences = preferences;
+        this.externalFileTypes = externalFileTypes;
+        allExternalFileTypes.set(FXCollections.observableArrayList(externalFileTypes.getExternalFileTypeSelection()));
         setValues(linkedFile);
     }
 
     private void checkExtension() {
-        if (!linkProperty.getValueSafe().isEmpty()) {
+        if (!link.getValueSafe().isEmpty()) {
 
             // Check if this looks like a remote link:
-            if (REMOTE_LINK_PATTERN.matcher(linkProperty.get()).matches()) {
-                ExternalFileTypes.getInstance().getExternalFileTypeByExt("html").ifPresent(selectedExternalFileType::setValue);
+            if (REMOTE_LINK_PATTERN.matcher(link.get()).matches()) {
+                externalFileTypes.getExternalFileTypeByExt("html").ifPresent(selectedExternalFileType::setValue);
             }
 
             // Try to guess the file type:
-            String theLink = linkProperty.get().trim();
-            ExternalFileTypes.getInstance().getExternalFileTypeForName(theLink).ifPresent(selectedExternalFileType::setValue);
+            String theLink = link.get().trim();
+            externalFileTypes.getExternalFileTypeForName(theLink).ifPresent(selectedExternalFileType::setValue);
         }
     }
 
@@ -65,7 +66,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
         Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.getFileDirectoryPreferences());
 
-        Path workingDir = file.orElse(Paths.get(preferences.get(JabRefPreferences.WORKING_DIRECTORY)));
+        Path workingDir = file.orElse(preferences.getWorkingDir());
         String fileName = Paths.get(fileText).getFileName().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -75,7 +76,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> {
             // Store the directory for next time:
-            preferences.put(JabRefPreferences.WORKING_DIRECTORY, path.toString());
+            preferences.setWorkingDir(path);
 
             // If the file is below the file directory, make the path relative:
             List<Path> fileDirectories = database.getFileDirectoriesAsPaths(preferences.getFileDirectoryPreferences());
@@ -86,32 +87,31 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         });
     }
 
-    //
-    public void setValues(LinkedFile entry) {
-        descriptionProperty.set(entry.getDescription());
-        linkProperty.set(entry.getLink());
+    public void setValues(LinkedFile linkedFile) {
+        description.set(linkedFile.getDescription());
+        link.set(linkedFile.getLink());
 
         selectedExternalFileType.setValue(null);
 
         // See what is a reasonable selection for the type combobox:
-        Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance().fromLinkedFile(entry, false);
+        Optional<ExternalFileType> fileType = externalFileTypes.fromLinkedFile(linkedFile, false);
         if (fileType.isPresent() && !(fileType.get() instanceof UnknownExternalFileType)) {
             selectedExternalFileType.setValue(fileType.get());
-        } else if ((entry.getLink() != null) && (!entry.getLink().isEmpty())) {
+        } else if ((linkedFile.getLink() != null) && (!linkedFile.getLink().isEmpty())) {
             checkExtension();
         }
     }
 
     public StringProperty link() {
-        return linkProperty;
+        return link;
     }
 
     public StringProperty description() {
-        return descriptionProperty;
+        return description;
     }
 
     public ListProperty<ExternalFileType> externalFileType() {
-        return externalfilesTypes;
+        return allExternalFileTypes;
     }
 
     public ObjectProperty<ExternalFileType> selectedExternalFileType() {
@@ -119,7 +119,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     }
 
     public LinkedFile getNewLinkedFile() {
-        return new LinkedFile(descriptionProperty.getValue(), linkProperty.getValue(), selectedExternalFileType.getValue().toString());
+        return new LinkedFile(description.getValue(), link.getValue(), selectedExternalFileType.getValue().toString());
 
     }
 

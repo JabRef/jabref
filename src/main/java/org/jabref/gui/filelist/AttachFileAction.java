@@ -11,7 +11,6 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -32,7 +31,6 @@ public class AttachFileAction extends SimpleCommand {
             return;
         }
         BibEntry entry = panel.getSelectedEntries().get(0);
-
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                                                                                                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                                                                                                .build();
@@ -40,22 +38,17 @@ public class AttachFileAction extends SimpleCommand {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
             LinkedFile newLinkedFile = new LinkedFile("", newFile.toString(), "");
 
-            LinkedFilesWrapper wrapper = new LinkedFilesWrapper();
-            wrapper.setLinkedFile(newLinkedFile);
-            LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(wrapper);
+            LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(newLinkedFile);
 
             Optional<LinkedFile> editedLinkeDfile = dialog.showAndWait();
             editedLinkeDfile.ifPresent(file -> {
 
                 Optional<FieldChange> fieldChange = entry.addFile(file);
-
-                if (fieldChange.isPresent()) {
-                    UndoableFieldChange ce = new UndoableFieldChange(entry, FieldName.FILE,
-                                                                     entry.getField(FieldName.FILE).orElse(null),
-                                                                     fieldChange.get().getNewValue());
+                fieldChange.ifPresent(change -> {
+                    UndoableFieldChange ce = new UndoableFieldChange(change);
                     panel.getUndoManager().addEdit(ce);
                     panel.markBaseChanged();
-                }
+                });
             });
         });
     }

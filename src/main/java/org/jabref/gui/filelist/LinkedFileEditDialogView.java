@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.PreferencesService;
@@ -31,10 +32,12 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
     private LinkedFilesEditDialogViewModel viewModel;
 
     private final LinkedFile linkedFile;
+    private ExternalFileTypes externalFileTypes;
 
-    public LinkedFileEditDialogView(LinkedFilesWrapper wrapper) {
-        this.linkedFile = wrapper.getLinkedFile();
+    public LinkedFileEditDialogView(LinkedFile linkedFile) {
+        this.linkedFile = linkedFile;
 
+        this.externalFileTypes = ExternalFileTypes.getInstance();
         ViewLoader.view(this)
                   .load()
                   .setAsContent(this.getDialogPane());
@@ -53,7 +56,7 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
     @FXML
     private void initialize() {
 
-        viewModel = new LinkedFilesEditDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), dialogService, preferences);
+        viewModel = new LinkedFilesEditDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), dialogService, preferences, externalFileTypes);
         fileType.itemsProperty().bindBidirectional(viewModel.externalFileType());
         description.textProperty().bindBidirectional(viewModel.description());
         link.textProperty().bindBidirectional(viewModel.link());

@@ -69,7 +69,6 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.filelist.LinkedFileEditDialogView;
-import org.jabref.gui.filelist.LinkedFilesWrapper;
 import org.jabref.gui.groups.GroupTreeNodeViewModel;
 import org.jabref.gui.groups.UndoableChangeEntriesOfGroup;
 import org.jabref.gui.help.HelpAction;
@@ -1318,9 +1317,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             entry = selectionModel.getSelected().get(0);
             LinkedFile linkedFile = new LinkedFile("", "", "");
 
-            LinkedFilesWrapper wrapper = new LinkedFilesWrapper();
-            wrapper.setLinkedFile(linkedFile);
-            LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(wrapper);
+            LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(linkedFile);
 
             Optional<LinkedFile> editedLinkedFile = DefaultTaskExecutor.runInJavaFXThread(() -> dialog.showAndWait());
             editedLinkedFile.ifPresent(file -> entry.addFile(linkedFile));

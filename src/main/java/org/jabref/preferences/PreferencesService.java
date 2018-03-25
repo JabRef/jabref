@@ -1,5 +1,7 @@
 package org.jabref.preferences;
 
+import java.nio.file.Path;
+
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.model.metadata.FileDirectoryPreferences;
@@ -15,7 +17,8 @@ public interface PreferencesService {
 
     FileDirectoryPreferences getFileDirectoryPreferences();
 
-    String get(String key);
+    Path getWorkingDir();
 
-    void put(String key, String value);
+    void setWorkingDir(Path dir);
+
 }

@@ -30,7 +30,6 @@ import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.LinkedFileEditDialogView;
-import org.jabref.gui.filelist.LinkedFilesWrapper;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BackgroundTask;
@@ -317,9 +316,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void edit() {
 
-        LinkedFilesWrapper wrapper = new LinkedFilesWrapper();
-        wrapper.setLinkedFile(this.linkedFile);
-        LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(wrapper);
+        LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(this.linkedFile);
 
         Optional<LinkedFile> editedFile = dialog.showAndWait();
         editedFile.ifPresent(file -> {
