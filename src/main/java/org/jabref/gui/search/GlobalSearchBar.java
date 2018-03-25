@@ -139,7 +139,7 @@ public class GlobalSearchBar extends HBox {
                     updateOpenCurrentResultsTooltip(globalSearch.isSelected());
                     focus();
                     event.consume();
-                } else if (keyBinding.get().equals(KeyBinding.CLEAR_SEARCH)) {
+                } else if (keyBinding.get().equals(KeyBinding.CLOSE)) {
                     // Clear search and select first entry, if available
                     clearSearch();
                     frame.getCurrentBasePanel().getMainTable().getSelectionModel().selectFirst();

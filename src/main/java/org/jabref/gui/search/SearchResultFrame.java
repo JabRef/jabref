@@ -164,7 +164,7 @@ public class SearchResultFrame {
 
         ActionMap actionMap = contentPane.getActionMap();
         InputMap inputMap = contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DATABASE), "close");
         actionMap.put("close", closeAction);
 

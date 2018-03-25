@@ -348,7 +348,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
         };
         mCancel.addActionListener(cancelAction);
         builderAll.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+                  .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         builderAll.getPanel().getActionMap().put("close", cancelAction);
 
         okButton.addActionListener(e -> {
