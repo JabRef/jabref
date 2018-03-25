@@ -62,7 +62,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     }
 
     public void openBrowseDialog() {
-        String fileText = link().get();
+        String fileText = link.get();
 
         Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.getFileDirectoryPreferences());
 
@@ -82,7 +82,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
             List<Path> fileDirectories = database.getFileDirectoriesAsPaths(preferences.getFileDirectoryPreferences());
             path = FileUtil.shortenFileName(path, fileDirectories);
 
-            link().set(path.toString());
+            link.set(path.toString());
             checkExtension();
         });
     }
