@@ -47,16 +47,16 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         setValues(linkedFile);
     }
 
-    private void checkExtension() {
-        if (!link.getValueSafe().isEmpty()) {
+    private void setExternalFileTypeByExtension(String link) {
+        if (!link.isEmpty()) {
 
             // Check if this looks like a remote link:
-            if (REMOTE_LINK_PATTERN.matcher(link.get()).matches()) {
+            if (REMOTE_LINK_PATTERN.matcher(link).matches()) {
                 externalFileTypes.getExternalFileTypeByExt("html").ifPresent(selectedExternalFileType::setValue);
             }
 
             // Try to guess the file type:
-            String theLink = link.get().trim();
+            String theLink = link.trim();
             externalFileTypes.getExternalFileTypeForName(theLink).ifPresent(selectedExternalFileType::setValue);
         }
     }
@@ -83,7 +83,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
             path = FileUtil.shortenFileName(path, fileDirectories);
 
             link.set(path.toString());
-            checkExtension();
+            setExternalFileTypeByExtension(link.getValueSafe());
         });
     }
 
@@ -102,19 +102,19 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         }
     }
 
-    public StringProperty link() {
+    public StringProperty linkProperty() {
         return link;
     }
 
-    public StringProperty description() {
+    public StringProperty descriptionProperty() {
         return description;
     }
 
-    public ListProperty<ExternalFileType> externalFileType() {
+    public ListProperty<ExternalFileType> externalFileTypeProperty() {
         return allExternalFileTypes;
     }
 
-    public ObjectProperty<ExternalFileType> selectedExternalFileType() {
+    public ObjectProperty<ExternalFileType> selectedExternalFileTypeProperty() {
         return selectedExternalFileType;
     }
 
