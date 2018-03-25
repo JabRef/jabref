@@ -61,7 +61,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     }
 
     public void openBrowseDialog() {
-        String fileText = linkProperty().get();
+        String fileText = link().get();
 
         Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.getFileDirectoryPreferences());
 
@@ -69,9 +69,9 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         String fileName = Paths.get(fileText).getFileName().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-        .withInitialDirectory(workingDir)
-        .withInitialFileName(fileName)
-        .build();
+                                                                                               .withInitialDirectory(workingDir)
+                                                                                               .withInitialFileName(fileName)
+                                                                                               .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> {
             // Store the directory for next time:
@@ -81,7 +81,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
             List<Path> fileDirectories = database.getFileDirectoriesAsPaths(preferences.getFileDirectoryPreferences());
             path = FileUtil.shortenFileName(path, fileDirectories);
 
-            linkProperty().set(path.toString());
+            link().set(path.toString());
             checkExtension();
         });
     }
@@ -102,19 +102,19 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         }
     }
 
-    public StringProperty linkProperty() {
+    public StringProperty link() {
         return linkProperty;
     }
 
-    public StringProperty descriptionProperty() {
+    public StringProperty description() {
         return descriptionProperty;
     }
 
-    public ListProperty<ExternalFileType> externalFileTypeProperty() {
+    public ListProperty<ExternalFileType> externalFileType() {
         return externalfilesTypes;
     }
 
-    public ObjectProperty<ExternalFileType> getSelectedExternalFileType() {
+    public ObjectProperty<ExternalFileType> selectedExternalFileType() {
         return selectedExternalFileType;
     }
 

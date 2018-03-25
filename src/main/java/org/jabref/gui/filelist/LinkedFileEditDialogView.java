@@ -54,10 +54,10 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
     private void initialize() {
 
         viewModel = new LinkedFilesEditDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), dialogService, preferences);
-        fileType.itemsProperty().bindBidirectional(viewModel.externalFileTypeProperty());
-        description.textProperty().bindBidirectional(viewModel.descriptionProperty());
-        link.textProperty().bindBidirectional(viewModel.linkProperty());
-        fileType.valueProperty().bindBidirectional(viewModel.getSelectedExternalFileType());
+        fileType.itemsProperty().bindBidirectional(viewModel.externalFileType());
+        description.textProperty().bindBidirectional(viewModel.description());
+        link.textProperty().bindBidirectional(viewModel.link());
+        fileType.valueProperty().bindBidirectional(viewModel.selectedExternalFileType());
     }
 
     @FXML
