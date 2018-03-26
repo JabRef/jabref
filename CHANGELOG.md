@@ -43,6 +43,7 @@ The new default removes the linked file from the entry instead of deleting the f
 - We added another CLI functionality for reading and writing metadata to pdfs. (see https://github.com/JabRef/jabref/pull/3756 and see http://help.jabref.org/en/CommandLine)
 - We no longer print errors in field values during autosave into the log [#3811](https://github.com/JabRef/jabref/issues/3811)
 
+
 ### Fixed
 - We fixed several performance problems with the management of journal abbreviations [#3323](https://github.com/JabRef/jabref/issues/3323)
 - We fixed an issue where changing the type of an entry did not update the label in the tool bar of the entry editor and the contents of the currently visible entry editor tab

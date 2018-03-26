@@ -62,7 +62,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         panel.showAndEdit(entry.getEntry());
                     }
                 })
-                .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, Globals.getKeyPrefs()))
+        .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, Globals.getKeyPrefs(), frame.getDialogService()))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnMouseDragEntered(this::handleOnDragEntered)
                 .install(this);
@@ -219,6 +219,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // Support the following gesture to select entries: click on one row -> hold mouse button -> move over other rows
         // We need to select all items between the starting row and the row where the user currently hovers the mouse over
         // It is not enough to just select the currently hovered row since then sometimes rows are not marked selected if the user moves to fast
+        @SuppressWarnings("unchecked")
         TableRow<BibEntryTableViewModel> sourceRow = (TableRow<BibEntryTableViewModel>) event.getGestureSource();
         getSelectionModel().selectRange(sourceRow.getIndex(), row.getIndex());
     }

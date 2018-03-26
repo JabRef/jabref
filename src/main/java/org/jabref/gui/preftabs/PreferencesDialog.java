@@ -256,8 +256,6 @@ public class PreferencesDialog extends BaseDialog<Void> {
         }
     }
 
-
-
     class ExportAction extends AbstractAction {
 
         public ExportAction() {
@@ -272,8 +270,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
                     .withDefaultExtension(FileType.XML)
                     .withInitialDirectory(prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                     .build();
-            Optional<Path> path = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> dialogService.showFileSaveDialog(fileDialogConfiguration));
+            Optional<Path> path = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showFileSaveDialog(fileDialogConfiguration));
 
             path.ifPresent(exportFile -> {
                 try {

@@ -21,12 +21,13 @@ import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory;
 public class AboutDialogView extends BaseDialog<Void> {
 
     @FXML private ButtonType copyVersionButton;
-    @FXML protected ImageView iconImage;
+    @FXML private TextArea textAreaVersions;
+    @FXML private ImageView iconImage;
+
     @Inject private DialogService dialogService;
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private BuildInfo buildInfo;
 
-    @FXML private TextArea textAreaVersions;
     private AboutDialogViewModel viewModel;
 
     public AboutDialogView() {

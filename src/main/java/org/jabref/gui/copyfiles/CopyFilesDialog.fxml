@@ -23,13 +23,6 @@
                </columnResizePolicy>
             </TableView>
          </center>
-         <bottom>
-            <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-               <buttons>
-                  <Button defaultButton="true" mnemonicParsing="false" onAction="#close" text="%OK" ButtonBar.buttonData="OK_DONE" />
-               </buttons>
-            </ButtonBar>
-         </bottom>
       </BorderPane>
    </content>
 </DialogPane>
