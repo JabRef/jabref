@@ -56,29 +56,26 @@ public class IconTheme {
         try (InputStream stream = getMaterialDesignIconsStream()) {
             FONT = Font.createFont(Font.TRUETYPE_FONT, stream);
         } catch (FontFormatException | IOException e) {
-            LOGGER.warn("Error loading font", e);
+            LOGGER.error("Error loading font", e);
+        }
+
+        try (InputStream stream = getJabRefMaterialDesignIconsStream()) {
+            javafx.scene.text.Font.loadFont(stream, 7);
+        } catch (IOException e) {
+            LOGGER.error("Error loading custom font for custom JabRef icons", e);
         }
     }
 
     private static InputStream getMaterialDesignIconsStream() {
-        // TODO: The next line loads the additional JabRef-Icons. Most certainly wrong at this place
-        javafx.scene.text.Font.loadFont(FontBasedIcon.class.getResource("/fonts/JabRefMaterialDesign.ttf").toExternalForm(), 7);
         return FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf");
+    }
+
+    private static InputStream getJabRefMaterialDesignIconsStream() throws IOException {
+        return  FontBasedIcon.class.getResource("/fonts/JabRefMaterialDesign.ttf").openStream();
     }
 
     public static javafx.scene.paint.Color getDefaultColor() {
         return ColorUtil.toFX(DEFAULT_COLOR);
-    }
-
-    /**
-     * Constructs an ImageIcon for the image representing the given function, in the resource
-     * file listing images.
-     *
-     * @param name The name of the icon, such as "open", "save", "saveAs" etc.
-     * @return The ImageIcon for the function.
-     */
-    public static ImageIcon getImage(String name) {
-        return new ImageIcon(getIconUrl(name));
     }
 
     public static Image getJabRefImageFX() {
@@ -303,10 +300,6 @@ public class IconTheme {
             icon = new InternalMaterialDesignIcon(color, icons);
         }
 
-        JabRefIcons(ImageIcon imageIcon) {
-            icon = new InternalFileIcon(imageIcon);
-        }
-
         @Override
         public Icon getIcon() {
             return icon.getIcon();
@@ -330,40 +323,6 @@ public class IconTheme {
         @Override
         public JabRefIcon withColor(javafx.scene.paint.Color color) {
             return icon.withColor(color);
-        }
-
-        private class InternalFileIcon implements JabRefIcon {
-
-            private final ImageIcon imageIcon;
-
-            InternalFileIcon(ImageIcon imageIcon) {
-                this.imageIcon = imageIcon;
-            }
-
-            @Override
-            public Icon getIcon() {
-                return imageIcon;
-            }
-
-            @Override
-            public Icon getSmallIcon() {
-                return imageIcon;
-            }
-
-            @Override
-            public Node getGraphicNode() {
-                return new ImageView(new Image(imageIcon.getDescription()));
-            }
-
-            @Override
-            public JabRefIcon disabled() {
-                throw new NotImplementedException("Cannot create disabled version of a file-based icon");
-            }
-
-            @Override
-            public JabRefIcon withColor(javafx.scene.paint.Color color) {
-                throw new NotImplementedException("Cannot create colored version of a file-based icon");
-            }
         }
 
         public Button asButton() {

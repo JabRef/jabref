@@ -12,9 +12,9 @@
     -jr-theme: #50618F;
     /* The base gray. Most gray-tones in the application are derived from this color. */
     -jr-base: #f0f0f0;
+    -jr-accent: derive(-jr-theme, 50%);
 
     -jr-white: #ffffff;
-    -jr-gray-00: #f5f5f5;
     -jr-gray-0: #f0f0f0;
     -jr-gray-1: #e6e6e6;
     -jr-gray-2: #808080;
@@ -43,6 +43,7 @@
     /* maintable and group view cells*/
     -jr-hover-cell: derive(-jr-yellow, 50%);
     -jr-selected-cell: derive(-jr-yellow, 5%);
+    -jr-drag-target: -jr-orange;
 
     /* Background-color of the toolbar */
     -jr-toolbar: derive(-jr-base, 80%);
@@ -62,9 +63,14 @@
     -jr-tooltip-bg: -jr-info;
     -jr-tooltip-fg: -jr-black;
 
-    /* Consistent size for headers of tab-pane and side-panels*/
-    -jr-header-height: 3em;
+    /* Finally, some specific jr styles that depend on -fx definitions in *this* style */
+    -jr-sidepane-background: -fx-control-inner-background;
+    -jr-sidepane-header-background: -fx-background;
+    -jr-sidepane-header-color: -jr-icon;
 
+    /* Specs for the scrollbars */
+    -jr-scrollbar-thumb: -fx-outer-border;
+    -jr-scrollbar-track: -fx-control-inner-background;
 
     /*
      Here are redefinitions of the default properties of modena. They should in principle all be derived from the
@@ -104,7 +110,7 @@
 
     /* A bright blue for highlighting/accenting objects.  For example: selected
      * text; selected items in menus, lists, trees, and tables; progress bars */
-    -fx-accent: derive(-jr-theme, 50%);
+    -fx-accent: -jr-accent;
 
     /* Default buttons color, this is similar to accent but more subtle */
     -fx-default-button: derive(-fx-accent, 50%);
@@ -227,11 +233,11 @@
     /** Focus line for keyboard focus traversal on cell based controls */
     -fx-cell-focus-inner-border: derive(-fx-selection-bar,30%);
 
-
     -fx-focused-text-base-color : -fx-dark-text-color;
     -fx-focused-mark-color : -fx-focused-text-base-color;
 
-
+    /* Consistent size for headers of tab-pane and side-panels*/
+    -jr-header-height: 3em;
 }
 
 /*
@@ -526,21 +532,21 @@
 
 .scroll-bar:horizontal .track,
 .scroll-bar:vertical .track {
-    /*-fx-background-color: derive(-fx-outer-border, 10%);*/
+    -fx-background-color: -jr-scrollbar-track;
     -fx-opacity: 0.2;
     -fx-background-radius: 0em;
 }
 
 .scroll-bar:horizontal .thumb,
 .scroll-bar:vertical .thumb {
-    -fx-background-color: -fx-outer-border;
+    -fx-background-color: -jr-scrollbar-thumb;
     -fx-background-insets: 0, 0, 0;
     -fx-background-radius: 0em;
 }
 
 .scroll-bar .thumb:hover,
 .scroll-bar .thumb:pressed {
-    -fx-background-color: derive(-fx-outer-border, -20%);
+    -fx-background-color: derive(-jr-scrollbar-thumb, -20%);
 }
 
 /* Hide increment and decrement buttons */
@@ -583,13 +589,15 @@
 }
 
 .sidePaneComponentHeader {
-    /*-fx-background-color: -jr-background;*/
+    -fx-background-color: -jr-sidepane-header-background;
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
-    -fx-fill: -jr-theme;
-    -fx-text-fill: -jr-theme;
-    -fx-font-weight: bold;
     -fx-pref-height: -jr-header-height;
+}
 
+.sidePaneComponentHeader > .label {
+    -fx-text-fill: -jr-sidepane-header-color;
+    -fx-font-weight: bold;
+    -fx-padding: 0.3em 0.9em 0.3em 0.9em;
 }
 
 .sidePaneComponentHeader .glyph-icon{

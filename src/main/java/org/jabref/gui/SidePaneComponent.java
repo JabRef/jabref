@@ -103,7 +103,6 @@ public abstract class SidePaneComponent {
         BorderPane container = new BorderPane();
 //        container.setLeft(graphic);
         final Label label = new Label(title);
-        label.getStyleClass().add("sidePaneComponentHeader");
         container.setCenter(label);
         container.setRight(buttonContainer);
         container.getStyleClass().add("sidePaneComponentHeader");

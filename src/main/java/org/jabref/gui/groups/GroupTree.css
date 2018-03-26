@@ -1,5 +1,5 @@
 .tree-table-view, .tree-table-row-cell {
-    -fx-background-color: -fx-control-inner-background;
+    -fx-background-color: -jr-sidepane-background;
     -fx-table-cell-border-color: transparent; /* hide grid lines */
 }
 
@@ -34,19 +34,19 @@
 }
 
 .tree-table-row-cell:dragOver-bottom {
-    -fx-border-color: -jr-yellow;
+    -fx-border-color: -jr-drag-target;
     -fx-border-width: 0 0 2 0;
     -fx-padding: 0 0 -2 0;
 }
 
 .tree-table-row-cell:dragOver-center {
-    -fx-border-color: -jr-yellow;
+    -fx-border-color: -jr-drag-target;
     -fx-border-width: 2 2 2 2;
     -fx-padding: -2 -2 -2 -2;
 }
 
 .tree-table-row-cell:dragOver-top {
-    -fx-border-color: -jr-yellow;
+    -fx-border-color: -jr-drag-target;
     -fx-border-width: 2 0 0 0;
     -fx-padding: -2 0 0 0;
 }
