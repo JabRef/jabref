@@ -1,0 +1,27 @@
+.root {
+    -jr-theme: #d90dee;
+    -jr-red: #ee5253;
+    -jr-light-red: #61ff67;
+    -jr-yellow: #77fe82;
+    -jr-orange: #7cffc0;
+
+    -jr-white: #ffffff;
+    -jr-gray-0: #f0f0f0;
+    -jr-gray-1: #e6e6e6;
+    -jr-gray-2: #808080;
+    -jr-gray-3: #404040;
+    -jr-black: #000;
+
+    -fx-text-background-color: -fx-dark-text-color;
+
+    /* A little darker than -fx-color and used to draw boxes around objects such
+     * as progress bars, scroll bars, scroll panes, trees, tables, and lists.
+     */
+    -fx-box-border: derive(-fx-color, -5%);
+
+    /* Darker than -fx-background and used to draw boxes around text boxes and
+     * password boxes.
+     */
+    -fx-text-box-border: derive(-fx-background, -15%);
+
+}
