@@ -2,38 +2,41 @@
     -fx-border-width: 0;
     -fx-padding: 0;
     -fx-border-insets: 0;
-    -fx-background-color: -fx-light-background;
     -fx-table-cell-border-color: transparent;
+    /*-fx-background-color: -jr-foreground;*/
 }
 
 .table-view .column-header-background {
-    -fx-background-color: -fx-light-background;
+    -fx-background-color: -fx-control-inner-background;
     -fx-border-width: 0 0 1 0;
-    -fx-border-color: darkgrey;
+    -fx-border-color: -fx-background;
 }
 
 .table-view .column-header-background:hover {
-    -fx-background-color: darkgray;
+    -fx-background-color: derive(-fx-control-inner-background, -10%);
 }
+
 
 .table-view .column-header,
 .table-view .filler {
-    -fx-background-color: transparent, -fx-light-background;
+    -fx-background-color: transparent, -fx-control-inner-background;
     -fx-background-insets: 0, 0 0.02em 0 0.02em;
     -fx-font-weight: bold;
     -fx-size: 3em;
+    -fx-border-width: 0 0 1 0;
+    /*-fx-border-color: -jr-separator;*/
 }
 
 .table-view .column-header > .label {
     -fx-padding: 0 1em 0 1em;
     -fx-alignment: center-left;
-    -fx-text-fill: -fx-unimportant;
+    -fx-text-fill: -jr-theme;
 }
 
 .table-view .column-header .glyph-icon {
     -fx-alignment: baseline-center;
-    -fx-text-fill: -fx-unimportant;
-    -fx-fill: -fx-unimportant;
+    -fx-text-fill: -jr-icon;
+    -fx-fill: -jr-icon;
 }
 
 .table-cell {
@@ -41,9 +44,9 @@
     -fx-cell-size: 4.0em;
 }
 
-.table-row-cell:odd {
-    -fx-background: -fx-control-inner-background;
-}
+/*.table-row-cell:odd {*/
+    /*-fx-background: derive(-jr-foreground, -2%);*/
+/*}*/
 
 .column-icon {
     -fx-alignment: baseline-center;
@@ -61,7 +64,7 @@
 
 .table-row-cell:hover .empty-special-field {
     visibility: visible;
-    -fx-fill: -fx-unimportant;
+    /*-fx-fill: -jr-grayed-text;*/
 }
 
 .rating > .container {
