@@ -11,7 +11,7 @@ import java.util.Objects;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 
-import org.jabref.gui.AbstractView;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ThemeLoader {
 
-    private static final String DEFAULT_PATH_MAIN_CSS = AbstractView.class.getResource("Main.css").toExternalForm();
+    private static final String DEFAULT_PATH_MAIN_CSS = JabRefFrame.class.getResource("Main.css").toExternalForm();
     private static final String CSS_SYSTEM_PROPERTY = System.getProperty("jabref.main.css");
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeLoader.class);
     private final FileUpdateMonitor fileUpdateMonitor;

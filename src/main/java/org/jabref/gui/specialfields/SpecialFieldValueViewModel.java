@@ -6,10 +6,10 @@ import java.util.Optional;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 
-import org.jabref.gui.JabRefIcon;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
 

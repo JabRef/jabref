@@ -4,16 +4,12 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-
-import javafx.embed.swing.SwingNode;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.cleanup.CleanupDialog;
 import org.jabref.gui.cleanup.CleanupPresetPanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -67,27 +63,14 @@ public class CleanupAction extends AbstractWorker {
         if (canceled) {
             return;
         }
-        CleanupPresetPanel presetPanel = new CleanupPresetPanel(panel.getBibDatabaseContext(),
-                CleanupPreset.loadFromPreferences(preferences));
+        CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), CleanupPreset.loadFromPreferences(preferences));
 
-        SwingNode node = new SwingNode();
-        presetPanel.getScrollPane().setVisible(true);
-
-        JScrollPane scrollPane = presetPanel.getScrollPane();
-        node.setContent(scrollPane);
-        node.setVisible(true);
-
-        DialogPane pane = new DialogPane();
-        pane.setContent(node);
-        pane.setPrefSize(600, 600);
-
-        Optional<ButtonType> ok = dialogService.showCustomDialogAndWait(Localization.lang("Cleanup entries"), pane, ButtonType.OK, ButtonType.CANCEL);
-
-        if (!ok.isPresent() || ((ok.isPresent() && (ok.get() == ButtonType.CANCEL)))) {
+        Optional<CleanupPreset> chosenPreset = cleanupDialog.showAndWait();
+        if (!chosenPreset.isPresent()) {
             canceled = true;
             return;
         }
-        CleanupPreset cleanupPreset = presetPanel.getCleanupPreset();
+        CleanupPreset cleanupPreset = chosenPreset.get();
         cleanupPreset.storeInPreferences(preferences);
 
         if (cleanupPreset.isRenamePDF() && Globals.prefs.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {

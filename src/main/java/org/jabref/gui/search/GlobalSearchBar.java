@@ -38,13 +38,13 @@ import javafx.util.Duration;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.PersonNameStringConverter;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.MainTable;
@@ -85,10 +85,6 @@ public class GlobalSearchBar extends HBox {
     private SearchResultFrame searchResultFrame;
 
     private SearchDisplayMode searchDisplayMode;
-    /**
-     * if this flag is set the searchbar won't be selected after the next search
-     */
-    private boolean dontSelectSearchBar;
 
     public GlobalSearchBar(JabRefFrame frame) {
         super();
@@ -143,7 +139,7 @@ public class GlobalSearchBar extends HBox {
                     updateOpenCurrentResultsTooltip(globalSearch.isSelected());
                     focus();
                     event.consume();
-                } else if (keyBinding.get().equals(KeyBinding.CLEAR_SEARCH)) {
+                } else if (keyBinding.get().equals(KeyBinding.CLOSE)) {
                     // Clear search and select first entry, if available
                     clearSearch();
                     frame.getCurrentBasePanel().getMainTable().getSelectionModel().selectFirst();
@@ -314,12 +310,6 @@ public class GlobalSearchBar extends HBox {
         openCurrentResultsInDialog.setDisable(true);
 
         Globals.stateManager.clearSearchQuery();
-
-        if (dontSelectSearchBar) {
-            dontSelectSearchBar = false;
-            return;
-        }
-        focus();
     }
 
     public void performSearch() {
@@ -436,12 +426,7 @@ public class GlobalSearchBar extends HBox {
             return;
         }
 
-        setDontSelectSearchBar();
         DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchTerm));
-    }
-
-    public void setDontSelectSearchBar() {
-        this.dontSelectSearchBar = true;
     }
 
     private void updateOpenCurrentResultsTooltip(boolean globalSearchEnabled) {

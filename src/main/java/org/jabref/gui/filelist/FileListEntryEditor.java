@@ -61,7 +61,9 @@ import org.slf4j.LoggerFactory;
  *
  * For use when downloading files, this class also offers a progress bar and a "Downloading..."
  * label that can be hidden when the download is complete.
+ * @deprecated Use {@link LinkedFileEditDialogView}
  */
+@Deprecated
 public class FileListEntryEditor {
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
@@ -82,6 +84,9 @@ public class FileListEntryEditor {
     //Do not make this variable final, as then the lambda action listener will fail on compiöe
     private BibDatabaseContext databaseContext;
     private final ActionListener browsePressed = e -> {
+
+
+
         String fileText = link.getText().trim();
         Optional<Path> file = FileHelper.expandFilename(this.databaseContext, fileText,
                 Globals.prefs.getFileDirectoryPreferences());
@@ -206,7 +211,7 @@ public class FileListEntryEditor {
         // Key bindings:
         ActionMap am = builder.getPanel().getActionMap();
         InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         am.put("close", cancelAction);
 
         link.getDocument().addDocumentListener(new DocumentListener() {

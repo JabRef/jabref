@@ -33,11 +33,11 @@ import javax.swing.JTextField;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -457,7 +457,7 @@ public class OpenOfficePanel extends AbstractWorker {
         URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         Class<URLClassLoader> sysclass = URLClassLoader.class;
         try {
-            Method method = sysclass.getDeclaredMethod("addURL", new Class[] {URL.class});
+            Method method = sysclass.getDeclaredMethod("addURL", URL.class);
             method.setAccessible(true);
             for (URL anU : jarList) {
                 method.invoke(sysloader, anU);

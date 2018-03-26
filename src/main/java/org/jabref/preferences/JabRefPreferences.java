@@ -14,6 +14,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1373,6 +1375,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
+    @Override
     public FileDirectoryPreferences getFileDirectoryPreferences() {
         List<String> fields = Arrays.asList(FieldName.FILE, FieldName.PDF, FieldName.PS);
         Map<String, String> fieldDirectories = new HashMap<>();
@@ -1741,5 +1744,16 @@ public class JabRefPreferences implements PreferencesService {
         return new MainTablePreferences(
                 getColumnPreferences(),
                 getBoolean(AUTO_RESIZE_MODE));
+    }
+
+    @Override
+    public Path getWorkingDir() {
+        return Paths.get(get(WORKING_DIRECTORY));
+    }
+
+    @Override
+    public void setWorkingDir(Path dir) {
+        put(WORKING_DIRECTORY, dir.toString());
+
     }
 }

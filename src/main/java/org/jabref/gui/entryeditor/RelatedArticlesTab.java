@@ -10,7 +10,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 
 import org.jabref.Globals;
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.OpenHyperlinksInExternalBrowser;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;

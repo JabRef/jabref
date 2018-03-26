@@ -18,10 +18,10 @@ import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 
 import org.jabref.Globals;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;

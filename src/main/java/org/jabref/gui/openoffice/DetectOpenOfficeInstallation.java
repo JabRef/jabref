@@ -139,7 +139,7 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
 
         Optional<Path> selectedPath = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showChoiceDialogAndWait(
                 Localization.lang("Choose OpenOffice/LibreOffice executable"),
-                content, Localization.lang("Use selected instance"), null, installDirs));
+                content, Localization.lang("Use selected instance"), installDirs));
 
         return selectedPath;
     }
