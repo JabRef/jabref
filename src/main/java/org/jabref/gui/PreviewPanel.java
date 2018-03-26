@@ -113,7 +113,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
                         copyPreviewToClipBoard();
                         event.consume();
                         break;
-                    case CLOSE_DIALOG:
+                    case CLOSE:
                         close();
                         event.consume();
                         break;

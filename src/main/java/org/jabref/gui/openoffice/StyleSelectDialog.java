@@ -192,7 +192,7 @@ class StyleSelectDialog {
 
         ActionMap am = bb.getPanel().getActionMap();
         InputMap im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         am.put("close", cancelListener);
         im.put(KeyStroke.getKeyStroke("ENTER"), "enterOk");
         am.put("enterOk", okListener);
@@ -514,7 +514,7 @@ class StyleSelectDialog {
             // Key bindings:
             bb.getPanel()
               .getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-              .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+              .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
             bb.getPanel().getActionMap().put("close", cancelAction);
             pack();
             setLocationRelativeTo(diag);
