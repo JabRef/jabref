@@ -422,7 +422,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     private Optional<ExternalFileType> inferFileTypeFromMimeType(URLDownload urlDownload) {
         // TODO: what if this takes long time?
-        String mimeType = urlDownload.getMimeType(); // Read MIME type
+        String mimeType = urlDownload.getMimeType();
+
         if (mimeType != null) {
             LOGGER.debug("MIME Type suggested: " + mimeType);
             return ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(mimeType);

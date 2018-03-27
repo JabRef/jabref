@@ -1,11 +1,4 @@
-.text-area {
-    -fx-text-fill: text-area-foreground;
-    -fx-control-inner-background: text-area-background;
-}
 
-.text-area *.text {
-    -fx-alignment: center-left;
-}
 
 .editorPane {
     -fx-hgap: 10;
