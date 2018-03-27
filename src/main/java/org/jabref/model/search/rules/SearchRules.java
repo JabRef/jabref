@@ -1,15 +1,16 @@
 package org.jabref.model.search.rules;
 
-import org.jabref.model.strings.StringUtil;
-
 import java.util.regex.Pattern;
+
+import org.jabref.model.strings.StringUtil;
 
 public class SearchRules {
 
+
+    private static final Pattern SIMPLE_EXPRESSION = Pattern.compile("(\\w|\\d|\\s)*");
+
     private SearchRules() {
     }
-
-    private static final Pattern simpleExpression = Pattern.compile("(\\w|\\d|\\s)*");
 
     /**
      * Returns the appropriate search rule that fits best to the given parameter.
@@ -30,7 +31,7 @@ public class SearchRules {
     }
 
     private static boolean isSimpleQuery(String query) {
-        return StringUtil.isBlank(query) || simpleExpression.matcher(query).matches();
+        return StringUtil.isBlank(query) || SIMPLE_EXPRESSION.matcher(query).matches();
     }
 
     private static SearchRule getSearchRule(boolean caseSensitive, boolean regex) {
