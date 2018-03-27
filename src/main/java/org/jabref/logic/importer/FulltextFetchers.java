@@ -62,7 +62,9 @@ public class FulltextFetchers {
             List<Future<Optional<FetcherResult>>> result = new ArrayList<>();
             try {
                 result = executor.invokeAll(getCallables(clonedEntry, finders), FETCHER_TIMEOUT, TimeUnit.SECONDS);
-            } catch (InterruptedException ignore) {}
+            } catch (InterruptedException ignore) {
+
+            }
 
             return result.stream()
                     .map(FulltextFetchers::waitForResult)
