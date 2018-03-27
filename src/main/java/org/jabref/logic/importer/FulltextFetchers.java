@@ -70,7 +70,6 @@ public class FulltextFetchers {
                     .map(Optional::get)
                     .filter(res -> Objects.nonNull(res.source))
                     .sorted(Comparator.comparingInt((FetcherResult res) -> res.trust.getTrustScore()).reversed())
-                    .peek(f -> System.out.println("SORT: " + f.trust.getTrustScore() +  " " + f.source))
                     .map(res -> res.source)
                     .findFirst();
         } finally {
