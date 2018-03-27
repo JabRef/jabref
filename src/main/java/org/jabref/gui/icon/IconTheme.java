@@ -27,7 +27,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 import org.jabref.gui.util.ColorUtil;
 import org.jabref.logic.groups.DefaultGroupsFactory;
@@ -35,7 +34,6 @@ import org.jabref.preferences.JabRefPreferences;
 
 import de.jensd.fx.glyphs.GlyphIcons;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -358,6 +356,7 @@ public class IconTheme {
         public String fontFamily() {
             return icon.fontFamily();
         }
+
         public Button asButton() {
             Button button = new Button();
             button.setGraphic(getGraphicNode());

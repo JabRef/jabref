@@ -15,7 +15,6 @@ import org.jabref.gui.util.ColorUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 import de.jensd.fx.glyphs.GlyphIcons;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 public class InternalMaterialDesignIcon implements JabRefIcon {
     private final List<GlyphIcons> icons;
