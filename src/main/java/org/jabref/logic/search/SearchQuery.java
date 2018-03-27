@@ -85,7 +85,7 @@ public class SearchQuery implements SearchMatcher {
     }
 
     public boolean isGrammarBasedSearch() {
-        return rule instanceof GrammarBasedSearchRule;
+        return rule instanceof GrammarBasedSearchRule || rule instanceof RegexBasedSearchRule;
     }
 
     public String getQuery() {

@@ -21,15 +21,15 @@ public class SearchQueryTest {
 
     @Test
     public void testIsContainsBasedSearch() {
-        assertFalse(new SearchQuery("asdf", true, false).isContainsBasedSearch());
-        assertFalse(new SearchQuery("asdf", true, true).isContainsBasedSearch());
+        assertTrue(new SearchQuery("asdf", true, false).isContainsBasedSearch());
+        assertTrue(new SearchQuery("asdf", true, true).isContainsBasedSearch());
         assertFalse(new SearchQuery("author=asdf", true, false).isContainsBasedSearch());
     }
 
     @Test
     public void testIsGrammarBasedSearch() {
-        assertTrue(new SearchQuery("asdf", true, false).isGrammarBasedSearch());
-        assertTrue(new SearchQuery("asdf", true, true).isGrammarBasedSearch());
+        assertFalse(new SearchQuery("asdf", true, false).isGrammarBasedSearch());
+        assertFalse(new SearchQuery("asdf", true, true).isGrammarBasedSearch());
         assertTrue(new SearchQuery("author=asdf", true, false).isGrammarBasedSearch());
     }
 
@@ -184,6 +184,15 @@ public class SearchQueryTest {
 
         assertTrue(new SearchQuery("text AND author=asdf", true, true).isMatch(entry));
 
+    }
+
+    @Test
+    public void testSimpleTerm() {
+        String query = "progress";
+
+        SearchQuery result = new SearchQuery(query, false, false);
+
+        assertFalse(result.isGrammarBasedSearch());
     }
 
 }
