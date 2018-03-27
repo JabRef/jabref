@@ -1,27 +1,46 @@
 .root {
-    -jr-theme: #d90dee;
-    -jr-red: #ee5253;
-    -jr-light-red: #61ff67;
-    -jr-yellow: #77fe82;
-    -jr-orange: #7cffc0;
+    -jr-theme: #30bfbb;
 
-    -jr-white: #ffffff;
-    -jr-gray-0: #f0f0f0;
-    -jr-gray-1: #e6e6e6;
-    -jr-gray-2: #808080;
-    -jr-gray-3: #404040;
-    -jr-black: #000;
+    -jr-background-alt: #151924;
+    -jr-menu-background: #141824;
+    -jr-toolbar: -jr-menu-background;
+    -jr-sidepane-background: #212330;
+    -jr-search-background: #2c2e3b;
 
-    -fx-text-background-color: -fx-dark-text-color;
+    -jr-sidepane-header-background: -jr-background-alt;
+    -jr-group-hits-bg: -jr-background-alt;
+    -jr-group-hits-fg: -fx-light-text-color;
+    -fx-control-inner-background: #272b38;
 
-    /* A little darker than -fx-color and used to draw boxes around objects such
-     * as progress bars, scroll bars, scroll panes, trees, tables, and lists.
-     */
-    -fx-box-border: derive(-fx-color, -5%);
+    -fx-control-inner-background-alt: -fx-control-inner-background;
 
-    /* Darker than -fx-background and used to draw boxes around text boxes and
-     * password boxes.
-     */
-    -fx-text-box-border: derive(-fx-background, -15%);
+    -fx-dark-text-color: black;
+    -fx-mid-text-color: #949da9;
+    -fx-light-text-color: #ced2df;
+    -jr-separator: #333744;
+    -fx-outer-border: #424758;
 
+    -jr-icon: -fx-light-text-color;
+
+    -jr-menu-foreground: #fdfffa;
+    -jr-menu-item-foreground: -fx-light-text-color;
+
+    -jr-hover: derive(-jr-accent, 10%);
+    -fx-focused-text-base-color: -fx-dark-text-color;
+}
+
+.menu-bar {
+    -fx-background-color: -jr-menu-background;
+}
+
+.menu-bar > .container > .menu-button > .label {
+    -fx-padding: 0.41777em 0.41777em 0.41777em 0.41777em;
+}
+
+.menu-bar > .menu {
+    -fx-padding: 0.0em 0.666667em 0.0em 0.666667em;
+}
+
+.menu-item {
+    -fx-padding: 0.5em 0.41777em 0.5em 0.41777em;
 }

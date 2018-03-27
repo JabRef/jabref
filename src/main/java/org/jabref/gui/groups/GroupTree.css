@@ -4,7 +4,6 @@
 }
 
 .tree-table-cell {
-    /*-fx-font-size: 105%;*/
     -fx-padding: 0.35em 0em 0.25em 0em;
 }
 
@@ -14,11 +13,15 @@
 }
 
 .numberColumn > .hits {
-    /*-fx-font-size: 85%;*/
+    -fx-font-size: 85%;
     -fx-background-color: -jr-group-hits-bg;
     -fx-padding: 0.1em 0.4em 0.1em 0.4em;
     -fx-background-insets: 0;
     -fx-background-radius: 0.8em;
+}
+
+.numberColumn > .hits .text {
+    -fx-fill: -jr-group-hits-fg;
 }
 
 .numberColumn > .hits:any-selected {
@@ -61,7 +64,7 @@
 
 .tree-table-row-cell:root {
     -fx-border-width: 0 0 1 0;
-    -fx-border-color: -fx-outer-border;
+    -fx-border-color: -jr-separator;
 }
 
 .tree-table-row-cell:root > .tree-table-cell {
@@ -75,10 +78,6 @@
 .tree-table-row-cell:root > .disclosureNodeColumn {
     -fx-padding: 0.45em 0.2em 0.45em 0.2em;
 }
-
-/*.tree-table-row-cell:selected > .tree-table-cell > .tree-disclosure-node > .arrow {*/
-    /*-fx-background-color: -jr-white;*/
-/*}*/
 
 .tree-table-row-cell:empty {
     -fx-background-color: transparent; /* hide cells which are not bound to a group */
@@ -105,12 +104,12 @@
 }
 
 #barBottom {
-    -fx-border-color: -fx-outer-border;
+    -fx-background-color: -jr-sidepane-background;
+    -fx-border-color: -jr-separator;
     -fx-border-width: 0 0 1 0;
     -fx-padding: 0em 1em 0em 1em;
 }
 
 #barBottom .glyph-icon {
-    -fx-fill: -jr-icon;
     -fx-font-size: 2em;
 }

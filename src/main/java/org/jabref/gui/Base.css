@@ -6,12 +6,11 @@
     work nicely with this base color
     */
 
-
     /* This theme is the original JabRef dark blue color */
     -jr-theme: #50618F;
     /* The base gray. Most gray-tones in the application are derived from this color. */
     -jr-base: #f0f0f0;
-    -jr-accent: derive(-jr-theme, 50%);
+    -jr-accent: -jr-theme;
 
     -jr-white: #ffffff;
     -jr-gray-0: #f0f0f0;
@@ -38,14 +37,21 @@
     -jr-blue-gray-3: #576574;
     -jr-blue-gray-4: #222f3e;
 
+    /* Background specs */
+    -jr-background-alt: derive(-fx-base, 80%);
+    -jr-text-area-background: derive(-jr-base, 80%);
+    -jr-search-background: -jr-text-area-background;
+    -jr-toolbar: derive(-jr-base, 80%);
+    -jr-menu-background: derive(-jr-base, 80%);
 
-    /* maintable and group view cells*/
-    -jr-hover-cell: derive(-jr-yellow, 50%);
-    -jr-selected-cell: derive(-jr-yellow, 5%);
+    -jr-menu-foreground: -fx-dark-text-color;
+    -jr-menu-item-foreground: -fx-dark-text-color;
+
+    -jr-hover: derive(-jr-accent, 50%);
+    -jr-selected: -jr-accent;
     -jr-drag-target: -jr-orange;
 
-    /* Background-color of the toolbar */
-    -jr-toolbar: derive(-jr-base, 80%);
+    -jr-head-fg: -fx-text-inner-color;
 
     /* All icons on toolbars or next to inputs */
     -jr-icon: -jr-theme;
@@ -55,8 +61,15 @@
     -jr-warn: -jr-orange;
     -jr-error: -jr-light-red;
 
-    /* Background-color for the small group view indicator for the number of hits */
+    /* Color for the small group view indicator for the number of hits */
     -jr-group-hits-bg: -jr-gray-0;
+    -jr-group-hits-fg: ladder(
+            -jr-group-hits-bg,
+            -fx-light-text-color 45%,
+            -fx-dark-text-color 46%,
+            -fx-dark-text-color 59%,
+            -fx-mid-text-color 60%
+    );
 
     /* Specific color for general tooltips */
     -jr-tooltip-bg: -jr-info;
@@ -70,6 +83,8 @@
     /* Specs for the scrollbars */
     -jr-scrollbar-thumb: -fx-outer-border;
     -jr-scrollbar-track: -fx-control-inner-background;
+
+    -jr-separator: -fx-text-inner-color;
 
     /*
      Here are redefinitions of the default properties of modena. They should in principle all be derived from the
@@ -138,11 +153,6 @@
      */
     -fx-pressed-base: derive(-fx-base,-6%);
 
-    /* The color to use for -fx-text-fill when text is to be painted on top of
-     * a background filled with the -fx-background color.
-     */
-    -fx-text-background-color: -fx-dark-text-color;
-
     /* A little darker than -fx-color and used to draw boxes around objects such
      * as progress bars, scroll bars, scroll panes, trees, tables, and lists.
      */
@@ -188,21 +198,6 @@
     -fx-body-color-bottomup: derive(-fx-color,20%);
     -fx-body-color-to-right: derive(-fx-color,20%);
 
-    /* The color to use as -fx-text-fill when painting text on top of
-     * backgrounds filled with -fx-base, -fx-color, and -fx-body-color.
-     */
-    -fx-text-base-color: -fx-dark-text-color  46%;
-
-    /* The color to use as -fx-text-fill when painting text on top of
-     * backgrounds filled with -fx-control-inner-background.
-     */
-    -fx-text-inner-color: -fx-dark-text-color;
-
-    /* The color to use for small mark-like objects such as checks on check
-     * boxes, filled in circles in radio buttons, arrows on scroll bars, etc.
-     */
-    -fx-mark-color: -jr-theme;
-
     /* The small thin light "shadow" for mark-like objects. Typically used in
      * conjunction with -fx-mark-color with an insets of 1 0 -1 0. */
     -fx-mark-highlight-color: transparent;
@@ -210,17 +205,14 @@
 
     /* Background for items in list like things such as menus, lists, trees,
      * and tables. */
-    -fx-selection-bar: -fx-accent;
+    -fx-selection-bar: -jr-selected;
 
     /* Background color to use for selection of list cells etc. This is when
      * the control doesn't have focus or the row of a previously selected item. */
     -fx-selection-bar-non-focused: lightgrey;
 
     /* The color to use as -fx-text-fill when painting text on top of
-     * backgrounds filled with -fx-selection-bar.
-     *
-     * TODO: this can be removed
-     */
+     * backgrounds filled with -fx-selection-bar. */
     -fx-selection-bar-text: -fx-text-background-color;
 
     /* These are needed for Popup */
@@ -232,7 +224,6 @@
     /** Focus line for keyboard focus traversal on cell based controls */
     -fx-cell-focus-inner-border: derive(-fx-selection-bar,30%);
 
-    -fx-focused-text-base-color : -fx-dark-text-color;
     -fx-focused-mark-color : -fx-focused-text-base-color;
 
     /* Consistent size for headers of tab-pane and side-panels*/
@@ -242,7 +233,6 @@
 /*
  * The base css file defining the style that is valid for every pane and dialog.
  */
-
 .hyperlink {
     -fx-padding: 0;
     -fx-underline: false;
@@ -308,9 +298,8 @@
 .flatButtonNoSpaceBottom:hover .glyph-icon,
 .flatButtonNoSpaceTop:hover .glyph-icon,
 .flatButton:hover .glyph-icon {
-    -fx-fill: derive(-jr-icon, -30%);
-    -fx-text-fill: derive(-jr-icon, -30%);
-    -fx-effect: dropshadow(one-pass-box, -jr-icon, 5, 0, 1, 1);
+    -fx-fill: -jr-accent;
+    -fx-text-fill: -jr-accent;
 }
 
 .flatButton:selected {
@@ -327,23 +316,26 @@
     -fx-padding: -0.1em 0.5em 0.5em 0.5em;
 }
 
+.button,
+.toggle-button,
+.radio-button > .radio,
+.check-box > .box,
+.menu-button,
+.choice-box,
+.color-picker.split-button > .color-picker-label,
+.combo-box-base,
+.combo-box-base:editable > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-text-fill: -fx-text-base-color;
+}
+
 .menu-bar {
     -fx-background-color: -fx-body-color;
     -fx-background-insets: 0;
     -fx-background-radius: 0;
 }
-
-/*.menu-bar > .container > .menu-button > .label {*/
-    /*-fx-padding: 0.41777em 0.41777em 0.41777em 0.41777em; !* 5 5 5 5 *!*/
-/*}*/
-
-/*.menu-bar > .menu {*/
-    /*-fx-padding: 0.0em 0.666667em 0.0em 0.666667em; !* 0 8 0 8 *!*/
-/*}*/
-
-/*.menu-item {*/
-    /*-fx-padding: 0.5em 0.41777em 0.5em 0.41777em; !* 6 5 6 5 *!*/
-/*}*/
 
 .tab-pane {
     -fx-open-tab-animation: NONE;
@@ -353,13 +345,11 @@
 .tab-pane > .tab-header-area > .headers-region > .tab {
     -fx-background-insets: 0;
     -fx-background-radius: 0;
-    /*-fx-background-color: green;*/
-    /*-fx-background-color: -fx-accented-background;*/
+    -fx-background-color: -jr-background-alt;
     -fx-border-color: -fx-outer-border;
     -fx-border-width: 0.5 0.5 0.5 0.5;
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
     -fx-pref-height: -jr-header-height;
-
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab .tab-label {
@@ -373,34 +363,22 @@
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected {
-    /*-fx-background-color: -fx-control-inner-background;*/
+    -fx-background-color: -fx-control-inner-background;
     -fx-border-color: -jr-theme;
-    -fx-fill: -jr-theme;
-    -fx-text-fill: -jr-theme;
     -fx-border-width: 3 0 0 0;
 }
 
-
-.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-label{
-    -fx-text-fill: -jr-theme;
-    -fx-fill: -jr-theme;
-}
-
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-close-button {
-    -fx-background-color: -jr-theme;
+    -fx-background-color: -fx-mid-text-color;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-close-button:hover {
-    -fx-background-color: -jr-theme;
-    -fx-fill: derive(-jr-icon, -30%);
-    -fx-text-fill: derive(-jr-icon, -30%);
-    -fx-effect: dropshadow(one-pass-box, -jr-icon, 5, 0, 1, 1);
+    -fx-background-color: -jr-selected-bar;
 }
 
-
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
-    -fx-text-fill: -jr-theme;
-    -fx-fill: -jr-theme;
+    -fx-text-fill: -fx-mid-text-color;
+    -fx-fill: -fx-mid-text-color;
 }
 
 .tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
@@ -410,7 +388,7 @@
 }
 
 .tab-pane > .tab-header-area > .tab-header-background {
-    -fx-background-color: -fx-outer-border;
+    -fx-background-color: -jr-background-alt;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab .glyph-icon {
@@ -425,7 +403,6 @@
 }
 
 .tab-pane > .tab-header-area {
-    /*-fx-padding: 0.416667em 5 0.0em 0em;*/
     -fx-padding: 0 0 0 0;
 }
 
@@ -439,25 +416,21 @@
 }
 
 .split-pane > .split-pane-divider {
-    /*-fx-background-color: -jr-separator;*/
+    -fx-background-color: -jr-sidepane-background;
     -fx-padding: 0 .5 0 .5;
 }
 
 .table-row-cell:hover,
 .tree-table-row-cell:hover {
-    -fx-background-color: -jr-hover-cell;
+    -fx-background-color: -jr-hover;
+    -fx-text-fill: -fx-focused-text-base-color;
+    -fx-fill: -fx-focused-text-base-color;
 }
 
-.table-row-cell:selected,
-.tree-table-row-cell:selected {
-    -fx-background-color: -jr-selected-cell;
-    /*-fx-text-fill: white;*/
-    /*-fx-fill: white;*/
-}
-
+.table-row-cell:hover,
 .tree-table-row-cell:selected > .tree-table-cell > .glyph-icon {
-    /*-fx-fill: white;*/
-    /*-fx-text-fill: white;*/
+    -fx-fill: white;
+    -fx-text-fill: white;
 }
 
 .table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:selected,
@@ -474,6 +447,7 @@
 .table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:selected,
 .tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell .tree-table-cell:selected {
     -fx-background: -fx-selection-bar;
+    -fx-background-color: -fx-selection-bar;
     -fx-table-cell-border-color: transparent;
 }
 
@@ -485,7 +459,10 @@
 .table-row-cell:filled > .table-cell:selected,
 .tree-table-row-cell:filled > .tree-table-cell:selected {
     -fx-background: -fx-selection-bar;
+    -fx-background-color: derive(-fx-selection-bar, -20%);
     -fx-table-cell-border-color: transparent;
+    -fx-fill: white;
+    -fx-text-fill: green;
 }
 
 .scroll-pane,
@@ -497,6 +474,7 @@
 .text-input {
     -fx-background-color: -fx-outer-border, -fx-control-inner-background;
     -fx-background-insets: 0, 1;
+    -fx-prompt-text-fill: -fx-mid-text-color;
 }
 
 .text-input:focused {
@@ -509,19 +487,40 @@
 }
 
 .text-area .content {
-    /*-fx-background-color: -jr-separator, -fx-control-inner-background;*/
+    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
     -fx-background-insets: 0, 1;
     -fx-padding: 0.333333em 0.583em 0.333333em 0.583em;
+    -fx-background-radius: 0;
 }
 
 .text-area:focused .content {
     -fx-background-color: -fx-accent, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
+    -fx-background-radius: 0;
 }
 
+.text-area > .scroll-pane > .corner {
+    -fx-background-radius: 0 0 0 0;
+}
+
+.combo-box-base:editable > .text-field,
+.date-picker > .text-field {
+    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0;
+}
+
+.combo-box-base:editable:focused > .text-field,
+.combo-box-base:editable > .text-field:focused,
 .date-picker > .text-field:focused {
     -fx-background-color: -fx-accent, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
+    -fx-background-radius: 0;
+}
+
+.date-picker:focused > .text-field {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-background-insets: 0;
 }
 
 .scroll-bar {
@@ -602,36 +601,75 @@
 .sidePaneComponentHeader .glyph-icon{
     -fx-font-size: 16px;
 }
-/*.mainMenu {*/
-    /*-fx-background-color: -jr-background;*/
-/*}*/
 
-/*.menu-bar > .container > .menu-button:hover,*/
-/*.menu-bar > .container > .menu-button:focused,*/
-/*.menu-bar > .container > .menu-button:showing {*/
-    /*-fx-background: -jr-hover-cell;*/
-/*}*/
+.mainMenu {
+    -fx-background-color: -jr-menu-background;
+    -fx-background-insets: 0;
+}
 
-/*.mainMenu > .container > .menu-button > .label {*/
-    /*-fx-text-fill: black;*/
-    /*!*-fx-font-weight: bold;*!*/
-/*}*/
+.menu-bar > .container {
+    -fx-border-width: 0;
+}
 
-/*.menu-item:focused {*/
-    /*-fx-background: -jr-hover-cell;*/
-    /*-fx-background-color: -fx-background;*/
-    /*-fx-text-fill:  black;*/
-/*}*/
-/*.menu-item:focused > .label {*/
-    /*-fx-text-fill: black;*/
-/*}*/
+.menu-bar > .container > .menu-button:hover,
+.menu-bar > .container > .menu-button:focused,
+.menu-bar > .container > .menu-button:showing {
+    -fx-background: -jr-hover;
+}
+
+.menu-bar > .container > .menu-button:hover > .label,
+.menu-bar > .container > .menu-button:focused > .label,
+.menu-bar > .container > .menu-button:showing > .label {
+    -fx-text-fill: -fx-focused-text-base-color;
+}
+
+.mainMenu > .container > .menu-button > .label {
+    -fx-text-fill: -jr-menu-foreground;
+}
+
+.menu-item > .label {
+    -fx-text-fill: -jr-menu-item-foreground;
+}
+
+.menu-item:focused {
+    -fx-text-fill: -fx-focused-text-base-color;
+}
+
+.menu-item:focused > .label {
+    -fx-text-fill: -fx-focused-text-base-color;
+}
+
+.menu-item .glyph-icon {
+    -fx-fill: -jr-menu-item-foreground;
+    -fx-text-fill: -jr-menu-item-foreground;
+}
+
+.menu-item:focused .glyph-icon {
+    -fx-fill: -fx-focused-text-base-color;
+    -fx-text-fill: -fx-focused-text-base-color;
+}
+
+.context-menu {
+    -fx-border-color: -fx-outer-border;
+    -fx-border-width: 1;
+}
+
+.separator:horizontal .line {
+    -fx-border-color: -jr-separator;
+    -fx-border-width: 0;
+    -fx-border-insets: 1 0 0 0;
+}
+
+.separator:vertical .line {
+    -fx-border-color: -jr-separator;
+    -fx-border-width: 1;
+    -fx-border-insets: 0 0 0 1;
+}
 
 .mainToolbar {
     -fx-background-color: -jr-toolbar;
     -fx-border-color: derive(-jr-toolbar, 50%);
-    -fx-border-width: 1 1 1 1;
-    -fx-border-radius: 2 2 2 2;
-    -fx-background-radius: 2 2 2 2;
+    -fx-border-width: 0;
 }
 
 .mainToolbar .glyph-icon {
@@ -643,6 +681,10 @@
     -fx-text-fill: -jr-icon;
 }
 
+.mainToolbar .search-field {
+    -fx-background-color: -jr-search-background;
+}
+
 /* The little arrow that shows up when not all tool-bar icons fit into the tool-bar.
 We want to have a look that matches our icons in the tool-bar */
 .mainToolbar .tool-bar-overflow-button:hover > .arrow {
@@ -650,3 +692,45 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-effect: dropshadow(one-pass-box, -jr-icon, 5, 0, 1, 1);
 }
 
+.table-view {
+    -fx-border-width: 0;
+    -fx-padding: 0;
+    -fx-border-insets: 0;
+    -fx-table-cell-border-color: transparent;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-border-width: 0;
+}
+
+.table-view .column-header-background:hover {
+    -fx-background-color: -fx-outer-border;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent, -fx-control-inner-background;
+    -fx-background-insets: 0, 0 0.02em 0 0.02em;
+    -fx-font-weight: bold;
+    -fx-size: 3em;
+    -fx-border-width: 0 0 2 0;
+    -fx-border-color: -jr-separator;
+}
+
+.table-view .column-header > .label {
+    -fx-padding: 0 1em 0 1em;
+    -fx-alignment: center-left;
+    -fx-text-fill: -jr-head-fg;
+}
+
+.table-view .column-header .glyph-icon {
+    -fx-alignment: baseline-center;
+    -fx-text-fill: -jr-head-fg;
+    -fx-fill: -jr-head-fg;
+}
+
+.table-cell {
+    -fx-padding: 0.5em 1em 0.5em 1em;
+    -fx-cell-size: 4.0em;
+}

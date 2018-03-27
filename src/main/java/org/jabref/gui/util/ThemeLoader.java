@@ -48,20 +48,19 @@ public class ThemeLoader {
      * Changes in the css file lead to a redraw of the scene using the new css file.
      */
     public void installBaseCss(Scene scene) {
-        scene.getStylesheets().add(0, DEFAULT_PATH_MAIN_CSS);
-        watchForChanges(scene, DEFAULT_PATH_MAIN_CSS);
+        addAndWatchForChanges(scene, DEFAULT_PATH_MAIN_CSS, 0);
 
         if (CSS_SYSTEM_PROPERTY != null) {
             final Path path = Paths.get(CSS_SYSTEM_PROPERTY);
             if (Files.isReadable(path)) {
                 String cssUrl = path.toUri().toString();
-                scene.getStylesheets().add(1, cssUrl);
-                watchForChanges(scene, cssUrl);
+                addAndWatchForChanges(scene, cssUrl, 1);
             }
         }
     }
 
-    private void watchForChanges(Scene scene, String cssUrl) {
+    private void addAndWatchForChanges(Scene scene, String cssUrl, int index) {
+        scene.getStylesheets().add(index, cssUrl);
 
         try {
             // If -Djabref.theme.css is defined and the resources are not part of a .jar bundle,
@@ -74,7 +73,7 @@ public class ThemeLoader {
 
                     DefaultTaskExecutor.runInJavaFXThread(() -> {
                                 scene.getStylesheets().remove(cssUrl);
-                                scene.getStylesheets().add(0, cssUrl);
+                        scene.getStylesheets().add(index, cssUrl);
                             }
                     );
                 });
