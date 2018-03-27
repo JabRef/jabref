@@ -41,6 +41,9 @@ public class IsiImporter extends Importer {
     // extra | at the end:
     private static final Pattern ISI_PATTERN = Pattern.compile("FN ISI Export Format|VR 1.|PY \\d{4}");
 
+    private static final String EOL = "EOLEOL";
+    private static final Pattern EOL_PATTERN = Pattern.compile(EOL);
+
     @Override
     public String getName() {
         return "ISI";
@@ -160,7 +163,7 @@ public class IsiImporter extends Importer {
                     sb.append(" ## "); // mark the beginning of each field
                     sb.append(str);
                 } else {
-                    sb.append("EOLEOL"); // mark the end of each line
+                    sb.append(EOL); // mark the end of each line
                     sb.append(str.trim()); // remove the initial spaces
                 }
             }
@@ -212,7 +215,7 @@ public class IsiImporter extends Importer {
                 } else if ("JO".equals(beg)) {
                     hm.put(FieldName.BOOKTITLE, value);
                 } else if ("AU".equals(beg)) {
-                    String author = IsiImporter.isiAuthorsConvert(value.replace("EOLEOL", " and "));
+                    String author = IsiImporter.isiAuthorsConvert(EOL_PATTERN.matcher(value).replaceAll(" and "));
 
                     // if there is already someone there then append with "and"
                     if (hm.get(FieldName.AUTHOR) != null) {
@@ -221,12 +224,12 @@ public class IsiImporter extends Importer {
 
                     hm.put(FieldName.AUTHOR, author);
                 } else if ("TI".equals(beg)) {
-                    hm.put(FieldName.TITLE, value.replace("EOLEOL", " "));
+                    hm.put(FieldName.TITLE, EOL_PATTERN.matcher(value).replaceAll(" "));
                 } else if ("SO".equals(beg) || "JA".equals(beg)) {
-                    hm.put(FieldName.JOURNAL, value.replace("EOLEOL", " "));
+                    hm.put(FieldName.JOURNAL, EOL_PATTERN.matcher(value).replaceAll(" "));
                 } else if ("ID".equals(beg) || "KW".equals(beg)) {
 
-                    value = value.replace("EOLEOL", " ");
+                    value = EOL_PATTERN.matcher(value).replaceAll(" ");
                     String existingKeywords = hm.get(FieldName.KEYWORDS);
                     if ((existingKeywords == null) || existingKeywords.contains(value)) {
                         existingKeywords = value;
@@ -236,7 +239,7 @@ public class IsiImporter extends Importer {
                     hm.put(FieldName.KEYWORDS, existingKeywords);
 
                 } else if ("AB".equals(beg)) {
-                    hm.put(FieldName.ABSTRACT, value.replace("EOLEOL", " "));
+                    hm.put(FieldName.ABSTRACT, EOL_PATTERN.matcher(value).replaceAll(" "));
                 } else if ("BP".equals(beg) || "BR".equals(beg) || "SP".equals(beg)) {
                     pages = value;
                 } else if ("EP".equals(beg)) {
@@ -279,7 +282,7 @@ public class IsiImporter extends Importer {
                         Type = BibEntry.DEFAULT_TYPE;
                     }
                 } else if ("CR".equals(beg)) {
-                    hm.put("CitedReferences", value.replace("EOLEOL", " ; ").trim());
+                    hm.put("CitedReferences", EOL_PATTERN.matcher(value).replaceAll(" ; ").trim());
                 } else {
                     // Preserve all other entries except
                     if ("ER".equals(beg) || "EF".equals(beg) || "VR".equals(beg) || "FN".equals(beg)) {

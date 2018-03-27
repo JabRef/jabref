@@ -20,7 +20,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 /**
  * Test cases for the IsiImporter
  */
@@ -70,13 +69,13 @@ public class IsiImporterTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testIsRecognizedFormatAccepted(String fileName) throws IOException, URISyntaxException {
+    public void testIsRecognizedFormatAccepted(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(importer, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    public void testIsRecognizedFormatRejected(String fileName) throws IOException, URISyntaxException {
+    public void testIsRecognizedFormatRejected(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(importer, fileName);
     }
 

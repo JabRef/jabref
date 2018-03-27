@@ -72,9 +72,9 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
     private final JPanel filePanel = new JPanel();
     private final JPanel buttonPanel = new JPanel();
 
-    private final JLabel databaseTypeLabel = new JLabel(Localization.lang("Library type") + ":");
+    private final JLabel databaseTypeLabel = new JLabel(Localization.lang("Database type") + ":");
     private final JLabel hostPortLabel = new JLabel(Localization.lang("Host") + "/" + Localization.lang("Port") + ":");
-    private final JLabel databaseLabel = new JLabel(Localization.lang("Library") + ":");
+    private final JLabel databaseLabel = new JLabel(Localization.lang("Database") + ":");
     private final JLabel userLabel = new JLabel(Localization.lang("User") + ":");
     private final JLabel passwordLabel = new JLabel(Localization.lang("Password") + ":");
 
@@ -468,7 +468,6 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
     }
 
     private void showFileChooser() {
-
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(FileType.BIBTEX_DB)
                 .withDefaultExtension(FileType.BIBTEX_DB)
