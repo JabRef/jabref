@@ -38,11 +38,11 @@
     -jr-blue-gray-4: #222f3e;
 
     /* Background specs */
-    -jr-background-alt: derive(-fx-base, 80%);
+    -jr-background-alt: -fx-background;
     -jr-text-area-background: derive(-jr-base, 80%);
     -jr-search-background: -jr-text-area-background;
-    -jr-toolbar: derive(-jr-base, 80%);
-    -jr-menu-background: derive(-jr-base, 80%);
+    -jr-toolbar: -fx-background;
+    -jr-menu-background: -fx-background;
 
     -jr-menu-foreground: -fx-dark-text-color;
     -jr-menu-item-foreground: -fx-dark-text-color;
