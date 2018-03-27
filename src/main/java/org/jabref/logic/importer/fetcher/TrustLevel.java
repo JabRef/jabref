@@ -1,18 +1,19 @@
 package org.jabref.logic.importer.fetcher;
 
 public enum TrustLevel {
-    ORIGINAL(3),
+    SOURCE(3),
     PUBLISHER(2),
-    META(1),
+    PREPRINT(1),
+    META_SEARCH(1),
     UNKNOWN(0);
 
-    private int trust;
+    private int score;
 
-    TrustLevel(int trust) {
-        this.trust = trust;
+    TrustLevel(int score) {
+        this.score = score;
     }
 
-    public boolean isHigherThan(TrustLevel other) {
-        return this.trust > other.trust;
+    public int getTrustScore() {
+        return this.score;
     }
 }

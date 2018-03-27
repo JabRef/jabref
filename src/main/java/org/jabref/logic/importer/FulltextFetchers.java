@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 public class FulltextFetchers {
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextFetchers.class);
 
+    private static final int FETCHER_TIMEOUT = 10;
+
     private final List<FulltextFetcher> finders = new ArrayList<>();
 
     public FulltextFetchers(ImportFormatPreferences importFormatPreferences) {
@@ -57,48 +59,54 @@ public class FulltextFetchers {
 
         ExecutorService executor = Executors.newCachedThreadPool();
         try {
-            List<Future<FetcherResult>> result = new ArrayList<>();
+            List<Future<Optional<FetcherResult>>> result = new ArrayList<>();
             try {
-                result = executor.invokeAll(getCallables(clonedEntry, finders), 10, TimeUnit.SECONDS);
+                result = executor.invokeAll(getCallables(clonedEntry, finders), FETCHER_TIMEOUT, TimeUnit.SECONDS);
             } catch (InterruptedException ignore) {}
 
             return result.stream()
-                    .map(future -> {
-                        try {
-                            return future.get();
-                        } catch (InterruptedException | ExecutionException | CancellationException ignore) {
-                            return null;
-                        }
-                    })
-                    .filter(Objects::nonNull)
-                    .peek(f -> System.out.println("AlL" + f.trust +  " " + f.source))
-                    .filter(f -> f.source != null)
-                    .peek(f -> System.out.println("URL: " + f.trust +  " " + f.source))
-                    .sorted(Comparator.comparingInt(f -> f.trust.ordinal()))
-                    .peek(f -> System.out.println("SORT: " + f.trust +  " " + f.source))
-                    .map(f -> f.source)
+                    .map(FulltextFetchers::waitForResult)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .filter(res -> Objects.nonNull(res.source))
+                    .sorted(Comparator.comparingInt((FetcherResult res) -> res.trust.getTrustScore()).reversed())
+                    .peek(f -> System.out.println("SORT: " + f.trust.getTrustScore() +  " " + f.source))
+                    .map(res -> res.source)
                     .findFirst();
         } finally {
             shutdownAndAwaitTermination(executor);
         }
     }
 
-    private Callable<FetcherResult> getCallable(BibEntry entry, FulltextFetcher fetcher) {
+    private static Optional<FetcherResult> waitForResult(Future<Optional<FetcherResult>> future) {
+        while (true) {
+            try {
+                return future.get();
+            } catch (InterruptedException retry) {
+
+            } catch (ExecutionException | CancellationException e) {
+                LOGGER.debug("Fetcher execution failed or was cancelled");
+                return Optional.empty();
+            }
+        }
+    }
+
+    private Callable<Optional<FetcherResult>> getCallable(BibEntry entry, FulltextFetcher fetcher) {
             return () -> {
                 try {
                     Optional<URL> result = fetcher.findFullText(entry);
 
                     if (result.isPresent() && new URLDownload(result.get().toString()).isPdf()) {
-                        return new FetcherResult(fetcher.getTrustLevel(), result.get());
+                        return Optional.of(new FetcherResult(fetcher.getTrustLevel(), result.get()));
                     }
                 } catch (IOException | FetcherException e) {
                     LOGGER.debug("Failed to find fulltext PDF at given URL", e);
                 }
-                return null;
+                return Optional.empty();
             };
     }
 
-    private List<Callable<FetcherResult>> getCallables(BibEntry entry, List<FulltextFetcher> fetchers) {
+    private List<Callable<Optional<FetcherResult>>> getCallables(BibEntry entry, List<FulltextFetcher> fetchers) {
         return fetchers.stream()
                 .map(f -> getCallable(entry, f))
                 .collect(Collectors.toList());

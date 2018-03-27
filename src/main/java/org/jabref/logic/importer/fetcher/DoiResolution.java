@@ -88,6 +88,6 @@ public class DoiResolution implements FulltextFetcher {
 
     @Override
     public TrustLevel getTrustLevel() {
-        return TrustLevel.ORIGINAL;
+        return TrustLevel.SOURCE;
     }
 }
