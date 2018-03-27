@@ -397,9 +397,9 @@ public class GlobalSearchBar extends JPanel {
             searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
         }
         if (grammarBasedSearch) {
-            searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
-        } else {
             searchIcon.setIcon(IconTheme.JabRefIcon.ADVANCED_SEARCH.getIcon());
+        } else {
+            searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
         }
         Tooltip tooltip = new Tooltip();
         tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
