@@ -1,8 +1,10 @@
-This isssue tracks the status of JabRef packaging to Debian. The current version at Debian is shown at https://tracker.debian.org/pkg/jabref.
+# JabRef in Debian
+
+This file tracks the status of JabRef packaging to Debian.
+The current version at Debian is shown at <https://tracker.debian.org/pkg/jabref>.
+The corresponding debian bug is [810725](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=810725).
 
 At [koppor's repository](https://github.com/koppor/jabref/), required Debian adaptions to branches are tracked in `debian_x.y` branches.
-
-The corresponding debian bug is https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=810725
 
 ## JavaFX libraries
 
@@ -38,30 +40,3 @@ The corresponding debian bug is https://bugs.debian.org/cgi-bin/bugreport.cgi?bu
 
 - [ ] Remove `org.json` dependency: https://github.com/JabRef/jabref/issues/3703
 - [ ] Make JabRef running on Java9. Triggered by the discussion at https://lists.debian.org/debian-java/2017/11/msg00028.html. This is WIP at see https://github.com/JabRef/jabref/issues/2594#issuecomment-346829982
-
-# Done for JabRef 3.8.2 in Debian
-
-- [x] packaging of libunirest-java: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=819672 
-  - blocked by https://github.com/Mashape/unirest-java/issues/176 
-  - implemented in https://github.com/Mashape/unirest-java/pull/179
-  - workaround exists
-- [x] #131 needs to be solved
-
-### JGoodies (old versions already existing in Debian)
-- [x] update of  libjgoodies-common-java: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=819668 
-- [x] update of  libjgoodies-forms-java: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=819669 
-- [x] update of  libjgoodies-looks-java: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=819670 
-
-Newer versions of JGoodies are not distributed as open source any more. The latest open source versions are listed at https://web.archive.org/web/20150517070237/http://www.jgoodies.com/downloads/libraries/.
-
-```
-JGoodies Binding 2.14.0     Apr/02/2015
-JGoodies Common 1.9.0   Apr/02/2015
-JGoodies Forms 1.10.0   Apr/02/2015
-JGoodies Looks 2.8.0    Apr/02/2015
-JGoodies Validation 2.6.0   Apr/02/2015
-```
-
-The links to the files are 404 and there are no other mirrors where these files are available.
-
-The files available on maven central are also the latest versions available through www.archive.org - see https://web.archive.org/web/20150407130628/http://www.jgoodies.com/downloads/libraries/ and https://web.archive.org/web/20150905122056/http://www.jgoodies.com/downloads/archive/
