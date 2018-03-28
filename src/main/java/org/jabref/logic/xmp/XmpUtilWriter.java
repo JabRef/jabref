@@ -3,6 +3,8 @@ package org.jabref.logic.xmp;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ import java.util.TreeSet;
 
 import javax.xml.transform.TransformerException;
 
+import org.jabref.Globals;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -82,6 +85,15 @@ public class XmpUtilWriter {
         XmpUtilWriter.writeXmp(file, bibEntryList, database, xmpPreferences);
     }
 
+    /**
+     * Writes the information of the bib entry to the dublin core schema using
+     * a custom extractor.
+     *
+     * @param dcSchema
+     * @param entry
+     * @param database
+     * @param xmpPreferences
+     */
     private static void writeToDCSchema(DublinCoreSchema dcSchema, BibEntry entry, BibDatabase database,
             XmpPreferences xmpPreferences) {
 
@@ -157,6 +169,26 @@ public class XmpUtilWriter {
         ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
         PDMetadata metadataStream = new PDMetadata(document, is);
         catalog.setMetadata(metadataStream);
+    }
+
+    public static String generateXmpString(List<BibEntry> entries) {
+        XMPMetadata meta = XMPMetadata.createXMPMetadata();
+        for (BibEntry entry : entries) {
+            DublinCoreSchema dcSchema = meta.createAndAddDublinCoreSchema();
+            XmpUtilWriter.writeToDCSchema(dcSchema, entry, null, Globals.prefs.getXMPPreferences());
+        }
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        XmpSerializer serializer = new XmpSerializer();
+        try {
+            serializer.serialize(meta, os, true);
+            return os.toString(StandardCharsets.UTF_8.name());
+        } catch (TransformerException e) {
+            LOGGER.warn("Tranformation into xmp not possible: " + e.getMessage());
+            return "";
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.warn("Unsupported encoding to UTF-8 of bib entries in xmp metadata.");
+            return "";
+        }
     }
 
     /**

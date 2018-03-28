@@ -54,6 +54,7 @@ public class ExporterFactory {
         exporters.add(new OpenDocumentSpreadsheetCreator());
         exporters.add(new MSBibExporter());
         exporters.add(new ModsExporter());
+        exporters.add(new XmpExporter());
 
         // Now add custom export formats
         exporters.addAll(customFormats.values());

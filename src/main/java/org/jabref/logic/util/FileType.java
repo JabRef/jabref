@@ -26,6 +26,7 @@ public enum FileType {
     DIN_1505(Localization.lang("%0 file", "DIN 1505"), "rtf"),
     ENDNOTE(Localization.lang("%0 file", "EndNote/Refer"), "ref", "enw"),
     ENDNOTE_XML(Localization.lang("%0 file", "EndNote XML"), "xml"),
+    ENDNOTE_XMP(Localization.lang("%0 file", "EndNote Xmp"), "xmp"),
     ENDNOTE_TXT(Localization.lang("%0 file", "EndNote"), "txt"), //for export
     FREECITE(Localization.lang("%0 file", "FreeCite"), "txt", "xml"),
     HARVARD_RTF(Localization.lang("%0 file", "Harvard"), "rtf"),
