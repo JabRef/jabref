@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 public class FulltextFetchers {
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextFetchers.class);
 
+    // Timeout in seconds
     private static final int FETCHER_TIMEOUT = 10;
 
     private final List<FulltextFetcher> finders = new ArrayList<>();

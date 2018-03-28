@@ -99,7 +99,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
             if (link.first() != null) {
                 String target = link.first().attr("href");
                 // link present?
-                if (!"".equals(target) && new URLDownload(target).isPdf()) {
+                if (!target.isEmpty() && new URLDownload(target).isPdf()) {
                     // TODO: check title inside pdf + length?
                     // TODO: report error function needed?! query -> result
                     LOGGER.info("Fulltext PDF found @ Google: " + target);

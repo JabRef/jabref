@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
@@ -165,14 +167,14 @@ public class DownloadExternalFile {
         Optional<ExternalFileType> fileType = getExternalFileType(mimeType);
 
         // First of all, start the download itself in the background to a temporary file:
-        final File tempFile = File.createTempFile("jabref_download", "tmp");
-        tempFile.deleteOnExit();
+        final Path tempFile = Files.createTempFile("jabref_download", "tmp");
+        tempFile.toFile().deleteOnExit();
 
         final URLDownload fileDownload = new URLDownload(url);
 
         JabRefExecutorService.INSTANCE.execute(() -> {
             try {
-                fileDownload.toFile(tempFile.toPath());
+                fileDownload.toFile(tempFile);
             } catch (IOException e) {
                 dontShowDialog = true;
                 if ((editor != null) && editor.isVisible()) {
@@ -248,7 +250,7 @@ public class DownloadExternalFile {
                 }
             }
 
-            boolean success = FileUtil.copyFile(Paths.get(tempFile.toURI()), Paths.get(toFile.toURI()), true);
+            boolean success = FileUtil.copyFile(tempFile, Paths.get(toFile.toURI()), true);
             if (!success) {
                 // OOps, the file exists!
                 LOGGER.error("File already exists! DownloadExternalFile.download()");
@@ -263,12 +265,12 @@ public class DownloadExternalFile {
             }
             callback.downloadComplete(fileListEntry);
 
-            if (!tempFile.delete()) {
+            if (!Files.deleteIfExists(tempFile)) {
                 LOGGER.info("Cannot delete temporary file");
             }
         } else {
             // Canceled. Just delete the temp file:
-            if (downloadFinished && !tempFile.delete()) {
+            if (downloadFinished && !Files.deleteIfExists(tempFile)) {
                 LOGGER.info("Cannot delete temporary file");
             }
         }
