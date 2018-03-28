@@ -114,4 +114,25 @@ public class FulltextFetchers {
                 .map(f -> getCallable(entry, f))
                 .collect(Collectors.toList());
     }
+
+    private void shutdownAndAwaitTermination(ExecutorService pool) {
+        // Disable new tasks from being submitted
+        pool.shutdown();
+        try {
+            // Wait a while for existing tasks to terminate
+            if (!pool.awaitTermination(5, TimeUnit.SECONDS)) {
+                // Cancel currently executing tasks
+                pool.shutdownNow();
+                // Wait a while for tasks to respond to being cancelled
+                if (!pool.awaitTermination(5, TimeUnit.SECONDS)) {
+                    LOGGER.warn("Pool did not terminate");
+                }
+            }
+        } catch (InterruptedException ie) {
+            // (Re-)Cancel if current thread also interrupted
+            pool.shutdownNow();
+            // Preserve interrupt status
+            Thread.currentThread().interrupt();
+        }
+    }
 }
