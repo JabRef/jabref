@@ -1,6 +1,7 @@
 package org.jabref.logic.importer;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -10,10 +11,9 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.jabref.JabRefExecutorService;
@@ -87,19 +87,26 @@ public class FulltextFetchers {
         return Optional.empty();
     }
 
-    private Callable<Optional<FetcherResult>> getCallable(BibEntry entry, FulltextFetcher fetcher) {
-            return () -> {
-                try {
-                    Optional<URL> result = fetcher.findFullText(entry);
+    final Predicate<String> isPDF = url -> {
+        try {
+            return new URLDownload(url).isPdf();
+        } catch (MalformedURLException e) {
+            LOGGER.warn("URL returned by fulltext fetcher is invalid");
+        }
+        return false;
+    };
 
-                    if (result.isPresent() && new URLDownload(result.get().toString()).isPdf()) {
-                        return Optional.of(new FetcherResult(fetcher.getTrustLevel(), result.get()));
-                    }
-                } catch (IOException | FetcherException e) {
-                    LOGGER.debug("Failed to find fulltext PDF at given URL", e);
-                }
-                return Optional.empty();
-            };
+    private Callable<Optional<FetcherResult>> getCallable(BibEntry entry, FulltextFetcher fetcher) {
+        return () -> {
+            try {
+                return fetcher.findFullText(entry)
+                        .filter(url -> isPDF.test(url.toString()))
+                        .map(url -> new FetcherResult(fetcher.getTrustLevel(), url));
+            } catch (IOException | FetcherException e) {
+                LOGGER.debug("Failed to find fulltext PDF at given URL", e);
+            }
+            return Optional.empty();
+        };
     }
 
     private List<Callable<Optional<FetcherResult>>> getCallables(BibEntry entry, List<FulltextFetcher> fetchers) {
