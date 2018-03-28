@@ -71,9 +71,7 @@ public class WebFetchersTest {
     public void getFullTextFetchersReturnsAllFetcherDerivingFromFullTextFetcher() throws Exception {
         List<FulltextFetcher> fullTextFetchers = WebFetchers.getFullTextFetchers(importFormatPreferences);
 
-        Set<Class<? extends FulltextFetcher>> expected = Stream.of(
-                DoiResolution.class, ACS.class, GoogleScholar.class, ArXiv.class, OpenAccessDoi.class, ScienceDirect.class, SpringerLink.class, IEEE.class
-        ).collect(Collectors.toSet());
+        Set<Class<? extends FulltextFetcher>> expected = reflections.getSubTypesOf(FulltextFetcher.class);
         assertEquals(expected, getClasses(fullTextFetchers));
     }
 
