@@ -147,11 +147,11 @@ public class JabRefExecutorService {
         pool.shutdown();
         try {
             // Wait a while for existing tasks to terminate
-            if (!pool.awaitTermination(10, TimeUnit.SECONDS)) {
+            if (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
                 // Cancel currently executing tasks
                 pool.shutdownNow();
                 // Wait a while for tasks to respond to being cancelled
-                if (!pool.awaitTermination(10, TimeUnit.SECONDS))
+                if (!pool.awaitTermination(60, TimeUnit.SECONDS))
                     LOGGER.warn("Pool did not terminate");
             }
         } catch (InterruptedException ie) {
