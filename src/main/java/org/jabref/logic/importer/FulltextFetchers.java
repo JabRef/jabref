@@ -16,6 +16,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.jabref.JabRefExecutorService;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -52,26 +53,17 @@ public class FulltextFetchers {
             findDoiForEntry(clonedEntry);
         }
 
-        ExecutorService executor = Executors.newCachedThreadPool();
-        try {
-            List<Future<Optional<FetcherResult>>> result = new ArrayList<>();
-            try {
-                result = executor.invokeAll(getCallables(clonedEntry, finders), FETCHER_TIMEOUT, TimeUnit.SECONDS);
-            } catch (InterruptedException ignore) {
+        List<Future<Optional<FetcherResult>>> result = new ArrayList<>();
+        result = JabRefExecutorService.INSTANCE.executeAll(getCallables(clonedEntry, finders), FETCHER_TIMEOUT, TimeUnit.SECONDS);
 
-            }
-
-            return result.stream()
-                    .map(FulltextFetchers::waitForResult)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .filter(res -> Objects.nonNull(res.source))
-                    .sorted(Comparator.comparingInt((FetcherResult res) -> res.trust.getTrustScore()).reversed())
-                    .map(res -> res.source)
-                    .findFirst();
-        } finally {
-            shutdownAndAwaitTermination(executor);
-        }
+        return result.stream()
+                .map(FulltextFetchers::getResults)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(res -> Objects.nonNull(res.source))
+                .sorted(Comparator.comparingInt((FetcherResult res) -> res.trust.getTrustScore()).reversed())
+                .map(res -> res.source)
+                .findFirst();
     }
 
     private void findDoiForEntry(BibEntry clonedEntry) {
@@ -84,17 +76,15 @@ public class FulltextFetchers {
         }
     }
 
-    private static Optional<FetcherResult> waitForResult(Future<Optional<FetcherResult>> future) {
-        while (true) {
-            try {
-                return future.get();
-            } catch (InterruptedException retry) {
+    private static Optional<FetcherResult> getResults(Future<Optional<FetcherResult>> future) {
+        try {
+            return future.get();
+        } catch (InterruptedException ignore) {
 
-            } catch (ExecutionException | CancellationException e) {
-                LOGGER.debug("Fetcher execution failed or was cancelled");
-                return Optional.empty();
-            }
+        } catch (ExecutionException | CancellationException e) {
+            LOGGER.debug("Fetcher execution failed or was cancelled");
         }
+        return Optional.empty();
     }
 
     private Callable<Optional<FetcherResult>> getCallable(BibEntry entry, FulltextFetcher fetcher) {
