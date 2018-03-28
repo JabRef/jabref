@@ -58,6 +58,12 @@ public class IconTheme {
             LOGGER.error("Error loading font", e);
         }
 
+        try (InputStream stream = getMaterialDesignIconsStream()) {
+            javafx.scene.text.Font.loadFont(stream, 7);
+        } catch (IOException e) {
+            LOGGER.error("Error loading Material Design Icons TTF font", e);
+        }
+
         try (InputStream stream = getJabRefMaterialDesignIconsStream()) {
             javafx.scene.text.Font.loadFont(stream, 7);
         } catch (IOException e) {
@@ -351,6 +357,7 @@ public class IconTheme {
         public String fontFamily() {
             return icon.fontFamily();
         }
+
         public Button asButton() {
             Button button = new Button();
             button.setGraphic(getGraphicNode());
