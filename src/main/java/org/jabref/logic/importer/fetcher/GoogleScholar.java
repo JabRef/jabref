@@ -75,7 +75,6 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
             uriBuilder.addParameter("as_occt", "title");
 
             pdfLink = search(uriBuilder.toString());
-            }
         } catch (URISyntaxException e) {
             throw new FetcherException("Building URI failed.", e);
         }
