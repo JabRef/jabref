@@ -14,6 +14,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class FulltextFetchersTest {
     private BibEntry entry;
@@ -56,31 +58,17 @@ public class FulltextFetchersTest {
     }
 
     @Test
-    public void higherTrustLevelWins() throws MalformedURLException {
+    public void higherTrustLevelWins() throws MalformedURLException, IOException, FetcherException {
         final URL lowUrl = new URL("http://docs.oasis-open.org/opencsa/sca-bpel/sca-bpel-1.1-spec-cd-01.pdf");
         final URL highUrl = new URL("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
-        FulltextFetcher finderHigh = new FulltextFetcher() {
-            @Override
-            public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
-                return Optional.of(highUrl);
-            }
 
-            @Override
-            public TrustLevel getTrustLevel() {
-                return TrustLevel.SOURCE;
-            }
-        };
-        FulltextFetcher finderLow = new FulltextFetcher() {
-            @Override
-            public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
-                return Optional.of(lowUrl);
-            }
+        FulltextFetcher finderHigh = mock(FulltextFetcher.class);
+        FulltextFetcher finderLow = mock(FulltextFetcher.class);
+        when(finderHigh.getTrustLevel()).thenReturn(TrustLevel.SOURCE);
+        when(finderLow.getTrustLevel()).thenReturn(TrustLevel.UNKNOWN);
+        when(finderHigh.findFullText(entry)).thenReturn(Optional.of(highUrl));
+        when(finderLow.findFullText(entry)).thenReturn(Optional.of(lowUrl));
 
-            @Override
-            public TrustLevel getTrustLevel() {
-                return TrustLevel.UNKNOWN;
-            }
-        };
         FulltextFetchers fetcher = new FulltextFetchers(Arrays.asList(finderLow, finderHigh));
 
         assertEquals(Optional.of(highUrl), fetcher.findFullTextPDF(entry));
