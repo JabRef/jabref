@@ -48,13 +48,7 @@ public class FulltextFetchers {
         Optional<DOI> doi = clonedEntry.getField(FieldName.DOI).flatMap(DOI::parse);
 
         if (!doi.isPresent()) {
-            try {
-                WebFetchers.getIdFetcherForIdentifier(DOI.class)
-                        .findIdentifier(clonedEntry)
-                        .ifPresent(e -> clonedEntry.setField(FieldName.DOI, e.getDOI()));
-            } catch (FetcherException e) {
-                LOGGER.debug("Failed to find DOI", e);
-            }
+            findDoiForEntry(clonedEntry);
         }
 
         ExecutorService executor = Executors.newCachedThreadPool();
@@ -76,6 +70,16 @@ public class FulltextFetchers {
                     .findFirst();
         } finally {
             shutdownAndAwaitTermination(executor);
+        }
+    }
+
+    private void findDoiForEntry(BibEntry clonedEntry) {
+        try {
+            WebFetchers.getIdFetcherForIdentifier(DOI.class)
+                    .findIdentifier(clonedEntry)
+                    .ifPresent(e -> clonedEntry.setField(FieldName.DOI, e.getDOI()));
+        } catch (FetcherException e) {
+            LOGGER.debug("Failed to find DOI", e);
         }
     }
 

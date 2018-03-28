@@ -14,6 +14,8 @@ import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.worker.AbstractWorker;
@@ -32,8 +34,8 @@ import org.slf4j.LoggerFactory;
 public class FindFullTextAction extends AbstractWorker {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FindFullTextAction.class);
-
-    private static final int WARNING_LIMIT = 5; // The minimum number of selected entries to ask the user for confirmation
+    // The minimum number of selected entries to ask the user for confirmation
+    private static final int WARNING_LIMIT = 5;
 
     private final BasePanel basePanel;
     private final Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
@@ -70,6 +72,7 @@ public class FindFullTextAction extends AbstractWorker {
                 return;
             }
         }
+
         for (BibEntry entry : basePanel.getSelectedEntries()) {
             FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
             downloads.put(fetchers.findFullTextPDF(entry), entry);
@@ -78,7 +81,7 @@ public class FindFullTextAction extends AbstractWorker {
 
     @Override
     public void update() {
-        List<Optional<URL>> remove = new ArrayList<>();
+        List<Optional<URL>> finishedTasks = new ArrayList<>();
         for (Entry<Optional<URL>, BibEntry> download : downloads.entrySet()) {
             BibEntry entry = download.getValue();
             Optional<URL> result = download.getKey();
@@ -92,10 +95,10 @@ public class FindFullTextAction extends AbstractWorker {
                             Localization.lang("Directory not found"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(),
+                DownloadExternalFile fileDownload = new DownloadExternalFile(basePanel.frame(),
                         basePanel.getBibDatabaseContext(), entry);
                 try {
-                    def.download(result.get(), file -> {
+                    fileDownload.download(result.get(), "application/pdf", file -> {
                         DefaultTaskExecutor.runInJavaFXThread(() -> {
                             Optional<FieldChange> fieldChange = entry.addFile(file);
                             if (fieldChange.isPresent()) {
@@ -120,9 +123,9 @@ public class FindFullTextAction extends AbstractWorker {
                 basePanel.output(message);
                 JOptionPane.showMessageDialog(basePanel.frame(), message, title, JOptionPane.ERROR_MESSAGE);
             }
-            remove.add(result);
+            finishedTasks.add(result);
         }
-        for (Optional<URL> result : remove) {
+        for (Optional<URL> result : finishedTasks) {
             downloads.remove(result);
         }
     }
