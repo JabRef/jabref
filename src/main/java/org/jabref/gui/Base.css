@@ -8,8 +8,8 @@
 
     /* This theme is the original JabRef dark blue color */
     -jr-theme: #50618F;
-    -jr-hover-color: #F0F2F7;
-    -jr-select-color: #D4DDF7;
+    -jr-hover-color: #CBDFEC;
+    -jr-select-color: #c4cce2;
     -jr-accent: -jr-theme;
 
     /* The base gray. Most gray-tones in the application are derived from this color. */
@@ -44,8 +44,8 @@
     -jr-background-alt: -fx-background;
     -jr-text-area-background: derive(-jr-base, 80%);
     -jr-search-background: -jr-text-area-background;
-    -jr-toolbar: -fx-background;
-    -jr-menu-background: -fx-background;
+    -jr-toolbar: #c4cce2;
+    -jr-menu-background: #c4cce2;
 
     -jr-menu-foreground: -fx-dark-text-color;
     -jr-menu-item-foreground: -fx-dark-text-color;
@@ -59,7 +59,6 @@
 
     /* All icons on toolbars or next to inputs */
     -jr-icon: -jr-theme;
-    -jr-icon-hover-effect: dropshadow(one-pass-box, -jr-accent, 5, 0, 1, 1);
 
     /* Colors for messages and errors */
     -jr-info: -jr-light-green;
@@ -77,19 +76,19 @@
     );
 
     /* Specific color for general tooltips */
-    -jr-tooltip-bg: -jr-info;
+    -jr-tooltip-bg: #CBDFEC;
     -jr-tooltip-fg: -jr-black;
 
     /* Finally, some specific jr styles that depend on -fx definitions in *this* style */
-    -jr-sidepane-background: -fx-control-inner-background;
-    -jr-sidepane-header-background: -fx-background;
+    -jr-sidepane-background: #eeeeee;
+    -jr-sidepane-header-background: -jr-sidepane-background;
     -jr-sidepane-header-color: -jr-icon;
 
     /* Specs for the scrollbars */
     -jr-scrollbar-thumb: -fx-outer-border;
     -jr-scrollbar-track: -fx-control-inner-background;
 
-    -jr-separator: -fx-text-inner-color;
+    -jr-separator: derive(-fx-color, -5%);
 
     /*
      Here are redefinitions of the default properties of modena. They should in principle all be derived from the
@@ -284,12 +283,12 @@
 .flatButtonNoSpaceBottom,
 .flatButtonNoSpaceTop,
 .flatButton {
-    -fx-shadow-highlight-color: transparent;
-    -fx-outer-border: transparent;
-    -fx-inner-border: transparent;
+    -fx-shadow-highlight-color: black;
+    -fx-outer-border: red;
+    -fx-inner-border: purple;
     -fx-faint-focus-color: transparent;
     -fx-background-color: transparent;
-    -fx-text-background-color: transparent;
+    -fx-text-background-color: blue;
     -fx-padding: 0.5em;
 }
 
@@ -305,8 +304,18 @@
 .flatButton:hover .glyph-icon {
     -fx-fill: -jr-accent;
     -fx-text-fill: -jr-accent;
-    -fx-effect: -jr-icon-hover-effect;
+}
 
+.flatButtonNoSpaceBottom:hover,
+.flatButtonNoSpaceTop:hover,
+.flatButton:hover {
+    -fx-background-color: -jr-hover;
+}
+
+.flatButtonNoSpaceBottom:armed,
+.flatButtonNoSpaceTop:armed,
+.flatButton:armed {
+    -fx-background-color: -jr-selected;
 }
 
 .flatButton:selected {
@@ -385,10 +394,6 @@
     -fx-background-color: -jr-icon;
 }
 
-.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-close-button:hover {
-    -fx-effect: -jr-icon-hover-effect;
-}
-
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
     -fx-text-fill: -fx-mid-text-color;
     -fx-fill: -fx-mid-text-color;
@@ -431,8 +436,6 @@
 .split-pane > .split-pane-divider {
     -fx-background-color: -jr-sidepane-background;
     -fx-padding: 0 .5 0 .5;
-    -fx-border-color: -jr-gray-0;
-    -fx-border-width: 1;
 }
 
 .table-row-cell:hover,
@@ -509,7 +512,7 @@
 }
 
 .text-area:focused .content {
-    -fx-background-color: -jr-selected, -fx-control-inner-background;
+    -fx-background-color: -fx-accent, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 0;
 }
@@ -708,7 +711,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 .mainToolbar .tool-bar-overflow-button:hover > .arrow {
     -fx-background-color: -fx-mark-highlight-color, derive(-jr-icon, -30%);
-    -fx-effect: -jr-icon-hover-effect;
 }
 
 .table-view {
