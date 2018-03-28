@@ -20,9 +20,10 @@ import org.slf4j.LoggerFactory;
  * Responsible for managing of all threads (except GUI threads) in JabRef
  */
 public class JabRefExecutorService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefExecutorService.class);
 
     public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
-    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefExecutorService.class);
+
     private final ExecutorService executorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
         thread.setName("JabRef CachedThreadPool");
@@ -80,8 +81,7 @@ public class JabRefExecutorService {
         Objects.requireNonNull(tasks);
         try {
             return executorService.invokeAll(tasks);
-        } catch (InterruptedException exception) {
-            // Ignored
+        } catch (InterruptedException ignore) {
             return Collections.emptyList();
         }
     }
@@ -90,8 +90,7 @@ public class JabRefExecutorService {
         Objects.requireNonNull(tasks);
         try {
             return executorService.invokeAll(tasks, timeout, timeUnit);
-        } catch (InterruptedException exception) {
-            // Ignored
+        } catch (InterruptedException ignore) {
             return Collections.emptyList();
         }
     }
@@ -135,18 +134,36 @@ public class JabRefExecutorService {
 
     public void shutdownEverything() {
         // those threads will be allowed to finish
-        this.executorService.shutdown();
-        //those threads will be interrupted in their current task
+        gracefulShutdown(this.executorService);
+        // those threads will be interrupted in their current task
         this.lowPriorityExecutorService.shutdownNow();
         // kill the remote thread
         stopRemoteThread();
         // timer doesn't need to be canceled as it is run in daemon mode, which ensures that it is stopped if the application is shut down
     }
 
+    private void gracefulShutdown(ExecutorService pool) {
+        // Disable new tasks from being submitted
+        pool.shutdown();
+        try {
+            // Wait a while for existing tasks to terminate
+            if (!pool.awaitTermination(10, TimeUnit.SECONDS)) {
+                // Cancel currently executing tasks
+                pool.shutdownNow();
+                // Wait a while for tasks to respond to being cancelled
+                if (!pool.awaitTermination(10, TimeUnit.SECONDS))
+                    LOGGER.warn("Pool did not terminate");
+            }
+        } catch (InterruptedException ie) {
+            // (Re-)Cancel if current thread also interrupted
+            pool.shutdownNow();
+            // Preserve interrupt status
+            Thread.currentThread().interrupt();
+        }
+    }
+
     private class NamedRunnable implements Runnable {
-
         private final String name;
-
         private final Runnable task;
 
         private NamedRunnable(String name, Runnable runnable) {
