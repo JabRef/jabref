@@ -88,6 +88,11 @@ public class ScienceDirect implements FulltextFetcher {
         return Optional.empty();
     }
 
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.PUBLISHER;
+    }
+
     private String getUrlByDoi(String doi) throws UnirestException {
         String sciLink = "";
         try {

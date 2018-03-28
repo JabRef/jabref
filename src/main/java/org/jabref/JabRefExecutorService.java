@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +80,16 @@ public class JabRefExecutorService {
         Objects.requireNonNull(tasks);
         try {
             return executorService.invokeAll(tasks);
+        } catch (InterruptedException exception) {
+            // Ignored
+            return Collections.emptyList();
+        }
+    }
+
+    public <T> List<Future<T>> executeAll(Collection<Callable<T>> tasks, int timeout, TimeUnit timeUnit) {
+        Objects.requireNonNull(tasks);
+        try {
+            return executorService.invokeAll(tasks, timeout, timeUnit);
         } catch (InterruptedException exception) {
             // Ignored
             return Collections.emptyList();
