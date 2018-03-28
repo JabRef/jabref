@@ -117,3 +117,7 @@
 .tooltip-error {
     -fx-background-color: -jr-error;
 }
+
+.code-area .text {
+    -fx-fill: -fx-text-background-color;
+}

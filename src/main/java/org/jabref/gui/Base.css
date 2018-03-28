@@ -8,9 +8,12 @@
 
     /* This theme is the original JabRef dark blue color */
     -jr-theme: #50618F;
+    -jr-hover-color: #F0F2F7;
+    -jr-select-color: #D4DDF7;
+    -jr-accent: -jr-theme;
+
     /* The base gray. Most gray-tones in the application are derived from this color. */
     -jr-base: #f0f0f0;
-    -jr-accent: -jr-theme;
 
     -jr-white: #ffffff;
     -jr-gray-0: #f0f0f0;
@@ -46,15 +49,17 @@
 
     -jr-menu-foreground: -fx-dark-text-color;
     -jr-menu-item-foreground: -fx-dark-text-color;
+    -jr-menu-forground-active: -fx-dark-text-color;
 
-    -jr-hover: derive(-jr-accent, 50%);
-    -jr-selected: -jr-accent;
-    -jr-drag-target: -jr-orange;
+    -jr-hover: -jr-hover-color;
+    -jr-selected: -jr-select-color;
+    -jr-drag-target: -fx-accent;
 
     -jr-head-fg: -fx-text-inner-color;
 
     /* All icons on toolbars or next to inputs */
     -jr-icon: -jr-theme;
+    -jr-icon-hover-effect: dropshadow(one-pass-box, -jr-accent, 5, 0, 1, 1);
 
     /* Colors for messages and errors */
     -jr-info: -jr-light-green;
@@ -119,7 +124,7 @@
      * -fx-selection-bar-text for text on top of -fx-selection-bar
      */
     -fx-dark-text-color: -jr-black;
-    -fx-mid-text-color: derive(-jr-base, -60%);
+    -fx-mid-text-color: -jr-gray-3;
     -fx-light-text-color: -jr-white;
 
     /* A bright blue for highlighting/accenting objects.  For example: selected
@@ -300,6 +305,8 @@
 .flatButton:hover .glyph-icon {
     -fx-fill: -jr-accent;
     -fx-text-fill: -jr-accent;
+    -fx-effect: -jr-icon-hover-effect;
+
 }
 
 .flatButton:selected {
@@ -368,12 +375,18 @@
     -fx-border-width: 3 0 0 0;
 }
 
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-label{
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
+}
+
+
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-close-button {
-    -fx-background-color: -fx-mid-text-color;
+    -fx-background-color: -jr-icon;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-close-button:hover {
-    -fx-background-color: -jr-selected-bar;
+    -fx-effect: -jr-icon-hover-effect;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
@@ -418,6 +431,8 @@
 .split-pane > .split-pane-divider {
     -fx-background-color: -jr-sidepane-background;
     -fx-padding: 0 .5 0 .5;
+    -fx-border-color: -jr-gray-0;
+    -fx-border-width: 1;
 }
 
 .table-row-cell:hover,
@@ -459,7 +474,7 @@
 .table-row-cell:filled > .table-cell:selected,
 .tree-table-row-cell:filled > .tree-table-cell:selected {
     -fx-background: -fx-selection-bar;
-    -fx-background-color: derive(-fx-selection-bar, -20%);
+    -fx-background-color: -fx-selection-bar;
     -fx-table-cell-border-color: transparent;
     -fx-fill: white;
     -fx-text-fill: green;
@@ -494,7 +509,7 @@
 }
 
 .text-area:focused .content {
-    -fx-background-color: -fx-accent, -fx-control-inner-background;
+    -fx-background-color: -jr-selected, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 0;
 }
@@ -614,13 +629,13 @@
 .menu-bar > .container > .menu-button:hover,
 .menu-bar > .container > .menu-button:focused,
 .menu-bar > .container > .menu-button:showing {
-    -fx-background: -jr-hover;
+    -fx-background-color: -jr-selected;
 }
 
 .menu-bar > .container > .menu-button:hover > .label,
 .menu-bar > .container > .menu-button:focused > .label,
 .menu-bar > .container > .menu-button:showing > .label {
-    -fx-text-fill: -fx-focused-text-base-color;
+    -fx-text-fill: -jr-menu-forground-active;
 }
 
 .mainMenu > .container > .menu-button > .label {
@@ -632,11 +647,11 @@
 }
 
 .menu-item:focused {
-    -fx-text-fill: -fx-focused-text-base-color;
+    -fx-text-fill: -jr-menu-forground-active;
 }
 
 .menu-item:focused > .label {
-    -fx-text-fill: -fx-focused-text-base-color;
+    -fx-text-fill: -jr-menu-forground-active;
 }
 
 .menu-item .glyph-icon {
@@ -645,8 +660,8 @@
 }
 
 .menu-item:focused .glyph-icon {
-    -fx-fill: -fx-focused-text-base-color;
-    -fx-text-fill: -fx-focused-text-base-color;
+    -fx-fill: -jr-menu-forground-active;
+    -fx-text-fill: -jr-menu-forground-active;
 }
 
 .context-menu {
@@ -687,9 +702,13 @@
 
 /* The little arrow that shows up when not all tool-bar icons fit into the tool-bar.
 We want to have a look that matches our icons in the tool-bar */
+.mainToolbar .tool-bar-overflow-button > .arrow {
+    -fx-background-color: -jr-icon;
+}
+
 .mainToolbar .tool-bar-overflow-button:hover > .arrow {
     -fx-background-color: -fx-mark-highlight-color, derive(-jr-icon, -30%);
-    -fx-effect: dropshadow(one-pass-box, -jr-icon, 5, 0, 1, 1);
+    -fx-effect: -jr-icon-hover-effect;
 }
 
 .table-view {
@@ -714,8 +733,8 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-insets: 0, 0 0.02em 0 0.02em;
     -fx-font-weight: bold;
     -fx-size: 3em;
-    -fx-border-width: 0 0 2 0;
-    -fx-border-color: -jr-separator;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: -fx-outer-border;
 }
 
 .table-view .column-header > .label {
@@ -730,7 +749,19 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -jr-head-fg;
 }
 
-.table-cell {
+.table-cell, .table-cell  .glyph-icon{
     -fx-padding: 0.5em 1em 0.5em 1em;
     -fx-cell-size: 4.0em;
+    -fx-text-fill: -fx-text-background-color;
+    -fx-fill: -fx-text-background-color;
+}
+
+/* Improve the context menu of the main toolbar, when icons don't fit and you have to press the little arrow to see them */
+.mainToolbar .context-menu .glyph-icon {
+    -fx-fill: -jr-icon;
+}
+
+/* This is awful, but I don't know a better way*/
+.mainToolbar .context-menu * {
+    -fx-background-color: -fx-control-inner-background;
 }

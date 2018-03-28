@@ -105,8 +105,8 @@
 
 #barBottom {
     -fx-background-color: -jr-sidepane-background;
-    -fx-border-color: -jr-separator;
-    -fx-border-width: 0 0 1 0;
+    -fx-border-color: -fx-outer-border;
+    -fx-border-width: 1 0 0 0;
     -fx-padding: 0em 1em 0em 1em;
 }
 
