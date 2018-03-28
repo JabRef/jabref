@@ -60,9 +60,9 @@ public class FulltextFetchers {
                 .map(FulltextFetchers::getResults)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .filter(res -> Objects.nonNull(res.source))
-                .sorted(Comparator.comparingInt((FetcherResult res) -> res.trust.getTrustScore()).reversed())
-                .map(res -> res.source)
+                .filter(res -> Objects.nonNull(res.getSource()))
+                .sorted(Comparator.comparingInt((FetcherResult res) -> res.getTrust().getTrustScore()).reversed())
+                .map(res -> res.getSource())
                 .findFirst();
     }
 
