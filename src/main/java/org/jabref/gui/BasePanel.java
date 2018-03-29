@@ -1031,13 +1031,13 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 
     private void openExternalFile() {
         JabRefExecutorService.INSTANCE.execute(() -> {
-            final List<BibEntry> bes = mainTable.getSelectedEntries();
-            if (bes.size() != 1) {
+            final List<BibEntry> selectedEntries = mainTable.getSelectedEntries();
+            if (selectedEntries.size() != 1) {
                 output(Localization.lang("This operation requires exactly one item to be selected."));
                 return;
             }
 
-            final BibEntry entry = bes.get(0);
+            final BibEntry entry = selectedEntries.get(0);
             if (!entry.hasField(FieldName.FILE)) {
                 // no bibtex field
                 new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
@@ -2006,7 +2006,6 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                 /*  The search can lead to an unexpected 100% CPU usage which is perceived
                     as a bug, if the search incidentally starts at a directory with lots
                     of stuff below. It is now disabled by default. */
-
                 return;
             }
 
