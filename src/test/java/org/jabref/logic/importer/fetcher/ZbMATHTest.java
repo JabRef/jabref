@@ -18,8 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-class zbMathTest {
-
+class ZbMATHTest {
     private ZbMATH fetcher;
     private BibEntry donaldsonEntry;
 
