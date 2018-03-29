@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CodeStyleTests {
 
     @Test
-    public void StringUtilClassIsSmall() throws Exception {
+    public void stringUtilClassIsSmall() throws Exception {
         Path path = Paths.get("src", "main", "java", StringUtil.class.getName().replace('.', '/') + ".java");
         int lineCount = Files.readAllLines(path, StandardCharsets.UTF_8).size();
 
