@@ -130,7 +130,7 @@ public class InternalBibtexFields {
         add(new BibtexSingleField(FieldName.MONTHFILED, true).withProperties(FieldProperty.MONTH));
 
         add(new BibtexSingleField(FieldName.NOTE, true));
-        add(new BibtexSingleField(FieldName.NUMBER, true, 60).setNumeric(true));
+        add(new BibtexSingleField(FieldName.NUMBER, true, 60).setNumeric());
         add(new BibtexSingleField(FieldName.ORGANIZATION, true));
         add(new BibtexSingleField(FieldName.PAGES, true));
         add(new BibtexSingleField(FieldName.PUBLISHER, true));
@@ -140,8 +140,8 @@ public class InternalBibtexFields {
         dummy = new BibtexSingleField(FieldName.TYPE, true).withProperties(FieldProperty.TYPE);
         add(dummy);
         add(new BibtexSingleField(FieldName.LANGUAGE, true));
-        add(new BibtexSingleField(FieldName.VOLUME, true, 60).setNumeric(true));
-        add(new BibtexSingleField(FieldName.YEAR, true, 60).setNumeric(true));
+        add(new BibtexSingleField(FieldName.VOLUME, true, 60).setNumeric());
+        add(new BibtexSingleField(FieldName.YEAR, true, 60).setNumeric());
 
         // custom fields not displayed at editor, but as columns in the UI
         for (String fieldName : SPECIAL_FIELDS) {
@@ -166,7 +166,7 @@ public class InternalBibtexFields {
         dummy = new BibtexSingleField(FieldName.DATE, true).withProperties(FieldProperty.DATE);
         add(dummy);
 
-        add(new BibtexSingleField(FieldName.PMID, false, 60).setNumeric(true));
+        add(new BibtexSingleField(FieldName.PMID, false, 60).setNumeric());
 
         // additional fields ------------------------------------------------------
         add(new BibtexSingleField(FieldName.LOCATION, false));
@@ -239,7 +239,7 @@ public class InternalBibtexFields {
         for (String numericField : INTEGER_FIELDS) {
             BibtexSingleField field = fieldSet.get(numericField);
             if (field == null) {
-                field = new BibtexSingleField(numericField, true).setNumeric(true);
+                field = new BibtexSingleField(numericField, true).setNumeric();
             }
             field.getProperties().add(FieldProperty.INTEGER);
             add(field);
@@ -374,14 +374,14 @@ public class InternalBibtexFields {
         for (String fieldName : InternalBibtexFields.RUNTIME.fieldSet.keySet()) {
             BibtexSingleField field = InternalBibtexFields.RUNTIME.fieldSet.get(fieldName);
             if (!field.isNumeric() && nF.contains(fieldName)) {
-                field.setNumeric(true);
+                field.setNumeric();
             }
             nF.remove(fieldName); // remove, so we clear the set of all standard fields.
         }
         // If there are fields left in nF, these must be non-standard fields. Add descriptors for them:
         for (String fieldName : nF) {
             BibtexSingleField field = new BibtexSingleField(fieldName, false);
-            field.setNumeric(true);
+            field.setNumeric();
             InternalBibtexFields.RUNTIME.fieldSet.put(fieldName, field);
         }
     }
