@@ -103,13 +103,13 @@ public class JabRefDesktop {
             try {
                 NATIVE_DESKTOP.openFile(link, FieldName.PS);
             } catch (IOException e) {
-                LOGGER.error("An error occured on the command: " + link, e);
+                LOGGER.error("An error occurred on the command: " + link, e);
             }
         } else if (FieldName.PDF.equals(fieldName)) {
             try {
                 NATIVE_DESKTOP.openFile(link, FieldName.PDF);
             } catch (IOException e) {
-                LOGGER.error("An error occured on the command: " + link, e);
+                LOGGER.error("An error occurred on the command: " + link, e);
             }
         } else {
             LOGGER.info("Message: currently only PDF, PS and HTML files can be opened by double clicking");
