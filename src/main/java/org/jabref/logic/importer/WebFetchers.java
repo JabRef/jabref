@@ -25,7 +25,7 @@ import org.jabref.logic.importer.fetcher.OpenAccessDoi;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
 import org.jabref.logic.importer.fetcher.SpringerLink;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
-import org.jabref.logic.importer.fetcher.zbMATH;
+import org.jabref.logic.importer.fetcher.ZbMATH;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
@@ -77,7 +77,7 @@ public class WebFetchers {
         list.add(new MedlineFetcher());
         list.add(new AstrophysicsDataSystem(importFormatPreferences));
         list.add(new MathSciNet(importFormatPreferences));
-        list.add(new zbMATH(importFormatPreferences));
+        list.add(new ZbMATH(importFormatPreferences));
         list.add(new GoogleScholar(importFormatPreferences));
         list.add(new DBLPFetcher(importFormatPreferences));
         list.add(new CrossRef());

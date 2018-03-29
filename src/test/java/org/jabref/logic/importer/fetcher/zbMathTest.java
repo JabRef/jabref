@@ -18,9 +18,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-class zbMATHTest {
+class zbMathTest {
 
-    private zbMATH fetcher;
+    private ZbMATH fetcher;
     private BibEntry donaldsonEntry;
 
     @BeforeEach
@@ -28,7 +28,7 @@ class zbMATHTest {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(
                 mock(FieldContentParserPreferences.class));
-        fetcher = new zbMATH(importFormatPreferences);
+        fetcher = new ZbMATH(importFormatPreferences);
 
         donaldsonEntry = new BibEntry();
         donaldsonEntry.setType(BibtexEntryTypes.ARTICLE);

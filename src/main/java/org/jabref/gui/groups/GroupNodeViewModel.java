@@ -156,10 +156,7 @@ public class GroupNodeViewModel {
 
         GroupNodeViewModel that = (GroupNodeViewModel) o;
 
-        if (!groupNode.equals(that.groupNode)) {
-            return false;
-        }
-        return true;
+        return groupNode.equals(that.groupNode);
     }
 
     @Override

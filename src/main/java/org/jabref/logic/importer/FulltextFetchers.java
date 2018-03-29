@@ -36,6 +36,15 @@ public class FulltextFetchers {
 
     private final List<FulltextFetcher> finders = new ArrayList<>();
 
+    private final Predicate<String> isPDF = url -> {
+        try {
+            return new URLDownload(url).isPdf();
+        } catch (MalformedURLException e) {
+            LOGGER.warn("URL returned by fulltext fetcher is invalid");
+        }
+        return false;
+    };
+
     public FulltextFetchers(ImportFormatPreferences importFormatPreferences) {
         this(WebFetchers.getFullTextFetchers(importFormatPreferences));
     }
@@ -86,15 +95,6 @@ public class FulltextFetchers {
         }
         return Optional.empty();
     }
-
-    final Predicate<String> isPDF = url -> {
-        try {
-            return new URLDownload(url).isPdf();
-        } catch (MalformedURLException e) {
-            LOGGER.warn("URL returned by fulltext fetcher is invalid");
-        }
-        return false;
-    };
 
     private Callable<Optional<FetcherResult>> getCallable(BibEntry entry, FulltextFetcher fetcher) {
         return () -> {
