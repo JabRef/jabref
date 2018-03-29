@@ -43,6 +43,7 @@ public class FieldCheckers {
         fieldCheckers.put(FieldName.ISBN, new ISBNChecker());
         fieldCheckers.put(FieldName.ISSN, new ISSNChecker());
         fieldCheckers.put(FieldName.MONTH, new MonthChecker(databaseContext));
+        fieldCheckers.put(FieldName.MONTHFILED, new MonthChecker(databaseContext));
         fieldCheckers.put(FieldName.NOTE, new NoteChecker(databaseContext));
         fieldCheckers.put(FieldName.PAGES, new PagesChecker(databaseContext));
         fieldCheckers.put(FieldName.URL, new UrlChecker());

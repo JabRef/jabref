@@ -125,8 +125,10 @@ public class InternalBibtexFields {
         add(dummy);
 
         add(new BibtexSingleField(FieldName.KEY, true));
-        dummy = new BibtexSingleField(FieldName.MONTH, true).withProperties(FieldProperty.MONTH);
-        add(dummy);
+
+        add(new BibtexSingleField(FieldName.MONTH, true).withProperties(FieldProperty.MONTH));
+        add(new BibtexSingleField(FieldName.MONTHFILED, true).withProperties(FieldProperty.MONTH));
+
         add(new BibtexSingleField(FieldName.NOTE, true));
         add(new BibtexSingleField(FieldName.NUMBER, true, 60).setNumeric(true));
         add(new BibtexSingleField(FieldName.ORGANIZATION, true));
