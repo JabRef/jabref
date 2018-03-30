@@ -750,14 +750,20 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         actions.put(Actions.MOVE_TO_GROUP, new GroupAddRemoveDialog(this, true, true));
 
         actions.put(Actions.INTERSECTION_PREF_GROUP, (BaseAction) () -> {
-            boolean currentState = Globals.prefs.getBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS);
-            boolean newState = !currentState;
+            boolean intersectionToggled = Globals.prefs.getBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS);
+            boolean newState = !intersectionToggled;
             Globals.prefs.putBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS, newState);
+
+            if (newState) {
+                output(Localization.lang("Group view mode set to intersection"));
+            } else {
+                output(Localization.lang("Group view mode set to union"));
+            }
+
         });
 
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this));
     }
-
 
     /**
      * Generates and copies citations based on the selected entries to the clipboard
@@ -1093,7 +1099,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     private boolean saveDatabase(File file, boolean selectedOnly, Charset enc,
-                                 SavePreferences.DatabaseSaveType saveType)
+            SavePreferences.DatabaseSaveType saveType)
             throws SaveException {
         SaveSession session;
         frame.block();
