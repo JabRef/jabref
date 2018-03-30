@@ -142,6 +142,7 @@ import org.jabref.model.entry.specialfields.SpecialFieldValue;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
+import org.jabref.preferences.SavePreferencesFactory;
 
 import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -1092,7 +1093,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         frame.block();
         final String SAVE_DATABASE = Localization.lang("Save library");
         try {
-            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
+            SavePreferences prefs = SavePreferencesFactory.loadForSaveFromPreferences(Globals.prefs)
                     .withEncoding(enc)
                     .withSaveType(saveType);
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(

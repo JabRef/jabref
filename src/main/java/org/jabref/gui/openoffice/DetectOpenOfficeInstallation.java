@@ -124,7 +124,7 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
         Optional<Path> jarFilePath = FileUtil.find(OpenOfficePreferences.OO_JARS.get(0), installDir);
 
         if (execPath.isPresent() && jarFilePath.isPresent()) {
-            preferences.setOOPath(installDir.toString());
+            preferences.setInstallationPath(installDir.toString());
             preferences.setExecutablePath(execPath.get().toString());
             preferences.setJarsPath(jarFilePath.get().getParent().toString());
             return true;
