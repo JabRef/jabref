@@ -6,13 +6,13 @@ import javafx.embed.swing.SwingNode;
 import javafx.scene.Node;
 import javafx.scene.layout.Priority;
 
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.SidePaneComponent;
 import org.jabref.gui.SidePaneManager;
 import org.jabref.gui.SidePaneType;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 
 public class OpenOfficeSidePanel extends SidePaneComponent {

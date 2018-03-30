@@ -42,8 +42,7 @@ public class MoveFilesCleanup implements CleanupJob {
     }
 
     public MoveFilesCleanup(BibDatabaseContext databaseContext, String fileDirPattern,
-                            FileDirectoryPreferences fileDirectoryPreferences,
-                            LinkedFile field) {
+                            FileDirectoryPreferences fileDirectoryPreferences, LinkedFile field) {
 
         this(databaseContext, fileDirPattern, fileDirectoryPreferences);
         this.singleFileFieldCleanup = field;

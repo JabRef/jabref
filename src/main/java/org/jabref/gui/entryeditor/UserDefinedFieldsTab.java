@@ -6,8 +6,8 @@ import java.util.List;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;

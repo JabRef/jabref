@@ -53,7 +53,8 @@ public class RenamePdfCleanupTest {
         LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPrefs);
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
+                                                        fileDirPrefs);
         cleanup.cleanup(entry);
 
         LinkedFile newFileField = new LinkedFile("", "Toot.tmp", "");
@@ -71,7 +72,8 @@ public class RenamePdfCleanupTest {
                                                                              new LinkedFile("", tempFile.getAbsolutePath(), ""),
                                                                              new LinkedFile("", "", ""))));
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPrefs);
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
+                                                        fileDirPrefs);
         cleanup.cleanup(entry);
 
         assertEquals(
@@ -88,7 +90,8 @@ public class RenamePdfCleanupTest {
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPrefs);
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
+                                                        fileDirPrefs);
         cleanup.cleanup(entry);
 
         LinkedFile newFileField = new LinkedFile("", "Toot - test title.tmp", "");
@@ -117,7 +120,8 @@ public class RenamePdfCleanupTest {
         LinkedFile fileField = new LinkedFile("", "Toot.pdf", "PDF");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
         entry.setField("title", "test title");
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPrefs, fileField);
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
+                fileDirPrefs, fileField);
 
         cleanup.cleanup(entry);
 

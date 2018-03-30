@@ -116,7 +116,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
         cancel.addActionListener(this);
 
         // Make ESC close dialog, equivalent to clicking Cancel.
-        cancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        cancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         cancel.getActionMap().put("close", cancelAction);
 
         JPanel buttons = new JPanel();

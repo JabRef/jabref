@@ -5,38 +5,26 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.ClipBoardManager;
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.os.DefaultDesktop;
 import org.jabref.gui.desktop.os.Linux;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.desktop.os.OSX;
 import org.jabref.gui.desktop.os.Windows;
 import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.externalfiletype.ExternalFileTypeEntryEditor;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.externalfiletype.UnknownExternalFileType;
-import org.jabref.gui.filelist.FileListEntry;
-import org.jabref.gui.filelist.FileListEntryEditor;
-import org.jabref.gui.filelist.FileListTableModel;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Eprint;
@@ -64,7 +52,8 @@ public class JabRefDesktop {
      * Open a http/pdf/ps viewer for the given link string.
      */
     public static void openExternalViewer(BibDatabaseContext databaseContext, String initialLink,
-            String initialFieldName) throws IOException {
+                                          String initialFieldName)
+        throws IOException {
         String link = initialLink;
         String fieldName = initialFieldName;
         if (FieldName.PS.equals(fieldName) || FieldName.PDF.equals(fieldName)) {
@@ -85,7 +74,7 @@ public class JabRefDesktop {
                 if ("pdf".equalsIgnoreCase(split[split.length - 1])) {
                     fieldName = FieldName.PDF;
                 } else if ("ps".equalsIgnoreCase(split[split.length - 1])
-                        || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
+                           || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
                     fieldName = FieldName.PS;
                 }
             }
@@ -132,7 +121,8 @@ public class JabRefDesktop {
      * @return false if the link couldn't be resolved, true otherwise.
      */
     public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext, String link,
-            final Optional<ExternalFileType> type) throws IOException {
+                                                    final Optional<ExternalFileType> type)
+        throws IOException {
 
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
             openExternalFilePlatformIndependent(type, link);
@@ -156,7 +146,7 @@ public class JabRefDesktop {
     }
 
     private static void openExternalFilePlatformIndependent(Optional<ExternalFileType> fileType, String filePath)
-            throws IOException {
+        throws IOException {
         if (fileType.isPresent()) {
             String application = fileType.get().getOpenWithApplication();
 
@@ -164,82 +154,6 @@ public class JabRefDesktop {
                 NATIVE_DESKTOP.openFile(filePath, fileType.get().getExtension());
             } else {
                 NATIVE_DESKTOP.openFileWithApplication(filePath, application);
-            }
-        }
-    }
-
-    public static boolean openExternalFileUnknown(JabRefFrame frame, BibEntry entry, BibDatabaseContext databaseContext,
-            String link, UnknownExternalFileType fileType) throws IOException {
-
-        String cancelMessage = Localization.lang("Unable to open file.");
-        String[] options = new String[] {Localization.lang("Define '%0'", fileType.getName()),
-                Localization.lang("Change file type"), Localization.lang("Cancel")};
-        String defOption = options[0];
-        int answer = JOptionPane.showOptionDialog(null,
-                Localization.lang("This external link is of the type '%0', which is undefined. What do you want to do?",
-                        fileType.getName()),
-                Localization.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
-                JOptionPane.QUESTION_MESSAGE, null, options, defOption);
-        if (answer == JOptionPane.CANCEL_OPTION) {
-            frame.output(cancelMessage);
-            return false;
-        } else if (answer == JOptionPane.YES_OPTION) {
-            // User wants to define the new file type. Show the dialog:
-
-            ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "", "new", IconTheme.JabRefIcons.FILE);
-            ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor((JFrame) null, newType);
-
-            editor.setVisible(true);
-            if (editor.okPressed()) {
-                // Get the old list of types, add this one, and update the list in prefs:
-                List<ExternalFileType> fileTypes = new ArrayList<>(
-                        ExternalFileTypes.getInstance().getExternalFileTypeSelection());
-                fileTypes.add(newType);
-                Collections.sort(fileTypes);
-                ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);
-                // Finally, open the file:
-                return openExternalFileAnyFormat(databaseContext, link, Optional.of(newType));
-            } else {
-                // Canceled:
-                frame.output(cancelMessage);
-                return false;
-            }
-        } else {
-            // User wants to change the type of this link.
-            // First get a model of all file links for this entry:
-            FileListTableModel tModel = new FileListTableModel();
-            Optional<String> oldValue = entry.getField(FieldName.FILE);
-            oldValue.ifPresent(tModel::setContent);
-            FileListEntry flEntry = null;
-            // Then find which one we are looking at:
-            for (int i = 0; i < tModel.getRowCount(); i++) {
-                FileListEntry iEntry = tModel.getEntry(i);
-                if (iEntry.getLink().equals(link)) {
-                    flEntry = iEntry;
-                    break;
-                }
-            }
-            if (flEntry == null) {
-                // This shouldn't happen, so I'm not sure what to put in here:
-                throw new RuntimeException("Could not find the file list entry " + link + " in " + entry);
-            }
-
-            FileListEntryEditor editor = new FileListEntryEditor(flEntry.toParsedFileField(), false, true, databaseContext);
-            editor.setVisible(true, false);
-            if (editor.okPressed()) {
-                // Store the changes and add an undo edit:
-                String newValue = tModel.getStringRepresentation();
-                UndoableFieldChange ce = new UndoableFieldChange(entry, FieldName.FILE, oldValue.orElse(null),
-                        newValue);
-                entry.setField(FieldName.FILE, newValue);
-                frame.getCurrentBasePanel().getUndoManager().addEdit(ce);
-                frame.getCurrentBasePanel().markBaseChanged();
-                // Finally, open the link:
-                return openExternalFileAnyFormat(databaseContext, flEntry.getLink(), flEntry.getType());
-            } else {
-                // Canceled:
-                frame.output(cancelMessage);
-                return false;
             }
         }
     }
@@ -284,8 +198,11 @@ public class JabRefDesktop {
             String openManually = Localization.lang("Please open %0 manually.", url);
             String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
             JabRefGUI.getMainFrame().output(couldNotOpenBrowser);
-            JOptionPane.showMessageDialog(null, couldNotOpenBrowser + "\n" + openManually + "\n" +
-                    copiedToClipboard, couldNotOpenBrowser, JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                                          couldNotOpenBrowser + "\n" + openManually + "\n" +
+                                                copiedToClipboard,
+                                          couldNotOpenBrowser,
+                                          JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -327,9 +244,9 @@ public class JabRefDesktop {
                     LOGGER.error("Open console", exception);
 
                     JOptionPane.showMessageDialog(null,
-                            Localization.lang("Error occured while executing the command \"%0\".", commandLoggingText),
-                            Localization.lang("Open console") + " - " + Localization.lang("Error"),
-                            JOptionPane.ERROR_MESSAGE);
+                                                  Localization.lang("Error occured while executing the command \"%0\".", commandLoggingText),
+                                                  Localization.lang("Open console") + " - " + Localization.lang("Error"),
+                                                  JOptionPane.ERROR_MESSAGE);
                     JabRefGUI.getMainFrame().output(null);
                 }
             }

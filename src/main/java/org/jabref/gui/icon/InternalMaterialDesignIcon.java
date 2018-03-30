@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.icon;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,33 +14,33 @@ import javafx.scene.text.Text;
 import org.jabref.gui.util.ColorUtil;
 import org.jabref.preferences.JabRefPreferences;
 
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import de.jensd.fx.glyphs.GlyphIcons;
 
 public class InternalMaterialDesignIcon implements JabRefIcon {
-    private final List<MaterialDesignIcon> icons;
+    private final List<GlyphIcons> icons;
     private Optional<Color> color;
     private final String unicode;
 
-    public InternalMaterialDesignIcon(java.awt.Color color, MaterialDesignIcon... icons) {
+    public InternalMaterialDesignIcon(java.awt.Color color, GlyphIcons... icons) {
         this(ColorUtil.toFX(color), Arrays.asList(icons));
     }
 
-    public InternalMaterialDesignIcon(Color color, MaterialDesignIcon... icons) {
+    public InternalMaterialDesignIcon(Color color, GlyphIcons... icons) {
         this(color, Arrays.asList(icons));
     }
 
-    InternalMaterialDesignIcon(Color color, List<MaterialDesignIcon> icons) {
+    InternalMaterialDesignIcon(Color color, List<GlyphIcons> icons) {
         this(icons);
         this.color = Optional.of(color);
     }
 
-    public InternalMaterialDesignIcon(MaterialDesignIcon... icons) {
+    public InternalMaterialDesignIcon(GlyphIcons... icons) {
         this(Arrays.asList(icons));
     }
 
-    public InternalMaterialDesignIcon(List<MaterialDesignIcon> icons) {
+    public InternalMaterialDesignIcon(List<GlyphIcons> icons) {
         this.icons = icons;
-        this.unicode = icons.stream().map(MaterialDesignIcon::unicode).collect(Collectors.joining());
+        this.unicode = icons.stream().map(GlyphIcons::unicode).collect(Collectors.joining());
         this.color = Optional.empty();
     }
 
@@ -56,7 +56,7 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
 
     @Override
     public Node getGraphicNode() {
-        MaterialDesignIcon icon = icons.get(0);
+        GlyphIcons icon = icons.get(0);
 
         Text text = new Text(icon.unicode());
         text.getStyleClass().add("glyph-icon");
@@ -78,5 +78,20 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
 
     public String getCode() {
         return this.unicode;
+    }
+
+    @Override
+    public String name() {
+        return null;
+    }
+
+    @Override
+    public String unicode() {
+        return icons.get(0).unicode();
+    }
+
+    @Override
+    public String fontFamily() {
+        return icons.get(0).fontFamily();
     }
 }

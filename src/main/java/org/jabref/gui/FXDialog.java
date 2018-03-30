@@ -9,6 +9,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import org.jabref.Globals;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 
@@ -59,7 +60,7 @@ public class FXDialog extends Alert {
 
         dialogWindow.getScene().setOnKeyPressed(event -> {
             KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
-            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE_DIALOG, event)) {
+            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
                 dialogWindow.close();
             }
         });

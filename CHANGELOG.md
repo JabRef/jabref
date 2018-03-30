@@ -31,6 +31,7 @@ For more details refer to the [field mapping help page](http://help.jabref.org/e
 - We added Facebook and Twitter icons in the toolbar to link to our [Facebook](https://www.facebook.com/JabRef/) and [Twitter](https://twitter.com/jabref_org) pages.
 - Renamed the _Review_ Tab into _Comments_ Tab
 - We no longer print empty lines when exporting an entry in RIS format [#3634](https://github.com/JabRef/jabref/issues/3634)
+- We added the option to download linked URLs in the context menu in the entry editor.
 - We improved file saving so that hard links are now preserved when a save is performed [#2633](https://github.com/JabRef/jabref/issues/2633)
 - We changed the default dialog option when removing a [file link](http://help.jabref.org/en/FileLinks#adding-external-links-to-an-entry) from an entry.
 The new default removes the linked file from the entry instead of deleting the file from disk. [#3679](https://github.com/JabRef/jabref/issues/3679)
@@ -40,6 +41,8 @@ The new default removes the linked file from the entry instead of deleting the f
 - Pressing <kbd>ESC</kbd> while searching will clear the search field and select the first entry, if available, in the table. [koppor#293](https://github.com/koppor/jabref/issues/293)
 - We changed the metadata reading and writing. DublinCore is now the only metadata format, JabRef supports. (https://github.com/JabRef/jabref/pull/3710)
 - We added another CLI functionality for reading and writing metadata to pdfs. (see https://github.com/JabRef/jabref/pull/3756 and see http://help.jabref.org/en/CommandLine)
+- We no longer print errors in field values during autosave into the log [#3811](https://github.com/JabRef/jabref/issues/3811)
+
 
 ### Fixed
 - We fixed several performance problems with the management of journal abbreviations [#3323](https://github.com/JabRef/jabref/issues/3323)
@@ -47,6 +50,7 @@ The new default removes the linked file from the entry instead of deleting the f
 - We fixed an issue where pressing space caused the cursor to jump to the start of the text field. [#3471](https://github.com/JabRef/jabref/issues/3471)
 - We fixed the missing dot in the name of an exported file. [#3576](https://github.com/JabRef/jabref/issues/3576)
 - Autocompletion in the search bar can now be disabled via the preferences. [#3598](https://github.com/JabRef/jabref/issues/3598)
+- We fixed an issue where the progress of an ongoing file download was not shown correctly. [#3614](https://github.com/JabRef/jabref/issues/3614)
 - We fixed an issue where odd linked files could not be selected in the entry editor. [#3639](https://github.com/JabRef/jabref/issues/3639)
 - We fixed and extended the RIS import functionality to cover more fields. [#3634](https://github.com/JabRef/jabref/issues/3634) [#2607](https://github.com/JabRef/jabref/issues/2607)
 - Chaining modifiers in BibTeX key pattern now works as described in the documentation. [#3648](https://github.com/JabRef/jabref/issues/3648)

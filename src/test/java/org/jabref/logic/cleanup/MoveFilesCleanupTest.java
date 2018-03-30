@@ -62,6 +62,7 @@ public class MoveFilesCleanupTest {
         LinkedFile fileField = new LinkedFile("", fileBefore.getAbsolutePath(), "");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
         cleanup = new MoveFilesCleanup(databaseContext, "", fileDirPrefs);
+
         cleanup.cleanup(entry);
 
         assertFalse(fileBefore.exists());
@@ -165,8 +166,7 @@ public class MoveFilesCleanupTest {
         Path relativefileDir = pdfFolder.toPath().relativize(after);
         assertTrue(Files.exists(after));
 
-        assertEquals(Optional
-                             .of(FileFieldWriter.getStringRepresentation(new LinkedFile("", relativefileDir.toString(), ""))),
+        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(new LinkedFile("", relativefileDir.toString(), ""))),
                      local_entry.getField("file"));
     }
 }

@@ -16,10 +16,10 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.DragAndDropDataFormats;
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.InternalMaterialDesignIcon;
-import org.jabref.gui.JabRefIcon;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.InternalMaterialDesignIcon;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.LocalDragboard;
