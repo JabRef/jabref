@@ -65,11 +65,29 @@ public class BracketedPattern {
         return expand(bibentry, null_database);
     }
 
+    /**
+     * Expands the current pattern using the given bibentry and database. ";" is used as keyword delimiter.
+     *
+     * @param bibentry The bibentry to expand.
+     * @param database The database to use for string-lookups and cross-refs. May be null.
+     *
+     * @return The expanded pattern. The empty string is returned, if it could not be expanded.
+     */
     public String expand(BibEntry bibentry, BibDatabase database) {
+        Objects.requireNonNull(bibentry);
         Character keywordDelimiter = ';';
         return expand(bibentry, keywordDelimiter, database);
     }
 
+    /**
+     * Expands the current pattern using the given bibentry, keyword delimiter, and database.
+     *
+     * @param bibentry The bibentry to expand.
+     * @param keywordDelimiter The keyword delimiter to use.
+     * @param database The database to use for string-lookups and cross-refs. May be null.
+     *
+     * @return The expanded pattern. The empty string is returned, if it could not be expanded.
+     */
     public String expand(BibEntry bibentry, Character keywordDelimiter, BibDatabase database) {
         Objects.requireNonNull(bibentry);
         return expandBrackets(this.pattern, keywordDelimiter, bibentry, database);
@@ -130,28 +148,21 @@ public class BracketedPattern {
     }
 
     /**
+     * Evaluates the given pattern ("value") to the given bibentry and database
+     *
      * @param entry The entry to get the field value from
      * @param value A pattern string (such as auth, pureauth, authorLast)
      * @param keywordDelimiter The de
      * @param database The database to use for field resolving. May be null.
-     * @return String containing the field value. Empty string if the pattern cannot be resolved.
+     *
+     * @return String containing the evaluation result. Empty string if the pattern cannot be resolved.
      */
     public static String getFieldValue(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database) {
 
         String val = value;
         try {
             if (val.startsWith("auth") || val.startsWith("pureauth")) {
-
-                /*
-                 * For label code "auth...": if there is no author, but there
-                 * are editor(s) (e.g. for an Edited Book), use the editor(s)
-                 * instead. (saw27@mrao.cam.ac.uk). This is what most people
-                 * want, but in case somebody really needs a field which expands
-                 * to nothing if there is no author (e.g. someone who uses both
-                 * "auth" and "ed" in the same label), we provide an alternative
-                 * form "pureauth..." which does not do this fallback
-                 * substitution of editor.
-                 */
+                // result the author
                 String authString;
                 if (database != null) {
                     authString = entry.getResolvedFieldOrAlias(FieldName.AUTHOR, database)
@@ -161,17 +172,20 @@ public class BracketedPattern {
                 }
 
                 if (val.startsWith("pure")) {
-                    // remove the "pure" prefix so the remaining
-                    // code in this section functions correctly
+                    // "pure" is used in the context of authors to resolve to authors only and not fallback to editors
+                    // The other functionality of the pattern "ForeIni", ... is the same
+                    // Thus, remove the "pure" prefix so the remaining code in this section functions correctly
+                    //
                     val = val.substring(4);
-                }
-
-                if (authString.isEmpty()) {
-                    if (database != null) {
-                        authString = entry.getResolvedFieldOrAlias(FieldName.EDITOR, database)
-                                .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
-                    } else {
-                        authString = entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse("");
+                } else {
+                    // special feature: A pattern starting with "auth" falls back to the editor
+                    if (authString.isEmpty()) {
+                        if (database != null) {
+                            authString = entry.getResolvedFieldOrAlias(FieldName.EDITOR, database)
+                                    .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
+                        } else {
+                            authString = entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse("");
+                        }
                     }
                 }
 
