@@ -115,6 +115,10 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         keywordSeparator.setText(prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
         autoAssignGroup.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
         multiSelectionModeIntersection.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS));
+
+        boolean intersectionSelected = prefs.getBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS);
+        boolean unionSelected = ! intersectionSelected;
+        multiSelectionModeUnion.setSelected(unionSelected);
     }
 
     @Override

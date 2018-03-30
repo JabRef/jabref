@@ -40,6 +40,7 @@ The new default removes the linked file from the entry instead of deleting the f
 - We changed the metadata reading and writing. DublinCore is now the only metadata format, JabRef supports. (https://github.com/JabRef/jabref/pull/3710)
 - We added another CLI functionality for reading and writing metadata to pdfs. (see https://github.com/JabRef/jabref/pull/3756 and see http://help.jabref.org/en/CommandLine)
 - We no longer print errors in field values during autosave into the log [#3811](https://github.com/JabRef/jabref/issues/3811)
+- We added a menu entry to quickly switch between `intersection` and `union` mode for the groups view [#3269](https://github.com/JabRef/jabref/issues/3269)
 
 ### Fixed
 - We fixed several performance problems with the management of journal abbreviations [#3323](https://github.com/JabRef/jabref/issues/3323)
