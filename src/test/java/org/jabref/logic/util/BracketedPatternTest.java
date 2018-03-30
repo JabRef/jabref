@@ -59,6 +59,21 @@ public class BracketedPatternTest {
         BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
         assertEquals("2017_Kitsune_213", pattern.expand(bibentry, another_database));
     }
+    
+    @Test
+    public void pureauthTest() {
+        BibDatabase anotherDatabase = new BibDatabase();
+        BracketedPattern pattern = new BracketedPattern("[pureauth]");
+        assertEquals("Kitsune", pattern.expand(bibentry, anotherDatabase));
+    }
+    
+    @Test
+    public void pureauthNoAuthorTest() {
+        BibDatabase anotherDatabase = new BibDatabase();
+        BracketedPattern pattern = new BracketedPattern("[pureauth]");
+        bibentry.setField("author", "");
+        assertEquals("", pattern.expand(bibentry, anotherDatabase));
+    }
 
     @Test
     public void emptyDatabaseExpansionTest() {
@@ -66,7 +81,7 @@ public class BracketedPatternTest {
         BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
         assertEquals("2017_Kitsune_213", pattern.expand(bibentry, another_database));
     }
-
+    
     @Test
     public void databaseWithStringsExpansionTest() {
         BibDatabase another_database = new BibDatabase();
@@ -189,7 +204,7 @@ public class BracketedPatternTest {
         database.removeEntry(dbentry);
         database.insertEntry(child);
 
-        assertEquals("", BracketedPattern.expandBrackets("[author]", ';', child, database));
-    }
+		assertEquals("", BracketedPattern.expandBrackets("[author]", ';', child, database));
+	}
 
 }
