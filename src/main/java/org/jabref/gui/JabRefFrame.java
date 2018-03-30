@@ -332,10 +332,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP,
             Localization.lang("Remove from group") + ELLIPSES);
     private final AbstractAction moveToGroup = new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group") + ELLIPSES);
-    /**
-     * @author - Tobias Stoever (3325847)
-     */
-    private final AbstractAction intersectPrefGroup = new GeneralAction(Actions.INTERSECTION_PREF_GROUP, Localization.lang("Toggle intersect/union pref group"));
+    private final AbstractAction intersectPrefGroup = new GeneralAction(Actions.INTERSECTION_PREF_GROUP, Localization.lang("Toggle intersect/union view"));
     private final Action togglePreview = enableToggle(new GeneralAction(Actions.TOGGLE_PREVIEW,
             Localization.menuTitle("Toggle entry preview"),
             Localization.lang("Toggle entry preview"),
@@ -1169,9 +1166,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         groups.add(addToGroup);
         groups.add(removeFromGroup);
         groups.add(moveToGroup);
-        /**
-         * @author - Tobias Stoever (3325847)
-         */
         groups.addSeparator();
         groups.add(intersectPrefGroup);
         mb.add(groups);

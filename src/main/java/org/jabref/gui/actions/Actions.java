@@ -9,9 +9,6 @@ public class Actions {
     public static final String ABBREVIATE_MEDLINE = "abbreviateMedline";
     public static final String ADD_FILE_LINK = "addFileLink";
     public static final String ADD_TO_GROUP = "addToGroup";
-    /**
-     * @author - Tobias Stoever (3325847)
-     */
     public static final String INTERSECTION_PREF_GROUP = "intersectionPrefGroup";
     public static final String AUTO_SET_FILE = "autoSetFile";
     public static final String BACK = "back";

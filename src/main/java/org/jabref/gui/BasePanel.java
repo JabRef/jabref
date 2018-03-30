@@ -749,9 +749,6 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         actions.put(Actions.REMOVE_FROM_GROUP, new GroupAddRemoveDialog(this, false, false));
         actions.put(Actions.MOVE_TO_GROUP, new GroupAddRemoveDialog(this, true, true));
 
-        /**
-         * @author - Tobias Stoever (3325847)
-         */
         actions.put(Actions.INTERSECTION_PREF_GROUP, (BaseAction) () -> {
             boolean currentState = Globals.prefs.getBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS);
             boolean newState = !currentState;
@@ -760,6 +757,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this));
     }
+
 
     /**
      * Generates and copies citations based on the selected entries to the clipboard
