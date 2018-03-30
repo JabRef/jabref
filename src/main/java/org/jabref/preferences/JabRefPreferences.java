@@ -325,6 +325,7 @@ public class JabRefPreferences implements PreferencesService {
     // Remote
     public static final String USE_REMOTE_SERVER = "useRemoteServer";
     public static final String REMOTE_SERVER_PORT = "remoteServerPort";
+
     /**
      * The OpenOffice/LibreOffice connection preferences are:
      * OO_PATH main directory for OO/LO installation, used to detect location on Win/OS X when using manual connect
@@ -345,6 +346,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String OO_USE_ALL_OPEN_BASES = "useAllOpenBases";
     public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
     public static final String OO_EXTERNAL_STYLE_FILES = "ooExternalStyleFiles";
+
     public static final String STYLES_SIZE_Y = "stylesSizeY";
     public static final String STYLES_SIZE_X = "stylesSizeX";
     public static final String STYLES_POS_Y = "stylesPosY";
@@ -1441,6 +1443,18 @@ public class JabRefPreferences implements PreferencesService {
     public XmpPreferences getXMPPreferences() {
         return new XmpPreferences(getBoolean(USE_XMP_PRIVACY_FILTER), getStringList(XMP_PRIVACY_FILTERS),
                 getKeywordDelimiter());
+    }
+
+    public OpenOfficePreferences getOpenOfficePreferences() {
+        return new OpenOfficePreferences(
+                this.get(JabRefPreferences.OO_JARS_PATH),
+                this.get(JabRefPreferences.OO_EXECUTABLE_PATH),
+                this.get(JabRefPreferences.OO_PATH),
+                this.getBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES),
+                this.getBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING),
+                this.getBoolean(JabRefPreferences.OO_SHOW_PANEL),
+                this.getStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES),
+                this.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE));
     }
 
     private NameFormatterPreferences getNameFormatterPreferences() {

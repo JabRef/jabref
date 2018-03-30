@@ -129,7 +129,7 @@ public class OpenOfficePanel extends AbstractWorker {
         update = new JButton(IconTheme.JabRefIcon.REFRESH.getSmallIcon());
         update.setToolTipText(Localization.lang("Sync OpenOffice/LibreOffice bibliography"));
         update.setPreferredSize(new Dimension(24, 24));
-        preferences = new OpenOfficePreferences(Globals.prefs);
+        preferences = Globals.prefs.getOpenOfficePreferences();
         loader = new StyleLoader(preferences,
                 Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
                 Globals.prefs.getDefaultEncoding());
@@ -353,7 +353,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private List<BibDatabase> getBaseList() {
         List<BibDatabase> databases = new ArrayList<>();
-        if (preferences.useAllDatabases()) {
+        if (preferences.getUseAllDatabases()) {
             for (BasePanel basePanel : frame.getBasePanelList()) {
                 databases.add(basePanel.getDatabase());
             }
@@ -599,7 +599,7 @@ public class OpenOfficePanel extends AbstractWorker {
                         style = loader.getUsedStyle();
                     }
                     ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, withText, pageInfo,
-                            preferences.syncWhenCiting());
+                            preferences.getSyncWhenCiting());
                 } catch (FileNotFoundException ex) {
                     JOptionPane.showMessageDialog(frame,
                             Localization
@@ -717,7 +717,7 @@ public class OpenOfficePanel extends AbstractWorker {
         JPopupMenu menu = new JPopupMenu();
         final JCheckBoxMenuItem autoSync = new JCheckBoxMenuItem(
                 Localization.lang("Automatically sync bibliography when inserting citations"),
-                preferences.syncWhenCiting());
+                preferences.getSyncWhenCiting());
         final JRadioButtonMenuItem useActiveBase = new JRadioButtonMenuItem(
                 Localization.lang("Look up BibTeX entries in the active tab only"));
         final JRadioButtonMenuItem useAllBases = new JRadioButtonMenuItem(
@@ -726,7 +726,7 @@ public class OpenOfficePanel extends AbstractWorker {
         ButtonGroup bg = new ButtonGroup();
         bg.add(useActiveBase);
         bg.add(useAllBases);
-        if (preferences.useAllDatabases()) {
+        if (preferences.getUseAllDatabases()) {
             useAllBases.setSelected(true);
         } else {
             useActiveBase.setSelected(true);
@@ -738,7 +738,16 @@ public class OpenOfficePanel extends AbstractWorker {
 
         useActiveBase.addActionListener(e -> preferences.setUseAllDatabases(!useActiveBase.isSelected()));
 
-        clearConnectionSettings.addActionListener(e -> frame.output(preferences.clearConnectionSettings()));
+        // TODO: implement this again
+        /*
+            public String clearConnectionSettings() {
+                preferences.clear(JabRefPreferences.OO_PATH);
+                preferences.clear(JabRefPreferences.OO_EXECUTABLE_PATH);
+                preferences.clear(JabRefPreferences.OO_JARS_PATH);
+                return Localization.lang("Cleared connection settings.");
+            }
+        */
+        // clearConnectionSettings.addActionListener(e -> frame.output(preferences.clearConnectionSettings()));
 
         menu.add(autoSync);
         menu.addSeparator();
