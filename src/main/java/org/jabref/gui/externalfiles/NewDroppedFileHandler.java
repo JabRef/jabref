@@ -74,13 +74,7 @@ public class NewDroppedFileHandler {
                     List<BibEntry> xmpEntriesInFile = XmpUtilReader.readXmp(file, Globals.prefs.getXMPPreferences());
 
                     if (showImportDialogAndShouldImport(xmpEntriesInFile, file.toString())) {
-
                         bibDatabaseContext.getDatabase().insertEntries(xmpEntriesInFile);
-                        for (BibEntry entry : xmpEntriesInFile) {
-
-
-                        }
-
                     }
                     //PdfContentImporter
                     //List<BibEntry> result = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
