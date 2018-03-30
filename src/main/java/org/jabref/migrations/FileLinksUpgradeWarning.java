@@ -43,7 +43,7 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class FileLinksUpgradeWarning implements GUIPostOpenAction {
 
-    private static final String[] FIELDS_TO_LOOK_FOR = new String[] {FieldName.PDF, FieldName.PS};
+    private static final String[] FIELDS_TO_LOOK_FOR = new String[]{FieldName.PDF, FieldName.PS};
 
     private boolean offerChangeSettings;
 
@@ -56,7 +56,6 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
      * GUIGlobals.FILE_FIELD.
      *
      * @param database The database to modify.
-     * @param fields   The fields to find links in.
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
     private static NamedCompound upgradePdfPsToFile(BibDatabase database) {
@@ -78,7 +77,7 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
     /**
      * This method should be performed if the major/minor versions recorded in the ParserResult
      * are less than or equal to 2.2.
-     * @param pr
+     *
      * @return true if the file was written by a jabref version <=2.2
      */
     @Override
@@ -91,18 +90,16 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
         // If the "file" directory is not set, offer to migrate pdf/ps dir:
         offerSetFileDir = !Globals.prefs.hasKey(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX)
                 && (Globals.prefs.hasKey(FieldName.PDF + FileDirectoryPreferences.DIR_SUFFIX)
-                        || Globals.prefs.hasKey(FieldName.PS + FileDirectoryPreferences.DIR_SUFFIX));
+                || Globals.prefs.hasKey(FieldName.PS + FileDirectoryPreferences.DIR_SUFFIX));
 
         // First check if this warning is disabled:
         return Globals.prefs.getBoolean(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING)
                 && isThereSomethingToBeDone();
     }
 
-    /**
+    /*
      * This method presents a dialog box explaining and offering to make the
      * changes. If the user confirms, the changes are performed.
-     * @param panel
-     * @param parserResult
      */
     @Override
     public void performAction(BasePanel panel, ParserResult parserResult) {
@@ -130,7 +127,7 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
         int row = 1;
         formBuilder.add(new JLabel("<html>" + Localization.lang("This library uses outdated file links.") + "<br><br>"
                 + Localization
-                        .lang("JabRef no longer supports 'ps' or 'pdf' fields.<br>File links are now stored in the 'file' field and files are stored in an external file directory.<br>To make use of this feature, JabRef needs to upgrade file links.<br><br>")
+                .lang("JabRef no longer supports 'ps' or 'pdf' fields.<br>File links are now stored in the 'file' field and files are stored in an external file directory.<br>To make use of this feature, JabRef needs to upgrade file links.<br><br>")
                 + "<p>"
                 + Localization.lang("Do you want JabRef to do the following operations?") + "</html>")).xy(1, row);
 
@@ -191,10 +188,11 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
     /**
      * Check the database to find out whether any of a set of fields are used
      * for any of the entries.
+     *
      * @param database The BIB database.
-     * @param fields The set of fields to look for.
+     * @param fields   The set of fields to look for.
      * @return true if at least one of the given fields is set in at least one entry,
-     *  false otherwise.
+     * false otherwise.
      */
     private boolean linksFound(BibDatabase database, String[] fields) {
         for (BibEntry entry : database.getEntries()) {
@@ -209,12 +207,11 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
 
     /**
      * This method performs the actual changes.
-     * @param panel
-     * @param pr
+     *
      * @param fileDir The path to the file directory to set, or null if it should not be set.
      */
     private void makeChanges(BasePanel panel, ParserResult pr, boolean upgradePrefs,
-            boolean upgradeDatabase, String fileDir) {
+                             boolean upgradeDatabase, String fileDir) {
 
         if (upgradeDatabase) {
             // Update file links links in the database:

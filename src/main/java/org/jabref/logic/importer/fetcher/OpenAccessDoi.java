@@ -20,7 +20,7 @@ import org.json.JSONObject;
 /**
  * A fulltext fetcher that uses <a href="https://oadoi.org/">oaDOI</a>.
  *
- * @implSpec API is documented at https://oadoi.org/api/v2
+ * @implSpec API is documented at http://unpaywall.org/api/v2
  */
 public class OpenAccessDoi implements FulltextFetcher {
     private static String API_URL = "https://api.oadoi.org/v2/";
@@ -40,6 +40,11 @@ public class OpenAccessDoi implements FulltextFetcher {
         } else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.META_SEARCH;
     }
 
     public Optional<URL> findFullText(DOI doi) throws UnirestException, MalformedURLException {

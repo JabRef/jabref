@@ -13,13 +13,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class MergeReviewIntoCommentTest {
-
-    private MergeReviewIntoComment action;
+class MergeReviewIntoCommentActionMigrationTest {
+    private MergeReviewIntoCommentMigration action;
 
     @BeforeEach
     public void setUp() {
-        action = new MergeReviewIntoComment();
+        action = new MergeReviewIntoCommentMigration();
     }
 
     @Test
@@ -57,9 +56,24 @@ class MergeReviewIntoCommentTest {
         assertEquals(entry, actualParserResult.getDatabase().getEntryByKey("Entry1").get());
     }
 
+    @Test
+    public void multiLineReviewField() {
+        String commentString = "My Review\n\nSecond Paragraph\n\nThird Paragraph";
+
+        BibEntry actualEntry = createMinimalBibEntry();
+        actualEntry.setField(FieldName.REVIEW, commentString);
+        ParserResult actualParserResult = new ParserResult(Collections.singletonList(actualEntry));
+
+        BibEntry expectedEntry = createMinimalBibEntry();
+        expectedEntry.setField(FieldName.COMMENT, commentString);
+
+        action.performMigration(actualParserResult);
+
+        assertEquals(expectedEntry, actualParserResult.getDatabase().getEntryByKey("Entry1").get());
+    }
 
     @Test
-    @Disabled("Re-enable if the MergeReviewIntoComment.mergeCommentFieldIfPresent() does not block and wait for user input.")
+    @Disabled("Re-enable if the MergeReviewIntoCommentMigration.mergeCommentFieldIfPresent() does not block and wait for user input.")
     public void reviewAndCommentField() {
         BibEntry actualEntry = createMinimalBibEntry();
         actualEntry.setField(FieldName.REVIEW, "My Review");

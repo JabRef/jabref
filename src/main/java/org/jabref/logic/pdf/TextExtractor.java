@@ -9,7 +9,7 @@ import org.apache.pdfbox.cos.COSFloat;
 import org.apache.pdfbox.cos.COSInteger;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.util.PDFTextStripperByArea;
+import org.apache.pdfbox.text.PDFTextStripperByArea;
 
 /**
  * Extracts the text of marked annotations using bounding boxes.

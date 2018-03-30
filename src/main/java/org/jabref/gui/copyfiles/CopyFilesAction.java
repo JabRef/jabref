@@ -43,7 +43,7 @@ public class CopyFilesAction extends AbstractAction {
                 .runInJavaFXThread(() -> dialogService.showDirectorySelectionDialog(dirDialogConfiguration));
 
         exportPath.ifPresent(path -> {
-            databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabaseContext();
+            databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext();
 
             Task<List<CopyFilesResultItemViewModel>> exportTask = new CopyFilesTask(databaseContext, entries, path);
             startServiceAndshowProgessDialog(exportTask);
@@ -52,13 +52,21 @@ public class CopyFilesAction extends AbstractAction {
 
     private void startServiceAndshowProgessDialog(Task<List<CopyFilesResultItemViewModel>> exportService) {
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showCanceableProgressDialogAndWait(exportService));
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            dialogService.showCanceableProgressDialogAndWait(exportService);
+        });
 
-        exportService.run(); //Run kinda blocks, so we just show the result dialog wgeb run is ready
-        DefaultTaskExecutor.runInJavaFXThread(() -> showDialog(exportService.getValue()));
+        exportService.run();
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            showDialog(exportService.getValue());
+        });
     }
 
     private void showDialog(List<CopyFilesResultItemViewModel> data) {
+        if (data.isEmpty()) {
+            dialogService.showInformationDialogAndWait(Localization.lang("Copy linked files to folder..."), Localization.lang("No linked files found for export."));
+            return;
+        }
         CopyFilesDialogView dlg = new CopyFilesDialogView(databaseContext, new CopyFilesResultListDependency(data));
         dlg.show();
     }

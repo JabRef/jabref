@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
@@ -56,6 +57,7 @@ import org.jabref.preferences.SearchPreferences;
 
 import org.fxmisc.easybind.EasyBind;
 
+@SuppressWarnings("Duplicates")
 public class GlobalSearchBar extends JPanel {
 
     private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
@@ -395,7 +397,7 @@ public class GlobalSearchBar extends JPanel {
             searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
         }
         if (grammarBasedSearch) {
-           searchIcon.setIcon(IconTheme.JabRefIcon.ADVANCED_SEARCH.getIcon());
+            searchIcon.setIcon(IconTheme.JabRefIcon.ADVANCED_SEARCH.getIcon());
         } else {
             searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
         }
@@ -435,13 +437,19 @@ public class GlobalSearchBar extends JPanel {
     private class SearchKeyAdapter extends KeyAdapter {
 
         @Override
-        public void keyPressed(java.awt.event.KeyEvent e) {
+        public void keyPressed(KeyEvent e) {
             switch (e.getKeyCode()) {
+
+                // Clear search bar and select first entry, if available
+                case KeyEvent.VK_ESCAPE:
+                    clearOnEsc();
+                    break;
+
                 //This "hack" prevents that the focus moves out of the field
-                case java.awt.event.KeyEvent.VK_RIGHT:
-                case java.awt.event.KeyEvent.VK_LEFT:
-                case java.awt.event.KeyEvent.VK_UP:
-                case java.awt.event.KeyEvent.VK_DOWN:
+                case KeyEvent.VK_RIGHT:
+                case KeyEvent.VK_LEFT:
+                case KeyEvent.VK_UP:
+                case KeyEvent.VK_DOWN:
                     e.consume();
                     break;
                 default:
@@ -463,6 +471,15 @@ public class GlobalSearchBar extends JPanel {
                         //do nothing
                 }
             }
+        }
+
+        /**
+         * Clears the search bar and select first entry, if available
+         */
+        private void clearOnEsc() {
+            MainTable currentTable = frame.getCurrentBasePanel().getMainTable();
+            clearSearch(frame.getCurrentBasePanel());
+            currentTable.setSelected(0);
         }
     }
 }
