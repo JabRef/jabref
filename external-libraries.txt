@@ -52,8 +52,8 @@ License: Apache 2.0
 
 Id:      com.google.guava
 Project: Google Guava
-URL:
-License:
+URL:     https://github.com/google/guava
+License: Apache-2.0
 
 Id:      com.impossibl.pgjdbc-ng:pgjdbc-ng
 Project: pgjdbc-ng
@@ -196,23 +196,23 @@ URL:     https://github.com/jhy/jsoup/
 License: MIT
 
 Id:      org.libreoffice:juh
-Project: OpenOffice.org
-URL:     http://www.openoffice.org/api/SDK
+Project: LibreOffice
+URL:
 License: LGPL 3.0
 
 Id:      org.libreoffice:jurt
-Project: LibreOffice.org
-URL:     http://www.openoffice.org/api/SDK
+Project: LibreOffice
+URL:
 License: Apache-2.0
 
 Id:      org.libreoffice:ridl
-Project: OpenOffice.org
-URL:     http://www.openoffice.org/api/SDK
+Project: LibreOffice
+URL:
 License: Apache-2.0
 
 Id:      org.libreoffice:unoil
-Project: OpenOffice.org
-URL:     http://www.openoffice.org/api/SDK
+Project: LibreOffice
+URL:
 License: Apache-2.0
 
 Id:      org.xmlunit:xmlunit-core
