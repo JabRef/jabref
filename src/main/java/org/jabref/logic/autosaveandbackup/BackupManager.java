@@ -25,7 +25,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.SavePreferencesFactory;
 
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
@@ -120,7 +119,7 @@ public class BackupManager {
     private void performBackup(Path backupPath) {
         try {
             Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(preferences.getDefaultEncoding());
-            SavePreferences savePreferences = SavePreferencesFactory.loadForSaveFromPreferences(preferences).withEncoding
+            SavePreferences savePreferences = JabRefPreferences.loadForSaveFromPreferences(preferences).withEncoding
                     (charset).withMakeBackup(false);
             new BibtexDatabaseWriter<>(FileSaveSession::new).saveDatabase(bibDatabaseContext, savePreferences).commit
                     (backupPath);

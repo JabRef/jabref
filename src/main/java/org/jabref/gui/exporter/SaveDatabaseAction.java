@@ -39,7 +39,6 @@ import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.SavePreferencesFactory;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -179,7 +178,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         frame.block();
 
         try {
-            SavePreferences prefs = SavePreferencesFactory.loadForSaveFromPreferences(Globals.prefs).withEncoding(encoding);
+            SavePreferences prefs = JabRefPreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(encoding);
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
 
             if (selectedOnly) {
