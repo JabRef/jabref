@@ -43,7 +43,7 @@ public class CopyFilesAction extends AbstractAction {
                 .runInJavaFXThread(() -> dialogService.showDirectorySelectionDialog(dirDialogConfiguration));
 
         exportPath.ifPresent(path -> {
-            databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabaseContext();
+            databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext();
 
             Task<List<CopyFilesResultItemViewModel>> exportTask = new CopyFilesTask(databaseContext, entries, path);
             startServiceAndshowProgessDialog(exportTask);

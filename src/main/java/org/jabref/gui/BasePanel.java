@@ -1949,10 +1949,6 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         return mainTable;
     }
 
-    public BibDatabaseContext getDatabaseContext() {
-        return bibDatabaseContext;
-    }
-
     public Optional<SearchQuery> getCurrentSearchQuery() {
         return currentSearchQuery;
     }
