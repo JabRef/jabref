@@ -75,6 +75,15 @@ public class BracketedPattern {
         return expandBrackets(this.pattern, keywordDelimiter, bibentry, database);
     }
 
+    /**
+     * Expands a pattern
+     *
+     * @param pattern The pattern to expand
+     * @param keywordDelimiter The keyword delimiter to use
+     * @param entry The bibentry to use for expansion
+     * @param database The database for field resolving. May be null.
+     * @return The expanded pattern. Not null.
+     */
     public static String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database) {
         Objects.requireNonNull(pattern);
         Objects.requireNonNull(entry);
@@ -120,7 +129,15 @@ public class BracketedPattern {
         return sb.toString();
     }
 
+    /**
+     * @param entry The entry to get the field value from
+     * @param value A pattern string (such as auth, pureauth, authorLast)
+     * @param keywordDelimiter The de
+     * @param database The database to use for field resolving. May be null.
+     * @return String containing the field value. Empty string if the pattern cannot be resolved.
+     */
     public static String getFieldValue(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database) {
+
         String val = value;
         try {
             if (val.startsWith("auth") || val.startsWith("pureauth")) {
@@ -997,6 +1014,7 @@ public class BracketedPattern {
     /**
      * Parse a field marker with modifiers, possibly containing a parenthesised modifier,
      * as well as escaped colons and parentheses.
+     *
      * @param arg The argument string.
      * @return An array of strings representing the parts of the marker
      */

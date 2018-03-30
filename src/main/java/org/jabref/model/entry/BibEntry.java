@@ -122,8 +122,6 @@ public class BibEntry implements Cloneable {
      * @return The resolved field value or null if not found.
      */
     public Optional<String> getResolvedFieldOrAlias(String field, BibDatabase database) {
-        Objects.requireNonNull(this, "entry cannot be null");
-
         if (TYPE_HEADER.equals(field) || OBSOLETE_TYPE_HEADER.equals(field)) {
             Optional<EntryType> entryType = EntryTypes.getType(getType(), BibDatabaseMode.BIBLATEX);
             if (entryType.isPresent()) {
@@ -861,7 +859,6 @@ public class BibEntry implements Cloneable {
     }
 
     private interface GetFieldInterface {
-
         Optional<String> getValueForField(String fieldName);
     }
 }
