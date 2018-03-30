@@ -679,12 +679,12 @@ public class BibEntry implements Cloneable {
 
     public KeywordList getKeywords(Character delimiter) {
         Optional<String> keywordsContent = getField(FieldName.KEYWORDS);
-        return KeywordList.parse(keywordsContent, delimiter);
+        return keywordsContent.map(content -> KeywordList.parse(content, delimiter)).orElse(new KeywordList());
     }
 
     public KeywordList getResolvedKeywords(Character delimiter, BibDatabase database) {
         Optional<String> keywordsContent = getResolvedFieldOrAlias(FieldName.KEYWORDS, database);
-        return KeywordList.parse(keywordsContent, delimiter);
+        return keywordsContent.map(content -> KeywordList.parse(content, delimiter)).orElse(new KeywordList());
     }
 
     public Optional<FieldChange> removeKeywords(KeywordList keywordsToRemove, Character keywordDelimiter) {
