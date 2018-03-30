@@ -54,9 +54,8 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 /**
- * This action goes through all selected entries in the BasePanel, and attempts to autoset the
- * given external file (pdf, ps, ...) based on the same algorithm used for the "Auto" button in
- * EntryEditor.
+ * This action goes through all selected entries in the BasePanel, and attempts to auto set the
+ * given external file (pdf, ps, ...)
  */
 public class SynchronizeFileField extends AbstractWorker {
 
@@ -64,13 +63,12 @@ public class SynchronizeFileField extends AbstractWorker {
     private final Object[] brokenLinkOptions = {Localization.lang("Ignore"), Localization.lang("Assign new file"),
             Localization.lang("Remove link"), Localization.lang("Remove all broken links"),
             Localization.lang("Quit synchronization")};
-    private List<BibEntry> sel;
-    private SynchronizeFileField.OptionsDialog optDiag;
+    private List<BibEntry> selectedEntries;
+    private SynchronizeFileField.OptionsDialog dialog;
     private int entriesChangedCount;
     private boolean goOn = true;
     private boolean autoSet = true;
     private boolean checkExisting = true;
-
 
     public SynchronizeFileField(BasePanel panel) {
         this.panel = panel;
@@ -78,22 +76,21 @@ public class SynchronizeFileField extends AbstractWorker {
 
     @Override
     public void init() {
-        Collection<BibEntry> col = panel.getDatabase().getEntries();
         goOn = true;
-        sel = new ArrayList<>(col);
+        selectedEntries = new ArrayList<>(panel.getDatabase().getEntries());
 
         // Ask about rules for the operation:
-        if (optDiag == null) {
-            optDiag = new SynchronizeFileField.OptionsDialog(panel.frame(), panel.getBibDatabaseContext());
+        if (dialog == null) {
+            dialog = new SynchronizeFileField.OptionsDialog(panel.frame(), panel.getBibDatabaseContext());
         }
-        optDiag.setLocationRelativeTo(panel.frame());
-        optDiag.setVisible(true);
-        if (optDiag.canceled()) {
+        dialog.setLocationRelativeTo(panel.frame());
+        dialog.setVisible(true);
+        if (dialog.canceled()) {
             goOn = false;
             return;
         }
-        autoSet = !optDiag.isAutoSetNone();
-        checkExisting = optDiag.isCheckLinks();
+        autoSet = !dialog.isAutoSetNone();
+        checkExisting = dialog.isCheckLinks();
 
         panel.output(Localization.lang("Synchronizing file links..."));
     }
@@ -108,7 +105,7 @@ public class SynchronizeFileField extends AbstractWorker {
         panel.frame().setProgressBarValue(0);
         panel.frame().setProgressBarVisible(true);
         int weightAutoSet = 10; // autoSet takes 10 (?) times longer than checkExisting
-        int progressBarMax = (autoSet ? weightAutoSet * sel.size() : 0) + (checkExisting ? sel.size() : 0);
+        int progressBarMax = (autoSet ? weightAutoSet * selectedEntries.size() : 0) + (checkExisting ? selectedEntries.size() : 0);
         panel.frame().setProgressBarMaximum(progressBarMax);
         int progress = 0;
         final NamedCompound ce = new NamedCompound(Localization.lang("Automatically set file links"));
@@ -117,18 +114,18 @@ public class SynchronizeFileField extends AbstractWorker {
 
         // First we try to autoset fields
         if (autoSet) {
-            List<BibEntry> entries = new ArrayList<>(sel);
+            List<BibEntry> entries = new ArrayList<>(selectedEntries);
 
             // Start the automatically setting process:
-            Runnable r = AutoSetLinks.autoSetLinks(entries, ce, changedEntries, panel.getBibDatabaseContext(), null, null);
-            JabRefExecutorService.INSTANCE.executeAndWait(r);
+            Runnable runnable = AutoSetLinks.autoSetLinks(entries, ce, changedEntries, panel.getBibDatabaseContext(), null, null);
+            JabRefExecutorService.INSTANCE.executeAndWait(runnable);
         }
-        progress += sel.size() * weightAutoSet;
+        progress += selectedEntries.size() * weightAutoSet;
         panel.frame().setProgressBarValue(progress);
         // The following loop checks all external links that are already set.
         if (checkExisting) {
             boolean removeAllBroken = false;
-            mainLoop: for (BibEntry aSel : sel) {
+            mainLoop: for (BibEntry aSel : selectedEntries) {
                 panel.frame().setProgressBarValue(progress++);
                 final Optional<String> old = aSel.getField(FieldName.FILE);
                 // Check if a extension is set:

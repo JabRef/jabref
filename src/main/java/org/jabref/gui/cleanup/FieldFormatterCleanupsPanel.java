@@ -139,7 +139,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         resetButton = new JButton(Localization.lang("Reset"));
         resetButton.addActionListener(e -> ((CleanupActionsListModel) actionsList.getModel()).reset(defaultFormatters));
 
-        BibDatabaseContext databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabaseContext();
+        BibDatabaseContext databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext();
 
         recommendButton = new JButton(Localization.lang("Recommended for %0", databaseContext.getMode().getFormattedName()));
         boolean isBiblatex = databaseContext.isBiblatexMode();
