@@ -33,6 +33,10 @@ public class BibtexSingleField {
      */
     private Set<FieldProperty> properties = EnumSet.noneOf(FieldProperty.class);
 
+    public BibtexSingleField(String fieldName) {
+        this(fieldName, true, DEFAULT_FIELD_LENGTH);
+    }
+
     public BibtexSingleField(String fieldName, boolean standardField) {
         this(fieldName, standardField, DEFAULT_FIELD_LENGTH);
     }
@@ -127,5 +131,4 @@ public class BibtexSingleField {
     public void setName(String fieldName) {
         name = fieldName;
     }
-
 }
