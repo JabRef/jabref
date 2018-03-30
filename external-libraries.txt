@@ -50,6 +50,11 @@ Project: latex2unicode
 URL:     https://github.com/tomtung/latex2unicode
 License: Apache 2.0
 
+Id:      com.google.guava
+Project: Google Guava
+URL:
+License:
+
 Id:      com.impossibl.pgjdbc-ng:pgjdbc-ng
 Project: pgjdbc-ng
 URL:     http://impossibl.github.io/pgjdbc-ng
@@ -83,11 +88,6 @@ License: MIT
 Id:      commons-cli:commons-cli
 Project: Apache Commons CLI
 URL:     http://commons.apache.org/cli/
-License: Apache-2.0
-
-Id:      commons-logging:commons-logging
-Project: Apache Commons Logging
-URL:     http://commons.apache.org/logging/
 License: Apache-2.0
 
 Id:      de.codecentric.centerdevice
@@ -134,11 +134,6 @@ Id:      org.antlr:antlr4
 Project: ANTLR 4
 URL:     http://www.antlr.org/
 License: BSD
-
-Id:      org.apache.commons:commons-lang3
-Project: Apache Commons Lang
-URL:     https://commons.apache.org/proper/commons-lang/
-License: Apache-2.0
 
 Id:      org.apache.logging.log4j
 Project: Apache Log2j 2
@@ -200,22 +195,22 @@ Project: jsoup
 URL:     https://github.com/jhy/jsoup/
 License: MIT
 
-Id:      org.openoffice:juh
+Id:      org.libreoffice:juh
 Project: OpenOffice.org
 URL:     http://www.openoffice.org/api/SDK
 License: LGPL 3.0
 
-Id:      org.openoffice:jurt
+Id:      org.libreoffice:jurt
+Project: LibreOffice.org
+URL:     http://www.openoffice.org/api/SDK
+License: Apache-2.0
+
+Id:      org.libreoffice:ridl
 Project: OpenOffice.org
 URL:     http://www.openoffice.org/api/SDK
 License: Apache-2.0
 
-Id:      org.openoffice:ridl
-Project: OpenOffice.org
-URL:     http://www.openoffice.org/api/SDK
-License: Apache-2.0
-
-Id:      org.openoffice:unoil
+Id:      org.libreoffice:unoil
 Project: OpenOffice.org
 URL:     http://www.openoffice.org/api/SDK
 License: Apache-2.0

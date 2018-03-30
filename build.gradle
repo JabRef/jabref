@@ -18,14 +18,14 @@ buildscript {
 }
 
 plugins {
+    id "com.simonharrer.modernizer" version '1.5.0-1'
+    id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
+    id 'com.github.ben-manes.versions' version '0.17.0'
+    id 'com.github.johnrengelman.shadow' version '2.0.2'
     id 'com.gradle.build-scan' version '1.11'
     id 'com.install4j.gradle' version '7.0.3'
-    id 'com.github.johnrengelman.shadow' version '2.0.2'
-    id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
-    id "com.simonharrer.modernizer" version '1.5.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.3'
     id 'net.ltgt.errorprone' version '0.0.13'
-    id 'com.github.ben-manes.versions' version '0.17.0'
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
@@ -34,14 +34,14 @@ buildScan {
     licenseAgree = 'yes'
 }
 
-apply plugin: 'java'
 apply plugin: 'application'
-apply plugin: 'project-report'
-apply plugin: 'jacoco'
-apply plugin: 'install4j'
-apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'checkstyle'
+apply plugin: 'install4j'
+apply plugin: 'jacoco'
+apply plugin: 'java'
+apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'org.junit.platform.gradle.plugin'
+apply plugin: 'project-report'
 
 apply from: 'eclipse.gradle'
 apply from: 'localization.gradle'
@@ -85,91 +85,75 @@ configurations {
 }
 
 dependencies {
+    // legacy dependencies [apple, customjfx, spin]
     compile fileTree(dir: 'lib', includes: ['*.jar'])
 
+    antlr3 'org.antlr:antlr:3.5.2'
+    antlr4 'org.antlr:antlr4:4.7.1'
+    compile 'org.antlr:antlr-runtime:3.5.2'
+    compile 'org.antlr:antlr4-runtime:4.7.1'
+    
+    compile 'com.github.bkromhout:java-diff-utils:2.1.1'
+    compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
+    compile 'com.google.guava:guava:24.1-jre'
+    compile 'com.impossibl.pgjdbc-ng:pgjdbc-ng:0.7.1' // postgres jdbc
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
-
-    compile 'org.apache.pdfbox:pdfbox:2.0.8'
-    compile 'org.apache.pdfbox:fontbox:2.0.8'
-    compile 'org.apache.pdfbox:xmpbox:2.0.8'
-
-    // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    compile 'org.bouncycastle:bcprov-jdk15on:1.59'
-
+    compile 'com.mashape.unirest:unirest-java:1.4.9'
+    compile 'com.microsoft.azure:applicationinsights-core:2.0.1'
+    compile 'com.microsoft.azure:applicationinsights-logging-log4j2:2.0.1'
     compile 'commons-cli:commons-cli:1.4'
-
-    compile "org.libreoffice:juh:5.4.2"
-    compile "org.libreoffice:jurt:5.4.2"
-    compile "org.libreoffice:ridl:5.4.2"
-    compile "org.libreoffice:unoil:5.4.2"
-
-    compile 'com.github.bkromhout:java-diff-utils:2.1.1'
     compile 'info.debatty:java-string-similarity:1.1.0'
-
-    antlr3 'org.antlr:antlr:3.5.2'
-    compile 'org.antlr:antlr-runtime:3.5.2'
-
-    antlr4 'org.antlr:antlr4:4.7.1'
-    compile 'org.antlr:antlr4-runtime:4.7.1'
-
-    // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
     compile 'mysql:mysql-connector-java:5.1.46'
-
-    compile 'com.impossibl.pgjdbc-ng:pgjdbc-ng:0.7.1'
-
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
+    compile 'org.apache.pdfbox:fontbox:2.0.8'
+    compile 'org.apache.pdfbox:pdfbox:2.0.8'
+    compile 'org.apache.pdfbox:xmpbox:2.0.8'
+    compile 'org.bouncycastle:bcprov-jdk15on:1.59' // write-protected pdfs
+    compile 'org.jsoup:jsoup:1.11.2'
+    compile 'org.libreoffice:juh:5.4.2'
+    compile 'org.libreoffice:jurt:5.4.2'
+    compile 'org.libreoffice:ridl:5.4.2'
+    compile 'org.libreoffice:unoil:5.4.2'
 
-    compile 'com.google.guava:guava:24.1-jre'
-
-    // JavaFX stuff
+    // JavaFX
     compile 'com.airhacks:afterburner.fx:1.7.0'
     compile 'de.codecentric.centerdevice:javafxsvg:1.3.0'
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
     compile 'de.saxsys:mvvmfx-validation:1.7.0'
+    compile 'org.controlsfx:controlsfx:8.40.15-SNAPSHOT' // Cannot be updated to 9.*.* until Jabref works with Java 9
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.6'
     compile 'org.fxmisc.richtext:richtextfx:0.8.2'
 
-    // Cannot be updated to 9.*.* until Jabref works with Java 9
-    compile 'org.controlsfx:controlsfx:8.40.15-SNAPSHOT'
-
-    compile 'org.jsoup:jsoup:1.11.2'
-    compile 'com.mashape.unirest:unirest-java:1.4.9'
-
-    // >1.8.0-beta is required for java 9 compatibility
-    compile 'org.slf4j:slf4j-api:1.8.0-beta2'
-    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.0'
-    compile 'org.apache.logging.log4j:log4j-jcl:2.11.0'
+    // logging
     compile 'org.apache.logging.log4j:log4j-api:2.11.0'
     compile 'org.apache.logging.log4j:log4j-core:2.11.0'
+    compile 'org.apache.logging.log4j:log4j-jcl:2.11.0'
+    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.0'
+    compile 'org.slf4j:slf4j-api:1.8.0-beta2'
 
     // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
     compile 'org.citationstyles:locales:1.0.1-SNAPSHOT'
     compile 'de.undercouch:citeproc-java:1.0.1'
 
-    compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
-
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.0.1'
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.0.1'
-
+    testCompile "org.testfx:testfx-core:4.0.+"
+    testCompile "org.testfx:testfx-junit:4.0.+"
+    testCompile 'com.github.tomakehurst:wiremock:2.15.0'
+    testCompile 'com.tngtech.archunit:archunit-junit:0.5.0'
+    testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.0'
     testCompile 'org.junit.jupiter:junit-jupiter-params:5.1.0'
-    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
-    testRuntime 'org.junit.vintage:junit-vintage-engine:5.1.0'
     testCompile 'org.junit.platform:junit-platform-launcher:1.1.0'
-    testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
-    testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
     testCompile 'org.mockito:mockito-core:2.16.0'
-    testCompile 'com.github.tomakehurst:wiremock:2.15.0'
-    testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.5.1'
     testCompile 'org.xmlunit:xmlunit-matchers:2.5.1'
-    testCompile 'com.tngtech.archunit:archunit-junit:0.5.0'
-    testCompile "org.testfx:testfx-core:4.0.+"
-    testCompile "org.testfx:testfx-junit:4.0.+"
+    testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
+    testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
+    testRuntime 'org.junit.vintage:junit-vintage-engine:5.1.0'
 
     checkstyle 'com.puppycrawl.tools:checkstyle:8.8'
 }
