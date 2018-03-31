@@ -6,40 +6,54 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
-import org.jabref.logic.remote.client.RemoteListenerClient;
+import org.jabref.logic.remote.client.RemoteClient;
+import org.jabref.logic.remote.server.MessageHandler;
 import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import org.jabref.logic.util.OS;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
-public class RemoteTest {
+/**
+ * Tests where the remote client and server setup is wrong.
+ */
+class RemoteSetupTest {
+
+    MessageHandler messageHandler;
+
+    @BeforeEach
+    void setUp() {
+        messageHandler = mock(MessageHandler.class);
+    }
 
     @Test
-    public void testGoodCase() {
+    void testGoodCase() {
         final int port = 34567;
-        final String message = "MYMESSAGE";
-
+        final String[] message = new String[]{"MYMESSAGE"};
 
         try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
             assertFalse(server.isOpen());
-            server.openAndStart(msg -> assertEquals(message, msg), port);
+            server.openAndStart(messageHandler, port);
             assertTrue(server.isOpen());
-            assertTrue(RemoteListenerClient.sendToActiveJabRefInstance(new String[]{message}, port));
+            assertTrue(new RemoteClient(port).sendCommandLineArguments(message));
+            verify(messageHandler).handleCommandLineArguments(message);
             server.stop();
             assertFalse(server.isOpen());
         }
     }
 
     @Test
-    public void testGoodCaseWithAllLifecycleMethods() {
+    void testGoodCaseWithAllLifecycleMethods() {
         final int port = 34567;
-        final String message = "MYMESSAGE";
+        final String[] message = new String[]{"MYMESSAGE"};
 
         try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
             assertFalse(server.isOpen());
@@ -47,14 +61,15 @@ public class RemoteTest {
             server.stop();
             assertFalse(server.isOpen());
             assertTrue(server.isNotStartedBefore());
-            server.open(msg -> assertEquals(message, msg), port);
+            server.open(messageHandler, port);
             assertTrue(server.isOpen());
             assertTrue(server.isNotStartedBefore());
             server.start();
             assertTrue(server.isOpen());
             assertFalse(server.isNotStartedBefore());
 
-            assertTrue(RemoteListenerClient.sendToActiveJabRefInstance(new String[]{message}, port));
+            assertTrue(new RemoteClient(port).sendCommandLineArguments(message));
+            verify(messageHandler).handleCommandLineArguments(message);
             server.stop();
             assertFalse(server.isOpen());
             assertTrue(server.isNotStartedBefore());
@@ -62,7 +77,7 @@ public class RemoteTest {
     }
 
     @Test
-    public void testPortAlreadyInUse() throws IOException {
+    void testPortAlreadyInUse() throws IOException {
         assumeFalse(OS.OS_X);
 
         final int port = 34567;
@@ -72,41 +87,44 @@ public class RemoteTest {
 
             try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
                 assertFalse(server.isOpen());
-                server.openAndStart(msg -> fail("should not happen"), port);
+                server.openAndStart(messageHandler, port);
                 assertFalse(server.isOpen());
-            } catch (Exception e) {
-                fail("Exception: " + e.getMessage());
+                verify(messageHandler, never()).handleCommandLineArguments(any());
             }
         }
     }
 
     @Test
-    public void testClientTimeout() {
+    void testClientTimeout() {
         final int port = 34567;
         final String message = "MYMESSAGE";
 
-        assertFalse(RemoteListenerClient.sendToActiveJabRefInstance(new String[]{message}, port));
+        assertFalse(new RemoteClient(port).sendCommandLineArguments(new String[]{message}));
     }
 
     @Test
-    public void testClientConnectingToWrongServer() throws IOException, InterruptedException {
+    void pingReturnsFalseForWrongServerListening() throws IOException, InterruptedException {
         final int port = 34567;
-        final String message = "MYMESSAGE";
 
         try (ServerSocket socket = new ServerSocket(port)) {
-            new Thread() {
-
-                @Override
-                public void run() {
-                    try (Socket socket2 = socket.accept(); OutputStream os = socket2.getOutputStream()) {
-                        os.write("whatever".getBytes(StandardCharsets.UTF_8));
-                    } catch (IOException e) {
-                        // Ignored
-                    }
+            // Setup dummy server always answering "whatever"
+            new Thread(() -> {
+                try (Socket message = socket.accept(); OutputStream os = message.getOutputStream()) {
+                    os.write("whatever".getBytes(StandardCharsets.UTF_8));
+                } catch (IOException e) {
+                    // Ignored
                 }
-            }.start();
+            }).start();
             Thread.sleep(100);
-            assertFalse(RemoteListenerClient.sendToActiveJabRefInstance(new String[]{message}, port));
+
+            assertFalse(new RemoteClient(port).ping());
         }
+    }
+
+    @Test
+    void pingReturnsFalseForNoServerListening() throws IOException, InterruptedException {
+        final int port = 34567;
+
+        assertFalse(new RemoteClient(port).ping());
     }
 }

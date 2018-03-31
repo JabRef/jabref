@@ -20,7 +20,7 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
-import org.jabref.logic.remote.client.RemoteListenerClient;
+import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.JavaVersion;
 import org.jabref.logic.util.OS;
@@ -152,7 +152,7 @@ public class JabRefMain extends Application {
 
             if (!Globals.REMOTE_LISTENER.isOpen()) {
                 // we are not alone, there is already a server out there, try to contact already running JabRef:
-                if (RemoteListenerClient.sendToActiveJabRefInstance(args, remotePreferences.getPort())) {
+                if (new RemoteClient(remotePreferences.getPort()).sendCommandLineArguments(args)) {
                     // We have successfully sent our command line options through the socket to another JabRef instance.
                     // So we assume it's all taken care of, and quit.
                     LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
