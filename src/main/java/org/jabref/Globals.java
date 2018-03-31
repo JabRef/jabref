@@ -2,9 +2,6 @@ package org.jabref;
 
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,8 +24,6 @@ import com.google.common.base.StandardSystemProperty;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryConfiguration;
 import com.microsoft.applicationinsights.telemetry.SessionState;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Globals {
 
@@ -56,7 +51,6 @@ public class Globals {
      */
     public static StateManager stateManager = new StateManager();
     public static ExporterFactory exportFactory;
-    private static final Logger LOGGER = LoggerFactory.getLogger(Globals.class);
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
     // Background tasks
@@ -96,13 +90,6 @@ public class Globals {
     }
 
     private static void startTelemetryClient() {
-
-        // Ugly workaround: while reading the configuration file, Application Insights directly writes to System.err
-        // In order to suppress this output, we temporarily redirect System.err to a output stream
-        PrintStream oldErr = System.err;
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        System.setErr(new PrintStream(outputStream));
-
         TelemetryConfiguration telemetryConfiguration = TelemetryConfiguration.getActive();
         telemetryConfiguration.setInstrumentationKey(Globals.BUILD_INFO.getAzureInstrumentationKey());
         telemetryConfiguration.setTrackingIsDisabled(!Globals.prefs.shouldCollectTelemetry());
@@ -117,11 +104,6 @@ public class Globals {
                 Toolkit.getDefaultToolkit().getScreenSize().toString());
 
         telemetryClient.trackSessionState(SessionState.Start);
-
-        // Second part of the workaround: reset System.err and log initialization message from Application Insights
-        System.setErr(oldErr);
-        String log = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
-        LOGGER.debug(log);
     }
 
     public static GlobalFocusListener getFocusListener() {
