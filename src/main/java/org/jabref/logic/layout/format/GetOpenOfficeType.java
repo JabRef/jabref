@@ -4,10 +4,6 @@ import org.jabref.logic.layout.LayoutFormatter;
 
 /**
  * Change type of record to match the one used by OpenOffice formatter.
- *
- * Based on the RemoveBrackets.java class (Revision 1.2) by mortenalver
- * @author $author$
- * @version $Revision$
  */
 public class GetOpenOfficeType implements LayoutFormatter {
 

@@ -22,12 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test for OAI2-Handler and Fetcher.
- *
- * @author Ulrich St&auml;rk
- * @author Christian Kopf
- * @author Christopher Oezbek
  */
-
 @FetcherTest
 public class OAI2HandlerFetcherTest {
 

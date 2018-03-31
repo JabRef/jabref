@@ -11,8 +11,6 @@ import org.jabref.logic.layout.LayoutFormatter;
  * <p>If a fieldText is given, it must be a valid {@link DateTimeFormatter} pattern.
  * If none is given, the format pattern will be <code>yyyy-MM-dd hh:mm:ss z</code>.
  * This follows ISO-8601. Reason: <a href="https://xkcd.com/1179/">https://xkcd.com/1179/</a>.</p>
- *
- * @author andreas_sf at rudert-home dot de
  */
 public class CurrentDate implements LayoutFormatter {
 
@@ -20,10 +18,6 @@ public class CurrentDate implements LayoutFormatter {
     private static final String DEFAULT_FORMAT = "yyyy-MM-dd hh:mm:ss z";
 
 
-    /*
-     *  (non-Javadoc)
-     * @see org.jabref.export.layout.LayoutFormatter#format(java.lang.String)
-     */
     @Override
     public String format(String fieldText) {
         String format = CurrentDate.DEFAULT_FORMAT;
