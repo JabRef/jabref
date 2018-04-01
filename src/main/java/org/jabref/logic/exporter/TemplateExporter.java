@@ -148,7 +148,6 @@ public class TemplateExporter extends Exporter {
      * This method should return a reader from which the given layout file can
      * be read.
      * <p>
-     * <p>
      * Subclasses of TemplateExporter are free to override and provide their own
      * implementation.
      *
