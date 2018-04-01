@@ -178,7 +178,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         frame.block();
 
         try {
-            SavePreferences prefs = JabRefPreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(encoding);
+            SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences().withEncoding(encoding);
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
 
             if (selectedOnly) {

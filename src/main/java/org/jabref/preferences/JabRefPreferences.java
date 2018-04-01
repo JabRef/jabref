@@ -1427,45 +1427,45 @@ public class JabRefPreferences implements PreferencesService {
                 isKeywordSyncEnabled());
     }
 
-    public static SavePreferences loadForExportFromPreferences(JabRefPreferences preferences) {
-        Boolean saveInOriginalOrder = preferences.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
+    public SavePreferences loadForExportFromPreferences() {
+        Boolean saveInOriginalOrder = this.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
         SaveOrderConfig saveOrder = null;
         if (!saveInOriginalOrder) {
-            if (preferences.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
-                saveOrder = preferences.loadExportSaveOrder();
+            if (this.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
+                saveOrder = this.loadExportSaveOrder();
             } else {
-                saveOrder = preferences.loadTableSaveOrder();
+                saveOrder = this.loadTableSaveOrder();
             }
         }
-        Charset encoding = preferences.getDefaultEncoding();
-        Boolean makeBackup = preferences.getBoolean(JabRefPreferences.BACKUP);
+        Charset encoding = this.getDefaultEncoding();
+        Boolean makeBackup = this.getBoolean(JabRefPreferences.BACKUP);
         SavePreferences.DatabaseSaveType saveType = SavePreferences.DatabaseSaveType.ALL;
         Boolean takeMetadataSaveOrderInAccount = false;
-        Boolean reformatFile = preferences.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
-        LatexFieldFormatterPreferences latexFieldFormatterPreferences = preferences.getLatexFieldFormatterPreferences();
-        GlobalBibtexKeyPattern globalCiteKeyPattern =  preferences.getKeyPattern();
+        Boolean reformatFile = this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
+        LatexFieldFormatterPreferences latexFieldFormatterPreferences = this.getLatexFieldFormatterPreferences();
+        GlobalBibtexKeyPattern globalCiteKeyPattern =  this.getKeyPattern();
         return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
                 takeMetadataSaveOrderInAccount, reformatFile, latexFieldFormatterPreferences, globalCiteKeyPattern);
     }
 
-    public static SavePreferences loadForSaveFromPreferences(JabRefPreferences preferences) {
+    public SavePreferences loadForSaveFromPreferences() {
         Boolean saveInOriginalOrder = false;
         SaveOrderConfig saveOrder = null;
-        Charset encoding = preferences.getDefaultEncoding();
-        Boolean makeBackup = preferences.getBoolean(JabRefPreferences.BACKUP);
+        Charset encoding = this.getDefaultEncoding();
+        Boolean makeBackup = this.getBoolean(JabRefPreferences.BACKUP);
         SavePreferences.DatabaseSaveType saveType = SavePreferences.DatabaseSaveType.ALL;
         Boolean takeMetadataSaveOrderInAccount = true;
-        Boolean reformatFile = preferences.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
-        LatexFieldFormatterPreferences latexFieldFormatterPreferences = preferences.getLatexFieldFormatterPreferences();
-        GlobalBibtexKeyPattern globalCiteKeyPattern =  preferences.getKeyPattern();
+        Boolean reformatFile = this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
+        LatexFieldFormatterPreferences latexFieldFormatterPreferences = this.getLatexFieldFormatterPreferences();
+        GlobalBibtexKeyPattern globalCiteKeyPattern =  this.getKeyPattern();
         return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
                 takeMetadataSaveOrderInAccount, reformatFile, latexFieldFormatterPreferences, globalCiteKeyPattern);
     }
 
-    public static ExporterFactory getExporterFactory(JabRefPreferences preferences, JournalAbbreviationLoader abbreviationLoader) {
-        Map<String, TemplateExporter> customFormats = preferences.customExports.getCustomExportFormats(preferences, abbreviationLoader);
-        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(abbreviationLoader);
-        SavePreferences savePreferences = JabRefPreferences.loadForExportFromPreferences(preferences);
+    public ExporterFactory getExporterFactory(JournalAbbreviationLoader abbreviationLoader) {
+        Map<String, TemplateExporter> customFormats = this.customExports.getCustomExportFormats(this, abbreviationLoader);
+        LayoutFormatterPreferences layoutPreferences = this.getLayoutFormatterPreferences(abbreviationLoader);
+        SavePreferences savePreferences = this.loadForExportFromPreferences();
         return ExporterFactory.create(customFormats, layoutPreferences, savePreferences);
     }
 

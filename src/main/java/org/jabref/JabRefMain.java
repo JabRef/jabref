@@ -145,7 +145,7 @@ public class JabRefMain extends Application {
                 Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
         EntryTypes.loadCustomEntryTypes(preferences.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
-        Globals.exportFactory = JabRefPreferences.getExporterFactory(Globals.prefs, Globals.journalAbbreviationLoader);
+        Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());

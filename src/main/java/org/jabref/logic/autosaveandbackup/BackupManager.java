@@ -119,7 +119,7 @@ public class BackupManager {
     private void performBackup(Path backupPath) {
         try {
             Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(preferences.getDefaultEncoding());
-            SavePreferences savePreferences = JabRefPreferences.loadForSaveFromPreferences(preferences).withEncoding
+            SavePreferences savePreferences = preferences.loadForSaveFromPreferences().withEncoding
                     (charset).withMakeBackup(false);
             new BibtexDatabaseWriter<>(FileSaveSession::new).saveDatabase(bibDatabaseContext, savePreferences).commit
                     (backupPath);

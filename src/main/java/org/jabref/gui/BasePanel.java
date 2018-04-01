@@ -1092,7 +1092,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         frame.block();
         final String SAVE_DATABASE = Localization.lang("Save library");
         try {
-            SavePreferences prefs = JabRefPreferences.loadForSaveFromPreferences(Globals.prefs)
+            SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences()
                     .withEncoding(enc)
                     .withSaveType(saveType);
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(

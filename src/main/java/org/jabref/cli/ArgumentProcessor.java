@@ -364,7 +364,7 @@ public class ArgumentProcessor {
 
                 try {
                     System.out.println(Localization.lang("Saving") + ": " + subName);
-                    SavePreferences prefs = JabRefPreferences.loadForSaveFromPreferences(Globals.prefs);
+                    SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences();
                     BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
                     Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
                     SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults), prefs);
@@ -403,7 +403,7 @@ public class ArgumentProcessor {
                 if (!pr.isInvalid()) {
                     try {
                         System.out.println(Localization.lang("Saving") + ": " + data[0]);
-                        SavePreferences prefs = JabRefPreferences.loadForSaveFromPreferences(Globals.prefs);
+                        SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences();
                         Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
                         BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
                                 FileSaveSession::new);
@@ -471,7 +471,7 @@ public class ArgumentProcessor {
                     Globals.journalAbbreviationLoader);
             LayoutFormatterPreferences layoutPreferences = Globals.prefs
                     .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
-            SavePreferences savePreferences = JabRefPreferences.loadForExportFromPreferences(Globals.prefs);
+            SavePreferences savePreferences = Globals.prefs.loadForExportFromPreferences();
             Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences);
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);

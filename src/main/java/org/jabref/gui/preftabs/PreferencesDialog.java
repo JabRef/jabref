@@ -34,7 +34,6 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.FileType;
-import org.jabref.preferences.ExporterFactoryFactory;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.JabRefPreferencesFilter;
 
@@ -225,7 +224,7 @@ public class PreferencesDialog extends JabRefDialog {
     private void updateAfterPreferenceChanges() {
         setValues();
 
-        Globals.exportFactory = JabRefPreferences.getExporterFactory(Globals.prefs, Globals.journalAbbreviationLoader);
+        Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
 
         Globals.prefs.updateEntryEditorTabList();
     }
