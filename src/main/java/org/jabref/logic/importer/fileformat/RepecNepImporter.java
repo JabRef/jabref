@@ -135,9 +135,6 @@ import org.slf4j.LoggerFactory;
  *       '\n-----------------------------'
  * </pre>
  * </p>
- *
- * @author andreas_sf at rudert-home dot de
- * @see <a href="http://nep.repec.org">NEP</a>
  */
 public class RepecNepImporter extends Importer {
 

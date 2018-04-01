@@ -23,10 +23,6 @@ import org.jabref.model.entry.FieldName;
  * other hand it provides the functionality to create a Bibtex entry out of a
  * file. The interface extends the java.io.FileFilter to inherit a common way of
  * defining file sets.
- *
- * @author Dan&Nosh
- * @version 25.11.2008 | 23:39:03
- *
  */
 public abstract class EntryFromFileCreator implements FileFilter {
 

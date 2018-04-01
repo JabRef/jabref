@@ -20,8 +20,6 @@ import org.jabref.gui.icon.JabRefIcon;
 
 /**
  * Extends the JTabbedPane class to support Drag&Drop of Tabs.
- *
- * @author kleinms, strassfn
  */
 class DragDropPane extends JTabbedPane {
 
