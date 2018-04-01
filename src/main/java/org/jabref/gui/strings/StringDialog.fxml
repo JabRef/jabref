@@ -9,7 +9,7 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 
-<DialogPane xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.strings.StringDialogController">
+<DialogPane xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.strings.StringDialogView">
    <header>
       <ToolBar maxWidth="1.7976931348623157E308" prefHeight="40.0" prefWidth="299.0">
         <items>
@@ -33,14 +33,6 @@
                </columnResizePolicy>
             </TableView>
          </center>
-         <bottom>
-            <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-              <buttons>
-                  <Button fx:id="btnCancel" cancelButton="true" mnemonicParsing="false" text="Cancel" />
-                <Button fx:id="btnSave" defaultButton="true" mnemonicParsing="false" onAction="#save" text="Save" />
-              </buttons>
-            </ButtonBar>
-         </bottom>
       </BorderPane>
    </content>
 </DialogPane>

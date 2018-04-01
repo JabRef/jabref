@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.StateManager;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibtexString;
@@ -20,10 +19,9 @@ public class StringDialogViewModel extends AbstractViewModel {
 
     private final BibDatabase db;
 
-    public StringDialogViewModel(StateManager stateManager) {
-        this.db = stateManager.getActiveDatabase().get().getDatabase();
+    public StringDialogViewModel(BibDatabase bibDatabase) {
+        this.db = bibDatabase;
         addAllStringsFromDB();
-
     }
 
     private void addAllStringsFromDB() {
