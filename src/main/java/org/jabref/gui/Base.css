@@ -8,12 +8,12 @@
 
     /* This theme is the original JabRef dark blue color */
     -jr-theme: #50618F;
-    -jr-hover-color: #CBDFEC;
-    -jr-select-color: #c4cce2;
-    -jr-accent: -jr-theme;
+    -jr-accent: #a3b7e6;
+    -jr-selected: -jr-accent;
+    -jr-hover: #0002;
 
     /* The base gray. Most gray-tones in the application are derived from this color. */
-    -jr-base: #f0f0f0;
+    -jr-base: #ebebeb;
 
     -jr-white: #ffffff;
     -jr-gray-0: #f0f0f0;
@@ -44,21 +44,24 @@
     -jr-background-alt: -fx-background;
     -jr-text-area-background: derive(-jr-base, 80%);
     -jr-search-background: -jr-text-area-background;
-    -jr-toolbar: #c4cce2;
-    -jr-menu-background: #c4cce2;
+    -jr-toolbar: derive(-jr-base, 46.4%);
+    -jr-menu-background: -fx-background;
+    -jr-menu-background-active: -jr-hover;
 
     -jr-menu-foreground: -fx-dark-text-color;
     -jr-menu-item-foreground: -fx-dark-text-color;
     -jr-menu-forground-active: -fx-dark-text-color;
 
-    -jr-hover: -jr-hover-color;
-    -jr-selected: -jr-select-color;
     -jr-drag-target: -fx-accent;
 
     -jr-head-fg: -fx-text-inner-color;
 
     /* All icons on toolbars or next to inputs */
     -jr-icon: -jr-theme;
+    -jr-icon-active: derive(-jr-theme, -20%);
+    -jr-icon-background: transparent;
+    -jr-icon-background-active: #0001;
+    -jr-icon-background-armed: #0002;
 
     /* Colors for messages and errors */
     -jr-info: -jr-light-green;
@@ -66,7 +69,7 @@
     -jr-error: -jr-light-red;
 
     /* Color for the small group view indicator for the number of hits */
-    -jr-group-hits-bg: -jr-gray-0;
+    -jr-group-hits-bg: derive(-jr-sidepane-background, -5%);
     -jr-group-hits-fg: ladder(
             -jr-group-hits-bg,
             -fx-light-text-color 45%,
@@ -76,12 +79,12 @@
     );
 
     /* Specific color for general tooltips */
-    -jr-tooltip-bg: #CBDFEC;
+    -jr-tooltip-bg: -jr-accent;
     -jr-tooltip-fg: -jr-black;
 
     /* Finally, some specific jr styles that depend on -fx definitions in *this* style */
-    -jr-sidepane-background: #eeeeee;
-    -jr-sidepane-header-background: -jr-sidepane-background;
+    -jr-sidepane-background: -jr-toolbar;
+    -jr-sidepane-header-background: -fx-background;
     -jr-sidepane-header-color: -jr-icon;
 
     /* Specs for the scrollbars */
@@ -108,7 +111,7 @@
      * -fx-text-fill value for text painted on top of backgrounds colored
      * with -fx-control-inner-background.
      */
-    -fx-control-inner-background: derive(-fx-base, 80%);
+    -fx-control-inner-background: derive(-fx-base, 95%);
     /* Version of -fx-control-inner-background for alternative rows */
     -fx-control-inner-background-alt: derive(-fx-control-inner-background, -2%);
 
@@ -209,7 +212,7 @@
 
     /* Background for items in list like things such as menus, lists, trees,
      * and tables. */
-    -fx-selection-bar: -jr-selected;
+    -fx-selection-bar: -jr-accent;
 
     /* Background color to use for selection of list cells etc. This is when
      * the control doesn't have focus or the row of a previously selected item. */
@@ -287,7 +290,7 @@
     -fx-outer-border: red;
     -fx-inner-border: purple;
     -fx-faint-focus-color: transparent;
-    -fx-background-color: transparent;
+    -fx-background-color: -jr-icon-background;
     -fx-text-background-color: blue;
     -fx-padding: 0.5em;
 }
@@ -302,24 +305,24 @@
 .flatButtonNoSpaceBottom:hover .glyph-icon,
 .flatButtonNoSpaceTop:hover .glyph-icon,
 .flatButton:hover .glyph-icon {
-    -fx-fill: -jr-accent;
-    -fx-text-fill: -jr-accent;
+    -fx-fill: -jr-icon-active;
+    -fx-text-fill: -jr-icon-active;
 }
 
 .flatButtonNoSpaceBottom:hover,
 .flatButtonNoSpaceTop:hover,
 .flatButton:hover {
-    -fx-background-color: -jr-hover;
+    -fx-background-color: -jr-icon-background-active;
 }
 
 .flatButtonNoSpaceBottom:armed,
 .flatButtonNoSpaceTop:armed,
 .flatButton:armed {
-    -fx-background-color: -jr-selected;
+    -fx-background-color: -jr-icon-background-armed;
 }
 
 .flatButton:selected {
-    -fx-background-color: -fx-active-background;
+    -fx-background-color: -jr-icon-background-active;
     -fx-text-fill: white;
     -fx-fill: white;
 }
@@ -394,6 +397,10 @@
     -fx-background-color: -jr-icon;
 }
 
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-close-button:hover {
+    -fx-background-color: -jr-icon-active;
+}
+
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
     -fx-text-fill: -fx-mid-text-color;
     -fx-fill: -fx-mid-text-color;
@@ -464,8 +471,8 @@
 .tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell:filled:selected,
 .table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:selected,
 .tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell .tree-table-cell:selected {
-    -fx-background: -fx-selection-bar;
-    -fx-background-color: -fx-selection-bar;
+    -fx-background: -jr-selected;
+    -fx-background-color: -jr-selected;
     -fx-table-cell-border-color: transparent;
 }
 
@@ -476,8 +483,8 @@
 .tree-table-row-cell:filled:selected,
 .table-row-cell:filled > .table-cell:selected,
 .tree-table-row-cell:filled > .tree-table-cell:selected {
-    -fx-background: -fx-selection-bar;
-    -fx-background-color: -fx-selection-bar;
+    -fx-background: -jr-selected;
+    -fx-background-color: -jr-selected;
     -fx-table-cell-border-color: transparent;
     -fx-fill: white;
     -fx-text-fill: green;
@@ -519,6 +526,7 @@
 
 .text-area > .scroll-pane > .corner {
     -fx-background-radius: 0 0 0 0;
+    -fx-background-color: -fx-background;
 }
 
 .combo-box-base:editable > .text-field,
@@ -632,7 +640,8 @@
 .menu-bar > .container > .menu-button:hover,
 .menu-bar > .container > .menu-button:focused,
 .menu-bar > .container > .menu-button:showing {
-    -fx-background-color: -jr-selected;
+    -fx-background-color: -jr-menu-background-active;
+    -fx-background: -jr-menu-background-active;
 }
 
 .menu-bar > .container > .menu-button:hover > .label,
@@ -650,7 +659,9 @@
 }
 
 .menu-item:focused {
-    -fx-text-fill: -jr-menu-forground-active;
+    -fx-text-fill: -jr-menu-background-active;
+    -fx-background: -jr-menu-background-active;
+    -fx-background-color: -jr-menu-background-active;
 }
 
 .menu-item:focused > .label {
@@ -701,6 +712,9 @@
 
 .mainToolbar .search-field {
     -fx-background-color: -jr-search-background;
+    -fx-border-width: 1;
+    -fx-border-color: -jr-separator;
+    -fx-border-radius: 2;
 }
 
 /* The little arrow that shows up when not all tool-bar icons fit into the tool-bar.
@@ -762,6 +776,13 @@ We want to have a look that matches our icons in the tool-bar */
 .mainToolbar .context-menu .glyph-icon {
     -fx-fill: -jr-icon;
 }
+
+.mainToolbar .context-menu .glyph-icon:hover {
+    -fx-fill: -jr-icon-active;
+    -fx-text-fill: -jr-icon-active;
+    -fx-background-color: -jr-icon-background-active; /* TODO: This has no effect */
+}
+
 
 /* This is awful, but I don't know a better way*/
 .mainToolbar .context-menu * {

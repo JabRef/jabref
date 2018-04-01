@@ -288,7 +288,7 @@ public class IconTheme {
         BLOG(MaterialDesignIcon.RSS), /* css: rss */
         GLOBAL_SEARCH(MaterialDesignIcon.EARTH), /* css: earth */
         DATE_PICKER(MaterialDesignIcon.CALENDAR), /* css: calendar */
-        DEFAULT_GROUP_ICON_COLORED(MaterialDesignIcon.CHECKBOX_BLANK_CIRCLE),
+        DEFAULT_GROUP_ICON_COLORED(MaterialDesignIcon.PLAY),
         DEFAULT_GROUP_ICON(MaterialDesignIcon.LABEL_OUTLINE),
         ALL_ENTRIES_GROUP_ICON(DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON),
         IMPORT_EXPORT(MaterialDesignIcon.SWAP_VERTICAL),

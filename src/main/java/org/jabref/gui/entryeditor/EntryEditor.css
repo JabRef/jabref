@@ -17,10 +17,6 @@
     -fx-text-origin: baseline;
 }
 
-.list-cell:odd {
-    /*-fx-background: text-area-background;*/
-}
-
 /* Selected rows */
 .list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
 .tree-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected,
@@ -60,7 +56,9 @@
     -fx-padding: 0.1em;
     -fx-font-size: 1.166667em;
     -fx-font-weight: bold;
-    -fx-text-fill: derive(-jr-icon, -30%);
+    -fx-text-fill: -jr-icon-active;
+    -fx-background-color: -jr-icon-background-active;
+
 }
 
 .flatButton.narrow {
@@ -83,12 +81,6 @@
 .tool-bar {
     -fx-background-color: -jr-background-alt;
     -fx-background-insets: 0;
-    /*-fx-border-color: -jr-gray-1;*/
-    /*-fx-border-width: 1 1 1 1;*/
-    /*-fx-border-radius: 2 2 2 2;*/
-    /*-fx-background-radius: 2 2 2 2;*/
-    /*-fx-text-fill: -jr-icon;*/
-    /*-fx-fill: -jr-icon;*/
 }
 
 

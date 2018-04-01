@@ -89,6 +89,7 @@
 }
 
 .tree-table-row-cell > .tree-table-cell > .tree-disclosure-node > .arrow {
+    -fx-background-color: -fx-mid-text-color;
     -fx-max-height: 0.5em;
     -fx-max-width: 0.5em;
     -fx-padding: 0.333333em 0.229em 0.333333em 0.229em; /* 4 */
@@ -104,7 +105,7 @@
 }
 
 #barBottom {
-    -fx-background-color: -jr-sidepane-background;
+    -fx-background-color: -jr-sidepane-header-background;
     -fx-border-color: -jr-separator;
     -fx-border-width: 1 0 0 0;
     -fx-padding: 0em 1em 0em 1em;
