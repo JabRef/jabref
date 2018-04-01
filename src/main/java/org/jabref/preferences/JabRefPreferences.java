@@ -49,7 +49,9 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.Cleanups;
+import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -1458,6 +1460,13 @@ public class JabRefPreferences implements PreferencesService {
         GlobalBibtexKeyPattern globalCiteKeyPattern =  preferences.getKeyPattern();
         return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
                 takeMetadataSaveOrderInAccount, reformatFile, latexFieldFormatterPreferences, globalCiteKeyPattern);
+    }
+
+    public static ExporterFactory getExporterFactory(JabRefPreferences preferences, JournalAbbreviationLoader abbreviationLoader) {
+        Map<String, TemplateExporter> customFormats = preferences.customExports.getCustomExportFormats(preferences, abbreviationLoader);
+        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(abbreviationLoader);
+        SavePreferences savePreferences = JabRefPreferences.loadForExportFromPreferences(preferences);
+        return ExporterFactory.create(customFormats, layoutPreferences, savePreferences);
     }
 
     public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {

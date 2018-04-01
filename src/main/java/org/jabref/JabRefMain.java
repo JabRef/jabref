@@ -12,8 +12,6 @@ import javafx.stage.Stage;
 
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.remote.JabRefMessageHandler;
-import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
-import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
@@ -29,7 +27,6 @@ import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.InternalBibtexFields;
-import org.jabref.preferences.ExporterFactoryFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -148,7 +145,7 @@ public class JabRefMain extends Application {
                 Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
         EntryTypes.loadCustomEntryTypes(preferences.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
-        Globals.exportFactory = ExporterFactoryFactory.create(Globals.prefs, Globals.journalAbbreviationLoader);
+        Globals.exportFactory = JabRefPreferences.getExporterFactory(Globals.prefs, Globals.journalAbbreviationLoader);
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());

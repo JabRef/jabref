@@ -225,7 +225,7 @@ public class PreferencesDialog extends JabRefDialog {
     private void updateAfterPreferenceChanges() {
         setValues();
 
-        Globals.exportFactory = ExporterFactoryFactory.create(Globals.prefs, Globals.journalAbbreviationLoader);
+        Globals.exportFactory = JabRefPreferences.getExporterFactory(Globals.prefs, Globals.journalAbbreviationLoader);
 
         Globals.prefs.updateEntryEditorTabList();
     }
