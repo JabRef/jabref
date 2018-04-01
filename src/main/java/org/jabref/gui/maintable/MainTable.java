@@ -60,14 +60,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final NewDroppedFileHandler fileHandler;
 
     public MainTable(MainTableDataModel model, JabRefFrame frame,
-            BasePanel panel, BibDatabaseContext database, MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
+                     BasePanel panel, BibDatabaseContext database,
+                     MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
         super();
 
         this.model = model;
         this.database = Objects.requireNonNull(database);
         this.undoManager = panel.getUndoManager();
 
-        fileHandler = new NewDroppedFileHandler(frame.getDialogService(), database, externalFileTypes, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern());
+        fileHandler = new NewDroppedFileHandler(frame.getDialogService(), database, externalFileTypes, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern(), Globals.prefs.getImportFormatPreferences());
 
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
@@ -269,6 +270,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         boolean success = false;
 
+        @SuppressWarnings("unchecked")
         TableRow<BibEntryTableViewModel> targetRow = (TableRow<BibEntryTableViewModel>) event.getGestureTarget();
 
         BibEntry entry = this.getItems().get(targetRow.getIndex()).getEntry();
@@ -290,6 +292,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
             }
             if (event.getTransferMode() == TransferMode.COPY) {
+                System.out.println("Mode Copy");
 
             }
         }
