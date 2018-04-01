@@ -61,13 +61,11 @@ import javax.swing.text.StyledDocument;
 import org.jabref.Globals;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.EntryMarker;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.OSXCompatibleToolbar;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.component.OverlayPanel;
@@ -176,7 +174,7 @@ public class TextInputDialog extends JabRefDialog {
         // Key bindings:
         ActionMap am = buttons.getActionMap();
         InputMap im = buttons.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         am.put("close", new AbstractAction() {
 
             @Override
@@ -478,15 +476,8 @@ public class TextInputDialog extends JabRefDialog {
             return false;
         } else {
             UpdateField.setAutomaticFields(importedEntries, false, false, Globals.prefs.getUpdateFieldPreferences());
-            boolean markEntries = EntryMarker.shouldMarkEntries();
 
-            for (BibEntry e : importedEntries) {
-                if (markEntries) {
-                    EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
-                }
-
-                frame.getCurrentBasePanel().insertEntry(e);
-            }
+            importedEntries.forEach(entry -> frame.getCurrentBasePanel().insertEntry(entry));
             return true;
         }
     }
@@ -627,8 +618,8 @@ public class TextInputDialog extends JabRefDialog {
         private final Font usedFont;
         private final Icon okIcon = IconTheme.JabRefIcons.PLAIN_TEXT_IMPORT_DONE.getSmallIcon();
         private final Icon needIcon = IconTheme.JabRefIcons.PLAIN_TEXT_IMPORT_TODO.getSmallIcon();
-        private final Color requiredColor = Globals.prefs.getColor(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND);
-        private final Color optionalColor = Globals.prefs.getColor(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND);
+        private final Color requiredColor = new Color(230, 235, 255);
+        private final Color optionalColor = new Color(230, 255, 230);
 
 
         public SimpleCellRenderer(Font normFont) {

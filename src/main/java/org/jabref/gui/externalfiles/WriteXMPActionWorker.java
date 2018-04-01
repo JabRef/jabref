@@ -205,7 +205,7 @@ public class WriteXMPActionWorker extends AbstractWorker {
 
             InputMap im = cancelButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
             ActionMap am = cancelButton.getActionMap();
-            im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+            im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
             am.put("close", cancel);
 
             progressArea = new JTextArea(15, 60);

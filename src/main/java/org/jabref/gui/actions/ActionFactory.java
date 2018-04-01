@@ -16,7 +16,7 @@ import org.controlsfx.control.action.ActionUtils;
  */
 public class ActionFactory {
 
-    private KeyBindingRepository keyBindingRepository;
+    private final KeyBindingRepository keyBindingRepository;
 
     public ActionFactory(KeyBindingRepository keyBindingRepository) {
         this.keyBindingRepository = Objects.requireNonNull(keyBindingRepository);

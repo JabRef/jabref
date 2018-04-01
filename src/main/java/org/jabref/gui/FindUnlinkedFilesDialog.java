@@ -1008,10 +1008,6 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
     /**
      * Wrapper for displaying the Type {@link BibtexEntryType} in a Combobox.
-     *
-     * @author Nosh&Dan
-     * @version 12.11.2008 | 01:02:30
-     *
      */
     private static class BibtexEntryTypeWrapper {
 

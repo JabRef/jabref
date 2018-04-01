@@ -113,7 +113,7 @@ public class FetcherPreviewDialog extends JabRefDialog implements OutputPrinter 
         };
         ActionMap am = centerPan.getActionMap();
         InputMap im = centerPan.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         am.put("close", closeAction);
 
         pack();

@@ -22,7 +22,6 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -36,14 +35,12 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.externalfiletype.UnknownExternalFileType;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -53,7 +50,6 @@ import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -113,7 +109,7 @@ public class ProtectedTermsDialog {
         removeButton.setToolTipText(Localization.lang("Remove protected terms file"));
 
         newButton.addActionListener(actionEvent -> {
-            NewProtectedTermsFileDialog newDialog = new NewProtectedTermsFileDialog(diag, loader);
+            NewProtectedTermsFileDialog newDialog = new NewProtectedTermsFileDialog(diag, loader, frame.getDialogService());
             newDialog.setVisible(true);
             tableModel.fireTableDataChanged();
         });
@@ -167,7 +163,7 @@ public class ProtectedTermsDialog {
 
         ActionMap am = bb.getPanel().getActionMap();
         InputMap im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         am.put("close", cancelListener);
         im.put(KeyStroke.getKeyStroke("ENTER"), "enterOk");
         am.put("enterOk", okListener);
@@ -236,12 +232,8 @@ public class ProtectedTermsDialog {
                     // Fall back to ".txt"
                     Optional<ExternalFileType> txtType = ExternalFileTypes.getInstance()
                             .getExternalFileTypeByExt("txt");
-                    if (txtType.isPresent()) {
-                        JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), fileName, txtType);
-                    } else {
-                        JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new BibDatabaseContext(), fileName,
-                                new UnknownExternalFileType("terms"));
-                    }
+                    JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), fileName, type);
+
                 }
             } catch (IOException e) {
                 LOGGER.warn("Problem open protected terms file editor", e);
@@ -254,10 +246,10 @@ public class ProtectedTermsDialog {
         // Create action listener for removing a term file, also used for the remove button
         removeAction = actionEvent -> getSelectedTermsList().ifPresent(list -> {
 
-            if (!list.isInternalList() && (JOptionPane.showConfirmDialog(diag,
+            if (!list.isInternalList() && frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Remove protected terms file"),
                     Localization.lang("Are you sure you want to remove the protected terms file?"),
                     Localization.lang("Remove protected terms file"),
-                    JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)) {
+                    Localization.lang("Cancel"))) {
                 if (!loader.removeProtectedTermsList(list)) {
                     LOGGER.info("Problem removing protected terms file");
                 }
@@ -309,30 +301,30 @@ public class ProtectedTermsDialog {
         @Override
         public String getColumnName(int i) {
             switch (i) {
-            case 0:
-                return Localization.lang("Enabled");
-            case 1:
-                return Localization.lang("Description");
-            case 2:
-                return Localization.lang("File");
-            default:
-                return "";
+                case 0:
+                    return Localization.lang("Enabled");
+                case 1:
+                    return Localization.lang("Description");
+                case 2:
+                    return Localization.lang("File");
+                default:
+                    return "";
             }
         }
 
         @Override
         public Object getValueAt(int row, int column) {
             switch (column) {
-            case 0:
-                return loader.getProtectedTermsLists().get(row).isEnabled();
-            case 1:
-                return loader.getProtectedTermsLists().get(row).getDescription();
-            case 2:
-                ProtectedTermsList list = loader.getProtectedTermsLists().get(row);
-                return list.isInternalList() ? Localization.lang("Internal list") + " - " + list.getLocation() : list
-                        .getLocation();
-            default:
-                return "";
+                case 0:
+                    return loader.getProtectedTermsLists().get(row).isEnabled();
+                case 1:
+                    return loader.getProtectedTermsLists().get(row).getDescription();
+                case 2:
+                    ProtectedTermsList list = loader.getProtectedTermsLists().get(row);
+                    return list.isInternalList() ? Localization.lang("Internal list") + " - " + list.getLocation() : list
+                            .getLocation();
+                default:
+                    return "";
             }
         }
 
@@ -344,14 +336,14 @@ public class ProtectedTermsDialog {
         @Override
         public Class<?> getColumnClass(int column) {
             switch (column) {
-            case 0:
-                return Boolean.class;
-            case 1:
-                return String.class;
-            case 2:
-                return String.class;
-            default:
-                return String.class;
+                case 0:
+                    return Boolean.class;
+                case 1:
+                    return String.class;
+                case 2:
+                    return String.class;
+                default:
+                    return String.class;
             }
         }
 
@@ -434,11 +426,9 @@ public class ProtectedTermsDialog {
                     .addExtensionFilter(FileType.TERMS)
                     .withDefaultExtension(FileType.TERMS)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-            DialogService ds = frame.getDialogService();
 
             browse.addActionListener(e -> {
-                Optional<Path> file = DefaultTaskExecutor
-                        .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
+                Optional<Path> file = DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showFileOpenDialog(fileDialogConfiguration));
                 file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
             });
 
@@ -478,7 +468,7 @@ public class ProtectedTermsDialog {
 
             // Key bindings:
             bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                    .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+              .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
             bb.getPanel().getActionMap().put("close", cancelAction);
             pack();
             setLocationRelativeTo(diag);

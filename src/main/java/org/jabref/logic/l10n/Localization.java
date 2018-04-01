@@ -112,7 +112,7 @@ public class Localization {
     }
 
     /**
-     * Public access to the messages bundle for classes like AbstractView.
+     * Returns the messages bundle, e.g. to load FXML files correctly translated.
      *
      * @return The internally cashed bundle.
      */
@@ -214,9 +214,11 @@ public class Localization {
             lookup = lookupMap;
         }
 
+        @Override
         public final Object handleGetObject(String key) {
             Objects.requireNonNull(key);
-            return lookup.get(key);
+            return Optional.ofNullable(lookup.get(key))
+                           .orElse(key);
         }
 
         @Override
@@ -231,7 +233,8 @@ public class Localization {
 
         @Override
         public boolean containsKey(String key) {
-            return (key != null) && lookup.containsKey(key);
+            // Pretend we have every key
+            return true;
         }
     }
 }

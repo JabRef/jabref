@@ -10,10 +10,12 @@ import javafx.scene.control.SeparatorMenuItem;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.OldCommandWrapper;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.filelist.AttachFileAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
@@ -30,7 +32,7 @@ import org.jabref.preferences.PreviewPreferences;
 
 public class RightClickMenu {
 
-    public static ContextMenu create(BibEntryTableViewModel entry, KeyBindingRepository keyBindingRepository, BasePanel panel, KeyBindingRepository keyBindings) {
+    public static ContextMenu create(BibEntryTableViewModel entry, KeyBindingRepository keyBindingRepository, BasePanel panel, KeyBindingRepository keyBindings, DialogService dialogService) {
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory(keyBindingRepository);
 
@@ -84,7 +86,7 @@ public class RightClickMenu {
 
         contextMenu.getItems().add(new ChangeEntryTypeMenu(keyBindings).getChangeEntryTypeMenu(entry.getEntry(), panel.getBibDatabaseContext(), panel.getUndoManager()));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, getFetchEntryData(panel)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.ADD_FILE_LINK, getAddFileLinkCommand(panel)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.ATTACH_FILE, new AttachFileAction(panel, dialogService)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.MERGE_ENTRIES, mergeEntries(panel)));
 
         contextMenu.getItems().add(new SeparatorMenuItem());
@@ -117,12 +119,6 @@ public class RightClickMenu {
     private static OldCommandWrapper mergeEntries(BasePanel panel) {
         OldCommandWrapper command = new OldCommandWrapper(Actions.MERGE_ENTRIES, panel);
         command.setExecutable(panel.getMainTable().getSelectedEntries().size() == 2);
-        return command;
-    }
-
-    private static OldCommandWrapper getAddFileLinkCommand(BasePanel panel) {
-        OldCommandWrapper command = new OldCommandWrapper(Actions.ADD_FILE_LINK, panel);
-        command.setExecutable(panel.getMainTable().getSelectedEntries().size() == 1);
         return command;
     }
 

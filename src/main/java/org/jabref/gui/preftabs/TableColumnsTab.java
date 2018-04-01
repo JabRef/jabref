@@ -19,7 +19,6 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -32,12 +31,13 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibtexSingleField;
@@ -90,7 +90,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private boolean oldSyncKeyWords;
     private boolean oldWriteSpecialFields;
 
-
     /**
      * Customization of external program paths.
      *
@@ -117,9 +116,10 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             public Object getValueAt(int row, int column) {
                 int internalRow = row;
                 internalRow--;
-                if (internalRow >= tableRows.size()) {
+                if ((internalRow == -1) || (internalRow >= tableRows.size())) {
                     return "";
                 }
+
                 TableRow rowContent = tableRows.get(internalRow);
                 if (rowContent == null) {
                     return "";
@@ -134,8 +134,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
             @Override
             public String getColumnName(int col) {
-                return col == 0 ? Localization.lang("Field name") :
-                    Localization.lang("Column width");
+                return col == 0 ? Localization.lang("Field name") : Localization.lang("Column width");
             }
 
             @Override
@@ -166,8 +165,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                     if ("".equals(getValueAt(row, 1))) {
                         setValueAt(String.valueOf(BibtexSingleField.DEFAULT_FIELD_LENGTH), row, 1);
                     }
-                }
-                else {
+                } else {
                     if (value == null) {
                         rowContent.setLength(-1);
                     } else {
@@ -183,15 +181,13 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         cm.getColumn(0).setPreferredWidth(140);
         cm.getColumn(1).setPreferredWidth(80);
 
-        FormLayout layout = new FormLayout
-                ("1dlu, 8dlu, left:pref, 4dlu, fill:pref","");
+        FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         JPanel pan = new JPanel();
         JPanel tabPanel = new JPanel();
         tabPanel.setLayout(new BorderLayout());
-        JScrollPane sp = new JScrollPane
-                (colSetup, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane sp = new JScrollPane(colSetup, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         colSetup.setPreferredScrollableViewportSize(new Dimension(250, 200));
         sp.setMinimumSize(new Dimension(250, 300));
         tabPanel.add(sp, BorderLayout.CENTER);
@@ -346,8 +342,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 }
             }
             listOfFileColumns.setSelectedIndices(indicesToSelect);
-        }
-        else {
+        } else {
             listOfFileColumns.setSelectedIndices(new int[] {});
         }
 
@@ -663,7 +658,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         }
     }
 
-
     /**
      * Store changes to table preferences. This method is called when
      * the user clicks Ok.
@@ -711,12 +705,11 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 (oldSyncKeyWords != newSyncKeyWords) ||
                 (oldWriteSpecialFields != newWriteSpecialFields);
         if (restartRequired) {
-            JOptionPane.showMessageDialog(null,
+            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showWarningDialogAndWait(Localization.lang("Changed special field settings"),
                     Localization.lang("You have changed settings for special fields.")
-                    .concat(" ")
-                    .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
-                    Localization.lang("Changed special field settings"),
-                    JOptionPane.WARNING_MESSAGE);
+                            .concat(" ")
+                            .concat(Localization.lang("You must restart JabRef for this to come into effect."))));
+
         }
 
         // restart required implies that the settings have been changed

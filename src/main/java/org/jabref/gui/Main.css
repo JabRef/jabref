@@ -1,68 +1,248 @@
+.root {
+
+    /*
+    The theme color and some derived colors from it are used for icons, tab-headers, marking of selected inputs and
+    hover colors for the main menu. It generally defines the look of JabRef. The highlighting colors below should
+    work nicely with this base color
+    */
+
+    /*-jr-theme: #2467ab;*/
+
+    /* This theme is the original JabRef dark blue color */
+    -jr-theme: #50618F;
+    /* The base gray. Most gray-tones in the application are derived from this color. */
+    -jr-base: #f0f0f0;
+    -jr-accent: derive(-jr-theme, 50%);
+
+    -jr-white: #ffffff;
+    -jr-gray-0: #f0f0f0;
+    -jr-gray-1: #e6e6e6;
+    -jr-gray-2: #808080;
+    -jr-gray-3: #404040;
+    -jr-black: #000;
+
+    /* Highlights */
+    -jr-blue: #0abde3;
+    -jr-light-blue: #48dbfb;
+    -jr-purple: #f368e0;
+    -jr-light-purple: #ff9ff3;
+    -jr-green: #10ac84;
+    -jr-light-green: #1dd1a1;
+    -jr-red: #ee5253;
+    -jr-light-red: #ff6b6b;
+    -jr-yellow: #feca57;
+    -jr-orange: #ff9f43;
+
+    /* Some blueish greys */
+    -jr-blue-gray-1: #c8d6e5;
+    -jr-blue-gray-2: #8395a7;
+    -jr-blue-gray-3: #576574;
+    -jr-blue-gray-4: #222f3e;
+
+
+    /* maintable and group view cells*/
+    -jr-hover-cell: derive(-jr-yellow, 50%);
+    -jr-selected-cell: derive(-jr-yellow, 5%);
+    -jr-drag-target: -jr-orange;
+
+    /* Background-color of the toolbar */
+    -jr-toolbar: derive(-jr-base, 80%);
+
+    /* All icons on toolbars or next to inputs */
+    -jr-icon: -jr-theme;
+
+    /* Colors for messages and errors */
+    -jr-info: -jr-light-green;
+    -jr-warn: -jr-orange;
+    -jr-error: -jr-light-red;
+
+    /* Background-color for the small group view indicator for the number of hits */
+    -jr-group-hits-bg: -jr-gray-0;
+
+    /* Specific color for general tooltips */
+    -jr-tooltip-bg: -jr-info;
+    -jr-tooltip-fg: -jr-black;
+
+    /* Finally, some specific jr styles that depend on -fx definitions in *this* style */
+    -jr-sidepane-background: -fx-control-inner-background;
+    -jr-sidepane-header-background: -fx-background;
+    -jr-sidepane-header-color: -jr-icon;
+
+    /* Specs for the scrollbars */
+    -jr-scrollbar-thumb: -fx-outer-border;
+    -jr-scrollbar-track: -fx-control-inner-background;
+
+    /*
+     Here are redefinitions of the default properties of modena. They should in principle all be derived from the
+     above colors. Goal should be to make as few as possible direct color-changes to elements and only do this for
+     very specific purposes.
+     */
+    -fx-base: -jr-base;
+
+    /* A very light grey used for the background of windows.  See also
+     * -fx-text-background-color, which should be used as the -fx-text-fill
+     * value for text painted on top of backgrounds colored with -fx-background.
+     */
+    -fx-background: derive(-fx-base, 26.4%);
+
+    /* Used for the inside of text boxes, password boxes, lists, trees, and
+     * tables.  See also -fx-text-inner-color, which should be used as the
+     * -fx-text-fill value for text painted on top of backgrounds colored
+     * with -fx-control-inner-background.
+     */
+    -fx-control-inner-background: derive(-fx-base, 80%);
+    /* Version of -fx-control-inner-background for alternative rows */
+    -fx-control-inner-background-alt: derive(-fx-control-inner-background, -2%);
+
+    /* One of these colors will be chosen based upon a ladder calculation
+     * that uses the brightness of a background color.  Instead of using these
+     * colors directly as -fx-text-fill values, the sections in this file should
+     * use a derived color to match the background in use.  See also:
+     *
+     * -fx-text-base-color for text on top of -fx-base, -fx-color, and -fx-body-color
+     * -fx-text-background-color for text on top of -fx-background
+     * -fx-text-inner-color for text on top of -fx-control-inner-color
+     * -fx-selection-bar-text for text on top of -fx-selection-bar
+     */
+    -fx-dark-text-color: -jr-black;
+    -fx-mid-text-color: derive(-jr-base, -60%);
+    -fx-light-text-color: -jr-white;
+
+    /* A bright blue for highlighting/accenting objects.  For example: selected
+     * text; selected items in menus, lists, trees, and tables; progress bars */
+    -fx-accent: -jr-accent;
+
+    /* Default buttons color, this is similar to accent but more subtle */
+    -fx-default-button: derive(-fx-accent, 50%);
+
+    /* A bright blue for the focus indicator of objects. Typically used as the
+     * first color in -fx-background-color for the "focused" pseudo-class. Also
+     * typically used with insets of -1.4 to provide a glowing effect.
+     */
+    -fx-focus-color: -fx-accent;
+    -fx-faint-focus-color: derive(-fx-accent, 50%);
+
+    /* The color that is used in styling controls. The default value is based
+     * on -fx-base, but is changed by pseudoclasses to change the base color.
+     * For example, the "hover" pseudoclass will typically set -fx-color to
+     * -fx-hover-base (see below) and the "armed" pseudoclass will typically
+     * set -fx-color to -fx-pressed-base.
+     */
+    -fx-color: -fx-base;
+
+    -fx-hover-base: derive(-fx-base,30%);
+
+    /* A little darker than -fx-base and used as the -fx-color for the
+     * "armed" pseudoclass state.
+     *
+     * TODO: should this be renamed to -fx-armed-base?
+     */
+    -fx-pressed-base: derive(-fx-base,-6%);
+
+    /* The color to use for -fx-text-fill when text is to be painted on top of
+     * a background filled with the -fx-background color.
+     */
+    -fx-text-background-color: -fx-dark-text-color;
+
+    /* A little darker than -fx-color and used to draw boxes around objects such
+     * as progress bars, scroll bars, scroll panes, trees, tables, and lists.
+     */
+    -fx-box-border: derive(-fx-color,-5%);
+
+    /* Darker than -fx-background and used to draw boxes around text boxes and
+     * password boxes.
+     */
+    -fx-text-box-border: derive(-fx-background, -15%);
+
+    /* Lighter than -fx-background and used to provide a small highlight when
+     * needed on top of -fx-background. This is never a shadow in Modena but
+     * keep -fx-shadow-highlight-color name to be compatible with Caspian.
+     */
+    -fx-shadow-highlight-color: rgba(255,255,255,0.07) 70%;
+
+    /* A gradient that goes from a little darker than -fx-color on the top to
+     * even more darker than -fx-color on the bottom.  Typically is the second
+     * color in the -fx-background-color list as the small thin border around
+     * a control. It is typically the same size as the control (i.e., insets
+     * are 0).
+     */
+    -fx-outer-border: derive(-fx-color,-5%);
+
+    /* A gradient that goes from a bit lighter than -fx-color on the top to
+     * a little darker at the bottom.  Typically is the third color in the
+     * -fx-background-color list as a thin highlight inside the outer border.
+     * Insets are typically 1.
+     */
+    -fx-inner-border: derive(-fx-color,65%);
+    -fx-inner-border-horizontal: derive(-fx-color,65%);
+    -fx-inner-border-bottomup: derive(-fx-color,65%);
+
+    /*-fx-inner-border: red;*/
+    /*-fx-inner-border-horizontal: green;*/
+    /*-fx-inner-border-bottomup: blue;*/
+
+    /* A gradient that goes from a little lighter than -fx-color at the top to
+     * a little darker than -fx-color at the bottom and is used to fill the
+     * body of many controls such as buttons.
+     */
+    -fx-body-color: derive(-fx-color,20%);
+    -fx-body-color-bottomup: derive(-fx-color,20%);
+    -fx-body-color-to-right: derive(-fx-color,20%);
+
+    /* The color to use as -fx-text-fill when painting text on top of
+     * backgrounds filled with -fx-base, -fx-color, and -fx-body-color.
+     */
+    -fx-text-base-color: -fx-dark-text-color  46%;
+
+    /* The color to use as -fx-text-fill when painting text on top of
+     * backgrounds filled with -fx-control-inner-background.
+     */
+    -fx-text-inner-color: -fx-dark-text-color;
+
+    /* The color to use for small mark-like objects such as checks on check
+     * boxes, filled in circles in radio buttons, arrows on scroll bars, etc.
+     */
+    -fx-mark-color: -jr-theme;
+
+    /* The small thin light "shadow" for mark-like objects. Typically used in
+     * conjunction with -fx-mark-color with an insets of 1 0 -1 0. */
+    -fx-mark-highlight-color: transparent;
+    /*-fx-mark-highlight-color: derive(-fx-color,80%);*/
+
+    /* Background for items in list like things such as menus, lists, trees,
+     * and tables. */
+    -fx-selection-bar: -fx-accent;
+
+    /* Background color to use for selection of list cells etc. This is when
+     * the control doesn't have focus or the row of a previously selected item. */
+    -fx-selection-bar-non-focused: lightgrey;
+
+    /* The color to use as -fx-text-fill when painting text on top of
+     * backgrounds filled with -fx-selection-bar.
+     *
+     * TODO: this can be removed
+     */
+    -fx-selection-bar-text: -fx-text-background-color;
+
+    /* These are needed for Popup */
+    -fx-background-color: inherit;
+    -fx-background-radius: inherit;
+    -fx-background-insets: inherit;
+    -fx-padding: inherit;
+
+    /** Focus line for keyboard focus traversal on cell based controls */
+    -fx-cell-focus-inner-border: derive(-fx-selection-bar,30%);
+
+    -fx-focused-text-base-color : -fx-dark-text-color;
+    -fx-focused-mark-color : -fx-focused-text-base-color;
+
+    /* Consistent size for headers of tab-pane and side-panels*/
+    -jr-header-height: 3em;
+}
+
 /*
  * The base css file defining the style that is valid for every pane and dialog.
  */
-
-.root {
-    /*
-     * A strong blue to indicate something neutral.
-     */
-    -fx-neutral: #2980b9;
-
-    /*
-     * A strong green to indicate something positive.
-     */
-    -fx-positive: #27ae60;
-
-    /*
-     * A strong red to indicate something negative.
-     */
-    -fx-negative: #c0392b;
-
-    /*
-     * A dark grayish blue to display information (but kind of highlighted).
-     */
-    -fx-info: #2c3e50;
-
-    /*
-     * A dark gray to indicate something not so important
-     */
-    -fx-unimportant: #595959;
-
-    /*
-     * A light gray for accented background
-     */
-    -fx-accented-background: #dadad8;
-
-    /*
-     * A darker gray as background
-     */
-    -fx-dark-background: #aaaaaa;
-
-    /*
-     * A strong white as background
-     */
-    -fx-light-background: #ffffff;
-
-    /*
-     * A dark gray for borders
-     */
-    -fx-border: #868786;
-
-    /*
-     * A light gray for background for active items in list like elements such as menus, lists, trees, and tables.
-     */
-    -fx-selection-bar: #e5e5e5;
-
-    /*
-     * The base color for the theme
-     */
-    -fx-theme-base: #4d4673;
-
-    /*
-     * A slightly lighter theme-based color for backgrounds of active items (toggle button, selected list item)
-     */
-    -fx-active-background: derive(-fx-theme-base, 20%);
-}
 
 .hyperlink {
     -fx-padding: 0;
@@ -85,14 +265,13 @@
 }
 
 .tooltip {
-    -fx-background-color: #616161;
+    -fx-background-color: -jr-tooltip-bg;
     -fx-opacity: 95%;
-    -fx-text-fill: rgba(255, 255, 255, 0.9);
+    -fx-text-fill: -jr-tooltip-fg;
     -fx-font-size: 1em;
 }
 
 .tooltip > TextFlow > Text {
-    -fx-fill: rgba(255, 255, 255, 0.9);
     -fx-font-size: 1em;
 }
 
@@ -114,11 +293,25 @@
     -fx-shadow-highlight-color: transparent;
     -fx-outer-border: transparent;
     -fx-inner-border: transparent;
-    -fx-focus-color: -fx-active-background;
     -fx-faint-focus-color: transparent;
     -fx-background-color: transparent;
-    -fx-text-background-color: dimgray;
+    -fx-text-background-color: transparent;
     -fx-padding: 0.5em;
+}
+
+.flatButtonNoSpaceBottom .glyph-icon,
+.flatButtonNoSpaceTop .glyph-icon,
+.flatButton .glyph-icon {
+    -fx-fill: -jr-icon;
+    -fx-text-fill: -jr-icon;
+}
+
+.flatButtonNoSpaceBottom:hover .glyph-icon,
+.flatButtonNoSpaceTop:hover .glyph-icon,
+.flatButton:hover .glyph-icon {
+    -fx-fill: derive(-jr-icon, -30%);
+    -fx-text-fill: derive(-jr-icon, -30%);
+    -fx-effect: dropshadow(one-pass-box, -jr-icon, 5, 0, 1, 1);
 }
 
 .flatButton:selected {
@@ -136,22 +329,22 @@
 }
 
 .menu-bar {
-    -fx-background-color: white;
+    -fx-background-color: -fx-body-color;
     -fx-background-insets: 0;
     -fx-background-radius: 0;
 }
 
-.menu-bar > .container > .menu-button > .label {
-    -fx-padding: 0.41777em 0.41777em 0.41777em 0.41777em; /* 5 5 5 5 */
-}
+/*.menu-bar > .container > .menu-button > .label {*/
+    /*-fx-padding: 0.41777em 0.41777em 0.41777em 0.41777em; !* 5 5 5 5 *!*/
+/*}*/
 
-.menu-bar > .menu {
-    -fx-padding: 0.0em 0.666667em 0.0em 0.666667em; /* 0 8 0 8 */
-}
+/*.menu-bar > .menu {*/
+    /*-fx-padding: 0.0em 0.666667em 0.0em 0.666667em; !* 0 8 0 8 *!*/
+/*}*/
 
-.menu-item {
-    -fx-padding: 0.5em 0.41777em 0.5em 0.41777em; /* 6 5 6 5 */
-}
+/*.menu-item {*/
+    /*-fx-padding: 0.5em 0.41777em 0.5em 0.41777em; !* 6 5 6 5 *!*/
+/*}*/
 
 .tab-pane {
     -fx-open-tab-animation: NONE;
@@ -161,24 +354,54 @@
 .tab-pane > .tab-header-area > .headers-region > .tab {
     -fx-background-insets: 0;
     -fx-background-radius: 0;
-    -fx-background-color: -fx-accented-background;
-    -fx-border-color: -fx-border;
+    /*-fx-background-color: green;*/
+    /*-fx-background-color: -fx-accented-background;*/
+    -fx-border-color: -fx-outer-border;
     -fx-border-width: 0.5 0.5 0.5 0.5;
-    -fx-padding: 0.4em 0.9em 0.4em 0.9em;
+    -fx-padding: 0.3em 0.9em 0.3em 0.9em;
+    -fx-pref-height: -jr-header-height;
+
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab .tab-label {
-    -fx-text-fill: -fx-unimportant;
+    -fx-text-fill: -fx-mid-text-color;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .control-buttons-tab {
+    -fx-border-color: -jr-theme;
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected {
-    -fx-background-color: -fx-light-background;
-    -fx-border-color: -fx-active-background;
+    /*-fx-background-color: -fx-control-inner-background;*/
+    -fx-border-color: -jr-theme;
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
     -fx-border-width: 3 0 0 0;
 }
 
-.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-label {
-    -fx-text-fill: black;
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-label{
+    -fx-text-fill: -jr-theme;
+    -fx-fill: -jr-theme;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-close-button {
+    -fx-background-color: -jr-theme;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-close-button:hover {
+    -fx-background-color: -jr-theme;
+    -fx-fill: derive(-jr-icon, -30%);
+    -fx-text-fill: derive(-jr-icon, -30%);
+    -fx-effect: dropshadow(one-pass-box, -jr-icon, 5, 0, 1, 1);
+}
+
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
+    -fx-text-fill: -jr-theme;
+    -fx-fill: -jr-theme;
 }
 
 .tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
@@ -188,22 +411,23 @@
 }
 
 .tab-pane > .tab-header-area > .tab-header-background {
-    -fx-background-color: -fx-accented-background;
+    -fx-background-color: -fx-outer-border;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab .glyph-icon {
     -glyph-size: 13px;
-    -fx-text-fill: -fx-unimportant;
-    -fx-fill: -fx-unimportant;
+    -fx-text-fill: -fx-mid-text-color;
+    -fx-fill: -fx-mid-text-color;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
-    -fx-text-fill: black;
-    -fx-fill: black;
+    -fx-text-fill: -jr-icon;
+    -fx-fill: -jr-icon;
 }
 
 .tab-pane > .tab-header-area {
-    -fx-padding: 0.416667em 5 0.0em 0em;
+    /*-fx-padding: 0.416667em 5 0.0em 0em;*/
+    -fx-padding: 0 0 0 0;
 }
 
 .table-view {
@@ -216,25 +440,25 @@
 }
 
 .split-pane > .split-pane-divider {
-    -fx-background-color: -fx-accented-background;
-    -fx-padding: 0 0.15ex 0 0.15ex;
+    /*-fx-background-color: -jr-separator;*/
+    -fx-padding: 0 .5 0 .5;
 }
 
 .table-row-cell:hover,
 .tree-table-row-cell:hover {
-    -fx-background-color: lightgrey;
+    -fx-background-color: -jr-hover-cell;
 }
 
 .table-row-cell:selected,
 .tree-table-row-cell:selected {
-    -fx-background-color: -fx-active-background;
-    -fx-text-fill: white;
-    -fx-fill: white;
+    -fx-background-color: -jr-selected-cell;
+    /*-fx-text-fill: white;*/
+    /*-fx-fill: white;*/
 }
 
 .tree-table-row-cell:selected > .tree-table-cell > .glyph-icon {
-    -fx-fill: white;
-    -fx-text-fill: white;
+    /*-fx-fill: white;*/
+    /*-fx-text-fill: white;*/
 }
 
 .table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:selected,
@@ -272,32 +496,32 @@
 }
 
 .text-input {
-    -fx-background-color: #cacbca, -fx-control-inner-background;
+    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
     -fx-background-insets: 0, 1;
 }
 
 .text-input:focused {
-    -fx-background-color: -fx-active-background, -fx-control-inner-background;
+    -fx-background-color: -fx-accent, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
 }
 
 .text-area {
-    -fx-background-color: white;
+    -fx-background-color: -fx-control-inner-background;
 }
 
 .text-area .content {
-    -fx-background-color: #cacbca, -fx-control-inner-background;
+    /*-fx-background-color: -jr-separator, -fx-control-inner-background;*/
     -fx-background-insets: 0, 1;
     -fx-padding: 0.333333em 0.583em 0.333333em 0.583em;
 }
 
 .text-area:focused .content {
-    -fx-background-color: -fx-active-background, -fx-control-inner-background;
+    -fx-background-color: -fx-accent, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
 }
 
 .date-picker > .text-field:focused {
-    -fx-background-color: -fx-active-background, -fx-control-inner-background;
+    -fx-background-color: -fx-accent, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
 }
 
@@ -308,21 +532,21 @@
 
 .scroll-bar:horizontal .track,
 .scroll-bar:vertical .track {
-    -fx-background-color: derive(#868786, 20%);
+    -fx-background-color: -jr-scrollbar-track;
     -fx-opacity: 0.2;
     -fx-background-radius: 0em;
 }
 
 .scroll-bar:horizontal .thumb,
 .scroll-bar:vertical .thumb {
-    -fx-background-color: derive(#757575, 60%);
+    -fx-background-color: -jr-scrollbar-thumb;
     -fx-background-insets: 0, 0, 0;
     -fx-background-radius: 0em;
 }
 
 .scroll-bar .thumb:hover,
 .scroll-bar .thumb:pressed {
-    -fx-background-color: derive(black, 70%);
+    -fx-background-color: derive(-jr-scrollbar-thumb, -20%);
 }
 
 /* Hide increment and decrement buttons */
@@ -365,38 +589,65 @@
 }
 
 .sidePaneComponentHeader {
-    -fx-background-color: -fx-dark-background;
+    -fx-background-color: -jr-sidepane-header-background;
+    -fx-padding: 0.3em 0.9em 0.3em 0.9em;
+    -fx-pref-height: -jr-header-height;
 }
 
-.mainMenu {
-    -fx-background-color: derive(-fx-theme-base, -10%);
-}
-
-.menu-bar > .container > .menu-button:hover,
-.menu-bar > .container > .menu-button:focused,
-.menu-bar > .container > .menu-button:showing {
-    -fx-background: derive(-fx-theme-base, 10%);
-}
-
-.mainMenu > .container > .menu-button > .label {
-    -fx-text-fill: white;
+.sidePaneComponentHeader > .label {
+    -fx-text-fill: -jr-sidepane-header-color;
     -fx-font-weight: bold;
+    -fx-padding: 0.3em 0.9em 0.3em 0.9em;
 }
+
+.sidePaneComponentHeader .glyph-icon{
+    -fx-font-size: 16px;
+}
+/*.mainMenu {*/
+    /*-fx-background-color: -jr-background;*/
+/*}*/
+
+/*.menu-bar > .container > .menu-button:hover,*/
+/*.menu-bar > .container > .menu-button:focused,*/
+/*.menu-bar > .container > .menu-button:showing {*/
+    /*-fx-background: -jr-hover-cell;*/
+/*}*/
+
+/*.mainMenu > .container > .menu-button > .label {*/
+    /*-fx-text-fill: black;*/
+    /*!*-fx-font-weight: bold;*!*/
+/*}*/
+
+/*.menu-item:focused {*/
+    /*-fx-background: -jr-hover-cell;*/
+    /*-fx-background-color: -fx-background;*/
+    /*-fx-text-fill:  black;*/
+/*}*/
+/*.menu-item:focused > .label {*/
+    /*-fx-text-fill: black;*/
+/*}*/
 
 .mainToolbar {
-    -fx-background-color: derive(-fx-theme-base, -10%);
+    -fx-background-color: -jr-toolbar;
+    -fx-border-color: derive(-jr-toolbar, 50%);
+    -fx-border-width: 1 1 1 1;
+    -fx-border-radius: 2 2 2 2;
+    -fx-background-radius: 2 2 2 2;
 }
 
 .mainToolbar .glyph-icon {
     -fx-font-size: 1.7em;
-    -fx-text-fill: white;
-    -fx-fill: white;
 }
 
-.mainToolbar .search-field {
-    -fx-background-color: derive(-fx-theme-base, -15%);
+.mainToolbar .search-field .glyph-icon {
+    -fx-fill: -jr-icon;
+    -fx-text-fill: -jr-icon;
 }
 
-.mainToolbar .search-field:focused {
-    -fx-background-color: derive(-fx-theme-base, 15%);
+/* The little arrow that shows up when not all tool-bar icons fit into the tool-bar.
+We want to have a look that matches our icons in the tool-bar */
+.mainToolbar .tool-bar-overflow-button:hover > .arrow {
+    -fx-background-color: -fx-mark-highlight-color, derive(-jr-icon, -30%);
+    -fx-effect: dropshadow(one-pass-box, -jr-icon, 5, 0, 1, 1);
 }
+

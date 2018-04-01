@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.migrations.MergeReviewIntoCommentMigration;
+import org.jabref.migrations.MergeReviewIntoCommentMigration;
 import org.jabref.model.entry.BibEntry;
 
 public class MergeReviewIntoCommentAction implements GUIPostOpenAction {
@@ -20,7 +20,7 @@ public class MergeReviewIntoCommentAction implements GUIPostOpenAction {
 
         migration.performMigration(parserResult);
         List<BibEntry> conflicts = MergeReviewIntoCommentMigration.collectConflicts(parserResult);
-        if (new MergeReviewIntoCommentConfirmationDialog(basePanel).askUserForMerge(conflicts)) {
+        if (!conflicts.isEmpty() && new MergeReviewIntoCommentConfirmationDialog(basePanel).askUserForMerge(conflicts)) {
             migration.performConflictingMigration(parserResult);
         }
     }

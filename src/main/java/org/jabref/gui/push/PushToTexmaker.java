@@ -1,13 +1,18 @@
 package org.jabref.gui.push;
 
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefIcon;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.preferences.JabRefPreferences;
 
 /**
  * Class for pushing entries into TexMaker.
  */
 public class PushToTexmaker extends AbstractPushToApplication implements PushToApplication {
+
+    public PushToTexmaker(DialogService dialogService) {
+        super(dialogService);
+    }
 
     @Override
     public String getApplicationName() {

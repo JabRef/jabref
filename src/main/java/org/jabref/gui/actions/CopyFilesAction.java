@@ -8,7 +8,6 @@ import java.util.Optional;
 import javafx.concurrent.Task;
 
 import org.jabref.Globals;
-import org.jabref.JabRefGUI;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.copyfiles.CopyFilesDialogView;
@@ -16,6 +15,7 @@ import org.jabref.gui.copyfiles.CopyFilesResultItemViewModel;
 import org.jabref.gui.copyfiles.CopyFilesResultListDependency;
 import org.jabref.gui.copyfiles.CopyFilesTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
@@ -43,8 +43,12 @@ public class CopyFilesAction extends SimpleCommand {
     }
 
     private void showDialog(List<CopyFilesResultItemViewModel> data) {
-        CopyFilesDialogView dlg = new CopyFilesDialogView(databaseContext, new CopyFilesResultListDependency(data));
-        dlg.show();
+        if (data.isEmpty()) {
+            dialogService.showInformationDialogAndWait(Localization.lang("Copy linked files to folder..."), Localization.lang("No linked files found for export."));
+            return;
+        }
+        CopyFilesDialogView dialog = new CopyFilesDialogView(databaseContext, new CopyFilesResultListDependency(data));
+        dialog.showAndWait();
     }
 
     @Override
@@ -57,7 +61,7 @@ public class CopyFilesAction extends SimpleCommand {
         Optional<Path> exportPath = dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
 
         exportPath.ifPresent(path -> {
-            databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabaseContext();
+            databaseContext = frame.getCurrentBasePanel().getBibDatabaseContext();
 
             Task<List<CopyFilesResultItemViewModel>> exportTask = new CopyFilesTask(databaseContext, entries, path);
             startServiceAndshowProgessDialog(exportTask);

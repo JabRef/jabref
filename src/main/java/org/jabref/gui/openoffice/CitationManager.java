@@ -110,7 +110,7 @@ class CitationManager {
         cancel.addActionListener(cancelAction);
 
         bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put
-                (Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+                (Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         bb.getPanel().getActionMap().put("close", cancelAction);
 
         table.getColumnModel().getColumn(0).setPreferredWidth(580);
@@ -225,7 +225,7 @@ class CitationManager {
             cancelButton.addActionListener(cancelAction);
 
             builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put
-                    (Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+                    (Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
             builder.getPanel().getActionMap().put("close", cancelAction);
 
         }

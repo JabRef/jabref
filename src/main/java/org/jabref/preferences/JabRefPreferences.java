@@ -14,6 +14,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -201,34 +203,12 @@ public class JabRefPreferences implements PreferencesService {
     public static final String PREFER_URL_DOI = "preferUrlDoi";
     public static final String URL_COLUMN = "urlColumn";
     // Colors
-    public static final String TABLE_COLOR_CODES_ON = "tableColorCodesOn";
-    public static final String TABLE_RESOLVED_COLOR_CODES_ON = "tableResolvedColorCodesOn";
-    public static final String INCOMPLETE_ENTRY_BACKGROUND = "incompleteEntryBackground";
     public static final String FIELD_EDITOR_TEXT_COLOR = "fieldEditorTextColor";
     public static final String ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR = "activeFieldEditorBackgroundColor";
     public static final String INVALID_FIELD_BACKGROUND_COLOR = "invalidFieldBackgroundColor";
     public static final String VALID_FIELD_BACKGROUND_COLOR = "validFieldBackgroundColor";
-    public static final String MARKED_ENTRY_BACKGROUND5 = "markedEntryBackground5";
-    public static final String MARKED_ENTRY_BACKGROUND4 = "markedEntryBackground4";
-    public static final String MARKED_ENTRY_BACKGROUND3 = "markedEntryBackground3";
-    public static final String MARKED_ENTRY_BACKGROUND2 = "markedEntryBackground2";
-    public static final String MARKED_ENTRY_BACKGROUND1 = "markedEntryBackground1";
-    public static final String MARKED_ENTRY_BACKGROUND0 = "markedEntryBackground0";
-    public static final String VERY_GRAYED_OUT_TEXT = "veryGrayedOutText";
-    public static final String VERY_GRAYED_OUT_BACKGROUND = "veryGrayedOutBackground";
-    public static final String GRAYED_OUT_TEXT = "grayedOutText";
-    public static final String GRAYED_OUT_BACKGROUND = "grayedOutBackground";
-    public static final String GRID_COLOR = "gridColor";
-    public static final String TABLE_TEXT = "tableText";
-    public static final String TABLE_OPT_FIELD_BACKGROUND = "tableOptFieldBackground";
-    public static final String TABLE_REQ_FIELD_BACKGROUND = "tableReqFieldBackground";
-    public static final String MARKED_ENTRY_BACKGROUND = "markedEntryBackground";
-    public static final String TABLE_RESOLVED_FIELD_BACKGROUND = "tableResolvedFieldBackground";
-    public static final String TABLE_BACKGROUND = "tableBackground";
     public static final String ICON_ENABLED_COLOR = "iconEnabledColor";
     public static final String ICON_DISABLED_COLOR = "iconDisabledColor";
-    public static final String TABLE_SHOW_GRID = "tableShowGrid";
-    public static final String TABLE_ROW_PADDING = "tableRowPadding";
     public static final String MENU_FONT_SIZE = "menuFontSize";
     public static final String OVERRIDE_DEFAULT_FONTS = "overrideDefaultFonts";
     public static final String FONT_SIZE = "fontSize";
@@ -249,8 +229,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String OVERWRITE_TIME_STAMP = "overwriteTimeStamp";
 
     public static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
-    public static final String UNMARK_ALL_ENTRIES_BEFORE_IMPORTING = "unmarkAllEntriesBeforeImporting";
-    public static final String MARK_IMPORTED_ENTRIES = "markImportedEntries";
     public static final String GENERATE_KEYS_AFTER_INSPECTION = "generateKeysAfterInspection";
     public static final String NON_WRAPPABLE_FIELDS = "nonWrappableFields";
     public static final String RESOLVE_STRINGS_ALL_FIELDS = "resolveStringsAllFields";
@@ -278,7 +256,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SHOW_FILE_LINKS_UPGRADE_WARNING = "showFileLinksUpgradeWarning";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
     public static final String LAST_USED_EXPORT = "lastUsedExport";
-    public static final String FLOAT_MARKED_ENTRIES = "floatMarkedEntries";
     public static final String CITE_COMMAND = "citeCommand";
     public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
     public static final String EMAIL_SUBJECT = "emailSubject";
@@ -425,7 +402,6 @@ public class JabRefPreferences implements PreferencesService {
      * HashMap that contains all preferences which are set by default
      */
     public final Map<String, Object> defaults = new HashMap<>();
-    public final String MARKING_WITH_NUMBER_PATTERN;
     // Object containing custom export formats:
     public final CustomExportList customExports;
     /**
@@ -517,8 +493,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(WINDOW_MAXIMISED, Boolean.FALSE);
         defaults.put(AUTO_RESIZE_MODE, Boolean.TRUE);
         defaults.put(ENTRY_EDITOR_HEIGHT, 0.65);
-        defaults.put(TABLE_COLOR_CODES_ON, Boolean.FALSE);
-        defaults.put(TABLE_RESOLVED_COLOR_CODES_ON, Boolean.FALSE);
         defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
         defaults.put(NAMES_FIRST_LAST, Boolean.FALSE); // "Show 'Firstname Lastname'"
         defaults.put(NAMES_NATBIB, Boolean.TRUE); // "Natbib style"
@@ -620,25 +594,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(MENU_FONT_SIZE, UNSET_MENU_FONT_SIZE);
         defaults.put(ICON_SIZE_LARGE, 24);
         defaults.put(ICON_SIZE_SMALL, 16);
-        defaults.put(TABLE_ROW_PADDING, 9);
-        defaults.put(TABLE_SHOW_GRID, Boolean.FALSE);
         // Main table color settings:
-        defaults.put(TABLE_BACKGROUND, "255:255:255");
-        defaults.put(TABLE_REQ_FIELD_BACKGROUND, "230:235:255");
-        defaults.put(TABLE_OPT_FIELD_BACKGROUND, "230:255:230");
-        defaults.put(TABLE_RESOLVED_FIELD_BACKGROUND, "240:240:240");
-        defaults.put(TABLE_TEXT, "0:0:0");
-        defaults.put(GRID_COLOR, "210:210:210");
-        defaults.put(GRAYED_OUT_BACKGROUND, "210:210:210");
-        defaults.put(GRAYED_OUT_TEXT, "40:40:40");
-        defaults.put(VERY_GRAYED_OUT_BACKGROUND, "180:180:180");
-        defaults.put(VERY_GRAYED_OUT_TEXT, "40:40:40");
-        defaults.put(MARKED_ENTRY_BACKGROUND0, "255:255:180");
-        defaults.put(MARKED_ENTRY_BACKGROUND1, "255:220:180");
-        defaults.put(MARKED_ENTRY_BACKGROUND2, "255:180:160");
-        defaults.put(MARKED_ENTRY_BACKGROUND3, "255:120:120");
-        defaults.put(MARKED_ENTRY_BACKGROUND4, "255:75:75");
-        defaults.put(MARKED_ENTRY_BACKGROUND5, "220:255:220");
         defaults.put(VALID_FIELD_BACKGROUND_COLOR, "255:255:255");
         defaults.put(INVALID_FIELD_BACKGROUND_COLOR, "255:0:0");
         defaults.put(ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR, "220:220:255");
@@ -647,8 +603,6 @@ public class JabRefPreferences implements PreferencesService {
         // default icon colors
         defaults.put(ICON_ENABLED_COLOR, "0:0:0");
         defaults.put(ICON_DISABLED_COLOR, "200:200:200");
-
-        defaults.put(INCOMPLETE_ENTRY_BACKGROUND, "250:175:175");
 
         defaults.put(URL_COLUMN, Boolean.TRUE);
         defaults.put(PREFER_URL_DOI, Boolean.FALSE);
@@ -709,8 +663,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
         defaults.put(GENERATE_KEYS_AFTER_INSPECTION, Boolean.TRUE);
-        defaults.put(MARK_IMPORTED_ENTRIES, Boolean.TRUE);
-        defaults.put(UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, Boolean.TRUE);
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
         defaults.put(USE_TIME_STAMP, Boolean.FALSE);
         defaults.put(OVERWRITE_TIME_STAMP, Boolean.FALSE);
@@ -729,7 +681,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PERSONAL_JOURNAL_LIST, "");
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(CITE_COMMAND, "\\cite"); // obsoleted by the app-specific ones (not any more?)
-        defaults.put(FLOAT_MARKED_ENTRIES, Boolean.TRUE);
 
         defaults.put(LAST_USED_EXPORT, "");
         defaults.put(SIDE_PANE_WIDTH, 0.15);
@@ -779,8 +730,6 @@ public class JabRefPreferences implements PreferencesService {
 
         customExports = new CustomExportList(new ExportComparator());
         customImports = new CustomImportList(this);
-
-        MARKING_WITH_NUMBER_PATTERN = "\\[" + get(DEFAULT_OWNER).replaceAll("\\\\", "\\\\\\\\") + ":(\\d+)\\]";
 
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
         defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
@@ -1426,6 +1375,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
+    @Override
     public FileDirectoryPreferences getFileDirectoryPreferences() {
         List<String> fields = Arrays.asList(FieldName.FILE, FieldName.PDF, FieldName.PS);
         Map<String, String> fieldDirectories = new HashMap<>();
@@ -1792,8 +1742,18 @@ public class JabRefPreferences implements PreferencesService {
 
     public MainTablePreferences getMainTablePreferences() {
         return new MainTablePreferences(
-                getBoolean(TABLE_SHOW_GRID),
                 getColumnPreferences(),
                 getBoolean(AUTO_RESIZE_MODE));
+    }
+
+    @Override
+    public Path getWorkingDir() {
+        return Paths.get(get(WORKING_DIRECTORY));
+    }
+
+    @Override
+    public void setWorkingDir(Path dir) {
+        put(WORKING_DIRECTORY, dir.toString());
+
     }
 }

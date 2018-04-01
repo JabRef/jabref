@@ -4,8 +4,8 @@ import java.util.Objects;
 
 import javax.swing.JLabel;
 
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefIcon;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 
 /**
  * This class defines a type of external files that can be linked to from JabRef.
@@ -175,6 +175,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     }
 
     public void setIcon(JabRefIcon icon) {
+        Objects.requireNonNull(icon);
         this.icon = icon;
         label.setIcon(this.icon.getSmallIcon());
     }

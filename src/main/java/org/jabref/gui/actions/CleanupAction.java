@@ -1,6 +1,7 @@
 package org.jabref.gui.actions;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JOptionPane;
 
@@ -8,11 +9,11 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.cleanup.CleanupDialog;
 import org.jabref.gui.cleanup.CleanupPresetPanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.util.component.CheckBoxMessage;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.CleanupWorker;
@@ -48,8 +49,7 @@ public class CleanupAction extends AbstractWorker {
         canceled = false;
         modifiedEntriesCount = 0;
         if (panel.getSelectedEntries().isEmpty()) { // None selected. Inform the user to select entries first.
-            JOptionPane.showMessageDialog(null, Localization.lang("First select entries to clean up."),
-                    Localization.lang("Cleanup entry"), JOptionPane.INFORMATION_MESSAGE);
+            dialogService.showInformationDialogAndWait(Localization.lang("Cleanup entry"), Localization.lang("First select entries to clean up."));
             canceled = true;
             return;
         }
@@ -59,29 +59,30 @@ public class CleanupAction extends AbstractWorker {
 
     @Override
     public void run() {
+
         if (canceled) {
             return;
         }
-        CleanupPresetPanel presetPanel = new CleanupPresetPanel(panel.getBibDatabaseContext(),
-                CleanupPreset.loadFromPreferences(preferences));
-        int choice = showDialog(presetPanel);
-        if (choice != JOptionPane.OK_OPTION) {
+        CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), CleanupPreset.loadFromPreferences(preferences));
+
+        Optional<CleanupPreset> chosenPreset = cleanupDialog.showAndWait();
+        if (!chosenPreset.isPresent()) {
             canceled = true;
             return;
         }
-        CleanupPreset cleanupPreset = presetPanel.getCleanupPreset();
+        CleanupPreset cleanupPreset = chosenPreset.get();
         cleanupPreset.storeInPreferences(preferences);
 
         if (cleanupPreset.isRenamePDF() && Globals.prefs.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
-            CheckBoxMessage cbm = new CheckBoxMessage(
+
+            boolean autogeneratePressed = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Autogenerate PDF Names"),
                     Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
-                    Localization.lang("Disable this confirmation dialog"), false);
-            int answer = JOptionPane.showConfirmDialog(null, cbm, Localization.lang("Autogenerate PDF Names"),
-                    JOptionPane.YES_NO_OPTION);
-            if (cbm.isSelected()) {
-                Globals.prefs.putBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN, false);
-            }
-            if (answer == JOptionPane.NO_OPTION) {
+                    Localization.lang("Autogenerate PDF Names"),
+                    Localization.lang("Cancel"),
+                    Localization.lang("Disable this confirmation dialog"),
+                    optOut -> Globals.prefs.putBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN, !optOut)));
+
+            if (!autogeneratePressed) {
                 canceled = true;
                 return;
             }
@@ -99,6 +100,7 @@ public class CleanupAction extends AbstractWorker {
                 panel.getUndoManager().addEdit(ce);
             }
         }
+
     }
 
     @Override
@@ -117,24 +119,28 @@ public class CleanupAction extends AbstractWorker {
         }
         String message;
         switch (modifiedEntriesCount) {
-        case 0:
-            message = Localization.lang("No entry needed a clean up");
-            break;
-        case 1:
-            message = Localization.lang("One entry needed a clean up");
-            break;
-        default:
-            message = Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
-            break;
+            case 0:
+                message = Localization.lang("No entry needed a clean up");
+                break;
+            case 1:
+                message = Localization.lang("One entry needed a clean up");
+                break;
+            default:
+                message = Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
+                break;
         }
         panel.output(message);
     }
 
     private int showDialog(CleanupPresetPanel presetPanel) {
+
         String dialogTitle = Localization.lang("Cleanup entries");
+
         Object[] messages = {Localization.lang("What would you like to clean up?"), presetPanel.getScrollPane()};
+
         return JOptionPane.showConfirmDialog(null, messages, dialogTitle, JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
+
     }
 
     /**

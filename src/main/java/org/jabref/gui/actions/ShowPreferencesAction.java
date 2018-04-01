@@ -14,17 +14,12 @@ public class ShowPreferencesAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        // output(Localization.lang("Opening preferences..."));
         if (prefsDialog == null) {
             prefsDialog = new PreferencesDialog(jabRefFrame);
-            //prefsDialog.setLocationRelativeTo(JabRefFrame.this);
         } else {
             prefsDialog.setValues();
         }
 
-        prefsDialog.setVisible(true);
-        //output("");
-
+        prefsDialog.show();
     }
-
 }

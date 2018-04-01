@@ -67,7 +67,7 @@ class GoogleScholarTest {
         entry.setField(FieldName.YEAR, "2013");
         entry.setField(FieldName.PAGES, "41--44");
 
-        List<BibEntry> foundEntries = finder.performSearch("info:RExzBa3OlkQJ:scholar.google.com");
+        List<BibEntry> foundEntries = finder.performSearch("Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models");
 
         assertEquals(Collections.singletonList(entry), foundEntries);
     }

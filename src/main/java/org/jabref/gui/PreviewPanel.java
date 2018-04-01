@@ -18,6 +18,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.web.WebView;
 
 import org.jabref.Globals;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.BackgroundTask;
@@ -112,7 +113,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
                         copyPreviewToClipBoard();
                         event.consume();
                         break;
-                    case CLOSE_DIALOG:
+                    case CLOSE:
                         close();
                         event.consume();
                         break;

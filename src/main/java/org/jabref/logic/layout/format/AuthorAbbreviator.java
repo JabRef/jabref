@@ -7,8 +7,6 @@ import org.jabref.model.entry.AuthorList;
  * Duplicate of AuthorLastFirstAbbreviator.
  *
  * @see AuthorLastFirstAbbreviator
- *
- * @author Carlos Silla
  */
 public class AuthorAbbreviator implements LayoutFormatter {
 

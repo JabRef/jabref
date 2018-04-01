@@ -1101,12 +1101,6 @@ public class BibtexParserTest {
         assertEquals(Optional.of("a b"), parsedEntry.getField("c"));
     }
 
-    /**
-     * Test for [2022983]
-     *
-     * @author Uwe Kuehn
-     * @author Andrei Haralevich
-     */
     @Test
     public void parsePreservesMultipleSpacesInNonWrappableField() throws IOException {
         when(importFormatPreferences.getFieldContentParserPreferences().getNonWrappableFields())

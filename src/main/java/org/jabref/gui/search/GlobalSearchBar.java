@@ -14,6 +14,7 @@ import javafx.beans.binding.Bindings;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
@@ -30,19 +31,20 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.PersonNameStringConverter;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.MainTable;
@@ -83,10 +85,6 @@ public class GlobalSearchBar extends HBox {
     private SearchResultFrame searchResultFrame;
 
     private SearchDisplayMode searchDisplayMode;
-    /**
-     * if this flag is set the searchbar won't be selected after the next search
-     */
-    private boolean dontSelectSearchBar;
 
     public GlobalSearchBar(JabRefFrame frame) {
         super();
@@ -132,13 +130,21 @@ public class GlobalSearchBar extends HBox {
         */
 
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
-        addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+        searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
-            if (keyBinding.isPresent() && keyBinding.get().equals(KeyBinding.GLOBAL_SEARCH)) {
-                globalSearch.setSelected(true);
-                searchPreferences.setGlobalSearch(globalSearch.isSelected());
-                updateOpenCurrentResultsTooltip(globalSearch.isSelected());
-                focus();
+            if (keyBinding.isPresent()) {
+                if (keyBinding.get().equals(KeyBinding.GLOBAL_SEARCH)) {
+                    globalSearch.setSelected(true);
+                    searchPreferences.setGlobalSearch(globalSearch.isSelected());
+                    updateOpenCurrentResultsTooltip(globalSearch.isSelected());
+                    focus();
+                    event.consume();
+                } else if (keyBinding.get().equals(KeyBinding.CLOSE)) {
+                    // Clear search and select first entry, if available
+                    clearSearch();
+                    frame.getCurrentBasePanel().getMainTable().getSelectionModel().selectFirst();
+                    event.consume();
+                }
             }
         });
 
@@ -180,9 +186,9 @@ public class GlobalSearchBar extends HBox {
         int initialSize = 400;
         int expandedSize = 700;
         searchField.getStyleClass().add("search-field");
-        searchField.setMinWidth(200);
+        searchField.setMinWidth(100);
         searchField.setMaxWidth(initialSize);
-        searchField.setPrefWidth(expandedSize);
+        HBox.setHgrow(searchField, Priority.ALWAYS);
         EasyBind.subscribe(searchField.textProperty(), searchText -> performSearch());
         EasyBind.subscribe(searchField.focusedProperty(), isFocused -> {
             if (isFocused) {
@@ -202,6 +208,8 @@ public class GlobalSearchBar extends HBox {
                 searchField,
                 currentResults
         );
+
+        this.setAlignment(Pos.CENTER_LEFT);
     }
 
     public void performGlobalSearch() {
@@ -302,12 +310,6 @@ public class GlobalSearchBar extends HBox {
         openCurrentResultsInDialog.setDisable(true);
 
         Globals.stateManager.clearSearchQuery();
-
-        if (dontSelectSearchBar) {
-            dontSelectSearchBar = false;
-            return;
-        }
-        focus();
     }
 
     public void performSearch() {
@@ -424,12 +426,7 @@ public class GlobalSearchBar extends HBox {
             return;
         }
 
-        setDontSelectSearchBar();
         DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchTerm));
-    }
-
-    public void setDontSelectSearchBar() {
-        this.dontSelectSearchBar = true;
     }
 
     private void updateOpenCurrentResultsTooltip(boolean globalSearchEnabled) {
@@ -498,14 +495,17 @@ public class GlobalSearchBar extends HBox {
             }
         }
 
+        @Override
         public Node getNode() {
             return this.container;
         }
 
+        @Override
         public AutoCompletePopup<T> getSkinnable() {
             return this.control;
         }
 
+        @Override
         public void dispose() {
         }
     }

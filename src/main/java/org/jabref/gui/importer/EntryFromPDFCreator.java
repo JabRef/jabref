@@ -6,9 +6,9 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.JabRefGUI;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.pdfimport.PdfImporter;
 import org.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
@@ -17,9 +17,6 @@ import org.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
  * Uses XMPUtils to get one BibEntry for a PDF-File.
  * Also imports the non-XMP Data (PDDocument-Information) using XMPUtil.getBibtexEntryFromDocumentInformation.
  * If data from more than one entry is read by XMPUtil then this entys are merged into one.
- * @author Dan
- * @version 12.11.2008 | 22:12:48
- *
  */
 public class EntryFromPDFCreator extends EntryFromFileCreator {
 

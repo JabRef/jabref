@@ -97,6 +97,7 @@ import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
@@ -170,13 +171,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     // Note: GeneralAction's constructor automatically gets translations
     // for the name and message strings.
 
-    private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, Localization.menuTitle("Mark entries"),
-            Localization.lang("Mark entries"), Globals.getKeyPrefs().getKey(KeyBinding.MARK_ENTRIES), IconTheme.JabRefIcons.MARK_ENTRIES.getIcon());
-    private final JMenu markSpecific = JabRefFrame.subMenu(Localization.menuTitle("Mark specific color"));
-    private final AbstractAction unmark = new GeneralAction(Actions.UNMARK_ENTRIES,
-            Localization.menuTitle("Unmark entries"), Localization.lang("Unmark entries"),
-            Globals.getKeyPrefs().getKey(KeyBinding.UNMARK_ENTRIES), IconTheme.JabRefIcons.UNMARK_ENTRIES.getIcon());
-    private final AbstractAction unmarkAll = new GeneralAction(Actions.UNMARK_ALL, Localization.menuTitle("Unmark all"));
     private final AbstractAction toggleRelevance = new GeneralAction(
             new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getCommand(),
             new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getMenuString(),
@@ -216,7 +210,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
-        this.dialogService = new FXDialogService();
+        this.dialogService = new FXDialogService(mainStage);
         init();
     }
 
@@ -578,7 +572,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private void initLayout() {
         setProgressBarVisible(false);
 
-        pushApplications = new PushToApplications();
+        pushApplications = new PushToApplications(this.getDialogService());
 
         BorderPane head = new BorderPane();
         head.setTop(createMenu());
@@ -669,11 +663,31 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 newLibrary,
                 factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this)),
                 factory.createIconButton(StandardActions.SAVE_LIBRARY, new OldDatabaseCommandWrapper(Actions.SAVE, this, Globals.stateManager)),
-
                 leftSpacer);
         leftSide.setMinWidth(100);
         leftSide.prefWidthProperty().bind(sidePane.widthProperty());
         leftSide.maxWidthProperty().bind(sidePane.widthProperty());
+
+        PushToApplicationButton pushToExternal = new PushToApplicationButton(this, pushApplications.getApplications());
+        HBox rightSide = new HBox (
+                factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE)),
+                factory.createIconButton(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, Globals.stateManager)),
+
+                factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, Globals.stateManager)),
+                factory.createIconButton(StandardActions.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, Globals.stateManager)),
+                factory.createIconButton(StandardActions.CUT, new OldDatabaseCommandWrapper(Actions.CUT, this, Globals.stateManager)),
+                factory.createIconButton(StandardActions.COPY, new OldDatabaseCommandWrapper(Actions.COPY, this, Globals.stateManager)),
+                factory.createIconButton(StandardActions.PASTE, new OldDatabaseCommandWrapper(Actions.PASTE, this, Globals.stateManager)),
+
+                factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, Globals.stateManager)),
+                factory.createIconButton(pushToExternal.getMenuAction(), pushToExternal),
+
+                factory.createIconButton(StandardActions.FORK_ME, new OpenBrowserAction("https://github.com/JabRef/jabref")),
+                factory.createIconButton(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
+                factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org"))
+                );
+
+        HBox.setHgrow(globalSearchBar, Priority.ALWAYS);
 
         ToolBar toolBar = new ToolBar(
                 leftSide,
@@ -681,7 +695,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 globalSearchBar,
 
                 rightSpacer,
-                factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE)));
+                rightSide
+                );
         toolBar.getStyleClass().add("mainToolbar");
 
         return toolBar;
@@ -833,16 +848,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 new SeparatorMenuItem()
 
         );
-        /*
-        edit.add(mark);
-        for (int i = 0; i < EntryMarker.MAX_MARKING_LEVEL; i++) {
-            markSpecific.add(new MarkEntriesAction(this, i).getMenuItem());
-        }
-        edit.add(markSpecific);
-        edit.add(unmark);
-        edit.add(unmarkAll);
-        edit.addSeparator();
-        */
+
         /* TODO
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
             boolean menuitem = false;
@@ -896,15 +902,13 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 new SeparatorMenuItem(),
 
-
-                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(Actions.DELETE)),
+                factory.createMenuItem(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, Globals.stateManager)),
 
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this)),
-                factory.createMenuItem(StandardActions.EDIT_PREAMBLE, new OldDatabaseCommandWrapper(Actions.EDIT_PREAMBLE, this, Globals.stateManager)),
-
-                factory.createMenuItem(StandardActions.EDIT_STRINGS, new StringAction())
+                factory.createMenuItem(StandardActions.EDIT_PREAMBLE, new PreambleEditor(this)),
+     	 	factory.createMenuItem(StandardActions.EDIT_STRINGS, new StringAction())
 
         );
 

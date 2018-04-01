@@ -15,10 +15,11 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
+
 /**
  * Extends the JTabbedPane class to support Drag&Drop of Tabs.
- *
- * @author kleinms, strassfn
  */
 class DragDropPane extends JTabbedPane {
 

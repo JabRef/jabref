@@ -18,10 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-/**
- * @author Nosh&Dan
- * @version 09.11.2008 | 21:06:17
- */
 public class DatabaseFileLookupTest {
 
     private BibDatabase database;

@@ -1,6 +1,6 @@
 .text-area {
-    -fx-text-fill: text-area-foreground;
-    -fx-control-inner-background: text-area-background;
+    /*-fx-text-fill: text-area-foreground;*/
+    /*-fx-control-inner-background: text-area-background;*/
 }
 
 .text-area *.text {
@@ -10,12 +10,12 @@
 .editorPane {
     -fx-hgap: 10;
     -fx-vgap: 6;
-    -fx-background-color: -fx-light-background;
+    /*-fx-background-color: -jr-white;*/
     -fx-padding: 5 5 5 15;
 }
 
 .date-picker > .date-picker-display-node {
-    -fx-text-fill: text-area-foreground;
+    /*-fx-text-fill: text-area-foreground;*/
     -fx-text-origin: baseline;
 }
 
@@ -24,12 +24,12 @@
 }
 
 .combo-box > *.text {
-    -fx-text-fill: text-area-foreground;
+    /*-fx-text-fill: text-area-foreground;*/
     -fx-text-origin: baseline;
 }
 
 .list-cell:odd {
-    -fx-background: text-area-background;
+    /*-fx-background: text-area-background;*/
 }
 
 /* Selected rows */
@@ -48,7 +48,7 @@
 .tree-table-row-cell:filled:selected,
 .table-row-cell:filled > .table-cell:selected,
 .tree-table-row-cell:filled > .tree-table-cell:selected {
-    -fx-background: -fx-selection-bar-non-focused;
+    -fx-background: -fx-selection-bar;
 }
 /* focused cell (keyboard navigation) */
 .list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:focused,
@@ -64,6 +64,14 @@
     -fx-padding: 0.1em;
     -fx-font-size: 1.166667em;
     -fx-font-weight: bold;
+    -fx-text-fill: -jr-icon;
+}
+
+#typeLabel:hover {
+    -fx-padding: 0.1em;
+    -fx-font-size: 1.166667em;
+    -fx-font-weight: bold;
+    -fx-text-fill: derive(-jr-icon, -30%);
 }
 
 .flatButton.narrow {
@@ -78,37 +86,54 @@
     -fx-padding: -0.2em 0.1em 0.1em 0.1em;
 }
 
+/*.flatButton .glyph-icon, .flatButtonNoSpaceTop .glyph-icon, .flatButtonNoSpaceBottom .glyph-icon {*/
+    /*-fx-fill: -jr-icon;*/
+/*}*/
+
+/*.flatButton .glyph-icon:hover, .flatButtonNoSpaceTop .glyph-icon:hover, .flatButtonNoSpaceBottom .glyph-icon:hover {*/
+    /*-fx-fill: derive(-jr-icon, -30%);*/
+    /*-fx-effect: dropshadow(one-pass-box, -jr-icon, 5, 0, 1, 1);*/
+/*}*/
+
 .editorPane .glyph-icon {
     -glyph-size: 16px;
 }
 
+
 .tool-bar {
-    -fx-background-color: #dadad8;
+    /*-fx-background-color: -jr-toolbar;*/
     -fx-background-insets: 0;
+    /*-fx-border-color: -jr-gray-1;*/
+    /*-fx-border-width: 1 1 1 1;*/
+    /*-fx-border-radius: 2 2 2 2;*/
+    /*-fx-background-radius: 2 2 2 2;*/
+    /*-fx-text-fill: -jr-icon;*/
+    /*-fx-fill: -jr-icon;*/
 }
 
+
 .tool-bar > .container > .separator {
-    -fx-background-color: #5e5f5e;
+    /*-fx-background-color: -jr-separator;*/
 }
 
 .tool-bar .glyph-icon {
-    -glyph-size: 18px;
+    -glyph-size: 16px;
     -fx-font-size: 2em;
 }
 
 .warning-icon {
-    -fx-fill: #ffb500;
+    -fx-fill: -jr-warn;
 }
 
 .error-icon {
-    -fx-text-fill: #bb0613;
-    -fx-fill: #bb0613;
+    -fx-text-fill: -jr-error;
+    -fx-fill: -jr-error;
 }
 
 .tooltip-warning {
-    -fx-background-color: #d69600;
+    -fx-background-color: -jr-warn;
 }
 
 .tooltip-error {
-    -fx-background-color: #a80511;
+    -fx-background-color: -jr-error;
 }
