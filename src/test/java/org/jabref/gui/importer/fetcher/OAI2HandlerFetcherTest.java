@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * FIXME: Move this AND the OAI2HandlerFetcher to org.jabref.logic. Needs to be rewritten to new interface
  */
-
 @FetcherTest
 public class OAI2HandlerFetcherTest {
 

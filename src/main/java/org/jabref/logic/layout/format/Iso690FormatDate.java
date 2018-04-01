@@ -2,10 +2,6 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-/**
- *
- * @author Usuario
- */
 public class Iso690FormatDate implements LayoutFormatter {
 
     @Override

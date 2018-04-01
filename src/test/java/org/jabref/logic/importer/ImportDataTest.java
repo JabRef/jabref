@@ -8,10 +8,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Nosh&Dan
- * @version 09.11.2008 | 19:41:40
- */
 public class ImportDataTest {
 
     public static final File FILE_IN_DATABASE = Paths

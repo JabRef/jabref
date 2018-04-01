@@ -23,11 +23,6 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
-/**
- * @author Oscar
- *
- *         Dialog for merging two Bibtex entries
- */
 public class MergeEntriesDialog extends JabRefDialog {
 
     private static final String MERGE_ENTRIES = Localization.lang("Merge entries");

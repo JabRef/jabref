@@ -22,11 +22,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
-/**
- * @author Morten O. Alver.
- * Based on net.sf.jabref.MODSDatabase by Michael Wrighton
- *
- */
 class OOCalcDatabase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OOCalcDatabase.class);

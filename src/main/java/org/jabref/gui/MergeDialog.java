@@ -21,12 +21,8 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 
 /**
- * <p>Title: MergeDialog</p>
- * <p>Description: Asks for details about merge database operation.</p>
- * <p>Copyright: Copyright (c) 2003</p>
- * @author Morten O. Alver
+ * Asks for details about merge database operation.
  */
-
 public class MergeDialog extends JabRefDialog {
 
     private final JPanel panel1 = new JPanel();

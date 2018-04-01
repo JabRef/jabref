@@ -38,9 +38,6 @@ import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-/**
- * @author alver
- */
 class FieldSetComponent extends JPanel {
 
     protected final JList<String> list;
