@@ -1,20 +1,27 @@
-This document lists the fonts, icons, and libraries used by JabRef.
+# External dependencies of JabRef
+
+This file lists the fonts, icons, and libraries used by JabRef.
 This file is manually kept in sync with build.gradle and the binary jars contained in the lib/ directory.
 
 One can list all depdencies by using Gradle task `depdencyReport`.
 It generated the file [build/reports/project/dependencies.txt](build/reports/project/dependencies.txt).
 
-# Legend
-
-## License
+## Howto
 
 We follow the [SPDX license identifiers](https://spdx.org/licenses/).
 In case you add a library, please use these identifiers.
 For instance, "BSD" is not exact enough, there are numerous variants out there: BSD-2-Clause, BSD-3-Clause-No-Nuclear-Warranty, ...
 Note that the SPDX license identifiers are different from the ones used by debian. See https://wiki.debian.org/Proposals/CopyrightFormat for more information.
 
+You can create a license report by using the [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by executing following command:
 
-# Fonts and Icons
+    ./gradlew generateLicenseReport
+
+You will have `build/reports/depdendency-license/index.html` and `build/reports/depdendency-license/THIRD-PARTY-NOTICES.txt`.
+The licenses stated there are not as complete as here.
+Nevertheless, you should the output for a cross-check
+
+## Fonts and Icons
 
 The loading animation during loading of recommendations from Mr. DLib is created by <http://loading.io/> and is free of use under licence CC0 1.0.
 
@@ -26,7 +33,7 @@ License: SIL Open Font License, Version 1.1
 Note:    It is important to include v1.5.54 or later as v1.5.54 is the first version offering fixed code points. Do not confuse with http://zavoloklom.github.io/material-design-iconic-font/
 
 
-# Libraries
+## Libraries
 
 (Sorted alphabetically by Id)
 
@@ -230,5 +237,3 @@ Path:    lib/spin.jar
 Project: Spin
 URL:     http://spin.sourceforge.net/
 License: LGPL-2.1+
-
-The last entry has to end with an empty line. Otherwise the entry is not present in About.html.
