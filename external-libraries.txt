@@ -1,20 +1,30 @@
-This document lists the fonts, icons, and libraries used by JabRef.
-This file is manually kept in sync with build.gradle and the binary jars contained in the lib/ directory.
+# External dependencies of JabRef
 
-One can list all depdencies by using Gradle task `depdencyReport`.
+This file lists the fonts, icons, and libraries used by JabRef during runtime.
+Build-time dependencies are not listed.
+This file is manually kept in sync with `build.gradle` and the binary jars contained in the `lib/` directory.
+
+One can list all dependencies by using Gradle task `depdencyReport`.
 It generated the file [build/reports/project/dependencies.txt](build/reports/project/dependencies.txt).
 
-# Legend
+See [ADR-0003](docs/adr/0003-use-external-libraries.txt-for-tracking-dependencies.md) for a reasoning, why we maintain this file manually.
 
-## License
+## Howto
 
 We follow the [SPDX license identifiers](https://spdx.org/licenses/).
 In case you add a library, please use these identifiers.
 For instance, "BSD" is not exact enough, there are numerous variants out there: BSD-2-Clause, BSD-3-Clause-No-Nuclear-Warranty, ...
 Note that the SPDX license identifiers are different from the ones used by debian. See https://wiki.debian.org/Proposals/CopyrightFormat for more information.
 
+You can create a license report by using the [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by executing following command:
 
-# Fonts and Icons
+    ./gradlew generateLicenseReport
+
+You will have `build/reports/depdendency-license/index.html` and `build/reports/depdendency-license/THIRD-PARTY-NOTICES.txt`.
+The licenses stated there are not as complete as here.
+Nevertheless, you should the output for a cross-check
+
+## Fonts and Icons
 
 The loading animation during loading of recommendations from Mr. DLib is created by <http://loading.io/> and is free of use under licence CC0 1.0.
 
@@ -26,19 +36,24 @@ License: SIL Open Font License, Version 1.1
 Note:    It is important to include v1.5.54 or later as v1.5.54 is the first version offering fixed code points. Do not confuse with http://zavoloklom.github.io/material-design-iconic-font/
 
 
-# Libraries
+## Libraries
 
-(Sorted alphabetically by Id)
+The libraries are grouped as in `build.gradle`.
+Inside each group, they are sorted alphabetically by id.
 
-Id:      com.airhacks:afterburner.fx
-Project: afterburner.fx
-URL:     https://github.com/AdamBien/afterburner.fx
-License: Apache 2.0
+### Antlr
 
-Id:      com.apple:AppleJavaExtensions
-Project: AppleJavaExtensions
-URL:     https://developer.apple.com/legacy/library/samplecode/AppleJavaExtensions/Introduction/Intro.html
-License: Apple License
+Id:      org.antlr:antlr
+Project: ANTLR 3
+URL:     http://www.antlr.org/
+License: BSD
+
+Id:      org.antlr:antlr4
+Project: ANTLR 4
+URL:     http://www.antlr.org/
+License: BSD
+
+## General libraries
 
 Id:      com.github.bkromhout:java-diff-utils
 Project: java-diff-utils
@@ -49,6 +64,11 @@ Id:      com.github.tomtung
 Project: latex2unicode
 URL:     https://github.com/tomtung/latex2unicode
 License: Apache 2.0
+
+Id:      com.google.guava
+Project: Google Guava
+URL:     https://github.com/google/guava
+License: Apache-2.0
 
 Id:      com.impossibl.pgjdbc-ng:pgjdbc-ng
 Project: pgjdbc-ng
@@ -85,31 +105,6 @@ Project: Apache Commons CLI
 URL:     http://commons.apache.org/cli/
 License: Apache-2.0
 
-Id:      commons-logging:commons-logging
-Project: Apache Commons Logging
-URL:     http://commons.apache.org/logging/
-License: Apache-2.0
-
-Id:      de.codecentric.centerdevice
-Project: javafxsvg
-URL:     https://github.com/codecentric/javafxsvg
-License: BSD 3-Clause
-
-Id:      de.jensd:fontawesomefx-materialdesignfont
-Project: FontAwesomeFX
-URL:     https://bitbucket.org/Jerady/fontawesomefx
-License: Apache-2.0
-
-Id:      de.saxsys:mvvmfx-validation
-Project: mvvm(fx)
-URL:     https://github.com/sialcasa/mvvmFX
-License: Apache-2.0
-
-Id:      de.undercouch.citeproc-java
-Project: Citeproc-Java
-URL:     http://michel-kraemer.github.io/citeproc-java/
-Licence: Apache-2.0
-
 Id:      info.debatty:java-string-similarity
 Project: Java String Similarity
 URL:     https://github.com/tdebatty/java-string-similarity
@@ -125,33 +120,8 @@ Project: Glazed Lists
 URL:     http://www.glazedlists.com/
 License: LGPL-2.1 (not explicitly, but no comments in the source header) and MPL-2.0
 
-Id:      org.antlr:antlr
-Project: ANTLR 3
-URL:     http://www.antlr.org/
-License: BSD
-
-Id:      org.antlr:antlr4
-Project: ANTLR 4
-URL:     http://www.antlr.org/
-License: BSD
-
-Id:      org.apache.commons:commons-lang3
-Project: Apache Commons Lang
-URL:     https://commons.apache.org/proper/commons-lang/
-License: Apache-2.0
-
-Id:      org.apache.logging.log4j
-Project: Apache Log2j 2
-URL:     http://logging.apache.org/log4j/2.x/
-License: Apache-2.0
-
 Id:      org.apache.pdfbox:fontbox
-Project: Apache PDFBox
-URL:     http://pdfbox.apache.org
-License: Apache-2.0
-
-Id:      org.apache.pdfbox:jempbox
-Project: Apache PDFBox
+Project: Apache FontBox
 URL:     http://pdfbox.apache.org
 License: Apache-2.0
 
@@ -160,20 +130,62 @@ Project: Apache PDFBox
 URL:     http://pdfbox.apache.org
 License: Apache-2.0
 
+Id:      org.apache.pdfbox:xmpbox
+Project: Apache XmpBox
+URL:     http://pdfbox.apache.org
+License: Apache-2.0
+
 Id:      org.bouncycastle:bcprov-jdk15on
 Project: The Legion of the Bouncy Castle
 URL:     https://www.bouncycastle.org/
 License: MIT
 
-Id:      org.citationstyles.styles
-Project: CSL Styles
-URL:     https://github.com/citation-style-language/styles
-Licence: Creative Commons Attribution-ShareAlike 3.0 Unported license
+Id:      org.jsoup:jsoup
+Project: jsoup
+URL:     https://github.com/jhy/jsoup/
+License: MIT
 
-Id:      org.citationstyles.locales
-Project: CSL Locales
-URL:     https://github.com/citation-style-language/locales
-Licence: CC-BY-SA-3.0
+Id:      org.libreoffice:juh
+Project: LibreOffice
+URL:
+License: LGPL 3.0
+
+Id:      org.libreoffice:jurt
+Project: LibreOffice
+URL:
+License: Apache-2.0
+
+Id:      org.libreoffice:ridl
+Project: LibreOffice
+URL:
+License: Apache-2.0
+
+Id:      org.libreoffice:unoil
+Project: LibreOffice
+URL:
+License: Apache-2.0
+
+## JavaFX
+
+Id:      com.airhacks:afterburner.fx
+Project: afterburner.fx
+URL:     https://github.com/AdamBien/afterburner.fx
+License: Apache 2.0
+
+Id:      de.codecentric.centerdevice
+Project: javafxsvg
+URL:     https://github.com/codecentric/javafxsvg
+License: BSD 3-Clause
+
+Id:      de.jensd:fontawesomefx-materialdesignfont
+Project: FontAwesomeFX
+URL:     https://bitbucket.org/Jerady/fontawesomefx
+License: Apache-2.0
+
+Id:      de.saxsys:mvvmfx-validation
+Project: mvvm(fx)
+URL:     https://github.com/sialcasa/mvvmFX
+License: Apache-2.0
 
 Id:      org.controlsfx:controlsfx
 Project: ControlsFX
@@ -195,45 +207,50 @@ Project: RichTextFX
 URL:     https://github.com/TomasMikula/RichTextFX
 License: BSD-2-Clause
 
-Id:      org.jsoup:jsoup
-Project: jsoup
-URL:     https://github.com/jhy/jsoup/
+
+## Logging
+
+Id:      org.apache.logging.log4j:*
+Project: Apache Log2j 2
+URL:     http://logging.apache.org/log4j/2.x/
+License: Apache-2.0
+
+Id:      org.slf4j:slf4j-api
+Project: Simpe Logging Facade for Java
+URL:     https://www.slf4j.org/
 License: MIT
 
-Id:      org.openoffice:juh
-Project: OpenOffice.org
-URL:     http://www.openoffice.org/api/SDK
-License: LGPL 3.0
 
-Id:      org.openoffice:jurt
-Project: OpenOffice.org
-URL:     http://www.openoffice.org/api/SDK
-License: Apache-2.0
+## Citation Style Language
 
-Id:      org.openoffice:ridl
-Project: OpenOffice.org
-URL:     http://www.openoffice.org/api/SDK
-License: Apache-2.0
+Id:      de.undercouch.citeproc-java
+Project: Citeproc-Java
+URL:     http://michel-kraemer.github.io/citeproc-java/
+Licence: Apache-2.0
 
-Id:      org.openoffice:unoil
-Project: OpenOffice.org
-URL:     http://www.openoffice.org/api/SDK
-License: Apache-2.0
+Id:      org.citationstyles.styles
+Project: CSL Styles
+URL:     https://github.com/citation-style-language/styles
+Licence: Creative Commons Attribution-ShareAlike 3.0 Unported license
 
-Id:      org.xmlunit:xmlunit-core
-Project: XMLUnit
-URL:     http://www.xmlunit.org/
-License: Apache 2.0
+Id:      org.citationstyles.locales
+Project: CSL Locales
+URL:     https://github.com/citation-style-language/locales
+Licence: CC-BY-SA-3.0
 
-Id:      org.xmlunit:xmlunit-matchers
-Project: XMLUnit
-URL:     http://www.xmlunit.org/
-License: Apache 2.0
+## Transitive dependencies
+
+Currently all depenencies are listed in `build.gradle`.
+
+## Dependencies included as JARs in the source tree
+
+Id:      com.apple:AppleJavaExtensions
+Project: AppleJavaExtensions
+URL:     https://developer.apple.com/legacy/library/samplecode/AppleJavaExtensions/Introduction/Intro.html
+License: Apple License
 
 Id:      spin
 Path:    lib/spin.jar
 Project: Spin
 URL:     http://spin.sourceforge.net/
 License: LGPL-2.1+
-
-The last entry has to end with an empty line. Otherwise the entry is not present in About.html.
