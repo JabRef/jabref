@@ -92,7 +92,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.7.1'
     compile 'org.antlr:antlr-runtime:3.5.2'
     compile 'org.antlr:antlr4-runtime:4.7.1'
-    
+
     compile 'com.github.bkromhout:java-diff-utils:2.1.1'
     compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
     compile 'com.google.guava:guava:24.1-jre'
@@ -100,15 +100,15 @@ dependencies {
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
-    compile 'com.microsoft.azure:applicationinsights-core:2.0.1'
-    compile 'com.microsoft.azure:applicationinsights-logging-log4j2:2.0.1'
+    compile 'com.microsoft.azure:applicationinsights-core:2.0.2'
+    compile 'com.microsoft.azure:applicationinsights-logging-log4j2:2.0.2'
     compile 'commons-cli:commons-cli:1.4'
     compile 'info.debatty:java-string-similarity:1.1.0'
     compile 'mysql:mysql-connector-java:5.1.46'
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
-    compile 'org.apache.pdfbox:fontbox:2.0.8'
-    compile 'org.apache.pdfbox:pdfbox:2.0.8'
-    compile 'org.apache.pdfbox:xmpbox:2.0.8'
+    compile 'org.apache.pdfbox:fontbox:2.0.9'
+    compile 'org.apache.pdfbox:pdfbox:2.0.9'
+    compile 'org.apache.pdfbox:xmpbox:2.0.9'
     compile 'org.bouncycastle:bcprov-jdk15on:1.59' // write-protected pdfs
     compile 'org.jsoup:jsoup:1.11.2'
     compile 'org.libreoffice:juh:5.4.2'
@@ -140,13 +140,13 @@ dependencies {
 
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit:4.0.+"
-    testCompile 'com.github.tomakehurst:wiremock:2.15.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.16.0'
     testCompile 'com.tngtech.archunit:archunit-junit:0.5.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.0'
     testCompile 'org.junit.jupiter:junit-jupiter-params:5.1.0'
     testCompile 'org.junit.platform:junit-platform-launcher:1.1.0'
-    testCompile 'org.mockito:mockito-core:2.16.0'
+    testCompile 'org.mockito:mockito-core:2.17.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.5.1'
     testCompile 'org.xmlunit:xmlunit-matchers:2.5.1'
