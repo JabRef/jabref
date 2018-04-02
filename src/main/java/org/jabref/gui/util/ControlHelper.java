@@ -3,6 +3,7 @@ package org.jabref.gui.util;
 import java.util.function.Consumer;
 
 import javax.swing.JComponent;
+
 import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
