@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
-import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.Region;
 
@@ -69,9 +69,14 @@ public class PreferencesDialog extends BaseDialog<Void> {
         getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         setResizable(true);
 
-        ButtonType save = new ButtonType(Localization.lang("Save"), ButtonBar.ButtonData.APPLY);
-        getDialogPane().getButtonTypes().setAll(save, ButtonType.CANCEL);
-        ControlHelper.setAction(save, getDialogPane(), event -> storeAllSettings());
+        ButtonType save = new ButtonType(Localization.lang("Save"), ButtonData.OK_DONE);
+
+        getDialogPane().getButtonTypes().addAll(save, ButtonType.CANCEL);
+        ControlHelper.setAction(save, getDialogPane(), event -> {
+            storeAllSettings();
+            close();
+        });
+
 
         prefs = JabRefPreferences.getInstance();
         frame = parent;
