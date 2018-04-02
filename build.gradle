@@ -24,6 +24,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '2.0.2'
     id 'com.gradle.build-scan' version '1.11'
     id 'com.install4j.gradle' version '7.0.3'
+    id 'com.github.jk1.dependency-license-report' version '0.7'
     id 'me.champeau.gradle.jmh' version '0.4.3'
     id 'net.ltgt.errorprone' version '0.0.13'
 }
@@ -482,4 +483,8 @@ jmh {
     warmupIterations = 5
     iterations = 10
     fork = 2
+}
+
+licenseReport {
+     renderers = [new com.github.jk1.license.render.TextReportRenderer(), new com.github.jk1.license.render.SimpleHtmlReportRenderer()]
 }
