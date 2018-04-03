@@ -11,7 +11,7 @@ function Respond($response) {
     }
 }
 
-$jabRefJarFileName = "JabRef-4.2-dev-fat.jar"
+$jabRefJarFileName = "@jabRefJarFileName@"
 $jabRefJar = [System.IO.Path]::Combine($PSScriptRoot, $jabRefJarFileName)
 
 try {
@@ -27,7 +27,7 @@ try {
             return Respond @{message="jarFound"}
         }
     }
-    
+
     if (-not (Test-Path $jabRefJar)) {
 
         $wshell = New-Object -ComObject Wscript.Shell
