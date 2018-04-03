@@ -24,7 +24,7 @@ public class StringViewModel {
             return ValidationMessage.error("May not be null2");
         } else if (input.trim().isEmpty()) {
             System.out.println("Should not empty");
-            return ValidationMessage.warning("Should not be empty");
+            return ValidationMessage.error("Should not be empty");
         } else {
             return null; // everything is ok
         }

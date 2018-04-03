@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableColumn?>
@@ -11,7 +10,7 @@
 
 <DialogPane xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.strings.StringDialogView">
    <header>
-      <ToolBar maxWidth="1.7976931348623157E308" prefHeight="40.0" prefWidth="299.0">
+      <ToolBar prefHeight="40.0" prefWidth="299.0">
         <items>
           <Button fx:id="btnNewString" mnemonicParsing="false" onAction="#addString" />
             <Button fx:id="btnRemove" mnemonicParsing="false" onAction="#removeString" />

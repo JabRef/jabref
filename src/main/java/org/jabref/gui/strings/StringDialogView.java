@@ -22,7 +22,6 @@ import org.jabref.model.database.BibDatabase;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import org.controlsfx.tools.ValueExtractor;
 
 public class StringDialogView extends BaseDialog<Void> {
 
@@ -62,31 +61,47 @@ public class StringDialogView extends BaseDialog<Void> {
         btnRemove.setGraphic(JabRefIcons.REMOVE.getGraphicNode());
         btnRemove.setTooltip(new Tooltip(Localization.lang("Remove string")));
 
-        //Register TextfieldTableCell Control for validation
-        ValueExtractor.addObservableValueExtractor(c -> c instanceof TextFieldTableCell, c -> ((TextFieldTableCell<?, String>) c).textProperty());
 
-        colLabel.setCellFactory(column -> {
+        colLabel.setCellValueFactory(cellData -> cellData.getValue().getLabel());
+        colLabel.setCellFactory(column -> new TextFieldTableCell<StringViewModel, String>(new DefaultStringConverter()) {
 
-            TextFieldTableCell<StringViewModel, String> cell = new TextFieldTableCell<>(new DefaultStringConverter());
-            column.setCellValueFactory(cellData -> {
+            @Override
+            public void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
 
-                visualizer.initVisualization(cellData.getValue().labelValidation(), cell);
-                return cellData.getValue().getLabel();
-            });
-            return cell;
+                if (!empty) {
+                    if (getTableRow() != null) {
+                        Object rowItem = getTableRow().getItem();
 
+                        if ((rowItem != null) && (rowItem instanceof StringViewModel)) {
+                            StringViewModel vm = (StringViewModel) rowItem;
+
+                            visualizer.initVisualization(vm.labelValidation(), this);
+                        }
+                    }
+                }
+            }
         });
 
-        colContent.setCellFactory(column -> {
+        colContent.setCellValueFactory(cellData -> cellData.getValue().getContent());
+        colContent.setCellFactory(column -> new TextFieldTableCell<StringViewModel, String>(new DefaultStringConverter()) {
 
-            TextFieldTableCell<StringViewModel, String> cell = new TextFieldTableCell<>(new DefaultStringConverter());
-            column.setCellValueFactory(cellData -> {
+            @Override
+            public void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
 
-                visualizer.initVisualization(cellData.getValue().contentValidation(), cell);
-                return cellData.getValue().getContent();
-            });
-            return cell;
+                if (!empty) {
+                    if (getTableRow() != null) {
+                        Object rowItem = getTableRow().getItem();
 
+                        if ((rowItem != null) && (rowItem instanceof StringViewModel)) {
+                            StringViewModel vm = (StringViewModel) rowItem;
+
+                            visualizer.initVisualization(vm.contentValidation(), this);
+                        }
+                    }
+                }
+            }
         });
 
         colLabel.setOnEditCommit((CellEditEvent<StringViewModel, String> cell) -> {

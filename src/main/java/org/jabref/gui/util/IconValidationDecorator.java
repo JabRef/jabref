@@ -48,7 +48,7 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
         Label label = new Label();
         label.setGraphic(graphic);
         label.setTooltip(createTooltip(message));
-        label.setAlignment(Pos.CENTER);
+        label.setAlignment(position);
         return label;
     }
 
