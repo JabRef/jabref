@@ -34,6 +34,7 @@ public class MainArchitectureTests {
     private static final String EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS = "javafx.collections";
     private static final String EXCEPTION_PACKAGE_JAVA_FX_BEANS = "javafx.beans";
     private static final String EXCEPTION_CLASS_JAVA_FX_COLOR = "javafx.scene.paint.Color";
+    private static final String EXCEPTION_CLASS_JAVA_FX_PAIR = "javafx.util.Pair";
 
     private static Map<String, List<String>> exceptions;
 
@@ -48,6 +49,7 @@ public class MainArchitectureTests {
         logicExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS);
         logicExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_BEANS);
         logicExceptions.add(EXCEPTION_CLASS_JAVA_FX_COLOR);
+        logicExceptions.add(EXCEPTION_CLASS_JAVA_FX_PAIR);
 
         List<String> modelExceptions = new ArrayList<>(4);
         modelExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS);
