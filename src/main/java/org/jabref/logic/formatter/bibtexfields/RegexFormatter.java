@@ -34,9 +34,23 @@ public class RegexFormatter implements Formatter {
     private static final String CLOSING_BRACE_AND_QUOTE = ")\"";
 
     private static final int LENGTH_OF_CLOSING_BRACE_AND_QUOTE = CLOSING_BRACE_AND_QUOTE.length();
+    public static final String KEY = "regex";
 
-    // stores the regex set by setRegex
-    private static String[] regex;
+    private String regex;
+    private String replacement;
+
+    /**
+     * Constructs a new regular expression-based formatter with the given RegEx.
+     *
+     * @param input the regular expressions for matching and replacing given in the form {@code (<regex>, <replace>)}.
+     */
+    public RegexFormatter(String input) {
+        // formatting is like ("exp1","exp2"), we want to first remove (" and ")
+        String rexToSet = input.substring(LENGTH_OF_QUOTE_AND_OPENING_BRACE, input.length() - LENGTH_OF_CLOSING_BRACE_AND_QUOTE);
+        String[] parts = rexToSet.split("\",\"");
+        regex = parts[0];
+        replacement = parts[1];
+    }
 
     @Override
     public String getName() {
@@ -45,7 +59,7 @@ public class RegexFormatter implements Formatter {
 
     @Override
     public String getKey() {
-        return "regex";
+        return KEY;
     }
 
     private String replaceHonoringProtectedGroups(final String input) {
@@ -56,7 +70,7 @@ public class RegexFormatter implements Formatter {
             replaced.add(matcher.group(1));
         }
         String workingString = matcher.replaceAll(PLACEHOLDER_FOR_PROTECTED_GROUP);
-        workingString = workingString.replaceAll(RegexFormatter.regex[0], RegexFormatter.regex[1]);
+        workingString = workingString.replaceAll(regex, replacement);
 
         for (String r : replaced) {
             workingString = workingString.replaceFirst(PLACEHOLDER_FOR_PROTECTED_GROUP, r);
@@ -93,13 +107,4 @@ public class RegexFormatter implements Formatter {
     public String getExampleInput() {
         return "Please replace the spaces";
     }
-
-    public static void setRegex(String rex) {
-        // formatting is like ("exp1","exp2"), we want to remove (" and ")
-        String rexToSet = rex;
-        rexToSet = rexToSet.substring(LENGTH_OF_QUOTE_AND_OPENING_BRACE, rexToSet.length() - LENGTH_OF_CLOSING_BRACE_AND_QUOTE);
-        String[] parts = rexToSet.split("\",\"");
-        regex = parts;
-    }
-
 }
