@@ -27,16 +27,22 @@ try {
             return Respond @{message="jarFound"}
         }
     }
-
+    
     if (-not (Test-Path $jabRefJar)) {
-
         $wshell = New-Object -ComObject Wscript.Shell
         $popup = "Unable to locate '$jabRefJarFileName' in '$([System.IO.Path]::GetDirectoryName($jabRefJar))'."
         $wshell.Popup($popup,0,"JabRef", 0x0 + 0x30)
         return
     }
 
-    javaw -jar $jabRefJar -importBibtex $message.Text
+    #$wshell = New-Object -ComObject Wscript.Shell
+    #$wshell.Popup($message.Text,0,"JabRef", 0x0 + 0x30)
+
+    $messageText = $message.Text
+    $output = & java -jar $jabRefJar -importBibtex "$messageText" 2>&1
+    #$output = & echoargs -importBibtex $messageText 2>&1
+    #$wshell.Popup($output,0,"JabRef", 0x0 + 0x30)
+    return Respond @{message="ok";output="$output"}
 } finally {
     $reader.Dispose()
 }
