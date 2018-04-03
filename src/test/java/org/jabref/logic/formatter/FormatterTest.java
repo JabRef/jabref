@@ -54,8 +54,7 @@ class FormatterTest {
         // all classes implementing {@link net.sf.jabref.model.cleanup.Formatter}
         // sorted alphabetically
         // Alternative: Use reflection - https://github.com/ronmamo/reflections
-        // @formatter:off
-       return Stream.of(
+        return Stream.of(
                 new CapitalizeFormatter(),
                 new ClearFormatter(),
                 new HtmlToLatexFormatter(),
@@ -71,15 +70,14 @@ class FormatterTest {
                 new NormalizePagesFormatter(),
                 new OrdinalsToSuperscriptFormatter(),
                 new ProtectTermsFormatter(protectedTermsLoader),
-               new RegexFormatter("(\" \",\"-\")"),
+                new RegexFormatter("(\" \",\"-\")"),
                 new RemoveBracesFormatter(),
                 new SentenceCaseFormatter(),
                 new TitleCaseFormatter(),
                 new UnicodeToLatexFormatter(),
                 new UnitsToLatexFormatter(),
-                new UpperCaseFormatter());
-
-        // @formatter:on
+                new UpperCaseFormatter()
+        );
     }
 
     @ParameterizedTest
