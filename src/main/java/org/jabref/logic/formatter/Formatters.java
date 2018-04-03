@@ -80,22 +80,18 @@ public class Formatters {
     public static Optional<Formatter> getFormatterForModifier(String modifier) {
         Objects.requireNonNull(modifier);
 
-        if (modifier.startsWith(RegexFormatter.KEY)) {
-            String regex = modifier.substring(RegexFormatter.KEY.length());
-            return Optional.of(new RegexFormatter(regex));
-        } else {
-            Optional<Formatter> formatter = getAll().stream().filter(f -> f.getKey().equals(modifier)).findAny();
-            if (formatter.isPresent()) {
-                return formatter;
-            }
-        }
         switch (modifier) {
             case "lower":
                 return Optional.of(new LowerCaseFormatter());
             case "upper":
                 return Optional.of(new UpperCaseFormatter());
-            default:
-                return Optional.empty();
+        }
+
+        if (modifier.startsWith(RegexFormatter.KEY)) {
+            String regex = modifier.substring(RegexFormatter.KEY.length());
+            return Optional.of(new RegexFormatter(regex));
+        } else {
+            return getAll().stream().filter(f -> f.getKey().equals(modifier)).findAny();
         }
     }
 
