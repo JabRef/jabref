@@ -11,31 +11,21 @@ import org.jabref.model.cleanup.Formatter;
 
 public class RegexFormatter implements Formatter {
 
+    public static final String KEY = "regex";
     private static final Pattern PATTERN_ESCAPED_OPENING_CURLY_BRACE = Pattern.compile("\\\\\\{");
-
     private static final Pattern PATTERN_ESCAPED_CLOSING_CURLY_BRACE = Pattern.compile("\\\\\\}");
-
     // RegEx to match {...}
     // \\ is required to have the { interpreted as character
     // ? is required to disable the aggressive match
     private static final Pattern PATTERN_ENCLOSED_IN_CURLY_BRACES = Pattern.compile("(\\{.*?})");
-
     // Magic arbitrary unicode char, which will never appear in bibtex files
     private static final String PLACEHOLDER_FOR_PROTECTED_GROUP = Character.toString('\u0A14');
-
     private static final String PLACEHOLDER_FOR_OPENING_CURLY_BRACE = Character.toString('\u0A15');
-
     private static final String PLACEHOLDER_FOR_CLOSING_CURLY_BRACE = Character.toString('\u0A16');
-
     private static final String QUOTE_AND_OPENING_BRACE = "\"(";
-
     private static final int LENGTH_OF_QUOTE_AND_OPENING_BRACE = QUOTE_AND_OPENING_BRACE.length();
-
     private static final String CLOSING_BRACE_AND_QUOTE = ")\"";
-
     private static final int LENGTH_OF_CLOSING_BRACE_AND_QUOTE = CLOSING_BRACE_AND_QUOTE.length();
-    public static final String KEY = "regex";
-
     private String regex;
     private String replacement;
 
