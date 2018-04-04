@@ -56,6 +56,7 @@ The new default removes the linked file from the entry instead of deleting the f
 - We fixed the name of the group editing window to "Add group" instead of "Edit Group" when adding a new group. [koppor#277](https://github.com/koppor/jabref/issues/277)
 - We fixed the `pureauth` [BibTeX key generator pattern](https://help.jabref.org/en/BibtexKeyPatterns) to just return the author if no author, but an editor is present.
 - We fixed an issue where the "Copy linked files" dialog produced an error when the entry had no file [#3818](https://github.com/JabRef/jabref/issues/3818)
+- We fixed an issue where pressing <kbd>del</kbd> in the `file` field would trigger the delete dialog a second file, if the first file is deleted [#3926](https://github.com/JabRef/jabref/issues/3926)
 
 ### Removed
 - We removed the [Look and Feels from JGoodies](http://www.jgoodies.com/freeware/libraries/looks/), because the open source version is not compatible with Java 9.
