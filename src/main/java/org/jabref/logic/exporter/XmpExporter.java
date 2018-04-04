@@ -8,8 +8,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.Globals;
 import org.jabref.logic.util.FileType;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -21,8 +21,11 @@ import org.jabref.model.entry.BibEntry;
  */
 public class XmpExporter extends Exporter {
 
-    public XmpExporter() {
-        super("XmpBib", FileType.ENDNOTE_XMP.getDescription(), FileType.ENDNOTE_XMP);
+    private final XmpPreferences xmpPreferences;
+
+    public XmpExporter(XmpPreferences xmpPreferences) {
+        super("xmp", FileType.PLAIN_XMP.getDescription(), FileType.PLAIN_XMP);
+        this.xmpPreferences = xmpPreferences;
     }
 
     @Override
@@ -35,7 +38,7 @@ public class XmpExporter extends Exporter {
         }
 
         try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
-            writer.write(XmpUtilWriter.generateXmpString(entries, Globals.prefs.getXMPPreferences()));
+            writer.write(XmpUtilWriter.generateXmpString(entries, this.xmpPreferences));
             writer.flush();
         }
     }

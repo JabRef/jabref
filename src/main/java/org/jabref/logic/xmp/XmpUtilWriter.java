@@ -99,7 +99,21 @@ public class XmpUtilWriter {
 
         BibEntry resolvedEntry = XmpUtilWriter.getDefaultOrDatabaseEntry(entry, database);
 
-        DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, resolvedEntry);
+        writeToDCSchema(dcSchema, resolvedEntry, xmpPreferences);
+    }
+
+    /**
+     * Writes the information of the bib entry to the dublin core schema using
+     * a custom extractor.
+     *
+     * @param dcSchema  Dublin core schema, which is filled with the bib entry.
+     * @param entry     The entry, which is added to the dublin core metadata.
+     * @param xmpPreferences    The user's xmp preferences.
+     */
+    private static void writeToDCSchema(DublinCoreSchema dcSchema, BibEntry entry,
+            XmpPreferences xmpPreferences) {
+
+        DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, entry);
         dcExtractor.fillDublinCoreSchema();
     }
 
@@ -184,20 +198,20 @@ public class XmpUtilWriter {
         XMPMetadata meta = XMPMetadata.createXMPMetadata();
         for (BibEntry entry : entries) {
             DublinCoreSchema dcSchema = meta.createAndAddDublinCoreSchema();
-            XmpUtilWriter.writeToDCSchema(dcSchema, entry, null, xmpPreferences);
+            XmpUtilWriter.writeToDCSchema(dcSchema, entry, xmpPreferences);
         }
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             XmpSerializer serializer = new XmpSerializer();
             serializer.serialize(meta, os, true);
             return os.toString(StandardCharsets.UTF_8.name());
         } catch (TransformerException e) {
-            LOGGER.warn("Tranformation into xmp not possible: " + e.getMessage());
+            LOGGER.warn("Tranformation into xmp not possible: " + e.getMessage(), e);
             return "";
         } catch (UnsupportedEncodingException e) {
-            LOGGER.warn("Unsupported encoding to UTF-8 of bib entries in xmp metadata.");
+            LOGGER.warn("Unsupported encoding to UTF-8 of bib entries in xmp metadata.", e);
             return "";
         } catch (IOException e) {
-            LOGGER.warn("IO Exception thrown by closing the output stream.");
+            LOGGER.warn("IO Exception thrown by closing the output stream.", e);
             return "";
         }
     }

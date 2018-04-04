@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.Globals;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.FileType;
@@ -54,7 +55,7 @@ public class ExporterFactory {
         exporters.add(new OpenDocumentSpreadsheetCreator());
         exporters.add(new MSBibExporter());
         exporters.add(new ModsExporter());
-        exporters.add(new XmpExporter());
+        exporters.add(new XmpExporter(Globals.prefs.getXMPPreferences()));
 
         // Now add custom export formats
         exporters.addAll(customFormats.values());

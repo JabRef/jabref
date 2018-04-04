@@ -26,7 +26,6 @@ public enum FileType {
     DIN_1505(Localization.lang("%0 file", "DIN 1505"), "rtf"),
     ENDNOTE(Localization.lang("%0 file", "EndNote/Refer"), "ref", "enw"),
     ENDNOTE_XML(Localization.lang("%0 file", "EndNote XML"), "xml"),
-    ENDNOTE_XMP(Localization.lang("%0 file", "Xmp"), "xmp"),
     ENDNOTE_TXT(Localization.lang("%0 file", "EndNote"), "txt"), //for export
     FREECITE(Localization.lang("%0 file", "FreeCite"), "txt", "xml"),
     HARVARD_RTF(Localization.lang("%0 file", "Harvard"), "rtf"),
@@ -51,6 +50,7 @@ public enum FileType {
     SILVER_PLATTER(Localization.lang("%0 file", "SilverPlatter"), "dat", "txt"),
     SIMPLE_HTML(Localization.lang("%0 file", Localization.lang("Simple HTML")), "html"),
     XMP(Localization.lang("XMP-annotated PDF"), "pdf"),
+    PLAIN_XMP(Localization.lang("%0 file", "Xmp"), "xmp"),
 
     AUX(Localization.lang("%0 file", "AUX"), "aux"),
     JSTYLE(Localization.lang("Style file"), "jstyle"),
