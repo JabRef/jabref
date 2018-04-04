@@ -38,79 +38,23 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class FormatterTest {
+class FormatterTest {
 
     private static ProtectedTermsLoader protectedTermsLoader;
 
     @BeforeAll
-    public static void setUp() {
+    static void setUp() {
         protectedTermsLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
                         Collections.emptyList(), Collections.emptyList()));
 
-
     }
 
-    @ParameterizedTest
-    @MethodSource("getFormatters")
-    public void getNameReturnsNotNull(Formatter formatter) {
-        assertNotNull(formatter.getName());
-    }
-
-    @ParameterizedTest
-    @MethodSource("getFormatters")
-    public void getNameReturnsNotEmpty(Formatter formatter) {
-        assertNotEquals("", formatter.getName());
-    }
-
-    @ParameterizedTest
-    @MethodSource("getFormatters")
-    public void getKeyReturnsNotNull(Formatter formatter) {
-        assertNotNull(formatter.getKey());
-    }
-
-    @ParameterizedTest
-    @MethodSource("getFormatters")
-    public void getKeyReturnsNotEmpty(Formatter formatter) {
-        assertNotEquals("", formatter.getKey());
-    }
-
-    @ParameterizedTest
-    @MethodSource("getFormatters")
-    public void formatOfNullThrowsException(Formatter formatter) {
-        assertThrows(NullPointerException.class, () -> formatter.format(null));
-    }
-
-    @ParameterizedTest
-    @MethodSource("getFormatters")
-    public void formatOfEmptyStringReturnsEmpty(Formatter formatter) {
-        assertEquals("", formatter.format(""));
-    }
-
-    @ParameterizedTest
-    @MethodSource("getFormatters")
-    public void formatNotReturnsNull(Formatter formatter) {
-        assertNotNull(formatter.format("string"));
-    }
-
-    @ParameterizedTest
-    @MethodSource("getFormatters")
-    public void getDescriptionAlwaysNonEmpty(Formatter formatter) {
-        assertFalse(formatter.getDescription().isEmpty());
-    }
-
-    @ParameterizedTest
-    @MethodSource("getFormatters")
-    public void getExampleInputAlwaysNonEmpty(Formatter formatter) {
-        assertFalse(formatter.getExampleInput().isEmpty());
-    }
-
-    public static Stream<Formatter> getFormatters() {
+    private static Stream<Formatter> getFormatters() {
         // all classes implementing {@link net.sf.jabref.model.cleanup.Formatter}
         // sorted alphabetically
         // Alternative: Use reflection - https://github.com/ronmamo/reflections
-        // @formatter:off
-       return Stream.of(
+        return Stream.of(
                 new CapitalizeFormatter(),
                 new ClearFormatter(),
                 new HtmlToLatexFormatter(),
@@ -126,14 +70,67 @@ public class FormatterTest {
                 new NormalizePagesFormatter(),
                 new OrdinalsToSuperscriptFormatter(),
                 new ProtectTermsFormatter(protectedTermsLoader),
-                new RegexFormatter(),
+                new RegexFormatter("(\" \",\"-\")"),
                 new RemoveBracesFormatter(),
                 new SentenceCaseFormatter(),
                 new TitleCaseFormatter(),
                 new UnicodeToLatexFormatter(),
                 new UnitsToLatexFormatter(),
-                new UpperCaseFormatter());
+                new UpperCaseFormatter()
+        );
+    }
 
-        // @formatter:on
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    void getNameReturnsNotNull(Formatter formatter) {
+        assertNotNull(formatter.getName());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    void getNameReturnsNotEmpty(Formatter formatter) {
+        assertNotEquals("", formatter.getName());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    void getKeyReturnsNotNull(Formatter formatter) {
+        assertNotNull(formatter.getKey());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    void getKeyReturnsNotEmpty(Formatter formatter) {
+        assertNotEquals("", formatter.getKey());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    void formatOfNullThrowsException(Formatter formatter) {
+        assertThrows(NullPointerException.class, () -> formatter.format(null));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    void formatOfEmptyStringReturnsEmpty(Formatter formatter) {
+        assertEquals("", formatter.format(""));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    void formatNotReturnsNull(Formatter formatter) {
+        assertNotNull(formatter.format("string"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    void getDescriptionAlwaysNonEmpty(Formatter formatter) {
+        assertFalse(formatter.getDescription().isEmpty());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    void getExampleInputAlwaysNonEmpty(Formatter formatter) {
+        assertFalse(formatter.getExampleInput().isEmpty());
     }
 }
