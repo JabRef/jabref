@@ -8,13 +8,16 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.Globals;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 /**
- *
+ * A custom exporter to write bib entries to a .xmp file for further processing
+ * in other scenarios and applications. The xmp metadata are written in dublin
+ * core format.
  */
 public class XmpExporter extends Exporter {
 
@@ -32,7 +35,7 @@ public class XmpExporter extends Exporter {
         }
 
         try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
-            writer.write(XmpUtilWriter.generateXmpString(entries));
+            writer.write(XmpUtilWriter.generateXmpString(entries, Globals.prefs.getXMPPreferences()));
             writer.flush();
         }
     }
