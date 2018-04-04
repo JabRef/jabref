@@ -8,6 +8,9 @@ import org.jabref.model.cleanup.Formatter;
 
 public class JournalMedlineAbbreviator implements Formatter {
 
+    private final JournalAbbreviationLoader repostioryLoader;
+    private final JournalAbbreviationPreferences journalAbbreviationPreferences;
+
     //TODO: How do I pass the prefs at best?
     public JournalMedlineAbbreviator(JournalAbbreviationLoader repostioryLoader,
             JournalAbbreviationPreferences journalAbbreviationPreferences) {
@@ -26,11 +29,6 @@ public class JournalMedlineAbbreviator implements Formatter {
         // TODO Auto-generated method stub
         return null;
     }
-
-    private final JournalAbbreviationLoader repostioryLoader;
-    private final JournalAbbreviationPreferences journalAbbreviationPreferences;
-
-
 
     @Override
     public String format(String fieldText) {
