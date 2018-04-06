@@ -85,8 +85,13 @@ public class SearchQuery implements SearchMatcher {
         }
     }
 
+    /**
+     * Tests if the query is an advanced search query described as described in the help
+     *
+     * @return true if the query is an advanced search query
+     */
     public boolean isGrammarBasedSearch() {
-        return rule instanceof GrammarBasedSearchRule || rule instanceof RegexBasedSearchRule;
+        return rule instanceof GrammarBasedSearchRule;
     }
 
     public String getQuery() {
