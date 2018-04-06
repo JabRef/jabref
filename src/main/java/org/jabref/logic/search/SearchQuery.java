@@ -9,7 +9,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
 import org.jabref.model.search.rules.ContainBasedSearchRule;
 import org.jabref.model.search.rules.GrammarBasedSearchRule;
-import org.jabref.model.search.rules.RegexBasedSearchRule;
 import org.jabref.model.search.rules.SearchRule;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.search.rules.SentenceAnalyzer;

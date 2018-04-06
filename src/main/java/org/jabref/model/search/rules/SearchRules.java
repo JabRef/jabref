@@ -2,8 +2,6 @@ package org.jabref.model.search.rules;
 
 import java.util.regex.Pattern;
 
-import org.jabref.model.strings.StringUtil;
-
 public class SearchRules {
 
 
@@ -31,7 +29,7 @@ public class SearchRules {
     }
 
     private static boolean isSimpleQuery(String query) {
-        return StringUtil.isBlank(query) || SIMPLE_EXPRESSION.matcher(query).matches();
+        return SIMPLE_EXPRESSION.matcher(query).matches();
     }
 
     private static SearchRule getSearchRule(boolean caseSensitive, boolean regex) {
