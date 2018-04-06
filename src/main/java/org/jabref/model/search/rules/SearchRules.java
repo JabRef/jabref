@@ -7,7 +7,7 @@ import org.jabref.model.strings.StringUtil;
 public class SearchRules {
 
 
-    private static final Pattern SIMPLE_EXPRESSION = Pattern.compile("(\\w|\\d|\\s)*");
+    private static final Pattern SIMPLE_EXPRESSION = Pattern.compile("[^\\p{Punct}]*");
 
     private SearchRules() {
     }
