@@ -334,9 +334,11 @@ public class GlobalSearchBar extends JPanel {
             searchWorker.cancel(true);
         }
 
-        // An empty search field should cause the search to be cleared.
+        // An empty search field should cause the search to be cleared
         if (searchField.getText().isEmpty()) {
             clearSearch(currentBasePanel);
+            // also make sure the search icon has the standard color
+            searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
             return;
         }
 
