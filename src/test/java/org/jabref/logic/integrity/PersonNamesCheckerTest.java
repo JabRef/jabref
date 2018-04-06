@@ -22,6 +22,26 @@ public class PersonNamesCheckerTest {
     }
 
     @Test
+    public void validNameFirstnameAuthor() throws Exception {
+        assertEquals(Optional.empty(), checker.checkValue("Kolb, Stefan"));
+    }
+
+    @Test
+    public void validNameFirstnameAuthors() throws Exception {
+        assertEquals(Optional.empty(), checker.checkValue("Kolb, Stefan and Harrer, Simon"));
+    }
+
+    @Test
+    public void validFirstnameNameAuthor() throws Exception {
+        assertEquals(Optional.empty(), checker.checkValue("Stefan Kolb"));
+    }
+
+    @Test
+    public void validFirstnameNameAuthors() throws Exception {
+        assertEquals(Optional.empty(), checker.checkValue("Stefan Kolb and Simon Harrer"));
+    }
+
+    @Test
     public void complainAboutPersonStringWithTwoManyCommas() throws Exception {
         assertEquals(Optional.of("Names are not in the standard BibTeX format."),
                 checker.checkValue("Test1, Test2, Test3, Test4, Test5, Test6"));
@@ -30,5 +50,10 @@ public class PersonNamesCheckerTest {
     @Test
     public void doNotComplainAboutSecondNameInFront() throws Exception {
         assertEquals(Optional.empty(), checker.checkValue("M. J. Gotay"));
+    }
+
+    @Test
+    public void validCorporateNameInBrackets() throws Exception {
+        assertEquals(Optional.empty(), checker.checkValue("{JabRef}"));
     }
 }

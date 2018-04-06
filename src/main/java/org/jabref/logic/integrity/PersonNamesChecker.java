@@ -30,6 +30,11 @@ public class PersonNamesChecker implements ValueChecker {
             return Optional.of(Localization.lang("should end with a name"));
         }
 
+        // Protected corporate names inside {}
+        if (value.startsWith("{") && value.endsWith("}")) {
+            return Optional.empty();
+        }
+
         // Check that the value is in one of the two standard BibTeX formats:
         //  Last, First and ...
         //  First Last and ...
