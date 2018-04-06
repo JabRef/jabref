@@ -23,11 +23,11 @@ import org.apache.http.client.utils.URIBuilder;
 /**
  * Fetches data from the Zentralblatt Math (https://www.zbmath.org/)
  */
-public class zbMATH implements SearchBasedParserFetcher {
+public class ZbMATH implements SearchBasedParserFetcher {
 
     private final ImportFormatPreferences preferences;
 
-    public zbMATH(ImportFormatPreferences preferences) {
+    public ZbMATH(ImportFormatPreferences preferences) {
         this.preferences = Objects.requireNonNull(preferences);
     }
 

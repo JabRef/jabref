@@ -1,7 +1,5 @@
 package org.jabref.model.entry;
 
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -91,25 +89,4 @@ public class KeywordListTest {
                 KeywordList.parse("Parent1 > Node1 > Child1, Parent2 > Node2 > Child2", ',', '>'));
     }
 
-    @Test
-    public void parseEmptyOptionalReturnsEmptyList() throws Exception {
-        assertEquals(new KeywordList(), KeywordList.parse(Optional.empty(), ','));
-    }
-
-    @Test
-    public void parseEmptyStringOptionalReturnsEmptyList() throws Exception {
-        assertEquals(new KeywordList(), KeywordList.parse(Optional.of(""), ','));
-    }
-
-    @Test
-    public void parseOneWordOptionalReturnsOneKeyword() throws Exception {
-        assertEquals(new KeywordList("keywordOne"),
-                KeywordList.parse(Optional.of("keywordOne"), ','));
-    }
-
-    @Test
-    public void parseTwoWordOptionalReturnsTwoKeywords() throws Exception {
-        assertEquals(new KeywordList("keywordOne", "keywordTwo"),
-                KeywordList.parse(Optional.of("keywordOne, keywordTwo"), ','));
-    }
 }

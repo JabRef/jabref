@@ -42,7 +42,6 @@ public class GroupNodeViewModelTest {
 
         viewModel = getViewModelForGroup(
                 new WordKeywordGroup("Test group", GroupHierarchyType.INDEPENDENT, "test", "search", true, ',', false));
-
     }
 
     @Test
@@ -152,7 +151,7 @@ public class GroupNodeViewModelTest {
     }
 
     @Test
-    public void entriesAreAddedCorrectly() {;
+    public void entriesAreAddedCorrectly() {
         String groupName = "group";
         ExplicitGroup group = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT,',');
         BibEntry entry = new BibEntry();
