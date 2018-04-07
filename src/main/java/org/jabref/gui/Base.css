@@ -16,7 +16,7 @@
     -jr-base: #ebebeb;
 
     -jr-white: #ffffff;
-    -jr-gray-0: #f0f0f0;
+    -jr-gray-0: #f2f2f2;
     -jr-gray-1: #e6e6e6;
     -jr-gray-2: #808080;
     -jr-gray-3: #404040;
@@ -45,7 +45,7 @@
     -jr-text-area-background: derive(-jr-base, 80%);
     -jr-search-background: -jr-text-area-background;
     -jr-toolbar: derive(-jr-base, 46.4%);
-    -jr-menu-background: -fx-background;
+    -jr-menu-background: derive(-jr-base, 46.4%);
     -jr-menu-background-active: -jr-hover;
 
     -jr-menu-foreground: -fx-dark-text-color;
@@ -56,9 +56,9 @@
 
     -jr-head-fg: -fx-text-inner-color;
 
-    /* All icons on toolbars or next to inputs */
-    -jr-icon: -jr-theme;
-    -jr-icon-active: derive(-jr-theme, -20%);
+    /* All icons/text on toolbars */
+    -jr-theme-text: -jr-theme;
+
     -jr-icon-background: transparent;
     -jr-icon-background-active: #0001;
     -jr-icon-background-armed: #0002;
@@ -83,15 +83,17 @@
     -jr-tooltip-fg: -jr-black;
 
     /* Finally, some specific jr styles that depend on -fx definitions in *this* style */
-    -jr-sidepane-background: -jr-toolbar;
-    -jr-sidepane-header-background: -fx-background;
-    -jr-sidepane-header-color: -jr-icon;
+    -jr-sidepane-background: -jr-gray-0;
+    -jr-sidepane-header-background: -jr-gray-0;
+    -jr-sidepane-header-color: -jr-theme-text;
 
     /* Specs for the scrollbars */
     -jr-scrollbar-thumb: -fx-outer-border;
     -jr-scrollbar-track: -fx-control-inner-background;
 
     -jr-separator: derive(-fx-color, -5%);
+
+    -jr-search-text: -fx-text-base-color;
 
     /*
      Here are redefinitions of the default properties of modena. They should in principle all be derived from the
@@ -295,20 +297,6 @@
     -fx-padding: 0.5em;
 }
 
-.flatButtonNoSpaceBottom .glyph-icon,
-.flatButtonNoSpaceTop .glyph-icon,
-.flatButton .glyph-icon {
-    -fx-fill: -jr-icon;
-    -fx-text-fill: -jr-icon;
-}
-
-.flatButtonNoSpaceBottom:hover .glyph-icon,
-.flatButtonNoSpaceTop:hover .glyph-icon,
-.flatButton:hover .glyph-icon {
-    -fx-fill: -jr-icon-active;
-    -fx-text-fill: -jr-icon-active;
-}
-
 .flatButtonNoSpaceBottom:hover,
 .flatButtonNoSpaceTop:hover,
 .flatButton:hover {
@@ -351,9 +339,21 @@
 }
 
 .menu-bar {
-    -fx-background-color: -fx-body-color;
+    -fx-background-color: -jr-menu-background;
     -fx-background-insets: 0;
     -fx-background-radius: 0;
+}
+
+.menu-bar > .container > .menu-button > .label {
+    -fx-padding: 0.41777em 0.41777em 0.41777em 0.41777em;
+}
+
+.menu-bar > .menu {
+    -fx-padding: 0.0em 0.666667em 0.0em 0.666667em;
+}
+
+.menu-item {
+    -fx-padding: 0.5em 0.41777em 0.5em 0.41777em;
 }
 
 .tab-pane {
@@ -377,8 +377,8 @@
 
 .tab-pane > .tab-header-area > .headers-region > .control-buttons-tab {
     -fx-border-color: -jr-theme;
-    -fx-fill: -jr-theme;
-    -fx-text-fill: -jr-theme;
+    -fx-fill: -jr-theme-text;
+    -fx-text-fill: -jr-theme-text;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected {
@@ -388,17 +388,12 @@
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-label{
-    -fx-fill: -jr-theme;
-    -fx-text-fill: -jr-theme;
+    -fx-fill: -jr-theme-text;
+    -fx-text-fill: -jr-theme-text;
 }
-
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-close-button {
-    -fx-background-color: -jr-icon;
-}
-
-.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-close-button:hover {
-    -fx-background-color: -jr-icon-active;
+    -fx-background-color: -jr-theme-text;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
@@ -423,8 +418,8 @@
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
-    -fx-text-fill: -jr-icon;
-    -fx-fill: -jr-icon;
+    -fx-text-fill: -jr-theme-text;
+    -fx-fill: -jr-theme-text;
 }
 
 .tab-pane > .tab-header-area {
@@ -625,6 +620,8 @@
 }
 
 .sidePaneComponentHeader .glyph-icon{
+    -fx-fill: -jr-sidepane-header-color;
+    -fx-text-fill: -jr-sidepane-header-color;
     -fx-font-size: 16px;
 }
 
@@ -703,11 +700,8 @@
 
 .mainToolbar .glyph-icon {
     -fx-font-size: 1.7em;
-}
-
-.mainToolbar .search-field .glyph-icon {
-    -fx-fill: -jr-icon;
-    -fx-text-fill: -jr-icon;
+    -fx-fill: -jr-theme-text;
+    -fx-text-fill: -jr-theme-text;
 }
 
 .mainToolbar .search-field {
@@ -715,16 +709,22 @@
     -fx-border-width: 1;
     -fx-border-color: -jr-separator;
     -fx-border-radius: 2;
+    -fx-fill: -jr-search-text;
+}
+
+.mainToolbar .search-field .glyph-icon {
+    -fx-fill: -jr-search-text;
+    -fx-text-fill: -jr-search-text;
 }
 
 /* The little arrow that shows up when not all tool-bar icons fit into the tool-bar.
 We want to have a look that matches our icons in the tool-bar */
 .mainToolbar .tool-bar-overflow-button > .arrow {
-    -fx-background-color: -jr-icon;
+    -fx-background-color: -jr-theme-text;
 }
 
 .mainToolbar .tool-bar-overflow-button:hover > .arrow {
-    -fx-background-color: -fx-mark-highlight-color, derive(-jr-icon, -30%);
+    -fx-background-color: -fx-mark-highlight-color, derive(-jr-theme-text, -30%);
 }
 
 .table-view {
@@ -774,12 +774,12 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* Improve the context menu of the main toolbar, when icons don't fit and you have to press the little arrow to see them */
 .mainToolbar .context-menu .glyph-icon {
-    -fx-fill: -jr-icon;
+    -fx-fill: -jr-theme-text;
 }
 
 .mainToolbar .context-menu .glyph-icon:hover {
-    -fx-fill: -jr-icon-active;
-    -fx-text-fill: -jr-icon-active;
+    -fx-fill: -jr-theme-active;
+    -fx-text-fill: -jr-theme-active;
     -fx-background-color: -jr-icon-background-active; /* TODO: This has no effect */
 }
 

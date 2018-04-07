@@ -12,6 +12,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 
 import org.jabref.gui.JabRefFrame;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -50,7 +51,7 @@ public class ThemeLoader {
     public void installBaseCss(Scene scene) {
         addAndWatchForChanges(scene, DEFAULT_PATH_MAIN_CSS, 0);
 
-        if (CSS_SYSTEM_PROPERTY != null) {
+        if (StringUtil.isNotBlank(CSS_SYSTEM_PROPERTY)) {
             final Path path = Paths.get(CSS_SYSTEM_PROPERTY);
             if (Files.isReadable(path)) {
                 String cssUrl = path.toUri().toString();

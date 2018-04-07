@@ -50,19 +50,3 @@
 
     -jr-tooltip-fg: derive(-fx-light-text-color, 50%);
 }
-
-.menu-bar {
-    -fx-background-color: -jr-menu-background;
-}
-
-.menu-bar > .container > .menu-button > .label {
-    -fx-padding: 0.41777em 0.41777em 0.41777em 0.41777em;
-}
-
-.menu-bar > .menu {
-    -fx-padding: 0.0em 0.666667em 0.0em 0.666667em;
-}
-
-.menu-item {
-    -fx-padding: 0.5em 0.41777em 0.5em 0.41777em;
-}

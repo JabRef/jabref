@@ -49,14 +49,13 @@
     -fx-padding: 0.1em;
     -fx-font-size: 1.166667em;
     -fx-font-weight: bold;
-    -fx-text-fill: -jr-icon;
+    -fx-text-fill: -jr-theme-text;
 }
 
 #typeLabel:hover {
     -fx-padding: 0.1em;
     -fx-font-size: 1.166667em;
     -fx-font-weight: bold;
-    -fx-text-fill: -jr-icon-active;
     -fx-background-color: -jr-icon-background-active;
 
 }
@@ -91,6 +90,8 @@
 .tool-bar .glyph-icon {
     -glyph-size: 16px;
     -fx-font-size: 2em;
+    -fx-fill: -jr-theme-text;
+    -fx-text-fill: -jr-theme-text;
 }
 
 .warning-icon {
