@@ -1,21 +1,11 @@
-.text-area {
-    /*-fx-text-fill: text-area-foreground;*/
-    /*-fx-control-inner-background: text-area-background;*/
-}
-
-.text-area *.text {
-    -fx-alignment: center-left;
-}
-
 .editorPane {
     -fx-hgap: 10;
     -fx-vgap: 6;
-    /*-fx-background-color: -jr-white;*/
+    -fx-background-color: -fx-control-inner-background;
     -fx-padding: 5 5 5 15;
 }
 
 .date-picker > .date-picker-display-node {
-    /*-fx-text-fill: text-area-foreground;*/
     -fx-text-origin: baseline;
 }
 
@@ -24,12 +14,7 @@
 }
 
 .combo-box > *.text {
-    /*-fx-text-fill: text-area-foreground;*/
     -fx-text-origin: baseline;
-}
-
-.list-cell:odd {
-    /*-fx-background: text-area-background;*/
 }
 
 /* Selected rows */
@@ -64,14 +49,15 @@
     -fx-padding: 0.1em;
     -fx-font-size: 1.166667em;
     -fx-font-weight: bold;
-    -fx-text-fill: -jr-icon;
+    -fx-text-fill: -jr-theme-text;
 }
 
 #typeLabel:hover {
     -fx-padding: 0.1em;
     -fx-font-size: 1.166667em;
     -fx-font-weight: bold;
-    -fx-text-fill: derive(-jr-icon, -30%);
+    -fx-background-color: -jr-icon-background-active;
+
 }
 
 .flatButton.narrow {
@@ -86,39 +72,26 @@
     -fx-padding: -0.2em 0.1em 0.1em 0.1em;
 }
 
-/*.flatButton .glyph-icon, .flatButtonNoSpaceTop .glyph-icon, .flatButtonNoSpaceBottom .glyph-icon {*/
-    /*-fx-fill: -jr-icon;*/
-/*}*/
-
-/*.flatButton .glyph-icon:hover, .flatButtonNoSpaceTop .glyph-icon:hover, .flatButtonNoSpaceBottom .glyph-icon:hover {*/
-    /*-fx-fill: derive(-jr-icon, -30%);*/
-    /*-fx-effect: dropshadow(one-pass-box, -jr-icon, 5, 0, 1, 1);*/
-/*}*/
-
 .editorPane .glyph-icon {
     -glyph-size: 16px;
 }
 
 
 .tool-bar {
-    /*-fx-background-color: -jr-toolbar;*/
+    -fx-background-color: -jr-background-alt;
     -fx-background-insets: 0;
-    /*-fx-border-color: -jr-gray-1;*/
-    /*-fx-border-width: 1 1 1 1;*/
-    /*-fx-border-radius: 2 2 2 2;*/
-    /*-fx-background-radius: 2 2 2 2;*/
-    /*-fx-text-fill: -jr-icon;*/
-    /*-fx-fill: -jr-icon;*/
 }
 
 
 .tool-bar > .container > .separator {
-    /*-fx-background-color: -jr-separator;*/
+    -fx-background-color: -jr-separator;
 }
 
 .tool-bar .glyph-icon {
     -glyph-size: 16px;
     -fx-font-size: 2em;
+    -fx-fill: -jr-theme-text;
+    -fx-text-fill: -jr-theme-text;
 }
 
 .warning-icon {
@@ -136,4 +109,8 @@
 
 .tooltip-error {
     -fx-background-color: -jr-error;
+}
+
+.code-area .text {
+    -fx-fill: -fx-text-background-color;
 }

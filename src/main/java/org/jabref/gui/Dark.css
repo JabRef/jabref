@@ -1,0 +1,52 @@
+.root {
+    -jr-theme: #2c9490;
+    -jr-accent: #255652;
+    -jr-selected: -jr-accent;
+    -jr-hover: #fff1;
+
+
+    -jr-red: #b71c1f;
+    -jr-light-red: #db1d2b;
+    -jr-green: #1cb631;
+    -jr-light-green: #28d93c;
+    -jr-blue: #2c2cb7;
+    -jr-light-blue: #3a3ad9;
+    -jr-purple: #b72486;
+    -jr-light-purple: #d927a8;
+    -jr-yellow: #b5b021;
+    -jr-orange: #b77620;
+
+    -jr-base: #141824;
+
+    -jr-background-alt: #151924;
+    -jr-menu-background: #141824;
+    -jr-toolbar: -jr-menu-background;
+    -jr-sidepane-background: #212330;
+    -jr-search-background: #2c2e3b;
+
+    -jr-sidepane-header-background: -jr-background-alt;
+    -jr-group-hits-bg: -jr-background-alt;
+    -jr-group-hits-fg: -fx-light-text-color;
+    -fx-control-inner-background: #272b38;
+
+    -fx-control-inner-background-alt: -fx-control-inner-background;
+
+    -fx-dark-text-color: black;
+    -fx-mid-text-color: #7d8591;
+    -fx-light-text-color: #9aa3af;
+    -jr-separator: #333744;
+    -fx-outer-border: #424758;
+
+    -jr-icon: -fx-light-text-color;
+    -jr-icon-active: derive(-fx-light-text-color, 50%);
+    -jr-icon-background-active: -jr-hover;
+    -jr-icon-background-armed: #fff2;
+
+    -jr-menu-foreground: -fx-light-text-color;
+    -jr-menu-item-foreground: -fx-light-text-color;
+    -jr-menu-forground-active: derive(-fx-light-text-color, 50%);
+
+    -fx-focused-text-base-color: -fx-dark-text-color;
+
+    -jr-tooltip-fg: derive(-fx-light-text-color, 50%);
+}
