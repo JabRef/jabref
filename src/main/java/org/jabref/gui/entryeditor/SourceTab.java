@@ -11,8 +11,6 @@ import javax.swing.undo.UndoManager;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.icon.IconTheme;

@@ -1240,17 +1240,12 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             default:
                 throw new NotImplementedException("new mode not recognized: " + newMode.name());
         }
-
-
-
         if (splitPane.getItems().size() == 2) {
             splitPane.getItems().set(1, pane);
         } else {
             splitPane.getItems().add(1, pane);
         }
-
         mode = newMode;
-
         adjustSplitter();
     }
 
