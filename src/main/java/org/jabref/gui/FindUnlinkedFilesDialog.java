@@ -158,7 +158,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
         restoreSizeOfDialog();
 
-        databaseContext = frame.getCurrentBasePanel().getDatabaseContext();
+        databaseContext = frame.getCurrentBasePanel().getBibDatabaseContext();
         creatorManager = new EntryFromFileCreatorManager(ExternalFileTypes.getInstance());
 
         crawler = new UnlinkedFilesCrawler(databaseContext);

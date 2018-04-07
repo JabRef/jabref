@@ -162,19 +162,19 @@ public class EntryEditor extends BorderPane {
         List<EntryEditorTab> tabs = new LinkedList<>();
 
         // Required fields
-        tabs.add(new RequiredFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager, dialogService));
+        tabs.add(new RequiredFieldsTab(panel.getBibDatabaseContext(), panel.getSuggestionProviders(), undoManager, dialogService));
 
         // Optional fields
-        tabs.add(new OptionalFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager, dialogService));
-        tabs.add(new OptionalFields2Tab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager, dialogService));
-        tabs.add(new DeprecatedFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager, dialogService));
+        tabs.add(new OptionalFieldsTab(panel.getBibDatabaseContext(), panel.getSuggestionProviders(), undoManager, dialogService));
+        tabs.add(new OptionalFields2Tab(panel.getBibDatabaseContext(), panel.getSuggestionProviders(), undoManager, dialogService));
+        tabs.add(new DeprecatedFieldsTab(panel.getBibDatabaseContext(), panel.getSuggestionProviders(), undoManager, dialogService));
 
         // Other fields
-        tabs.add(new OtherFieldsTab(panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager, preferences.getCustomTabFieldNames(), dialogService));
+        tabs.add(new OtherFieldsTab(panel.getBibDatabaseContext(), panel.getSuggestionProviders(), undoManager, preferences.getCustomTabFieldNames(), dialogService));
 
         // General fields from preferences
         for (Map.Entry<String, List<String>> tab : preferences.getEntryEditorTabList().entrySet()) {
-            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), panel.getDatabaseContext(), panel.getSuggestionProviders(), undoManager, dialogService));
+            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), panel.getBibDatabaseContext(), panel.getSuggestionProviders(), undoManager, dialogService));
         }
 
         // Special tabs

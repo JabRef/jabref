@@ -1,5 +1,6 @@
 package org.jabref.gui.util;
 
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -58,8 +59,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
      * @throws NullPointerException if {@code action} is {@code null}
      */
     public static void runAndWaitInJavaFXThread(Runnable action) {
-        if (action == null)
-            throw new NullPointerException("action");
+        Objects.requireNonNull(action);
 
         // Run synchronously on JavaFX thread
         if (Platform.isFxApplicationThread()) {

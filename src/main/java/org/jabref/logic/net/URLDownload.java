@@ -123,7 +123,7 @@ public class URLDownload {
         return source;
     }
 
-    public String getMimeType() throws IOException {
+    public String getMimeType() {
         Unirest.setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
 
         String contentType;
@@ -162,7 +162,7 @@ public class URLDownload {
         return "";
     }
 
-    public boolean isMimeType(String type) throws IOException {
+    public boolean isMimeType(String type) {
         String mime = getMimeType();
 
         if (mime.isEmpty()) {
@@ -172,7 +172,7 @@ public class URLDownload {
         return mime.startsWith(type);
     }
 
-    public boolean isPdf() throws IOException {
+    public boolean isPdf() {
         return isMimeType("application/pdf");
     }
 

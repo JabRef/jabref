@@ -31,10 +31,7 @@ public class ISBN implements Identifier {
 
     public boolean isValidFormat() {
         Matcher isbnMatcher = ISBN_PATTERN.matcher(isbnString);
-        if (isbnMatcher.matches()) {
-            return true;
-        }
-        return false;
+        return isbnMatcher.matches();
     }
 
     public boolean isValidChecksum() {

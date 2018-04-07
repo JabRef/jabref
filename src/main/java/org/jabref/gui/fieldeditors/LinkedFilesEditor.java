@@ -189,7 +189,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     }
 
     private void setUpKeyBindings() {
-        listView.addEventFilter(KeyEvent.ANY, event -> {
+        listView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {

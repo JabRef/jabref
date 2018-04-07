@@ -252,7 +252,7 @@ class StyleSelectDialog {
             String link = style.getPath();
             try {
 
-                JabRefDesktop.openExternalFileAnyFormat(frame.getCurrentBasePanel().getDatabaseContext(), link, type);
+                JabRefDesktop.openExternalFileAnyFormat(frame.getCurrentBasePanel().getBibDatabaseContext(), link, type);
 
             } catch (IOException e) {
                 LOGGER.warn("Problem open style file editor", e);

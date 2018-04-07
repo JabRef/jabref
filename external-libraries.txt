@@ -33,7 +33,7 @@ Note:    It is important to include v1.5.54 or later as v1.5.54 is the first ver
 Id:      com.airhacks:afterburner.fx
 Project: afterburner.fx
 URL:     https://github.com/AdamBien/afterburner.fx
-License: Apache 2.0
+License: Apache-2.0
 
 Id:      com.apple:AppleJavaExtensions
 Project: AppleJavaExtensions
@@ -48,22 +48,22 @@ License: Apache-2.0
 Id:      com.github.tomtung
 Project: latex2unicode
 URL:     https://github.com/tomtung/latex2unicode
-License: Apache 2.0
+License: Apache-2.0
 
 Id:      com.impossibl.pgjdbc-ng:pgjdbc-ng
 Project: pgjdbc-ng
 URL:     http://impossibl.github.io/pgjdbc-ng
-License: BSD
+License: BSD-3-Clause
 
 Id:      com.jgoodies:jgoodies-common
 Project: JGoodies Common
 URL:     http://www.jgoodies.com/downloads/libraries/
-License: BSD
+License: BSD-3-Clause
 
 Id:      com.jgoodies:jgoodies-forms
 Project: JGoodies Forms
 URL:     http://www.jgoodies.com/downloads/libraries/
-License: BSD
+License: BSD-3-Clause
 
 Id:      com.mashape.unirest
 Project: Unirest for Java
@@ -132,13 +132,13 @@ License: LGPL-2.1 (not explicitly, but no comments in the source header) and MPL
 
 Id:      org.antlr:antlr
 Project: ANTLR 3
-URL:     http://www.antlr.org/
-License: BSD
+URL:     http://www.antlr3.org/
+License: BSD-3-Clause
 
 Id:      org.antlr:antlr4
 Project: ANTLR 4
 URL:     http://www.antlr.org/
-License: BSD
+License: BSD-3-Clause
 
 Id:      org.apache.commons:commons-lang3
 Project: Apache Commons Lang
@@ -228,12 +228,12 @@ License: Apache-2.0
 Id:      org.xmlunit:xmlunit-core
 Project: XMLUnit
 URL:     http://www.xmlunit.org/
-License: Apache 2.0
+License: Apache-2.0
 
 Id:      org.xmlunit:xmlunit-matchers
 Project: XMLUnit
 URL:     http://www.xmlunit.org/
-License: Apache 2.0
+License: Apache-2.0
 
 Id:      spin
 Path:    lib/spin.jar
