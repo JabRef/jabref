@@ -117,6 +117,7 @@ public class SourceTab extends EntryEditorTab {
                 }
             });
         });
+
     }
 
     private void storeSource(String text) {

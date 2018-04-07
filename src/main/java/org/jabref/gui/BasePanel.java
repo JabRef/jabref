@@ -835,9 +835,10 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         final String SAVE_DATABASE = Localization.lang("Save library");
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
-                                                   .withEncoding(enc)
-                                                   .withSaveType(saveType);
-            BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
+                    .withEncoding(enc)
+                    .withSaveType(saveType);
+            BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
+                    FileSaveSession::new);
             if (selectedOnly) {
                 session = databaseWriter.savePartOfDatabase(bibDatabaseContext, mainTable.getSelectedEntries(), prefs);
             } else {
@@ -1239,6 +1240,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             default:
                 throw new NotImplementedException("new mode not recognized: " + newMode.name());
         }
+
+
 
         if (splitPane.getItems().size() == 2) {
             splitPane.getItems().set(1, pane);
