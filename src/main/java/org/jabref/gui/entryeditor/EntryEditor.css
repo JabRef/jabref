@@ -17,34 +17,6 @@
     -fx-text-origin: baseline;
 }
 
-/* Selected rows */
-.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
-.tree-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected,
-.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell:filled:selected,
-.tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell:filled:selected,
-.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:selected,
-.tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell .tree-table-cell:selected {
-    -fx-background: -fx-selection-bar;
-}
-/* Selected when control is not focused */
-.list-cell:filled:selected,
-.tree-cell:filled:selected,
-.table-row-cell:filled:selected,
-.tree-table-row-cell:filled:selected,
-.table-row-cell:filled > .table-cell:selected,
-.tree-table-row-cell:filled > .tree-table-cell:selected {
-    -fx-background: -fx-selection-bar;
-}
-/* focused cell (keyboard navigation) */
-.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:focused,
-.tree-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-cell:focused,
-.table-view:focused:row-selection > .virtual-flow > .clipped-container > .sheet > .table-row-cell:focused,
-.tree-table-view:focused:row-selection > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell:focused,
-.table-view:focused:cell-selection > .virtual-flow > .clipped-container > .sheet > .table-row-cell > .table-cell:focused,
-.tree-table-view:focused:cell-selection > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell > .tree-table-cell:focused {
-    -fx-background: -fx-selection-bar;
-}
-
 #typeLabel {
     -fx-padding: 0.1em;
     -fx-font-size: 1.166667em;
@@ -57,7 +29,6 @@
     -fx-font-size: 1.166667em;
     -fx-font-weight: bold;
     -fx-background-color: -jr-icon-background-active;
-
 }
 
 .flatButton.narrow {
@@ -72,16 +43,10 @@
     -fx-padding: -0.2em 0.1em 0.1em 0.1em;
 }
 
-.editorPane .glyph-icon {
-    -glyph-size: 16px;
-}
-
-
 .tool-bar {
     -fx-background-color: -jr-background-alt;
     -fx-background-insets: 0;
 }
-
 
 .tool-bar > .container > .separator {
     -fx-background-color: -jr-separator;

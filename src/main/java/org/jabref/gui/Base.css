@@ -52,7 +52,7 @@
     -jr-menu-item-foreground: -fx-dark-text-color;
     -jr-menu-forground-active: -fx-dark-text-color;
 
-    -jr-drag-target: -fx-accent;
+    -jr-drag-target: -jr-accent;
 
     -jr-head-fg: -fx-text-inner-color;
 
@@ -131,19 +131,18 @@
     -fx-mid-text-color: -jr-gray-3;
     -fx-light-text-color: -jr-white;
 
-    /* A bright blue for highlighting/accenting objects.  For example: selected
-     * text; selected items in menus, lists, trees, and tables; progress bars */
-    -fx-accent: -jr-accent;
+    /* We overwrite accents -> make old stick out  */
+    -fx-accent: red;
 
     /* Default buttons color, this is similar to accent but more subtle */
-    -fx-default-button: derive(-fx-accent, 50%);
+    -fx-default-button: derive(-jr-accent, 50%);
 
     /* A bright blue for the focus indicator of objects. Typically used as the
      * first color in -fx-background-color for the "focused" pseudo-class. Also
      * typically used with insets of -1.4 to provide a glowing effect.
      */
-    -fx-focus-color: -fx-accent;
-    -fx-faint-focus-color: derive(-fx-accent, 50%);
+    -fx-focus-color: -jr-accent;
+    -fx-faint-focus-color: derive(-jr-accent, 50%);
 
     /* The color that is used in styling controls. The default value is based
      * on -fx-base, but is changed by pseudoclasses to change the base color.
@@ -250,16 +249,16 @@
 }
 
 .hyperlink:visited {
-    -fx-text-fill: -fx-accent;
-}
-
-.icon {
-    -fx-font-family: 'Material Design Icons';
-    -fx-font-size: 16.0;
+    -fx-text-fill: -jr-accent;
 }
 
 .glyph-icon {
-    -fx-font-size: 1em;
+    /* This adjusts text alignment within the bounds of text nodes so that
+       the text is always vertically centered within the bounds. Based on
+       the cap height of the text. */
+    -fx-bounds-type: logical_vertical_center;
+    /* Enable LCD text rendering */
+    -fx-font-smoothing-type: lcd;
 }
 
 .tooltip {
@@ -459,6 +458,18 @@
     -fx-background-insets: 0;
 }
 
+.scroll-pane:focused,
+.split-pane:focused,
+.list-view:focused,
+.tree-view:focused,
+.table-view:focused,
+.tree-table-view:focused,
+.html-editor:contains-focus {
+    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0, 0;
+}
+
 /* Selected rows */
 .list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
 .tree-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected,
@@ -485,6 +496,45 @@
     -fx-text-fill: green;
 }
 
+.combo-box-base {
+    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0, 0;
+}
+
+.combo-box > .list-cell {
+    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1 0 1 1;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.combo-box-popup > .list-view {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-background-insets: 0;
+    -fx-effect: null;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-padding: 4 0 4 5;
+    /* No alternate highlighting */
+    -fx-background: -fx-control-inner-background;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
+    -fx-background: -fx-control-inner-background;
+    -fx-background-color: -jr-hover;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
+    -fx-background: -fx-control-inner-background;
+    -fx-background-insets: 0;
+}
+
+.combo-box-popup > .list-view > .placeholder > .label {
+    -fx-text-fill: -fx-text-base-color;
+}
+
 .scroll-pane,
 .split-pane {
     -fx-background-insets: 0, 0;
@@ -498,7 +548,7 @@
 }
 
 .text-input:focused {
-    -fx-background-color: -fx-accent, -fx-control-inner-background;
+    -fx-background-color: -jr-accent, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
 }
 
@@ -514,7 +564,7 @@
 }
 
 .text-area:focused .content {
-    -fx-background-color: -fx-accent, -fx-control-inner-background;
+    -fx-background-color: -jr-accent, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 0;
 }
@@ -534,7 +584,7 @@
 .combo-box-base:editable:focused > .text-field,
 .combo-box-base:editable > .text-field:focused,
 .date-picker > .text-field:focused {
-    -fx-background-color: -fx-accent, -fx-control-inner-background;
+    -fx-background-color: -jr-accent, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 0;
 }

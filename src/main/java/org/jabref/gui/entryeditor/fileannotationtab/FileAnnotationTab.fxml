@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
@@ -8,27 +7,21 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.Cursor?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <?import org.controlsfx.control.MasterDetailPane?>
 <ScrollPane xmlns:fx="http://javafx.com/fxml/1" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER"
-            styleClass="fileAnnotationTab" xmlns="http://javafx.com/javafx/8.0.112"
-            fx:controller="org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTabView">
+            xmlns="http://javafx.com/javafx/8.0.112"
+            fx:controller="org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTabView" styleClass="editorPane">
     <MasterDetailPane dividerPosition="0.6">
         <masterNode>
             <BorderPane>
-                <padding>
-                    <Insets bottom="5" left="5" right="5" top="5" />
-                </padding>
                 <top>
-                    <HBox alignment="BASELINE_LEFT">
-                        <Label alignment="BASELINE_LEFT" prefWidth="70.0" text="%Filename" />
+                    <HBox alignment="BASELINE_LEFT" spacing="10">
+                        <Label alignment="BASELINE_LEFT" text="%File"/>
                         <ComboBox fx:id="files" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
                     </HBox>
                 </top>
@@ -38,48 +31,24 @@
             </BorderPane>
         </masterNode>
         <detailNode>
-            <GridPane fx:id="grid">
-                <padding>
-                    <Insets bottom="5" left="10" right="5" top="5" />
-                </padding>
-                <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="10.0" />
-                    <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="40.0" prefWidth="40.0" />
-                </columnConstraints>
-                <rowConstraints>
-                    <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="100.0" vgrow="ALWAYS" />
-                    <RowConstraints maxHeight="-Infinity" minHeight="20.0" prefHeight="40.0" vgrow="ALWAYS" />
-               <RowConstraints />
-               <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="10.0" />
-                </rowConstraints>
-                <Label text="%Marking" GridPane.columnIndex="1" GridPane.valignment="BOTTOM">
-               <padding>
-                  <Insets bottom="3.0" />
-               </padding></Label>
-                <TextArea fx:id="marking" editable="false" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                <Label text="%Content" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
-               <padding>
-                  <Insets bottom="5.0" />
-               </padding></Label>
-                <TextArea fx:id="content" editable="false" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                <HBox GridPane.columnIndex="2" GridPane.rowIndex="1">
+            <VBox fx:id="details">
+                <HBox>
                     <Label fx:id="author" />
                     <Pane HBox.hgrow="ALWAYS" />
                     <Button onAction="#copy" styleClass="flatButton">
                         <graphic>
                             <JabRefIconView glyph="COPY"/>
                         </graphic>
-                        <cursor>
-                           <Cursor fx:constant="HAND" />
-                        </cursor>
                         <tooltip>
                             <Tooltip text="%Copy to clipboard" />
                         </tooltip>
                     </Button>
                 </HBox>
-            </GridPane>
+                <Label text="%Marking"/>
+                <TextArea fx:id="marking" editable="false" wrapText="true"/>
+                <Label text="%Content"/>
+                <TextArea fx:id="content" editable="false" wrapText="true"/>
+            </VBox>
         </detailNode>
     </MasterDetailPane>
 </ScrollPane>

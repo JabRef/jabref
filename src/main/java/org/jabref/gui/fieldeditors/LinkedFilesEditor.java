@@ -164,6 +164,10 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         progressIndicator.progressProperty().bind(linkedFile.downloadProgressProperty());
         progressIndicator.visibleProperty().bind(linkedFile.downloadOngoingProperty());
 
+        HBox info = new HBox(8);
+        info.setStyle("-fx-padding: 0.5em 0 0.5em 0;"); // To align with buttons below which also have 0.5em padding
+        info.getChildren().setAll(icon, link, desc, progressIndicator);
+
         Button acceptAutoLinkedFile = MaterialDesignIconFactory.get().createIconButton(MaterialDesignIcon.BRIEFCASE_CHECK);
         acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang("This file was found automatically. Do you want to link it to this entry?")));
         acceptAutoLinkedFile.visibleProperty().bind(linkedFile.isAutomaticallyFoundProperty());
@@ -179,11 +183,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         HBox container = new HBox(10);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
 
-        if (desc.getText().isEmpty()) {
-            container.getChildren().addAll(icon, link, progressIndicator, acceptAutoLinkedFile, writeXMPMetadata);
-        } else {
-            container.getChildren().addAll(icon, desc, link, progressIndicator, acceptAutoLinkedFile, writeXMPMetadata);
-        }
+        container.getChildren().addAll(info, acceptAutoLinkedFile, writeXMPMetadata);
 
         return container;
     }
