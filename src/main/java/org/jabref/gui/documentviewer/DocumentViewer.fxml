@@ -48,7 +48,7 @@
                     <HBox alignment="CENTER" spacing="5.0" HBox.hgrow="ALWAYS">
                         <Button onAction="#previousPage" styleClass="flatButton">
                             <graphic>
-                                <JabRefIconView glyph="PREVIOUS_PAGE"/>
+                                <JabRefIconView glyph="PREVIOUS_LEFT"/>
                             </graphic>
                             <tooltip>
                                 <Tooltip text="%Previous page"/>
@@ -59,7 +59,7 @@
                         <Label fx:id="maxPages"/>
                         <Button onAction="#nextPage" styleClass="flatButton">
                             <graphic>
-                                <JabRefIconView glyph="NEXT_PAGE"/>
+                                <JabRefIconView glyph="NEXT_RIGHT"/>
                             </graphic>
                             <tooltip>
                                 <Tooltip text="%Next page"/>
