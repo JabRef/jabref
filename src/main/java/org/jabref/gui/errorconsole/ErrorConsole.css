@@ -9,14 +9,12 @@
 
 .info-section .glyph-icon {
 	-fx-font-size: 24.0;
-    -fx-fill: -jr-icon
 }
 
 .exception .glyph-icon {
     -fx-font-size: 18.0;
     -fx-fill: -jr-error;
 }
-
 
 .log .glyph-icon {
     -fx-font-size: 18.0;
