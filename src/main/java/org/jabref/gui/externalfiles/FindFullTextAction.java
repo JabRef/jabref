@@ -110,12 +110,14 @@ public class FindFullTextAction extends AbstractWorker {
                     });
                 } catch (IOException e) {
                     LOGGER.warn("Problem downloading file", e);
+                    basePanel.output(Localization.lang("Full text document download failed for entry %0",
+                            entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
                 }
                 basePanel.output(Localization.lang("Finished downloading full text document for entry %0.",
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
             } else {
-                String title = Localization.lang("Full text document download failed");
-                String message = Localization.lang("Full text document download failed for entry %0.",
+                String title = Localization.lang("No full text document found");
+                String message = Localization.lang("No full text document found for entry %0.",
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined")));
 
                 basePanel.output(message);
