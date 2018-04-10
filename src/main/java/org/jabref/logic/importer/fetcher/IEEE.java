@@ -18,17 +18,16 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Class for finding PDF URLs for entries on IEEE
- * Will first look for URLs of the type http://ieeexplore.ieee.org/stamp/stamp.jsp?[tp=&]arnumber=...
+ * Will first look for URLs of the type https://ieeexplore.ieee.org/stamp/stamp.jsp?[tp=&]arnumber=...
  * If not found, will resolve the DOI, if it starts with 10.1109, and try to find a similar link on the HTML page
  */
 public class IEEE implements FulltextFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IEEE.class);
     private static final Pattern STAMP_PATTERN = Pattern.compile("(/stamp/stamp.jsp\\?t?p?=?&?arnumber=[0-9]+)");
-    private static final Pattern PDF_PATTERN = Pattern
-            .compile("\"(http://ieeexplore.ieee.org/ielx[0-9/]+\\.pdf[^\"]+)\"");
+    private static final Pattern PDF_PATTERN = Pattern.compile("\"(https://ieeexplore.ieee.org/ielx[0-9/]+\\.pdf[^\"]+)\"");
     private static final String IEEE_DOI = "10.1109";
-    private static final String BASE_URL = "http://ieeexplore.ieee.org";
+    private static final String BASE_URL = "https://ieeexplore.ieee.org";
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
