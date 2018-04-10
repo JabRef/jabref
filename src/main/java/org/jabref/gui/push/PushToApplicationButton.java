@@ -95,7 +95,7 @@ public class PushToApplicationButton extends SimpleCommand implements ActionList
         settings.addActionListener(event -> {
             JPanel options = toApp.getSettingsPanel();
             if (options != null) {
-                PushToApplicationSettingsDialog.showSettingsDialog(null, toApp, options);
+                PushToApplicationSettingsDialog.showSettingsDialog(null, frame, toApp, options);
             }
         });
 
@@ -144,6 +144,12 @@ public class PushToApplicationButton extends SimpleCommand implements ActionList
 
         // Store the last used application
         Globals.prefs.put(JabRefPreferences.PUSH_TO_APPLICATION, toApp.getApplicationName());
+    }
+
+    public void refreshSelected() {
+        if(toApp.getApplicationName() != Globals.prefs.get(JabRefPreferences.PUSH_TO_APPLICATION)) {
+            setSelected(getLastUsedApplication());
+        }
     }
 
     /**

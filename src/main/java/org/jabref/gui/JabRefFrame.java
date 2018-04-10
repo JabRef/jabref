@@ -206,6 +206,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final CountingUndoManager undoManager = new CountingUndoManager();
     private final DialogService dialogService;
     private SidePane sidePane;
+    private PushToApplicationButton pushToExternal;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
@@ -667,7 +668,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         leftSide.prefWidthProperty().bind(sidePane.widthProperty());
         leftSide.maxWidthProperty().bind(sidePane.widthProperty());
 
-        PushToApplicationButton pushToExternal = new PushToApplicationButton(this, pushApplications.getApplications());
+        pushToExternal = new PushToApplicationButton(this, pushApplications.getApplications());
         HBox rightSide = new HBox (
                 factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, BiblatexEntryTypes.ARTICLE)),
                 factory.createIconButton(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, Globals.stateManager)),
@@ -699,6 +700,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         toolBar.getStyleClass().add("mainToolbar");
 
         return toolBar;
+    }
+
+    public PushToApplicationButton getPushToApplicationButton() {
+        return pushToExternal;
     }
 
     /**

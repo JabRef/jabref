@@ -31,6 +31,7 @@ import com.jgoodies.forms.layout.FormLayout;
 class ExternalTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
+    private final JabRefFrame frame;
 
     private final JTextField emailSubject;
     private final JTextField citeCommand;
@@ -50,6 +51,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
     public ExternalTab(JabRefFrame frame, PreferencesDialog prefsDiag, JabRefPreferences prefs) {
         this.prefs = prefs;
+        this.frame = frame;
 
         setLayout(new BorderLayout());
 
@@ -198,7 +200,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
     private void addSettingsButton(final PushToApplication pt, JPanel p) {
         JButton button = new JButton(Localization.lang("Settings for %0", pt.getApplicationName()), pt.getIcon().getIcon());
-        button.addActionListener(e -> PushToApplicationSettingsDialog.showSettingsDialog(null, pt, pt.getSettingsPanel()));
+        button.addActionListener(e -> PushToApplicationSettingsDialog.showSettingsDialog(null, frame, pt, pt.getSettingsPanel()));
         p.add(button);
     }
 
