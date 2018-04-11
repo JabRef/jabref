@@ -257,9 +257,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
-        // TODO:
-        //SwingUtilities.invokeLater(() -> this.markBaseChanged());
-
+        this.markBaseChanged();
     }
 
     /**
@@ -363,11 +361,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 stringDialog.setVisible(true);
             }
         });
-
-        /*   actions.put(Actions.findUnlinkedFiles, (BaseAction) () -> {
-            final FindUnlinkedFilesDialog dialog = new FindUnlinkedFilesDialog(null, frame, BasePanel.this);
-            dialog.setVisible(true);
-        });*/
 
         // The action for auto-generating keys.
         actions.put(Actions.MAKE_KEY, new AbstractWorker() {
@@ -527,11 +520,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             }
         });
 
-        /*     actions.put(Actions.DUPLI_CHECK,
-                (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(new DuplicateSearch(BasePanel.this)));
-        */
-
-        // Note that we can't put the number of entries that have been reverted into the undoText as the concrete number cannot be injected
         actions.put(new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getCommand(),
                     new SpecialFieldViewModel(SpecialField.RELEVANCE, undoManager).getSpecialFieldAction(SpecialField.RELEVANCE.getValues().get(0), frame));
 
@@ -622,14 +610,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         if (!cut && !showDeleteConfirmationDialog(entries.size())) {
             return;
         }
-
-        // TODO: check if needed
-        // select the next entry to stay at the same place as before (or the previous if we're already at the end)
-        //if (mainTable.getSelectedRow() != (mainTable.getRowCount() - 1)) {
-        //    selectNextEntry();
-        //} else {
-        //    selectPreviousEntry();
-        //}
 
         NamedCompound compound;
         if (cut) {
@@ -999,7 +979,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     public void editEntryByIdAndFocusField(final String entryId, final String fieldName) {
         bibDatabaseContext.getDatabase().getEntryById(entryId).ifPresent(entry -> {
             clearAndSelect(entry);
-            //selectionListener.editSignalled();
             showAndEdit(entry);
             entryEditor.setFocusToField(fieldName);
         });
@@ -1088,36 +1067,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 }
             }
         });
-
-        mainTable.addKeyListener(new KeyAdapter() {
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                final int keyCode = e.getKeyCode();
-
-                if (e.isControlDown()) {
-                    switch (keyCode) {
-                        case KeyEvent.VK_PAGE_DOWN:
-                            frame.nextTab.actionPerformed(null);
-                            e.consume();
-                            break;
-                        case KeyEvent.VK_PAGE_UP:
-                            frame.prevTab.actionPerformed(null);
-                            e.consume();
-                            break;
-                        default:
-                            break;
-                    }
-                } else if (keyCode == KeyEvent.VK_ENTER) {
-                    e.consume();
-                    try {
-                        runCommand(Actions.EDIT);
-                    } catch (Throwable ex) {
-                        LOGGER.warn("Could not run action based on key press", ex);
-                    }
-                }
-            }
-        });
         */
     }
 
@@ -1125,9 +1074,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         splitPane = new SplitPane();
         splitPane.setOrientation(Orientation.VERTICAL);
         adjustSplitter(); // restore last splitting state (before mainTable is created as creation affects the stored size of the entryEditors)
-
-        // TODO: check whether a mainTable already existed and a floatSearch was active
-        //boolean floatSearchActive = (mainTable != null) && (this.tableModel.getSearchState() == MainTableDataModel.DisplayOption.FLOAT);
 
         createMainTable();
 
@@ -1146,11 +1092,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         setupAutoCompletion();
 
-        // TODO: restore floating search result
-        // (needed if preferences have been changed which causes a recreation of the main table)
-        //if (floatSearchActive) {
-        //    mainTable.showFloatSearch();
-        //}
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
         dividerPositionSubscription = EasyBind.monadic(Bindings.valueAt(splitPane.getDividers(), 0))
@@ -1712,15 +1653,12 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 return;
             }
 
-            // TODO:
             // Automatically add new entry to the selected group (or set of groups)
-            /*
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)) {
                 final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
                 Globals.stateManager.getSelectedGroup(bibDatabaseContext).forEach(
                         selectedGroup -> selectedGroup.addEntriesToGroup(entries));
             }
-            */
         }
     }
 

@@ -24,7 +24,6 @@ public enum Actions {
     CUT,
     DELETE,
     DOWNLOAD_FULL_TEXT,
-    DUPLI_CHECK,
     EDIT,
     EDIT_PREAMBLE,
     EDIT_STRINGS,

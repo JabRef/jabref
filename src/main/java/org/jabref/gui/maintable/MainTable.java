@@ -13,6 +13,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
@@ -142,6 +143,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
         this.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode().equals(KeyCode.ENTER)) {
+                getSelectedEntries().stream()
+                                    .findFirst()
+                                    .ifPresent(panel::showAndEdit);
+                event.consume();
+                return;
+            }
+
             Optional<KeyBinding> keyBinding = keyBindings.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
