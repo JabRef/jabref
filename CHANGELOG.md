@@ -19,12 +19,10 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Reorganised annotation information on the right side of the "File annotations" tab. [#3109](https://github.com/JabRef/jabref/issues/3109)
 - We now show a small notification icon in the entry editor when we detect data inconsistency or other problems. [#3145](https://github.com/JabRef/jabref/issues/3145)
 - We added [oaDOI](https://oadoi.org/) as a fulltext provider, so that JabRef is now able to provide fulltexts for more than 90 million open-access articles.
-- We completely reworked and redesigned the main table.
 - We changed one default of [Cleanup entries dialog](http://help.jabref.org/en/CleanupEntries): Per default, the PDF are not moved to the default file directory anymore. [#3619](https://github.com/JabRef/jabref/issues/3619)
 - We added a new type of group that shows all items referenced in a given LaTeX file (actually the generated AUX file). [#1664](https://github.com/JabRef/jabref/issues/1664)
 - We added an importer for the EndNote XML format. [Feature request in the forum](http://discourse.jabref.org/t/import-from-bookends-or-endnote/1048)
 - We added the export of the `translator` field to the according MS-Office XML field. [#1750, comment](https://github.com/JabRef/jabref/issues/1750#issuecomment-357350986)
-- We added the export of the the `translator` field to the according MS-Office XML field. [#1750, comment](https://github.com/JabRef/jabref/issues/1750#issuecomment-357350986)
 - We changed the import of the MS-Office XML fields `bookauthor` and `translator`. Both are now imported to their corresponding bibtex/biblatex fields.
 - We improved the export of the `address` and `location` field to the MS-Office XML fields. If the address field does not contain a comma, it is treated as single value and exported to the field `city`. [#1750, comment](https://github.com/JabRef/jabref/issues/1750#issuecomment-357539167)
 For more details refer to the [field mapping help page](http://help.jabref.org/en/MsOfficeBibFieldMapping)
@@ -42,7 +40,6 @@ The new default removes the linked file from the entry instead of deleting the f
 - We changed the metadata reading and writing. DublinCore is now the only metadata format, JabRef supports. (https://github.com/JabRef/jabref/pull/3710)
 - We added another CLI functionality for reading and writing metadata to pdfs. (see https://github.com/JabRef/jabref/pull/3756 and see http://help.jabref.org/en/CommandLine)
 - We no longer print errors in field values during autosave into the log [#3811](https://github.com/JabRef/jabref/issues/3811)
-
 
 ### Fixed
 - We fixed several performance problems with the management of journal abbreviations [#3323](https://github.com/JabRef/jabref/issues/3323)
