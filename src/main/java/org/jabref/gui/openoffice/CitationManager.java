@@ -15,13 +15,12 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.CitationEntry;
@@ -57,8 +56,7 @@ class CitationManager {
 
     private final DefaultEventTableModel<CitationEntry> tableModel;
 
-
-    public CitationManager(final JabRefFrame frame, OOBibBase ooBase)
+    public CitationManager(OOBibBase ooBase, DialogService dialogService)
             throws NoSuchElementException, WrappedTargetException, UnknownPropertyException {
         diag = new JDialog((JFrame) null, Localization.lang("Manage citations"), true);
         this.ooBase = ooBase;
@@ -95,7 +93,7 @@ class CitationManager {
             } catch (UnknownPropertyException | NotRemoveableException | PropertyExistException | IllegalTypeException |
                     IllegalArgumentException ex) {
                 LOGGER.warn("Problem modifying citation", ex);
-                JOptionPane.showMessageDialog(null, Localization.lang("Problem modifying citation"));
+                dialogService.showErrorDialogAndWait(Localization.lang("Problem modifying citation"), ex);
             }
             diag.dispose();
         });

@@ -193,7 +193,6 @@ public class SaveDatabaseAction extends AbstractWorker {
             panel.registerUndoableChanges(session);
 
         } catch (UnsupportedCharsetException ex) {
-
             frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file.")
                     + Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()));
             throw new SaveException(ex.getMessage(), ex);

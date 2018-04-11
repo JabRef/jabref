@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
 import javax.swing.undo.CompoundEdit;
 
 import org.jabref.Globals;
@@ -49,10 +48,12 @@ public class AppendDatabaseAction implements BaseAction {
     private final BasePanel panel;
 
     private final List<Path> filesToOpen = new ArrayList<>();
+    private final DialogService dialogService;
 
     public AppendDatabaseAction(JabRefFrame frame, BasePanel panel) {
         this.frame = frame;
         this.panel = panel;
+        dialogService = frame.getDialogService();
     }
 
     private static void mergeFromBibtex(BasePanel panel, ParserResult parserResult, boolean importEntries,
@@ -153,7 +154,6 @@ public class AppendDatabaseAction implements BaseAction {
                     .withDefaultExtension(FileType.BIBTEX_DB)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                     .build();
-            DialogService dialogService = frame.getDialogService();
 
             List<Path> chosen = DefaultTaskExecutor
                     .runInJavaFXThread(() -> dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));
@@ -185,8 +185,8 @@ public class AppendDatabaseAction implements BaseAction {
                 panel.output(Localization.lang("Imported from library") + " '" + file + "'");
             } catch (IOException | KeyCollisionException ex) {
                 LOGGER.warn("Could not open database", ex);
-                JOptionPane.showMessageDialog(null, ex.getMessage(), Localization.lang("Open library"),
-                        JOptionPane.ERROR_MESSAGE);
+
+                dialogService.showErrorDialogAndWait(Localization.lang("Open library"), ex);
             }
         }
     }

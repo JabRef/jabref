@@ -248,7 +248,7 @@ public class OpenOfficePanel extends AbstractWorker {
         settingsB.addActionListener(e -> showSettingsPopup());
         manageCitations.addActionListener(e -> {
             try {
-                CitationManager cm = new CitationManager(frame, ooBase);
+                CitationManager cm = new CitationManager(ooBase, frame.getDialogService());
                 cm.showDialog();
             } catch (NoSuchElementException | WrappedTargetException | UnknownPropertyException ex) {
                 LOGGER.warn("Problem showing citation manager", ex);

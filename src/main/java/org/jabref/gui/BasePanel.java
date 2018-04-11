@@ -828,15 +828,18 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         }
     }
 
-    private boolean saveDatabase(File file, boolean selectedOnly, Charset enc,
+    /**
+     * FIXME: high code duplication with {@link SaveDatabaseAction#saveDatabase(File, boolean, Charset)}
+     */
+    private boolean saveDatabase(File file, boolean selectedOnly, Charset encoding,
                                  SavePreferences.DatabaseSaveType saveType)
             throws SaveException {
         SaveSession session;
         final String SAVE_DATABASE = Localization.lang("Save library");
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
-                    .withEncoding(enc)
-                    .withSaveType(saveType);
+                                                   .withEncoding(encoding)
+                                                   .withSaveType(saveType);
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
                     FileSaveSession::new);
             if (selectedOnly) {
@@ -849,8 +852,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         }
         // FIXME: not sure if this is really thrown anywhere
         catch (UnsupportedCharsetException ex) {
-            JOptionPane.showMessageDialog(null, Localization.lang("Could not save file.") + ' '
-                    + Localization.lang("Character encoding '%0' is not supported.", enc.displayName()), SAVE_DATABASE, JOptionPane.ERROR_MESSAGE);
+            frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file.")
+                    + Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()));
             throw new SaveException("rt");
         } catch (SaveException ex) {
             if (ex.specificEntry()) {
@@ -880,7 +883,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             if (answer == JOptionPane.NO_OPTION) {
 
                 // The user wants to use another encoding.
-                Object choice = JOptionPane.showInputDialog(null, Localization.lang("Select encoding"), SAVE_DATABASE, JOptionPane.QUESTION_MESSAGE, null, Encodings.ENCODINGS_DISPLAYNAMES, enc);
+                Object choice = JOptionPane.showInputDialog(null, Localization.lang("Select encoding"), SAVE_DATABASE, JOptionPane.QUESTION_MESSAGE, null, Encodings.ENCODINGS_DISPLAYNAMES, encoding);
                 if (choice == null) {
                     commit = false;
                 } else {
@@ -894,7 +897,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         if (commit) {
             session.commit(file.toPath());
-            this.bibDatabaseContext.getMetaData().setEncoding(enc); // Make sure to remember which encoding we used.
+            this.bibDatabaseContext.getMetaData().setEncoding(encoding); // Make sure to remember which encoding we used.
         } else {
             session.cancel();
         }
