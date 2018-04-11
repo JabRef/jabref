@@ -155,7 +155,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
     // Keeps track of the string dialog if it is open.
     private final Map<Actions, Object> actions = new HashMap<>();
     private final SidePaneManager sidePaneManager;
-    private PreviewPanel preview;
+    private final PreviewPanel preview;
     private final BasePanelPreferences preferences;
     private final ExternalFileTypes externalFileTypes;
 
@@ -231,8 +231,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         this.entryEditor = new EntryEditor(this, preferences.getEntryEditorPreferences(), Globals.getFileUpdateMonitor(), dialogService);
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> this.preview = new PreviewPanel(this, getBibDatabaseContext(), preferences.getKeyBindings(), preferences.getPreviewPreferences(), dialogService));
-        DefaultTaskExecutor.runInJavaFXThread(() -> frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview));
+        this.preview = new PreviewPanel(this, getBibDatabaseContext(), preferences.getKeyBindings(), preferences.getPreviewPreferences(), dialogService);
+        frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview);
     }
 
     public static void runWorker(AbstractWorker worker) throws Exception {
