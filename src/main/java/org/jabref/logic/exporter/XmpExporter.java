@@ -1,10 +1,13 @@
 package org.jabref.logic.exporter;
 
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,6 +24,8 @@ import org.jabref.model.entry.BibEntry;
  */
 public class XmpExporter extends Exporter {
 
+    private static final String XMP_SPLIT_PATTERN = "split";
+
     private final XmpPreferences xmpPreferences;
 
     public XmpExporter(XmpPreferences xmpPreferences) {
@@ -31,16 +36,31 @@ public class XmpExporter extends Exporter {
     @Override
     public void export(BibDatabaseContext databaseContext, Path file, Charset encoding, List<BibEntry> entries) throws Exception {
         Objects.requireNonNull(databaseContext);
+        Objects.requireNonNull(file);
         Objects.requireNonNull(entries);
 
         if (entries.isEmpty()) {
             return;
         }
 
+        // This is a distinction between writing all entries from the supplied list to a single .xmp file,
+        // or write every entry to a separate file.
+        if (file.getFileName().toString().trim().equals(XMP_SPLIT_PATTERN)) {
+            for (BibEntry entry : entries) {
+                // Avoid situations, where two cite keys are null
+                Path entryFile = Paths.get(entry.getId() + "_" + entry.getCiteKey() + ".xmp");
+
+                this.writeBibToXmp(entryFile, Arrays.asList(entry));
+            }
+        } else {
+            this.writeBibToXmp(file, entries);
+        }
+    }
+
+    private void writeBibToXmp(Path file, List<BibEntry> entries) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
             writer.write(XmpUtilWriter.generateXmpString(entries, this.xmpPreferences));
             writer.flush();
         }
     }
-
 }
