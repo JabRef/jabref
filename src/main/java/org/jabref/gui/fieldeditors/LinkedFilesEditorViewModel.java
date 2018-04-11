@@ -182,7 +182,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                     if (url.isPresent()) {
                         addFromURL(url.get());
                     } else {
-                        dialogService.notify(Localization.lang("Full text document download failed"));
+                        dialogService.notify(Localization.lang("No full text document found"));
                     }
                 })
                 .executeWith(taskExecutor);
