@@ -41,6 +41,7 @@ import org.jabref.logic.search.DatabaseSearcher;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.Defaults;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabase;
@@ -471,7 +472,8 @@ public class ArgumentProcessor {
             LayoutFormatterPreferences layoutPreferences = Globals.prefs
                     .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
             SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
-            Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences);
+            XmpPreferences xmpPreferences = Globals.prefs.getXMPPreferences();
+            Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }

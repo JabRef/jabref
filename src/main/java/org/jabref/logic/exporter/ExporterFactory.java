@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.FileType;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
 public class ExporterFactory {
@@ -29,7 +30,7 @@ public class ExporterFactory {
     }
 
     public static ExporterFactory create(Map<String, TemplateExporter> customFormats,
-            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
+            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, XmpPreferences xmpPreferences) {
 
         List<Exporter> exporters = new ArrayList<>();
 
@@ -54,6 +55,7 @@ public class ExporterFactory {
         exporters.add(new OpenDocumentSpreadsheetCreator());
         exporters.add(new MSBibExporter());
         exporters.add(new ModsExporter());
+        exporters.add(new XmpExporter(xmpPreferences));
 
         // Now add custom export formats
         exporters.addAll(customFormats.values());
@@ -65,7 +67,8 @@ public class ExporterFactory {
         Map<String, TemplateExporter> customFormats = preferences.customExports.getCustomExportFormats(preferences, abbreviationLoader);
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(abbreviationLoader);
         SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(preferences);
-        return create(customFormats, layoutPreferences, savePreferences);
+        XmpPreferences xmpPreferences = preferences.getXMPPreferences();
+        return create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
     }
 
     /**
