@@ -1,0 +1,9 @@
+# Test case KoppAZ-MADR-ZEUS-2018
+
+Files in this directory
+
+- `.gitignore` - ignore LaTeX compilation output
+- `KoppAZ-MADR-ZEUS-2018.bib` - manually created
+- `KoppAZ-MADR-ZEUS-2018.tex` - LaTeX code to generate `KoppAZ-MADR-ZEUS-2018.pdf`
+- `KoppAZ-MADR-ZEUS-2018.xmp` - exported by JabRef. Currently modified by hand. TODO: Have JabRef export that file (keywords!)
+- `paper.pdf` - the original ZEUS publication. Used in `KoppAZ-MADR-ZEUS-2018.tex` to generate `KoppAZ-MADR-ZEUS-2018.pdf`

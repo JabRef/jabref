@@ -1,0 +1,57 @@
+<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>
+
+<x:xmpmeta xmlns:x="adobe:ns:meta/">
+  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about="">
+      <dc:subject>
+        <rdf:Bag>
+          <rdf:li>ADR</rdf:li>
+          <rdf:li>MADR</rdf:li>
+          <rdf:li>architecture decision records</rdf:li>
+          <rdf:li>architectural decision records</rdf:li>
+          <rdf:li>Nygard</rdf:li>
+        </rdf:Bag>
+      </dc:subject>
+      <dc:date>
+        <rdf:Seq>
+          <rdf:li>2018</rdf:li>
+        </rdf:Seq>
+      </dc:date>
+      <dc:creator>
+        <rdf:Seq>
+          <rdf:li>Oliver Kopp</rdf:li>
+          <rdf:li>Anita Armbruster</rdf:li>
+          <rdf:li>Olaf Zimmermann</rdf:li>
+        </rdf:Seq>
+      </dc:creator>
+      <dc:title>
+        <rdf:Alt>
+          <rdf:li xml:lang="x-default">Markdown Architectural Decision Records: Format and Tool Support</rdf:li>
+        </rdf:Alt>
+      </dc:title>
+      <dc:relation>
+        <rdf:Bag>
+          <rdf:li>bibtex/url/https://adr.github.io/madr/</rdf:li>
+          <rdf:li>bibtex/volume/2072</rdf:li>
+          <rdf:li>bibtex/pages/55--62</rdf:li>
+          <rdf:li>bibtex/series/{CEUR} Workshop Proceedings</rdf:li>
+          <rdf:li>bibtex/bibtexkey/KoppEtAl-MADR2018</rdf:li>
+          <rdf:li>bibtex/booktitle/Proceedings of the 10th Central European Workshop on Services and their Composition ({ZEUS} 2018)</rdf:li>
+        </rdf:Bag>
+      </dc:relation>
+      <dc:publisher>
+        <rdf:Bag>
+          <rdf:li>CEUR-WS.org</rdf:li>
+        </rdf:Bag>
+      </dc:publisher>
+      <dc:format>application/pdf</dc:format>
+      <dc:type>
+        <rdf:Bag>
+          <rdf:li>InProceedings</rdf:li>
+        </rdf:Bag>
+      </dc:type>
+    </rdf:Description>
+  </rdf:RDF>
+</x:xmpmeta>
+<?xpacket end="w"?>
+
