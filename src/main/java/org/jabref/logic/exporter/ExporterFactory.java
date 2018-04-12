@@ -56,6 +56,7 @@ public class ExporterFactory {
         exporters.add(new MSBibExporter());
         exporters.add(new ModsExporter());
         exporters.add(new XmpExporter(xmpPreferences));
+        exporters.add(new PdfExporter(xmpPreferences));
 
         // Now add custom export formats
         exporters.addAll(customFormats.values());
