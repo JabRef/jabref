@@ -1,6 +1,5 @@
 package org.jabref.logic.openoffice;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class OpenOfficePreferences {
             Boolean showPanel,
             List<String> externalStyles,
             String currentStyle
-            ) {
+    ) {
         this.jarsPath = jarsPath;
         this.executablePath = executablePath;
         this.installationPath = installationPath;
@@ -146,16 +145,12 @@ public class OpenOfficePreferences {
         setInstallationPath(ooPath);
         setExecutablePath(execPath);
         setJarsPath(jarsPath);
-        // TODO: caller should store that in the real preferences again
     }
 
-    /**
-     * Checks whether the executablePath exists
-     *
-     * TODO this should go elsewhere - no preference!
-     */
-    public boolean checkAutoDetectedPaths() {
-        return ((executablePath != null) && new File(getExecutablePath()).exists());
+    public void clearConnectionSettings() {
+        this.installationPath = null;
+        this.executablePath = null;
+        this.jarsPath = null;
     }
 
 }

@@ -50,7 +50,7 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
 
     public boolean isInstalled() {
         foundPaths = false;
-        if (preferences.checkAutoDetectedPaths()) {
+        if (this.checkAutoDetectedPaths(preferences)) {
             return true;
         }
         init();
@@ -108,6 +108,14 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
         }
 
         return false;
+    }
+
+    /**
+     * Checks whether the executablePath exists
+     */
+    private boolean checkAutoDetectedPaths(OpenOfficePreferences openOfficePreferences) {
+        String executablePath = openOfficePreferences.getExecutablePath();
+        return ((executablePath != null) && new File(executablePath).exists());
     }
 
     private boolean setOpenOfficePreferences(Path installDir) {

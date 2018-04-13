@@ -1503,6 +1503,17 @@ public class JabRefPreferences implements PreferencesService {
                 this.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE));
     }
 
+    public void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences) {
+        this.put(JabRefPreferences.OO_JARS_PATH, openOfficePreferences.getJarsPath());
+        this.put(JabRefPreferences.OO_EXECUTABLE_PATH, openOfficePreferences.getExecutablePath());
+        this.put(JabRefPreferences.OO_PATH, openOfficePreferences.getInstallationPath());
+        this.putBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES, openOfficePreferences.getUseAllDatabases());
+        this.putBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING, openOfficePreferences.getSyncWhenCiting());
+        this.putBoolean(JabRefPreferences.OO_SHOW_PANEL, openOfficePreferences.getShowPanel());
+        this.putStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles());
+        this.put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE, openOfficePreferences.getCurrentStyle());
+    }
+
     private NameFormatterPreferences getNameFormatterPreferences() {
         return new NameFormatterPreferences(getStringList(NAME_FORMATER_KEY), getStringList(NAME_FORMATTER_VALUE));
     }

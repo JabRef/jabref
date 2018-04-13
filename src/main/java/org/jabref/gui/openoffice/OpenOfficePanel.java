@@ -723,31 +723,32 @@ public class OpenOfficePanel extends AbstractWorker {
         final JRadioButtonMenuItem useAllBases = new JRadioButtonMenuItem(
                 Localization.lang("Look up BibTeX entries in all open libraries"));
         final JMenuItem clearConnectionSettings = new JMenuItem(Localization.lang("Clear connection settings"));
-        ButtonGroup bg = new ButtonGroup();
-        bg.add(useActiveBase);
-        bg.add(useAllBases);
+
+        ButtonGroup lookupButtonGroup = new ButtonGroup();
+        lookupButtonGroup.add(useActiveBase);
+        lookupButtonGroup.add(useAllBases);
         if (preferences.getUseAllDatabases()) {
             useAllBases.setSelected(true);
         } else {
             useActiveBase.setSelected(true);
         }
 
-        autoSync.addActionListener(e -> preferences.setSyncWhenCiting(autoSync.isSelected()));
-
-        useAllBases.addActionListener(e -> preferences.setUseAllDatabases(useAllBases.isSelected()));
-
-        useActiveBase.addActionListener(e -> preferences.setUseAllDatabases(!useActiveBase.isSelected()));
-
-        // TODO: implement this again
-        /*
-            public String clearConnectionSettings() {
-                preferences.clear(JabRefPreferences.OO_PATH);
-                preferences.clear(JabRefPreferences.OO_EXECUTABLE_PATH);
-                preferences.clear(JabRefPreferences.OO_JARS_PATH);
-                return Localization.lang("Cleared connection settings.");
-            }
-        */
-        // clearConnectionSettings.addActionListener(e -> frame.output(preferences.clearConnectionSettings()));
+        autoSync.addActionListener(e -> {
+            preferences.setSyncWhenCiting(autoSync.isSelected());
+            Globals.prefs.setOpenOfficePreferences(preferences);
+        });
+        useAllBases.addActionListener(e -> {
+            preferences.setUseAllDatabases(useAllBases.isSelected());
+            Globals.prefs.setOpenOfficePreferences(preferences);
+        });
+        useActiveBase.addActionListener(e -> {
+            preferences.setUseAllDatabases(!useActiveBase.isSelected());
+            Globals.prefs.setOpenOfficePreferences(preferences);
+        });
+        clearConnectionSettings.addActionListener(e -> {
+            preferences.clearConnectionSettings();
+            Globals.prefs.setOpenOfficePreferences(preferences);
+        });
 
         menu.add(autoSync);
         menu.addSeparator();
