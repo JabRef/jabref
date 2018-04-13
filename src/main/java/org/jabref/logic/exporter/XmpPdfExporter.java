@@ -10,11 +10,11 @@ import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-public class PdfExporter extends Exporter {
+public class XmpPdfExporter extends Exporter {
 
     private final XmpPreferences xmpPreferences;
 
-    public PdfExporter(XmpPreferences xmpPreferences) {
+    public XmpPdfExporter(XmpPreferences xmpPreferences) {
         super("pdf", FileType.XMP.getDescription(), FileType.XMP);
         this.xmpPreferences = xmpPreferences;
     }
