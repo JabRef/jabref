@@ -64,9 +64,11 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("Duplicates")
 public class GlobalSearchBar extends JPanel {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchBar.class);
+
+    private static final int SEARCH_DELAY = 400;
     private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
     private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
-    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchBar.class);
 
     private final JabRefFrame frame;
 
@@ -191,13 +193,12 @@ public class GlobalSearchBar extends JPanel {
         updateSearchModeButtonText();
         searchModeButton.addActionListener(event -> toggleSearchModeAndSearch());
 
-        //Add a delay of 400 milliseconds before starting search
-        Timer searchTask = FxTimer.create(Duration.ofMillis(400), () -> {
+        //Add a delay of SEARCH_DELAY milliseconds before starting search
+        Timer searchTask = FxTimer.create(Duration.ofMillis(SEARCH_DELAY), () -> {
             LOGGER.debug("Run search " + searchField.getText());
             performSearch();
         });
         searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
-
 
         container = CustomJFXPanel.create();
         DefaultTaskExecutor.runInJavaFXThread(() -> {
@@ -263,7 +264,9 @@ public class GlobalSearchBar extends JPanel {
                         .orElse(GUIGlobals.UNTITLED_TITLE),
                         this.getSearchQuery().localize()),
                 getSearchQuery(), false);
-        List<BibEntry> entries = currentBasePanel.getDatabase().getEntries().stream()
+        List<BibEntry> entries = currentBasePanel.getDatabase()
+                .getEntries()
+                .stream()
                 .filter(BibEntry::isSearchHit)
                 .collect(Collectors.toList());
         searchDialog.addEntries(entries, currentBasePanel);
