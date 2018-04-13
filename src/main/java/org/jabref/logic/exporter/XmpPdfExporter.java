@@ -3,6 +3,7 @@ package org.jabref.logic.exporter;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -21,6 +22,11 @@ public class XmpPdfExporter extends Exporter {
 
     @Override
     public void export(BibDatabaseContext databaseContext, Path pdfFile, Charset encoding, List<BibEntry> entries) throws Exception {
+
+        Objects.requireNonNull(databaseContext);
+        Objects.requireNonNull(pdfFile);
+        Objects.requireNonNull(entries);
+
         if (pdfFile.toString().endsWith(".pdf")) {
             XmpUtilWriter.writeXmp(pdfFile, entries, databaseContext.getDatabase(), xmpPreferences);
         }
