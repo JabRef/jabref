@@ -78,4 +78,9 @@ public class IEEE implements FulltextFetcher {
         return Optional.empty();
     }
 
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.PUBLISHER;
+    }
+
 }

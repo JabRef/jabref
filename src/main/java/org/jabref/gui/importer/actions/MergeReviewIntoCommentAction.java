@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.migrations.MergeReviewIntoCommentMigration;
+import org.jabref.migrations.MergeReviewIntoCommentMigration;
 import org.jabref.model.entry.BibEntry;
 
 public class MergeReviewIntoCommentAction implements GUIPostOpenAction {
