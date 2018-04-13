@@ -1,11 +1,13 @@
 package org.jabref.gui.search;
 
-import java.io.File;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.swing.JLabel;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -56,12 +58,13 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.SearchPreferences;
 
-import org.reactfx.util.FxTimer;
-import org.reactfx.util.Timer;
+import impl.org.controlsfx.skin.AutoCompletePopup;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchBar.class);
+public class GlobalSearchBar extends HBox {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchBar.class);
 
@@ -86,7 +89,7 @@ import org.slf4j.LoggerFactory;
 
     private SearchDisplayMode searchDisplayMode;
 
-    private final JLabel searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getIcon());
+    private final JLabel searchIcon = new JLabel(IconTheme.JabRefIcons.SEARCH.getIcon());
 
     /**
      * if this flag is set the searchbar won't be selected after the next search
@@ -213,8 +216,7 @@ import org.slf4j.LoggerFactory;
 
         this.getChildren().addAll(
                 searchField,
-                currentResults
-        );
+                currentResults);
 
         this.setAlignment(Pos.CENTER_LEFT);
     }
@@ -379,6 +381,7 @@ import org.slf4j.LoggerFactory;
     /**
      * The popup has private access in {@link AutoCompletionBinding}, so we use reflection to access it.
      */
+    @SuppressWarnings("unchecked")
     private <T> AutoCompletePopup<T> getPopup(AutoCompletionBinding<T> autoCompletionBinding) {
         try {
             Field privatePopup = AutoCompletionBinding.class.getDeclaredField("autoCompletionPopup");
@@ -450,6 +453,7 @@ import org.slf4j.LoggerFactory;
     }
 
     private class SearchPopupSkin<T> implements Skin<AutoCompletePopup<T>> {
+
         private final AutoCompletePopup<T> control;
         private final ListView<T> suggestionList;
         private final BorderPane container;
@@ -471,8 +475,7 @@ import org.slf4j.LoggerFactory;
                     globalSearch,
                     regularExp,
                     caseSensitive,
-                    searchModeButton
-            );
+                    searchModeButton);
 
             this.container = new BorderPane();
             this.container.setCenter(suggestionList);
@@ -497,6 +500,9 @@ import org.slf4j.LoggerFactory;
                         if (this.control.isHideOnEscape()) {
                             this.control.hide();
                         }
+                        break;
+                    default:
+                        break;
                 }
             });
         }
