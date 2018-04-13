@@ -40,6 +40,7 @@ The new default removes the linked file from the entry instead of deleting the f
 - We changed the metadata reading and writing. DublinCore is now the only metadata format, JabRef supports. (https://github.com/JabRef/jabref/pull/3710)
 - We added another CLI functionality for reading and writing metadata to pdfs. (see https://github.com/JabRef/jabref/pull/3756 and see http://help.jabref.org/en/CommandLine)
 - We no longer print errors in field values during autosave into the log [#3811](https://github.com/JabRef/jabref/issues/3811)
+- We improved the search performance by adding a short delay before starting to display search results [Bug report in the forum](http://discourse.jabref.org/t/poor-performance-of-jabref-4/1110/2)
 
 ### Fixed
 - We fixed several performance problems with the management of journal abbreviations [#3323](https://github.com/JabRef/jabref/issues/3323)
@@ -56,6 +57,7 @@ The new default removes the linked file from the entry instead of deleting the f
 - We fixed the name of the group editing window to "Add group" instead of "Edit Group" when adding a new group. [koppor#277](https://github.com/koppor/jabref/issues/277)
 - We fixed the `pureauth` [BibTeX key generator pattern](https://help.jabref.org/en/BibtexKeyPatterns) to just return the author if no author, but an editor is present.
 - We fixed an issue where the "Copy linked files" dialog produced an error when the entry had no file [#3818](https://github.com/JabRef/jabref/issues/3818)
+- We fixed the coloring of the search box icon in case a user switches to advanced search mode [#3870](https://github.com/JabRef/jabref/issues/3870)
 - We fixed an issue where pressing <kbd>del</kbd> in the `file` field would trigger the delete dialog a second file, if the first file is deleted [#3926](https://github.com/JabRef/jabref/issues/3926)
 
 ### Removed

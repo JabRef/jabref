@@ -56,16 +56,16 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.SearchPreferences;
 
-import impl.org.controlsfx.skin.AutoCompletePopup;
-import org.controlsfx.control.textfield.AutoCompletionBinding;
-import org.fxmisc.easybind.EasyBind;
+import org.reactfx.util.FxTimer;
+import org.reactfx.util.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GlobalSearchBar extends HBox {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchBar.class);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchBar.class);
 
+    private static final int SEARCH_DELAY = 400;
     private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
     private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
 
@@ -85,6 +85,13 @@ public class GlobalSearchBar extends HBox {
     private SearchResultFrame searchResultFrame;
 
     private SearchDisplayMode searchDisplayMode;
+
+    private final JLabel searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getIcon());
+
+    /**
+     * if this flag is set the searchbar won't be selected after the next search
+     */
+    private boolean dontSelectSearchBar;
 
     public GlobalSearchBar(JabRefFrame frame) {
         super();
@@ -244,10 +251,15 @@ public class GlobalSearchBar extends HBox {
 
         SearchResultFrame searchDialog = new SearchResultFrame(currentBasePanel.frame(),
                 Localization.lang("Search results in library %0 for %1", currentBasePanel.getBibDatabaseContext()
-                                .getDatabaseFile().map(File::getName).orElse(GUIGlobals.UNTITLED_TITLE),
+                        .getDatabasePath()
+                        .map(Path::getFileName)
+                        .map(Path::toString)
+                        .orElse(GUIGlobals.UNTITLED_TITLE),
                         this.getSearchQuery().localize()),
                 getSearchQuery(), false);
-        List<BibEntry> entries = currentBasePanel.getDatabase().getEntries().stream()
+        List<BibEntry> entries = currentBasePanel.getDatabase()
+                .getEntries()
+                .stream()
                 .filter(BibEntry::isSearchHit)
                 .collect(Collectors.toList());
         searchDialog.addEntries(entries, currentBasePanel);
