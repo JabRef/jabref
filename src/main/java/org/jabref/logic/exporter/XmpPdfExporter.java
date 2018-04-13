@@ -15,7 +15,7 @@ public class XmpPdfExporter extends Exporter {
     private final XmpPreferences xmpPreferences;
 
     public XmpPdfExporter(XmpPreferences xmpPreferences) {
-        super("pdf", FileType.XMP.getDescription(), FileType.XMP);
+        super("pdf", FileType.PDF_XMP.getDescription(), FileType.PDF_XMP);
         this.xmpPreferences = xmpPreferences;
     }
 

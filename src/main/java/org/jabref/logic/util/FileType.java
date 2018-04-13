@@ -49,7 +49,7 @@ public enum FileType {
     RIS(Localization.lang("%0 file", "RIS"), "ris"),
     SILVER_PLATTER(Localization.lang("%0 file", "SilverPlatter"), "dat", "txt"),
     SIMPLE_HTML(Localization.lang("%0 file", Localization.lang("Simple HTML")), "html"),
-    XMP(Localization.lang("XMP-annotated PDF"), "pdf"),
+    PDF_XMP(Localization.lang("XMP-annotated PDF"), "pdf"),
     PLAIN_XMP(Localization.lang("%0 file", "XMP"), "xmp"),
 
     AUX(Localization.lang("%0 file", "AUX"), "aux"),
