@@ -33,7 +33,7 @@ public class PdfXmpImporter extends Importer {
 
     @Override
     public FileType getFileType() {
-        return FileType.XMP;
+        return FileType.PDF_XMP;
     }
 
     @Override

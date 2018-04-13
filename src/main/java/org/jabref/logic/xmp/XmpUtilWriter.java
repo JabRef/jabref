@@ -164,7 +164,14 @@ public class XmpUtilWriter {
         if (metaRaw == null) {
             meta = XMPMetadata.createXMPMetadata();
         } else {
-            meta = XmpUtilShared.parseXmpMetadata(metaRaw.createInputStream());
+            try {
+                meta = XmpUtilShared.parseXmpMetadata(metaRaw.createInputStream());
+                // In case, that the pdf file has no namespace definition for xmp,
+                // but metadata in a different format, the parser throws an exception 
+                // Creating an empty xmp metadata element solves this problem
+            } catch (IOException e) {
+                meta = XMPMetadata.createXMPMetadata();
+            }
         }
 
         // Remove all current Dublin-Core schemas
