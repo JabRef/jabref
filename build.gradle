@@ -154,14 +154,14 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.0.2'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.0.2'
 
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.0'
-    testCompile 'org.junit.jupiter:junit-jupiter-params:5.1.0'
-    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
-    testRuntime 'org.junit.vintage:junit-vintage-engine:5.1.0'
-    testCompile 'org.junit.platform:junit-platform-launcher:1.1.0'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.1'
+    testCompile 'org.junit.jupiter:junit-jupiter-params:5.1.1'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.1.1'
+    testRuntime 'org.junit.vintage:junit-vintage-engine:5.1.1'
+    testCompile 'org.junit.platform:junit-platform-launcher:1.1.1'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
-    testCompile 'org.mockito:mockito-core:2.17.0'
+    testCompile 'org.mockito:mockito-core:2.18.0'
     testCompile 'com.github.tomakehurst:wiremock:2.16.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
@@ -171,7 +171,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.8'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.9'
 }
 
 jacoco {

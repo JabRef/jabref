@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.FileType;
+import org.jabref.logic.xmp.XmpPreferences;
 
 public class ExporterFactory {
 
@@ -27,7 +28,7 @@ public class ExporterFactory {
     }
 
     public static ExporterFactory create(Map<String, TemplateExporter> customFormats,
-            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
+            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, XmpPreferences xmpPreferences) {
 
         List<Exporter> exporters = new ArrayList<>();
 
@@ -52,6 +53,8 @@ public class ExporterFactory {
         exporters.add(new OpenDocumentSpreadsheetCreator());
         exporters.add(new MSBibExporter());
         exporters.add(new ModsExporter());
+        exporters.add(new XmpExporter(xmpPreferences));
+        exporters.add(new XmpPdfExporter(xmpPreferences));
 
         // Now add custom export formats
         exporters.addAll(customFormats.values());

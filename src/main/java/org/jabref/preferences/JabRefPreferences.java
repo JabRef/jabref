@@ -1466,7 +1466,8 @@ public class JabRefPreferences implements PreferencesService {
         Map<String, TemplateExporter> customFormats = this.customExports.getCustomExportFormats(this, abbreviationLoader);
         LayoutFormatterPreferences layoutPreferences = this.getLayoutFormatterPreferences(abbreviationLoader);
         SavePreferences savePreferences = this.loadForExportFromPreferences();
-        return ExporterFactory.create(customFormats, layoutPreferences, savePreferences);
+        XmpPreferences xmpPreferences = this.getXMPPreferences();
+        return ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
     }
 
     public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {

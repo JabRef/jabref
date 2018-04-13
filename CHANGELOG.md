@@ -12,10 +12,10 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
-- Added "*.*" (any file type) to the Import File Filter Dialog. [#3757] (https://github.com/JabRef/jabref/issues/3757)
-- Abbreviate journal names functionality is now running parallel, increasing performance significantly. [#2831] (https://github.com/JabRef/jabref/issues/2831)
-- Changed order of items in context menu [#298] (https://github.com/koppor/jabref/issues/298)
-- Changed ID-based entry generator to store the last used fetcher. [#2796] (https://github.com/JabRef/jabref/issues/2796)
+- Added "*.*" (any file type) to the Import File Filter Dialog. [#3757](https://github.com/JabRef/jabref/issues/3757)
+- Abbreviate journal names functionality is now running parallel, increasing performance significantly. [#2831](https://github.com/JabRef/jabref/issues/2831)
+- Changed order of items in context menu [#298](https://github.com/koppor/jabref/issues/298)
+- Changed ID-based entry generator to store the last used fetcher. [#2796](https://github.com/JabRef/jabref/issues/2796)
 - Reorganised annotation information on the right side of the "File annotations" tab. [#3109](https://github.com/JabRef/jabref/issues/3109)
 - We now show a small notification icon in the entry editor when we detect data inconsistency or other problems. [#3145](https://github.com/JabRef/jabref/issues/3145)
 - We added [oaDOI](https://oadoi.org/) as a fulltext provider, so that JabRef is now able to provide fulltexts for more than 90 million open-access articles.
@@ -40,6 +40,7 @@ The new default removes the linked file from the entry instead of deleting the f
 - We changed the metadata reading and writing. DublinCore is now the only metadata format, JabRef supports. (https://github.com/JabRef/jabref/pull/3710)
 - We added another CLI functionality for reading and writing metadata to pdfs. (see https://github.com/JabRef/jabref/pull/3756 and see http://help.jabref.org/en/CommandLine)
 - We no longer print errors in field values during autosave into the log [#3811](https://github.com/JabRef/jabref/issues/3811)
+- We improved the search performance by adding a short delay before starting to display search results [Bug report in the forum](http://discourse.jabref.org/t/poor-performance-of-jabref-4/1110/2)
 
 ### Fixed
 - We fixed several performance problems with the management of journal abbreviations [#3323](https://github.com/JabRef/jabref/issues/3323)
@@ -49,13 +50,15 @@ The new default removes the linked file from the entry instead of deleting the f
 - Autocompletion in the search bar can now be disabled via the preferences. [#3598](https://github.com/JabRef/jabref/issues/3598)
 - We fixed an issue where the progress of an ongoing file download was not shown correctly. [#3614](https://github.com/JabRef/jabref/issues/3614)
 - We fixed an issue where odd linked files could not be selected in the entry editor. [#3639](https://github.com/JabRef/jabref/issues/3639)
-- We fixed and extended the RIS import functionality to cover more fields. [#3634](https://github.com/JabRef/jabref/issues/3634) [#2607](https://github.com/JabRef/jabref/issues/2607)
+- We fixed and extended the RIS import functionality to cover more fields. [#3634](https://github.com/JabRef/jabref/issues/3634)[#2607](https://github.com/JabRef/jabref/issues/2607)
 - Chaining modifiers in BibTeX key pattern now works as described in the documentation. [#3648](https://github.com/JabRef/jabref/issues/3648)
 - We fixed an issue where not all bibtex/biblatex fields would be exported as latex-free to MS-Office XML [koppor#284](https://github.com/koppor/jabref/issues/284)
 - We fixed an issue where linked files would be deleted from bibliography entries despite choosing the "Cancel" option in the dialog menu.
 - We fixed the name of the group editing window to "Add group" instead of "Edit Group" when adding a new group. [koppor#277](https://github.com/koppor/jabref/issues/277)
 - We fixed the `pureauth` [BibTeX key generator pattern](https://help.jabref.org/en/BibtexKeyPatterns) to just return the author if no author, but an editor is present.
 - We fixed an issue where the "Copy linked files" dialog produced an error when the entry had no file [#3818](https://github.com/JabRef/jabref/issues/3818)
+- We fixed the coloring of the search box icon in case a user switches to advanced search mode [#3870](https://github.com/JabRef/jabref/issues/3870)
+- We fixed an issue where pressing <kbd>del</kbd> in the `file` field would trigger the delete dialog a second file, if the first file is deleted [#3926](https://github.com/JabRef/jabref/issues/3926)
 
 ### Removed
 - We removed the [Look and Feels from JGoodies](http://www.jgoodies.com/freeware/libraries/looks/), because the open source version is not compatible with Java 9.
@@ -203,7 +206,7 @@ The new default removes the linked file from the entry instead of deleting the f
 - We fixed an issue where the arrow keys in the search bar did not work as expected [#3081](https://github.com/JabRef/jabref/issues/3081)
 - We fixed wrong hotkey being displayed at "automatically file links" in the entry editor
 - We fixed an issue where metadata syncing with local and shared database were unstable. It will also fix syncing groups and sub-groups in database. [#2284](https://github.com/JabRef/jabref/issues/2284)
-- We fixed an issue where renaming a linked file would fail silently if a file with the same name existed.  Added support for overriding existing file at user discretion. [#3172] (https://github.com/JabRef/jabref/issues/3172)
+- We fixed an issue where renaming a linked file would fail silently if a file with the same name existed.  Added support for overriding existing file at user discretion. [#3172](https://github.com/JabRef/jabref/issues/3172)
 - We fixed an issue where the "Remove group and subgroups" operation did not remove group information from entries in the group [#3190](https://github.com/JabRef/jabref/issues/3190)
 - We fixed an issue where it was possible to leave the entry editor with an imbalance of braces. [#3167](https://github.com/JabRef/jabref/issues/3167)
 - Renaming files now truncates the filename to not exceed the limit of 255 chars [#2622](https://github.com/JabRef/jabref/issues/2622)
