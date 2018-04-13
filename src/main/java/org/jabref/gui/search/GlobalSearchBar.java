@@ -6,7 +6,8 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.File;
+import java.nio.file.Path;
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -55,11 +56,17 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.SearchPreferences;
 
-import org.fxmisc.easybind.EasyBind;
+import org.reactfx.util.FxTimer;
+import org.reactfx.util.Timer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("Duplicates")
 public class GlobalSearchBar extends JPanel {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchBar.class);
+
+    private static final int SEARCH_DELAY = 400;
     private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
     private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
 
@@ -80,7 +87,7 @@ public class GlobalSearchBar extends JPanel {
 
     private SearchDisplayMode searchDisplayMode;
 
-    private JLabel searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getIcon());
+    private final JLabel searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getIcon());
 
     /**
      * if this flag is set the searchbar won't be selected after the next search
@@ -186,7 +193,12 @@ public class GlobalSearchBar extends JPanel {
         updateSearchModeButtonText();
         searchModeButton.addActionListener(event -> toggleSearchModeAndSearch());
 
-        EasyBind.subscribe(searchField.textProperty(), searchText -> performSearch());
+        //Add a delay of SEARCH_DELAY milliseconds before starting search
+        Timer searchTask = FxTimer.create(Duration.ofMillis(SEARCH_DELAY), () -> {
+            LOGGER.debug("Run search " + searchField.getText());
+            performSearch();
+        });
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
 
         container = CustomJFXPanel.create();
         DefaultTaskExecutor.runInJavaFXThread(() -> {
@@ -246,10 +258,15 @@ public class GlobalSearchBar extends JPanel {
 
         SearchResultFrame searchDialog = new SearchResultFrame(currentBasePanel.frame(),
                 Localization.lang("Search results in library %0 for %1", currentBasePanel.getBibDatabaseContext()
-                                .getDatabaseFile().map(File::getName).orElse(GUIGlobals.UNTITLED_TITLE),
+                        .getDatabasePath()
+                        .map(Path::getFileName)
+                        .map(Path::toString)
+                        .orElse(GUIGlobals.UNTITLED_TITLE),
                         this.getSearchQuery().localize()),
                 getSearchQuery(), false);
-        List<BibEntry> entries = currentBasePanel.getDatabase().getEntries().stream()
+        List<BibEntry> entries = currentBasePanel.getDatabase()
+                .getEntries()
+                .stream()
                 .filter(BibEntry::isSearchHit)
                 .collect(Collectors.toList());
         searchDialog.addEntries(entries, currentBasePanel);
