@@ -16,15 +16,17 @@ public abstract class SidePaneComponent {
 
     protected final SidePaneManager manager;
     protected final ToggleCommand toggleCommand;
-    private final JabRefIcon icon;
-    private final String title;
+    protected final JabRefIcon icon;
+    protected final String title;
     private Node contentNode;
+
 
     public SidePaneComponent(SidePaneManager manager, JabRefIcon icon, String title) {
         this.manager = manager;
         this.icon = icon;
         this.title = title;
         this.toggleCommand = new ToggleCommand(this);
+
     }
 
     protected void hide() {
@@ -35,11 +37,11 @@ public abstract class SidePaneComponent {
         manager.show(this.getType());
     }
 
-    private void moveUp() {
+    protected void moveUp() {
         manager.moveUp(this);
     }
 
-    private void moveDown() {
+    protected void moveDown() {
         manager.moveDown(this);
     }
 
@@ -88,7 +90,7 @@ public abstract class SidePaneComponent {
     /**
      * @return the header pane for this component
      */
-    public final Node getHeader() {
+    public Node getHeader() {
         Button close = IconTheme.JabRefIcons.CLOSE.asButton();
         close.setOnAction(event -> hide());
 
@@ -98,13 +100,13 @@ public abstract class SidePaneComponent {
         Button down = IconTheme.JabRefIcons.DOWN.asButton();
         down.setOnAction(event -> moveDown());
 
-        HBox buttonContainer = new HBox();
+        final HBox buttonContainer = new HBox();
         buttonContainer.getChildren().addAll(up, down, close);
         BorderPane graphic = new BorderPane();
         graphic.setCenter(icon.getGraphicNode());
-        BorderPane container = new BorderPane();
-//        container.setLeft(graphic);
+        //        container.setLeft(graphic);
         final Label label = new Label(title);
+        BorderPane container = new BorderPane();
         container.setCenter(label);
         container.setRight(buttonContainer);
         container.getStyleClass().add("sidePaneComponentHeader");
