@@ -131,7 +131,7 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         if (multiSelectionModeIntersection.isSelected()) {
             prefs.setGroupViewMode(GroupViewMode.INTERSECTION);
         }
-        if(multiSelectionModeUnion.isSelected()) {
+        if (multiSelectionModeUnion.isSelected()) {
             prefs.setGroupViewMode(GroupViewMode.UNION);
         }
     }
