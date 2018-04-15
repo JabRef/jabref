@@ -34,7 +34,10 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
@@ -460,41 +463,16 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
      * @return true if the user chose to quit; false otherwise
      */
     public boolean quit() {
-        // Ask here if the user really wants to close, if the base
-        // has not been saved since last save.
-        boolean close = true;
-
+        // First ask if the user really wants to close, if the library has not been saved since last save.
         List<String> filenames = new ArrayList<>();
         for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
-            BibDatabaseContext context = getBasePanelAt(i).getBibDatabaseContext();
+            BasePanel panel = getBasePanelAt(i);
+            BibDatabaseContext context = panel.getBibDatabaseContext();
 
-            if (getBasePanelAt(i).isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
+            if (panel.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
                 tabbedPane.getSelectionModel().select(i);
-                String filename = context.getDatabaseFile().map(File::getAbsolutePath).orElse(GUIGlobals.UNTITLED_TITLE);
-                int answer = showSaveDialog(filename);
-
-                if ((answer == JOptionPane.CANCEL_OPTION) ||
-                        (answer == JOptionPane.CLOSED_OPTION)) {
+                if (!confirmClose(panel)) {
                     return false;
-                }
-                if (answer == JOptionPane.YES_OPTION) {
-                    // The user wants to save.
-                    try {
-                        //getCurrentBasePanel().runCommand("save");
-                        SaveDatabaseAction saveAction = new SaveDatabaseAction(getCurrentBasePanel());
-                        saveAction.runCommand();
-                        if (saveAction.isCanceled() || !saveAction.isSuccess()) {
-                            // The action was either canceled or unsuccessful.
-                            // Break!
-                            output(Localization.lang("Unable to save library"));
-                            close = false;
-                        }
-                    } catch (Throwable ex) {
-                        // Something prevented the file
-                        // from being saved. Break!!!
-                        close = false;
-                        break;
-                    }
                 }
             } else if (context.getLocation() == DatabaseLocation.SHARED) {
                 context.convertToLocalDatabase();
@@ -506,23 +484,22 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             context.getDatabaseFile().map(File::getAbsolutePath).ifPresent(filenames::add);
         }
 
-        if (close) {
-            for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
-                if (getBasePanelAt(i).isSaving()) {
-                    // There is a database still being saved, so we need to wait.
-                    WaitForSaveOperation w = new WaitForSaveOperation(this);
-                    w.show(); // This method won't return until canceled or the save operation is done.
-                    if (w.canceled()) {
-                        return false; // The user clicked cancel.
-                    }
+        // Wait for save operations to finish
+        for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
+            if (getBasePanelAt(i).isSaving()) {
+                // There is a database still being saved, so we need to wait.
+                WaitForSaveOperation w = new WaitForSaveOperation(this);
+                w.show(); // This method won't return until canceled or the save operation is done.
+                if (w.canceled()) {
+                    return false; // The user clicked cancel.
                 }
             }
-
-            tearDownJabRef(filenames);
-            return true;
         }
 
-        return false;
+        // Good bye!
+        tearDownJabRef(filenames);
+        Platform.exit();
+        return true;
     }
 
     private void initLayout() {
@@ -1364,15 +1341,42 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         JOptionPane.showMessageDialog(null, message);
     }
 
-    private int showSaveDialog(String filename) {
-        Object[] options = {Localization.lang("Save changes"),
-                Localization.lang("Discard changes"),
-                Localization.lang("Return to JabRef")};
+    /**
+     * Ask if the user really wants to close the given database
+     *
+     * @return true if the user choose to close the database
+     */
+    private boolean confirmClose(BasePanel panel) {
+        String filename = panel.getBibDatabaseContext()
+                               .getDatabasePath()
+                               .map(Path::toAbsolutePath)
+                               .map(Path::toString)
+                               .orElse(GUIGlobals.UNTITLED_TITLE);
 
-        return JOptionPane.showOptionDialog(null,
+        ButtonType saveChanges = new ButtonType(Localization.lang("Save changes"), ButtonBar.ButtonData.YES);
+        ButtonType discardChanges = new ButtonType(Localization.lang("Discard changes"), ButtonBar.ButtonData.NO);
+        ButtonType cancel = new ButtonType(Localization.lang("Return to JabRef"), ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
+                Localization.lang("Save before closing"),
                 Localization.lang("Library '%0' has changed.", filename),
-                Localization.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION,
-                JOptionPane.WARNING_MESSAGE, null, options, options[2]);
+                saveChanges, discardChanges, cancel);
+
+        if (response.isPresent() && response.get().equals(saveChanges)) {
+            // The user wants to save.
+            try {
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(panel);
+                saveAction.runCommand();
+                if (saveAction.isCanceled() || !saveAction.isSuccess()) {
+                    // The action was either canceled or unsuccessful.
+                    output(Localization.lang("Unable to save library"));
+                    return false;
+                }
+            } catch (Throwable ex) {
+                return false;
+            }
+        } else return !response.isPresent() || !response.get().equals(cancel);
+        return false;
     }
 
     private void closeTab(BasePanel panel) {
@@ -1397,35 +1401,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
         AutosaveManager.shutdown(context);
         BackupManager.shutdown(context);
-    }
-
-    // Ask if the user really wants to close, if the base has not been saved
-    private boolean confirmClose(BasePanel panel) {
-        boolean close = false;
-        String filename;
-
-        filename = panel.getBibDatabaseContext()
-                .getDatabaseFile()
-                .map(File::getAbsolutePath)
-                .orElse(GUIGlobals.UNTITLED_TITLE);
-
-        int answer = showSaveDialog(filename);
-        if (answer == JOptionPane.YES_OPTION) {
-            // The user wants to save.
-            try {
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(panel);
-                saveAction.runCommand();
-                if (saveAction.isSuccess()) {
-                    close = true;
-                }
-            } catch (Throwable ex) {
-                // do not close
-            }
-        } else if (answer == JOptionPane.NO_OPTION) {
-            // discard changes
-            close = true;
-        }
-        return close;
     }
 
     private void removeTab(BasePanel panel) {
@@ -1479,7 +1454,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         @Override
         public void execute() {
             quit();
-            Platform.exit();
         }
     }
 

@@ -13,7 +13,6 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.FontUIResource;
 
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -156,8 +155,10 @@ public class JabRefGUI {
         mainStage.show();
 
         mainStage.setOnCloseRequest(event -> {
-            mainFrame.quit();
-            Platform.exit();
+            boolean reallyQuit = mainFrame.quit();
+            if (!reallyQuit) {
+                event.consume();
+            }
         });
 
         for (ParserResult pr : failed) {
