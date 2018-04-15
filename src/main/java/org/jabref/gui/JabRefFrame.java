@@ -24,7 +24,6 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -211,20 +210,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         this.mainStage = mainStage;
         this.dialogService = new FXDialogService(mainStage);
         init();
-    }
-
-    private static JMenu subMenu(String name) {
-        int i = name.indexOf('&');
-        JMenu res;
-        if (i >= 0) {
-            res = new JMenu(name.substring(0, i) + name.substring(i + 1));
-            char mnemonic = Character.toUpperCase(name.charAt(i + 1));
-            res.setMnemonic((int) mnemonic);
-        } else {
-            res = new JMenu(name);
-        }
-
-        return res;
     }
 
     /**
@@ -1422,14 +1407,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 Localization.lang("Library '%0' has changed.", filename),
                 Localization.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.WARNING_MESSAGE, null, options, options[2]);
-    }
-
-    private void closeTab(Tab tab) {
-        closeTab(getBasePanel(tab));
-    }
-
-    private BasePanel getBasePanel(Tab tab) {
-        return (BasePanel) tab.getContent();
     }
 
     private void closeTab(BasePanel panel) {
