@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
 
 import org.jabref.gui.DialogService;
@@ -26,6 +27,8 @@ public class GroupSidePane extends SidePaneComponent {
     private final JabRefPreferences preferences;
     private final DialogService dialogService;
     private final Button intersectionUnionToggle = IconTheme.JabRefIcons.WWW.asButton();
+    private final Tooltip toggleUnion = new Tooltip(Localization.lang("Toogle union"));
+    private final Tooltip toggleIntersectoin = new Tooltip(Localization.lang("Toogle intersection"));
 
     public GroupSidePane(SidePaneManager manager, JabRefPreferences preferences, DialogService dialogService) {
         super(manager, IconTheme.JabRefIcons.TOGGLE_GROUPS, Localization.lang("Groups"));
@@ -43,10 +46,22 @@ public class GroupSidePane extends SidePaneComponent {
         return preferences.getGroupViewMode().getIcon().getGraphicNode();
     }
 
+    private Tooltip getUnionInterSectionToolTip() {
+        GroupViewMode mode = preferences.getGroupViewMode();
+        if (mode == GroupViewMode.UNION) {
+            return toggleIntersectoin;
+        }
+        if (mode == GroupViewMode.INTERSECTION) {
+            return toggleUnion;
+        }
+        return new Tooltip();
+    }
+
     @Override
     public void afterOpening() {
         preferences.putBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
         intersectionUnionToggle.setGraphic(getUnionIntersectionGraphic());
+        intersectionUnionToggle.setTooltip(getUnionInterSectionToolTip());
     }
 
     @Override
@@ -74,10 +89,12 @@ public class GroupSidePane extends SidePaneComponent {
 
         if (mode == GroupViewMode.INTERSECTION) {
             preferences.setGroupViewMode(GroupViewMode.UNION);
+
             dialogService.notify(Localization.lang("Group view mode set to union"));
         }
 
         intersectionUnionToggle.setGraphic(getUnionIntersectionGraphic());
+        intersectionUnionToggle.setTooltip(getUnionInterSectionToolTip());
     }
 
     @Override

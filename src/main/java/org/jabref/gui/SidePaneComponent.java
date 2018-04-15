@@ -5,6 +5,7 @@ import java.util.Optional;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -13,6 +14,7 @@ import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.logic.l10n.Localization;
 
 public abstract class SidePaneComponent {
 
@@ -94,12 +96,15 @@ public abstract class SidePaneComponent {
      */
     public final Node getHeader() {
         Button close = IconTheme.JabRefIcons.CLOSE.asButton();
+        close.setTooltip(new Tooltip(Localization.lang("Hide panel")));
         close.setOnAction(event -> hide());
 
         Button up = IconTheme.JabRefIcons.UP.asButton();
+        up.setTooltip(new Tooltip(Localization.lang("Move panel up")));
         up.setOnAction(event -> moveUp());
 
         Button down = IconTheme.JabRefIcons.DOWN.asButton();
+        down.setTooltip(new Tooltip(Localization.lang("Move panel down")));
         down.setOnAction(event -> moveDown());
 
         final HBox buttonContainer = new HBox();
