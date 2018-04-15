@@ -4,8 +4,8 @@ import org.jabref.gui.icon.IconTheme.JabRefIcons;
 
 public enum GroupViewMode {
 
-    INTERSECTION(JabRefIcons.WWW),
-    UNION(JabRefIcons.TWITTER);
+    INTERSECTION(JabRefIcons.GROUP_INTERSECTION),
+    UNION(JabRefIcons.GROUP_UNION);
 
     private JabRefIcons icon;
 
