@@ -104,13 +104,12 @@ public abstract class SidePaneComponent {
 
         final HBox buttonContainer = new HBox();
         buttonContainer.getChildren().addAll(up, down);
-
         getAddtionalHeaderButtons().ifPresent(btn -> buttonContainer.getChildren().add(btn));
-
         buttonContainer.getChildren().add(close);
+
         BorderPane graphic = new BorderPane();
         graphic.setCenter(icon.getGraphicNode());
-        //        container.setLeft(graphic);
+
         final Label label = new Label(title);
         BorderPane container = new BorderPane();
         container.setCenter(label);
