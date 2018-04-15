@@ -43,6 +43,7 @@ import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorTabList;
+import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
@@ -193,7 +194,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CF = "editorEMACSkeyBindingsRebindCF";
     public static final String GROUPS_DEFAULT_FIELD = "groupsDefaultField";
-    public static final String GROUP_INTERSECT_SELECTIONS = "groupIntersectSelections";
+    public static final String GROUP_INTERSECT_UNION_VIEW_MODE = "groupIntersectUnionViewModes";
+
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
     public static final String LIST_OF_FILE_COLUMNS = "listOfFileColumns";
@@ -578,9 +580,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AUTOCOMPLETER_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
         defaults.put(AUTOCOMPLETER_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
         defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref;related;entryset");
-        defaults.put(GROUP_INTERSECT_SELECTIONS, Boolean.FALSE);
         defaults.put(GROUPS_DEFAULT_FIELD, FieldName.KEYWORDS);
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
+        defaults.put(GROUP_INTERSECT_UNION_VIEW_MODE, GroupViewMode.INTERSECTION.name());
         defaults.put(KEYWORD_SEPARATOR, ", ");
         defaults.put(TOOLBAR_VISIBLE, Boolean.TRUE);
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
@@ -1755,5 +1757,13 @@ public class JabRefPreferences implements PreferencesService {
     public void setWorkingDir(Path dir) {
         put(WORKING_DIRECTORY, dir.toString());
 
+    }
+
+    public GroupViewMode getGroupViewMode() {
+        return GroupViewMode.valueOf(get(GROUP_INTERSECT_UNION_VIEW_MODE));
+    }
+
+    public void setGroupViewMode(GroupViewMode mode) {
+        put(GROUP_INTERSECT_UNION_VIEW_MODE, mode.name());
     }
 }

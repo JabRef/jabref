@@ -32,7 +32,7 @@ public class SidePaneManager {
         OpenOfficePreferences openOfficePreferences = new OpenOfficePreferences(preferences);
         Stream.of(
                   new FileUpdatePanel(this),
-                  new GroupSidePane(this, preferences, frame),
+                  new GroupSidePane(this, preferences, frame.getDialogService()),
                   new GeneralFetcher(this, preferences, frame),
                   new OpenOfficeSidePanel(this, openOfficePreferences, frame))
               .forEach(pane -> components.put(pane.getType(), pane));

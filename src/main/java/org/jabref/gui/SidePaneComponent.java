@@ -1,5 +1,7 @@
 package org.jabref.gui;
 
+import java.util.Optional;
+
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -90,7 +92,7 @@ public abstract class SidePaneComponent {
     /**
      * @return the header pane for this component
      */
-    public Node getHeader() {
+    public final Node getHeader() {
         Button close = IconTheme.JabRefIcons.CLOSE.asButton();
         close.setOnAction(event -> hide());
 
@@ -101,7 +103,11 @@ public abstract class SidePaneComponent {
         down.setOnAction(event -> moveDown());
 
         final HBox buttonContainer = new HBox();
-        buttonContainer.getChildren().addAll(up, down, close);
+        buttonContainer.getChildren().addAll(up, down);
+
+        getAddtionalHeaderButtons().ifPresent(btn -> buttonContainer.getChildren().add(btn));
+
+        buttonContainer.getChildren().add(close);
         BorderPane graphic = new BorderPane();
         graphic.setCenter(icon.getGraphicNode());
         //        container.setLeft(graphic);
@@ -112,6 +118,10 @@ public abstract class SidePaneComponent {
         container.getStyleClass().add("sidePaneComponentHeader");
 
         return container;
+    }
+
+    protected Optional<Node> getAddtionalHeaderButtons() {
+        return Optional.empty();
     }
 
     /**

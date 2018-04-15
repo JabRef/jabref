@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -111,12 +112,12 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         keywordSeparator.setText(prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
         autoAssignGroup.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
 
-        boolean intersectionSelected = prefs.getBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS);
-        //Looks odd, but the prefs store true for intersection and false for union
-        if (intersectionSelected) {
-            multiSelectionModeIntersection.setSelected(intersectionSelected);
-        } else {
-            multiSelectionModeUnion.setSelected(intersectionSelected);
+        GroupViewMode mode = prefs.getGroupViewMode();
+        if (mode == GroupViewMode.INTERSECTION) {
+            multiSelectionModeIntersection.setSelected(true);
+        }
+        if (mode == GroupViewMode.UNION) {
+            multiSelectionModeUnion.setSelected(true);
         }
     }
 
@@ -126,7 +127,13 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         prefs.put(JabRefPreferences.GROUPS_DEFAULT_FIELD, groupingField.getText().trim());
         prefs.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroup.isSelected());
         prefs.put(JabRefPreferences.KEYWORD_SEPARATOR, keywordSeparator.getText());
-        prefs.putBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS, multiSelectionModeIntersection.isSelected());
+
+        if (multiSelectionModeIntersection.isSelected()) {
+            prefs.setGroupViewMode(GroupViewMode.INTERSECTION);
+        }
+        if(multiSelectionModeUnion.isSelected()) {
+            prefs.setGroupViewMode(GroupViewMode.UNION);
+        }
     }
 
     @Override

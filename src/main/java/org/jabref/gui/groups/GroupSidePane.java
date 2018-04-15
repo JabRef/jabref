@@ -1,21 +1,18 @@
 package org.jabref.gui.groups;
 
+import java.util.Optional;
+
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.SidePaneComponent;
 import org.jabref.gui.SidePaneManager;
 import org.jabref.gui.SidePaneType;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.IconTheme.JabRefIcons;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -27,45 +24,23 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class GroupSidePane extends SidePaneComponent {
 
     private final JabRefPreferences preferences;
-    private final JabRefFrame frame;
+    private final DialogService dialogService;
     private final Button intersectionUnionToggle = IconTheme.JabRefIcons.WWW.asButton();
 
-    public GroupSidePane(SidePaneManager manager, JabRefPreferences preferences, JabRefFrame frame) {
+    public GroupSidePane(SidePaneManager manager, JabRefPreferences preferences, DialogService dialogService) {
         super(manager, IconTheme.JabRefIcons.TOGGLE_GROUPS, Localization.lang("Groups"));
         this.preferences = preferences;
-        this.frame = frame;
+        this.dialogService = dialogService;
     }
 
     @Override
-    public Node getHeader() {
-        Button close = IconTheme.JabRefIcons.CLOSE.asButton();
-        close.setOnAction(event -> hide());
-
-        Button up = IconTheme.JabRefIcons.UP.asButton();
-        up.setOnAction(event -> moveUp());
-
-        Button down = IconTheme.JabRefIcons.DOWN.asButton();
-        down.setOnAction(event -> moveDown());
-
+    protected Optional<Node> getAddtionalHeaderButtons() {
         intersectionUnionToggle.setOnAction(event -> toggleUnionIntersection());
-
-        final HBox buttonContainer = new HBox();
-        buttonContainer.getChildren().addAll(up, down, intersectionUnionToggle, close);
-        BorderPane graphic = new BorderPane();
-        graphic.setCenter(icon.getGraphicNode());
-        //        container.setLeft(graphic);
-        final Label label = new Label(title);
-        BorderPane container = new BorderPane();
-        container.setCenter(label);
-        container.setRight(buttonContainer);
-        container.getStyleClass().add("sidePaneComponentHeader");
-
-        return container;
+        return Optional.of(intersectionUnionToggle);
     }
 
     private Node getUnionIntersectionGraphic() {
-        boolean intersectionToggled = preferences.getBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS);
-        return intersectionToggled ? JabRefIcons.WWW.getGraphicNode() : JabRefIcons.TWITTER.getGraphicNode();
+        return preferences.getGroupViewMode().getIcon().getGraphicNode();
     }
 
     @Override
@@ -90,18 +65,19 @@ public class GroupSidePane extends SidePaneComponent {
     }
 
     private void toggleUnionIntersection() {
-        boolean intersectionToggled = preferences.getBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS);
-        boolean newState = !intersectionToggled;
-        preferences.putBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS, newState);
+        GroupViewMode mode = preferences.getGroupViewMode();
 
-        BasePanel basePanel = frame.getCurrentBasePanel();
-        if (newState) {
-            basePanel.output(Localization.lang("Group view mode set to intersection"));
-        } else {
-            basePanel.output(Localization.lang("Group view mode set to union"));
+        if (mode == GroupViewMode.UNION) {
+            preferences.setGroupViewMode(GroupViewMode.INTERSECTION);
+            dialogService.notify(Localization.lang("Group view mode set to intersection"));
         }
-        intersectionUnionToggle.setGraphic(getUnionIntersectionGraphic());
 
+        if (mode == GroupViewMode.INTERSECTION) {
+            preferences.setGroupViewMode(GroupViewMode.UNION);
+            dialogService.notify(Localization.lang("Group view mode set to union"));
+        }
+
+        intersectionUnionToggle.setGraphic(getUnionIntersectionGraphic());
     }
 
     @Override
