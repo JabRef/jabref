@@ -33,7 +33,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +93,6 @@ public class ChangeScanner implements Runnable {
                     storeTempDatabase();
                 }
             });
-
         } else {
             JOptionPane.showMessageDialog(frame, Localization.lang("No actual changes found."),
                     Localization.lang("External changes"), JOptionPane.INFORMATION_MESSAGE);
