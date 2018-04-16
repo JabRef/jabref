@@ -177,6 +177,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         chosenModel.clear();
         boolean isPreviewChosen = false;
         for (String style : previewPreferences.getPreviewCycle()) {
+            // in case the style is not a valid citation style file, an empty Optional is returned
             Optional<CitationStyle> citationStyle = CitationStyle.createCitationStyleFromFile(style);
             if (citationStyle.isPresent()) {
                 chosenModel.addElement(citationStyle.get());
