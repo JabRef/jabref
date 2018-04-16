@@ -13,7 +13,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.1'
     }
 }
 
