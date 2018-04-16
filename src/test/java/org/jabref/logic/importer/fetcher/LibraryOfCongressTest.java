@@ -2,17 +2,20 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.Optional;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 @FetcherTest
 public class LibraryOfCongressTest {
 
-    private final LibraryOfCongress fetcher = new LibraryOfCongress();
+    private final LibraryOfCongress fetcher = new LibraryOfCongress(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
     @Test
     public void performSearchById() throws Exception {

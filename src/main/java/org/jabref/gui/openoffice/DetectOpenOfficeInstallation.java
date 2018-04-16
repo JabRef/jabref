@@ -2,7 +2,9 @@ package org.jabref.gui.openoffice;
 
 import java.awt.BorderLayout;
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +52,7 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
 
     public boolean isInstalled() {
         foundPaths = false;
-        if (preferences.checkAutoDetectedPaths()) {
+        if (this.checkAutoDetectedPaths(preferences)) {
             return true;
         }
         init();
@@ -110,6 +112,14 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
         return false;
     }
 
+    /**
+     * Checks whether the executablePath exists
+     */
+    private boolean checkAutoDetectedPaths(OpenOfficePreferences openOfficePreferences) {
+        String executablePath = openOfficePreferences.getExecutablePath();
+        return ((executablePath != null) && Files.exists(Paths.get(executablePath)));
+    }
+
     private boolean setOpenOfficePreferences(Path installDir) {
         Optional<Path> execPath = Optional.empty();
 
@@ -124,7 +134,7 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
         Optional<Path> jarFilePath = FileUtil.find(OpenOfficePreferences.OO_JARS.get(0), installDir);
 
         if (execPath.isPresent() && jarFilePath.isPresent()) {
-            preferences.setOOPath(installDir.toString());
+            preferences.setInstallationPath(installDir.toString());
             preferences.setExecutablePath(execPath.get().toString());
             preferences.setJarsPath(jarFilePath.get().getParent().toString());
             return true;

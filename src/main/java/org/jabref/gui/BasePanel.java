@@ -219,7 +219,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         this.tableModel = new MainTableDataModel(getBibDatabaseContext());
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
-        annotationCache = new FileAnnotationCache(bibDatabaseContext);
+        annotationCache = new FileAnnotationCache(bibDatabaseContext, Globals.prefs.getFileDirectoryPreferences());
 
         this.preview = new PreviewPanel(this, getBibDatabaseContext());
         DefaultTaskExecutor.runInJavaFXThread(() -> frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview));
@@ -1092,7 +1092,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         frame.block();
         final String SAVE_DATABASE = Localization.lang("Save library");
         try {
-            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
+            SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences()
                     .withEncoding(enc)
                     .withSaveType(saveType);
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(

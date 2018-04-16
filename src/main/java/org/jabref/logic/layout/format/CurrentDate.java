@@ -19,11 +19,6 @@ public class CurrentDate implements LayoutFormatter {
     // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
     private static final String DEFAULT_FORMAT = "yyyy-MM-dd hh:mm:ss z";
 
-
-    /*
-     *  (non-Javadoc)
-     * @see org.jabref.export.layout.LayoutFormatter#format(java.lang.String)
-     */
     @Override
     public String format(String fieldText) {
         String format = CurrentDate.DEFAULT_FORMAT;
