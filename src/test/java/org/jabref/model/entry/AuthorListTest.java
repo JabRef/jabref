@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -376,12 +377,9 @@ public class AuthorListTest {
 
     @Test
     public void testCompanyAuthorAndPerson() {
-        Author author = AuthorList.parse("{JabRef Developers} and Stefan Kolb").getAuthor(0);
-        Author expected = new Author(null, null, null, "JabRef Developers", null);
-        assertEquals(expected, author);
-        author = AuthorList.parse("{JabRef Developers} and Stefan Kolb").getAuthor(1);
-        expected = new Author("Stefan", "S.", null, "Kolb", null);
-        assertEquals(expected, author);
+        Author company = new Author(null, null, null, "JabRef Developers", null);
+        Author person = new Author("Stefan", "S.", null, "Kolb", null);
+        assertEquals(Arrays.asList(company, person), AuthorList.parse("{JabRef Developers} and Stefan Kolb"));
     }
 
     @Test
