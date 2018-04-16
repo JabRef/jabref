@@ -569,7 +569,7 @@ return console.askOkCancel(message, true);
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.registry.SetRegistryValueAction">
                           <void property="keyName">
-                            <string>SOFTWARE\Mozilla\NativeMessagingHosts</string>
+                            <string>SOFTWARE\Mozilla\NativeMessagingHosts\org.jabref.jabref</string>
                           </void>
                           <void property="registryRoot">
                             <object class="java.lang.Enum" method="valueOf">
@@ -578,10 +578,7 @@ return console.askOkCancel(message, true);
                             </object>
                           </void>
                           <void property="value">
-                            <string>/ve /d "${installer:sys.installationDir}\jabref.json" /f</string>
-                          </void>
-                          <void property="valueName">
-                            <string>org.jabref.jabref</string>
+                            <string>${installer:sys.installationDir}\jabref.json</string>
                           </void>
                         </object>
                       </java>
@@ -928,7 +925,7 @@ return console.askYesNo(message, true);
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.registry.DeleteRegistryItemAction">
                           <void property="keyName">
-                            <string>SOFTWARE\Mozilla\NativeMessagingHosts</string>
+                            <string>SOFTWARE\Mozilla\NativeMessagingHosts\org.jabref.jabref</string>
                           </void>
                           <void property="onlyIfEmpty">
                             <boolean>false</boolean>
@@ -938,9 +935,6 @@ return console.askYesNo(message, true);
                               <class>com.install4j.api.windows.RegistryRoot</class>
                               <string>HKEY_LOCAL_MACHINE</string>
                             </object>
-                          </void>
-                          <void property="valueName">
-                            <string>org.jabref.jabref</string>
                           </void>
                         </object>
                       </java>
