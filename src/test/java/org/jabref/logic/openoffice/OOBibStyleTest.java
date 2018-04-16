@@ -1,5 +1,6 @@
 package org.jabref.logic.openoffice;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -57,8 +58,9 @@ public class OOBibStyleTest {
 
     @Test
     public void testAuthorYearAsFile() throws URISyntaxException, IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+        File defFile = Paths.get(OOBibStyleTest.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+                .toFile();
+        OOBibStyle style = new OOBibStyle(defFile, layoutFormatterPreferences, StandardCharsets.UTF_8);
         assertTrue(style.isValid());
         assertFalse(style.isFromResource());
         assertFalse(style.isBibtexKeyCiteMarkers());
@@ -71,7 +73,6 @@ public class OOBibStyleTest {
 
     @Test
     public void testNumerical() throws IOException {
-
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
         assertTrue(style.isValid());
@@ -81,7 +82,6 @@ public class OOBibStyleTest {
         assertFalse(style.isItalicCitations());
         assertTrue(style.isNumberEntries());
         assertTrue(style.isSortByPosition());
-
     }
 
     @Test
@@ -132,6 +132,9 @@ public class OOBibStyleTest {
         assertTrue(journals.contains("Journal name 1"));
     }
 
+    /**
+     * In IntelliJ: When running this test, ensure that the working directory is <code>%MODULE_WORKING_DIR%"</code>
+     */
     @Test
     public void testGetCitationMarker() throws IOException {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
@@ -153,6 +156,9 @@ public class OOBibStyleTest {
                 style.getCitationMarker(Arrays.asList(entry), entryDBMap, true, null, new int[] {5}));
     }
 
+    /**
+     * In IntelliJ: When running this test, ensure that the working directory is <code>%MODULE_WORKING_DIR%"</code>
+     */
     @Test
     public void testLayout() throws IOException {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
@@ -504,7 +510,5 @@ public class OOBibStyleTest {
         entryDBMap.put(entry, database);
         assertEquals("von Beta, Epsilon, & Tau, 2016",
                 style.getCitationMarker(entries, entryDBMap, true, null, null));
-
     }
-
 }
