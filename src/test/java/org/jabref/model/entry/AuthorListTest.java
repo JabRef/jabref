@@ -379,7 +379,7 @@ public class AuthorListTest {
     public void testCompanyAuthorAndPerson() {
         Author company = new Author(null, null, null, "JabRef Developers", null);
         Author person = new Author("Stefan", "S.", null, "Kolb", null);
-        assertEquals(Arrays.asList(company, person), AuthorList.parse("{JabRef Developers} and Stefan Kolb"));
+        assertEquals(Arrays.asList(company, person), AuthorList.parse("{JabRef Developers} and Stefan Kolb").getAuthors());
     }
 
     @Test
