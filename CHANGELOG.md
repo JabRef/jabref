@@ -59,6 +59,7 @@ The new default removes the linked file from the entry instead of deleting the f
 - We fixed an issue where the "Copy linked files" dialog produced an error when the entry had no file [#3818](https://github.com/JabRef/jabref/issues/3818)
 - We fixed the coloring of the search box icon in case a user switches to advanced search mode [#3870](https://github.com/JabRef/jabref/issues/3870)
 - We fixed an issue where pressing <kbd>del</kbd> in the `file` field would trigger the delete dialog a second file, if the first file is deleted [#3926](https://github.com/JabRef/jabref/issues/3926)
+- We fixed the saving of entry preview preferences [#3845](https://github.com/JabRef/jabref/issues/3845)
 
 ### Removed
 - We removed the [Look and Feels from JGoodies](http://www.jgoodies.com/freeware/libraries/looks/), because the open source version is not compatible with Java 9.
