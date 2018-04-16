@@ -56,4 +56,10 @@ public class PersonNamesCheckerTest {
     public void validCorporateNameInBrackets() throws Exception {
         assertEquals(Optional.empty(), checker.checkValue("{JabRef}"));
     }
+
+    @Test
+    public void validCorporateNameAndPerson() throws Exception {
+        assertEquals(Optional.empty(), checker.checkValue("{JabRef} and Stefan Kolb"));
+        assertEquals(Optional.empty(), checker.checkValue("{JabRef} and Kolb, Stefan"));
+    }
 }

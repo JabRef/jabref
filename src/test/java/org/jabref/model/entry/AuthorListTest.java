@@ -326,7 +326,6 @@ public class AuthorListTest {
     @Test
     public void testGetEmptyAuthor() {
         assertThrows(Exception.class, () -> AuthorList.parse("").getAuthor(0));
-
     }
 
     @Test
@@ -372,6 +371,16 @@ public class AuthorListTest {
     public void testCompanyAuthor() {
         Author author = AuthorList.parse("{JabRef Developers}").getAuthor(0);
         Author expected = new Author(null, null, null, "JabRef Developers", null);
+        assertEquals(expected, author);
+    }
+
+    @Test
+    public void testCompanyAuthorAndPerson() {
+        Author author = AuthorList.parse("{JabRef Developers} and Stefan Kolb").getAuthor(0);
+        Author expected = new Author(null, null, null, "JabRef Developers", null);
+        assertEquals(expected, author);
+        author = AuthorList.parse("{JabRef Developers} and Stefan Kolb").getAuthor(1);
+        expected = new Author("Stefan", "S.", null, "Kolb", null);
         assertEquals(expected, author);
     }
 
