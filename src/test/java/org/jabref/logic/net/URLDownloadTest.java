@@ -6,6 +6,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
+import org.jabref.support.DisabledOnCIServer;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -66,6 +68,7 @@ public class URLDownloadTest {
     }
 
     @Test
+    @DisabledOnCIServer("CI Server is apparently blocked")
     public void downloadOfFTPSucceeds() throws IOException {
         URLDownload ftp = new URLDownload(new URL("ftp://ftp.informatik.uni-stuttgart.de/pub/library/ncstrl.ustuttgart_fi/INPROC-2016-15/INPROC-2016-15.pdf"));
 

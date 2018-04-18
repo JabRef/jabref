@@ -62,14 +62,14 @@ public class CleanupAction extends AbstractWorker {
             return;
         }
         CleanupPresetPanel presetPanel = new CleanupPresetPanel(panel.getBibDatabaseContext(),
-                CleanupPreset.loadFromPreferences(preferences));
+                preferences.getCleanupPreset());
         int choice = showDialog(presetPanel);
         if (choice != JOptionPane.OK_OPTION) {
             canceled = true;
             return;
         }
         CleanupPreset cleanupPreset = presetPanel.getCleanupPreset();
-        cleanupPreset.storeInPreferences(preferences);
+        preferences.setCleanupPreset(cleanupPreset);
 
         if (cleanupPreset.isRenamePDF() && Globals.prefs.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
             CheckBoxMessage cbm = new CheckBoxMessage(

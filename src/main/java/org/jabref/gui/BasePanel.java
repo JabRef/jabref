@@ -219,7 +219,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         this.tableModel = new MainTableDataModel(getBibDatabaseContext());
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
-        annotationCache = new FileAnnotationCache(bibDatabaseContext);
+        annotationCache = new FileAnnotationCache(bibDatabaseContext, Globals.prefs.getFileDirectoryPreferences());
 
         this.preview = new PreviewPanel(this, getBibDatabaseContext());
         DefaultTaskExecutor.runInJavaFXThread(() -> frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview));
@@ -585,8 +585,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                 .openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null)));
 
         actions.put(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, (BaseAction) () -> {
-            DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext()
-                    .getDBMSSynchronizer();
+            DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBMSSynchronizer();
             dbmsSynchronizer.pullChanges();
         });
 
@@ -1032,13 +1031,13 @@ public class BasePanel extends JPanel implements ClipboardOwner {
 
     private void openExternalFile() {
         JabRefExecutorService.INSTANCE.execute(() -> {
-            final List<BibEntry> bes = mainTable.getSelectedEntries();
-            if (bes.size() != 1) {
+            final List<BibEntry> selectedEntries = mainTable.getSelectedEntries();
+            if (selectedEntries.size() != 1) {
                 output(Localization.lang("This operation requires exactly one item to be selected."));
                 return;
             }
 
-            final BibEntry entry = bes.get(0);
+            final BibEntry entry = selectedEntries.get(0);
             if (!entry.hasField(FieldName.FILE)) {
                 // no bibtex field
                 new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
@@ -1087,12 +1086,14 @@ public class BasePanel extends JPanel implements ClipboardOwner {
     }
 
     private boolean saveDatabase(File file, boolean selectedOnly, Charset enc,
-            SavePreferences.DatabaseSaveType saveType) throws SaveException {
+                                 SavePreferences.DatabaseSaveType saveType)
+            throws SaveException {
         SaveSession session;
         frame.block();
         final String SAVE_DATABASE = Localization.lang("Save library");
         try {
-            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(enc)
+            SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences()
+                    .withEncoding(enc)
                     .withSaveType(saveType);
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
                     FileSaveSession::new);
@@ -1500,17 +1501,20 @@ public class BasePanel extends JPanel implements ClipboardOwner {
      * @param entry The entry to edit.
      */
     public void showAndEdit(BibEntry entry) {
+
         if (mode == BasePanelMode.SHOWING_EDITOR) {
             Globals.prefs.putInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT, splitPane.getHeight() - splitPane.getDividerLocation());
         }
         mode = BasePanelMode.SHOWING_EDITOR;
         splitPane.setBottomComponent(entryEditorContainer);
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            if (entry != getShowing()) {
+                entryEditor.setEntry(entry);
+                newEntryShowing(entry);
+            }
+            entryEditor.requestFocus();
 
-        if (entry != getShowing()) {
-            entryEditor.setEntry(entry);
-            newEntryShowing(entry);
-        }
-        DefaultTaskExecutor.runInJavaFXThread(() -> entryEditor.requestFocus());
+        });
         adjustSplitter();
     }
 
@@ -1945,10 +1949,6 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         return mainTable;
     }
 
-    public BibDatabaseContext getDatabaseContext() {
-        return bibDatabaseContext;
-    }
-
     public Optional<SearchQuery> getCurrentSearchQuery() {
         return currentSearchQuery;
     }
@@ -2002,7 +2002,6 @@ public class BasePanel extends JPanel implements ClipboardOwner {
                 /*  The search can lead to an unexpected 100% CPU usage which is perceived
                     as a bug, if the search incidentally starts at a directory with lots
                     of stuff below. It is now disabled by default. */
-
                 return;
             }
 
@@ -2013,7 +2012,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             // Run the search operation:
             FileFinder fileFinder = FileFinders.constructFromConfiguration(Globals.prefs.getAutoLinkPreferences());
             try {
-            List<Path> files = fileFinder.findAssociatedFiles(entry, dirs, extensions);
+                List<Path> files = fileFinder.findAssociatedFiles(entry, dirs, extensions);
                 if (!files.isEmpty()) {
                     Path file = files.get(0);
                     Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByFile(file);
@@ -2223,7 +2222,8 @@ public class BasePanel extends JPanel implements ClipboardOwner {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .withDefaultExtension(FileType.BIBTEX_DB)
                     .addExtensionFilter(FileType.BIBTEX_DB)
-                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                    .build();
 
             DialogService ds = new FXDialogService();
 

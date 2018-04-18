@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.BoxLayout;
@@ -176,8 +177,10 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         chosenModel.clear();
         boolean isPreviewChosen = false;
         for (String style : previewPreferences.getPreviewCycle()) {
-            if (CitationStyle.isCitationStyleFile(style)) {
-                chosenModel.addElement(CitationStyle.createCitationStyleFromFile(style));
+            // in case the style is not a valid citation style file, an empty Optional is returned
+            Optional<CitationStyle> citationStyle = CitationStyle.createCitationStyleFromFile(style);
+            if (citationStyle.isPresent()) {
+                chosenModel.addElement(citationStyle.get());
             } else {
                 if (isPreviewChosen) {
                     LOGGER.error("Preview is already in the list, something went wrong");

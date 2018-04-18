@@ -66,7 +66,7 @@ public class ExportAction {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                Globals.exportFactory = ExporterFactory.create(Globals.prefs, Globals.journalAbbreviationLoader);
+                Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
                 FileDialogConfiguration fileDialogConfiguration = ExportAction.createExportFileChooser(Globals.exportFactory, Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
                 DialogService dialogService = new FXDialogService();
                 DefaultTaskExecutor.runInJavaFXThread(() ->

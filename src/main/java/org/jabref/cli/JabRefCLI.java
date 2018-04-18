@@ -146,10 +146,6 @@ public class JabRefCLI {
         return cl.getOptionValue("exportMatches");
     }
 
-    public boolean isXmpFacilities() {
-        return cl.hasOption("readAndWriteXmpMetadata");
-    }
-
     public boolean isGenerateBibtexKeys() { return cl.hasOption("generateBibtexKeys"); }
 
     public boolean isAutomaticallySetFileLinks() { return cl.hasOption("automaticallySetFileLinks"); }
@@ -248,11 +244,6 @@ public class JabRefCLI {
         options.addOption(Option.builder("asfl").
                 longOpt("automaticallySetFileLinks").
                 desc(Localization.lang("Automatically set file links")).
-                build());
-
-        options.addOption(Option.builder("xmp").
-                longOpt("readAndWriteXmpMetadata").
-                desc("Read and write xmp metadata from/to pdf files").
                 build());
 
         return options;
