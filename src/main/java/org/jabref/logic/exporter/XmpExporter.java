@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -24,6 +26,7 @@ import org.jabref.model.entry.BibEntry;
 public class XmpExporter extends Exporter {
 
     private static final String XMP_SPLIT_PATTERN = "split";
+    private static final String XMP_BEGIN_END_TAG = "?xpacket";
 
     private final XmpPreferences xmpPreferences;
 
@@ -64,8 +67,16 @@ public class XmpExporter extends Exporter {
     }
 
     private void writeBibToXmp(Path file, List<BibEntry> entries, Charset encoding) throws IOException {
+        String xmpContent = XmpUtilWriter.generateXmpString(entries, this.xmpPreferences);
+        // remove the <?xpacket *> tags to enable the usage of the CTAN package xmpincl
+        Predicate<String> isBeginOrEndTag = s -> s.contains(XMP_BEGIN_END_TAG);
+        String updatedXmpContent = Arrays.stream(xmpContent.split(System.lineSeparator()))
+                .filter(isBeginOrEndTag.negate())
+                .map(line -> line.toString())
+                .collect(Collectors.joining(System.lineSeparator()));
+
         try (BufferedWriter writer = Files.newBufferedWriter(file, encoding)) {
-            writer.write(XmpUtilWriter.generateXmpString(entries, this.xmpPreferences));
+            writer.write(updatedXmpContent);
             writer.flush();
         }
     }

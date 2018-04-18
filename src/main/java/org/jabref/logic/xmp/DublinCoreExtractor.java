@@ -61,12 +61,12 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Year + Month in BibTex - Date in DublinCore is a combination of year and month information
+     * Year in BibTex - Date in DublinCore is only the year information, because dc interprets empty months as January.
      *
      * @param bibEntry The BibEntry object, which is filled during metadata extraction.
      * @param dcSchema Metadata in DublinCore format.
      */
-    private void extractYearAndMonth() {
+    private void extractYear() {
         List<String> dates = dcSchema.getUnqualifiedSequenceValueList("date");
         if ((dates != null) && !dates.isEmpty()) {
             String date = dates.get(0).trim();
@@ -78,10 +78,6 @@ public class DublinCoreExtractor {
             }
             if (calender != null) {
                 bibEntry.setField(FieldName.YEAR, String.valueOf(calender.get(Calendar.YEAR)));
-                if (date.length() > 4) {
-                    Optional<Month> month = Month.getMonthByNumber(calender.get(Calendar.MONTH) + 1);
-                    month.ifPresent(bibEntry::setMonth);
-                }
             }
         }
     }
@@ -141,7 +137,17 @@ public class DublinCoreExtractor {
                     r = r.substring("bibtex/".length());
                     int i = r.indexOf('/');
                     if (i != -1) {
-                        bibEntry.setField(r.substring(0, i), r.substring(i + 1));
+                        String key = r.substring(0, i);
+                        String value = r.substring(i + 1);
+                        bibEntry.setField(key, value);
+
+                        // only for month field - override value
+                        if (key.equals("month")) {
+                            Optional<Month> parsedMonth = Month.parse(value);
+                            if (parsedMonth.isPresent()) {
+                                bibEntry.setField(key, parsedMonth.get().getShortName());
+                            }
+                        }
                     }
                 }
             }
@@ -232,7 +238,7 @@ public class DublinCoreExtractor {
 
         this.extractEditor();
         this.extractAuthor();
-        this.extractYearAndMonth();
+        this.extractYear();
         this.extractAbstract();
         this.extractDOI();
         this.extractPublisher();
