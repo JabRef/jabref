@@ -10,6 +10,7 @@ import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.remote.server.MessageHandler;
 import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import org.jabref.logic.util.OS;
+import org.jabref.support.DisabledOnCIServer;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,9 +26,10 @@ import static org.mockito.Mockito.verify;
 /**
  * Tests where the remote client and server setup is wrong.
  */
+@DisabledOnCIServer("Tests fails sporadically on CI server")
 class RemoteSetupTest {
 
-    MessageHandler messageHandler;
+    private MessageHandler messageHandler;
 
     @BeforeEach
     void setUp() {

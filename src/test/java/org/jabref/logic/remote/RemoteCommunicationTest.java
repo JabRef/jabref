@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.remote.server.MessageHandler;
 import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
+import org.jabref.support.DisabledOnCIServer;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.verify;
  * Tests for the case where the client and server are set-up correctly.
  * Testing the exceptional cases happens in {@link RemoteSetupTest}.
  */
+@DisabledOnCIServer("Tests fails sporadically on CI server")
 class RemoteCommunicationTest {
 
     private RemoteClient client;
