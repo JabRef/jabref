@@ -1,5 +1,6 @@
 package org.jabref.gui.maintable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,12 +10,14 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -22,6 +25,7 @@ import javafx.scene.shape.Rectangle;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
@@ -44,11 +48,15 @@ import org.jabref.model.util.OptionalUtil;
 
 import org.controlsfx.control.Rating;
 import org.fxmisc.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class MainTableColumnFactory {
 
     private static final String ICON_COLUMN = "column-icon";
     private static final String GROUP_COLUMN = "column-groups";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnFactory.class);
 
     private final ColumnPreferences preferences;
     private final ExternalFileTypes externalFileTypes;
@@ -79,9 +87,9 @@ class MainTableColumnFactory {
         // Add column for DOI/URL
         if (preferences.showUrlColumn()) {
             if (preferences.preferDoiOverUrl()) {
-                columns.add(createIconColumn(IconTheme.JabRefIcons.DOI, FieldName.DOI, FieldName.URL));
+                columns.add(createUrlOrDoiColumn(IconTheme.JabRefIcons.DOI, FieldName.DOI, FieldName.URL));
             } else {
-                columns.add(createIconColumn(IconTheme.JabRefIcons.WWW, FieldName.URL, FieldName.DOI));
+                columns.add(createUrlOrDoiColumn(IconTheme.JabRefIcons.WWW, FieldName.URL, FieldName.DOI));
             }
         }
 
@@ -269,18 +277,48 @@ class MainTableColumnFactory {
     }
 
     /**
-     * Creates a column which shows an icon instead of the textual content
+     * Creates a column for DOIs or URLs.
+     * The {@code firstField} is preferred to be shown over {@code secondField}.
      */
-    private TableColumn<BibEntryTableViewModel, String> createIconColumn(JabRefIcon icon, String firstField, String secondField) {
+    private TableColumn<BibEntryTableViewModel, String> createUrlOrDoiColumn(JabRefIcon icon, String firstField, String secondField) {
         TableColumn<BibEntryTableViewModel, String> column = new TableColumn<>();
         column.setGraphic(icon.getGraphicNode());
         column.getStyleClass().add(ICON_COLUMN);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
-        column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(firstField)).orElse(cellData.getValue().getField(secondField)));
+        column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(firstField)).map(x -> firstField).orElse(EasyBind.monadic(cellData.getValue().getField(secondField)).map(x -> secondField)));
                 new ValueTableCellFactory<BibEntryTableViewModel, String>()
                         .withGraphic(cellFactory::getTableIcon)
+                        .withOnMouseClickedEvent((entry, content) -> createOpenUrlOrDoiHandler(entry, firstField, secondField))
                         .install(column);
         return column;
+    }
+
+    private EventHandler<? super MouseEvent> createOpenUrlOrDoiHandler(BibEntryTableViewModel entry, String firstField, String secondField) {
+        return (event) -> {
+            if (event.getButton() != MouseButton.PRIMARY) {
+                return;
+            }
+
+            String field;
+            if (entry.getEntry().hasField(firstField)) {
+                field = firstField;
+            } else if (entry.getEntry().hasField(secondField)) {
+                field = secondField;
+            } else {
+                // nothing to open
+                LOGGER.debug("Requested opening DOI or URL, but none present.");
+                return;
+            }
+
+            entry.getEntry().getField(field).ifPresent(url -> {
+                try {
+                    JabRefDesktop.openExternalViewer(database, url, field);
+                } catch (IOException e) {
+                    LOGGER.error("Failed to open external viewer for '{}'", url, e);
+                }
+            });
+            event.consume();
+        };
     }
 
     private TableColumn<BibEntryTableViewModel, String> createIconColumn(JabRefIcon icon, String field) {
