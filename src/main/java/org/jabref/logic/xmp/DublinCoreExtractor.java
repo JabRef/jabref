@@ -7,6 +7,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.model.database.BibDatabaseMode;
@@ -130,27 +132,33 @@ public class DublinCoreExtractor {
      * @param dcSchema Metadata in DublinCore format.
      */
     private void extractBibTexFields() {
-        List<String> relationships = dcSchema.getRelations();
-        if (relationships != null) {
-            for (String r : relationships) {
-                if (r.startsWith("bibtex/")) {
-                    r = r.substring("bibtex/".length());
-                    int i = r.indexOf('/');
-                    if (i != -1) {
-                        String key = r.substring(0, i);
-                        String value = r.substring(i + 1);
-                        bibEntry.setField(key, value);
+        Predicate<String> isBibTeXElement = s -> s.startsWith("bibtex/");
+        Consumer<String> splitBibTeXElement = s -> {
+            // split solution is complicated, because some fields contains url etc.
+            String temp = s.substring("bibtex/".length());
+            int i = temp.indexOf('/');
+            if (i != -1) {
+                String key = temp.substring(0, i);
+                String value = temp.substring(i + 1);
+                bibEntry.setField(key, value);
 
-                        // only for month field - override value
-                        if (key.equals("month")) {
-                            Optional<Month> parsedMonth = Month.parse(value);
-                            if (parsedMonth.isPresent()) {
-                                bibEntry.setField(key, parsedMonth.get().getShortName());
-                            }
-                        }
+                // only for month field - override value
+                // workaround, because the date value of the xmp component of pdf box is corrupted
+                if ("month".equals(key)) {
+                    Optional<Month> parsedMonth = Month.parse(value);
+                    if (parsedMonth.isPresent()) {
+                        bibEntry.setField(key, parsedMonth.get().getShortName());
                     }
                 }
             }
+
+        };
+        List<String> relationships = dcSchema.getRelations();
+        if (relationships != null) {
+            relationships.stream()
+                    .filter(isBibTeXElement)
+                    .forEach(splitBibTeXElement);
+
         }
     }
 
