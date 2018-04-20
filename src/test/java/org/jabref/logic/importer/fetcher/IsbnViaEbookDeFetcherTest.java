@@ -24,14 +24,13 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setType(BiblatexEntryTypes.BOOK);
         bibEntry.setField("bibtexkey", "9780134685991");
         bibEntry.setField("title", "Effective Java");
-        bibEntry.setField("publisher", "ADDISON WESLEY PUB CO INC");
-        bibEntry.setField("pagetotal", "416");
+        bibEntry.setField("publisher", "Addison Wesley");
         bibEntry.setField("year", "2018");
         bibEntry.setField("author", "Bloch, Joshua");
-        bibEntry.setField("date", "2018-01-06");
+        bibEntry.setField("date", "2018-01-11");
         bibEntry.setField("ean", "9780134685991");
         bibEntry.setField("isbn", "0134685997");
-        bibEntry.setField("url", "http://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html");
+        bibEntry.setField("url", "https://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html");
 
         fetcher = new IsbnViaEbookDeFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
@@ -71,12 +70,12 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setField("title", "Fundamentals of Business Process Management");
         bibEntry.setField("publisher", "Springer Berlin Heidelberg");
         bibEntry.setField("year", "2015");
-        bibEntry.setField("author", "Marlon Dumas and Marcello La Rosa and Jan Mendling and Hajo A. Reijers");
+        bibEntry.setField("author", "Dumas, Marlon and Rosa, Marcello La and Mendling, Jan and Reijers, Hajo A.");
         bibEntry.setField("date", "2015-04-12");
         bibEntry.setField("ean", "9783642434730");
         bibEntry.setField("isbn", "3642434738");
         bibEntry.setField("pagetotal", "428");
-        bibEntry.setField("url", "http://www.ebook.de/de/product/23955263/marlon_dumas_marcello_la_rosa_jan_mendling_hajo_a_reijers_fundamentals_of_business_process_management.html");
+        bibEntry.setField("url", "https://www.ebook.de/de/product/23955263/marlon_dumas_marcello_la_rosa_jan_mendling_hajo_a_reijers_fundamentals_of_business_process_management.html");
 
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3642434738");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
