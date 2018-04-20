@@ -46,8 +46,6 @@ public class IEEE implements FulltextFetcher {
             }
         }
 
-        //        12:50:19.221 GEThttps://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf[HTTP/1.1 200 OK 8421ms]
-
         // If not, try DOI
         if (stampString.isEmpty()) {
             Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::parse);
