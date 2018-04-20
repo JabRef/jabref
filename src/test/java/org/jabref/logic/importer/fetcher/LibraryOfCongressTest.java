@@ -24,7 +24,7 @@ public class LibraryOfCongressTest {
         expected.setField("author", "West, Matthew");
         expected.setField("isbn", "0123751063 (pbk.)");
         expected.setField("issuance", "monographic");
-        expected.setField("keywords", "Database design, Data structures (Computer science)");
+        expected.setField("keywords", "Database design Data structures (Computer science)");
         expected.setField("language", "eng");
         expected.setField("lccn", "2010045158");
         expected.setField("note", "Matthew West., Includes index.");
