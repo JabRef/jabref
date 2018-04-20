@@ -170,7 +170,7 @@ public class MedlineFetcherTest {
 
     @Test
     public void testInvalidSearchTerm() throws Exception {
-        assertEquals(Collections.emptyList(), fetcher.performSearchById("this.is.a.invalid.search.term.for.the.medline.fetcher"));
+        assertEquals(Optional.empty(), fetcher.performSearchById("this.is.a.invalid.search.term.for.the.medline.fetcher"));
     }
 
     @Test
