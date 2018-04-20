@@ -34,6 +34,7 @@ public class IEEE implements FulltextFetcher {
         Objects.requireNonNull(entry);
 
         String stampString = "";
+
         // Try URL first -- will primarily work for entries from the old IEEE search
         Optional<String> urlString = entry.getField(FieldName.URL);
         if (urlString.isPresent()) {
@@ -50,7 +51,11 @@ public class IEEE implements FulltextFetcher {
             Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::parse);
             if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getExternalURI().isPresent()) {
                 // Download the HTML page from IEEE
-                String resolvedDOIPage = new URLDownload(doi.get().getExternalURI().get().toURL()).asString();
+                URLDownload urlDownload = new URLDownload(doi.get().getExternalURI().get().toURL());
+                //We don't need to modify the cookies, but we need support for them
+                urlDownload.getCookieFromUrl();
+
+                String resolvedDOIPage = urlDownload.asString();
                 // Try to find the link
                 Matcher matcher = STAMP_PATTERN.matcher(resolvedDOIPage);
                 if (matcher.find()) {
@@ -66,7 +71,11 @@ public class IEEE implements FulltextFetcher {
         }
 
         // Download the HTML page containing a frame with the PDF
-        String framePage = new URLDownload(BASE_URL + stampString).asString();
+        URLDownload urlDownload = new URLDownload(BASE_URL + stampString);
+        //We don't need to modify the cookies, but we need support for them
+        urlDownload.getCookieFromUrl();
+
+        String framePage = urlDownload.asString();
         // Try to find the direct PDF link
         Matcher matcher = PDF_PATTERN.matcher(framePage);
         if (matcher.find()) {
