@@ -14,6 +14,7 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.strings.StringUtil;
 
 public class CellFactory {
 
@@ -95,6 +96,10 @@ public class CellFactory {
     }
 
     public Node getTableIcon(String fieldType) {
+        if (StringUtil.isBlank(fieldType)) {
+            return null;
+        }
+
         JabRefIcon icon = TABLE_ICONS.get(fieldType);
         if (icon == null) {
             //LOGGER.info("Error: no table icon defined for type '" + fieldType + "'.");

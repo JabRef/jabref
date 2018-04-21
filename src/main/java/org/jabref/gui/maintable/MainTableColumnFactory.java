@@ -285,40 +285,33 @@ class MainTableColumnFactory {
         column.setGraphic(icon.getGraphicNode());
         column.getStyleClass().add(ICON_COLUMN);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
-        column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(firstField)).map(x -> firstField).orElse(EasyBind.monadic(cellData.getValue().getField(secondField)).map(x -> secondField)));
+        // icon is chosen based on field name in cell, so map fields to its names
+        column.setCellValueFactory(cellData -> EasyBind.map(cellData.getValue().getField(firstField), x -> firstField).orElse(EasyBind.map(cellData.getValue().getField(secondField), x -> secondField)));
                 new ValueTableCellFactory<BibEntryTableViewModel, String>()
                         .withGraphic(cellFactory::getTableIcon)
-                        .withOnMouseClickedEvent((entry, content) -> createOpenUrlOrDoiHandler(entry, firstField, secondField))
+                        .withOnMouseClickedEvent((BibEntryTableViewModel entry, String content) -> (MouseEvent event) -> openUrlOrDoi(event, entry, content))
                         .install(column);
         return column;
     }
 
-    private EventHandler<? super MouseEvent> createOpenUrlOrDoiHandler(BibEntryTableViewModel entry, String firstField, String secondField) {
-        return (event) -> {
-            if (event.getButton() != MouseButton.PRIMARY) {
-                return;
-            }
+    private void openUrlOrDoi(MouseEvent event, BibEntryTableViewModel entry, String field) {
+        if (event.getButton() != MouseButton.PRIMARY) {
+            return;
+        }
 
-            String field;
-            if (entry.getEntry().hasField(firstField)) {
-                field = firstField;
-            } else if (entry.getEntry().hasField(secondField)) {
-                field = secondField;
-            } else {
-                // nothing to open
-                LOGGER.debug("Requested opening DOI or URL, but none present.");
-                return;
-            }
+        if (!entry.getEntry().hasField(field)) {
+            LOGGER.error("Requested opening viewer for {} of entry '{}', but field is not present.", field, entry.getEntry().getId());
+            return;
+        }
 
-            entry.getEntry().getField(field).ifPresent(url -> {
-                try {
-                    JabRefDesktop.openExternalViewer(database, url, field);
-                } catch (IOException e) {
-                    LOGGER.error("Failed to open external viewer for '{}'", url, e);
-                }
-            });
-            event.consume();
-        };
+        entry.getEntry().getField(field).ifPresent(identifier -> {
+            try {
+                JabRefDesktop.openExternalViewer(database, identifier, field);
+            } catch (IOException e) {
+                dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
+            }
+        });
+        event.consume();
     }
 
     private TableColumn<BibEntryTableViewModel, String> createIconColumn(JabRefIcon icon, String field) {
