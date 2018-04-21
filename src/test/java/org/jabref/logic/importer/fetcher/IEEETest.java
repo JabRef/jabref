@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @FetcherTest
 class IEEETest {
+
     private IEEE finder;
     private BibEntry entry;
 
@@ -28,6 +29,15 @@ class IEEETest {
     void findByDOI() throws IOException {
         entry.setField("doi", "10.1109/ACCESS.2016.2535486");
 
+        assertEquals(
+                Optional.of(
+                        new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
+                finder.findFullText(entry));
+    }
+
+    @Test
+    void findByDocumentUrl() throws IOException {
+        entry.setField("url", "https://ieeexplore.ieee.org/document/7421926/");
         assertEquals(
                 Optional.of(
                         new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
