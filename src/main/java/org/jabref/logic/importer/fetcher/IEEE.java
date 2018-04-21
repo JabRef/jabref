@@ -24,7 +24,10 @@ import org.slf4j.LoggerFactory;
 public class IEEE implements FulltextFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IEEE.class);
+    private static final String STAMP_BASE_STRING_DOCUMENT = "/stamp/stamp.jsp?tp=&arnumber=";
     private static final Pattern STAMP_PATTERN = Pattern.compile("(/stamp/stamp.jsp\\?t?p?=?&?arnumber=[0-9]+)");
+    private static final Pattern DOCUMENT_PATTERN = Pattern.compile("document/([0-9]+)/");
+
     private static final Pattern PDF_PATTERN = Pattern.compile("\"(https://ieeexplore.ieee.org/ielx[0-9/]+\\.pdf[^\"]+)\"");
     private static final String IEEE_DOI = "10.1109";
     private static final String BASE_URL = "https://ieeexplore.ieee.org";
@@ -38,12 +41,22 @@ public class IEEE implements FulltextFetcher {
         // Try URL first -- will primarily work for entries from the old IEEE search
         Optional<String> urlString = entry.getField(FieldName.URL);
         if (urlString.isPresent()) {
-            // Is the URL a direct link to IEEE?
-            Matcher matcher = STAMP_PATTERN.matcher(urlString.get());
-            if (matcher.find()) {
-                // Found it
-                stampString = matcher.group(1);
+
+
+            Matcher documentUrlMatcher = DOCUMENT_PATTERN.matcher(urlString.get());
+            if(documentUrlMatcher.find())
+            {
+                String docId  = documentUrlMatcher.group(1);
+                stampString = STAMP_BASE_STRING_DOCUMENT + docId;
             }
+
+            //You get this url if you export bibtex from IEEE
+            Matcher stampMatcher = STAMP_PATTERN.matcher(urlString.get());
+            if (stampMatcher.find()) {
+                // Found it
+                stampString = stampMatcher.group(1);
+            }
+
         }
 
         // If not, try DOI
