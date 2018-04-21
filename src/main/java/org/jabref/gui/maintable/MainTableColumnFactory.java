@@ -319,9 +319,12 @@ class MainTableColumnFactory {
         column.setGraphic(icon.getGraphicNode());
         column.getStyleClass().add(ICON_COLUMN);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
-        column.setCellValueFactory(cellData -> cellData.getValue().getField(field));
+        column.setCellValueFactory(cellData -> {
+            return EasyBind.map(cellData.getValue().getField(field), x -> field);
+        });
                 new ValueTableCellFactory<BibEntryTableViewModel, String>()
                         .withGraphic(cellFactory::getTableIcon)
+                        .withOnMouseClickedEvent((BibEntryTableViewModel entry, String content) -> (MouseEvent event) -> openUrlOrDoi(event, entry, field))
                         .install(column);
         return column;
     }
