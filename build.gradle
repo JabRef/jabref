@@ -128,7 +128,7 @@ dependencies {
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
     compile 'de.saxsys:mvvmfx-validation:1.7.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
-    compile 'org.fxmisc.flowless:flowless:0.6'
+    compile 'org.fxmisc.flowless:flowless:0.6.1'
     compile 'org.fxmisc.richtext:richtextfx:0.9.0'
 
     // Cannot be updated to 9.*.* until Jabref works with Java 9
@@ -162,7 +162,7 @@ dependencies {
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
     testCompile 'org.mockito:mockito-core:2.18.0'
-    testCompile 'com.github.tomakehurst:wiremock:2.16.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.17.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.5.1'
