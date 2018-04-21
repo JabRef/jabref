@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
