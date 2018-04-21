@@ -1,10 +1,10 @@
 package org.jabref.gui.groups;
 
-import java.util.Optional;
+import java.util.Arrays;
+import java.util.List;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
 
 import org.jabref.gui.DialogService;
@@ -26,9 +26,7 @@ public class GroupSidePane extends SidePaneComponent {
 
     private final JabRefPreferences preferences;
     private final DialogService dialogService;
-    private final Button intersectionUnionToggle = IconTheme.JabRefIcons.WWW.asButton();
-    private final Tooltip toggleUnion = new Tooltip(Localization.lang("Toogle union"));
-    private final Tooltip toggleIntersectoin = new Tooltip(Localization.lang("Toogle intersection"));
+    private final Button intersectionUnionToggle = IconTheme.JabRefIcons.GROUP_INTERSECTION.asButton();
 
     public GroupSidePane(SidePaneManager manager, JabRefPreferences preferences, DialogService dialogService) {
         super(manager, IconTheme.JabRefIcons.TOGGLE_GROUPS, Localization.lang("Groups"));
@@ -37,31 +35,15 @@ public class GroupSidePane extends SidePaneComponent {
     }
 
     @Override
-    protected Optional<Node> getAddtionalHeaderButtons() {
+    protected List<Node> getAddtionalHeaderButtons() {
         intersectionUnionToggle.setOnAction(event -> toggleUnionIntersection());
-        return Optional.of(intersectionUnionToggle);
-    }
-
-    private Node getUnionIntersectionGraphic() {
-        return preferences.getGroupViewMode().getIcon().getGraphicNode();
-    }
-
-    private Tooltip getUnionInterSectionToolTip() {
-        GroupViewMode mode = preferences.getGroupViewMode();
-        if (mode == GroupViewMode.UNION) {
-            return toggleIntersectoin;
-        }
-        if (mode == GroupViewMode.INTERSECTION) {
-            return toggleUnion;
-        }
-        return new Tooltip();
+        return Arrays.asList(intersectionUnionToggle);
     }
 
     @Override
     public void afterOpening() {
         preferences.putBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
-        intersectionUnionToggle.setGraphic(getUnionIntersectionGraphic());
-        intersectionUnionToggle.setTooltip(getUnionInterSectionToolTip());
+        setGraphicsAndTooltipforButton(preferences.getGroupViewMode());
     }
 
     @Override
@@ -92,9 +74,12 @@ public class GroupSidePane extends SidePaneComponent {
 
             dialogService.notify(Localization.lang("Group view mode set to union"));
         }
+        setGraphicsAndTooltipforButton(mode);
+    }
 
-        intersectionUnionToggle.setGraphic(getUnionIntersectionGraphic());
-        intersectionUnionToggle.setTooltip(getUnionInterSectionToolTip());
+    private void setGraphicsAndTooltipforButton(GroupViewMode mode) {
+        intersectionUnionToggle.setGraphic(GroupModeViewModel.getUnionIntersectionGraphic(mode));
+        intersectionUnionToggle.setTooltip(GroupModeViewModel.getUnionIntersectionTooltip(mode));
     }
 
     @Override

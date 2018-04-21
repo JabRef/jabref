@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
-import java.util.Optional;
+import java.util.Collections;
+import java.util.List;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -18,12 +19,11 @@ import org.jabref.logic.l10n.Localization;
 
 public abstract class SidePaneComponent {
 
-    protected final SidePaneManager manager;
-    protected final ToggleCommand toggleCommand;
-    protected final JabRefIcon icon;
-    protected final String title;
+    private final SidePaneManager manager;
+    private final ToggleCommand toggleCommand;
+    private final JabRefIcon icon;
+    private final String title;
     private Node contentNode;
-
 
     public SidePaneComponent(SidePaneManager manager, JabRefIcon icon, String title) {
         this.manager = manager;
@@ -109,7 +109,7 @@ public abstract class SidePaneComponent {
 
         final HBox buttonContainer = new HBox();
         buttonContainer.getChildren().addAll(up, down);
-        getAddtionalHeaderButtons().ifPresent(btn -> buttonContainer.getChildren().add(btn));
+        buttonContainer.getChildren().addAll(getAddtionalHeaderButtons());
         buttonContainer.getChildren().add(close);
 
         BorderPane graphic = new BorderPane();
@@ -124,8 +124,8 @@ public abstract class SidePaneComponent {
         return container;
     }
 
-    protected Optional<Node> getAddtionalHeaderButtons() {
-        return Optional.empty();
+    protected List<Node> getAddtionalHeaderButtons() {
+        return Collections.emptyList();
     }
 
     /**
