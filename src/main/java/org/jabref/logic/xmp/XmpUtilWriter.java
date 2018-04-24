@@ -250,6 +250,7 @@ public class XmpUtilWriter {
 
         return updatedXmpContent;
     }
+
     /**
      * Try to write the given BibTexEntry in the Document Information (the
      * properties of the pdf).
