@@ -64,11 +64,18 @@ public class DublinCoreExtractor {
 
     /**
      * Year in BibTex - Date in DublinCore is only the year information, because dc interprets empty months as January.
+     * Tries to extract the month as well.
+     * In JabRef the bibtex/month/value is prioritized.
+     * <br/>
+     * The problem is the default value of the calendar, which is always January, also if there is no month information in
+     * the xmp metdata. The idea is, to reject all information with YYYY-01-01. In cases, where xmp is written with JabRef
+     * the month property filled with jan will override this behavior and no data is lost. In the cases, where xmp
+     * is written by another service, the assumption is, that the 1st January is not a publication date at all.
      *
      * @param bibEntry The BibEntry object, which is filled during metadata extraction.
      * @param dcSchema Metadata in DublinCore format.
      */
-    private void extractYear() {
+    private void extractYearAndMonth() {
         List<String> dates = dcSchema.getUnqualifiedSequenceValueList("date");
         if ((dates != null) && !dates.isEmpty()) {
             String date = dates.get(0).trim();
@@ -80,6 +87,13 @@ public class DublinCoreExtractor {
             }
             if (calender != null) {
                 bibEntry.setField(FieldName.YEAR, String.valueOf(calender.get(Calendar.YEAR)));
+                // not the 1st of January
+                if (!((calender.get(Calendar.MONTH) == 0) && (calender.get(Calendar.DAY_OF_MONTH) == 1))) {
+                    Optional<Month> month = Month.getMonthByNumber(calender.get(Calendar.MONTH) + 1);
+                    if (month.isPresent()) {
+                        bibEntry.setField(FieldName.MONTH, month.get().getShortName());
+                    }
+                }
             }
         }
     }
@@ -132,9 +146,14 @@ public class DublinCoreExtractor {
      * @param dcSchema Metadata in DublinCore format.
      */
     private void extractBibTexFields() {
+        List<String> relationships = dcSchema.getRelations();
+
         Predicate<String> isBibTeXElement = s -> s.startsWith("bibtex/");
+
         Consumer<String> splitBibTeXElement = s -> {
-            // split solution is complicated, because some fields contains url etc.
+            // the default pattern is bibtex/key/value, but some fields contains url etc.
+            // so the value property contains additional slashes, which makes the usage of
+            // String#split complicated.
             String temp = s.substring("bibtex/".length());
             int i = temp.indexOf('/');
             if (i != -1) {
@@ -144,6 +163,7 @@ public class DublinCoreExtractor {
 
                 // only for month field - override value
                 // workaround, because the date value of the xmp component of pdf box is corrupted
+                // see also DublinCoreExtractor#extractYearAndMonth
                 if ("month".equals(key)) {
                     Optional<Month> parsedMonth = Month.parse(value);
                     if (parsedMonth.isPresent()) {
@@ -153,12 +173,10 @@ public class DublinCoreExtractor {
             }
 
         };
-        List<String> relationships = dcSchema.getRelations();
         if (relationships != null) {
             relationships.stream()
                     .filter(isBibTeXElement)
                     .forEach(splitBibTeXElement);
-
         }
     }
 
@@ -246,7 +264,7 @@ public class DublinCoreExtractor {
 
         this.extractEditor();
         this.extractAuthor();
-        this.extractYear();
+        this.extractYearAndMonth();
         this.extractAbstract();
         this.extractDOI();
         this.extractPublisher();
