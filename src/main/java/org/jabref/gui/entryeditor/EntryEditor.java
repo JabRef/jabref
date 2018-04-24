@@ -26,9 +26,11 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.EntryFetchAndMergeWorker;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.TypedBibEntry;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -62,11 +64,17 @@ public class EntryEditor extends BorderPane {
      * A reference to the entry this editor works on.
      */
     private BibEntry entry;
-    @FXML private TabPane tabbed;
-    @FXML private Button typeChangeButton;
-    @FXML private Button fetcherButton;
+    @FXML
+    private TabPane tabbed;
+    @FXML
+    private Button typeChangeButton;
+    @FXML
+    private Button generateKeyButton;
+    @FXML
+    private Button fetcherButton;
     private SourceTab sourceTab;
-    @FXML private Label typeLabel;
+    @FXML
+    private Label typeLabel;
 
     public EntryEditor(BasePanel panel) {
         this.panel = panel;
@@ -253,7 +261,9 @@ public class EntryEditor extends BorderPane {
         ContextMenu typeMenu = new ChangeEntryTypeMenu().getChangeEntryTypePopupMenu(entry, bibDatabaseContext, undoManager);
         typeLabel.setOnMouseClicked(event -> typeMenu.show(typeLabel, Side.RIGHT, 0, 0));
         typeChangeButton.setOnMouseClicked(event -> typeMenu.show(typeChangeButton, Side.RIGHT, 0, 0));
-
+        generateKeyButton.setOnMouseClicked(event -> new BibtexKeyGenerator(bibDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences())
+                .generateAndSetKey(entry)
+                .ifPresent(change -> undoManager.addEdit(new UndoableKeyChange(change))));
         // Add menu for fetching bibliographic information
         ContextMenu fetcherMenu = new ContextMenu();
         for (EntryBasedFetcher fetcher : WebFetchers
@@ -282,5 +292,4 @@ public class EntryEditor extends BorderPane {
             }
         });
     }
-
 }
