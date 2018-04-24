@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
 
@@ -250,7 +250,6 @@ public class XmpUtilWriter {
 
         return updatedXmpContent;
     }
-
     /**
      * Try to write the given BibTexEntry in the Document Information (the
      * properties of the pdf).

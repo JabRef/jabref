@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;
@@ -63,7 +64,6 @@ public class XmpExporter extends Exporter {
     }
 
     private void writeBibToXmp(Path file, List<BibEntry> entries, Charset encoding) throws IOException {
-
         String xmpContent = XmpUtilWriter.generateXmpStringWithoutXmpDeclaration(entries, this.xmpPreferences);
 
         try (BufferedWriter writer = Files.newBufferedWriter(file, encoding)) {
