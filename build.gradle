@@ -165,8 +165,8 @@ dependencies {
     testCompile 'com.github.tomakehurst:wiremock:2.17.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
-    testCompile 'org.xmlunit:xmlunit-core:2.5.1'
-    testCompile 'org.xmlunit:xmlunit-matchers:2.5.1'
+    testCompile 'org.xmlunit:xmlunit-core:2.6.0'
+    testCompile 'org.xmlunit:xmlunit-matchers:2.6.0'
     testCompile 'com.tngtech.archunit:archunit-junit:0.5.0'
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit:4.0.+"
