@@ -64,17 +64,13 @@ public class EntryEditor extends BorderPane {
      * A reference to the entry this editor works on.
      */
     private BibEntry entry;
-    @FXML
-    private TabPane tabbed;
-    @FXML
-    private Button typeChangeButton;
-    @FXML
-    private Button generateKeyButton;
-    @FXML
-    private Button fetcherButton;
     private SourceTab sourceTab;
-    @FXML
-    private Label typeLabel;
+
+    @FXML private TabPane tabbed;
+    @FXML private Button typeChangeButton;
+    @FXML private Button generateKeyButton;
+    @FXML private Button fetcherButton;
+    @FXML private Label typeLabel;
 
     public EntryEditor(BasePanel panel) {
         this.panel = panel;
