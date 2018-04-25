@@ -818,7 +818,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         final String SAVE_DATABASE = Localization.lang("Save library");
         try {
             SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences()
-                    .withEncoding(enc)
+                                                 .withEncoding(encoding)
                     .withSaveType(saveType);
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
                     FileSaveSession::new);

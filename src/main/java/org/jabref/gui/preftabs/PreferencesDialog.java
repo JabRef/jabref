@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
@@ -33,15 +34,19 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.exporter.ExporterFactory;
+import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.FileType;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.JabRefPreferencesFilter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined in
@@ -75,7 +80,6 @@ public class PreferencesDialog extends BaseDialog<Void> {
             storeAllSettings();
             close();
         });
-
 
         prefs = JabRefPreferences.getInstance();
         frame = parent;
@@ -162,13 +166,13 @@ public class PreferencesDialog extends BaseDialog<Void> {
         importPreferences.addActionListener(e -> {
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileType.XML)
-                    .withDefaultExtension(FileType.XML)
-                    .withInitialDirectory(getPrefsExportPath())
-                    .build();
+                                                                                                   .addExtensionFilter(FileType.XML)
+                                                                                                   .withDefaultExtension(FileType.XML)
+                                                                                                   .withInitialDirectory(getPrefsExportPath())
+                                                                                                   .build();
 
             Optional<Path> fileName = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> dialogService.showFileOpenDialog(fileDialogConfiguration));
+                                                         .runInJavaFXThread(() -> dialogService.showFileOpenDialog(fileDialogConfiguration));
 
             if (fileName.isPresent()) {
                 try {
@@ -176,7 +180,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
                     updateAfterPreferenceChanges();
 
                     DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showWarningDialogAndWait(Localization.lang("Import preferences"),
-                            Localization.lang("You must restart JabRef for this to come into effect.")));
+                                                                                                       Localization.lang("You must restart JabRef for this to come into effect.")));
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
                     DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Import preferences"), ex));
@@ -185,12 +189,12 @@ public class PreferencesDialog extends BaseDialog<Void> {
         });
 
         showPreferences.addActionListener(
-                e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs), null).setVisible(true));
+                                          e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs), null).setVisible(true));
         resetPreferences.addActionListener(e -> {
 
             boolean resetPreferencesClicked = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showConfirmationDialogAndWait(Localization.lang("Reset preferences"),
-                    Localization.lang("Are you sure you want to reset all settings to default values?"),
-                    Localization.lang("Reset preferences"), Localization.lang("Cancel")));
+                                                                                                                                      Localization.lang("Are you sure you want to reset all settings to default values?"),
+                                                                                                                                      Localization.lang("Reset preferences"), Localization.lang("Cancel")));
 
             if (resetPreferencesClicked) {
                 try {
@@ -198,7 +202,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
                     new SharedDatabasePreferences().clear();
 
                     DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showWarningDialogAndWait(Localization.lang("Reset preferences"),
-                            Localization.lang("You must restart JabRef for this to come into effect.")));
+                                                                                                       Localization.lang("You must restart JabRef for this to come into effect.")));
                 } catch (BackingStoreException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
                     DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Reset preferences"), ex));
@@ -227,8 +231,11 @@ public class PreferencesDialog extends BaseDialog<Void> {
     private void updateAfterPreferenceChanges() {
         setValues();
 
-        Globals.exportFactory = ExporterFactory.create(prefs, Globals.journalAbbreviationLoader);
-
+        Map<String, TemplateExporter> customExporters = prefs.customExports.getCustomExportFormats(prefs, Globals.journalAbbreviationLoader);
+        LayoutFormatterPreferences layoutPreferences = prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
+        SavePreferences savePreferences = prefs.loadForExportFromPreferences();
+        XmpPreferences xmpPreferences = prefs.getXMPPreferences();
+        Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
         prefs.updateEntryEditorTabList();
     }
 
@@ -270,10 +277,10 @@ public class PreferencesDialog extends BaseDialog<Void> {
         public void actionPerformed(ActionEvent e) {
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileType.XML)
-                    .withDefaultExtension(FileType.XML)
-                    .withInitialDirectory(prefs.get(JabRefPreferences.WORKING_DIRECTORY))
-                    .build();
+                                                                                                   .addExtensionFilter(FileType.XML)
+                                                                                                   .withDefaultExtension(FileType.XML)
+                                                                                                   .withInitialDirectory(prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                                                                                                   .build();
             Optional<Path> path = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showFileSaveDialog(fileDialogConfiguration));
 
             path.ifPresent(exportFile -> {

@@ -100,7 +100,7 @@ public class ChangeScanner implements Runnable {
     private void storeTempDatabase() {
         JabRefExecutorService.INSTANCE.execute(() -> {
             try {
-                SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
+                SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences()
                         .withMakeBackup(false)
                         .withEncoding(panel.getBibDatabaseContext()
                                 .getMetaData()

@@ -7,8 +7,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JOptionPane;
-
 import javafx.stage.FileChooser;
 
 import org.jabref.Globals;
@@ -38,7 +36,6 @@ public class ExportAction {
     private ExportAction() {
     }
 
-
     /**
      * Create an AbstractAction for performing an export operation.
      *
@@ -61,7 +58,7 @@ public class ExportAction {
                 this.frame = frame;
                 this.selectedOnly = selectedOnly;
                 putValue(Action.NAME, selectedOnly ? Localization.menuTitle("Export selected entries") : Localization
-                        .menuTitle("Export"));
+                                                                                                                     .menuTitle("Export"));
             }
 
             @Override
@@ -69,9 +66,8 @@ public class ExportAction {
                 Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
                 FileDialogConfiguration fileDialogConfiguration = ExportAction.createExportFileChooser(Globals.exportFactory, Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
                 DialogService dialogService = new FXDialogService();
-                DefaultTaskExecutor.runInJavaFXThread(() ->
-                        dialogService.showFileSaveDialog(fileDialogConfiguration)
-                                .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), Globals.exportFactory.getExporters())));
+                DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showFileSaveDialog(fileDialogConfiguration)
+                                                                         .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), Globals.exportFactory.getExporters())));
             }
 
             private void export(Path file, FileChooser.ExtensionFilter selectedExtensionFilter, List<Exporter> exporters) {
@@ -94,7 +90,7 @@ public class ExportAction {
                 // so formatters can resolve linked files correctly.
                 // (This is an ugly hack!)
                 Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext()
-                        .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+                                                        .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
 
                 // Make sure we remember which filter was used, to set
                 // the default for next time:
@@ -110,10 +106,10 @@ public class ExportAction {
                     public void run() {
                         try {
                             format.export(frame.getCurrentBasePanel().getBibDatabaseContext(),
-                                    file,
-                                    frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getEncoding()
-                                            .orElse(Globals.prefs.getDefaultEncoding()),
-                                    finEntries);
+                                          file,
+                                          frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getEncoding()
+                                               .orElse(Globals.prefs.getDefaultEncoding()),
+                                          finEntries);
                         } catch (Exception ex) {
                             LOGGER.warn("Problem exporting", ex);
                             if (ex.getMessage() == null) {
@@ -134,9 +130,8 @@ public class ExportAction {
                         else {
                             frame.output(Localization.lang("Could not save file.") + " - " + errorMessage);
                             // Need to warn the user that saving failed!
-                            JOptionPane.showMessageDialog(frame,
-                                    Localization.lang("Could not save file.") + "\n" + errorMessage,
-                                    Localization.lang("Save library"), JOptionPane.ERROR_MESSAGE);
+                            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file.") + "\n" + errorMessage));
+
                         }
                     }
                 };
@@ -154,10 +149,10 @@ public class ExportAction {
     private static FileDialogConfiguration createExportFileChooser(ExporterFactory exportFactory, String currentDir) {
         List<FileType> fileTypes = exportFactory.getExporters().stream().map(Exporter::getFileType).collect(Collectors.toList());
         return new FileDialogConfiguration.Builder()
-                .addExtensionFilters(fileTypes)
-                .withDefaultExtension(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT))
-                .withInitialDirectory(currentDir)
-                .build();
+                                                    .addExtensionFilters(fileTypes)
+                                                    .withDefaultExtension(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT))
+                                                    .withInitialDirectory(currentDir)
+                                                    .build();
     }
 
 }

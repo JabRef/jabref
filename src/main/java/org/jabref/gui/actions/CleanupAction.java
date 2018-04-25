@@ -60,7 +60,7 @@ public class CleanupAction extends AbstractWorker {
         if (canceled) {
             return;
         }
-        CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), CleanupPreset.loadFromPreferences(preferences));
+        CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), Globals.prefs.getCleanupPreset());
 
         Optional<CleanupPreset> chosenPreset = cleanupDialog.showAndWait();
         if (!chosenPreset.isPresent()) {
@@ -68,7 +68,7 @@ public class CleanupAction extends AbstractWorker {
             return;
         }
         CleanupPreset cleanupPreset = chosenPreset.get();
-        cleanupPreset.storeInPreferences(preferences);
+        Globals.prefs.setCleanupPreset(cleanupPreset);
 
         if (cleanupPreset.isRenamePDF() && Globals.prefs.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
 
