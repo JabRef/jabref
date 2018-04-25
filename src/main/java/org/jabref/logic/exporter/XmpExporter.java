@@ -64,8 +64,10 @@ public class XmpExporter extends Exporter {
     }
 
     private void writeBibToXmp(Path file, List<BibEntry> entries, Charset encoding) throws IOException {
+        String xmpContent = XmpUtilWriter.generateXmpStringWithoutXmpDeclaration(entries, this.xmpPreferences);
+
         try (BufferedWriter writer = Files.newBufferedWriter(file, encoding)) {
-            writer.write(XmpUtilWriter.generateXmpString(entries, this.xmpPreferences));
+            writer.write(xmpContent);
             writer.flush();
         }
     }

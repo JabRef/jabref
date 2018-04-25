@@ -4,9 +4,13 @@ import java.io.IOException;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Answers;
 
+import static org.mockito.Mockito.mock;
 
 public class ModsImporterTestFiles {
 
@@ -21,12 +25,13 @@ public class ModsImporterTestFiles {
     @ParameterizedTest
     @MethodSource("fileNames")
     public void testIsRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsRecognizedFormat(new ModsImporter(), fileName);
+        ImporterTestEngine.testIsRecognizedFormat(new ModsImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS)), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
     public void testImportEntries(String fileName) throws Exception {
-        ImporterTestEngine.testImportEntries(new ModsImporter(), fileName, FILE_ENDING);
+        ImporterTestEngine.testImportEntries(new ModsImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS)
+        ), fileName, FILE_ENDING);
     }
 }

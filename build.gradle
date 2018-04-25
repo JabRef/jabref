@@ -13,7 +13,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.2.0-M1'
     }
 }
 
@@ -22,7 +22,7 @@ plugins {
     id 'com.install4j.gradle' version '7.0.3'
     id 'com.github.johnrengelman.shadow' version '2.0.2'
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
-    id "com.simonharrer.modernizer" version '1.5.0-1'
+    id "com.simonharrer.modernizer" version '1.6.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.3'
     id 'net.ltgt.errorprone' version '0.0.13'
     id 'com.github.ben-manes.versions' version '0.17.0'
@@ -129,16 +129,15 @@ dependencies {
     compile 'de.saxsys:mvvmfx-validation:1.7.0'
     compile 'de.saxsys:mvvmfx:1.7.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
-    compile 'org.fxmisc.flowless:flowless:0.6'
-    compile 'org.fxmisc.richtext:richtextfx:0.8.2'
+    compile 'org.fxmisc.flowless:flowless:0.6.1'
+    compile 'org.fxmisc.richtext:richtextfx:0.9.0'
     compile 'com.sibvisions.external.jvxfx:dndtabpane:0.1'
     compile 'javax.inject:javax.inject:1'
-
 
     // Cannot be updated to 9.*.* until Jabref works with Java 9
     compile 'org.controlsfx:controlsfx:8.40.15-SNAPSHOT'
 
-    compile 'org.jsoup:jsoup:1.11.2'
+    compile 'org.jsoup:jsoup:1.11.3'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
     // >1.8.0-beta is required for java 9 compatibility
@@ -158,19 +157,19 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.0.2'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.0.2'
 
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.1.1'
-    testCompile 'org.junit.jupiter:junit-jupiter-params:5.1.1'
-    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.1.1'
-    testRuntime 'org.junit.vintage:junit-vintage-engine:5.1.1'
-    testCompile 'org.junit.platform:junit-platform-launcher:1.1.1'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.0-RC1'
+    testCompile 'org.junit.jupiter:junit-jupiter-params:5.2.0-RC1'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.0-RC1'
+    testRuntime 'org.junit.vintage:junit-vintage-engine:5.2.0-RC1'
+    testCompile 'org.junit.platform:junit-platform-launcher:1.2.0-RC1'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
-    testCompile 'org.mockito:mockito-core:2.18.0'
-    testCompile 'com.github.tomakehurst:wiremock:2.16.0'
+    testCompile 'org.mockito:mockito-core:2.18.3'
+    testCompile 'com.github.tomakehurst:wiremock:2.17.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
-    testCompile 'org.xmlunit:xmlunit-core:2.5.1'
-    testCompile 'org.xmlunit:xmlunit-matchers:2.5.1'
+    testCompile 'org.xmlunit:xmlunit-core:2.6.0'
+    testCompile 'org.xmlunit:xmlunit-matchers:2.6.0'
     testCompile 'com.tngtech.archunit:archunit-junit:0.5.0'
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
@@ -179,7 +178,7 @@ dependencies {
 }
 
 jacoco {
-    toolVersion = '0.8.0'
+    toolVersion = '0.8.1'
 }
 
 dependencyUpdates {
@@ -205,12 +204,12 @@ dependencyUpdates.resolutionStrategy = {
             }
         }
         withModule("org.jacoco:org.jacoco.agent") { ComponentSelection selection ->
-            if (selection.candidate.version.equals("0.8.0")) {
+            if (selection.candidate.version ==~ /0.8.*/) {
                 selection.reject("As a native plugin we cannot control the actual version of jacoco. This dependency should be hidden.")
             }
         }
         withModule("org.jacoco:org.jacoco.ant") { ComponentSelection selection ->
-            if (selection.candidate.version.equals("0.8.0")) {
+            if (selection.candidate.version ==~ /0.8.*/) {
                 selection.reject("As a native plugin we cannot control the actual version of jacoco. This dependency should be hidden.")
             }
         }

@@ -89,7 +89,6 @@ public class ChangeScanner implements Runnable {
                     storeTempDatabase();
                 }
             });
-
         } else {
             frame.getDialogService().showInformationDialogAndWait(Localization.lang("External changes"),
                     Localization.lang("No actual changes found."));

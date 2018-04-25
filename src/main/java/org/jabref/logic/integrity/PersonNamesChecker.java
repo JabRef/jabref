@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.format.RemoveBrackets;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
@@ -30,6 +31,8 @@ public class PersonNamesChecker implements ValueChecker {
             return Optional.of(Localization.lang("should end with a name"));
         }
 
+        // Remove all brackets to handle corporate names correctly, e.g., {JabRef}
+        value = new RemoveBrackets().format(value);
         // Check that the value is in one of the two standard BibTeX formats:
         //  Last, First and ...
         //  First Last and ...

@@ -58,8 +58,8 @@ public class XmpExporterTest {
         exporter.export(databaseContext, file, encoding, Arrays.asList(entry));
 
         List<String> lines = Files.readAllLines(file);
-        assertTrue(lines.size() == 21);
-        assertEquals("<rdf:li>Alan Turing</rdf:li>", lines.get(7).trim());
+        assertTrue(lines.size() == 18);
+        assertEquals("<rdf:li>Alan Turing</rdf:li>", lines.get(6).trim());
     }
 
     @Test
@@ -77,9 +77,9 @@ public class XmpExporterTest {
         exporter.export(databaseContext, file, encoding, Arrays.asList(entryTuring, entryArmbrust));
 
         List<String> lines = Files.readAllLines(file);
-        assertTrue(lines.size() == 39);
-        assertEquals("<rdf:li>Alan Turing</rdf:li>", lines.get(7).trim());
-        assertEquals("<rdf:li>Michael Armbrust</rdf:li>", lines.get(20).trim());
+        assertTrue(lines.size() == 36);
+        assertEquals("<rdf:li>Alan Turing</rdf:li>", lines.get(6).trim());
+        assertEquals("<rdf:li>Michael Armbrust</rdf:li>", lines.get(19).trim());
     }
 
     @Test
@@ -101,12 +101,12 @@ public class XmpExporterTest {
 
         Path fileTuring = Paths.get(file.getParent().toString() + "/" + entryTuring.getId() + "_null.xmp");
         List<String> linesTuring = Files.readAllLines(fileTuring);
-        assertTrue(linesTuring.size() == 21);
-        assertEquals("<rdf:li>Alan Turing</rdf:li>", linesTuring.get(7).trim());
+        assertTrue(linesTuring.size() == 18);
+        assertEquals("<rdf:li>Alan Turing</rdf:li>", linesTuring.get(6).trim());
 
         Path fileArmbrust = Paths.get(file.getParent().toString() + "/" + entryArmbrust.getId() + "_Armbrust2010.xmp");
         List<String> linesArmbrust = Files.readAllLines(fileArmbrust);
-        assertTrue(linesArmbrust.size() == 26);
-        assertEquals("<rdf:li>Michael Armbrust</rdf:li>", linesArmbrust.get(7).trim());
+        assertTrue(linesArmbrust.size() == 23);
+        assertEquals("<rdf:li>Michael Armbrust</rdf:li>", linesArmbrust.get(6).trim());
     }
 }
