@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+
 import javafx.stage.FileChooser;
 
 import org.jabref.Globals;
