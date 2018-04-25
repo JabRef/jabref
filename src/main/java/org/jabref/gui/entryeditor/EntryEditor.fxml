@@ -39,7 +39,7 @@
                     <Tooltip text="%Change entry type"/>
                 </tooltip>
             </Button>
-            <Button fx:id="generateKeyButton" styleClass="flatButton,narrow">
+            <Button styleClass="flatButton,narrow" onAction="#generateKey">
                 <graphic>
                     <MaterialDesignIconView glyphName="KEY_VARIANT"/>
                 </graphic>

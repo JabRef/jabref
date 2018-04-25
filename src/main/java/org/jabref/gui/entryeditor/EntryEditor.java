@@ -68,7 +68,6 @@ public class EntryEditor extends BorderPane {
 
     @FXML private TabPane tabbed;
     @FXML private Button typeChangeButton;
-    @FXML private Button generateKeyButton;
     @FXML private Button fetcherButton;
     @FXML private Label typeLabel;
 
@@ -130,6 +129,13 @@ public class EntryEditor extends BorderPane {
     @FXML
     public void close() {
         panel.entryEditorClosing(EntryEditor.this);
+    }
+
+    @FXML
+    public void generateKey() {
+        new BibtexKeyGenerator(bibDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences())
+                .generateAndSetKey(entry)
+                .ifPresent(change -> undoManager.addEdit(new UndoableKeyChange(change)));
     }
 
     @FXML
@@ -257,9 +263,6 @@ public class EntryEditor extends BorderPane {
         ContextMenu typeMenu = new ChangeEntryTypeMenu().getChangeEntryTypePopupMenu(entry, bibDatabaseContext, undoManager);
         typeLabel.setOnMouseClicked(event -> typeMenu.show(typeLabel, Side.RIGHT, 0, 0));
         typeChangeButton.setOnMouseClicked(event -> typeMenu.show(typeChangeButton, Side.RIGHT, 0, 0));
-        generateKeyButton.setOnMouseClicked(event -> new BibtexKeyGenerator(bibDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences())
-                .generateAndSetKey(entry)
-                .ifPresent(change -> undoManager.addEdit(new UndoableKeyChange(change))));
         // Add menu for fetching bibliographic information
         ContextMenu fetcherMenu = new ContextMenu();
         for (EntryBasedFetcher fetcher : WebFetchers
