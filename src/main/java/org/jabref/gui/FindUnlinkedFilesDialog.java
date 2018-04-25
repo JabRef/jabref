@@ -18,13 +18,16 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -535,13 +538,13 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
     }
 
     /**
-     * This will start the import of all file of all selected nodes in this
+     * This will start the export of all files of all selected nodes in this
      * dialogs tree view. <br>
      * <br>
-     * The import itself will run in a seperate thread, whilst this dialog will
+     * The export itself will run in a seperate thread, whilst this dialog will
      * be showing a progress bar, until the thread has finished its work. <br>
      * <br>
-     * When the import has finished, the {@link #importFinishedHandler(java.util.List)} is
+     * When the export has finished, the {@link #exportFinishedHandler(java.util.List)} is
      * invoked.
      */
     private void startExport() {
@@ -580,38 +583,26 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
         Optional<Path> exportPath = DefaultTaskExecutor
                 .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
 
-        VerifyingWriter verifyingWriter;
-        try {
-            verifyingWriter = new VerifyingWriter(Files.newOutputStream(exportPath.get()), Charset.defaultCharset());
-        } catch (Exception e) {
-            LOGGER.warn("Error while opening file.", e);
-            exportFinishedHandler();
-            return;
-        }
-
         threadState.set(true);
         JabRefExecutorService.INSTANCE.execute(() -> {
-            List<String> errors = new LinkedList<>();
-            int counter = 0;
-            for (File file : fileList) {
-                try {
-                    verifyingWriter.write(file.toString() + "\n");
-                } catch (IOException e) {
-                    LOGGER.warn("Could not write to file.", e);
+            try (BufferedWriter writer =
+                         Files.newBufferedWriter(exportPath.get(), StandardCharsets.UTF_8,
+                                 StandardOpenOption.CREATE)) {
+                int counter = 0;
+                for (File file : fileList) {
+                    writer.write(file.toString() + "\n");
+                    counter++;
+                    progressBarImporting.setValue(counter);
+                    progressBarImporting.setString(Localization.lang("%0 of %1", Integer.toString(counter),
+                            Integer.toString(progressBarImporting.getMaximum())));
                 }
-                counter++;
-                progressBarImporting.setValue(counter);
-                progressBarImporting.setString(Localization.lang("%0 of %1", Integer.toString(counter),
-                        Integer.toString(progressBarImporting.getMaximum())));
-            }
-            try {
-                verifyingWriter.close();
-            } catch (IOException e) {
-                LOGGER.warn("Could not close stream.", e);
-            }
 
-            exportFinishedHandler();
+            } catch (IOException e) {
+                LOGGER.warn("IO Error.", e);
+            }
         });
+
+        exportFinishedHandler();
     }
 
     /**
