@@ -19,6 +19,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 
+import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
@@ -28,8 +29,10 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.EntryFetchAndMergeWorker;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.TypedBibEntry;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -141,6 +144,13 @@ public class EntryEditor extends BorderPane {
     @FXML
     public void close() {
         panel.entryEditorClosing(EntryEditor.this);
+    }
+
+    @FXML
+    public void generateKey() {
+        new BibtexKeyGenerator(bibDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences())
+                .generateAndSetKey(entry)
+                .ifPresent(change -> undoManager.addEdit(new UndoableKeyChange(change)));
     }
 
     @FXML
