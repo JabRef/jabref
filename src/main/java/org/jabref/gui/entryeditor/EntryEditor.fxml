@@ -40,6 +40,14 @@
                     <Tooltip text="%Change entry type"/>
                 </tooltip>
             </Button>
+            <Button styleClass="flatButton,narrow" onAction="#generateKey">
+                <graphic>
+                    <MaterialDesignIconView glyphName="KEY_VARIANT"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%Generate BibTeX key"/>
+                </tooltip>
+            </Button>
             <Button fx:id="fetcherButton" styleClass="flatButton,narrow">
                 <graphic>
                     <JabRefIconView glyph="REFRESH"/>
