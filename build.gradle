@@ -19,7 +19,7 @@ buildscript {
 
 plugins {
     id 'com.gradle.build-scan' version '1.11'
-    id 'com.install4j.gradle' version '7.0.3'
+    id 'com.install4j.gradle' version '7.0.4'
     id 'com.github.johnrengelman.shadow' version '2.0.2'
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
     id "com.simonharrer.modernizer" version '1.6.0-1'
@@ -50,7 +50,7 @@ apply from: 'xjc.gradle'
 group = "org.jabref"
 version = "4.2-dev"
 project.ext.threeDotVersion = "4.1.0.1"
-project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
+project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j7' : 'install4j7')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 mainClassName = "org.jabref.JabRefMain"
@@ -448,8 +448,16 @@ install4j {
     installDir = file(project.ext.install4jDir)
 }
 
+task generateFinalJabRefPS1File(type: Copy) {
+    from('buildres') {
+        include 'JabRef.ps1'
+    }
+    into 'build'
+    filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [jabRefJarFileName: jar.archiveName])
+}
+
 // has to be defined AFTER 'dev' things to have the correct project.version
-task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
+task media(type: com.install4j.gradle.Install4jTask, dependsOn: ["releaseJar", "generateFinalJabRefPS1File"]) {
     projectFile = file('jabref.install4j')
     release = project.version
     winKeystorePassword = System.getenv('CERTIFICATE_PW')
