@@ -38,4 +38,12 @@ public class JabRefCLITest {
         assertTrue(cli.isDisableGui());
     }
 
+    @Test
+    public void recognizesImportBibtex() {
+        String bibtex = "@article{test, title=\"test title\"}";
+        JabRefCLI cli = new JabRefCLI(new String[]{"-ib", bibtex});
+        assertEquals(Collections.emptyList(), cli.getLeftOver());
+        assertTrue(cli.isBibtexImport());
+        assertEquals(bibtex, cli.getBibtexImport());
+    }
 }

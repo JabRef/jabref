@@ -101,7 +101,7 @@ public class JabRefGUI {
             for (Iterator<ParserResult> parserResultIterator = bibDatabases.iterator(); parserResultIterator.hasNext();) {
                 ParserResult pr = parserResultIterator.next();
                 // Define focused tab
-                if (pr.getFile().get().getAbsolutePath().equals(focusedFile)) {
+                if (pr.getFile().filter(path -> path.getAbsolutePath().equals(focusedFile)).isPresent()) {
                     first = true;
                 }
 

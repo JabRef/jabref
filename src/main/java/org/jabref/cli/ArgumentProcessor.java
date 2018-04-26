@@ -32,7 +32,9 @@ import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.OutputPrinter;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.logging.JabRefLogger;
@@ -81,6 +83,19 @@ public class ArgumentProcessor {
         result.ifPresent(ParserResult::setToOpenTab);
 
         return result;
+    }
+
+    private static Optional<ParserResult> importBibtexToOpenBase(String argument) {
+        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+        try {
+            List<BibEntry> entries = parser.parseEntries(argument);
+            ParserResult result = new ParserResult(entries);
+            result.setToOpenTab();
+            return Optional.of(result);
+        } catch (ParseException e) {
+            System.err.println(Localization.lang("Error occurred when parsing entry") + ": " + e.getLocalizedMessage());
+            return Optional.empty();
+        }
     }
 
     private static Optional<ParserResult> importFile(String argument) {
@@ -340,6 +355,10 @@ public class ArgumentProcessor {
 
         if (!cli.isBlank() && cli.isImportToOpenBase()) {
             importToOpenBase(cli.getImportToOpenBase()).ifPresent(loaded::add);
+        }
+
+        if (!cli.isBlank() && cli.isBibtexImport()) {
+            importBibtexToOpenBase(cli.getBibtexImport()).ifPresent(loaded::add);
         }
 
         return loaded;

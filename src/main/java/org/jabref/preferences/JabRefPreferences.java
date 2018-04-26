@@ -785,6 +785,8 @@ public class JabRefPreferences implements PreferencesService {
                         + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
                         + "\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}"
                         + "</dd>__NEWLINE__<p></p></font>");
+
+        setLanguageDependentDefaultValues();
     }
 
     public static JabRefPreferences getInstance() {
