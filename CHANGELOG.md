@@ -1,4 +1,3 @@
-
 # Changelog
 All notable changes to this project will be documented in this file.
 This project **does not** adhere to [Semantic Versioning](http://semver.org/).
@@ -9,7 +8,7 @@ Here, the categories "Changed" for added and changed functionality,
 
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
-## [Unreleased]
+## [4.2] - 2018-04-26
 
 ### Changed
 - Added "*.*" (any file type) to the Import File Filter Dialog. [#3757](https://github.com/JabRef/jabref/issues/3757)
@@ -64,53 +63,6 @@ The new default removes the linked file from the entry instead of deleting the f
 
 ### Removed
 - We removed the [Look and Feels from JGoodies](http://www.jgoodies.com/freeware/libraries/looks/), because the open source version is not compatible with Java 9.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ## [4.1] - 2017-12-23
@@ -390,7 +342,7 @@ The new default removes the linked file from the entry instead of deleting the f
 The changelog of versions 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of 2.11 and versions before is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v4.1...HEAD
+[4.2]: https://github.com/JabRef/jabref/compare/v4.1...v4.2
 [4.1]: https://github.com/JabRef/jabref/compare/v4.0...v4.1
 [4.0]: https://github.com/JabRef/jabref/compare/v4.0-beta3...v4.0
 [4.0-beta3]: https://github.com/JabRef/jabref/compare/v4.0-beta2...v4.0-beta3
