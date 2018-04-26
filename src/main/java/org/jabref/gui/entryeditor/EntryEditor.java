@@ -149,7 +149,7 @@ public class EntryEditor extends BorderPane {
 
     @FXML
     public void generateKey() {
-        new BibtexKeyGenerator(bibDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences())
+        new BibtexKeyGenerator(bibDatabaseContext, preferences.getBibtexKeyPatternPreferences())
                 .generateAndSetKey(entry)
                 .ifPresent(change -> undoManager.addEdit(new UndoableKeyChange(change)));
     }
@@ -304,5 +304,9 @@ public class EntryEditor extends BorderPane {
                 }
             }
         });
+    }
+
+    private String convertToHex(java.awt.Color color) {
+        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }
 }
