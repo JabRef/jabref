@@ -270,8 +270,8 @@ public class LatexFieldFormatter {
 
     private void writeStringLabel(String text, int startPos, int endPos,
                                   boolean first, boolean last) {
-        putIn((first ? "{" : " # ") + text.substring(startPos, endPos)
-                + (last ? "}" : " # "));
+        putIn((first ? "" : " # ") + text.substring(startPos, endPos)
+                + (last ? "" : " # "));
     }
 
     private void putIn(String s) {
