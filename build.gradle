@@ -395,10 +395,10 @@ checkstyle {
     // do not use other packages for checkstyle, excluding gen(erated) sources
     checkstyleMain.source = "src/main/java"
     toolVersion = '8.5'
+    
+    // do not perform checkstyle checks by default
+    sourceSets = []
 }
-
-checkstyleMain.shouldRunAfter test
-checkstyleTest.shouldRunAfter test
 
 modernizer {
     // We have more than 20 issues, which are not fixed yet. Nevertheless, we produce the modernizer output.
