@@ -5,27 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.importer.fetcher.ACS;
-import org.jabref.logic.importer.fetcher.ArXiv;
-import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
-import org.jabref.logic.importer.fetcher.CrossRef;
-import org.jabref.logic.importer.fetcher.DBLPFetcher;
-import org.jabref.logic.importer.fetcher.DiVA;
-import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.fetcher.DoiResolution;
-import org.jabref.logic.importer.fetcher.GoogleScholar;
-import org.jabref.logic.importer.fetcher.GvkFetcher;
-import org.jabref.logic.importer.fetcher.IEEE;
-import org.jabref.logic.importer.fetcher.IacrEprintFetcher;
-import org.jabref.logic.importer.fetcher.IsbnFetcher;
-import org.jabref.logic.importer.fetcher.LibraryOfCongress;
-import org.jabref.logic.importer.fetcher.MathSciNet;
-import org.jabref.logic.importer.fetcher.MedlineFetcher;
-import org.jabref.logic.importer.fetcher.OpenAccessDoi;
-import org.jabref.logic.importer.fetcher.ScienceDirect;
-import org.jabref.logic.importer.fetcher.SpringerLink;
-import org.jabref.logic.importer.fetcher.TitleFetcher;
-import org.jabref.logic.importer.fetcher.ZbMATH;
+import org.jabref.logic.importer.fetcher.*;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
@@ -98,6 +78,7 @@ public class WebFetchers {
         list.add(new CrossRef());
         list.add(new LibraryOfCongress(importFormatPreferences));
         list.add(new IacrEprintFetcher(importFormatPreferences));
+        list.add(new RfcFetcher(importFormatPreferences));
         list.sort(Comparator.comparing(WebFetcher::getName));
         return list;
     }
