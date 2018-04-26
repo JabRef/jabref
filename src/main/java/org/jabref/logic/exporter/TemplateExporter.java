@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import org.jabref.JabRefMain;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
@@ -43,7 +42,7 @@ public class TemplateExporter extends Exporter {
     private static final Pattern BLANK_LINE_MATCHER = Pattern.compile("(?m)^\\s");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TemplateExporter.class);
-    
+
     private final String lfFileName;
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
@@ -149,7 +148,6 @@ public class TemplateExporter extends Exporter {
      * This method should return a reader from which the given layout file can
      * be read.
      * <p>
-     * <p>
      * Subclasses of TemplateExporter are free to override and provide their own
      * implementation.
      *
@@ -172,7 +170,7 @@ public class TemplateExporter extends Exporter {
         String name = dir + filename;
         Reader reader;
         // Try loading as a resource first. This works for files inside the JAR:
-        URL reso = JabRefMain.class.getResource(name);
+        URL reso = TemplateExporter.class.getResource(name);
 
         // If that did not work, try loading as a normal file URL:
         try {

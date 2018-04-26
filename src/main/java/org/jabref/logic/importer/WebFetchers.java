@@ -96,7 +96,7 @@ public class WebFetchers {
         list.add(new TitleFetcher(importFormatPreferences));
         list.add(new MathSciNet(importFormatPreferences));
         list.add(new CrossRef());
-        list.add(new LibraryOfCongress());
+        list.add(new LibraryOfCongress(importFormatPreferences));
         list.add(new IacrEprintFetcher(importFormatPreferences));
         list.sort(Comparator.comparing(WebFetcher::getName));
         return list;

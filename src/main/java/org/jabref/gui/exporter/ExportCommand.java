@@ -2,6 +2,7 @@ package org.jabref.gui.exporter;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
@@ -16,9 +17,13 @@ import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
+import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -40,11 +45,19 @@ public class ExportCommand extends SimpleCommand {
     public ExportCommand(JabRefFrame frame, boolean selectedOnly) {
         this.frame = frame;
         this.selectedOnly = selectedOnly;
+
     }
 
     @Override
     public void execute() {
-        Globals.exportFactory = ExporterFactory.create(Globals.prefs, Globals.journalAbbreviationLoader);
+
+        JabRefPreferences prefs = Globals.prefs; //TODO: Pass as param?
+
+        Map<String, TemplateExporter> customExporters = prefs.customExports.getCustomExportFormats(prefs, Globals.journalAbbreviationLoader);
+        LayoutFormatterPreferences layoutPreferences = prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
+        SavePreferences savePreferences = prefs.loadForExportFromPreferences();
+        XmpPreferences xmpPreferences = prefs.getXMPPreferences();
+        Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
         FileDialogConfiguration fileDialogConfiguration = createExportFileChooser(Globals.exportFactory, Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
         DialogService dialogService = frame.getDialogService();
         DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showFileSaveDialog(fileDialogConfiguration)

@@ -54,6 +54,9 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.Cleanups;
+import org.jabref.logic.exporter.ExporterFactory;
+import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -77,6 +80,7 @@ import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexSingleField;
@@ -306,6 +310,7 @@ public class JabRefPreferences implements PreferencesService {
     // Remote
     public static final String USE_REMOTE_SERVER = "useRemoteServer";
     public static final String REMOTE_SERVER_PORT = "remoteServerPort";
+
     /**
      * The OpenOffice/LibreOffice connection preferences are:
      * OO_PATH main directory for OO/LO installation, used to detect location on Win/OS X when using manual connect
@@ -326,6 +331,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String OO_USE_ALL_OPEN_BASES = "useAllOpenBases";
     public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
     public static final String OO_EXTERNAL_STYLE_FILES = "ooExternalStyleFiles";
+
     public static final String STYLES_SIZE_Y = "stylesSizeY";
     public static final String STYLES_SIZE_X = "stylesSizeX";
     public static final String STYLES_POS_Y = "stylesPosY";
@@ -1411,6 +1417,49 @@ public class JabRefPreferences implements PreferencesService {
                 isKeywordSyncEnabled());
     }
 
+    public SavePreferences loadForExportFromPreferences() {
+        Boolean saveInOriginalOrder = this.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
+        SaveOrderConfig saveOrder = null;
+        if (!saveInOriginalOrder) {
+            if (this.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
+                saveOrder = this.loadExportSaveOrder();
+            } else {
+                saveOrder = this.loadTableSaveOrder();
+            }
+        }
+        Charset encoding = this.getDefaultEncoding();
+        Boolean makeBackup = this.getBoolean(JabRefPreferences.BACKUP);
+        SavePreferences.DatabaseSaveType saveType = SavePreferences.DatabaseSaveType.ALL;
+        Boolean takeMetadataSaveOrderInAccount = false;
+        Boolean reformatFile = this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
+        LatexFieldFormatterPreferences latexFieldFormatterPreferences = this.getLatexFieldFormatterPreferences();
+        GlobalBibtexKeyPattern globalCiteKeyPattern =  this.getKeyPattern();
+        return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
+                takeMetadataSaveOrderInAccount, reformatFile, latexFieldFormatterPreferences, globalCiteKeyPattern);
+    }
+
+    public SavePreferences loadForSaveFromPreferences() {
+        Boolean saveInOriginalOrder = false;
+        SaveOrderConfig saveOrder = null;
+        Charset encoding = this.getDefaultEncoding();
+        Boolean makeBackup = this.getBoolean(JabRefPreferences.BACKUP);
+        SavePreferences.DatabaseSaveType saveType = SavePreferences.DatabaseSaveType.ALL;
+        Boolean takeMetadataSaveOrderInAccount = true;
+        Boolean reformatFile = this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
+        LatexFieldFormatterPreferences latexFieldFormatterPreferences = this.getLatexFieldFormatterPreferences();
+        GlobalBibtexKeyPattern globalCiteKeyPattern =  this.getKeyPattern();
+        return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
+                takeMetadataSaveOrderInAccount, reformatFile, latexFieldFormatterPreferences, globalCiteKeyPattern);
+    }
+
+    public ExporterFactory getExporterFactory(JournalAbbreviationLoader abbreviationLoader) {
+        Map<String, TemplateExporter> customFormats = this.customExports.getCustomExportFormats(this, abbreviationLoader);
+        LayoutFormatterPreferences layoutPreferences = this.getLayoutFormatterPreferences(abbreviationLoader);
+        SavePreferences savePreferences = this.loadForExportFromPreferences();
+        XmpPreferences xmpPreferences = this.getXMPPreferences();
+        return ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
+    }
+
     public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
         return new BibtexKeyPatternPreferences(get(KEY_PATTERN_REGEX),
                 get(KEY_PATTERN_REPLACEMENT), getBoolean(KEY_GEN_ALWAYS_ADD_LETTER), getBoolean(KEY_GEN_FIRST_LETTER_A),
@@ -1431,6 +1480,29 @@ public class JabRefPreferences implements PreferencesService {
     public XmpPreferences getXMPPreferences() {
         return new XmpPreferences(getBoolean(USE_XMP_PRIVACY_FILTER), getStringList(XMP_PRIVACY_FILTERS),
                 getKeywordDelimiter());
+    }
+
+    public OpenOfficePreferences getOpenOfficePreferences() {
+        return new OpenOfficePreferences(
+                this.get(JabRefPreferences.OO_JARS_PATH),
+                this.get(JabRefPreferences.OO_EXECUTABLE_PATH),
+                this.get(JabRefPreferences.OO_PATH),
+                this.getBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES),
+                this.getBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING),
+                this.getBoolean(JabRefPreferences.OO_SHOW_PANEL),
+                this.getStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES),
+                this.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE));
+    }
+
+    public void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences) {
+        this.put(JabRefPreferences.OO_JARS_PATH, openOfficePreferences.getJarsPath());
+        this.put(JabRefPreferences.OO_EXECUTABLE_PATH, openOfficePreferences.getExecutablePath());
+        this.put(JabRefPreferences.OO_PATH, openOfficePreferences.getInstallationPath());
+        this.putBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES, openOfficePreferences.getUseAllDatabases());
+        this.putBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING, openOfficePreferences.getSyncWhenCiting());
+        this.putBoolean(JabRefPreferences.OO_SHOW_PANEL, openOfficePreferences.getShowPanel());
+        this.putStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles());
+        this.put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE, openOfficePreferences.getCurrentStyle());
     }
 
     private NameFormatterPreferences getNameFormatterPreferences() {
@@ -1535,6 +1607,62 @@ public class JabRefPreferences implements PreferencesService {
     public CleanupPreferences getCleanupPreferences(JournalAbbreviationLoader journalAbbreviationLoader) {
         return new CleanupPreferences(get(IMPORT_FILENAMEPATTERN), get(IMPORT_FILEDIRPATTERN),
                 getLayoutFormatterPreferences(journalAbbreviationLoader), getFileDirectoryPreferences());
+    }
+
+    public CleanupPreset getCleanupPreset() {
+        Set<CleanupPreset.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreset.CleanupStep.class);
+
+        if (this.getBoolean(JabRefPreferences.CLEANUP_DOI)) {
+            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_ISSN)) {
+            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_ISSN);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_MOVE_PDF)) {
+            activeJobs.add(CleanupPreset.CleanupStep.MOVE_PDF);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_MAKE_PATHS_RELATIVE)) {
+            activeJobs.add(CleanupPreset.CleanupStep.MAKE_PATHS_RELATIVE);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_RENAME_PDF)) {
+            activeJobs.add(CleanupPreset.CleanupStep.RENAME_PDF);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS)) {
+            activeJobs.add(CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_UPGRADE_EXTERNAL_LINKS)) {
+            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX)) {
+            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBTEX)) {
+            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX);
+        }
+        if (this.getBoolean(JabRefPreferences.CLEANUP_FIX_FILE_LINKS)) {
+            activeJobs.add(CleanupPreset.CleanupStep.FIX_FILE_LINKS);
+        }
+
+        FieldFormatterCleanups formatterCleanups = Cleanups.parse(
+                this.getStringList(JabRefPreferences.CLEANUP_FORMATTERS));
+
+        return new CleanupPreset(activeJobs, formatterCleanups);
+    }
+
+    public void setCleanupPreset(CleanupPreset cleanupPreset) {
+        this.putBoolean(JabRefPreferences.CLEANUP_DOI, cleanupPreset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_DOI));
+        this.putBoolean(JabRefPreferences.CLEANUP_ISSN, cleanupPreset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_ISSN));
+        this.putBoolean(JabRefPreferences.CLEANUP_MOVE_PDF, cleanupPreset.isActive(CleanupPreset.CleanupStep.MOVE_PDF));
+        this.putBoolean(JabRefPreferences.CLEANUP_MAKE_PATHS_RELATIVE, cleanupPreset.isActive(CleanupPreset.CleanupStep.MAKE_PATHS_RELATIVE));
+        this.putBoolean(JabRefPreferences.CLEANUP_RENAME_PDF, cleanupPreset.isActive(CleanupPreset.CleanupStep.RENAME_PDF));
+        this.putBoolean(JabRefPreferences.CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS,
+                cleanupPreset.isActive(CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS));
+        this.putBoolean(JabRefPreferences.CLEANUP_UPGRADE_EXTERNAL_LINKS,
+                cleanupPreset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
+        this.putBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX, cleanupPreset.isActive(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX));
+        this.putBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBTEX, cleanupPreset.isActive(CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX));
+        this.putBoolean(JabRefPreferences.CLEANUP_FIX_FILE_LINKS, cleanupPreset.isActive(CleanupPreset.CleanupStep.FIX_FILE_LINKS));
+        this.putStringList(JabRefPreferences.CLEANUP_FORMATTERS, cleanupPreset.getFormatterCleanups().getAsStringList(OS.NEWLINE));
     }
 
     public RemotePreferences getRemotePreferences() {

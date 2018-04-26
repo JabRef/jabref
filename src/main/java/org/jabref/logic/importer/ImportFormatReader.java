@@ -63,7 +63,7 @@ public class ImportFormatReader {
         formats.add(new IsiImporter());
         formats.add(new MedlineImporter());
         formats.add(new MedlinePlainImporter());
-        formats.add(new ModsImporter());
+        formats.add(new ModsImporter(importFormatPreferences));
         formats.add(new MsBibImporter());
         formats.add(new OvidImporter());
         formats.add(new PdfContentImporter(importFormatPreferences));

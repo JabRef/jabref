@@ -200,7 +200,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         this.tableModel = new MainTableDataModel(getBibDatabaseContext());
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
-        annotationCache = new FileAnnotationCache(bibDatabaseContext);
+        annotationCache = new FileAnnotationCache(bibDatabaseContext, Globals.prefs.getFileDirectoryPreferences());
 
         setupMainPanel();
 
@@ -817,9 +817,9 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         SaveSession session;
         final String SAVE_DATABASE = Localization.lang("Save library");
         try {
-            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
-                                                   .withEncoding(encoding)
-                                                   .withSaveType(saveType);
+            SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences()
+                                                 .withEncoding(encoding)
+                    .withSaveType(saveType);
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
                     FileSaveSession::new);
             if (selectedOnly) {

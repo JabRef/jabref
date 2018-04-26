@@ -19,8 +19,6 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.jabref.JabRefGUI;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -201,13 +199,6 @@ public class FreeCiteImporter extends Importer {
                     // type has been derived from "genre"
                     // has to be done before label generation as label generation is dependent on entry type
                     e.setType(type);
-
-                    // autogenerate label (BibTeX key)
-                    if (JabRefGUI.getMainFrame() != null) {
-                        // only possible in GUI mode
-                        new BibtexKeyGenerator(JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext(), importFormatPreferences.getBibtexKeyPatternPreferences())
-                                .generateAndSetKey(e);
-                    }
 
                     res.add(e);
                 }

@@ -67,7 +67,7 @@ public class ExportCustomizationDialog extends JabRefDialog {
             if (ecd.okPressed()) {
                 Globals.prefs.customExports.addFormat(ecd.name(), ecd.layoutFile(), ecd.extension(),
                         Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
-                        SavePreferences.loadForExportFromPreferences(Globals.prefs));
+                        Globals.prefs.loadForExportFromPreferences());
                 Globals.prefs.customExports.store(Globals.prefs);
             }
         });
@@ -103,7 +103,7 @@ public class ExportCustomizationDialog extends JabRefDialog {
             }
             LayoutFormatterPreferences layoutPreferences = Globals.prefs
                     .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
-            SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+            SavePreferences savePreferences = Globals.prefs.loadForExportFromPreferences();
             for (List<String> list : entries) {
                 Globals.prefs.customExports.remove(list, layoutPreferences, savePreferences);
             }
