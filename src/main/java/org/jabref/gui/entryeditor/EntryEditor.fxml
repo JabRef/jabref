@@ -42,7 +42,7 @@
             </Button>
             <Button styleClass="flatButton,narrow" onAction="#generateKey">
                 <graphic>
-                    <MaterialDesignIconView glyphName="KEY_VARIANT"/>
+                    <JabRefIconView glyphName="KEY_VARIANT"/>
                 </graphic>
                 <tooltip>
                     <Tooltip text="%Generate BibTeX key"/>

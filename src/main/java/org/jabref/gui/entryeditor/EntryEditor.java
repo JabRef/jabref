@@ -29,7 +29,6 @@ import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.EntryFetchAndMergeWorker;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.UndoableKeyChange;
-import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
