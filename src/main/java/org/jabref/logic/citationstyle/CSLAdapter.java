@@ -88,10 +88,6 @@ public class CSLAdapter {
 
             // create a copy of bibEntry
             bibEntry = (BibEntry) bibEntry.clone();
-            // change month field from "#mon#" to "mon"
-            if((bibEntry.getFieldMap().get(FieldName.MONTH) != null) && !bibEntry.getFieldMap().get(FieldName.MONTH).isEmpty()){
-                bibEntry.getFieldMap().put(FieldName.MONTH, bibEntry.getMonth().get().getShortName());
-            }
 
             String citeKey = bibEntry.getCiteKeyOptional().orElse("");
             BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType()), new Key(citeKey));
@@ -100,6 +96,11 @@ public class CSLAdapter {
             HTMLChars latexToHtmlConverter = new HTMLChars();
             RemoveNewlinesFormatter removeNewlinesFormatter = new RemoveNewlinesFormatter();
             for (String key : bibEntry.getFieldMap().keySet()) {
+                if (FieldName.MONTH.equals(key)) {
+                    // change month field value from "#mon#" to "mon"
+                    bibEntry.getFieldMap().put(FieldName.MONTH, bibEntry.getMonth().get().getShortName());
+                }
+
                 bibEntry.getField(key)
                         .map(removeNewlinesFormatter::format)
                         .map(latexToHtmlConverter::format)
