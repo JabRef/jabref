@@ -1,6 +1,5 @@
 package org.jabref.cli;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.Globals;
@@ -21,14 +20,13 @@ public class JabRefCLI {
     private final CommandLine cl;
     private List<String> leftOver;
 
-
     public JabRefCLI(String[] args) {
 
         Options options = getOptions();
 
         try {
             this.cl = new DefaultParser().parse(options, args);
-            this.leftOver = Arrays.asList(cl.getArgs());
+            this.leftOver = cl.getArgList();
         } catch (ParseException e) {
             LOGGER.warn("Problem parsing arguments", e);
 
@@ -94,6 +92,14 @@ public class JabRefCLI {
 
     public String getFileExport() {
         return cl.getOptionValue("output");
+    }
+
+    public boolean isBibtexImport() {
+        return cl.hasOption("importBibtex");
+    }
+
+    public String getBibtexImport() {
+        return cl.getOptionValue("importBibtex");
     }
 
     public boolean isFileImport() {
@@ -163,6 +169,14 @@ public class JabRefCLI {
                         Localization.lang("filename"))).
                 hasArg().
                 argName("FILE").build());
+
+        options.addOption(
+                Option.builder("ib")
+                      .longOpt("importBibtex")
+                      .desc(String.format("%s: %s[,importBibtex bibtexString]", Localization.lang("Import") + " " + Localization.BIBTEX, Localization.lang("filename")))
+                      .hasArg()
+                      .argName("FILE")
+                      .build());
 
         options.addOption(Option.builder("o").
                 longOpt("output").

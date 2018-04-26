@@ -1,5 +1,6 @@
 package org.jabref.gui.remote;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.JabRefGUI;
@@ -10,11 +11,10 @@ import org.jabref.logic.remote.server.MessageHandler;
 public class JabRefMessageHandler implements MessageHandler {
 
     @Override
-    public void handleMessage(String message) {
-        ArgumentProcessor argumentProcessor = new ArgumentProcessor(message.split("\n"),
-                ArgumentProcessor.Mode.REMOTE_START);
+    public void handleCommandLineArguments(String[] message) {
+        ArgumentProcessor argumentProcessor = new ArgumentProcessor(message, ArgumentProcessor.Mode.REMOTE_START);
         if (!(argumentProcessor.hasParserResults())) {
-            throw new IllegalStateException("Could not start JabRef with arguments " + message);
+            throw new IllegalStateException("Could not start JabRef with arguments " + Arrays.toString(message));
         }
 
         List<ParserResult> loaded = argumentProcessor.getParserResults();

@@ -19,7 +19,7 @@ buildscript {
 
 plugins {
     id 'com.gradle.build-scan' version '1.11'
-    id 'com.install4j.gradle' version '7.0.3'
+    id 'com.install4j.gradle' version '7.0.4'
     id 'com.github.johnrengelman.shadow' version '2.0.2'
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
     id "com.simonharrer.modernizer" version '1.6.0-1'
@@ -48,9 +48,9 @@ apply from: 'localization.gradle'
 apply from: 'xjc.gradle'
 
 group = "org.jabref"
-version = "4.2-dev"
-project.ext.threeDotVersion = "4.1.0.1"
-project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
+version = "4.3-dev"
+project.ext.threeDotVersion = "4.2.0.1"
+project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j7' : 'install4j7')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 mainClassName = "org.jabref.JabRefMain"
@@ -120,7 +120,7 @@ dependencies {
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
-    compile 'com.google.guava:guava:24.1-jre'
+    compile 'com.google.guava:guava:25.0-jre'
 
     // JavaFX stuff
     compile 'com.airhacks:afterburner.fx:1.7.0'
@@ -154,19 +154,19 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.0.2'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.0.2'
 
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.0-M1'
-    testCompile 'org.junit.jupiter:junit-jupiter-params:5.2.0-M1'
-    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.0-M1'
-    testRuntime 'org.junit.vintage:junit-vintage-engine:5.2.0-M1'
-    testCompile 'org.junit.platform:junit-platform-launcher:1.2.0-M1'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.0-RC1'
+    testCompile 'org.junit.jupiter:junit-jupiter-params:5.2.0-RC1'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.0-RC1'
+    testRuntime 'org.junit.vintage:junit-vintage-engine:5.2.0-RC1'
+    testCompile 'org.junit.platform:junit-platform-launcher:1.2.0-RC1'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
-    testCompile 'org.mockito:mockito-core:2.18.0'
+    testCompile 'org.mockito:mockito-core:2.18.3'
     testCompile 'com.github.tomakehurst:wiremock:2.17.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
-    testCompile 'org.xmlunit:xmlunit-core:2.5.1'
-    testCompile 'org.xmlunit:xmlunit-matchers:2.5.1'
+    testCompile 'org.xmlunit:xmlunit-core:2.6.0'
+    testCompile 'org.xmlunit:xmlunit-matchers:2.6.0'
     testCompile 'com.tngtech.archunit:archunit-junit:0.5.0'
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit:4.0.+"
@@ -448,8 +448,16 @@ install4j {
     installDir = file(project.ext.install4jDir)
 }
 
+task generateFinalJabRefPS1File(type: Copy) {
+    from('buildres') {
+        include 'JabRef.ps1'
+    }
+    into 'build'
+    filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [jabRefJarFileName: jar.archiveName])
+}
+
 // has to be defined AFTER 'dev' things to have the correct project.version
-task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
+task media(type: com.install4j.gradle.Install4jTask, dependsOn: ["releaseJar", "generateFinalJabRefPS1File"]) {
     projectFile = file('jabref.install4j')
     release = project.version
     winKeystorePassword = System.getenv('CERTIFICATE_PW')
