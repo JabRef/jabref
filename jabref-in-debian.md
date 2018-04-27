@@ -2,7 +2,7 @@
 
 This file tracks the status of JabRef packaging to Debian.
 The current version at Debian is shown at <https://tracker.debian.org/pkg/jabref>.
-The corresponding debian bug is [810725](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=810725).
+Since Ubuntu is based on Debian, the JabRef version available in ubuntu (<https://packages.ubuntu.com/search?keywords=jabref>) is not higher.
 
 At [koppor's repository](https://github.com/koppor/jabref/), required Debian adaptions to branches are tracked in `debian_x.y` branches.
 
