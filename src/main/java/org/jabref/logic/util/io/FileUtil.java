@@ -256,40 +256,6 @@ public class FileUtil {
      * @param database        the database, where the entry is located
      * @param entry           the entry to which the file should be linked to
      * @param fileNamePattern the filename pattern
-     * @param prefs           the layout preferences
-     * @return a suggested fileName
-     * @deprecated use String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern ) instead.
-     */
-    @Deprecated
-    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern,
-                                                   LayoutFormatterPreferences prefs) {
-        String targetName = null;
-
-        StringReader sr = new StringReader(fileNamePattern);
-        Layout layout = null;
-        try {
-            layout = new LayoutHelper(sr, prefs).getLayoutFromText();
-        } catch (IOException e) {
-            LOGGER.info("Wrong format " + e.getMessage(), e);
-        }
-        if (layout != null) {
-            targetName = layout.doLayout(entry, database);
-        }
-
-        if ((targetName == null) || targetName.isEmpty()) {
-            targetName = entry.getCiteKeyOptional().orElse("default");
-        }
-        //Removes illegal characters from filename
-        targetName = FileNameCleaner.cleanFileName(targetName);
-        return targetName;
-    }
-
-    /**
-     * Determines filename provided by an entry in a database
-     *
-     * @param database        the database, where the entry is located
-     * @param entry           the entry to which the file should be linked to
-     * @param fileNamePattern the filename pattern
      * @return a suggested fileName
      */
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
