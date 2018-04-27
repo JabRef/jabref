@@ -536,7 +536,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
     }
 
     /**
-     * This will start the export of all files of all selected nodes in this
+     * This starts the export of all files of all selected nodes in this
      * dialogs tree view. <br>
      * <br>
      * The export itself will run in a seperate thread, whilst this dialog will
@@ -546,7 +546,6 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
      * invoked.
      */
     private void startExport() {
-
         if (treeModel == null) {
             return;
         }
@@ -555,7 +554,6 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
         CheckableTreeNode root = (CheckableTreeNode) treeModel.getRoot();
 
         final List<File> fileList = getFileListFromNode(root);
-
         if ((fileList == null) || fileList.isEmpty()) {
             return;
         }
@@ -606,7 +604,6 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
     /**
      */
     private void exportFinishedHandler() {
-
         progressBarImporting.setVisible(false);
         labelExportingInfo.setVisible(false);
         buttonExport.setVisible(true);
