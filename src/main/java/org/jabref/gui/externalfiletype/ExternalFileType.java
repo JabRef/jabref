@@ -1,10 +1,5 @@
 package org.jabref.gui.externalfiletype;
 
-import java.util.Objects;
-
-import javax.swing.JLabel;
-
-import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 
 public interface ExternalFileType {
