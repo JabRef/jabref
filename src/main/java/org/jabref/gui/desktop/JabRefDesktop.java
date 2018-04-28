@@ -136,7 +136,13 @@ public class JabRefDesktop {
             openExternalFilePlatformIndependent(type, filePath);
             return true;
         } else {
-            // No file matched the name, or we did not know the file type.
+            // No file matched the name, try to open it directly using the given app
+            if (type.isPresent()) {
+                openExternalFilePlatformIndependent(type, link);
+                return true;
+            }
+
+            // Run out of ideas what to do...
             return false;
         }
     }

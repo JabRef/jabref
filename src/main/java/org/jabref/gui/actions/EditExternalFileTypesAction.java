@@ -2,7 +2,6 @@ package org.jabref.gui.actions;
 
 import org.jabref.gui.externalfiletype.ExternalFileTypeEditor;
 
-//TODO: DOES NOT SHOW UP
 public class EditExternalFileTypesAction extends SimpleCommand {
 
     private ExternalFileTypeEditor editor;
@@ -10,11 +9,8 @@ public class EditExternalFileTypesAction extends SimpleCommand {
     @Override
     public void execute() {
         if (editor == null) {
-            editor = new ExternalFileTypeEditor(null);
-            editor.setVisible(true);
-
+            editor = new ExternalFileTypeEditor();
         }
-
+        editor.show();
     }
-
 }
