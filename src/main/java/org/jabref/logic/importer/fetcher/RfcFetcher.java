@@ -40,9 +40,10 @@ public class RfcFetcher implements IdBasedParserFetcher {
     @Override
     public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         // Add "rfc" prefix if user's search entry was numerical
-        identifier = (!identifier.toLowerCase().startsWith("rfc")) ? "rfc" + identifier : identifier;
+        String prefixedIdentifier = identifier;
+        prefixedIdentifier = (!identifier.toLowerCase().startsWith("rfc")) ? "rfc" + prefixedIdentifier : prefixedIdentifier;
 
-        URIBuilder uriBuilder = new URIBuilder("https://datatracker.ietf.org/doc/" + identifier + "/bibtex/");
+        URIBuilder uriBuilder = new URIBuilder("https://datatracker.ietf.org/doc/" + prefixedIdentifier + "/bibtex/");
 
         return uriBuilder.build().toURL();
     }
