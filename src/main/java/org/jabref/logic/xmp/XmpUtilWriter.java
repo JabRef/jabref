@@ -3,13 +3,18 @@ package org.jabref.logic.xmp;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
 
@@ -29,6 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class XmpUtilWriter {
+
+    private static final String XMP_BEGIN_END_TAG = "?xpacket";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilWriter.class);
 
@@ -82,15 +89,38 @@ public class XmpUtilWriter {
         XmpUtilWriter.writeXmp(file, bibEntryList, database, xmpPreferences);
     }
 
+    /**
+     * Writes the information of the bib entry to the dublin core schema using
+     * a custom extractor.
+     *
+     * @param dcSchema  Dublin core schema, which is filled with the bib entry.
+     * @param entry     The entry, which is added to the dublin core metadata.
+     * @param database  maybenull An optional database which the given bibtex entries belong to, which will be used to
+     *                  resolve strings. If the database is null the strings will not be resolved.
+     * @param xmpPreferences    The user's xmp preferences.
+     */
     private static void writeToDCSchema(DublinCoreSchema dcSchema, BibEntry entry, BibDatabase database,
             XmpPreferences xmpPreferences) {
 
         BibEntry resolvedEntry = XmpUtilWriter.getDefaultOrDatabaseEntry(entry, database);
 
-        DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, resolvedEntry);
-        dcExtractor.fillDublinCoreSchema();
+        writeToDCSchema(dcSchema, resolvedEntry, xmpPreferences);
     }
 
+    /**
+     * Writes the information of the bib entry to the dublin core schema using
+     * a custom extractor.
+     *
+     * @param dcSchema  Dublin core schema, which is filled with the bib entry.
+     * @param entry     The entry, which is added to the dublin core metadata.
+     * @param xmpPreferences    The user's xmp preferences.
+     */
+    private static void writeToDCSchema(DublinCoreSchema dcSchema, BibEntry entry,
+            XmpPreferences xmpPreferences) {
+
+        DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, entry);
+        dcExtractor.fillDublinCoreSchema();
+    }
 
     /**
      * Try to write the given BibTexEntry as a DublinCore XMP Schema
@@ -139,7 +169,14 @@ public class XmpUtilWriter {
         if (metaRaw == null) {
             meta = XMPMetadata.createXMPMetadata();
         } else {
-            meta = XmpUtilShared.parseXmpMetadata(metaRaw.createInputStream());
+            try {
+                meta = XmpUtilShared.parseXmpMetadata(metaRaw.createInputStream());
+                // In case, that the pdf file has no namespace definition for xmp,
+                // but metadata in a different format, the parser throws an exception
+                // Creating an empty xmp metadata element solves this problem
+            } catch (IOException e) {
+                meta = XMPMetadata.createXMPMetadata();
+            }
         }
 
         // Remove all current Dublin-Core schemas
@@ -157,6 +194,61 @@ public class XmpUtilWriter {
         ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
         PDMetadata metadataStream = new PDMetadata(document, is);
         catalog.setMetadata(metadataStream);
+    }
+
+    /**
+     * This method generates an xmp metadata string in dublin core format.
+     * <br/>
+     *
+     * @param entries   A list of entries, which are added to the dublin core metadata.
+     * @param xmpPreferences    The user's xmp preferences.
+     *
+     * @return  If something goes wrong (e.g. an exception is thrown), the method returns an empty string,
+     *          otherwise it returns the xmp metadata as a string in dublin core format.
+     */
+    public static String generateXmpStringWithXmpDeclaration(List<BibEntry> entries, XmpPreferences xmpPreferences) {
+        XMPMetadata meta = XMPMetadata.createXMPMetadata();
+        for (BibEntry entry : entries) {
+            DublinCoreSchema dcSchema = meta.createAndAddDublinCoreSchema();
+            XmpUtilWriter.writeToDCSchema(dcSchema, entry, xmpPreferences);
+        }
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            XmpSerializer serializer = new XmpSerializer();
+            serializer.serialize(meta, os, true);
+            return os.toString(StandardCharsets.UTF_8.name());
+        } catch (TransformerException e) {
+            LOGGER.warn("Tranformation into xmp not possible: " + e.getMessage(), e);
+            return "";
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.warn("Unsupported encoding to UTF-8 of bib entries in xmp metadata.", e);
+            return "";
+        } catch (IOException e) {
+            LOGGER.warn("IO Exception thrown by closing the output stream.", e);
+            return "";
+        }
+    }
+
+    /**
+     * This method generates an xmp metadata string in dublin core format without the
+     * metadata section <?xpacket begin=...>.
+     * <br/>
+     *
+     * @param entries   A list of entries, which are added to the dublin core metadata.
+     * @param xmpPreferences    The user's xmp preferences.
+     *
+     * @return  If something goes wrong (e.g. an exception is thrown), the method returns an empty string,
+     *          otherwise it returns the xmp metadata without metadata description as a string in dublin core format.
+     */
+    public static String generateXmpStringWithoutXmpDeclaration(List<BibEntry> entries, XmpPreferences xmpPreferences) {
+        String xmpContent = XmpUtilWriter.generateXmpStringWithXmpDeclaration(entries, xmpPreferences);
+        // remove the <?xpacket *> tags to enable the usage of the CTAN package xmpincl
+        Predicate<String> isBeginOrEndTag = s -> s.contains(XMP_BEGIN_END_TAG);
+        String updatedXmpContent = Arrays.stream(xmpContent.split(System.lineSeparator()))
+                .filter(isBeginOrEndTag.negate())
+                .map(line -> line.toString())
+                .collect(Collectors.joining(System.lineSeparator()));
+
+        return updatedXmpContent;
     }
 
     /**

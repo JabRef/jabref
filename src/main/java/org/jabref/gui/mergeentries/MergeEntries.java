@@ -52,12 +52,6 @@ import com.jgoodies.forms.layout.RowSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Oscar Gustafsson
- *
- *         Class for dealing with merging entries
- */
-
 public class MergeEntries {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MergeEntries.class);

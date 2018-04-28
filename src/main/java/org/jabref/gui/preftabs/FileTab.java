@@ -13,7 +13,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -38,6 +37,7 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 class FileTab extends JPanel implements PrefsTab {
 
+    private final DialogService dialogService;
     private final JabRefPreferences prefs;
 
     private final JCheckBox backup;
@@ -62,6 +62,7 @@ class FileTab extends JPanel implements PrefsTab {
     private final JTextField regExpTextField;
 
     public FileTab(DialogService dialogService, JabRefPreferences prefs) {
+        this.dialogService = dialogService;
         this.prefs = prefs;
 
         fileDir = new JTextField(25);
@@ -264,9 +265,9 @@ class FileTab extends JPanel implements PrefsTab {
         Path path = Paths.get(fileDir.getText());
         boolean valid = Files.exists(path) && Files.isDirectory(path);
         if (!valid) {
-            String content = String.format("%s -> %s %n %n %s: %n %s", Localization.lang("File"),
-                    Localization.lang("Main file directory"), Localization.lang("Directory not found"), path);
-            JOptionPane.showMessageDialog(null, content, Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+            dialogService.showErrorDialogAndWait(
+                    String.format("%s -> %s %n %n %s: %n %s", Localization.lang("File"),
+                            Localization.lang("Main file directory"), Localization.lang("Directory not found"), path));
         }
         return valid;
     }

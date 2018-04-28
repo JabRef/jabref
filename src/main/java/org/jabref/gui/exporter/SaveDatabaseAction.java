@@ -180,7 +180,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         SaveSession session;
 
         try {
-            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(encoding);
+            SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences().withEncoding(encoding);
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
 
             if (selectedOnly) {
@@ -193,7 +193,6 @@ public class SaveDatabaseAction extends AbstractWorker {
             panel.registerUndoableChanges(session);
 
         } catch (UnsupportedCharsetException ex) {
-
             frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file.")
                     + Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()));
             throw new SaveException(ex.getMessage(), ex);
@@ -399,8 +398,11 @@ public class SaveDatabaseAction extends AbstractWorker {
             ButtonType save = new ButtonType(Localization.lang("Save"));
             ButtonType reviewChanges = new ButtonType(Localization.lang("Review changes"));
 
-            Optional<ButtonType> buttonPressed = frame.getDialogService().showCustomButtonDialogAndWait(AlertType.CONFIRMATION, Localization.lang("File updated externally"),
-                    Localization.lang("File has been updated externally. " + "What do you want to do?"), reviewChanges, save, ButtonType.CANCEL);
+            Optional<ButtonType> buttonPressed = DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showCustomButtonDialogAndWait(AlertType.CONFIRMATION, Localization.lang("File updated externally"),
+                                                                                                                                                    Localization.lang("File has been updated externally. " + "What do you want to do?"),
+                                                                                                                                                    reviewChanges,
+                                                                                                                                                    save,
+                                                                                                                                                    ButtonType.CANCEL));
 
             if (buttonPressed.isPresent()) {
                 if (buttonPressed.get() == ButtonType.CANCEL) {

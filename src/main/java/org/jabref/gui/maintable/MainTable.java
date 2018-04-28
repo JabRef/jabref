@@ -13,6 +13,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
@@ -62,7 +63,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         panel.showAndEdit(entry.getEntry());
                     }
                 })
-                .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, Globals.getKeyPrefs()))
+        .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, Globals.getKeyPrefs(), frame.getDialogService()))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnMouseDragEntered(this::handleOnDragEntered)
                 .install(this);
@@ -142,6 +143,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
         this.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode().equals(KeyCode.ENTER)) {
+                getSelectedEntries().stream()
+                                    .findFirst()
+                                    .ifPresent(panel::showAndEdit);
+                event.consume();
+                return;
+            }
+
             Optional<KeyBinding> keyBinding = keyBindings.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
@@ -219,6 +228,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // Support the following gesture to select entries: click on one row -> hold mouse button -> move over other rows
         // We need to select all items between the starting row and the row where the user currently hovers the mouse over
         // It is not enough to just select the currently hovered row since then sometimes rows are not marked selected if the user moves to fast
+        @SuppressWarnings("unchecked")
         TableRow<BibEntryTableViewModel> sourceRow = (TableRow<BibEntryTableViewModel>) event.getGestureSource();
         getSelectionModel().selectRange(sourceRow.getIndex(), row.getIndex());
     }

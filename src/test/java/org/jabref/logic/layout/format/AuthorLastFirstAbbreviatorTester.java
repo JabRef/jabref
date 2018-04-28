@@ -6,9 +6,6 @@ import org.junit.jupiter.api.Test;
 /**
  * Test case  that verifies the functionalities of the
  * formater AuthorLastFirstAbbreviator.
- *
- * @author Carlos Silla
- * @author Christopher Oezbek <oezi@oezi.de>
  */
 public class AuthorLastFirstAbbreviatorTester {
 

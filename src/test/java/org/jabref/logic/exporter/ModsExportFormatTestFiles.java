@@ -73,7 +73,7 @@ public class ModsExportFormatTestFiles {
         modsExportFormat = new ModsExporter();
         tempFile = testFolder.newFile();
         bibtexImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
-        modsImporter = new ModsImporter();
+        modsImporter = new ModsImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     @Test

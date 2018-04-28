@@ -6,7 +6,6 @@ import javax.inject.Inject;
 
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -18,8 +17,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.text.Font;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -39,7 +37,7 @@ public class FileAnnotationTabView {
     @FXML public Label date;
     @FXML public TextArea content;
     @FXML public TextArea marking;
-    @FXML public GridPane grid;
+    @FXML public VBox details;
     private final BibEntry entry;
     private final FileAnnotationCache fileAnnotationCache;
     private FileAnnotationTabViewModel viewModel;
@@ -77,7 +75,7 @@ public class FileAnnotationTabView {
         // Set-up details pane
         content.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::contentProperty));
         marking.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::markingProperty));
-        grid.disableProperty().bind(viewModel.isAnnotationsEmpty());
+        details.disableProperty().bind(viewModel.isAnnotationsEmpty());
     }
 
     private Node createFileAnnotationNode(FileAnnotationViewModel annotation) {
@@ -91,27 +89,13 @@ public class FileAnnotationTabView {
         secondColumn.setHalignment(HPos.RIGHT);
         node.getColumnConstraints().addAll(firstColumn, secondColumn);
 
-        RowConstraints firstRow = new RowConstraints();
-        RowConstraints secondRow = new RowConstraints();
-        firstRow.setMinHeight(10);
-        firstRow.setPrefHeight(15);
-        secondRow.setMinHeight(10);
-        secondRow.setPrefHeight(35);
-        node.getRowConstraints().addAll(firstRow, secondRow);
-
         Label marking = new Label(annotation.getMarking());
         Label author = new Label(annotation.getAuthor());
         Label date = new Label(annotation.getDate());
         Label page = new Label(Localization.lang("Page") + ": " + annotation.getPage());
 
-        marking.setFont(new Font("System Bold", 15));
-        marking.setPrefWidth(250);
-        author.setFont(new Font("System", 14));
-
-        marking.setPrefHeight(10);
-        author.setPrefHeight(30);
-        date.setPrefHeight(10);
-        page.setPrefHeight(30);
+        marking.setStyle("-fx-font-weight: bold");
+        marking.setMaxHeight(30);
 
         // add alignment for text in the list
         marking.setTextAlignment(TextAlignment.LEFT);
@@ -131,7 +115,7 @@ public class FileAnnotationTabView {
         return node;
     }
 
-    public void copy(ActionEvent event) {
+    public void copy() {
         viewModel.copyCurrentAnnotation();
     }
 }

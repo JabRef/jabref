@@ -3,14 +3,11 @@ package org.jabref.gui.actions;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.JOptionPane;
-
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.cleanup.CleanupDialog;
-import org.jabref.gui.cleanup.CleanupPresetPanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -63,7 +60,7 @@ public class CleanupAction extends AbstractWorker {
         if (canceled) {
             return;
         }
-        CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), CleanupPreset.loadFromPreferences(preferences));
+        CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), Globals.prefs.getCleanupPreset());
 
         Optional<CleanupPreset> chosenPreset = cleanupDialog.showAndWait();
         if (!chosenPreset.isPresent()) {
@@ -71,7 +68,7 @@ public class CleanupAction extends AbstractWorker {
             return;
         }
         CleanupPreset cleanupPreset = chosenPreset.get();
-        cleanupPreset.storeInPreferences(preferences);
+        Globals.prefs.setCleanupPreset(cleanupPreset);
 
         if (cleanupPreset.isRenamePDF() && Globals.prefs.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
 
@@ -132,17 +129,6 @@ public class CleanupAction extends AbstractWorker {
         panel.output(message);
     }
 
-    private int showDialog(CleanupPresetPanel presetPanel) {
-
-        String dialogTitle = Localization.lang("Cleanup entries");
-
-        Object[] messages = {Localization.lang("What would you like to clean up?"), presetPanel.getScrollPane()};
-
-        return JOptionPane.showConfirmDialog(null, messages, dialogTitle, JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
-
-    }
-
     /**
      * Runs the cleanup on the entry and records the change.
      */
@@ -150,7 +136,7 @@ public class CleanupAction extends AbstractWorker {
         // Create and run cleaner
         CleanupWorker cleaner = new CleanupWorker(panel.getBibDatabaseContext(), preferences.getCleanupPreferences(
                 Globals.journalAbbreviationLoader));
-        List<FieldChange> changes = DefaultTaskExecutor.runInJavaFXThread(() -> cleaner.cleanup(preset, entry));
+        List<FieldChange> changes = cleaner.cleanup(preset, entry);
 
         unsuccessfulRenames = cleaner.getUnsuccessfulRenames();
 

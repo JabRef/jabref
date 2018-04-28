@@ -32,7 +32,9 @@ import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.OutputPrinter;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.logging.JabRefLogger;
@@ -41,6 +43,7 @@ import org.jabref.logic.search.DatabaseSearcher;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.Defaults;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabase;
@@ -80,6 +83,19 @@ public class ArgumentProcessor {
         result.ifPresent(ParserResult::setToOpenTab);
 
         return result;
+    }
+
+    private static Optional<ParserResult> importBibtexToOpenBase(String argument) {
+        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+        try {
+            List<BibEntry> entries = parser.parseEntries(argument);
+            ParserResult result = new ParserResult(entries);
+            result.setToOpenTab();
+            return Optional.of(result);
+        } catch (ParseException e) {
+            System.err.println(Localization.lang("Error occurred when parsing entry") + ": " + e.getLocalizedMessage());
+            return Optional.empty();
+        }
     }
 
     private static Optional<ParserResult> importFile(String argument) {
@@ -223,11 +239,6 @@ public class ArgumentProcessor {
             doAuxImport(loaded);
         }
 
-        if (cli.isXmpFacilities()) {
-            XmpUtilMain.executeXmpConsoleApplicaton();
-            System.exit(0);
-        }
-
         return loaded;
     }
 
@@ -250,18 +261,18 @@ public class ArgumentProcessor {
 
             //read in the export format, take default format if no format entered
             switch (data.length) {
-            case 3:
-                formatName = data[2];
-                break;
-            case 2:
-                //default exporter: HTML table (with Abstract & BibTeX)
-                formatName = "tablerefsabsbib";
-                break;
-            default:
-                System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
-                        .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
-                noGUINeeded = true;
-                return false;
+                case 3:
+                    formatName = data[2];
+                    break;
+                case 2:
+                    //default exporter: HTML table (with Abstract & BibTeX)
+                    formatName = "tablerefsabsbib";
+                    break;
+                default:
+                    System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
+                            .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
+                    noGUINeeded = true;
+                    return false;
             }
 
             //export new database
@@ -346,6 +357,10 @@ public class ArgumentProcessor {
             importToOpenBase(cli.getImportToOpenBase()).ifPresent(loaded::add);
         }
 
+        if (!cli.isBlank() && cli.isBibtexImport()) {
+            importBibtexToOpenBase(cli.getBibtexImport()).ifPresent(loaded::add);
+        }
+
         return loaded;
     }
 
@@ -363,7 +378,7 @@ public class ArgumentProcessor {
 
                 try {
                     System.out.println(Localization.lang("Saving") + ": " + subName);
-                    SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
+                    SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences();
                     BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
                     Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
                     SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults), prefs);
@@ -372,8 +387,8 @@ public class ArgumentProcessor {
                     if (!session.getWriter().couldEncodeAll()) {
                         System.err.println(Localization.lang("Warning") + ": "
                                 + Localization.lang(
-                                        "The chosen encoding '%0' could not encode the following characters:",
-                                        session.getEncoding().displayName())
+                                "The chosen encoding '%0' could not encode the following characters:",
+                                session.getEncoding().displayName())
                                 + " " + session.getWriter().getProblemCharacters());
                     }
                     session.commit(subName);
@@ -402,7 +417,7 @@ public class ArgumentProcessor {
                 if (!pr.isInvalid()) {
                     try {
                         System.out.println(Localization.lang("Saving") + ": " + data[0]);
-                        SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
+                        SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences();
                         Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
                         BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
                                 FileSaveSession::new);
@@ -413,8 +428,8 @@ public class ArgumentProcessor {
                         if (!session.getWriter().couldEncodeAll()) {
                             System.err.println(Localization.lang("Warning") + ": "
                                     + Localization.lang(
-                                            "The chosen encoding '%0' could not encode the following characters:",
-                                            session.getEncoding().displayName())
+                                    "The chosen encoding '%0' could not encode the following characters:",
+                                    session.getEncoding().displayName())
                                     + " " + session.getWriter().getProblemCharacters());
                         }
                         session.commit(data[0]);
@@ -457,7 +472,6 @@ public class ArgumentProcessor {
                             + Throwables.getStackTraceAsString(ex));
                 }
             }
-
         }
     }
 
@@ -470,8 +484,9 @@ public class ArgumentProcessor {
                     Globals.journalAbbreviationLoader);
             LayoutFormatterPreferences layoutPreferences = Globals.prefs
                     .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
-            SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
-            Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences);
+            SavePreferences savePreferences = Globals.prefs.loadForExportFromPreferences();
+            XmpPreferences xmpPreferences = Globals.prefs.getXMPPreferences();
+            Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }
@@ -585,5 +600,4 @@ public class ArgumentProcessor {
     public enum Mode {
         INITIAL_START, REMOTE_START
     }
-
 }

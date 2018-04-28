@@ -8,7 +8,6 @@ public class FindUnlinkedFilesAction extends SimpleCommand {
     private final JabRefFrame jabRefFrame;
 
     public FindUnlinkedFilesAction(JabRefFrame jabRefFrame) {
-
         this.jabRefFrame = jabRefFrame;
     }
 

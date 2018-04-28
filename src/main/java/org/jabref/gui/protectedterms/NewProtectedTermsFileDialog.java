@@ -111,7 +111,7 @@ public class NewProtectedTermsFileDialog extends JabRefDialog {
 
         // Key bindings:
         bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+          .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         bb.getPanel().getActionMap().put("close", cancelAction);
         pack();
     }

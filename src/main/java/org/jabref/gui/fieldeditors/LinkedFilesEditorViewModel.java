@@ -183,7 +183,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                     if (url.isPresent()) {
                         addFromURL(url.get());
                     } else {
-                        dialogService.notify(Localization.lang("Full text document download failed"));
+                        dialogService.notify(Localization.lang("No full text document found"));
                     }
                 })
                 .executeWith(taskExecutor);
@@ -205,7 +205,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     private void addFromURL(URL url) {
-        LinkedFileViewModel onlineFile = new LinkedFileViewModel(new LinkedFile("", url, ""), entry, databaseContext, taskExecutor, dialogService, preferences);
+        LinkedFileViewModel onlineFile = new LinkedFileViewModel(new LinkedFile(url, ""), entry, databaseContext, taskExecutor, dialogService, preferences);
         files.add(onlineFile);
         onlineFile.download();
     }

@@ -1,7 +1,7 @@
 package org.jabref.gui.copyfiles;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.paint.Color;
@@ -28,16 +28,13 @@ public class CopyFilesDialogView extends BaseDialog<Void> {
         this.setTitle(Localization.lang("Result"));
         this.setResizable(true);
 
+        this.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+
+        viewModel = new CopyFilesDialogViewModel(results);
+
         ViewLoader.view(this)
                   .load()
                   .setAsContent(this.getDialogPane());
-
-        viewModel = new CopyFilesDialogViewModel(results);
-    }
-
-    @FXML
-    private void close(@SuppressWarnings("unused") ActionEvent event) {
-        close();
     }
 
     @FXML

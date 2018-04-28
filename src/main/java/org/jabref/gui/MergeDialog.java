@@ -21,12 +21,8 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 
 /**
- * <p>Title: MergeDialog</p>
- * <p>Description: Asks for details about merge database operation.</p>
- * <p>Copyright: Copyright (c) 2003</p>
- * @author Morten O. Alver
+ * Asks for details about merge database operation.
  */
-
 public class MergeDialog extends JabRefDialog {
 
     private final JPanel panel1 = new JPanel();
@@ -91,7 +87,7 @@ public class MergeDialog extends JabRefDialog {
         // Key bindings:
         ActionMap am = jPanel1.getActionMap();
         InputMap im = jPanel1.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         am.put("close", new AbstractAction() {
 
             @Override

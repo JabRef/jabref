@@ -27,11 +27,10 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 
 import org.jabref.gui.actions.MnemonicAwareAction;
-import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 
 import com.jgoodies.forms.builder.ButtonStackBuilder;

@@ -19,16 +19,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.TimerTask;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -38,7 +34,10 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
@@ -77,7 +76,6 @@ import org.jabref.gui.actions.ManageKeywordsAction;
 import org.jabref.gui.actions.ManageProtectedTermsAction;
 import org.jabref.gui.actions.MassSetFieldAction;
 import org.jabref.gui.actions.MergeEntriesAction;
-import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.gui.actions.NewDatabaseAction;
 import org.jabref.gui.actions.NewEntryAction;
 import org.jabref.gui.actions.NewEntryFromPlainTextAction;
@@ -97,7 +95,6 @@ import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
@@ -106,7 +103,7 @@ import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.push.PushToApplicationButton;
 import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.search.GlobalSearchBar;
-import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
+import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
@@ -163,29 +160,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final JProgressBar progressBar = new JProgressBar();
     private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
 
-    // Here we instantiate menu/toolbar actions. Actions regarding
-    // the currently open database are defined as a GeneralAction
-    // with a unique command string. This causes the appropriate
-    // BasePanel's runCommand() method to be called with that command.
-    // Note: GeneralAction's constructor automatically gets translations
-    // for the name and message strings.
-
-    private final AbstractAction toggleRelevance = new GeneralAction(
-            new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getCommand(),
-            new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getMenuString(),
-            new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getToolTipText(),
-            IconTheme.JabRefIcons.RELEVANCE.getIcon());
-    private final AbstractAction toggleQualityAssured = new GeneralAction(
-            new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getCommand(),
-            new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getMenuString(),
-            new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getToolTipText(),
-            IconTheme.JabRefIcons.QUALITY_ASSURED.getIcon());
-    private final AbstractAction togglePrinted = new GeneralAction(
-            new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getCommand(),
-            new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getMenuString(),
-            new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getToolTipText(),
-            IconTheme.JabRefIcons.PRINTED.getIcon());
-
     // Lists containing different subsets of actions for different purposes
     private final List<Object> specialFieldButtons = new LinkedList<>();
     private final List<Object> openDatabaseOnlyActions = new LinkedList<>();
@@ -211,20 +185,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         this.mainStage = mainStage;
         this.dialogService = new FXDialogService(mainStage);
         init();
-    }
-
-    private static JMenu subMenu(String name) {
-        int i = name.indexOf('&');
-        JMenu res;
-        if (i >= 0) {
-            res = new JMenu(name.substring(0, i) + name.substring(i + 1));
-            char mnemonic = Character.toUpperCase(name.charAt(i + 1));
-            res.setMnemonic((int) mnemonic);
-        } else {
-            res = new JMenu(name);
-        }
-
-        return res;
     }
 
     /**
@@ -503,41 +463,16 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
      * @return true if the user chose to quit; false otherwise
      */
     public boolean quit() {
-        // Ask here if the user really wants to close, if the base
-        // has not been saved since last save.
-        boolean close = true;
-
+        // First ask if the user really wants to close, if the library has not been saved since last save.
         List<String> filenames = new ArrayList<>();
         for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
-            BibDatabaseContext context = getBasePanelAt(i).getBibDatabaseContext();
+            BasePanel panel = getBasePanelAt(i);
+            BibDatabaseContext context = panel.getBibDatabaseContext();
 
-            if (getBasePanelAt(i).isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
+            if (panel.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
                 tabbedPane.getSelectionModel().select(i);
-                String filename = context.getDatabaseFile().map(File::getAbsolutePath).orElse(GUIGlobals.UNTITLED_TITLE);
-                int answer = showSaveDialog(filename);
-
-                if ((answer == JOptionPane.CANCEL_OPTION) ||
-                        (answer == JOptionPane.CLOSED_OPTION)) {
+                if (!confirmClose(panel)) {
                     return false;
-                }
-                if (answer == JOptionPane.YES_OPTION) {
-                    // The user wants to save.
-                    try {
-                        //getCurrentBasePanel().runCommand("save");
-                        SaveDatabaseAction saveAction = new SaveDatabaseAction(getCurrentBasePanel());
-                        saveAction.runCommand();
-                        if (saveAction.isCanceled() || !saveAction.isSuccess()) {
-                            // The action was either canceled or unsuccessful.
-                            // Break!
-                            output(Localization.lang("Unable to save library"));
-                            close = false;
-                        }
-                    } catch (Throwable ex) {
-                        // Something prevented the file
-                        // from being saved. Break!!!
-                        close = false;
-                        break;
-                    }
                 }
             } else if (context.getLocation() == DatabaseLocation.SHARED) {
                 context.convertToLocalDatabase();
@@ -549,23 +484,22 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             context.getDatabaseFile().map(File::getAbsolutePath).ifPresent(filenames::add);
         }
 
-        if (close) {
-            for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
-                if (getBasePanelAt(i).isSaving()) {
-                    // There is a database still being saved, so we need to wait.
-                    WaitForSaveOperation w = new WaitForSaveOperation(this);
-                    w.show(); // This method won't return until canceled or the save operation is done.
-                    if (w.canceled()) {
-                        return false; // The user clicked cancel.
-                    }
+        // Wait for save operations to finish
+        for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
+            if (getBasePanelAt(i).isSaving()) {
+                // There is a database still being saved, so we need to wait.
+                WaitForSaveOperation w = new WaitForSaveOperation(this);
+                w.show(); // This method won't return until canceled or the save operation is done.
+                if (w.canceled()) {
+                    return false; // The user clicked cancel.
                 }
             }
-
-            tearDownJabRef(filenames);
-            return true;
         }
 
-        return false;
+        // Good bye!
+        tearDownJabRef(filenames);
+        Platform.exit();
+        return true;
     }
 
     private void initLayout() {
@@ -772,10 +706,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         });
     }
 
-    /**
-     * JavaFX Menus
-     * @return Menubar
-     */
     private MenuBar createMenu() {
         ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
         Menu file = new Menu(Localization.menuTitle("File"));
@@ -848,44 +778,42 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         );
 
-        /* TODO
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
-            boolean menuitem = false;
+            boolean menuItemAdded = false;
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
-                rankSubMenu = new JMenu();
-                // TODO RightClickMenu.createSpecialFieldMenu(rankSubMenu, SpecialField.RANKING, this);
-                edit.add(rankSubMenu);
-                menuitem = true;
+                edit.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.RANKING, factory, undoManager));
+                menuItemAdded = true;
             }
+
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
-                edit.add(toggleRelevance);
-                menuitem = true;
+                edit.getItems().add(SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.RELEVANCE, factory));
+                menuItemAdded = true;
             }
+
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
-                edit.add(toggleQualityAssured);
-                menuitem = true;
+                edit.getItems().add(SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.QUALITY, factory));
+                menuItemAdded = true;
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
-                rankSubMenu = new JMenu();
-                // TODO RightClickMenu.createSpecialFieldMenu(rankSubMenu, SpecialField.PRIORITY, this);
-                edit.add(rankSubMenu);
-                menuitem = true;
-            }
+
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
-                edit.add(togglePrinted);
-                menuitem = true;
+                edit.getItems().add(SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.PRINTED, factory));
+                menuItemAdded = true;
             }
+
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
+                edit.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.PRIORITY, factory, undoManager));
+                menuItemAdded = true;
+            }
+
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
-                rankSubMenu = new JMenu();
-                // TODO RightClickMenu.createSpecialFieldMenu(rankSubMenu, SpecialField.READ_STATUS, this);
-                edit.add(rankSubMenu);
-                menuitem = true;
+                edit.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.READ_STATUS, factory, undoManager));
+                menuItemAdded = true;
             }
-            if (menuitem) {
-                edit.addSeparator();
+
+            if (menuItemAdded) {
+                edit.getItems().add(new SeparatorMenuItem());
             }
         }
-        */
 
         edit.getItems().addAll(
                 factory.createMenuItem(StandardActions.MANAGE_KEYWORDS, new ManageKeywordsAction(this)),
@@ -1267,7 +1195,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private void trackOpenNewDatabase(BasePanel basePanel) {
         Map<String, String> properties = new HashMap<>();
         Map<String, Double> measurements = new HashMap<>();
-        measurements.put("NumberOfEntries", (double) basePanel.getDatabaseContext().getDatabase().getEntryCount());
+        measurements.put("NumberOfEntries", (double) basePanel.getBibDatabaseContext().getDatabase().getEntryCount());
 
         Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("OpenNewDatabase", properties, measurements));
     }
@@ -1413,23 +1341,42 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         JOptionPane.showMessageDialog(null, message);
     }
 
-    private int showSaveDialog(String filename) {
-        Object[] options = {Localization.lang("Save changes"),
-                Localization.lang("Discard changes"),
-                Localization.lang("Return to JabRef")};
+    /**
+     * Ask if the user really wants to close the given database
+     *
+     * @return true if the user choose to close the database
+     */
+    private boolean confirmClose(BasePanel panel) {
+        String filename = panel.getBibDatabaseContext()
+                               .getDatabasePath()
+                               .map(Path::toAbsolutePath)
+                               .map(Path::toString)
+                               .orElse(GUIGlobals.UNTITLED_TITLE);
 
-        return JOptionPane.showOptionDialog(null,
+        ButtonType saveChanges = new ButtonType(Localization.lang("Save changes"), ButtonBar.ButtonData.YES);
+        ButtonType discardChanges = new ButtonType(Localization.lang("Discard changes"), ButtonBar.ButtonData.NO);
+        ButtonType cancel = new ButtonType(Localization.lang("Return to JabRef"), ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
+                Localization.lang("Save before closing"),
                 Localization.lang("Library '%0' has changed.", filename),
-                Localization.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION,
-                JOptionPane.WARNING_MESSAGE, null, options, options[2]);
-    }
+                saveChanges, discardChanges, cancel);
 
-    private void closeTab(Tab tab) {
-        closeTab(getBasePanel(tab));
-    }
-
-    private BasePanel getBasePanel(Tab tab) {
-        return (BasePanel) tab.getContent();
+        if (response.isPresent() && response.get().equals(saveChanges)) {
+            // The user wants to save.
+            try {
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(panel);
+                saveAction.runCommand();
+                if (saveAction.isCanceled() || !saveAction.isSuccess()) {
+                    // The action was either canceled or unsuccessful.
+                    output(Localization.lang("Unable to save library"));
+                    return false;
+                }
+            } catch (Throwable ex) {
+                return false;
+            }
+        } else return !response.isPresent() || !response.get().equals(cancel);
+        return false;
     }
 
     private void closeTab(BasePanel panel) {
@@ -1454,35 +1401,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
         AutosaveManager.shutdown(context);
         BackupManager.shutdown(context);
-    }
-
-    // Ask if the user really wants to close, if the base has not been saved
-    private boolean confirmClose(BasePanel panel) {
-        boolean close = false;
-        String filename;
-
-        filename = panel.getBibDatabaseContext()
-                .getDatabaseFile()
-                .map(File::getAbsolutePath)
-                .orElse(GUIGlobals.UNTITLED_TITLE);
-
-        int answer = showSaveDialog(filename);
-        if (answer == JOptionPane.YES_OPTION) {
-            // The user wants to save.
-            try {
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(panel);
-                saveAction.runCommand();
-                if (saveAction.isSuccess()) {
-                    close = true;
-                }
-            } catch (Throwable ex) {
-                // do not close
-            }
-        } else if (answer == JOptionPane.NO_OPTION) {
-            // discard changes
-            close = true;
-        }
-        return close;
     }
 
     private void removeTab(BasePanel panel) {
@@ -1528,72 +1446,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         return dialogService;
     }
 
-    private class GeneralAction extends MnemonicAwareAction {
-
-        private final Actions command;
-
-        public GeneralAction(Actions command, String text) {
-            this.command = command;
-            putValue(Action.NAME, text);
-        }
-
-        public GeneralAction(Actions command, String text, String description) {
-            this.command = command;
-            putValue(Action.NAME, text);
-            putValue(Action.SHORT_DESCRIPTION, description);
-        }
-
-        public GeneralAction(Actions command, String text, Icon icon) {
-            super(icon);
-
-            this.command = command;
-            putValue(Action.NAME, text);
-        }
-
-        public GeneralAction(Actions command, String text, String description, Icon icon) {
-            super(icon);
-
-            this.command = command;
-            putValue(Action.NAME, text);
-            putValue(Action.SHORT_DESCRIPTION, description);
-        }
-
-        public GeneralAction(Actions command, String text, KeyStroke key) {
-            this.command = command;
-            putValue(Action.NAME, text);
-            putValue(Action.ACCELERATOR_KEY, key);
-        }
-
-        public GeneralAction(Actions command, String text, String description, KeyStroke key) {
-            this.command = command;
-            putValue(Action.NAME, text);
-            putValue(Action.SHORT_DESCRIPTION, description);
-            putValue(Action.ACCELERATOR_KEY, key);
-        }
-
-        public GeneralAction(Actions command, String text, String description, KeyStroke key, Icon icon) {
-            super(icon);
-
-            this.command = command;
-            putValue(Action.NAME, text);
-            putValue(Action.SHORT_DESCRIPTION, description);
-            putValue(Action.ACCELERATOR_KEY, key);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (tabbedPane.getTabs().size() > 0) {
-                try {
-                    getCurrentBasePanel().runCommand(command);
-                } catch (Throwable ex) {
-                    LOGGER.error("Problem with executing command: " + command, ex);
-                }
-            } else {
-                LOGGER.info("Action '" + command + "' must be disabled when no database is open.");
-            }
-        }
-    }
-
     /**
      * The action concerned with closing the window.
      */
@@ -1602,7 +1454,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         @Override
         public void execute() {
             quit();
-            Platform.exit();
         }
     }
 

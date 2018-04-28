@@ -8,13 +8,11 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.JOptionPane;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.FontUIResource;
 
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -103,7 +101,7 @@ public class JabRefGUI {
             for (Iterator<ParserResult> parserResultIterator = bibDatabases.iterator(); parserResultIterator.hasNext();) {
                 ParserResult pr = parserResultIterator.next();
                 // Define focused tab
-                if (pr.getFile().get().getAbsolutePath().equals(focusedFile)) {
+                if (pr.getFile().filter(path -> path.getAbsolutePath().equals(focusedFile)).isPresent()) {
                     first = true;
                 }
 
@@ -119,9 +117,10 @@ public class JabRefGUI {
                         pr.getDatabase().clearSharedDatabaseID();
 
                         LOGGER.error("Connection error", e);
-                        JOptionPane.showMessageDialog(null,
-                                e.getMessage() + "\n\n" + Localization.lang("A local copy will be opened."),
-                                Localization.lang("Connection error"), JOptionPane.WARNING_MESSAGE);
+                        dialogService.showErrorDialogAndWait(
+                                Localization.lang("Connection error"),
+                                Localization.lang("A local copy will be opened."),
+                                e);
                     }
                     toOpenTab.add(pr);
                 } else if (pr.toOpenTab()) {
@@ -156,8 +155,10 @@ public class JabRefGUI {
         mainStage.show();
 
         mainStage.setOnCloseRequest(event -> {
-            mainFrame.quit();
-            Platform.exit();
+            boolean reallyQuit = mainFrame.quit();
+            if (!reallyQuit) {
+                event.consume();
+            }
         });
 
         for (ParserResult pr : failed) {
