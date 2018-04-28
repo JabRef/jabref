@@ -12,9 +12,6 @@ buildscript {
             url 'https://oss.sonatype.org/content/groups/public'
         }
     }
-    dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.2.0-M1'
-    }
 }
 
 plugins {
@@ -41,7 +38,6 @@ apply plugin: 'jacoco'
 apply plugin: 'install4j'
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'checkstyle'
-apply plugin: 'org.junit.platform.gradle.plugin'
 
 apply from: 'eclipse.gradle'
 apply from: 'localization.gradle'
@@ -154,10 +150,10 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.0.2'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.0.2'
 
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.0-RC1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0-RC1'
     testCompile 'org.junit.jupiter:junit-jupiter-params:5.2.0-RC1'
-    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.0-RC1'
-    testRuntime 'org.junit.vintage:junit-vintage-engine:5.2.0-RC1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.2.0-RC1'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.2.0-RC1'
     testCompile 'org.junit.platform:junit-platform-launcher:1.2.0-RC1'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
@@ -311,14 +307,16 @@ javadoc {
 }
 
 // Test tasks
-junitPlatform {
-    filters {
-        tags {
-            exclude 'DatabaseTest', 'FetcherTest', 'GUITest', 'org.jabref.testutils.category.FetcherTest', 'org.jabref.testutils.category.GUITest'
-        }
+test {
+    useJUnitPlatform {
+        excludeTags 'DatabaseTest', 'FetcherTest', 'GUITest', 'org.jabref.testutils.category.FetcherTest', 'org.jabref.testutils.category.GUITest'
     }
-
-    logManager 'org.apache.logging.log4j.jul.LogManager'
+    
+    testLogging {
+        // set options for log level LIFECYCLE
+        events "failed"
+        exceptionFormat "full"
+    }
 }
 
 task databaseTest(type: Test) {
@@ -355,8 +353,8 @@ tasks.withType(Test) {
 }
 
 task jacocoMerge(type: JacocoMerge) {
-    executionData file("$buildDir/jacoco/junitPlatformTest.exec"), file("$buildDir/jacoco/databaseTest.exec"), file("$buildDir/jacoco/fetcherTest.exec")
-    dependsOn junitPlatformTest, databaseTest, fetcherTest
+    executionData file("$buildDir/jacoco/test.exec"), file("$buildDir/jacoco/databaseTest.exec"), file("$buildDir/jacoco/fetcherTest.exec")
+    dependsOn test, databaseTest, fetcherTest
 }
 
 jacocoTestReport {
@@ -366,27 +364,6 @@ jacocoTestReport {
     reports {
         xml.enabled = true // coveralls plugin depends on xml format report
         html.enabled = true
-    }
-}
-
-afterEvaluate {
-    def junitPlatformTest = tasks.junitPlatformTest
-
-    jacoco {
-        applyTo(junitPlatformTest)
-    }
-
-    task jacocoJunit5TestReport(type: JacocoReport) {
-        executionData jacocoMerge.destinationFile
-        dependsOn jacocoMerge
-        sourceSets sourceSets.main
-        sourceDirectories = files(sourceSets.main.allSource.srcDirs)
-        classDirectories = files(sourceSets.main.output)
-
-        reports {
-            xml.enabled true
-            html.enabled true
-        }
     }
 }
 

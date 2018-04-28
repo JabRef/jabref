@@ -49,8 +49,7 @@ public class RisImporter extends Importer {
         List<BibEntry> bibitems = new ArrayList<>();
 
         //use optional here, so that no exception will be thrown if the file is empty
-        Optional<String> OptionalLines = reader.lines().reduce((line, nextline) -> line + "\n" + nextline);
-        String linesAsString = OptionalLines.isPresent() ? OptionalLines.get() : "";
+        String linesAsString = reader.lines().reduce((line, nextline) -> line + "\n" + nextline).orElse("");
 
         String[] entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
                 .split("ER  -.*\\n");
@@ -207,7 +206,7 @@ public class RisImporter extends Importer {
                         }
                     } else if ("U1".equals(tag) || "U2".equals(tag) || "N1".equals(tag)) {
                         if (!comment.isEmpty()) {
-                            comment = comment + " ";
+                            comment = comment + OS.NEWLINE;
                         }
                         comment = comment + value;
                     }  else if ("M3".equals(tag) || "DO".equals(tag)) {
@@ -269,7 +268,7 @@ public class RisImporter extends Importer {
             BibEntry entry = new BibEntry(type);
             entry.setField(fields);
             // month has a special treatment as we use the separate method "setMonth" of BibEntry instead of directly setting the value
-            month.ifPresent(parsedMonth -> entry.setMonth(parsedMonth));
+            month.ifPresent(entry::setMonth);
             bibitems.add(entry);
 
         }
