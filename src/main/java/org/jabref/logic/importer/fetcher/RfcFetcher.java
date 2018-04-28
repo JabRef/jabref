@@ -1,6 +1,9 @@
 package org.jabref.logic.importer.fetcher;
 
-import org.apache.http.client.utils.URIBuilder;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
@@ -9,9 +12,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import org.apache.http.client.utils.URIBuilder;
 
 /*
  * https://datatracker.ietf.org
@@ -30,7 +31,7 @@ public class RfcFetcher implements IdBasedParserFetcher {
     public String getName() {
         return "RFC";
     }
-    
+
     @Override
     public HelpFile getHelpPage() {
         return HelpFile.FETCHER_RFC;
@@ -38,9 +39,9 @@ public class RfcFetcher implements IdBasedParserFetcher {
 
     @Override
     public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
-        // Add "rfc" prefix if user's search entry was only digits
-        identifier = (!identifier.startsWith("rfc")) ? "rfc" + identifier : identifier;
-        
+        // Add "rfc" prefix if user's search entry was numerical
+        identifier = (!identifier.toLowerCase().startsWith("rfc")) ? "rfc" + identifier : identifier;
+
         URIBuilder uriBuilder = new URIBuilder("https://datatracker.ietf.org/doc/" + identifier + "/bibtex/");
 
         return uriBuilder.build().toURL();
