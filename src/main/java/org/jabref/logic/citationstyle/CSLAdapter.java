@@ -83,10 +83,13 @@ public class CSLAdapter {
 
         /**
          * Converts the {@link BibEntry} into {@link CSLItemData}.
+         *
+         * Clone bibEntry to make a save changes,
+         * Change month field from JabRefFormat <code>#mon#</> to ShortName <code>mon</code>
+         * because CSL does not support JabRefFormat.
          */
         private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry) {
 
-            // create a copy of bibEntry
             bibEntry = (BibEntry) bibEntry.clone();
 
             String citeKey = bibEntry.getCiteKeyOptional().orElse("");
@@ -97,7 +100,6 @@ public class CSLAdapter {
             RemoveNewlinesFormatter removeNewlinesFormatter = new RemoveNewlinesFormatter();
             for (String key : bibEntry.getFieldMap().keySet()) {
                 if (FieldName.MONTH.equals(key)) {
-                    // change month field value from "#mon#" to "mon"
                     bibEntry.getFieldMap().put(FieldName.MONTH, bibEntry.getMonth().get().getShortName());
                 }
 
