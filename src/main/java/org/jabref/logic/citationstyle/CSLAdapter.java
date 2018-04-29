@@ -84,14 +84,10 @@ public class CSLAdapter {
         /**
          * Converts the {@link BibEntry} into {@link CSLItemData}.
          *
-         * Clone bibEntry to make a save changes,
          * Change month field from JabRefFormat <code>#mon#</> to ShortName <code>mon</code>
          * because CSL does not support JabRefFormat.
          */
         private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry) {
-
-            bibEntry = (BibEntry) bibEntry.clone();
-
             String citeKey = bibEntry.getCiteKeyOptional().orElse("");
             BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType()), new Key(citeKey));
 
@@ -99,14 +95,15 @@ public class CSLAdapter {
             HTMLChars latexToHtmlConverter = new HTMLChars();
             RemoveNewlinesFormatter removeNewlinesFormatter = new RemoveNewlinesFormatter();
             for (String key : bibEntry.getFieldMap().keySet()) {
-                if (FieldName.MONTH.equals(key)) {
-                    bibEntry.getFieldMap().put(FieldName.MONTH, bibEntry.getMonth().get().getShortName());
-                }
-
                 bibEntry.getField(key)
                         .map(removeNewlinesFormatter::format)
                         .map(latexToHtmlConverter::format)
-                        .ifPresent(value -> bibTeXEntry.addField(new Key(key), new DigitStringValue(value)));
+                        .ifPresent(value -> {
+                            if((FieldName.MONTH.equals(key))){
+                                value = bibEntry.getMonth().get().getShortName();
+                            }
+                            bibTeXEntry.addField(new Key(key), new DigitStringValue(value));
+                        });
             }
             return BIBTEX_CONVERTER.toItemData(bibTeXEntry);
         }
