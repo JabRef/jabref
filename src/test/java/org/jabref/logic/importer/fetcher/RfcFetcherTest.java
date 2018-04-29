@@ -71,7 +71,7 @@ public class RfcFetcherTest {
     }
 
     @Test
-    public void performSearchByIdThrowsExceptionWithInvalidIdentifier() throws Exception {
+    public void performSearchByIdFindsNothingWithInvalidIdentifier() throws Exception {
         assertEquals(Optional.empty(), fetcher.performSearchById("banana"));
     }
 }
