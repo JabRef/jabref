@@ -64,50 +64,71 @@ import org.slf4j.LoggerFactory;
 public class GlobalSearchBar extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchBar.class);
 
+    // search configuration
     private static final int SEARCH_DELAY = 400;
-    private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
-    private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("resultsFound");
 
+    // ui elements
     private final JabRefFrame frame;
-
     private final TextField searchField = SearchTextField.create();
-    private final JToggleButton caseSensitive;
-    private final JToggleButton regularExp;
-    private final JButton searchModeButton = new JButton();
     private final JLabel currentResults = new JLabel("");
     private final SearchQueryHighlightObservable searchQueryHighlightObservable = new SearchQueryHighlightObservable();
     private final JButton openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
     private final JFXPanel container;
+    private final JLabel searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getIcon());
+    private SearchResultFrame searchResultFrame;
+    // ui configuration
+    private final JToggleButton caseSensitive;
+    private final JToggleButton regularExp;
+    private final JToggleButton globalSearch;
+    private final JButton searchModeButton = new JButton();
+    private SearchDisplayMode searchDisplayMode;
+
     private SearchWorker searchWorker;
     private GlobalSearchWorker globalSearchWorker;
 
-    private SearchResultFrame searchResultFrame;
+    private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
+    private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("resultsFound");
 
-    private SearchDisplayMode searchDisplayMode;
-
-    private final JLabel searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getIcon());
-
-    /**
-     * if this flag is set the searchbar won't be selected after the next search
-     */
+    // if this flag is set the search bar won't be selected after the next search
     private boolean dontSelectSearchBar;
 
     public GlobalSearchBar(JabRefFrame frame) {
-        super();
         this.frame = Objects.requireNonNull(frame);
+
         SearchPreferences searchPreferences = new SearchPreferences(Globals.prefs);
         searchDisplayMode = searchPreferences.getSearchMode();
 
-        // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the frame width is too small
+        // fits the standard "found x entries"-message thus hinders the search bar to jump around while searching if the frame width is too small
         currentResults.setPreferredSize(new Dimension(150, 5));
         currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
 
+        // initialize search modes
+        globalSearch = initGlobalSearch(searchPreferences);
+        regularExp = initRegexSearch(searchPreferences);
+        caseSensitive = initCaseSensitiveSearch(searchPreferences);
+
+        updateSearchModeButtonText();
+        searchModeButton.addActionListener(event -> toggleSearchModeAndSearch());
+
+        initSearchDelay();
+
+        container = CustomJFXPanel.create();
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            Scene scene = new Scene(searchField);
+            scene.getStylesheets().add(AbstractView.class.getResource("Main.css").toExternalForm());
+            container.setScene(scene);
+            container.addKeyListener(new SearchKeyAdapter());
+        });
+
+        initToolbar();
+    }
+
+    private JToggleButton initGlobalSearch(SearchPreferences searchPreferences) {
         JToggleButton globalSearch = new JToggleButton(IconTheme.JabRefIcon.GLOBAL_SEARCH.getSmallIcon(), searchPreferences.isGlobalSearch());
         globalSearch.setToolTipText(Localization.lang("Search in all open libraries"));
 
         // default action to be performed for toggling globalSearch
         AbstractAction globalSearchStandardAction = new AbstractAction() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 searchPreferences.setGlobalSearch(globalSearch.isSelected());
@@ -117,7 +138,6 @@ public class GlobalSearchBar extends JPanel {
 
         // additional action for global search shortcut
         AbstractAction globalSearchShortCutAction = new AbstractAction() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 globalSearch.setSelected(true);
@@ -143,40 +163,10 @@ public class GlobalSearchBar extends JPanel {
         openCurrentResultsInDialog.setEnabled(false);
         updateOpenCurrentResultsTooltip(globalSearch.isSelected());
 
-        regularExp = new JToggleButton(IconTheme.JabRefIcon.REG_EX.getSmallIcon(),
-                searchPreferences.isRegularExpression());
-        regularExp.setToolTipText(Localization.lang("regular expression"));
-        regularExp.addActionListener(event -> {
-            searchPreferences.setRegularExpression(regularExp.isSelected());
-            performSearch();
-        });
+        return globalSearch;
+    }
 
-        caseSensitive = new JToggleButton(IconTheme.JabRefIcon.CASE_SENSITIVE.getSmallIcon(),
-                searchPreferences.isCaseSensitive());
-        caseSensitive.setToolTipText(Localization.lang("Case sensitive"));
-        caseSensitive.addActionListener(event -> {
-            searchPreferences.setCaseSensitive(caseSensitive.isSelected());
-            performSearch();
-        });
-
-        updateSearchModeButtonText();
-        searchModeButton.addActionListener(event -> toggleSearchModeAndSearch());
-
-        //Add a delay of SEARCH_DELAY milliseconds before starting search
-        Timer searchTask = FxTimer.create(Duration.ofMillis(SEARCH_DELAY), () -> {
-            LOGGER.debug("Run search " + searchField.getText());
-            performSearch();
-        });
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
-
-        container = CustomJFXPanel.create();
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            Scene scene = new Scene(searchField);
-            scene.getStylesheets().add(AbstractView.class.getResource("Main.css").toExternalForm());
-            container.setScene(scene);
-            container.addKeyListener(new SearchKeyAdapter());
-        });
-
+    private void initToolbar() {
         setLayout(new FlowLayout(FlowLayout.RIGHT));
         JToolBar toolBar = new OSXCompatibleToolbar();
         toolBar.setFloatable(false);
@@ -193,6 +183,36 @@ public class GlobalSearchBar extends JPanel {
         toolBar.addSeparator();
         toolBar.add(currentResults);
         this.add(toolBar);
+    }
+
+    private void initSearchDelay() {
+        // Add a delay of SEARCH_DELAY milliseconds before starting search
+        Timer searchTask = FxTimer.create(Duration.ofMillis(SEARCH_DELAY), () -> {
+            LOGGER.debug("Run search " + searchField.getText());
+            performSearch();
+        });
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
+    }
+
+    private JToggleButton initCaseSensitiveSearch(SearchPreferences searchPreferences) {
+        JToggleButton caseSensitive = new JToggleButton(IconTheme.JabRefIcon.CASE_SENSITIVE.getSmallIcon(),
+                searchPreferences.isCaseSensitive());
+        caseSensitive.setToolTipText(Localization.lang("Case sensitive"));
+        caseSensitive.addActionListener(event -> {
+            searchPreferences.setCaseSensitive(caseSensitive.isSelected());
+            performSearch();
+        });
+        return caseSensitive;
+    }
+
+    private JToggleButton initRegexSearch(SearchPreferences searchPreferences) {
+        JToggleButton regularExp = new JToggleButton(IconTheme.JabRefIcon.REG_EX.getSmallIcon(), searchPreferences.isRegularExpression());
+        regularExp.setToolTipText(Localization.lang("regular expression"));
+        regularExp.addActionListener(event -> {
+            searchPreferences.setRegularExpression(regularExp.isSelected());
+            performSearch();
+        });
+        return regularExp;
     }
 
     public void performGlobalSearch() {
@@ -423,16 +443,13 @@ public class GlobalSearchBar extends JPanel {
     }
 
     private class SearchKeyAdapter extends KeyAdapter {
-
         @Override
         public void keyPressed(KeyEvent e) {
             switch (e.getKeyCode()) {
-
                 // Clear search bar and select first entry, if available
                 case KeyEvent.VK_ESCAPE:
                     clearOnEsc();
                     break;
-
                 //This "hack" prevents that the focus moves out of the field
                 case KeyEvent.VK_RIGHT:
                 case KeyEvent.VK_LEFT:
@@ -444,7 +461,7 @@ public class GlobalSearchBar extends JPanel {
                     //do nothing
             }
 
-            //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
+            // we need to consume this event here to prevent the propagation of key binding events back to the JFrame
             Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
