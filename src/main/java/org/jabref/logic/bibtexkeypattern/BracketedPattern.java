@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
  * BibTeX entry "@Article{ authors = {O. Kitsune}, year = {2017}, pages={123-6}}".
  */
 public class BracketedPattern {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(BracketedPattern.class);
 
     private static final String STARTING_CAPITAL_PATTERN = "[^A-Z]";
