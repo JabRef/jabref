@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RenamePdfCleanup implements CleanupJob {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(RenamePdfCleanup.class);
 
     private final BibDatabaseContext databaseContext;
