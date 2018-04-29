@@ -61,14 +61,12 @@ import org.reactfx.util.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("Duplicates")
 public class GlobalSearchBar extends JPanel {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchBar.class);
 
     private static final int SEARCH_DELAY = 400;
     private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
-    private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
+    private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("resultsFound");
 
     private final JabRefFrame frame;
 
