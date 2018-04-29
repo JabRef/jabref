@@ -125,35 +125,6 @@ public class GlobalSearchBar extends JPanel {
                 focus();
             }
         };
-        //TODO: These have to be somehow converted
-        /*
-        String endSearch = "endSearch";
-        searchField.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLEAR_SEARCH), endSearch);
-        searchField.getActionMap().put(endSearch, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                if (autoCompleteSupport.isVisible()) {
-                    autoCompleteSupport.setVisible(false);
-                } else {
-                    endSearch();
-                }
-            }
-        });
-        */
-
-        /*
-        String acceptSearch = "acceptSearch";
-        searchField.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.ACCEPT), acceptSearch);
-        searchField.getActionMap().put(acceptSearch, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                autoCompleteSupport.setVisible(false);
-                BasePanel currentBasePanel = frame.getCurrentBasePanel();
-                Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
-                currentBasePanel.getMainTable().requestFocus();
-            }
-        });
-        */
 
         String searchGlobalByKey = "searchGlobalByKey";
         globalSearch.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(Globals.getKeyPrefs().getKey(KeyBinding.GLOBAL_SEARCH), searchGlobalByKey);
