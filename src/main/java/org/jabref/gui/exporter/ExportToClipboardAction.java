@@ -28,16 +28,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ExportToClipboardAction extends AbstractWorker {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportToClipboardAction.class);
 
     private final JabRefFrame frame;
 
-    /**
-     * written by run() and read by update()
-     */
+    // written by run() and read by update()
     private String message;
-
 
     public ExportToClipboardAction(JabRefFrame frame) {
         this.frame = Objects.requireNonNull(frame);
@@ -55,9 +51,8 @@ public class ExportToClipboardAction extends AbstractWorker {
             return;
         }
 
-        List<Exporter> exporters = Globals.exportFactory.getExporters();
-        exporters.sort(Comparator.comparing(Exporter::getDisplayName));
-        List<String> exportFormatDisplayNames = exporters.stream().map(Exporter::getDisplayName).collect(Collectors.toList());
+        List<Exporter> sortedExporters = Globals.exportFactory.getExporters().stream().sorted(Comparator.comparing(Exporter::getDisplayName)).collect(Collectors.toList());
+        List<String> exportFormatDisplayNames = sortedExporters.stream().map(Exporter::getDisplayName).collect(Collectors.toList());
 
         JList<String> list = new JList<>(exportFormatDisplayNames.toArray(new String[exportFormatDisplayNames.size()]));
         list.setBorder(BorderFactory.createEtchedBorder());
@@ -72,7 +67,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             return;
         }
 
-        Exporter exporter = exporters.get(list.getSelectedIndex());
+        Exporter exporter = sortedExporters.get(list.getSelectedIndex());
 
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
