@@ -8,10 +8,11 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -48,7 +49,9 @@ public class ExportToClipboardAction extends AbstractWorker {
             return;
         }
 
-        List<Exporter> exporters = Globals.exportFactory.getExporters().stream().sorted(Comparator.comparing(Exporter::getDisplayName)).collect(Collectors.toList());
+        List<Exporter> exporters = Globals.exportFactory.getExporters().stream()
+                                                        .sorted(Comparator.comparing(Exporter::getDisplayName))
+                                                        .collect(Collectors.toList());
 
         Optional<Exporter> selectedExporter = frame.getDialogService().showChoiceDialogAndWait(Localization.lang("Export"), Localization.lang("Select export format"),
                 Localization.lang("Export"), exporters);
