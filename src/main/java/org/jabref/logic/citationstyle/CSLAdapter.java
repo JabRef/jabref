@@ -99,7 +99,7 @@ public class CSLAdapter {
                         .map(removeNewlinesFormatter::format)
                         .map(latexToHtmlConverter::format)
                         .ifPresent(value -> {
-                            if((FieldName.MONTH.equals(key))){
+                            if (FieldName.MONTH.equals(key)) {
                                 value = bibEntry.getMonth().get().getShortName();
                             }
                             bibTeXEntry.addField(new Key(key), new DigitStringValue(value));
