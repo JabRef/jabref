@@ -98,6 +98,9 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         fxFontTweaksLAF = new JCheckBox(Localization.lang("Tweak font rendering for entry editor on Linux"));
         // Only list L&F which are available
         Set<String> lookAndFeels = LookAndFeel.getAvailableLookAndFeels();
+
+        System.out.println(lookAndFeels);
+
         classNamesLAF = new JComboBox<>(lookAndFeels.toArray(new String[lookAndFeels.size()]));
         classNamesLAF.setEditable(true);
         customLAF.addChangeListener(e -> classNamesLAF.setEnabled(((JCheckBox) e.getSource()).isSelected()));
