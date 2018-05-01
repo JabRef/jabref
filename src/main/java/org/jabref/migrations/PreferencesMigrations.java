@@ -288,7 +288,8 @@ public class PreferencesMigrations {
         String currentLandF = prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
 
         Stream.of("com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
-                "com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel")
+                "com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel",
+                "com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
                 .filter(style -> style.equals(currentLandF))
                 .findAny()
                 .ifPresent(loolAndFeel -> {
