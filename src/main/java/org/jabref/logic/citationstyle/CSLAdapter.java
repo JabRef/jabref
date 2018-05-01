@@ -15,6 +15,7 @@ import de.undercouch.citeproc.ItemDataProvider;
 import de.undercouch.citeproc.bibtex.BibTeXConverter;
 import de.undercouch.citeproc.csl.CSLItemData;
 import de.undercouch.citeproc.output.Bibliography;
+import org.jabref.model.entry.FieldName;
 import org.jbibtex.BibTeXEntry;
 import org.jbibtex.DigitStringValue;
 import org.jbibtex.Key;
@@ -84,6 +85,14 @@ public class CSLAdapter {
          * Converts the {@link BibEntry} into {@link CSLItemData}.
          */
         private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry) {
+
+            // create a copy of bibEntry
+            bibEntry = (BibEntry) bibEntry.clone();
+            // change month field from "#mon#" to "mon"
+            if((bibEntry.getFieldMap().get(FieldName.MONTH) != null) && !bibEntry.getFieldMap().get(FieldName.MONTH).isEmpty()){
+                bibEntry.getFieldMap().put(FieldName.MONTH, bibEntry.getMonth().get().getShortName());
+            }
+
             String citeKey = bibEntry.getCiteKeyOptional().orElse("");
             BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType()), new Key(citeKey));
 
