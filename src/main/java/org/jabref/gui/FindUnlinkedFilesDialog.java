@@ -542,7 +542,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
      * The export itself will run in a seperate thread, whilst this dialog will
      * be showing a progress bar, until the thread has finished its work. <br>
      * <br>
-     * When the export has finished, the {@link #exportFinishedHandler(java.util.List)} is
+     * When the export has finished, the {@link #exportFinishedHandler()} is
      * invoked.
      */
     private void startExport() {
@@ -558,19 +558,10 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
             return;
         }
 
-        progressBarImporting.setVisible(true);
-        labelExportingInfo.setVisible(true);
         buttonExport.setVisible(false);
         buttonApply.setVisible(false);
         buttonClose.setVisible(false);
         disOrEnableDialog(false);
-
-        labelExportingInfo.setEnabled(true);
-
-        progressBarImporting.setMinimum(0);
-        progressBarImporting.setMaximum(fileList.size());
-        progressBarImporting.setValue(0);
-        progressBarImporting.setString("");
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
@@ -579,18 +570,18 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
         Optional<Path> exportPath = DefaultTaskExecutor
                 .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
 
+        if (!exportPath.isPresent()) {
+            exportFinishedHandler();
+            return;
+        }
+
         threadState.set(true);
         JabRefExecutorService.INSTANCE.execute(() -> {
             try (BufferedWriter writer =
                          Files.newBufferedWriter(exportPath.get(), StandardCharsets.UTF_8,
                                  StandardOpenOption.CREATE)) {
-                int counter = 0;
                 for (File file : fileList) {
                     writer.write(file.toString() + "\n");
-                    counter++;
-                    progressBarImporting.setValue(counter);
-                    progressBarImporting.setString(Localization.lang("%0 of %1", Integer.toString(counter),
-                            Integer.toString(progressBarImporting.getMaximum())));
                 }
 
             } catch (IOException e) {
@@ -601,11 +592,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
         exportFinishedHandler();
     }
 
-    /**
-     */
     private void exportFinishedHandler() {
-        progressBarImporting.setVisible(false);
-        labelExportingInfo.setVisible(false);
         buttonExport.setVisible(true);
         buttonApply.setVisible(true);
         buttonClose.setVisible(true);
@@ -697,10 +684,8 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
          * Actions on this button will start the import of all file of all
          * selected nodes in this dialogs tree view. <br>
          */
-        ActionListener actionListenerImportEntrys = e -> startImport();
-        ActionListener actionListenerExportEntrys = e -> startExport();
-        buttonExport.addActionListener(actionListenerExportEntrys);
-        buttonApply.addActionListener(actionListenerImportEntrys);
+        buttonExport.addActionListener(e -> startExport());
+        buttonApply.addActionListener(e -> startImport());
         buttonClose.addActionListener(e -> dispose());
     }
 
