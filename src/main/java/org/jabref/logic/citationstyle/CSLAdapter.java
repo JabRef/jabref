@@ -10,6 +10,7 @@ import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.Month;
 
 import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.ItemDataProvider;
@@ -100,7 +101,7 @@ public class CSLAdapter {
                         .map(latexToHtmlConverter::format)
                         .ifPresent(value -> {
                             if (FieldName.MONTH.equals(key)) {
-                                value = bibEntry.getMonth().get().getShortName();
+                                value = bibEntry.getMonth().map(Month::getShortName).orElse(value);
                             }
                             bibTeXEntry.addField(new Key(key), new DigitStringValue(value));
                         });
