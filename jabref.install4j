@@ -438,7 +438,11 @@ return console.askOkCancel(message, true);
               <action name="" id="132" customizedId="" beanClass="com.install4j.runtime.beans.actions.UninstallPreviousAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" rollbackBarrierExitCode="1" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.UninstallPreviousAction" />
+                    <object class="com.install4j.runtime.beans.actions.UninstallPreviousAction">
+                      <void property="onlyIfSameApplicationId">
+                        <boolean>false</boolean>
+                      </void>
+                    </object>
                   </java>
                 </serializedBean>
                 <condition />
