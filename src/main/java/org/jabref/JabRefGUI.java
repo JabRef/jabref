@@ -1,5 +1,6 @@
 package org.jabref;
 
+import java.awt.Font;
 import java.awt.Frame;
 import java.io.File;
 import java.sql.SQLException;
@@ -285,7 +286,7 @@ public class JabRefGUI {
             Enumeration<Object> keys = defaults.keys();
             for (Object key : Collections.list(keys)) {
                 if ((key instanceof String) && ((String) key).endsWith(".font")) {
-                    FontUIResource font = (FontUIResource) UIManager.get(key);
+                    Font font = (Font) UIManager.get(key);
                     font = new FontUIResource(font.getName(), font.getStyle(), fontSize);
                     defaults.put(key, font);
                 }
