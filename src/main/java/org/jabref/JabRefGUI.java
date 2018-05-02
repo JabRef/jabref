@@ -239,9 +239,8 @@ public class JabRefGUI {
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL)) {
                 // FIXME: Problems with GTK L&F on Linux and Mac. Needs reevaluation for Java9
                 if (GTK_LF_CLASSNAME.equals(systemLookFeel)) {
-                    // Metal L&F
                     lookFeel = NIMBUS_LOOK_AND_FEEL;
-                    LOGGER.warn("There seem to be problems with OGTK Look&Feel. Using Nimbus L&F instead. Change to another L&F with caution.");
+                    LOGGER.warn("There seems to be problems with GTK Look&Feel. Using Nimbus L&F instead. Change to another L&F with caution.");
                 } else {
                     lookFeel = systemLookFeel;
                 }
@@ -249,7 +248,8 @@ public class JabRefGUI {
                 lookFeel = Globals.prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
             }
 
-            if (UIManager.getCrossPlatformLookAndFeelClassName().equals(lookFeel) && !GTK_LF_CLASSNAME.equals(lookFeel)) {
+            //Prevent metal l&f
+            if (UIManager.getCrossPlatformLookAndFeelClassName().equals(lookFeel)) {
                 UIManager.setLookAndFeel(NIMBUS_LOOK_AND_FEEL);
             } else {
                 try {
