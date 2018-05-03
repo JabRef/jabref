@@ -50,6 +50,11 @@ public class FieldCheckers {
         fieldCheckers.put(FieldName.YEAR, new YearChecker());
         fieldCheckers.put(FieldName.KEY, new ValidBibtexKeyChecker(enforceLegalKey));
 
+        if (databaseContext.isBiblatexMode()) {
+            fieldCheckers.put(FieldName.DATE, new DateChecker());
+            fieldCheckers.put(FieldName.URLDATE, new DateChecker());
+        }
+
         return fieldCheckers;
     }
 

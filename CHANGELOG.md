@@ -12,6 +12,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 We added RFC, a new entry generator ID type. [#3971](https://github.com/JabRef/jabref/issues/3971)
+We added a validity check for dates in the `date` and `urldate` fields.
+
 ### Fixed
 We fixed an issue where the export to clipboard functionality could not be invoked [#3994](https://github.com/JabRef/jabref/issues/3994)
 
