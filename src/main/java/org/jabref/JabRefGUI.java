@@ -1,5 +1,6 @@
 package org.jabref;
 
+import java.awt.Font;
 import java.awt.Frame;
 import java.io.File;
 import java.sql.SQLException;
@@ -39,7 +40,10 @@ import org.slf4j.LoggerFactory;
 
 public class JabRefGUI {
 
+    private static final String NIMBUS_LOOK_AND_FEEL = "javax.swing.plaf.nimbus.NimbusLookAndFeel";
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
+    private static final String GTK_LF_CLASSNAME = "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
+
     private static JabRefFrame mainFrame;
 
     private final List<ParserResult> bibDatabases;
@@ -54,7 +58,10 @@ public class JabRefGUI {
         this.isBlank = isBlank;
 
         // passed file (we take the first one) should be focused
-        focusedFile = argsDatabases.stream().findFirst().flatMap(ParserResult::getFile).map(File::getAbsolutePath)
+        focusedFile = argsDatabases.stream()
+                .findFirst()
+                .flatMap(ParserResult::getFile)
+                .map(File::getAbsolutePath)
                 .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
 
         openWindow();
@@ -230,13 +237,10 @@ public class JabRefGUI {
             String systemLookFeel = UIManager.getSystemLookAndFeelClassName();
 
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL)) {
-                // FIXME: Problems with OpenJDK and GTK L&F
-                // See https://github.com/JabRef/jabref/issues/393, https://github.com/JabRef/jabref/issues/638
-                if (System.getProperty("java.runtime.name").contains("OpenJDK")) {
-                    // Metal L&F
-                    lookFeel = UIManager.getCrossPlatformLookAndFeelClassName();
-                    LOGGER.warn(
-                            "There seem to be problems with OpenJDK and the default GTK Look&Feel. Using Metal L&F instead. Change to another L&F with caution.");
+                // FIXME: Problems with GTK L&F on Linux and Mac. Needs reevaluation for Java9
+                if (GTK_LF_CLASSNAME.equals(systemLookFeel)) {
+                    lookFeel = NIMBUS_LOOK_AND_FEEL;
+                    LOGGER.warn("There seems to be problems with GTK Look&Feel. Using Nimbus L&F instead. Change to another L&F with caution.");
                 } else {
                     lookFeel = systemLookFeel;
                 }
@@ -244,11 +248,9 @@ public class JabRefGUI {
                 lookFeel = Globals.prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
             }
 
-            // FIXME: Open JDK problem
-            if (UIManager.getCrossPlatformLookAndFeelClassName().equals(lookFeel)
-                    && !System.getProperty("java.runtime.name").contains("OpenJDK")) {
-                // try to avoid ending up with the ugly Metal L&F
-                UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            //Prevent metal l&f
+            if (UIManager.getCrossPlatformLookAndFeelClassName().equals(lookFeel)) {
+                UIManager.setLookAndFeel(NIMBUS_LOOK_AND_FEEL);
             } else {
                 try {
                     UIManager.setLookAndFeel(lookFeel);
@@ -285,7 +287,7 @@ public class JabRefGUI {
             Enumeration<Object> keys = defaults.keys();
             for (Object key : Collections.list(keys)) {
                 if ((key instanceof String) && ((String) key).endsWith(".font")) {
-                    FontUIResource font = (FontUIResource) UIManager.get(key);
+                    Font font = (Font) UIManager.get(key);
                     font = new FontUIResource(font.getName(), font.getStyle(), fontSize);
                     defaults.put(key, font);
                 }
