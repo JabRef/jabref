@@ -49,7 +49,8 @@ public class OpenOfficeSidePanel extends SidePaneComponent {
     @Override
     protected Node createContentPane() {
         SwingNode swingNode = new SwingNode();
-        SwingUtilities.invokeLater(() -> swingNode.setContent(new OpenOfficePanel(frame).getContent()));
+        // TODO: OO, Java 9
+        //SwingUtilities.invokeLater(() -> swingNode.setContent(new OpenOfficePanel(frame).getContent()));
         return swingNode;
     }
 

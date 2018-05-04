@@ -132,8 +132,6 @@ import org.jabref.preferences.LastFocusedTabPreferences;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import org.eclipse.fx.ui.controls.tabpane.DndTabPane;
-import org.eclipse.fx.ui.controls.tabpane.DndTabPaneFactory;
 import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -214,8 +212,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         sidePaneManager = new SidePaneManager(Globals.prefs, this);
         sidePane = sidePaneManager.getPane();
 
-        Pane containerPane = DndTabPaneFactory.createDefaultDnDPane(DndTabPaneFactory.FeedbackType.MARKER, null);
-        tabbedPane = (DndTabPane) containerPane.getChildren().get(0);
+        //Pane containerPane = DndTabPaneFactory.createDefaultDnDPane(DndTabPaneFactory.FeedbackType.MARKER, null);
+        tabbedPane = new TabPane();
 
         initLayout();
 
@@ -1024,7 +1022,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 saveAs, saveSelectedAs, saveSelectedAsPlain, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
                 unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, copyKeyAndLink, editPreamble, editStrings,
                 groupSidePane.getToggleCommand(), makeKeyAction, normalSearch, generalFetcher.getToggleCommand(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
-                sendAsEmail, downloadFullText, lookupIdentifiers, writeXmpAction, /*openOfficePanel.getToggleCommand(),*/ findUnlinkedFiles, addToGroup, removeFromGroup,
+                sendAsEmail, downloadFullText, lookupIdentifiers, writeXmpAction, /*openOfficePanel.getToggleCommand(), findUnlinkedFiles, addToGroup, removeFromGroup,
                 moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
                 dupliCheck, autoSetFile, newEntryAction, newSpec, customizeAction, plainTextImport, getMassSetField(), getManageKeywords(),
                 pushExternalButton.getMenuAction(), closeDatabaseAction, getNextPreviewStyleAction(), getPreviousPreviewStyleAction(), checkIntegrity,

@@ -29,10 +29,12 @@ open module org.jabref {
 	requires javafx.controls;
 	requires javafx.web;
 	requires javafx.fxml;
-	requires customjfx;
 	requires afterburner.fx;
-	requires de.jensd.fx.glyphs.commons;
-	requires de.jensd.fx.glyphs.materialdesignicons;
+//	requires de.jensd.fx.glyphs.commons;
+//	requires de.jensd.fx.glyphs.materialdesignicons;
+
+    provides com.airhacks.afterburner.views.ResourceLocator
+        with org.jabref.gui.util.JabRefResourceLocator;
 
 	// Logging
 	requires org.slf4j;
@@ -54,8 +56,10 @@ open module org.jabref {
 	requires commons.logging;
 	requires com.google.common;
 	requires spin;
+    requires easybind;
+    requires de.jensd.fx.glyphs.commons;
 
-	// Libre Office
+    // Libre Office
 	/*requires ridl;
 	requires unoil;
 	requires juh;*/
