@@ -1,7 +1,6 @@
 package org.jabref;
 
 import java.awt.Font;
-import java.awt.Frame;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import java.util.List;
 
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.FontUIResource;
 
 import javafx.scene.Scene;
@@ -24,7 +22,6 @@ import org.jabref.gui.FXDialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.dialogs.BackupUIManager;
-import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
@@ -241,41 +238,7 @@ public class JabRefGUI {
 
     private void setLookAndFeel() {
         try {
-            String lookFeel;
-            String systemLookFeel = UIManager.getSystemLookAndFeelClassName();
-
-            if (Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL)) {
-                // FIXME: Problems with GTK L&F on Linux and Mac. Needs reevaluation for Java9
-                if (GTK_LF_CLASSNAME.equals(systemLookFeel)) {
-                    lookFeel = NIMBUS_LOOK_AND_FEEL;
-                    LOGGER.warn("There seems to be problems with GTK Look&Feel. Using Nimbus L&F instead. Change to another L&F with caution.");
-                } else {
-                    lookFeel = systemLookFeel;
-                }
-            } else {
-                lookFeel = Globals.prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
-            }
-
-            //Prevent metal l&f
-            if (UIManager.getCrossPlatformLookAndFeelClassName().equals(lookFeel)) {
-                UIManager.setLookAndFeel(NIMBUS_LOOK_AND_FEEL);
-            } else {
-                try {
-                    UIManager.setLookAndFeel(lookFeel);
-                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
-                        UnsupportedLookAndFeelException e) {
-                    // specified look and feel does not exist on the classpath, so use system l&f
-                    UIManager.setLookAndFeel(systemLookFeel);
-                    // also set system l&f as default
-                    Globals.prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, systemLookFeel);
-                    // notify the user
-
-                    LOGGER.warn("Unable to find requested look and feel", e);
-                    dialogService.showWarningDialogAndWait(Localization.lang("Warning"),
-                            Localization.lang("Unable to find the requested look and feel and thus the default one is used."));
-
-                }
-            }
+            UIManager.setLookAndFeel(NIMBUS_LOOK_AND_FEEL);
 
             // On Linux, Java FX fonts look blurry per default. This can be improved by using a non-default rendering
             // setting. See https://github.com/woky/javafx-hates-linux
