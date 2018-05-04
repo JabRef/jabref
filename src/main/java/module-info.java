@@ -1,5 +1,20 @@
-module org.jabref {
+open module org.jabref {
     exports org.jabref;
+
+    exports org.jabref.gui;
+    exports org.jabref.gui.logging;
+    exports org.jabref.gui.maintable;
+    exports org.jabref.gui.specialfields;
+
+    exports org.jabref.model.database;
+
+    exports org.jabref.logic;
+    exports org.jabref.logic.citationstyle;
+    exports org.jabref.logic.search;
+
+//    opens org.jabref.gui to com.google.common;
+//    opens org.jabref.model.database to com.google.common;
+//    opens org.jabref.logic.citationstyle to com.google.common;
 
     // Swing
 	requires java.desktop;
