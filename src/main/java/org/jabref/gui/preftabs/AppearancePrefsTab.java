@@ -20,7 +20,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -32,6 +31,7 @@ import org.slf4j.LoggerFactory;
 class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppearancePrefsTab.class);
+    private static final String GTK_LF_CLASSNAME = "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
 
     private final JabRefPreferences prefs;
 
@@ -56,7 +56,10 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     static class LookAndFeel {
 
         public static Set<String> getAvailableLookAndFeels() {
-            return Arrays.stream(UIManager.getInstalledLookAndFeels()).map(LookAndFeelInfo::getClassName).collect(Collectors.toSet());
+            return Arrays.stream(UIManager.getInstalledLookAndFeels())
+                    .map(LookAndFeelInfo::getClassName)
+                    .filter(style -> !GTK_LF_CLASSNAME.equals(style))
+                    .collect(Collectors.toSet());
         }
     }
 
@@ -86,44 +89,46 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         fxFontTweaksLAF = new JCheckBox(Localization.lang("Tweak font rendering for entry editor on Linux"));
         // Only list L&F which are available
         Set<String> lookAndFeels = LookAndFeel.getAvailableLookAndFeels();
+
         classNamesLAF = new JComboBox<>(lookAndFeels.toArray(new String[lookAndFeels.size()]));
         classNamesLAF.setEditable(true);
         customLAF.addChangeListener(e -> classNamesLAF.setEnabled(((JCheckBox) e.getSource()).isSelected()));
 
-        // only the default L&F shows the OSX specific first drop-down menu
-        if (!OS.OS_X) {
-            JPanel pan = new JPanel();
-            builder.appendSeparator(Localization.lang("Look and feel"));
-            JLabel lab = new JLabel(
-                    Localization.lang("Default look and feel") + ": " + UIManager.getSystemLookAndFeelClassName());
-            builder.nextLine();
-            builder.append(pan);
-            builder.append(lab);
-            builder.nextLine();
-            builder.append(pan);
-            builder.append(customLAF);
-            builder.nextLine();
-            builder.append(pan);
-            JPanel pan2 = new JPanel();
-            lab = new JLabel(Localization.lang("Class name") + ':');
-            pan2.add(lab);
-            pan2.add(classNamesLAF);
-            builder.append(pan2);
-            builder.nextLine();
-            builder.append(pan);
-            lab = new JLabel(Localization
-                    .lang("Note that you must specify the fully qualified class name for the look and feel,"));
-            builder.append(lab);
-            builder.nextLine();
-            builder.append(pan);
-            lab = new JLabel(
-                    Localization.lang("and the class must be available in your classpath next time you start JabRef."));
-            builder.append(lab);
-            builder.nextLine();
-            builder.append(pan);
-            builder.append(fxFontTweaksLAF);
-            builder.nextLine();
-        }
+        colorPanel = new ColorSetupPanel(colorCodes, resolvedColorCodes, showGrid);
+
+
+        JPanel pan = new JPanel();
+        builder.appendSeparator(Localization.lang("Look and feel"));
+        JLabel lab = new JLabel(
+                Localization.lang("Default look and feel") + ": " + UIManager.getSystemLookAndFeelClassName());
+        builder.nextLine();
+        builder.append(pan);
+        builder.append(lab);
+        builder.nextLine();
+        builder.append(pan);
+        builder.append(customLAF);
+        builder.nextLine();
+        builder.append(pan);
+        JPanel pan2 = new JPanel();
+        lab = new JLabel(Localization.lang("Class name") + ':');
+        pan2.add(lab);
+        pan2.add(classNamesLAF);
+        builder.append(pan2);
+        builder.nextLine();
+        builder.append(pan);
+        lab = new JLabel(Localization
+                .lang("Note that you must specify the fully qualified class name for the look and feel,"));
+        builder.append(lab);
+        builder.nextLine();
+        builder.append(pan);
+        lab = new JLabel(
+                Localization.lang("and the class must be available in your classpath next time you start JabRef."));
+        builder.append(lab);
+        builder.nextLine();
+        builder.append(pan);
+        builder.append(fxFontTweaksLAF);
+        builder.nextLine();
+
 
         builder.leadingColumnOffset(2);
 
@@ -162,9 +167,12 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         overrideFonts.addActionListener(e -> largeIconsTextField.setEnabled(overrideFonts.isSelected()));
         overrideFonts.addActionListener(e -> smallIconsTextField.setEnabled(overrideFonts.isSelected()));
 
-        JPanel pan = builder.getPanel();
-        pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        add(pan, BorderLayout.CENTER);
+        fontButton.addActionListener(
+                e -> new FontSelectorDialog(null, usedFont).getSelectedFont().ifPresent(x -> usedFont = x));
+
+        JPanel panel = builder.getPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        add(panel, BorderLayout.CENTER);
     }
 
     @Override
