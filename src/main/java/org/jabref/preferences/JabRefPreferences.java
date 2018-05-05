@@ -198,7 +198,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CF = "editorEMACSkeyBindingsRebindCF";
     public static final String GROUPS_DEFAULT_FIELD = "groupsDefaultField";
-    public static final String GROUP_INTERSECT_UNION_VIEW_MODE = "groupIntersectUnionViewModes";
 
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
@@ -384,7 +383,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final String COLLECT_TELEMETRY = "collectTelemetry";
     private static final String ALREADY_ASKED_TO_COLLECT_TELEMETRY = "askedCollectTelemetry";
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
-    private static final Class PREFS_BASE_CLASS = JabRefMain.class;
+    private static final Class<JabRefMain> PREFS_BASE_CLASS = JabRefMain.class;
     private static final String DB_CONNECT_USERNAME = "dbConnectUsername";
     private static final String DB_CONNECT_DATABASE = "dbConnectDatabase";
     private static final String DB_CONNECT_HOSTNAME = "dbConnectHostname";
@@ -393,6 +392,10 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PROTECTED_TERMS_DISABLED_EXTERNAL = "protectedTermsDisabledExternal";
     private static final String PROTECTED_TERMS_ENABLED_INTERNAL = "protectedTermsEnabledInternal";
     private static final String PROTECTED_TERMS_DISABLED_INTERNAL = "protectedTermsDisabledInternal";
+
+    //GroupViewMode
+    private static final String GROUP_INTERSECT_UNION_VIEW_MODE = "groupIntersectUnionViewModes";
+
     // Preview
     private static final String CYCLE_PREVIEW_POS = "cyclePreviewPos";
     private static final String CYCLE_PREVIEW = "cyclePreview";
