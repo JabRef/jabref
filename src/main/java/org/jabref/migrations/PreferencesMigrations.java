@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import java.util.stream.Stream;
 
 import org.jabref.Globals;
 import org.jabref.JabRefMain;
@@ -198,7 +199,7 @@ public class PreferencesMigrations {
                                                  JabRefPreferences prefs, Preferences mainPrefsNode) {
         String preferenceFileNamePattern = mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null);
 
-        if (preferenceFileNamePattern != null &&
+        if ((preferenceFileNamePattern != null) &&
                 oldStylePattern.equals(preferenceFileNamePattern)) {
             // Upgrade the old-style File Name pattern to new one:
             mainPrefsNode.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
@@ -281,17 +282,22 @@ public class PreferencesMigrations {
     public static void upgradeObsoleteLookAndFeels() {
         JabRefPreferences prefs = Globals.prefs;
         String currentLandF = prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
-        if ("com.jgoodies.looks.windows.WindowsLookAndFeel".equals(currentLandF) ||
-                "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel".equals(currentLandF)) {
-            if (OS.WINDOWS) {
-                String windowsLandF = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-                prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, windowsLandF);
-                LOGGER.info("Switched from obsolete look and feel " + currentLandF + " to " + windowsLandF);
-            } else {
-                String nimbusLandF = "javax.swing.plaf.nimbus.NimbusLookAndFeel";
-                prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, nimbusLandF);
-                LOGGER.info("Switched from obsolete look and feel " + currentLandF + " to " + nimbusLandF);
-            }
-        }
+
+        Stream.of("com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
+                "com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel",
+                "com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
+                .filter(style -> style.equals(currentLandF))
+                .findAny()
+                .ifPresent(loolAndFeel -> {
+                    if (OS.WINDOWS) {
+                        String windowsLandF = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+                        prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, windowsLandF);
+                        LOGGER.info("Switched from obsolete look and feel " + currentLandF + " to " + windowsLandF);
+                    } else {
+                        String nimbusLandF = "javax.swing.plaf.nimbus.NimbusLookAndFeel";
+                        prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, nimbusLandF);
+                        LOGGER.info("Switched from obsolete look and feel " + currentLandF + " to " + nimbusLandF);
+                    }
+                });
     }
 }

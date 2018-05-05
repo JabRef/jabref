@@ -11,13 +11,16 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
-We added RFC, a new entry generator ID type. [#3971](https://github.com/JabRef/jabref/issues/3971)
+- We added a text file export for 'Find Unlinked Files'. [#3341](https://github.com/JabRef/jabref/issues/3341)
+- We added a fetcher based on RFC-IDs. [#3971](https://github.com/JabRef/jabref/issues/3971)
+
 ### Fixed
 We fixed an issue where the export to clipboard functionality could not be invoked [#3994](https://github.com/JabRef/jabref/issues/3994)
-
+We fixed an issue with the migration of invalid Look and Feels [#3995, comment](https://github.com/JabRef/jabref/issues/3995#issuecomment-385649448)
+We fixed an issue where JabRef would no longer start, when the option "Override default font settings" was activated [#3986](https://github.com/JabRef/jabref/issues/3986)
 ### Removed
-
-
+We removed the GTK Look and Feel from the Options, as it leads to freezes in JabRef on MacOSX and Linux [#3995](https://github.com/JabRef/jabref/issues/3995)
+The GTK Look and Feel is now replaced with the "Nimbus" style as default.
 
 
 

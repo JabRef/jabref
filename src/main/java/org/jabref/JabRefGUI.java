@@ -1,5 +1,6 @@
 package org.jabref;
 
+import java.awt.Font;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
@@ -42,7 +44,12 @@ import org.slf4j.LoggerFactory;
 
 public class JabRefGUI {
 
+    private static final String NIMBUS_LOOK_AND_FEEL = "javax.swing.plaf.nimbus.NimbusLookAndFeel";
+    private static final String WINDOWS_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+    private static final String OSX_AQUA_LOOk_AND_FEEL = "apple.laf.AquaLookAndFeel";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
+
     private static JabRefFrame mainFrame;
 
     private final List<ParserResult> bibDatabases;
@@ -59,8 +66,11 @@ public class JabRefGUI {
         this.dialogService = new FXDialogService(mainStage);
 
         // passed file (we take the first one) should be focused
-        focusedFile = argsDatabases.stream().findFirst().flatMap(ParserResult::getFile).map(File::getAbsolutePath)
-                .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
+        focusedFile = argsDatabases.stream()
+                                   .findFirst()
+                                   .flatMap(ParserResult::getFile)
+                                   .map(File::getAbsolutePath)
+                                   .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
 
         openWindow(mainStage);
         JabRefGUI.checkForNewVersion(false);
@@ -112,15 +122,15 @@ public class JabRefGUI {
                     try {
                         new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
                     } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
-                            NotASharedDatabaseException e) {
+                             NotASharedDatabaseException e) {
                         pr.getDatabaseContext().clearDatabaseFile(); // do not open the original file
                         pr.getDatabase().clearSharedDatabaseID();
 
                         LOGGER.error("Connection error", e);
                         dialogService.showErrorDialogAndWait(
-                                Localization.lang("Connection error"),
-                                Localization.lang("A local copy will be opened."),
-                                e);
+                                                             Localization.lang("Connection error"),
+                                                             Localization.lang("A local copy will be opened."),
+                                                             e);
                     }
                     toOpenTab.add(pr);
                 } else if (pr.toOpenTab()) {
@@ -163,7 +173,7 @@ public class JabRefGUI {
 
         for (ParserResult pr : failed) {
             String message = Localization.lang("Error opening file '%0'.", pr.getFile().get().getName()) + "\n"
-                    + pr.getErrorMessage();
+                             + pr.getErrorMessage();
 
             dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
 
@@ -212,7 +222,7 @@ public class JabRefGUI {
             }
 
             ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,
-                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+                                                                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
 
             if (parsedDatabase.isEmpty()) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
@@ -233,55 +243,30 @@ public class JabRefGUI {
 
     private void setLookAndFeel() {
         try {
-            String lookFeel;
-            String systemLookFeel = UIManager.getSystemLookAndFeelClassName();
 
-            if (Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL)) {
-                // FIXME: Problems with OpenJDK and GTK L&F
-                // See https://github.com/JabRef/jabref/issues/393, https://github.com/JabRef/jabref/issues/638
-                if (System.getProperty("java.runtime.name").contains("OpenJDK")) {
-                    // Metal L&F
-                    lookFeel = UIManager.getCrossPlatformLookAndFeelClassName();
-                    LOGGER.warn(
-                            "There seem to be problems with OpenJDK and the default GTK Look&Feel. Using Metal L&F instead. Change to another L&F with caution.");
-                } else {
-                    lookFeel = systemLookFeel;
-                }
-            } else {
-                lookFeel = Globals.prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
+            if (OS.WINDOWS) {
+                UIManager.setLookAndFeel(WINDOWS_LOOK_AND_FEEL);
             }
-
-            // FIXME: Open JDK problem
-            if (UIManager.getCrossPlatformLookAndFeelClassName().equals(lookFeel)
-                    && !System.getProperty("java.runtime.name").contains("OpenJDK")) {
-                // try to avoid ending up with the ugly Metal L&F
-                UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            if (OS.OS_X) {
+                UIManager.setLookAndFeel(OSX_AQUA_LOOk_AND_FEEL);
             } else {
-                try {
-                    UIManager.setLookAndFeel(lookFeel);
-                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
-                        UnsupportedLookAndFeelException e) {
-                    // specified look and feel does not exist on the classpath, so use system l&f
-                    UIManager.setLookAndFeel(systemLookFeel);
-                    // also set system l&f as default
-                    Globals.prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, systemLookFeel);
-                    // notify the user
-
-                    LOGGER.warn("Unable to find requested look and feel", e);
-                    dialogService.showWarningDialogAndWait(Localization.lang("Warning"),
-                            Localization.lang("Unable to find the requested look and feel and thus the default one is used."));
-
-                }
+                UIManager.setLookAndFeel(NIMBUS_LOOK_AND_FEEL);
             }
-
             // On Linux, Java FX fonts look blurry per default. This can be improved by using a non-default rendering
             // setting. See https://github.com/woky/javafx-hates-linux
             if (Globals.prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK)) {
                 System.setProperty("prism.text", "t2k");
                 System.setProperty("prism.lcdtext", "true");
             }
-        } catch (Exception e) {
-            LOGGER.warn("Look and feel could not be set", e);
+        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            try {
+                LOGGER.warn("Setting Look and Feel to Nimbus", e);
+
+                UIManager.setLookAndFeel(NIMBUS_LOOK_AND_FEEL);
+            } catch (Exception ex) {
+                LOGGER.warn("Look and feel could not be set", e);
+            }
+
         }
 
         // In JabRef v2.8, we did it only on NON-Mac. Now, we try on all platforms
@@ -292,7 +277,7 @@ public class JabRefGUI {
             Enumeration<Object> keys = defaults.keys();
             for (Object key : Collections.list(keys)) {
                 if ((key instanceof String) && ((String) key).endsWith(".font")) {
-                    FontUIResource font = (FontUIResource) UIManager.get(key);
+                    Font font = (Font) UIManager.get(key);
                     font = new FontUIResource(font.getName(), font.getStyle(), fontSize);
                     defaults.put(key, font);
                 }
