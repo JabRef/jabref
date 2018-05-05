@@ -1,4 +1,3 @@
-
 # Changelog
 All notable changes to this project will be documented in this file.
 This project **does not** adhere to [Semantic Versioning](http://semver.org/).
@@ -10,6 +9,88 @@ Here, the categories "Changed" for added and changed functionality,
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
 ## [Unreleased]
+
+### Changed
+- We added a text file export for 'Find Unlinked Files'. [#3341](https://github.com/JabRef/jabref/issues/3341)
+- We added a fetcher based on RFC-IDs. [#3971](https://github.com/JabRef/jabref/issues/3971)
+
+### Fixed
+We fixed an issue where the export to clipboard functionality could not be invoked [#3994](https://github.com/JabRef/jabref/issues/3994)
+We fixed an issue with the migration of invalid Look and Feels [#3995, comment](https://github.com/JabRef/jabref/issues/3995#issuecomment-385649448)
+We fixed an issue where JabRef would no longer start, when the option "Override default font settings" was activated [#3986](https://github.com/JabRef/jabref/issues/3986)
+### Removed
+We removed the GTK Look and Feel from the Options, as it leads to freezes in JabRef on MacOSX and Linux [#3995](https://github.com/JabRef/jabref/issues/3995)
+The GTK Look and Feel is now replaced with the "Nimbus" style as default.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## [4.2] - 2018-04-26
 
 ### Changed
 - Added "*.*" (any file type) to the Import File Filter Dialog. [#3757](https://github.com/JabRef/jabref/issues/3757)
@@ -41,6 +122,7 @@ The new default removes the linked file from the entry instead of deleting the f
 - We added another CLI functionality for reading and writing metadata to pdfs. (see https://github.com/JabRef/jabref/pull/3756 and see http://help.jabref.org/en/CommandLine)
 - We no longer print errors in field values during autosave into the log [#3811](https://github.com/JabRef/jabref/issues/3811)
 - We improved the search performance by adding a short delay before starting to display search results [Bug report in the forum](http://discourse.jabref.org/t/poor-performance-of-jabref-4/1110/2)
+- We re-added the Generate BibTeX Key button to the EntryEditor toolbar on the left
 
 ### Fixed
 - We fixed several performance problems with the management of journal abbreviations [#3323](https://github.com/JabRef/jabref/issues/3323)
@@ -59,56 +141,10 @@ The new default removes the linked file from the entry instead of deleting the f
 - We fixed an issue where the "Copy linked files" dialog produced an error when the entry had no file [#3818](https://github.com/JabRef/jabref/issues/3818)
 - We fixed the coloring of the search box icon in case a user switches to advanced search mode [#3870](https://github.com/JabRef/jabref/issues/3870)
 - We fixed an issue where pressing <kbd>del</kbd> in the `file` field would trigger the delete dialog a second file, if the first file is deleted [#3926](https://github.com/JabRef/jabref/issues/3926)
+- We fixed the saving of entry preview preferences [#3845](https://github.com/JabRef/jabref/issues/3845)
 
 ### Removed
 - We removed the [Look and Feels from JGoodies](http://www.jgoodies.com/freeware/libraries/looks/), because the open source version is not compatible with Java 9.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ## [4.1] - 2017-12-23
@@ -388,7 +424,8 @@ The new default removes the linked file from the entry instead of deleting the f
 The changelog of versions 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of 2.11 and versions before is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v4.1...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v4.2...HEAD
+[4.2]: https://github.com/JabRef/jabref/compare/v4.1...v4.2
 [4.1]: https://github.com/JabRef/jabref/compare/v4.0...v4.1
 [4.0]: https://github.com/JabRef/jabref/compare/v4.0-beta3...v4.0
 [4.0-beta3]: https://github.com/JabRef/jabref/compare/v4.0-beta2...v4.0-beta3

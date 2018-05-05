@@ -63,10 +63,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         panel.showAndEdit(entry.getEntry());
                     }
                 })
-        .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, Globals.getKeyPrefs(), frame.getDialogService()))
+                .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, Globals.getKeyPrefs(), frame.getDialogService()))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnMouseDragEntered(this::handleOnDragEntered)
                 .install(this);
+
         if (preferences.resizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
         }
@@ -143,7 +144,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
         this.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode().equals(KeyCode.ENTER)) {
+            if (event.getCode() == KeyCode.ENTER) {
                 getSelectedEntries().stream()
                                     .findFirst()
                                     .ifPresent(panel::showAndEdit);

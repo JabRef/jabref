@@ -8,19 +8,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import javax.swing.InputMap;
 import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -28,47 +23,39 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import org.jabref.Globals;
-import org.jabref.gui.JabRefDialog;
-import org.jabref.gui.JabRefFrame;
+import javafx.scene.control.ButtonType;
+import javafx.stage.Modality;
+
 import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 
 /**
  * Editor for external file types.
  */
-public class ExternalFileTypeEditor extends JabRefDialog {
+public class ExternalFileTypeEditor extends BaseDialog<Void> {
 
-    private JFrame frame;
-    private JDialog dialog;
     private List<ExternalFileType> fileTypes;
     private JTable table;
     private ExternalFileTypeEntryEditor entryEditor;
     private FileTypeTableModel tableModel;
-    private final JButton ok = new JButton(Localization.lang("OK"));
-    private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JButton add = new JButton(IconTheme.JabRefIcons.ADD_NOBOX.getIcon());
     private final JButton remove = new JButton(IconTheme.JabRefIcons.REMOVE_NOBOX.getIcon());
     private final JButton edit = new JButton(IconTheme.JabRefIcons.EDIT.getIcon());
     private final JButton toDefaults = new JButton(Localization.lang("Default"));
     private final EditListener editListener = new EditListener();
 
+    public ExternalFileTypeEditor() {
+        this.setTitle(Localization.lang("Manage external file types"));
+        this.initModality(Modality.APPLICATION_MODAL);
+        this.setResizable(true);
+        this.getDialogPane().setPrefSize(600, 500);
 
-    public ExternalFileTypeEditor(JFrame frame) {
-        super(frame, Localization.lang("Manage external file types"), true, ExternalFileTypeEditor.class);
-        this.frame = frame;
-        init();
-    }
-
-    private ExternalFileTypeEditor(JDialog dialog) {
-        super(dialog, Localization.lang("Manage external file types"), true, ExternalFileTypeEditor.class);
-        this.dialog = dialog;
         init();
     }
 
@@ -78,10 +65,8 @@ public class ExternalFileTypeEditor extends JabRefDialog {
     private void setValues() {
         fileTypes.clear();
         Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
-        for (ExternalFileType type : types) {
-            fileTypes.add(type.copy());
-        }
-        Collections.sort(fileTypes);
+        fileTypes.addAll(types);
+        fileTypes.sort(Comparator.comparing(ExternalFileType::getName));
     }
 
     /**
@@ -91,20 +76,29 @@ public class ExternalFileTypeEditor extends JabRefDialog {
         ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);
     }
 
+    /**
+     * Get an AbstractAction for opening the external file types editor.
+     *
+     * @return An Action for opening the editor.
+     */
+    public static AbstractAction getAction() {
+        return new EditExternalFileTypesAction();
+    }
+
     private void init() {
 
-        ok.addActionListener(e -> {
-            storeSettings();
-            dispose();
-        });
-        Action cancelAction = new AbstractAction() {
+        this.getDialogPane().getButtonTypes().setAll(
+                ButtonType.CANCEL,
+                ButtonType.OK
+        );
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
+        this.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                storeSettings();
             }
-        };
-        cancel.addActionListener(cancelAction);
+            return null;
+        });
+
         // The toDefaults resets the entire list to its default values.
         toDefaults.addActionListener(e -> {
             /*int reply = JOptionPane.showConfirmDialog(ExternalFileTypeEditor.this,
@@ -115,7 +109,7 @@ public class ExternalFileTypeEditor extends JabRefDialog {
             List<ExternalFileType> list = ExternalFileTypes.getDefaultExternalFileTypes();
             fileTypes.clear();
             fileTypes.addAll(list);
-            Collections.sort(fileTypes);
+            fileTypes.sort(Comparator.comparing(ExternalFileType::getName));
             //Globals.prefs.resetExternalFileTypesToDefault();
             //setValues();
             tableModel.fireTableDataChanged();
@@ -124,7 +118,7 @@ public class ExternalFileTypeEditor extends JabRefDialog {
 
         add.addActionListener(e -> {
             // Generate a new file type:
-            ExternalFileType type = new ExternalFileType("", "", "", "", "new",
+            CustomExternalFileType type = new CustomExternalFileType("", "", "", "", "new",
                     IconTheme.JabRefIcons.FILE);
             // Show the file type editor:
             getEditor(type).setVisible(true);
@@ -172,7 +166,7 @@ public class ExternalFileTypeEditor extends JabRefDialog {
         upper.setLayout(new BorderLayout());
         upper.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         upper.add(sp, BorderLayout.CENTER);
-        getContentPane().add(upper, BorderLayout.CENTER);
+        ControlHelper.setSwingContent(getDialogPane(), upper);
 
         ButtonStackBuilder bs = new ButtonStackBuilder();
         bs.addButton(add);
@@ -181,58 +175,22 @@ public class ExternalFileTypeEditor extends JabRefDialog {
         bs.addRelatedGap();
         bs.addButton(toDefaults);
         upper.add(bs.getPanel(), BorderLayout.EAST);
-
-        ButtonBarBuilder bb = new ButtonBarBuilder();
-        bb.addGlue();
-        bb.addButton(ok);
-        bb.addButton(cancel);
-        bb.addGlue();
-        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
-        pack();
-
-        // Key bindings:
-        ActionMap am = upper.getActionMap();
-        InputMap im = upper.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
-        am.put("close", cancelAction);
-        am = bb.getPanel().getActionMap();
-        im = bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
-        am.put("close", cancelAction);
-
-        if (frame == null) {
-            setLocationRelativeTo(dialog);
-        } else {
-            setLocationRelativeTo(frame);
-        }
     }
 
     private ExternalFileTypeEntryEditor getEditor(ExternalFileType type) {
-        if (entryEditor == null) {
-            entryEditor = new ExternalFileTypeEntryEditor(ExternalFileTypeEditor.this, type);
+        CustomExternalFileType typeForEdit;
+        if (type instanceof CustomExternalFileType) {
+            typeForEdit = (CustomExternalFileType) type;
         } else {
-            entryEditor.setEntry(type);
+            typeForEdit = new CustomExternalFileType(type);
+        }
+
+        if (entryEditor == null) {
+            entryEditor = new ExternalFileTypeEntryEditor(typeForEdit);
+        } else {
+            entryEditor.setEntry(typeForEdit);
         }
         return entryEditor;
-    }
-
-    /**
-     * Get an AbstractAction for opening the external file types editor.
-     * @param frame The JFrame used as parent window for the dialog.
-     * @return An Action for opening the editor.
-     */
-    public static AbstractAction getAction(JabRefFrame frame) {
-        return new EditExternalFileTypesAction(frame);
-    }
-
-    /**
-     * Get an AbstractAction for opening the external file types editor.
-     * @param dialog The JDialog used as parent window for the dialog.
-     * @return An Action for opening the editor.
-     */
-    public static AbstractAction getAction(JDialog dialog) {
-        return new EditExternalFileTypesAction(dialog);
     }
 
     class EditListener implements ActionListener {
@@ -344,34 +302,20 @@ public class ExternalFileTypeEditor extends JabRefDialog {
 
     public static class EditExternalFileTypesAction extends MnemonicAwareAction {
 
-        private JabRefFrame frame;
-        private JDialog dialog;
         private ExternalFileTypeEditor editor;
 
-
-        public EditExternalFileTypesAction(JabRefFrame frame) {
+        public EditExternalFileTypesAction() {
             super();
             putValue(Action.NAME, Localization.menuTitle("Manage external file types"));
-            this.frame = frame;
-        }
-
-        public EditExternalFileTypesAction(JDialog dialog) {
-            super();
-            putValue(Action.NAME, Localization.menuTitle("Manage external file types"));
-            this.dialog = dialog;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             if (editor == null) {
-                if (frame == null) {
-                    editor = new ExternalFileTypeEditor(dialog);
-                } else {
-                    editor = new ExternalFileTypeEditor((JFrame) null);
-                }
+                editor = new ExternalFileTypeEditor();
             }
             editor.setValues();
-            editor.setVisible(true);
+            editor.show();
         }
     }
 

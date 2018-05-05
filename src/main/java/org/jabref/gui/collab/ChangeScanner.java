@@ -89,7 +89,6 @@ public class ChangeScanner implements Runnable {
                     storeTempDatabase();
                 }
             });
-
         } else {
             frame.getDialogService().showInformationDialogAndWait(Localization.lang("External changes"),
                     Localization.lang("No actual changes found."));
@@ -101,7 +100,7 @@ public class ChangeScanner implements Runnable {
     private void storeTempDatabase() {
         JabRefExecutorService.INSTANCE.execute(() -> {
             try {
-                SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
+                SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences()
                         .withMakeBackup(false)
                         .withEncoding(panel.getBibDatabaseContext()
                                 .getMetaData()

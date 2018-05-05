@@ -55,7 +55,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
         JButton editFileTypes = new JButton(Localization.lang("Manage external file types"));
         citeCommand = new JTextField(25);
-        editFileTypes.addActionListener(ExternalFileTypeEditor.getAction(frame));
+        editFileTypes.addActionListener(ExternalFileTypeEditor.getAction());
 
         defaultConsole = new JRadioButton(Localization.lang("Use default terminal emulator"));
         executeConsole = new JRadioButton(Localization.lang("Execute command") + ":");

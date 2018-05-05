@@ -180,7 +180,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         SaveSession session;
 
         try {
-            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(encoding);
+            SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences().withEncoding(encoding);
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
 
             if (selectedOnly) {

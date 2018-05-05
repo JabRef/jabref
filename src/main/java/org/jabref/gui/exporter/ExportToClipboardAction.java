@@ -8,10 +8,11 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -25,14 +26,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ExportToClipboardAction extends AbstractWorker {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportToClipboardAction.class);
 
     private final JabRefFrame frame;
 
-    /**
-     * written by run() and read by update()
-     */
+    // written by run() and read by update()
     private String message;
 
     public ExportToClipboardAction(JabRefFrame frame) {
@@ -51,7 +49,9 @@ public class ExportToClipboardAction extends AbstractWorker {
             return;
         }
 
-        List<Exporter> exporters = new ArrayList<>(Globals.exportFactory.getExporters());
+        List<Exporter> exporters = Globals.exportFactory.getExporters().stream()
+                                                        .sorted(Comparator.comparing(Exporter::getDisplayName))
+                                                        .collect(Collectors.toList());
 
         Optional<Exporter> selectedExporter = frame.getDialogService().showChoiceDialogAndWait(Localization.lang("Export"), Localization.lang("Select export format"),
                 Localization.lang("Export"), exporters);

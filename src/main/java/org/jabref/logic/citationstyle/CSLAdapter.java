@@ -9,6 +9,8 @@ import java.util.Objects;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.Month;
 
 import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.ItemDataProvider;
@@ -82,6 +84,9 @@ public class CSLAdapter {
 
         /**
          * Converts the {@link BibEntry} into {@link CSLItemData}.
+         *
+         * Change month field from JabRefFormat <code>#mon#</> to ShortName <code>mon</code>
+         * because CSL does not support JabRefFormat.
          */
         private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry) {
             String citeKey = bibEntry.getCiteKeyOptional().orElse("");
@@ -94,7 +99,12 @@ public class CSLAdapter {
                 bibEntry.getField(key)
                         .map(removeNewlinesFormatter::format)
                         .map(latexToHtmlConverter::format)
-                        .ifPresent(value -> bibTeXEntry.addField(new Key(key), new DigitStringValue(value)));
+                        .ifPresent(value -> {
+                            if (FieldName.MONTH.equals(key)) {
+                                value = bibEntry.getMonth().map(Month::getShortName).orElse(value);
+                            }
+                            bibTeXEntry.addField(new Key(key), new DigitStringValue(value));
+                        });
             }
             return BIBTEX_CONVERTER.toItemData(bibTeXEntry);
         }

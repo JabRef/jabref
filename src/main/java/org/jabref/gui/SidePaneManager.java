@@ -29,7 +29,7 @@ public class SidePaneManager {
         this.preferences = preferences;
         this.sidePane = new SidePane();
 
-        OpenOfficePreferences openOfficePreferences = new OpenOfficePreferences(preferences);
+        OpenOfficePreferences openOfficePreferences = preferences.getOpenOfficePreferences();
         Stream.of(
                   new FileUpdatePanel(this),
                   new GroupSidePane(this, preferences, frame.getDialogService()),
@@ -41,7 +41,7 @@ public class SidePaneManager {
             show(SidePaneType.GROUPS);
         }
 
-        if (openOfficePreferences.showPanel()) {
+        if (openOfficePreferences.getShowPanel()) {
             show(SidePaneType.OPEN_OFFICE);
         }
     }

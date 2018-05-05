@@ -22,6 +22,7 @@ import org.jabref.logic.importer.fetcher.LibraryOfCongress;
 import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
 import org.jabref.logic.importer.fetcher.OpenAccessDoi;
+import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
 import org.jabref.logic.importer.fetcher.SpringerLink;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
@@ -96,8 +97,9 @@ public class WebFetchers {
         list.add(new TitleFetcher(importFormatPreferences));
         list.add(new MathSciNet(importFormatPreferences));
         list.add(new CrossRef());
-        list.add(new LibraryOfCongress());
+        list.add(new LibraryOfCongress(importFormatPreferences));
         list.add(new IacrEprintFetcher(importFormatPreferences));
+        list.add(new RfcFetcher(importFormatPreferences));
         list.sort(Comparator.comparing(WebFetcher::getName));
         return list;
     }

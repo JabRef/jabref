@@ -11,7 +11,6 @@ import javafx.stage.Stage;
 
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.remote.JabRefMessageHandler;
-import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
@@ -19,7 +18,7 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
-import org.jabref.logic.remote.client.RemoteListenerClient;
+import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.JavaVersion;
 import org.jabref.logic.util.OS;
@@ -94,24 +93,12 @@ public class JabRefMain extends Application {
     @Override
     public void start(Stage mainStage) throws Exception {
         FallbackExceptionHandler.installExceptionHandler();
-
-        JabRefPreferences preferences = JabRefPreferences.getInstance();
-
+      
         ensureCorrectJavaVersion();
 
-        ProxyPreferences proxyPreferences = preferences.getProxyPreferences();
-        ProxyRegisterer.register(proxyPreferences);
-        if (proxyPreferences.isUseProxy() && proxyPreferences.isUseAuthentication()) {
-            Authenticator.setDefault(new ProxyAuthenticator());
-        }
-
+        // Init preferences
+        JabRefPreferences preferences = JabRefPreferences.getInstance();
         Globals.prefs = preferences;
-        Globals.startBackgroundTasks();
-
-        // Note that the language was already set during the initialization of the preferences and it is safe to
-        // call the next function.
-        Globals.prefs.setLanguageDependentDefaultValues();
-
         // Perform Migrations
         // Perform checks and changes for users with a preference set from an older JabRef version.
         PreferencesMigrations.upgradePrefsToOrgJabRef();
@@ -123,6 +110,14 @@ public class JabRefMain extends Application {
         PreferencesMigrations.upgradeKeyBindingsToJavaFX();
         PreferencesMigrations.addCrossRefRelatedFieldsForAutoComplete();
         PreferencesMigrations.upgradeObsoleteLookAndFeels();
+
+        ProxyPreferences proxyPreferences = preferences.getProxyPreferences();
+        ProxyRegisterer.register(proxyPreferences);
+        if (proxyPreferences.isUseProxy() && proxyPreferences.isUseAuthentication()) {
+            Authenticator.setDefault(new ProxyAuthenticator());
+        }
+
+        Globals.startBackgroundTasks();
 
         // Update handling of special fields based on preferences
         InternalBibtexFields
@@ -140,7 +135,7 @@ public class JabRefMain extends Application {
                 Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
         EntryTypes.loadCustomEntryTypes(preferences.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
-        Globals.exportFactory = ExporterFactory.create(Globals.prefs, Globals.journalAbbreviationLoader);
+        Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());
@@ -152,7 +147,7 @@ public class JabRefMain extends Application {
 
             if (!Globals.REMOTE_LISTENER.isOpen()) {
                 // we are not alone, there is already a server out there, try to contact already running JabRef:
-                if (RemoteListenerClient.sendToActiveJabRefInstance(arguments, remotePreferences.getPort())) {
+                if (new RemoteClient(remotePreferences.getPort()).sendCommandLineArguments(arguments)) {
                     // We have successfully sent our command line options through the socket to another JabRef instance.
                     // So we assume it's all taken care of, and quit.
                     LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
@@ -183,5 +178,4 @@ public class JabRefMain extends Application {
         // If not, start GUI
         new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank());
     }
-
 }

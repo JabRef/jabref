@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URL;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -37,8 +38,8 @@ public class LinkedFile implements Serializable {
         setLink(Objects.requireNonNull(link));
     }
 
-    public LinkedFile(String description, URL link, String fileType) {
-        this(description, Objects.requireNonNull(link).toString(), fileType);
+    public LinkedFile(URL link, String fileType) {
+        this("", Objects.requireNonNull(link).toString(), fileType);
     }
 
     public StringProperty descriptionProperty() {
@@ -159,11 +160,15 @@ public class LinkedFile implements Serializable {
     }
 
     public Optional<Path> findIn(List<Path> directories) {
-        Path file = Paths.get(link.get());
-        if (file.isAbsolute() || directories.isEmpty()) {
-            return Optional.of(file);
-        } else {
-            return FileHelper.expandFilenameAsPath(link.get(), directories);
+        try {
+            Path file = Paths.get(link.get());
+            if (file.isAbsolute() || directories.isEmpty()) {
+                return Optional.of(file);
+            } else {
+                return FileHelper.expandFilenameAsPath(link.get(), directories);
+            }
+        } catch (InvalidPathException ex) {
+            return Optional.empty();
         }
     }
 
