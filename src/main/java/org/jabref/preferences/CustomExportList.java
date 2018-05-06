@@ -94,7 +94,7 @@ public class CustomExportList {
         } else {
             lfFileName = filename;
         }
-        if(extension.contains(".")) {
+        if (extension.contains(".")) {
             extension = extension.substring(extension.indexOf('.') + 1, extension.length());
         }
 

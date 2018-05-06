@@ -23,7 +23,6 @@ import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.BasicFileType;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
