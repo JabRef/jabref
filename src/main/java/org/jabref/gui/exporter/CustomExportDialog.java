@@ -28,7 +28,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.BasicFileType;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -95,8 +95,8 @@ class CustomExportDialog extends JabRefDialog {
         JButton browse = new JButton(Localization.lang("Browse"));
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileType.LAYOUT)
-                .withDefaultExtension(FileType.LAYOUT)
+                .addExtensionFilter(BasicFileType.LAYOUT)
+                .withDefaultExtension(BasicFileType.LAYOUT)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY)).build();
         DialogService ds = new FXDialogService();
         browse.addActionListener(

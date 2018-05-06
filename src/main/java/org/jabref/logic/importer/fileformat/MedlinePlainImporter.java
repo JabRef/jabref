@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.BasicFileType;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -40,8 +40,8 @@ public class MedlinePlainImporter extends Importer {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.MEDLINE_PLAIN;
+    public BasicFileType getFileType() {
+        return BasicFileType.MEDLINE_PLAIN;
     }
 
     @Override

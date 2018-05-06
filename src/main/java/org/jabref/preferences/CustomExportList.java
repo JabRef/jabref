@@ -12,6 +12,7 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.util.BasicFileType;
 import org.jabref.logic.util.FileType;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -88,14 +89,17 @@ public class CustomExportList {
             SavePreferences savePreferences) {
 
         String lfFileName;
-        if (extension.endsWith(".layout")) {
+        if (filename.endsWith(".layout")) {
             lfFileName = filename.substring(0, filename.length() - ".layout".length());
         } else {
             lfFileName = filename;
         }
-        FileType ext = FileType.parse(extension);
-        ext.setDescription(exporterName); //For custom exports we need to set the description also for filetype to be displayed correctly in the file choosers
-        TemplateExporter format = new TemplateExporter(exporterName, filename, lfFileName, null, ext, layoutPreferences,
+        if(extension.contains(".")) {
+            extension = extension.substring(extension.indexOf('.') + 1, extension.length());
+        }
+
+        FileType fileType = BasicFileType.addnewFileType(exporterName, extension);
+        TemplateExporter format = new TemplateExporter(exporterName, exporterName, lfFileName, null, fileType, layoutPreferences,
                 savePreferences);
         format.setCustomExport(true);
         return Optional.of(format);

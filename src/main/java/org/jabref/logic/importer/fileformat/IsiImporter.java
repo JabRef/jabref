@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import org.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.BasicFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
@@ -50,8 +50,8 @@ public class IsiImporter extends Importer {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.ISI;
+    public BasicFileType getFileType() {
+        return BasicFileType.ISI;
     }
 
     @Override

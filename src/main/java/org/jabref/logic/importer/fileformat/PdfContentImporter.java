@@ -18,7 +18,7 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.BasicFileType;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.entry.BibEntry;
@@ -592,8 +592,8 @@ public class PdfContentImporter extends Importer {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.PDF_CONTENT;
+    public BasicFileType getFileType() {
+        return BasicFileType.PDF_CONTENT;
     }
 
     @Override

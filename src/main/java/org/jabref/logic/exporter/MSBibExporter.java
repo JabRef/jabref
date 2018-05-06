@@ -16,7 +16,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.jabref.logic.msbib.MSBibDatabase;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.BasicFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -26,7 +26,7 @@ import org.jabref.model.entry.BibEntry;
 class MSBibExporter extends Exporter {
 
     public MSBibExporter() {
-        super("MSBib", FileType.MSBIB.getDescription(), FileType.MSBIB);
+        super("MSBib", BasicFileType.MSBIB.getDescription(), BasicFileType.MSBIB);
     }
 
     @Override

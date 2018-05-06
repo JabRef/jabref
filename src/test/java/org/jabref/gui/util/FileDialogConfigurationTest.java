@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 
+import org.jabref.logic.util.BasicFileType;
 import org.jabref.logic.util.FileType;
 
 import org.junit.Rule;
@@ -72,16 +75,16 @@ public class FileDialogConfigurationTest {
     @Test
     public void testSingleExtension() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withDefaultExtension(FileType.BIBTEX_DB).build();
+                .withDefaultExtension(BasicFileType.BIBTEX_DB).build();
 
-        FileChooser.ExtensionFilter filter = toFilter(FileType.BIBTEX_DB);
+        FileChooser.ExtensionFilter filter = toFilter(BasicFileType.BIBTEX_DB);
 
         assertEquals(filter.getExtensions(), fileDialogConfiguration.getDefaultExtension().getExtensions());
     }
 
     @Test
     public void testMultipleExtension() {
-        EnumSet<FileType> extensions = EnumSet.allOf(FileType.class);
+        Set<FileType> extensions = new HashSet<>(EnumSet.allOf(BasicFileType.class));
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilters(extensions).build();

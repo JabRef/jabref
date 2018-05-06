@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.BasicFileType;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.Test;
@@ -58,7 +58,7 @@ public class IsiImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(FileType.ISI, importer.getFileType());
+        assertEquals(BasicFileType.ISI, importer.getFileType());
     }
 
     @Test

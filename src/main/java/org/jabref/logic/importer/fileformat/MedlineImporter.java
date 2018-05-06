@@ -72,7 +72,7 @@ import org.jabref.logic.importer.fileformat.medline.QualifierName;
 import org.jabref.logic.importer.fileformat.medline.Section;
 import org.jabref.logic.importer.fileformat.medline.Sections;
 import org.jabref.logic.importer.fileformat.medline.Text;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.BasicFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.strings.StringUtil;
@@ -105,8 +105,8 @@ public class MedlineImporter extends Importer implements Parser {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.MEDLINE;
+    public BasicFileType getFileType() {
+        return BasicFileType.MEDLINE;
     }
 
     @Override

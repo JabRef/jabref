@@ -33,7 +33,7 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.BasicFileType;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.JabRefPreferencesFilter;
 
@@ -158,8 +158,8 @@ public class PreferencesDialog extends JabRefDialog {
         importPreferences.addActionListener(e -> {
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileType.XML)
-                    .withDefaultExtension(FileType.XML)
+                    .addExtensionFilter(BasicFileType.XML)
+                    .withDefaultExtension(BasicFileType.XML)
                     .withInitialDirectory(getPrefsExportPath()).build();
             DialogService ds = new FXDialogService();
 
@@ -281,8 +281,8 @@ public class PreferencesDialog extends JabRefDialog {
         public void actionPerformed(ActionEvent e) {
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileType.XML)
-                    .withDefaultExtension(FileType.XML)
+                    .addExtensionFilter(BasicFileType.XML)
+                    .withDefaultExtension(BasicFileType.XML)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
             DialogService ds = new FXDialogService();
             Optional<Path> path = DefaultTaskExecutor

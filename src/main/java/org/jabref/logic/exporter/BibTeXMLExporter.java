@@ -37,7 +37,7 @@ import org.jabref.logic.importer.fileformat.bibtexml.Phdthesis;
 import org.jabref.logic.importer.fileformat.bibtexml.Proceedings;
 import org.jabref.logic.importer.fileformat.bibtexml.Techreport;
 import org.jabref.logic.importer.fileformat.bibtexml.Unpublished;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.BasicFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -55,7 +55,7 @@ public class BibTeXMLExporter extends Exporter {
     private JAXBContext context;
 
     public BibTeXMLExporter() {
-        super("bibtexml", FileType.BIBTEXML_XML_ONLY.getDescription(), FileType.BIBTEXML_XML_ONLY);
+        super("bibtexml", BasicFileType.BIBTEXML_XML_ONLY.getDescription(), BasicFileType.BIBTEXML_XML_ONLY);
     }
 
     @Override

@@ -64,7 +64,8 @@ public class ImportFormats {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SortedSet<Importer> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
-                List<FileType> extensions = importers.stream().map(Importer::getFileType)
+                List<FileType> extensions = importers.stream()
+                        .map(Importer::getFileType)
                         .collect(Collectors.toList());
                 FileChooser.ExtensionFilter allImports = FileFilterConverter.forAllImporters(importers);
                 FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()

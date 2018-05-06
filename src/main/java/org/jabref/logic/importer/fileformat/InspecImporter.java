@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.BasicFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -28,8 +28,8 @@ public class InspecImporter extends Importer {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.INSPEC;
+    public BasicFileType getFileType() {
+        return BasicFileType.INSPEC;
     }
 
     @Override

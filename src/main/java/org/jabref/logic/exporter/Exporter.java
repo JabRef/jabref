@@ -10,14 +10,14 @@ import org.jabref.model.entry.BibEntry;
 
 public abstract class Exporter {
 
-    private String id;
-    private String displayName;
-    private FileType fileType;
+    private final String id;
+    private final String displayName;
+    private final FileType fileType;
 
-    public Exporter(String id, String displayName, FileType fileType) {
+    public Exporter(String id, String displayName, FileType extension) {
         this.id = id;
         this.displayName = displayName;
-        this.fileType = fileType;
+        this.fileType = extension;
     }
 
     /**

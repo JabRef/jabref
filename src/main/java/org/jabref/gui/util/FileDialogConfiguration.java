@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import javafx.stage.FileChooser;
 
+import org.jabref.logic.util.BasicFileType;
 import org.jabref.logic.util.FileType;
 
 public class FileDialogConfiguration {
@@ -101,7 +102,7 @@ public class FileDialogConfiguration {
             return this;
         }
 
-        public Builder withDefaultExtension(FileType fileType) {
+        public Builder withDefaultExtension(BasicFileType fileType) {
             defaultExtension = FileFilterConverter.toExtensionFilter(fileType);
             return this;
         }

@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.BasicFileType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ public class BiblioscapeImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(FileType.BIBLIOSCAPE, importer.getFileType());
+        assertEquals(BasicFileType.BIBLIOSCAPE, importer.getFileType());
     }
 
     @Test

@@ -24,7 +24,7 @@ import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.BasicFileType;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -164,7 +164,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      */
     public void addNewFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileType.TXT)
+                .addExtensionFilter(BasicFileType.TXT)
                 .build();
 
         dialogService.showFileSaveDialog(fileDialogConfiguration).ifPresent(this::openFile);
@@ -196,7 +196,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
 
     public void openFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileType.TXT)
+                .addExtensionFilter(BasicFileType.TXT)
                 .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(this::openFile);
