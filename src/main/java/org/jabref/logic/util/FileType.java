@@ -71,7 +71,8 @@ public enum FileType {
 
     private static final EnumSet<FileType> ALL_FILE_TYPES = EnumSet.allOf(FileType.class);
     private final String[] extensions;
-    private final String description;
+    //Needed for custom exporters
+    private String description;
 
     FileType(String description, String... extensions) {
         this.description = description;
@@ -88,6 +89,10 @@ public enum FileType {
             sj.add("*." + ext);
         }
         return sj.toString();
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getFirstExtensionWithDot() {

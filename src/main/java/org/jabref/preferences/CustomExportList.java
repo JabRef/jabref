@@ -93,7 +93,9 @@ public class CustomExportList {
         } else {
             lfFileName = filename;
         }
-        TemplateExporter format = new TemplateExporter(exporterName, filename, lfFileName, null, FileType.parse(extension), layoutPreferences,
+        FileType ext = FileType.parse(extension);
+        ext.setDescription(exporterName); //For custom exports we need to set the description also for filetype to be displayed correctly in the file choosers
+        TemplateExporter format = new TemplateExporter(exporterName, filename, lfFileName, null, ext, layoutPreferences,
                 savePreferences);
         format.setCustomExport(true);
         return Optional.of(format);
