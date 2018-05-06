@@ -326,11 +326,11 @@ class MainTableColumnFactory {
         Optional<String> field = entry.getEntry().getField(content);
         if (field.isPresent()) {
             if (FieldName.DOI.equals(content)) {
-                return Localization.lang("Open DOI web link (%0)", field.get());
+                return Localization.lang("Open %0 URL (%1)", "DOI", field.get());
             } else if (FieldName.URL.equals(content)) {
                 return Localization.lang("Open URL (%0)", field.get());
             } else if (FieldName.EPRINT.equals(content)) {
-                return Localization.lang("Open ArXiv URL (%0)", field.get());
+                return Localization.lang("Open %0 URL (%1)", "ArXiv", field.get());
             }
         }
         return null;
