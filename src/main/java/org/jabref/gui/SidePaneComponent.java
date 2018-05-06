@@ -1,8 +1,12 @@
 package org.jabref.gui;
 
+import java.util.Collections;
+import java.util.List;
+
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -11,11 +15,12 @@ import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.logic.l10n.Localization;
 
 public abstract class SidePaneComponent {
 
-    protected final SidePaneManager manager;
-    protected final ToggleCommand toggleCommand;
+    private final SidePaneManager manager;
+    private final ToggleCommand toggleCommand;
     private final JabRefIcon icon;
     private final String title;
     private Node contentNode;
@@ -25,6 +30,7 @@ public abstract class SidePaneComponent {
         this.icon = icon;
         this.title = title;
         this.toggleCommand = new ToggleCommand(this);
+
     }
 
     protected void hide() {
@@ -35,11 +41,11 @@ public abstract class SidePaneComponent {
         manager.show(this.getType());
     }
 
-    private void moveUp() {
+    protected void moveUp() {
         manager.moveUp(this);
     }
 
-    private void moveDown() {
+    protected void moveDown() {
         manager.moveDown(this);
     }
 
@@ -90,26 +96,36 @@ public abstract class SidePaneComponent {
      */
     public final Node getHeader() {
         Button close = IconTheme.JabRefIcons.CLOSE.asButton();
+        close.setTooltip(new Tooltip(Localization.lang("Hide panel")));
         close.setOnAction(event -> hide());
 
         Button up = IconTheme.JabRefIcons.UP.asButton();
+        up.setTooltip(new Tooltip(Localization.lang("Move panel up")));
         up.setOnAction(event -> moveUp());
 
         Button down = IconTheme.JabRefIcons.DOWN.asButton();
+        down.setTooltip(new Tooltip(Localization.lang("Move panel down")));
         down.setOnAction(event -> moveDown());
 
-        HBox buttonContainer = new HBox();
-        buttonContainer.getChildren().addAll(up, down, close);
+        final HBox buttonContainer = new HBox();
+        buttonContainer.getChildren().addAll(up, down);
+        buttonContainer.getChildren().addAll(getAddtionalHeaderButtons());
+        buttonContainer.getChildren().add(close);
+
         BorderPane graphic = new BorderPane();
         graphic.setCenter(icon.getGraphicNode());
-        BorderPane container = new BorderPane();
-//        container.setLeft(graphic);
+
         final Label label = new Label(title);
+        BorderPane container = new BorderPane();
         container.setCenter(label);
         container.setRight(buttonContainer);
         container.getStyleClass().add("sidePaneComponentHeader");
 
         return container;
+    }
+
+    protected List<Node> getAddtionalHeaderButtons() {
+        return Collections.emptyList();
     }
 
     /**
