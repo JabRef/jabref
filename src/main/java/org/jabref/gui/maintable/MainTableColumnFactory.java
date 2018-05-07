@@ -94,7 +94,7 @@ class MainTableColumnFactory {
 
         // Add column for eprints
         if (preferences.showEprintColumn()) {
-            columns.add(createIconColumn(IconTheme.JabRefIcons.WWW, FieldName.EPRINT));
+            columns.add(createEprintColumn(IconTheme.JabRefIcons.WWW, FieldName.EPRINT));
         }
 
         // Add columns for other file types
@@ -245,6 +245,7 @@ class MainTableColumnFactory {
         column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
                 new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
                         .withGraphic(this::createFileIcon)
+                        .withTooltip(this::createFileTooltip)
                         .withMenu(this::createFileMenu)
                         .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
                             if ((event.getButton() == MouseButton.PRIMARY) && (linkedFiles.size() == 1)) {
@@ -255,6 +256,13 @@ class MainTableColumnFactory {
                         })
                         .install(column);
         return column;
+    }
+
+    private String createFileTooltip(List<LinkedFile> linkedFiles) {
+        if (linkedFiles.size() > 0) {
+            return Localization.lang("Open file %0", linkedFiles.get(0).getLink());
+        }
+        return null;
     }
 
     private ContextMenu createFileMenu(BibEntryTableViewModel entry, List<LinkedFile> linkedFiles) {
@@ -285,9 +293,10 @@ class MainTableColumnFactory {
         column.getStyleClass().add(ICON_COLUMN);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         // icon is chosen based on field name in cell, so map fields to its names
-        column.setCellValueFactory(cellData -> EasyBind.map(cellData.getValue().getField(firstField), x -> firstField).orElse(EasyBind.map(cellData.getValue().getField(secondField), x -> secondField)));
+        column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(firstField)).map(x -> firstField).orElse(EasyBind.monadic(cellData.getValue().getField(secondField)).map(x -> secondField)));
                 new ValueTableCellFactory<BibEntryTableViewModel, String>()
                         .withGraphic(cellFactory::getTableIcon)
+                        .withTooltip(this::createIdentifierTooltip)
                         .withOnMouseClickedEvent((BibEntryTableViewModel entry, String content) -> (MouseEvent event) -> openUrlOrDoi(event, entry, content))
                         .install(column);
         return column;
@@ -313,16 +322,29 @@ class MainTableColumnFactory {
         event.consume();
     }
 
-    private TableColumn<BibEntryTableViewModel, String> createIconColumn(JabRefIcon icon, String field) {
+    private String createIdentifierTooltip(BibEntryTableViewModel entry, String content) {
+        Optional<String> field = entry.getEntry().getField(content);
+        if (field.isPresent()) {
+            if (FieldName.DOI.equals(content)) {
+                return Localization.lang("Open %0 URL (%1)", "DOI", field.get());
+            } else if (FieldName.URL.equals(content)) {
+                return Localization.lang("Open URL (%0)", field.get());
+            } else if (FieldName.EPRINT.equals(content)) {
+                return Localization.lang("Open %0 URL (%1)", "ArXiv", field.get());
+            }
+        }
+        return null;
+    }
+
+    private TableColumn<BibEntryTableViewModel, String> createEprintColumn(JabRefIcon icon, String field) {
         TableColumn<BibEntryTableViewModel, String> column = new TableColumn<>();
         column.setGraphic(icon.getGraphicNode());
         column.getStyleClass().add(ICON_COLUMN);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
-        column.setCellValueFactory(cellData -> {
-            return EasyBind.map(cellData.getValue().getField(field), x -> field);
-        });
+        column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(field)).map(x -> field));
                 new ValueTableCellFactory<BibEntryTableViewModel, String>()
                         .withGraphic(cellFactory::getTableIcon)
+                        .withTooltip(this::createIdentifierTooltip)
                         .withOnMouseClickedEvent((BibEntryTableViewModel entry, String content) -> (MouseEvent event) -> openUrlOrDoi(event, entry, field))
                         .install(column);
         return column;
