@@ -36,6 +36,9 @@ open module org.jabref {
     provides com.airhacks.afterburner.views.ResourceLocator
         with org.jabref.gui.util.JabRefResourceLocator;
 
+    provides com.airhacks.afterburner.injection.PresenterFactory
+        with org.jabref.gui.DefaultInjector;
+
 	// Logging
 	requires org.slf4j;
 	requires org.apache.logging.log4j;
@@ -58,6 +61,7 @@ open module org.jabref {
 	requires spin;
     requires easybind;
     requires de.jensd.fx.glyphs.commons;
+    requires controlsfx;
 
     // Libre Office
 	/*requires ridl;
