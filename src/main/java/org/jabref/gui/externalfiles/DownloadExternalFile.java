@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
@@ -137,46 +139,49 @@ public class DownloadExternalFile {
         }
     }
 
+    public void download(URL url, final DownloadCallback callback) throws IOException {
+        // TODO: what if this takes long time?
+        // TODO: stop editor dialog if this results in an error?
+        String mimeType = new URLDownload(url).getMimeType();
+        download(url, mimeType, callback);
+    }
+
+    private Optional<ExternalFileType> getExternalFileType(String mimeType) {
+        Optional<ExternalFileType> suggestedType = Optional.empty();
+        if (mimeType != null) {
+            LOGGER.debug("MIME Type suggested: " + mimeType);
+            suggestedType = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(mimeType);
+        }
+        return suggestedType;
+    }
+
     /**
      * Start a download.
      *
      * @param callback The object to which the filename should be reported when download
      *                 is complete.
      */
-    public void download(URL url, final DownloadCallback callback) throws IOException {
-        String res = url.toString();
-        String mimeType;
+    public void download(URL url, String mimeType, final DownloadCallback callback) throws IOException {
+        Optional<ExternalFileType> fileType = getExternalFileType(mimeType);
 
         // First of all, start the download itself in the background to a temporary file:
-        final File tmp = File.createTempFile("jabref_download", "tmp");
-        tmp.deleteOnExit();
+        final Path tempFile = Files.createTempFile("jabref_download", "tmp");
+        tempFile.toFile().deleteOnExit();
 
-        URLDownload udl = new URLDownload(url);
-
-        try {
-            // TODO: what if this takes long time?
-            // TODO: stop editor dialog if this results in an error:
-            mimeType = udl.getMimeType(); // Read MIME type
-        } catch (IOException ex) {
-            LOGGER.info("Error while downloading " + "'" + res + "'", ex);
-            dialogService.showErrorDialogAndWait(Localization.lang("Download file"), Localization.lang("Invalid URL") + ": " + ex.getMessage(), ex);
-            return;
-        }
-        final URL urlF = url;
-        final URLDownload udlF = udl;
+        final URLDownload fileDownload = new URLDownload(url);
 
         JabRefExecutorService.INSTANCE.execute(() -> {
             try {
-                udlF.toFile(tmp.toPath());
-            } catch (IOException e2) {
+                fileDownload.toFile(tempFile);
+            } catch (IOException e) {
                 dontShowDialog = true;
                 if ((editor != null) && editor.isVisible()) {
                     editor.setVisible(false, false);
                 }
 
-                LOGGER.info("Error while downloading " + "'" + urlF + "'", e2);
+                LOGGER.info("Error while downloading " + "'" + url + "'", e);
 
-                dialogService.showErrorDialogAndWait(Localization.lang("Download file"), Localization.lang("Invalid URL") + ": " + e2.getMessage());
+                dialogService.showErrorDialogAndWait(Localization.lang("Download file"), Localization.lang("Invalid URL") + ": " + e.getMessage());
 
                 return;
             }
@@ -184,24 +189,18 @@ public class DownloadExternalFile {
             SwingUtilities.invokeLater(DownloadExternalFile.this::downloadFinished);
         });
 
-        Optional<ExternalFileType> suggestedType = Optional.empty();
-        if (mimeType != null) {
-            LOGGER.debug("MIME Type suggested: " + mimeType);
-            suggestedType = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(mimeType);
-        }
         // Then, while the download is proceeding, let the user choose the details of the file:
         String suffix;
-        if (suggestedType.isPresent()) {
-            suffix = suggestedType.get().getExtension();
+        if (fileType.isPresent()) {
+            suffix = fileType.get().getExtension();
         } else {
             // If we did not find a file type from the MIME type, try based on extension:
-            suffix = getSuffix(res);
+            suffix = getSuffix(url.toString());
             if (suffix == null) {
                 suffix = "";
             }
-            suggestedType = ExternalFileTypes.getInstance().getExternalFileTypeByExt(suffix);
+            fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt(suffix);
         }
-
         String suggestedName = getSuggestedFileName(suffix);
         List<String> fDirectory = databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
         String directory;
@@ -212,7 +211,7 @@ public class DownloadExternalFile {
         }
         final String suggestDir = directory == null ? System.getProperty("user.home") : directory;
         File file = new File(new File(suggestDir), suggestedName);
-        LinkedFile fileListEntry = new LinkedFile("", file.getCanonicalPath(), suggestedType.map(ExternalFileType::getName).orElse(""));
+        LinkedFile fileListEntry = new LinkedFile("", file.getCanonicalPath(), fileType.map(ExternalFileType::getName).orElse(""));
         editor = new FileListEntryEditor(fileListEntry, true, false, databaseContext, true);
         editor.getProgressBar().setIndeterminate(true);
         editor.setOkEnabled(false);
@@ -253,7 +252,7 @@ public class DownloadExternalFile {
                 }
             }
 
-            boolean success = FileUtil.copyFile(Paths.get(tmp.toURI()), Paths.get(toFile.toURI()), true);
+            boolean success = FileUtil.copyFile(tempFile, Paths.get(toFile.toURI()), true);
             if (!success) {
                 // OOps, the file exists!
                 LOGGER.error("File already exists! DownloadExternalFile.download()");
@@ -268,16 +267,15 @@ public class DownloadExternalFile {
             }
             callback.downloadComplete(fileListEntry);
 
-            if (!tmp.delete()) {
+            if (!Files.deleteIfExists(tempFile)) {
                 LOGGER.info("Cannot delete temporary file");
             }
         } else {
             // Canceled. Just delete the temp file:
-            if (downloadFinished && !tmp.delete()) {
+            if (downloadFinished && !Files.deleteIfExists(tempFile)) {
                 LOGGER.info("Cannot delete temporary file");
             }
         }
-
     }
 
     /**

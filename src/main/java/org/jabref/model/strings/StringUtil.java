@@ -691,8 +691,7 @@ public class StringUtil {
     }
 
     /**
-     * Make first character of String uppercase, and the
-     * rest lowercase.
+     * Make first character of String uppercase, and the rest lowercase.
      */
     public static String capitalizeFirst(String toCapitalize) {
         if (toCapitalize.length() > 1) {
@@ -718,5 +717,9 @@ public class StringUtil {
     @ApacheCommonsLang3Allowed("No direct Guava equivalent existing - see https://stackoverflow.com/q/16560635/873282")
     public static boolean containsIgnoreCase(String text, String searchString) {
         return StringUtils.containsIgnoreCase(text, searchString);
+    }
+
+    public static String substringBetween(String str, String open, String close) {
+        return StringUtils.substringBetween(str, open, close);
     }
 }

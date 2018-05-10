@@ -3,24 +3,16 @@ package org.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridBagLayout;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -44,21 +36,9 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     private final JTextField fontSize;
     private final JTextField largeIconsTextField;
     private final JTextField smallIconsTextField;
-    // look and feel
-    private final JComboBox<String> classNamesLAF;
-    private String currentLAF = "";
-    private boolean useDefaultLAF;
-    private final JCheckBox customLAF;
     private final JCheckBox fxFontTweaksLAF;
 
     private final DialogService dialogService;
-
-    static class LookAndFeel {
-
-        public static Set<String> getAvailableLookAndFeels() {
-            return Arrays.stream(UIManager.getInstalledLookAndFeels()).map(LookAndFeelInfo::getClassName).collect(Collectors.toSet());
-        }
-    }
 
     /**
      * Customization of appearance parameters.
@@ -82,48 +62,13 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
-        customLAF = new JCheckBox(Localization.lang("Use other look and feel"));
         fxFontTweaksLAF = new JCheckBox(Localization.lang("Tweak font rendering for entry editor on Linux"));
         // Only list L&F which are available
-        Set<String> lookAndFeels = LookAndFeel.getAvailableLookAndFeels();
-        classNamesLAF = new JComboBox<>(lookAndFeels.toArray(new String[lookAndFeels.size()]));
-        classNamesLAF.setEditable(true);
-        customLAF.addChangeListener(e -> classNamesLAF.setEnabled(((JCheckBox) e.getSource()).isSelected()));
 
         // only the default L&F shows the OSX specific first drop-down menu
-        if (!OS.OS_X) {
-            JPanel pan = new JPanel();
-            builder.appendSeparator(Localization.lang("Look and feel"));
-            JLabel lab = new JLabel(
-                    Localization.lang("Default look and feel") + ": " + UIManager.getSystemLookAndFeelClassName());
-            builder.nextLine();
-            builder.append(pan);
-            builder.append(lab);
-            builder.nextLine();
-            builder.append(pan);
-            builder.append(customLAF);
-            builder.nextLine();
-            builder.append(pan);
-            JPanel pan2 = new JPanel();
-            lab = new JLabel(Localization.lang("Class name") + ':');
-            pan2.add(lab);
-            pan2.add(classNamesLAF);
-            builder.append(pan2);
-            builder.nextLine();
-            builder.append(pan);
-            lab = new JLabel(Localization
-                    .lang("Note that you must specify the fully qualified class name for the look and feel,"));
-            builder.append(lab);
-            builder.nextLine();
-            builder.append(pan);
-            lab = new JLabel(
-                    Localization.lang("and the class must be available in your classpath next time you start JabRef."));
-            builder.append(lab);
-            builder.nextLine();
-            builder.append(pan);
-            builder.append(fxFontTweaksLAF);
-            builder.nextLine();
-        }
+
+        builder.append(fxFontTweaksLAF);
+        builder.nextLine();
 
         builder.leadingColumnOffset(2);
 
@@ -135,14 +80,22 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
                 .rows("pref, 3dlu, pref, 3dlu, pref")
                 .columnGroup(2, 6)
                 .columnGroup(4, 8)
-                .add(overrideFonts).xyw(1, 1, 5)
-                .add(new JLabel("    ")).xy(1, 3)
-                .add(new JLabel(Localization.lang("Menu and label font size") + ":")).xy(2, 3)
-                .add(fontSize).xy(4, 3)
-                .add(new JLabel(Localization.lang("Size of large icons") + ":")).xy(2, 5)
-                .add(largeIconsTextField).xy(4, 5)
-                .add(new JLabel(Localization.lang("Size of small icons") + ":")).xy(6, 5)
-                .add(smallIconsTextField).xy(8, 5)
+                .add(overrideFonts)
+                .xyw(1, 1, 5)
+                .add(new JLabel("    "))
+                .xy(1, 3)
+                .add(new JLabel(Localization.lang("Menu and label font size") + ":"))
+                .xy(2, 3)
+                .add(fontSize)
+                .xy(4, 3)
+                .add(new JLabel(Localization.lang("Size of large icons") + ":"))
+                .xy(2, 5)
+                .add(largeIconsTextField)
+                .xy(4, 5)
+                .add(new JLabel(Localization.lang("Size of small icons") + ":"))
+                .xy(6, 5)
+                .add(smallIconsTextField)
+                .xy(8, 5)
                 .build();
 
         builder.append(generalPanel);
@@ -170,12 +123,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     @Override
     public void setValues() {
         // L&F
-        useDefaultLAF = prefs.getBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL);
+
         fxFontTweaksLAF.setSelected(prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK));
-        currentLAF = prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
-        customLAF.setSelected(!useDefaultLAF);
-        classNamesLAF.setSelectedItem(currentLAF);
-        classNamesLAF.setEnabled(!useDefaultLAF);
 
         oldOverrideFontSize = prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS);
         oldMenuFontSize = prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
@@ -194,13 +143,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public void storeSettings() {
-        boolean isRestartRequired;
-
-        // L&F
-        prefs.putBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL, !customLAF.isSelected());
-        prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, classNamesLAF.getSelectedItem().toString());
-        isRestartRequired = (customLAF.isSelected() == useDefaultLAF) ||
-                !currentLAF.equals(classNamesLAF.getSelectedItem().toString());
+        boolean isRestartRequired = false;
 
         // Java FX font rendering tweak
         final boolean oldFxTweakValue = prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK);
@@ -237,8 +180,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             }
 
             if (isRestartRequired) {
-               DefaultTaskExecutor.runInJavaFXThread(()-> dialogService.showWarningDialogAndWait(Localization.lang("Settings"),
-                        Localization.lang("Some appearance settings you changed require to restart JabRef to come into effect.")));
+                dialogService.showWarningDialogAndWait(Localization.lang("Settings"),
+                        Localization.lang("Some appearance settings you changed require to restart JabRef to come into effect."));
             }
         } catch (NumberFormatException ex) {
             // should not happen as values are checked beforehand
@@ -252,7 +195,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             Integer.parseInt(fieldValue);
         } catch (NumberFormatException ex) {
 
-            DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(errorTitle, Localization.lang("You must enter an integer value in the text field for") + " '" + fieldName + "'"));
+            dialogService.showErrorDialogAndWait(errorTitle, Localization.lang("You must enter an integer value in the text field for") + " '" + fieldName + "'");
             return false;
         }
         return true;

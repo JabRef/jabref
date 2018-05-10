@@ -1,18 +1,20 @@
 package org.jabref.logic.importer;
 
-import java.io.BufferedInputStream;
-import java.io.FileNotFoundException;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import org.jsoup.helper.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,8 +63,9 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
             return Optional.empty();
         }
 
-        try (InputStream stream = new BufferedInputStream(getURLForID(identifier).openStream())) {
-            List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
+        try {
+            HttpResponse<String> response = Unirest.get(getURLForID(identifier).toString()).asString();
+            List<BibEntry> fetchedEntries = getParser().parseEntries(new ByteArrayInputStream(response.getBody().getBytes(StandardCharsets.UTF_8)));
 
             if (fetchedEntries.isEmpty()) {
                 return Optional.empty();
@@ -81,13 +84,12 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
             return Optional.of(entry);
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
-        } catch (FileNotFoundException e) {
-            LOGGER.debug("Id not found");
-            return Optional.empty();
         } catch (IOException e) {
             // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource
             throw new FetcherException("An I/O exception occurred", e);
         } catch (ParseException e) {
+            throw new FetcherException("An internal parser error occurred", e);
+        } catch (UnirestException e) {
             throw new FetcherException("An internal parser error occurred", e);
         }
     }

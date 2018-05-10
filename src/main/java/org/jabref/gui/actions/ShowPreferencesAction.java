@@ -20,6 +20,6 @@ public class ShowPreferencesAction extends SimpleCommand {
             prefsDialog.setValues();
         }
 
-        prefsDialog.show();
+        prefsDialog.showAndWait();
     }
 }

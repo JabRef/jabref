@@ -8,8 +8,6 @@ import java.util.Optional;
 
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * Represents a Month of the Year.
  */
@@ -124,8 +122,8 @@ public enum Month {
         }
 
         try {
-            YearMonth yearMonth = YearMonth.parse("1969-" + StringUtils.capitalize(value),
-            		DateTimeFormatter.ofPattern("yyyy-MMM", Locale.GERMAN));
+            YearMonth yearMonth = YearMonth.parse("1969-" + StringUtil.capitalizeFirst(value),
+                    DateTimeFormatter.ofPattern("yyyy-MMM", Locale.GERMAN));
             return Month.getMonthByNumber(yearMonth.getMonthValue());
         } catch (DateTimeParseException e) {
             return Optional.empty();

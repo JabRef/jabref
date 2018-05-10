@@ -25,9 +25,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -179,7 +179,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     }
 
     private String getRequiredValueBetween(String from, String to, String haystack) throws FetcherException {
-        String value = StringUtils.substringBetween(haystack, from, to);
+        String value = StringUtil.substringBetween(haystack, from, to);
         if (value == null) {
             throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"));
         } else {

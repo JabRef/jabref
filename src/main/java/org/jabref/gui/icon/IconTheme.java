@@ -230,6 +230,8 @@ public class IconTheme {
         GROUP_INCLUDING(MaterialDesignIcon.FILTER_OUTLINE) /*css: filter-outline*/,
         GROUP_REFINING(MaterialDesignIcon.FILTER) /*css: filter*/,
         AUTO_GROUP(MaterialDesignIcon.AUTO_FIX), /*css: auto-fix*/
+        GROUP_INTERSECTION(JabRefMaterialDesignIcon.SET_CENTER),
+        GROUP_UNION(JabRefMaterialDesignIcon.SET_ALL),
         EMAIL(MaterialDesignIcon.EMAIL) /*css: email*/,
         EXPORT_TO_CLIPBOARD(MaterialDesignIcon.CLIPBOARD_ARROW_LEFT) /*css: clipboard-arrow-left */,
         ATTACH_FILE(MaterialDesignIcon.PAPERCLIP) /*css: paperclip*/,
@@ -288,7 +290,7 @@ public class IconTheme {
         BLOG(MaterialDesignIcon.RSS), /* css: rss */
         GLOBAL_SEARCH(MaterialDesignIcon.EARTH), /* css: earth */
         DATE_PICKER(MaterialDesignIcon.CALENDAR), /* css: calendar */
-        DEFAULT_GROUP_ICON_COLORED(MaterialDesignIcon.MENU_RIGHT),
+        DEFAULT_GROUP_ICON_COLORED(MaterialDesignIcon.PLAY),
         DEFAULT_GROUP_ICON(MaterialDesignIcon.LABEL_OUTLINE),
         ALL_ENTRIES_GROUP_ICON(DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON),
         IMPORT_EXPORT(MaterialDesignIcon.SWAP_VERTICAL),

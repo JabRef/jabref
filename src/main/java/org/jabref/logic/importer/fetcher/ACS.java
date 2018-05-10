@@ -55,4 +55,9 @@ public class ACS implements FulltextFetcher {
         }
         return pdfLink;
     }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.PUBLISHER;
+    }
 }

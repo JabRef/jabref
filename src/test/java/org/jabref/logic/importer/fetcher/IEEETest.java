@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @FetcherTest
 class IEEETest {
+
     private IEEE finder;
     private BibEntry entry;
 
@@ -30,27 +31,36 @@ class IEEETest {
 
         assertEquals(
                 Optional.of(
-                        new URL("http://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
+                        new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
+                finder.findFullText(entry));
+    }
+
+    @Test
+    void findByDocumentUrl() throws IOException {
+        entry.setField("url", "https://ieeexplore.ieee.org/document/7421926/");
+        assertEquals(
+                Optional.of(
+                        new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
                 finder.findFullText(entry));
     }
 
     @Test
     void findByURL() throws IOException {
-        entry.setField("url", "http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7421926");
+        entry.setField("url", "https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7421926");
 
         assertEquals(
                 Optional.of(
-                        new URL("http://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
+                        new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
                 finder.findFullText(entry));
     }
 
     @Test
     void findByOldURL() throws IOException {
-        entry.setField("url", "http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7421926");
+        entry.setField("url", "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7421926");
 
         assertEquals(
                 Optional.of(
-                        new URL("http://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
+                        new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
                 finder.findFullText(entry));
     }
 
@@ -61,7 +71,7 @@ class IEEETest {
 
         assertEquals(
                 Optional.of(
-                        new URL("http://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
+                        new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
                 finder.findFullText(entry));
     }
 

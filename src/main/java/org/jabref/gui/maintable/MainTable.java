@@ -19,6 +19,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
@@ -77,12 +78,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         panel.showAndEdit(entry.getEntry());
                     }
                 })
-        .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, Globals.getKeyPrefs(), frame.getDialogService()))
+                .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, Globals.getKeyPrefs(), frame.getDialogService()))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
                 .setOnMouseDragEntered(this::handleOnDragEntered)
                 .install(this);
+
         if (preferences.resizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
         }
@@ -158,6 +160,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
         this.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                getSelectedEntries().stream()
+                                    .findFirst()
+                                    .ifPresent(panel::showAndEdit);
+                event.consume();
+                return;
+            }
+
             Optional<KeyBinding> keyBinding = keyBindings.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {

@@ -5,7 +5,6 @@ import java.util.List;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 
 import org.jabref.Globals;
@@ -19,14 +18,12 @@ import org.jabref.gui.filelist.AttachFileAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
-import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
-import org.jabref.gui.specialfields.SpecialFieldViewModel;
+import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
-import org.jabref.model.entry.specialfields.SpecialFieldValue;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
@@ -50,29 +47,27 @@ public class RightClickMenu {
 
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
-                contextMenu.getItems().add(createSpecialFieldMenu(SpecialField.RANKING, factory, panel));
+                contextMenu.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, panel));
             }
 
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
-                contextMenu.getItems().add(getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, panel));
+                contextMenu.getItems().add(SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, panel));
             }
 
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
-                contextMenu.getItems().add(getSpecialFieldSingleItem(SpecialField.QUALITY, factory, panel));
+                contextMenu.getItems().add(SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, panel));
             }
 
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
-                contextMenu.getItems().add(getSpecialFieldSingleItem(SpecialField.PRINTED, factory, panel));
+                contextMenu.getItems().add(SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, panel));
             }
 
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
-                Menu priorityMenu = createSpecialFieldMenu(SpecialField.PRIORITY, factory, panel);
-                contextMenu.getItems().add(priorityMenu);
+                contextMenu.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, panel));
             }
 
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
-                Menu readStatusMenu = createSpecialFieldMenu(SpecialField.READ_STATUS, factory, panel);
-                contextMenu.getItems().add(readStatusMenu);
+                contextMenu.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, panel));
             }
         }
 
@@ -146,11 +141,6 @@ public class RightClickMenu {
         return command;
     }
 
-    private static MenuItem getSpecialFieldSingleItem(SpecialField field, ActionFactory factory, BasePanel panel) {
-        SpecialFieldValueViewModel specialField = new SpecialFieldValueViewModel(field.getValues().get(0));
-        return factory.createMenuItem(specialField.getAction(), new OldCommandWrapper(specialField.getCommand(), panel));
-    }
-
     private static Menu createCopySubMenu(BasePanel panel, ActionFactory factory) {
         Menu copySpecialMenu = factory.createMenu(StandardActions.COPY_MORE);
         copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_TITLE, new OldCommandWrapper(Actions.COPY_TITLE, panel)));
@@ -176,16 +166,6 @@ public class RightClickMenu {
 
         copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.EXPORT_TO_CLIPBOARD, new OldCommandWrapper(Actions.EXPORT_TO_CLIPBOARD, panel)));
         return copySpecialMenu;
-    }
-
-    private static Menu createSpecialFieldMenu(SpecialField field, ActionFactory factory, BasePanel panel) {
-        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field, panel.getUndoManager());
-        Menu menu = factory.createMenu(viewModel.getAction());
-        for (SpecialFieldValue val : field.getValues()) {
-            SpecialFieldValueViewModel specialField = new SpecialFieldValueViewModel(val);
-            menu.getItems().add(factory.createMenuItem(specialField.getAction(), new OldCommandWrapper(specialField.getCommand(), panel)));
-        }
-        return menu;
     }
 
     private static boolean areGroupsPresent(BibDatabaseContext database) {

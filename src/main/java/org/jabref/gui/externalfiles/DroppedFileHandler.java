@@ -23,6 +23,7 @@ import javax.swing.event.ChangeListener;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -64,8 +65,6 @@ public class DroppedFileHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DroppedFileHandler.class);
 
-    private final JabRefFrame frame;
-
     private final BasePanel panel;
 
     private final JRadioButton linkInPlace = new JRadioButton();
@@ -79,10 +78,12 @@ public class DroppedFileHandler {
     private final JTextField renameToTextBox = new JTextField(50);
 
     private final JPanel optionsPanel = new JPanel();
+    private final DialogService dialogService;
+    private JabRefPreferences preferences;
 
     public DroppedFileHandler(JabRefFrame frame, BasePanel panel) {
-
-        this.frame = frame;
+        this.dialogService = frame.getDialogService();
+        this.preferences = frame.prefs();
         this.panel = panel;
 
         ButtonGroup grp = new ButtonGroup();
@@ -368,10 +369,10 @@ public class DroppedFileHandler {
             renameToTextBox
                     .setText(targetDirName.concat("/").concat(targetName.concat(".").concat(fileType.getExtension())));
         }
-        linkInPlace.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE));
-        copyRadioButton.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_COPY));
-        moveRadioButton.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_MOVE));
-        renameCheckBox.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_RENAME));
+        linkInPlace.setSelected(preferences.getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE));
+        copyRadioButton.setSelected(preferences.getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_COPY));
+        moveRadioButton.setSelected(preferences.getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_MOVE));
+        renameCheckBox.setSelected(preferences.getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_RENAME));
 
         linkInPlace.addChangeListener(cl);
         cl.stateChanged(new ChangeEvent(linkInPlace));
@@ -382,10 +383,10 @@ public class DroppedFileHandler {
                     JOptionPane.QUESTION_MESSAGE);
             if (reply == JOptionPane.OK_OPTION) {
                 // store user's choice
-                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE, linkInPlace.isSelected());
-                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_COPY, copyRadioButton.isSelected());
-                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_MOVE, moveRadioButton.isSelected());
-                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_RENAME, renameCheckBox.isSelected());
+                preferences.putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE, linkInPlace.isSelected());
+                preferences.putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_COPY, copyRadioButton.isSelected());
+                preferences.putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_MOVE, moveRadioButton.isSelected());
+                preferences.putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_RENAME, renameCheckBox.isSelected());
                 return true;
             } else {
                 return false;
@@ -499,10 +500,10 @@ public class DroppedFileHandler {
             if (FileUtil.renameFile(fromFile, destFile, true)) {
                 return true;
             } else {
-                JOptionPane.showMessageDialog(null,
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("Move file failed"),
                         Localization.lang("Could not move file '%0'.", destFile.toString())
-                                + Localization.lang("Please move the file manually and link in place."),
-                        Localization.lang("Move file failed"), JOptionPane.ERROR_MESSAGE);
+                                + Localization.lang("Please move the file manually and link in place."));
                 return false;
             }
         }

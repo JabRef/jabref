@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -57,7 +58,8 @@ public class ExporterTest {
         Map<String, TemplateExporter> customFormats = new HashMap<>();
         LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class);
         SavePreferences savePreferences = mock(SavePreferences.class);
-        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences);
+        XmpPreferences xmpPreferences = mock(XmpPreferences.class);
+        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
 
         for (Exporter format : exporterFactory.getExporters()) {
             result.add(new Object[]{format, format.getDisplayName()});

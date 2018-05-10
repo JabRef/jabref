@@ -115,7 +115,7 @@ public class ImporterTest {
                 new Object[]{new IsiImporter()},
                 new Object[]{new MedlineImporter()},
                 new Object[]{new MedlinePlainImporter()},
-                new Object[]{new ModsImporter()},
+                new Object[]{new ModsImporter(importFormatPreferences)},
                 new Object[]{new MsBibImporter()},
                 new Object[]{new OvidImporter()},
                 new Object[]{new PdfContentImporter(importFormatPreferences)},

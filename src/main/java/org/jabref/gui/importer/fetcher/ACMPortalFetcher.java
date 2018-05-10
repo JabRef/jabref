@@ -78,7 +78,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private static final Pattern FULL_CITATION_PATTERN = Pattern.compile("<a href=\"(citation.cfm.*)\" target.*");
 
-    private static final Pattern ID_PATTERN = Pattern.compile("citation.cfm\\?id=(\\d+)&.*");
+    private static final Pattern ID_PATTERN = Pattern.compile("citation.cfm\\?id=(\\d+).*");
 
     // Patterns used to extract information for the preview:
     private static final Pattern TITLE_PATTERN = Pattern.compile("<a href=.*?\">([^<]*)</a>");

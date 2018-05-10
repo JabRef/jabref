@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -40,6 +39,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
     private final JabRefFrame frame;
     private final boolean openInNew;
     private final Importer importer;
+    private final DialogService dialogService;
     private Exception importError;
 
     public ImportMenuItem(JabRefFrame frame, boolean openInNew) {
@@ -50,6 +50,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         super(importer == null ? Localization.lang("Autodetect format") : importer.getName());
         this.importer = importer;
         this.frame = frame;
+        this.dialogService = frame.getDialogService();
         this.openInNew = openInNew;
         addActionListener(this);
     }
@@ -89,10 +90,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
 
-            DialogService ds = frame.getDialogService();
-
             filenames = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> ds.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));
+                    .runInJavaFXThread(() -> dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));
 
             if (!filenames.isEmpty()) {
                 frame.output(Localization.lang("Starting import"));
@@ -159,13 +158,11 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 } else {
                     // Import in a specific format was specified. Check if we have stored error information:
                     if (importError == null) {
-                        JOptionPane.showMessageDialog(null,
-                                Localization
-                                        .lang("No entries found. Please make sure you are using the correct import filter."),
-                                Localization.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
+                        dialogService.showErrorDialogAndWait(
+                                Localization.lang("Import failed"),
+                                Localization.lang("No entries found. Please make sure you are using the correct import filter."));
                     } else {
-                        JOptionPane.showMessageDialog(null, importError.getMessage(),
-                                Localization.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
+                        dialogService.showErrorDialogAndWait(Localization.lang("Import failed"), importError);
                     }
                 }
             } else {

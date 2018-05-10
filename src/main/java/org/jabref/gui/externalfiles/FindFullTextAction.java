@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
 public class FindFullTextAction extends AbstractWorker {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FindFullTextAction.class);
-
-    private static final int WARNING_LIMIT = 5; // The minimum number of selected entries to ask the user for confirmation
+    // The minimum number of selected entries to ask the user for confirmation
+    private static final int WARNING_LIMIT = 5;
 
     private final BasePanel basePanel;
     private final Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
@@ -68,15 +68,16 @@ public class FindFullTextAction extends AbstractWorker {
                 return;
             }
         }
+
         for (BibEntry entry : basePanel.getSelectedEntries()) {
-            FulltextFetchers fft = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
-            downloads.put(fft.findFullTextPDF(entry), entry);
+            FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
+            downloads.put(fetchers.findFullTextPDF(entry), entry);
         }
     }
 
     @Override
     public void update() {
-        List<Optional<URL>> remove = new ArrayList<>();
+        List<Optional<URL>> finishedTasks = new ArrayList<>();
         for (Map.Entry<Optional<URL>, BibEntry> download : downloads.entrySet()) {
             BibEntry entry = download.getValue();
             Optional<URL> result = download.getKey();
@@ -91,10 +92,10 @@ public class FindFullTextAction extends AbstractWorker {
 
                     return;
                 }
-                DownloadExternalFile def = new DownloadExternalFile(dialogService,
+                DownloadExternalFile fileDownload = new DownloadExternalFile(dialogService,
                         basePanel.getBibDatabaseContext(), entry);
                 try {
-                    def.download(result.get(), file -> {
+                    fileDownload.download(result.get(), "application/pdf", file -> {
                         DefaultTaskExecutor.runInJavaFXThread(() -> {
                             Optional<FieldChange> fieldChange = entry.addFile(file);
                             if (fieldChange.isPresent()) {
@@ -108,20 +109,22 @@ public class FindFullTextAction extends AbstractWorker {
                     });
                 } catch (IOException e) {
                     LOGGER.warn("Problem downloading file", e);
+                    basePanel.output(Localization.lang("Full text document download failed for entry %0",
+                            entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
                 }
                 basePanel.output(Localization.lang("Finished downloading full text document for entry %0.",
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
             } else {
-                String title = Localization.lang("Full text document download failed");
-                String message = Localization.lang("Full text document download failed for entry %0.",
+                String title = Localization.lang("No full text document found");
+                String message = Localization.lang("No full text document found for entry %0.",
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined")));
 
                 basePanel.output(message);
                 DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(title, message));
             }
-            remove.add(result);
+            finishedTasks.add(result);
         }
-        for (Optional<URL> result : remove) {
+        for (Optional<URL> result : finishedTasks) {
             downloads.remove(result);
         }
     }

@@ -45,7 +45,7 @@ public class PdfXmpImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(FileType.XMP, importer.getFileType());
+        assertEquals(FileType.PDF_XMP, importer.getFileType());
     }
 
     @Test

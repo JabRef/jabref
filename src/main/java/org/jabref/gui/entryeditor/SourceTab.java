@@ -48,11 +48,11 @@ public class SourceTab extends EntryEditorTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceTab.class);
     private final LatexFieldFormatterPreferences fieldFormatterPreferences;
     private final BibDatabaseMode mode;
-    private UndoManager undoManager;
+    private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator(sourceIsValid);
     private final ImportFormatPreferences importFormatPreferences;
-    private FileUpdateMonitor fileMonitor;
+    private final FileUpdateMonitor fileMonitor;
 
     public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.mode = bibDatabaseContext.getMode();
@@ -63,6 +63,7 @@ public class SourceTab extends EntryEditorTab {
         this.fieldFormatterPreferences = fieldFormatterPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
+
     }
 
     private static String getSourceString(BibEntry entry, BibDatabaseMode type, LatexFieldFormatterPreferences fieldFormatterPreferences) throws IOException {
@@ -114,10 +115,11 @@ public class SourceTab extends EntryEditorTab {
                 }
             });
         });
+
     }
 
     private void storeSource(String text) {
-        if (currentEntry == null || text.isEmpty()) {
+        if ((currentEntry == null) || text.isEmpty()) {
             return;
         }
 

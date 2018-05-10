@@ -3,7 +3,6 @@ package org.jabref.gui.util;
 import java.util.function.Consumer;
 
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 
 import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
@@ -24,7 +23,7 @@ public class ControlHelper {
 
     public static void setSwingContent(DialogPane dialogPane, JComponent content) {
         SwingNode node = new SwingNode();
-        SwingUtilities.invokeLater(() -> node.setContent(content));
+        node.setContent(content);
         node.setVisible(true);
 
         dialogPane.setContent(node);

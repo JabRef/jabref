@@ -93,13 +93,13 @@ public class JabRefDesktop {
             try {
                 NATIVE_DESKTOP.openFile(link, FieldName.PS);
             } catch (IOException e) {
-                LOGGER.error("An error occured on the command: " + link, e);
+                LOGGER.error("An error occurred on the command: " + link, e);
             }
         } else if (FieldName.PDF.equals(fieldName)) {
             try {
                 NATIVE_DESKTOP.openFile(link, FieldName.PDF);
             } catch (IOException e) {
-                LOGGER.error("An error occured on the command: " + link, e);
+                LOGGER.error("An error occurred on the command: " + link, e);
             }
         } else {
             LOGGER.info("Message: currently only PDF, PS and HTML files can be opened by double clicking");
@@ -136,7 +136,13 @@ public class JabRefDesktop {
             openExternalFilePlatformIndependent(type, filePath);
             return true;
         } else {
-            // No file matched the name, or we did not know the file type.
+            // No file matched the name, try to open it directly using the given app
+            if (type.isPresent()) {
+                openExternalFilePlatformIndependent(type, link);
+                return true;
+            }
+
+            // Run out of ideas what to do...
             return false;
         }
     }

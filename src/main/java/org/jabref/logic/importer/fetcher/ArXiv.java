@@ -86,6 +86,11 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         return Optional.empty();
     }
 
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.PREPRINT;
+    }
+
     private Optional<ArXivEntry> searchForEntry(String searchQuery) throws FetcherException {
         List<ArXivEntry> entries = queryApi(searchQuery, Collections.emptyList(), 0, 1);
         if (entries.size() == 1) {
@@ -398,7 +403,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             primaryCategory.ifPresent(category -> bibEntry.setField(FieldName.EPRINTCLASS, category));
             journalReferenceText.ifPresent(journal -> bibEntry.setField(FieldName.JOURNALTITLE, journal));
             getPdfUrl().ifPresent(url -> bibEntry
-                    .setFiles(Collections.singletonList(new LinkedFile("", url, "PDF"))));
+                    .setFiles(Collections.singletonList(new LinkedFile(url, "PDF"))));
             return bibEntry;
         }
     }

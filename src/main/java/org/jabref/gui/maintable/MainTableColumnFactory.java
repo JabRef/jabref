@@ -1,5 +1,6 @@
 package org.jabref.gui.maintable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +16,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -22,6 +24,7 @@ import javafx.scene.shape.Rectangle;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
@@ -44,11 +47,15 @@ import org.jabref.model.util.OptionalUtil;
 
 import org.controlsfx.control.Rating;
 import org.fxmisc.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class MainTableColumnFactory {
 
     private static final String ICON_COLUMN = "column-icon";
     private static final String GROUP_COLUMN = "column-groups";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnFactory.class);
 
     private final ColumnPreferences preferences;
     private final ExternalFileTypes externalFileTypes;
@@ -79,15 +86,15 @@ class MainTableColumnFactory {
         // Add column for DOI/URL
         if (preferences.showUrlColumn()) {
             if (preferences.preferDoiOverUrl()) {
-                columns.add(createIconColumn(IconTheme.JabRefIcons.DOI, FieldName.DOI, FieldName.URL));
+                columns.add(createUrlOrDoiColumn(IconTheme.JabRefIcons.DOI, FieldName.DOI, FieldName.URL));
             } else {
-                columns.add(createIconColumn(IconTheme.JabRefIcons.WWW, FieldName.URL, FieldName.DOI));
+                columns.add(createUrlOrDoiColumn(IconTheme.JabRefIcons.WWW, FieldName.URL, FieldName.DOI));
             }
         }
 
         // Add column for eprints
         if (preferences.showEprintColumn()) {
-            columns.add(createIconColumn(IconTheme.JabRefIcons.WWW, FieldName.EPRINT));
+            columns.add(createEprintColumn(IconTheme.JabRefIcons.WWW, FieldName.EPRINT));
         }
 
         // Add columns for other file types
@@ -238,6 +245,7 @@ class MainTableColumnFactory {
         column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
                 new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
                         .withGraphic(this::createFileIcon)
+                        .withTooltip(this::createFileTooltip)
                         .withMenu(this::createFileMenu)
                         .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
                             if ((event.getButton() == MouseButton.PRIMARY) && (linkedFiles.size() == 1)) {
@@ -248,6 +256,13 @@ class MainTableColumnFactory {
                         })
                         .install(column);
         return column;
+    }
+
+    private String createFileTooltip(List<LinkedFile> linkedFiles) {
+        if (linkedFiles.size() > 0) {
+            return Localization.lang("Open file %0", linkedFiles.get(0).getLink());
+        }
+        return null;
     }
 
     private ContextMenu createFileMenu(BibEntryTableViewModel entry, List<LinkedFile> linkedFiles) {
@@ -269,28 +284,68 @@ class MainTableColumnFactory {
     }
 
     /**
-     * Creates a column which shows an icon instead of the textual content
+     * Creates a column for DOIs or URLs.
+     * The {@code firstField} is preferred to be shown over {@code secondField}.
      */
-    private TableColumn<BibEntryTableViewModel, String> createIconColumn(JabRefIcon icon, String firstField, String secondField) {
+    private TableColumn<BibEntryTableViewModel, String> createUrlOrDoiColumn(JabRefIcon icon, String firstField, String secondField) {
         TableColumn<BibEntryTableViewModel, String> column = new TableColumn<>();
         column.setGraphic(icon.getGraphicNode());
         column.getStyleClass().add(ICON_COLUMN);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
-        column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(firstField)).orElse(cellData.getValue().getField(secondField)));
+        // icon is chosen based on field name in cell, so map fields to its names
+        column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(firstField)).map(x -> firstField).orElse(EasyBind.monadic(cellData.getValue().getField(secondField)).map(x -> secondField)));
                 new ValueTableCellFactory<BibEntryTableViewModel, String>()
                         .withGraphic(cellFactory::getTableIcon)
+                        .withTooltip(this::createIdentifierTooltip)
+                        .withOnMouseClickedEvent((BibEntryTableViewModel entry, String content) -> (MouseEvent event) -> openUrlOrDoi(event, entry, content))
                         .install(column);
         return column;
     }
 
-    private TableColumn<BibEntryTableViewModel, String> createIconColumn(JabRefIcon icon, String field) {
+    private void openUrlOrDoi(MouseEvent event, BibEntryTableViewModel entry, String field) {
+        if (event.getButton() != MouseButton.PRIMARY) {
+            return;
+        }
+
+        if (!entry.getEntry().hasField(field)) {
+            LOGGER.error("Requested opening viewer for {} of entry '{}', but field is not present.", field, entry.getEntry().getId());
+            return;
+        }
+
+        entry.getEntry().getField(field).ifPresent(identifier -> {
+            try {
+                JabRefDesktop.openExternalViewer(database, identifier, field);
+            } catch (IOException e) {
+                dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
+            }
+        });
+        event.consume();
+    }
+
+    private String createIdentifierTooltip(BibEntryTableViewModel entry, String content) {
+        Optional<String> field = entry.getEntry().getField(content);
+        if (field.isPresent()) {
+            if (FieldName.DOI.equals(content)) {
+                return Localization.lang("Open %0 URL (%1)", "DOI", field.get());
+            } else if (FieldName.URL.equals(content)) {
+                return Localization.lang("Open URL (%0)", field.get());
+            } else if (FieldName.EPRINT.equals(content)) {
+                return Localization.lang("Open %0 URL (%1)", "ArXiv", field.get());
+            }
+        }
+        return null;
+    }
+
+    private TableColumn<BibEntryTableViewModel, String> createEprintColumn(JabRefIcon icon, String field) {
         TableColumn<BibEntryTableViewModel, String> column = new TableColumn<>();
         column.setGraphic(icon.getGraphicNode());
         column.getStyleClass().add(ICON_COLUMN);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
-        column.setCellValueFactory(cellData -> cellData.getValue().getField(field));
+        column.setCellValueFactory(cellData -> EasyBind.monadic(cellData.getValue().getField(field)).map(x -> field));
                 new ValueTableCellFactory<BibEntryTableViewModel, String>()
                         .withGraphic(cellFactory::getTableIcon)
+                        .withTooltip(this::createIdentifierTooltip)
+                        .withOnMouseClickedEvent((BibEntryTableViewModel entry, String content) -> (MouseEvent event) -> openUrlOrDoi(event, entry, field))
                         .install(column);
         return column;
     }

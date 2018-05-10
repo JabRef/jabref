@@ -17,8 +17,8 @@ env:
   global:
     - GRADLE_OPTS=-Dorg.gradle.daemon=false
   matrix:
-    - TEST_SUITE=checkstyle
     - TEST_SUITE=check OPTIONS=modernizer
+    - TEST_SUITE=checkstyle
     - TEST_SUITE=fetcherTest
     - TEST_SUITE=databaseTest
     - TEST_SUITE=guiTest
@@ -50,7 +50,7 @@ script:
   - if [ "$TEST_SUITE" != "guiTest" ] && [ "$TEST_SUITE" != "checkstyle" ] && [ "$TEST_SUITE" != "codecov" ]; then ./gradlew $TEST_SUITE $OPTIONS --scan; fi
   - if [ "$TEST_SUITE" == "checkstyle" ]; then ./gradlew checkstyleMain checkstyleTest checkstyleJmh; fi
   - if [ "$TEST_SUITE" == "guiTest" ]; then ./buildres/gui-tests.sh; fi
-  - if [ "$TEST_SUITE" == "codecov" ]; then ./gradlew jacocoJunit5TestReport; bash <(curl -s https://codecov.io/bash); fi
+  - if [ "$TEST_SUITE" == "codecov" ]; then ./gradlew jacocoTestReport; bash <(curl -s https://codecov.io/bash); fi
   - if [ "$DEPENDENCY_UPDATES" == "check" ]; then ./gradlew -q checkOutdatedDependencies; fi
 
 after_failure:
