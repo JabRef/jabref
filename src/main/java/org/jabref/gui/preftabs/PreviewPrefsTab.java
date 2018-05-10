@@ -26,6 +26,7 @@ import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.PreviewPanel;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
@@ -125,7 +126,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
             try {
                 DefaultTaskExecutor.runInJavaFXThread(() -> {
 
-                    PreviewPanel testPane = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService);
+                    PreviewPanel testPane = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService, ExternalFileTypes.getInstance());
                     testPane.setFixedLayout(layout.getText());
                     testPane.setEntry(TestEntry.getTestEntry());
 
