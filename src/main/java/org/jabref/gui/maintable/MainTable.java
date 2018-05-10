@@ -292,7 +292,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             if (event.getTransferMode() == TransferMode.MOVE) {
 
                 System.out.println("Mode MOVE"); //shift on win or no modifier
-                fileHandler.addFilesToEntry(entry, files);
+                fileHandler.addNewEntryFromXMPorPDFContent(entry, files);
                 success = true;
             }
             if (event.getTransferMode() == TransferMode.LINK) {
