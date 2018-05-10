@@ -2,7 +2,6 @@ package org.jabref.gui.search;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -41,7 +40,6 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
-import org.jabref.gui.TransferableBibtexEntry;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
@@ -218,12 +216,17 @@ public class SearchResultFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!selectionModel.getSelected().isEmpty()) {
-                    List<BibEntry> bes = selectionModel.getSelected();
-                    TransferableBibtexEntry trbe = new TransferableBibtexEntry(bes);
+                    List<BibEntry> selectedEntries = selectionModel.getSelected();
                     // ! look at ClipBoardManager
-                    Toolkit.getDefaultToolkit().getSystemClipboard()
-                            .setContents(trbe, frame.getCurrentBasePanel());
-                    frame.output(Localization.lang("Copied") + ' ' + (bes.size() > 1 ? bes.size() + " "
+
+                    try {
+                        Globals.clipboardManager.setClipboardContent(selectedEntries);
+                    } catch (IOException ex) {
+                        LOGGER.error("Error while copying selected entries to clipboard", ex);
+                    }
+
+
+                    frame.output(Localization.lang("Copied") + ' ' + (selectedEntries.size() > 1 ? selectedEntries.size() + " "
                             + Localization.lang("entries")
                             : "1 " + Localization.lang("entry") + '.'));
                 }
