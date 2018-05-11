@@ -44,7 +44,9 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        Optional<DOI> doi = DOI.parse(identifier);
+        String cleanedIdentifier = identifier.trim();
+        cleanedIdentifier = identifier.replaceAll(" ", "");
+        Optional<DOI> doi = DOI.parse(cleanedIdentifier);
 
         try {
             if (doi.isPresent()) {
@@ -60,7 +62,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 fetchedEntry.ifPresent(this::doPostCleanup);
                 return fetchedEntry;
             } else {
-                throw new FetcherException(Localization.lang("Invalid DOI: '%0'.", identifier));
+                throw new FetcherException(Localization.lang("Invalid DOI: '%0'.", cleanedIdentifier));
             }
         } catch (IOException e) {
             throw new FetcherException(Localization.lang("Connection error"), e);
