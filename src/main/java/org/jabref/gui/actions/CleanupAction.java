@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.cleanup.CleanupDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -22,7 +21,6 @@ import org.jabref.preferences.JabRefPreferences;
 public class CleanupAction extends AbstractWorker {
 
     private final BasePanel panel;
-    private final JabRefFrame frame;
     private final DialogService dialogService;
 
     /**
@@ -36,9 +34,8 @@ public class CleanupAction extends AbstractWorker {
 
     public CleanupAction(BasePanel panel, JabRefPreferences preferences) {
         this.panel = panel;
-        this.frame = panel.frame();
         this.preferences = preferences;
-        this.dialogService = frame.getDialogService();
+        this.dialogService = panel.frame().getDialogService();
     }
 
     @Override
@@ -60,7 +57,7 @@ public class CleanupAction extends AbstractWorker {
         if (canceled) {
             return;
         }
-        CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), Globals.prefs.getCleanupPreset());
+        CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), preferences.getCleanupPreset());
 
         Optional<CleanupPreset> chosenPreset = cleanupDialog.showAndWait();
         if (!chosenPreset.isPresent()) {
@@ -68,18 +65,18 @@ public class CleanupAction extends AbstractWorker {
             return;
         }
         CleanupPreset cleanupPreset = chosenPreset.get();
-        Globals.prefs.setCleanupPreset(cleanupPreset);
+        preferences.setCleanupPreset(cleanupPreset);
 
-        if (cleanupPreset.isRenamePDF() && Globals.prefs.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
+        if (cleanupPreset.isRenamePDF() && preferences.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
 
-            boolean autogeneratePressed = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Autogenerate PDF Names"),
+            boolean confirmed = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Autogenerate PDF Names"),
                     Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
                     Localization.lang("Autogenerate PDF Names"),
                     Localization.lang("Cancel"),
                     Localization.lang("Disable this confirmation dialog"),
                     optOut -> Globals.prefs.putBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN, !optOut)));
 
-            if (!autogeneratePressed) {
+            if (!confirmed) {
                 canceled = true;
                 return;
             }
