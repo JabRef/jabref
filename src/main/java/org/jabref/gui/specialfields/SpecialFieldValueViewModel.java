@@ -87,37 +87,37 @@ public class SpecialFieldValueViewModel {
     public Actions getCommand() {
         switch (value) {
             case PRINTED:
-                return Actions.togglePrinted;
+                return Actions.TOGGLE_PRINTED;
             case CLEAR_PRIORITY:
-                return Actions.clearPriority;
+                return Actions.CLEAR_PRIORITY;
             case PRIORITY_HIGH:
-                return Actions.setPriority1;
+                return Actions.SET_PRIORITY_1;
             case PRIORITY_MEDIUM:
-                return Actions.setPriority2;
+                return Actions.SET_PRIORITY_2;
             case PRIORITY_LOW:
-                return Actions.setPriority3;
+                return Actions.SET_PRIORITY_3;
             case QUALITY_ASSURED:
-                return Actions.toggleQualityAssured;
+                return Actions.TOGGLE_QUALITY_ASSURED;
             case CLEAR_RANK:
-                return Actions.clearRank;
+                return Actions.CLEAR_RANK;
             case RANK_1:
-                return Actions.setRank1;
+                return Actions.SET_RANK_1;
             case RANK_2:
-                return Actions.setRank2;
+                return Actions.SET_RANK_2;
             case RANK_3:
-                return Actions.setRank3;
+                return Actions.SET_RANK_3;
             case RANK_4:
-                return Actions.setRank4;
+                return Actions.SET_RANK_4;
             case RANK_5:
-                return Actions.setRank5;
+                return Actions.SET_RANK_5;
             case CLEAR_READ_STATUS:
-                return Actions.clearReadStatus;
+                return Actions.CLEAR_READ_STATUS;
             case READ:
-                return Actions.setReadStatusToRead;
+                return Actions.SET_READ_STATUS_TO_READ;
             case SKIMMED:
-                return Actions.setReadStatusToSkimmed;
+                return Actions.SET_READ_STATUS_TO_SKIMMED;
             case RELEVANT:
-                return Actions.toggleRelevance;
+                return Actions.TOGGLE_RELEVANCE;
             default:
                 throw new IllegalArgumentException("There is no action name for special field value " + value);
         }
