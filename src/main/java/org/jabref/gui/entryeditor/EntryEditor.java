@@ -88,7 +88,6 @@ public class EntryEditor extends BorderPane {
                   .root(this)
                   .load();
 
-        //getStylesheets().add(EntryEditor.class.getResource("EntryEditor.css").toExternalForm());
         if (GUIGlobals.currentFont != null) {
             setStyle(
                     "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"
