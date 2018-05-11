@@ -15,9 +15,10 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added a fetcher based on RFC-IDs. [#3971](https://github.com/JabRef/jabref/issues/3971)
 
 ### Fixed
-We fixed an issue where the export to clipboard functionality could not be invoked [#3994](https://github.com/JabRef/jabref/issues/3994)
-We fixed an issue with the migration of invalid Look and Feels [#3995, comment](https://github.com/JabRef/jabref/issues/3995#issuecomment-385649448)
-We fixed an issue where JabRef would no longer start, when the option "Override default font settings" was activated [#3986](https://github.com/JabRef/jabref/issues/3986)
+We fixed an issue where the export to clipboard functionality could not be invoked. [#3994](https://github.com/JabRef/jabref/issues/3994)
+We fixed an issue with the migration of invalid Look and Feels. [#3995, comment](https://github.com/JabRef/jabref/issues/3995#issuecomment-385649448)
+We fixed an issue where JabRef would no longer start, when the option "Override default font settings" was activated. [#3986](https://github.com/JabRef/jabref/issues/3986)
+We fixed an issue where JabRef removed whitespace from the Title-fetcher which resulting in no entries being found. [#4014](https://github.com/JabRef/jabref/issues/4014)
 We fixed an issue where fetched entries from the ACM fetcher could not be imported. [#4018](https://github.com/JabRef/jabref/issues/4018)
 
 ### Removed
