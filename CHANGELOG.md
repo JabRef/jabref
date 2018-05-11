@@ -19,6 +19,8 @@ We fixed an issue where the export to clipboard functionality could not be invok
 We fixed an issue with the migration of invalid Look and Feels [#3995, comment](https://github.com/JabRef/jabref/issues/3995#issuecomment-385649448)
 We fixed an issue where JabRef would no longer start, when the option "Override default font settings" was activated [#3986](https://github.com/JabRef/jabref/issues/3986)
 We fixed an issue where custom exports could not be selected in the 'Export (selected) entries' dialog [#4013](https://github.com/JabRef/jabref/issues/4013)
+We fixed an issue where fetched entries from the ACM fetcher could not be imported. [#4018](https://github.com/JabRef/jabref/issues/4018)
+
 ### Removed
 We removed the GTK Look and Feel from the Options, as it leads to freezes in JabRef on MacOSX and Linux [#3995](https://github.com/JabRef/jabref/issues/3995)
 The GTK Look and Feel is now replaced with the "Nimbus" style as default.
