@@ -30,8 +30,9 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
     private final BibDatabaseMode mode;
     private final DialogService dialogService;
 
-    /** Creates a new instance of EntryTypeList
-     * @param frame */
+    /**
+     * Creates a new instance of EntryTypeList
+     */
     public EntryTypeList(DialogService dialogService, List<String> fields, BibDatabaseMode mode) {
         super(Localization.lang("Entry types"), fields, fields, false, true);
         this.mode = mode;
