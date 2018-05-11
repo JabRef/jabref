@@ -34,7 +34,7 @@ public class BibSonomySidePanel extends JPanel {
     private static final long serialVersionUID = 1L;
     private JPanel controlsPanel;
     private JTextField searchTextField;
-    private JComboBox<?> searchTypeComboBox;
+    private JComboBox<SearchTypeComboBoxItem> searchTypeComboBox;
     private JButton searchButton;
     private JPanel tagsPanel;
     private JButton tagsUpdateButton;
@@ -149,31 +149,27 @@ public class BibSonomySidePanel extends JPanel {
     }
 
     /**
-     * This method initializes searchTypeComboBox
-     *
-     * @return javax.swing.JComboBox
+     * Initializes searchTypeComboBox
      */
-    private JComboBox<?> getSearchTypeComboBox() {
-
+    private JComboBox<SearchTypeComboBoxItem> getSearchTypeComboBox() {
         if (searchTypeComboBox == null) {
             SearchTypeComboBoxItem[] items = new SearchTypeComboBoxItem[]{
                     new SearchTypeComboBoxItem(SearchType.FULL_TEXT, Localization.lang("Full text")),
                     new SearchTypeComboBoxItem(SearchType.TAGS, Localization.lang("Tag"))
             };
-            searchTypeComboBox = new JComboBox<Object>(items);
+            searchTypeComboBox = new JComboBox<>(items);
         }
         return searchTypeComboBox;
     }
 
     /**
-     * This method initializes searchButton
-     *
-     * @return javax.swing.JButton
+     * Initializes searchButton
      */
     private JButton getSearchButton() {
         if (searchButton == null) {
             searchButton = new JButton(
-                    new SearchAction(jabRefFrame, getSearchTextField(),
+                    new SearchAction(jabRefFrame,
+                            getSearchTextField(),
                             getSearchTypeComboBox(),
                             getVisibilityComboBox())
             );
@@ -182,9 +178,7 @@ public class BibSonomySidePanel extends JPanel {
     }
 
     /**
-     * This method initializes tagsPanel
-     *
-     * @return javax.swing.JPanel
+     * Initializes tagsPanel
      */
     private JPanel getTagsPanel() {
         if (tagsPanel == null) {
@@ -255,14 +249,11 @@ public class BibSonomySidePanel extends JPanel {
     }
 
     /**
-     * This method initializes visibilityComboBox
-     *
-     * @return javax.swing.JComboBox
+     * Initializes visibilityComboBox
      */
     private JComboBox<GroupingComboBoxItem> getVisibilityComboBox() {
         if (visibilityComboBox == null) {
             visibilityComboBox = new JComboBox<>();
-            //Set Default Values
             List<GroupingComboBoxItem> defaultGroupings = new ArrayList<>();
             defaultGroupings.add(new GroupingComboBoxItem(GroupingEntity.ALL, "all users"));
             defaultGroupings.add(new GroupingComboBoxItem(GroupingEntity.USER, BibSonomyProperties.getUsername()));
@@ -274,9 +265,7 @@ public class BibSonomySidePanel extends JPanel {
     }
 
     /**
-     * This method initializes tagListScrollPane
-     *
-     * @return javax.swing.JScrollPane
+     * Initializes tagListScrollPane
      */
     private JScrollPane getTagListScrollPane() {
         if (tagListScrollPane == null) {
@@ -309,5 +298,4 @@ public class BibSonomySidePanel extends JPanel {
         }
         return tagCloudPanel;
     }
-
 }  //  @jve:decl-index=0:visual-constraint="10,10"

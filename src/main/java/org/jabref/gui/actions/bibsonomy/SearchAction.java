@@ -1,6 +1,7 @@
 package org.jabref.gui.actions.bibsonomy;
 
 import java.awt.event.ActionEvent;
+import java.util.Objects;
 
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
@@ -18,15 +19,18 @@ import org.jabref.gui.worker.bibsonomy.ImportPostsByCriteriaWorker;
 public class SearchAction extends AbstractBibSonomyAction {
 
     private JTextField searchTextField;
-    private JComboBox<?> searchTypeComboBox;
-    private JComboBox<?> groupingComboBox;
+    private JComboBox<SearchTypeComboBoxItem> searchTypeComboBox;
+    private JComboBox<GroupingComboBoxItem> visibilityComboBox;
 
-    public SearchAction(JabRefFrame jabRefFrame, JTextField searchTextField, JComboBox<?> searchTypeComboBox, JComboBox<?> groupingComboBox) {
-        super(jabRefFrame, "", IconTheme.JabRefIcon.SEARCH.getIcon());
+    public SearchAction(JabRefFrame jabRefFrame,
+                        JTextField searchTextField,
+                        JComboBox<SearchTypeComboBoxItem> searchTypeComboBox,
+                        JComboBox<GroupingComboBoxItem> visibilityComboBox) {
+        super(Objects.requireNonNull(jabRefFrame), "", IconTheme.JabRefIcon.SEARCH.getIcon());
 
-        this.searchTextField = searchTextField;
-        this.searchTypeComboBox = searchTypeComboBox;
-        this.groupingComboBox = groupingComboBox;
+        this.searchTextField = Objects.requireNonNull(searchTextField);
+        this.searchTypeComboBox = Objects.requireNonNull(searchTypeComboBox);
+        this.visibilityComboBox = Objects.requireNonNull(visibilityComboBox);
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -34,9 +38,14 @@ public class SearchAction extends AbstractBibSonomyAction {
         String criteria = searchTextField.getText();
 
         if (criteria != null) {
-            ImportPostsByCriteriaWorker worker = new ImportPostsByCriteriaWorker(getJabRefFrame(), criteria, searchType, ((GroupingComboBoxItem) groupingComboBox.getSelectedItem()).getKey(), ((GroupingComboBoxItem) groupingComboBox.getSelectedItem()).getValue(), false);
+            ImportPostsByCriteriaWorker worker = new ImportPostsByCriteriaWorker(
+                    getJabRefFrame(),
+                    criteria,
+                    searchType,
+                    ((GroupingComboBoxItem) visibilityComboBox.getSelectedItem()).getKey(),
+                    ((GroupingComboBoxItem) visibilityComboBox.getSelectedItem()).getValue(),
+                    false);
             performAsynchronously(worker);
         }
     }
-
 }
