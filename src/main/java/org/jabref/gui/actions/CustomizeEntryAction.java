@@ -12,6 +12,7 @@ public class CustomizeEntryAction extends SimpleCommand {
     public CustomizeEntryAction(JabRefFrame frame) {
         this.frame = frame;
     }
+    
     @Override
     public void execute() {
         JDialog dialog = new EntryCustomizationDialog(frame);
