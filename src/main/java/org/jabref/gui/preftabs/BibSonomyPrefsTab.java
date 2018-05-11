@@ -13,21 +13,21 @@ import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.TitledBorder;
 
-import org.bibsonomy.common.enums.GroupingEntity;
-import org.bibsonomy.model.enums.Order;
 import org.jabref.bibsonomy.BibSonomyGlobals;
 import org.jabref.bibsonomy.BibSonomyProperties;
 import org.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import org.jabref.gui.preftabs.support.OrderComboBoxItem;
 import org.jabref.gui.worker.bibsonomy.UpdateVisibilityWorker;
 import org.jabref.logic.l10n.Localization;
+
+import org.bibsonomy.common.enums.GroupingEntity;
+import org.bibsonomy.model.enums.Order;
 
 public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
 
@@ -40,7 +40,6 @@ public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
     private JLabel apiKeyLabel;
     private JTextField apiKeyTextField;
     private JCheckBox storeAPIKeyCheckBox;
-    private JLabel apiKeyHintLabel;
     private JCheckBox ignoreOneTagWarningCheckBox;
     private JCheckBox updateTagsCheckBox;
     private JCheckBox uploadDocumentsCheckBox;
@@ -63,13 +62,6 @@ public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
     @Override
     public void setValues() {
         // automatically done by the getter methods
-
-        // display warning in the case of default values
-        if (BibSonomyProperties.getUsername().equals(BibSonomyGlobals.API_USERNAME))
-            JOptionPane.showMessageDialog(this,
-                    Localization.lang("PLEASE NOTE: the current API access data is for testing purposes only.\\nYou can upload and download entries.\\nAfter logging in you can see and edit your entries on www.bibsonomy.org.\\nDo not use this account for personal data, as it is accessible by everyone.\\nTo obtain your own personal API key, visit %0.", "http://www.bibsonomy.org/help/doc/gettingaccess.html").replaceAll("\\\\n", "<br>"),
-                    Localization.lang("Demo mode"),
-                    JOptionPane.INFORMATION_MESSAGE);
     }
 
     @Override
@@ -136,10 +128,6 @@ public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
 
             defaultVisibilityLabel = new JLabel();
             defaultVisibilityLabel.setText(Localization.lang("Default visibility"));
-
-            apiKeyHintLabel = new JLabel();
-            apiKeyHintLabel.setText(Localization.lang("You can find your API key at the settings page at http://www.bibsonomy.org"));
-            apiKeyHintLabel.setFont(new Font("Dialog", Font.ITALIC, 10));
 
             apiKeyLabel = new JLabel();
             apiKeyLabel.setText(Localization.lang("API key"));
@@ -367,8 +355,21 @@ public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
         credentialsPanel.add(getStoreAPIKeyCheckBox(), rightConstr);
         rightConstr.gridy++;
 
+        JLabel apiKeyHintLabel = new JLabel();
+        apiKeyHintLabel.setText(Localization.lang("You can find your API key at the settings page at http://www.bibsonomy.org"));
+        apiKeyHintLabel.setFont(new Font("Dialog", Font.ITALIC, 10));
         credentialsPanel.add(apiKeyHintLabel, rightConstr);
         rightConstr.gridy++;
+
+        if (BibSonomyProperties.getUsername().equals(BibSonomyGlobals.API_USERNAME)) {
+            JLabel demoWarning = new JLabel();
+            demoWarning.setText("<html>" +
+                    Localization.lang("PLEASE NOTE: the current API access data is for testing purposes only. You can upload and download entries. After logging in you can see and edit your entries on www.bibsonomy.org. Do not use this account for personal data, as it is accessible by everyone. To obtain your own personal API key, visit %0.", "http://www.bibsonomy.org/help/doc/gettingaccess.html").replaceAll("\\. ", "<br>") +
+                    "</html>");
+            demoWarning.setFont(new Font("Dialog", Font.ITALIC, 10));
+            credentialsPanel.add(demoWarning, rightConstr);
+            rightConstr.gridy++;
+        }
 
         changingCredentialsHintLabel = new JLabel();
         changingCredentialsHintLabel.setText(Localization.lang("Don't forget to hit the refresh button after changing credentials!"));
