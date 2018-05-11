@@ -464,7 +464,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         actions.put(Actions.COPY_CITATION_TEXT, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.TEXT));
 
         // The action for copying the BibTeX keys as hyperlinks to the urls of the selected entries
-        actions.put(Actions.COPY_KEY_AND_LINK, new CopyBibTeXKeyAndLinkAction(mainTable));
+        actions.put(Actions.COPY_KEY_AND_LINK, new CopyBibTeXKeyAndLinkAction(mainTable, Globals.clipboardManager));
 
         actions.put(Actions.MERGE_DATABASE, new AppendDatabaseAction(frame, this));
 
