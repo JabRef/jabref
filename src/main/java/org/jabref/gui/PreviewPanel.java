@@ -69,8 +69,6 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     /**
      * @param panel           (may be null) Only set this if the preview is associated to the main window.
      * @param databaseContext (may be null) Used for resolving pdf directories for links.
-     * @param preferences
-     * @param dialogService
      */
     public PreviewPanel(BasePanel panel, BibDatabaseContext databaseContext, KeyBindingRepository keyBindingRepository, PreviewPreferences preferences, DialogService dialogService) {
         this.databaseContext = Optional.ofNullable(databaseContext);
@@ -106,7 +104,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
 
     private void createKeyBindings() {
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
+            Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
                     case COPY_PREVIEW:
@@ -168,10 +166,10 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
             if (basePanel.isPresent()) {
                 layout = Optional.empty();
                 CitationStyle.createCitationStyleFromFile(style)
-                        .ifPresent(citationStyle -> {
-                    basePanel.get().getCitationStyleCache().setCitationStyle(citationStyle);
-                    basePanel.get().output(Localization.lang("Preview style changed to: %0", citationStyle.getTitle()));
-                        });
+                             .ifPresent(citationStyle -> {
+                                 basePanel.get().getCitationStyleCache().setCitationStyle(citationStyle);
+                                 basePanel.get().output(Localization.lang("Preview style changed to: %0", citationStyle.getTitle()));
+                             });
             }
         } else {
             updatePreviewLayout(previewPreferences.getPreviewStyle(), previewPreferences.getLayoutFormatterPreferences());
@@ -184,9 +182,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     private void updatePreviewLayout(String layoutFile, LayoutFormatterPreferences layoutFormatterPreferences) {
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         try {
-            layout = Optional.of(
-                    new LayoutHelper(sr, layoutFormatterPreferences)
-                            .getLayoutFromText());
+            layout = Optional.of(new LayoutHelper(sr, layoutFormatterPreferences).getLayoutFromText());
         } catch (IOException e) {
             layout = Optional.empty();
             LOGGER.debug("no layout could be set", e);
