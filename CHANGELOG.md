@@ -13,6 +13,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Changed
 - We added a text file export for 'Find Unlinked Files'. [#3341](https://github.com/JabRef/jabref/issues/3341)
 - We added a fetcher based on RFC-IDs. [#3971](https://github.com/JabRef/jabref/issues/3971)
+- We changed the implementation of the `[shorttitle]` key pattern. It now removes small words like `a`, `an`, `on`, `the` etc. Refer to the help page for a complete overview. [Feature request in the forum](http://discourse.jabref.org/t/jabref-differences-in-shorttitle-between-versions-3-8-1-and-4-not-discounting-the-a-an-of-in-titles/1147)
 
 ### Fixed
 We fixed an issue where the export to clipboard functionality could not be invoked. [#3994](https://github.com/JabRef/jabref/issues/3994)
