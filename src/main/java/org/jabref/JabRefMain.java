@@ -92,10 +92,6 @@ public class JabRefMain extends Application {
     public void start(Stage mainStage) throws Exception {
         FallbackExceptionHandler.installExceptionHandler();
 
-
-
-        //Platform.setImplicitExit(true);
-
         ensureCorrectJavaVersion();
 
         // Init preferences
@@ -187,7 +183,6 @@ public class JabRefMain extends Application {
 
     @Override
     public void stop() {
-        System.out.println("stop");
         Platform.exit();
         System.exit(0);
     }
