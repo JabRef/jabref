@@ -66,11 +66,9 @@ public class JabRefMain extends Application {
 
         if (java9Fail || versionFail) {
             StringBuilder versionError = new StringBuilder(
-                    Localization.lang("Your current Java version (%0) is not supported. Please install version %1 or higher.",
-                            checker.getJavaVersion(),
-                            buildInfo.getMinRequiredJavaVersion()
-                    )
-            );
+                                                           Localization.lang("Your current Java version (%0) is not supported. Please install version %1 or higher.",
+                                                                             checker.getJavaVersion(),
+                                                                             buildInfo.getMinRequiredJavaVersion()));
 
             versionError.append("\n");
             versionError.append(Localization.lang("Your Java Runtime Environment is located at %0.", checker.getJavaInstallationDirectory()));
@@ -93,7 +91,11 @@ public class JabRefMain extends Application {
     @Override
     public void start(Stage mainStage) throws Exception {
         FallbackExceptionHandler.installExceptionHandler();
-      
+
+
+
+        //Platform.setImplicitExit(true);
+
         ensureCorrectJavaVersion();
 
         // Init preferences
@@ -121,7 +123,7 @@ public class JabRefMain extends Application {
 
         // Update handling of special fields based on preferences
         InternalBibtexFields
-                .updateSpecialFields(Globals.prefs.getBoolean(JabRefPreferences.SERIALIZESPECIALFIELDS));
+                            .updateSpecialFields(Globals.prefs.getBoolean(JabRefPreferences.SERIALIZESPECIALFIELDS));
         // Update name of the time stamp field based on preferences
         InternalBibtexFields.updateTimeStampField(Globals.prefs.getTimestampPreferences().getTimestampField());
         // Update which fields should be treated as numeric, based on preferences:
@@ -132,9 +134,9 @@ public class JabRefMain extends Application {
 
         /* Build list of Import and Export formats */
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
-                Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
+                                                        Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
         EntryTypes.loadCustomEntryTypes(preferences.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
-                preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
+                                        preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
         Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
 
         // Initialize protected terms loader
@@ -151,9 +153,11 @@ public class JabRefMain extends Application {
                     // We have successfully sent our command line options through the socket to another JabRef instance.
                     // So we assume it's all taken care of, and quit.
                     LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
+                    Globals.stopBackgroundTasks();
                     Globals.shutdownThreadPools();
                     // needed to tell JavaFx to stop
                     Platform.exit();
+                    System.exit(0);
                     return;
                 }
             }
@@ -170,12 +174,21 @@ public class JabRefMain extends Application {
 
         // See if we should shut down now
         if (argumentProcessor.shouldShutDown()) {
+            Globals.stopBackgroundTasks();
             Globals.shutdownThreadPools();
             Platform.exit();
+            System.exit(0);
             return;
         }
 
         // If not, start GUI
         new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank());
+    }
+
+    @Override
+    public void stop() {
+        System.out.println("stop");
+        Platform.exit();
+        System.exit(0);
     }
 }
