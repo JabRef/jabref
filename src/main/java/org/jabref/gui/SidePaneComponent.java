@@ -109,7 +109,7 @@ public abstract class SidePaneComponent {
 
         final HBox buttonContainer = new HBox();
         buttonContainer.getChildren().addAll(up, down);
-        buttonContainer.getChildren().addAll(getAddtionalHeaderButtons());
+        buttonContainer.getChildren().addAll(getAdditionalHeaderButtons());
         buttonContainer.getChildren().add(close);
 
         BorderPane graphic = new BorderPane();
@@ -124,7 +124,7 @@ public abstract class SidePaneComponent {
         return container;
     }
 
-    protected List<Node> getAddtionalHeaderButtons() {
+    protected List<Node> getAdditionalHeaderButtons() {
         return Collections.emptyList();
     }
 
