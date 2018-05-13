@@ -29,6 +29,7 @@ import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.EntryFetchAndMergeWorker;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.UndoableKeyChange;
+import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
@@ -90,9 +91,9 @@ public class EntryEditor extends BorderPane {
 
         if (GUIGlobals.currentFont != null) {
             setStyle(
-                    "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"
-                            + "text-area-foreground: " + convertToHex(GUIGlobals.editorTextColor) + ";"
-                            + "text-area-highlight: " + convertToHex(GUIGlobals.activeBackgroundColor) + ";");
+                    "text-area-background: " + ColorUtil.toHex(GUIGlobals.validFieldBackgroundColor) + ";"
+                            + "text-area-foreground: " + ColorUtil.toHex(GUIGlobals.editorTextColor) + ";"
+                            + "text-area-highlight: " + ColorUtil.toHex(GUIGlobals.activeBackgroundColor) + ";");
         }
 
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
@@ -302,9 +303,5 @@ public class EntryEditor extends BorderPane {
                 }
             }
         });
-    }
-
-    private String convertToHex(java.awt.Color color) {
-        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }
 }
