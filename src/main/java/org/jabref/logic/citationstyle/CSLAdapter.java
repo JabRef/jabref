@@ -84,9 +84,6 @@ public class CSLAdapter {
 
         /**
          * Converts the {@link BibEntry} into {@link CSLItemData}.
-         *
-         * Change month field from JabRefFormat <code>#mon#</> to ShortName <code>mon</code>
-         * because CSL does not support JabRefFormat.
          */
         private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry) {
             String citeKey = bibEntry.getCiteKeyOptional().orElse("");
@@ -101,6 +98,7 @@ public class CSLAdapter {
                         .map(latexToHtmlConverter::format)
                         .ifPresent(value -> {
                             if (FieldName.MONTH.equals(key)) {
+                                // Change month from #mon# to mon because CSL does not support the former format
                                 value = bibEntry.getMonth().map(Month::getShortName).orElse(value);
                             }
                             bibTeXEntry.addField(new Key(key), new DigitStringValue(value));
