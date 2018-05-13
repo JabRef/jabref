@@ -71,7 +71,6 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         List<EntryFetcher> fetchers = new EntryFetchers(Globals.journalAbbreviationLoader).getEntryFetchers();
         EntryFetcher[] fetcherArray = fetchers.toArray(new EntryFetcher[fetchers.size()]);
         Arrays.sort(fetcherArray, new EntryFetcherComparator());
-        //JLabel[] choices = new JLabel[fetchers.size()];
         String[] choices = new String[fetcherArray.length];
         for (int i = 0; i < fetcherArray.length; i++) {
             choices[i] = fetcherArray[i].getTitle();
@@ -158,7 +157,6 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         main.add(optPanel);
 
         main.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        //add(main, BorderLayout.CENTER);
         go.addActionListener(this);
         tf.addActionListener(this);
 
