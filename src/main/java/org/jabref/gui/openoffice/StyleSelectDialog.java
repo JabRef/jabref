@@ -34,6 +34,7 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
 import org.jabref.Globals;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
@@ -78,6 +79,7 @@ class StyleSelectDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(StyleSelectDialog.class);
 
     private final JabRefFrame frame;
+    private final DialogService dialogService;
     private EventList<OOBibStyle> styles;
     private JDialog diag;
     private JTable table;
@@ -107,6 +109,7 @@ class StyleSelectDialog {
         this.loader = Objects.requireNonNull(loader);
         prevEntry = TestEntry.getTestEntry();
         init();
+        dialogService = frame.getDialogService();
     }
 
     private void init() {
@@ -131,7 +134,7 @@ class StyleSelectDialog {
         // Create a preview panel for previewing styles
         // Must be done before creating the table to avoid NPEs
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-            preview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), frame.getDialogService());
+            preview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService);
             // Use the test entry from the Preview settings tab in Preferences:
             preview.setEntry(prevEntry);
         });
@@ -162,7 +165,7 @@ class StyleSelectDialog {
             @Override
             public void actionPerformed(ActionEvent event) {
                 if ((table.getRowCount() == 0) || (table.getSelectedRowCount() == 0)) {
-                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Style selection"),
+                    dialogService.showErrorDialogAndWait(Localization.lang("Style selection"),
                                                                     Localization.lang("You must select a valid style file."));
                     return;
                 }
@@ -265,7 +268,7 @@ class StyleSelectDialog {
         // Create action listener for removing a style, also used for the remove button
         removeAction = actionEvent -> getSelectedStyle().ifPresent(style -> {
 
-            if (!style.isFromResource() && frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Remove style"),
+            if (!style.isFromResource() && dialogService.showConfirmationDialogAndWait(Localization.lang("Remove style"),
                                                                                                   Localization.lang("Are you sure you want to remove the style?"),
                                                                                                   Localization.lang("Remove style"),
                                                                                                   Localization.lang("Cancel"))) {
@@ -473,7 +476,7 @@ class StyleSelectDialog {
 
             browse.addActionListener(e -> {
                 Optional<Path> file = DefaultTaskExecutor
-                                                         .runInJavaFXThread(() -> frame.getDialogService().showFileOpenDialog(fileDialogConfiguration));
+                        .runInJavaFXThread(() -> dialogService.showFileOpenDialog(fileDialogConfiguration));
                 file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
             });
 
