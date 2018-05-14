@@ -113,7 +113,7 @@ dependencies {
     // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
     compile 'mysql:mysql-connector-java:5.1.46'
 
-    compile 'com.impossibl.pgjdbc-ng:pgjdbc-ng:0.7.1'
+    compile 'org.postgresql:postgresql:42.2.2'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
@@ -314,7 +314,7 @@ test {
     useJUnitPlatform {
         excludeTags 'DatabaseTest', 'FetcherTest', 'GUITest', 'org.jabref.testutils.category.FetcherTest', 'org.jabref.testutils.category.GUITest'
     }
-    
+
     testLogging {
         // set options for log level LIFECYCLE
         events "failed"
@@ -375,7 +375,7 @@ checkstyle {
     // do not use other packages for checkstyle, excluding gen(erated) sources
     checkstyleMain.source = "src/main/java"
     toolVersion = '8.5'
-    
+
     // do not perform checkstyle checks by default
     sourceSets = []
 }
