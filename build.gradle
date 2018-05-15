@@ -120,7 +120,6 @@ dependencies {
     compile 'com.google.guava:guava:25.0-jre'
 
     // JavaFX stuff
-    compile 'de.codecentric.centerdevice:javafxsvg:1.3.0'
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
     compile 'de.saxsys:mvvmfx-validation:1.7.0'
     compile 'de.saxsys:mvvmfx:1.7.0'
@@ -314,7 +313,7 @@ test {
     useJUnitPlatform {
         excludeTags 'DatabaseTest', 'FetcherTest', 'GUITest', 'org.jabref.testutils.category.FetcherTest', 'org.jabref.testutils.category.GUITest'
     }
-    
+
     testLogging {
         // set options for log level LIFECYCLE
         events "failed"
@@ -375,7 +374,7 @@ checkstyle {
     // do not use other packages for checkstyle, excluding gen(erated) sources
     checkstyleMain.source = "src/main/java"
     toolVersion = '8.5'
-    
+
     // do not perform checkstyle checks by default
     sourceSets = []
 }
