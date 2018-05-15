@@ -26,7 +26,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.OptionalUtil;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +65,7 @@ public class FileUtil {
      * Returns the name part of a file name (i.e., everything in front of last ".").
      */
     public static String getBaseName(String fileNameWithExtension) {
-        return FilenameUtils.getBaseName(fileNameWithExtension);
+        return com.google.common.io.Files.getNameWithoutExtension(fileNameWithExtension);
     }
 
     /**
