@@ -65,6 +65,7 @@ public class GUIGlobals {
         // Set WM_CLASS using reflection for certain Un*x window managers
         if (!OS.WINDOWS && !OS.OS_X) {
             try {
+                // TODO: reflective access, should be removed (Java 9)
                 Toolkit xToolkit = Toolkit.getDefaultToolkit();
                 java.lang.reflect.Field awtAppClassNameField = xToolkit.getClass().getDeclaredField("awtAppClassName");
                 awtAppClassNameField.setAccessible(true);

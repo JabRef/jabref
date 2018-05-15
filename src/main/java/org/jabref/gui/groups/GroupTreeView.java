@@ -354,6 +354,7 @@ public class GroupTreeView {
      */
     private void setupClearButtonField(CustomTextField customTextField) {
         try {
+            // TODO: reflective access, should be removed (Java 9)
             Method m = TextFields.class.getDeclaredMethod("setupClearButtonField", TextField.class,
                     ObjectProperty.class);
             m.setAccessible(true);
