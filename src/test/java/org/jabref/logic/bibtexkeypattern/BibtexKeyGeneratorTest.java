@@ -767,23 +767,30 @@ public class BibtexKeyGeneratorTest {
      */
     @Test
     public void shortTitle() {
-        // shortTitle is getTitleWords with "3" as count
+        // shortTitle is getTitleWords with "3" as count and removed small words
         int count = 3;
         assertEquals("application migration effort",
-                BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
-        assertEquals("BPEL conformance in", BibtexKeyGenerator.getTitleWords(count,
-                TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
-        assertEquals("Process Viewing Patterns", BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_CASED));
-        assertEquals("BPMN Conformance in",
-                BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
-        assertEquals("The Difference Between", BibtexKeyGenerator.getTitleWords(count,
-                TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING));
-        assertEquals("Cloud Computing: The",
-                BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
+                BibtexKeyGenerator.getTitleWords(count,
+                        BibtexKeyGenerator.removeSmallWords(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH)));
+        assertEquals("BPEL conformance open",
+                BibtexKeyGenerator.getTitleWords(count,
+                        BibtexKeyGenerator.removeSmallWords(TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON)));
+        assertEquals("Process Viewing Patterns",
+                BibtexKeyGenerator.getTitleWords(count,
+                        BibtexKeyGenerator.removeSmallWords(TITLE_STRING_CASED)));
+        assertEquals("BPMN Conformance Open",
+                BibtexKeyGenerator.getTitleWords(count,
+                        BibtexKeyGenerator.removeSmallWords(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD)));
+        assertEquals("Difference Graph Based",
+                BibtexKeyGenerator.getTitleWords(count,
+                        BibtexKeyGenerator.removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING)));
+        assertEquals("Cloud Computing: Next",
+                BibtexKeyGenerator.getTitleWords(count,
+                        BibtexKeyGenerator.removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON)));
         assertEquals("Towards Choreography based",
-                BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
-        assertEquals("On the Measurement",
-                BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
+                BibtexKeyGenerator.getTitleWords(count, BibtexKeyGenerator.removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD)));
+        assertEquals("Measurement Design Time",
+                BibtexKeyGenerator.getTitleWords(count, BibtexKeyGenerator.removeSmallWords(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS)));
     }
 
     /**
@@ -935,7 +942,7 @@ public class BibtexKeyGeneratorTest {
         BibEntry entry = new BibEntry();
         entry.setField("title", "Green Scheduling of Whatever");
         assertEquals("GSo", BibtexKeyGenerator.generateKey(entry, "shorttitleINI"));
-        assertEquals("GreenSchedulingof", BibtexKeyGenerator.generateKey(entry, "shorttitle",
+        assertEquals("GreenSchedulingWhatever", BibtexKeyGenerator.generateKey(entry, "shorttitle",
                 new BibDatabase()));
     }
 
@@ -950,7 +957,7 @@ public class BibtexKeyGeneratorTest {
         database.insertEntry(entry1);
         entry2.setField("title", "Green Scheduling of Whatever");
 
-        assertEquals("GreenSchedulingof", BibtexKeyGenerator.generateKey(entry1, "shorttitle",
+        assertEquals("GreenSchedulingWhatever", BibtexKeyGenerator.generateKey(entry1, "shorttitle",
                 database));
     }
 
