@@ -31,7 +31,7 @@ import org.jabref.gui.externalfiles.DroppedFileHandler;
 import org.jabref.gui.externalfiles.TransferableFileLinkSelection;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.importer.ImportMenuItem;
+import org.jabref.gui.importer.ImportAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.logic.net.URLDownload;
@@ -222,7 +222,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
         // System.out.println("importing from " + tmpfile.getAbsolutePath());
 
-        ImportMenuItem importer = new ImportMenuItem(frame, false);
+        ImportAction importer = new ImportAction(frame, false);
         importer.automatedImport(Collections.singletonList(tmpfile.getAbsolutePath()));
 
         return true;
@@ -364,7 +364,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         if (!notBibFiles.isEmpty()) {
             // Import into new if entryTable==null, otherwise into current
             // database:
-            ImportMenuItem importer = new ImportMenuItem(frame, entryTable == null);
+            ImportAction importer = new ImportAction(frame, entryTable == null);
             importer.automatedImport(notBibFiles);
         }
     }
@@ -376,7 +376,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         new URLDownload(dropLink).toFile(tmpfile.toPath());
 
         // Import into new if entryTable==null, otherwise into current library:
-        ImportMenuItem importer = new ImportMenuItem(frame, entryTable == null);
+        ImportAction importer = new ImportAction(frame, entryTable == null);
         importer.automatedImport(Collections.singletonList(tmpfile.getAbsolutePath()));
 
         return true;
