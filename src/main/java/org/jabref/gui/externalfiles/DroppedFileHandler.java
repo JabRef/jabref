@@ -267,10 +267,10 @@ public class DroppedFileHandler {
         // reply == JOptionPane.YES_OPTION)
 
         /*
-         * TODO Extract Import functionality from ImportMenuItem then we could
+         * TODO Extract Import functionality from ImportAction then we could
          * do:
          *
-         * ImportMenuItem importer = new ImportMenuItem(frame, (mainTable ==
+         * ImportAction importer = new ImportAction(frame, (mainTable ==
          * null), new PdfXmpImporter());
          *
          * importer.automatedImport(new String[] { fileName });
