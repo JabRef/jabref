@@ -113,7 +113,7 @@ dependencies {
     // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
     compile 'mysql:mysql-connector-java:5.1.46'
 
-    compile 'com.impossibl.pgjdbc-ng:pgjdbc-ng:0.7.1'
+    compile 'org.postgresql:postgresql:42.2.2'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 

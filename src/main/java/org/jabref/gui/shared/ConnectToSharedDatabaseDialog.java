@@ -26,7 +26,6 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -156,8 +155,9 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
 
             return; // setLoadingConnectButtonText(false) should not be reached regularly.
         } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
-            JOptionPane.showMessageDialog(ConnectToSharedDatabaseDialog.this, exception.getMessage(),
-                    Localization.lang("Connection error"), JOptionPane.ERROR_MESSAGE);
+
+            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection error"), exception));
+
         } catch (DatabaseNotSupportedException exception) {
             new MigrationHelpDialog(this).setVisible(true);
         }
@@ -187,7 +187,7 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
 
                     openSharedDatabase();
                 } catch (JabRefException exception) {
-                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Warning"), exception);
+                    DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(Localization.lang("Warning"), exception));
 
                 }
             }
