@@ -294,7 +294,8 @@ public class BracketedPattern {
             } else if ("fulltitle".equals(val)) {
                 return entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse("");
             } else if ("shorttitle".equals(val)) {
-                return getTitleWords(3, entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse(""));
+                return getTitleWords(3,
+                        removeSmallWords(entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse("")));
             } else if ("shorttitleINI".equals(val)) {
                 return keepLettersAndDigitsOnly(
                         applyModifiers(getTitleWordsWithSpaces(3, entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse("")),

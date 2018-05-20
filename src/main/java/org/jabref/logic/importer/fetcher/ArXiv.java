@@ -258,8 +258,10 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        return searchForEntryById(identifier).map(
-                (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()));
+        String cleanedIdentifier = identifier.trim();
+        cleanedIdentifier = identifier.replaceAll(" ", "");
+
+        return searchForEntryById(cleanedIdentifier).map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()));
     }
 
     @Override

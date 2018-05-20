@@ -143,4 +143,12 @@ public class DOITest {
     public void noDOIFoundInsideArbitraryText() {
         assertEquals(Optional.empty(), DOI.findInText("text without 28282 a doi"));
     }
+
+    @Test
+    public void parseDOIWithWhiteSpace() {
+        String doiWithSpace = "https : / / doi.org / 10 .1109 /V LHCC.20 04.20";
+        assertEquals("https://doi.org/10.1109/VLHCC.2004.20", DOI.parse(doiWithSpace).get().getURIAsASCIIString());
+
+    }
+
 }
