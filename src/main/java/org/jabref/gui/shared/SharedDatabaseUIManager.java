@@ -48,12 +48,12 @@ public class SharedDatabaseUIManager {
         jabRefFrame.output(Localization.lang("Connection lost."));
 
         String[] options = {Localization.lang("Reconnect"), Localization.lang("Work offline"),
-                Localization.lang("Close library")};
+                            Localization.lang("Close library")};
 
         int answer = JOptionPane.showOptionDialog(null,
-                Localization.lang("The connection to the server has been terminated.") + "\n\n",
-                Localization.lang("Connection lost"), JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,
-                null, options, options[0]);
+                                                  Localization.lang("The connection to the server has been terminated.") + "\n\n",
+                                                  Localization.lang("Connection lost"), JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,
+                                                  null, options, options[0]);
 
         if (answer == 0) {
             jabRefFrame.closeCurrentTab();
@@ -74,8 +74,8 @@ public class SharedDatabaseUIManager {
         jabRefFrame.output(Localization.lang("Update refused."));
 
         new MergeSharedEntryDialog(jabRefFrame, dbmsSynchronizer, updateRefusedEvent.getLocalBibEntry(),
-                updateRefusedEvent.getSharedBibEntry(),
-                    updateRefusedEvent.getBibDatabaseContext().getMode()).showMergeDialog();
+                                   updateRefusedEvent.getSharedBibEntry(),
+                                   updateRefusedEvent.getBibDatabaseContext().getMode()).showMergeDialog();
     }
 
     @Subscribe
@@ -87,9 +87,9 @@ public class SharedDatabaseUIManager {
 
         if (Objects.nonNull(entryEditor) && (entryEditor.getEntry() == event.getBibEntry())) {
             JOptionPane.showMessageDialog(null,
-                    Localization.lang("The BibEntry you currently work on has been deleted on the shared side.")
-                            + "\n" + Localization.lang("You can restore the entry using the \"Undo\" operation."),
-                    Localization.lang("Shared entry is no longer present"), JOptionPane.INFORMATION_MESSAGE);
+                                          Localization.lang("The BibEntry you currently work on has been deleted on the shared side.")
+                                                + "\n" + Localization.lang("You can restore the entry using the \"Undo\" operation."),
+                                          Localization.lang("Shared entry is no longer present"), JOptionPane.INFORMATION_MESSAGE);
 
             SwingUtilities.invokeLater(() -> panel.closeBottomPane());
         }
@@ -103,7 +103,7 @@ public class SharedDatabaseUIManager {
      * @return BasePanel which also used by {@link SaveDatabaseAction}
      */
     public BasePanel openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
-            throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
+        throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
         JabRefFrame frame = JabRefGUI.getMainFrame();
         BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode));
@@ -118,8 +118,8 @@ public class SharedDatabaseUIManager {
     }
 
     public void openSharedDatabaseFromParserResult(ParserResult parserResult)
-            throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException,
-            NotASharedDatabaseException {
+        throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException,
+        NotASharedDatabaseException {
 
         Optional<String> sharedDatabaseIDOptional = parserResult.getDatabase().getSharedDatabaseID();
 

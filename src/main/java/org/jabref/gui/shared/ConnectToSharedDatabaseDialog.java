@@ -142,7 +142,8 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
         setLoadingConnectButtonText(true);
 
         try {
-            BasePanel panel = new SharedDatabaseUIManager(frame).openNewSharedDatabaseTab(connectionProperties);
+            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(frame);
+            BasePanel panel = manager.openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
             dispose();
             if (!fileLocationField.getText().isEmpty()) {
