@@ -63,13 +63,13 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
     @Inject private DialogService dialogService;
 
-    private SharedDatabaseLoginDialogViewModel viewModel;
     private final SharedDatabasePreferences prefs = new SharedDatabasePreferences();
 
     private final ButtonType connect = new ButtonType("Connect", ButtonData.YES);
     private final JabRefFrame frame;
 
     private DBMSConnectionProperties connectionProperties;
+    private SharedDatabaseLoginDialogViewModel viewModel;
 
     public SharedDatabaseLoginDialogView(JabRefFrame frame) {
         this.frame = frame;
@@ -116,7 +116,6 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         viewModel.selectedDbmstypeProperty().addListener((observable, oldValue, newValue) -> {
             tbPort.setText(Integer.toString(newValue.getDefaultPort()));
         });
-
 
         btnBrowse.disableProperty().bind(chkAutosave.selectedProperty().not());
         tbFolder.disableProperty().bind(chkAutosave.selectedProperty().not());

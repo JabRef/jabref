@@ -50,8 +50,6 @@ public enum DBMSType {
         return this.defaultPort;
     }
 
-
-
     public static Optional<DBMSType> fromString(String typeName) {
         try {
             return Optional.of(Enum.valueOf(DBMSType.class, typeName.toUpperCase(Locale.ENGLISH)));
