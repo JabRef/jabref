@@ -6,11 +6,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.logic.formatter.AbstractFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringLengthComparator;
-import org.jabref.model.cleanup.Formatter;
 
-public class UnitsToLatexFormatter implements Formatter {
+public class UnitsToLatexFormatter extends AbstractFormatter {
 
     private static final List<String> UNIT_LIST = Arrays.asList(
             "A", // Ampere

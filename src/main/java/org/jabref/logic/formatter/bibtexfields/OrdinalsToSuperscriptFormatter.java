@@ -4,13 +4,13 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.formatter.AbstractFormatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.cleanup.Formatter;
 
 /**
  * This class transforms ordinal numbers into LaTex superscripts.
  */
-public class OrdinalsToSuperscriptFormatter implements Formatter {
+public class OrdinalsToSuperscriptFormatter extends AbstractFormatter {
 
     // find possible superscripts on word boundaries
     private static final Pattern SUPERSCRIPT_DETECT_PATTERN = Pattern.compile("\\b(\\d+)(st|nd|rd|th)\\b",

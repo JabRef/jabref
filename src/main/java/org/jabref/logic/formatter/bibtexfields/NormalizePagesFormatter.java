@@ -4,8 +4,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.formatter.AbstractFormatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.cleanup.Formatter;
 
 import com.google.common.base.Strings;
 
@@ -18,7 +18,7 @@ import com.google.common.base.Strings;
  * To make it easier to maintain Scribe-compatible databases, the standard styles convert
  * a single dash (as in 7-33) to the double dash used in TEX to denote number ranges (as in 7--33).
  */
-public class NormalizePagesFormatter implements Formatter {
+public class NormalizePagesFormatter extends AbstractFormatter {
 
     // "startpage" and "endpage" are named groups. See http://stackoverflow.com/a/415635/873282 for a documentation
     private static final Pattern PAGES_DETECT_PATTERN = Pattern.compile("\\A(?<startpage>(\\d+:)?\\d+)(?:-{1,2}(?<endpage>(\\d+:)?\\d+))?\\Z");
@@ -86,15 +86,5 @@ public class NormalizePagesFormatter implements Formatter {
     @Override
     public String getExampleInput() {
         return "1 - 2";
-    }
-
-    @Override
-    public int hashCode() {
-        return defaultHashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return defaultEquals(obj);
     }
 }

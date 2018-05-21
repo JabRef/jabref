@@ -1,9 +1,9 @@
 package org.jabref.logic.formatter.casechanger;
 
+import org.jabref.logic.formatter.AbstractFormatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.cleanup.Formatter;
 
-public class UpperCaseFormatter implements Formatter {
+public class UpperCaseFormatter extends AbstractFormatter {
 
     @Override
     public String getName() {

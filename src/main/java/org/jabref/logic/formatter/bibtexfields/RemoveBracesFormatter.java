@@ -2,10 +2,10 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
 
+import org.jabref.logic.formatter.AbstractFormatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.cleanup.Formatter;
 
-public class RemoveBracesFormatter implements Formatter {
+public class RemoveBracesFormatter extends AbstractFormatter {
 
     @Override
     public String getName() {

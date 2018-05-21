@@ -1,9 +1,9 @@
 package org.jabref.logic.formatter.casechanger;
 
+import org.jabref.logic.formatter.AbstractFormatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.cleanup.Formatter;
 
-public class LowerCaseFormatter implements Formatter {
+public class LowerCaseFormatter extends AbstractFormatter {
 
     @Override
     public String getName() {
@@ -25,16 +25,6 @@ public class LowerCaseFormatter implements Formatter {
         title.getWords().stream().forEach(Word::toLowerCase);
 
         return title.toString();
-    }
-
-    @Override
-    public int hashCode() {
-        return defaultHashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return defaultEquals(obj);
     }
 
     @Override
