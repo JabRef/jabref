@@ -13,6 +13,7 @@ import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
 import org.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeEnDashesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
@@ -53,6 +54,7 @@ public class Formatters {
             new LatexCleanupFormatter(),
             new MinifyNameListFormatter(),
             new NormalizeDateFormatter(),
+            new NormalizeEnDashesFormatter(),
             new NormalizeMonthFormatter(),
             new NormalizeNamesFormatter(),
             new NormalizePagesFormatter(),

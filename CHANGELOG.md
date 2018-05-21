@@ -15,6 +15,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added a fetcher based on RFC-IDs. [#3971](https://github.com/JabRef/jabref/issues/3971)
 - We changed the implementation of the `[shorttitle]` key pattern. It now removes small words like `a`, `an`, `on`, `the` etc. Refer to the help page for a complete overview. [Feature request in the forum](http://discourse.jabref.org/t/jabref-differences-in-shorttitle-between-versions-3-8-1-and-4-not-discounting-the-a-an-of-in-titles/1147)
 - We added a formatter for adding braces around the `title` field. E.g., `title = {ExamPle}` becomes `title = {{ExamPle}}`, which prevents BibTeX to convert it to lower case. You can use it at the [cleanup entries](http://help.jabref.org/en/CleanupEntries) functionality.
+- We added a formatter to ensure correct en dashes in the `title` field. E.g., `title = {Example - illustrative}` becomes `title = {Example -- illustrative}`.
 - We streamlined the defaults for a [cleanup of entries](http://help.jabref.org/en/CleanupEntries) in the case of BibTeX.
 
 ### Fixed
