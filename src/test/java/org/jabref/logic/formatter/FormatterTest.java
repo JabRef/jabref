@@ -1,6 +1,7 @@
 package org.jabref.logic.formatter;
 
 import java.util.Collections;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
@@ -9,6 +10,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.model.cleanup.Formatter;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -27,6 +29,18 @@ public class FormatterTest {
         protectedTermsLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
                         Collections.emptyList(), Collections.emptyList()));
+    }
+
+    /**
+     * When a new formatter is added by copy and pasting another formatter, it may happen that the <code>getKey()</code> method is not adapted. This results in duplicate keys, which this test tests for.
+     */
+    @Test
+    public void allFormatterKeysAreUnique() {
+        // idea for uniqueness checking by https://stackoverflow.com/a/44032568/873282
+       assertFalse(getFormatters().collect(Collectors.groupingBy(
+               formatter -> formatter.getKey(),
+               Collectors.counting()
+       )).entrySet().stream().anyMatch(e -> e.getValue() > 1));
     }
 
     @ParameterizedTest
