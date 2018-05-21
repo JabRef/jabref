@@ -28,7 +28,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnectionProperties;
@@ -66,6 +65,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     private final SharedDatabasePreferences prefs = new SharedDatabasePreferences();
 
     private final ButtonType connect = new ButtonType("Connect", ButtonData.YES);
+    private final Button btnConnect;
     private final JabRefFrame frame;
 
     private DBMSConnectionProperties connectionProperties;
@@ -76,7 +76,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         this.setTitle(Localization.lang("Connect to shared database"));
 
         this.getDialogPane().getButtonTypes().add(connect);
-        Button btnConnect = (Button) this.getDialogPane().lookupButton(connect);
+        this.btnConnect = (Button) this.getDialogPane().lookupButton(connect);
         btnConnect.setOnAction(this::openDatabase);
 
         ViewLoader.view(this)
@@ -181,7 +181,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
             return; // setLoadingConnectButtonText(false) should not be reached regularly.
         } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
 
-            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection error"), exception));
+          frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection error"), exception);
 
         } catch (DatabaseNotSupportedException exception) {
             // new MigrationHelpDialog(this).setVisible(true);
@@ -191,7 +191,12 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     }
 
     private void setLoadingConnectButtonText(boolean isLoading) {
-        //todo
+        btnConnect.setDisable(isLoading);
+        if (isLoading) {
+            btnConnect.setText(Localization.lang("Connecting..."));
+        } else {
+            btnConnect.setText(Localization.lang("Connect"));
+        }
     }
 
     private boolean isSharedDatabaseAlreadyPresent() {
