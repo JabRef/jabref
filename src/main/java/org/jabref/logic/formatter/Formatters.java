@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.logic.formatter.bibtexfields.AddBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeUnderscoresFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
@@ -47,6 +48,7 @@ public class Formatters {
     );
 
     private static final List<Formatter> OTHERS = Arrays.asList(
+            new AddBracesFormatter(),
             new ClearFormatter(),
             new LatexCleanupFormatter(),
             new MinifyNameListFormatter(),
