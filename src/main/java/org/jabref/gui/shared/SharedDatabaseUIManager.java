@@ -4,9 +4,9 @@ import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Optional;
 
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Alert.AlertType;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
