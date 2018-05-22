@@ -25,4 +25,8 @@ public class ColorUtil {
                 (int) (color.getGreen() * 255),
                 (int) (color.getBlue() * 255));
     }
+
+    public static String toHex(java.awt.Color color) {
+        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
+    }
 }

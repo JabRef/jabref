@@ -78,9 +78,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // Enable sorting
         model.bindComparator(this.comparatorProperty());
 
-        // TODO: Cannot add focus listener as it is expecting an swing component
-        //addFocusListener(Globals.getFocusListener());
-
         this.panel = panel;
 
         pane = new ScrollPane(this);
@@ -88,18 +85,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         pane.setFitToWidth(true);
 
         this.pane.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
-
-        // TODO: Tooltip for column header
-        /*
-        @Override
-        public String getToolTipText(MouseEvent event) {
-        int index = columnModel.getColumnIndexAtX(event.getX());
-        int realIndex = columnModel.getColumn(index).getModelIndex();
-        MainTableColumn column = tableFormat.getTableColumn(realIndex);
-        return column.getDisplayName();
-        }
-         */
-
+        
         // Store visual state
         new PersistenceVisualStateTable(this, Globals.prefs);
 

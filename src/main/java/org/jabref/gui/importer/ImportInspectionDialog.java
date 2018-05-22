@@ -730,12 +730,14 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                     // is indicated by the entry's group hit status:
                     if (entry.isGroupHit()) {
 
-                        boolean continuePressed = frame.getDialogService().showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
+                        boolean continuePressed =
+                                DefaultTaskExecutor.runInJavaFXThread(() ->
+                                        frame.getDialogService().showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
                                                                                                                    Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
                                                                                                                    Localization.lang("Continue"),
                                                                                                                    Localization.lang("Cancel"),
                                                                                                                    Localization.lang("Disable this confirmation dialog"),
-                                                                                                                   optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, !optOut));
+                                                optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, !optOut)));
 
                         if (!continuePressed) {
                             return;
@@ -940,7 +942,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         public void listChanged(ListEvent<BibEntry> listEvent) {
             if (listEvent.getSourceList().size() == 1) {
                 preview.setEntry(listEvent.getSourceList().get(0));
-                contentPane.setDividerLocation(0.5f);
             }
         }
     }

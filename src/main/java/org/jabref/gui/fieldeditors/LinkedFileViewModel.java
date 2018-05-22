@@ -356,26 +356,30 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
 
         try {
-            URLDownload urlDownload = new URLDownload(linkedFile.getLink());
-            Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
-            String suggestedTypeName = suggestedType.map(ExternalFileType::getName).orElse("");
-            linkedFile.setFileType(suggestedTypeName);
-
             Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
             if (!targetDirectory.isPresent()) {
                 dialogService.showErrorDialogAndWait(Localization.lang("Download file"), Localization.lang("File directory is not set or does not exist!"));
                 return;
             }
-            String suffix = suggestedType.map(ExternalFileType::getExtension).orElse("");
-            String suggestedName = getSuggestedFileName(suffix);
-            Path destination = targetDirectory.get().resolve(suggestedName);
 
-            BackgroundTask<Void> downloadTask = new FileDownloadTask(urlDownload.getSource(), destination)
-                                                                                                          .onSuccess(event -> {
-                                                                                                              LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectoriesAsPaths(fileDirectoryPreferences));
-                                                                                                              linkedFile.setLink(newLinkedFile.getLink());
-                                                                                                              linkedFile.setFileType(newLinkedFile.getFileType());
-                                                                                                          }).onFailure(ex -> dialogService.showErrorDialogAndWait("Download failed", ex));
+            URLDownload urlDownload = new URLDownload(linkedFile.getLink());
+            BackgroundTask<Path> downloadTask = BackgroundTask
+                    .wrap(() -> {
+                        Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
+                        String suggestedTypeName = suggestedType.map(ExternalFileType::getName).orElse("");
+                        linkedFile.setFileType(suggestedTypeName);
+
+                        String suffix = suggestedType.map(ExternalFileType::getExtension).orElse("");
+                        String suggestedName = getSuggestedFileName(suffix);
+                        return targetDirectory.get().resolve(suggestedName);
+                    })
+                    .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
+                    .onSuccess(destination -> {
+                        LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectoriesAsPaths(fileDirectoryPreferences));
+                        linkedFile.setLink(newLinkedFile.getLink());
+                        linkedFile.setFileType(newLinkedFile.getFileType());
+                    })
+                    .onFailure(exception -> dialogService.showErrorDialogAndWait("Download failed", exception));
 
             downloadProgress.bind(downloadTask.workDonePercentageProperty());
             taskExecutor.execute(downloadTask);
@@ -395,7 +399,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     private Optional<ExternalFileType> inferFileTypeFromMimeType(URLDownload urlDownload) {
-        // TODO: what if this takes long time?
         String mimeType = urlDownload.getMimeType();
 
         if (mimeType != null) {

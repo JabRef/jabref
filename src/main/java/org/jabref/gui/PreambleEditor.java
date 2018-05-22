@@ -29,23 +29,23 @@ class PreambleEditor extends SimpleCommand {
         DialogPane pane = new DialogPane();
 
         editor.setText(frame.getCurrentBasePanel()
-                .getDatabase()
-                .getPreamble()
-                .orElse(""));
+                            .getDatabase()
+                            .getPreamble()
+                            .orElse(""));
         pane.setContent(editor);
 
         Optional<ButtonType> pressedButton = frame.getDialogService().showCustomDialogAndWait(Localization.lang("Edit Preamble"), pane, ButtonType.APPLY, ButtonType.CANCEL);
 
         if (pressedButton.isPresent() && pressedButton.get().equals(ButtonType.APPLY)) {
-            String toSet = editor.getText();
+            String newPreamble = editor.getText();
 
             // We check if the field has changed, since we don't want to mark the
             // base as changed unless we have a real change.
-            if (!database.getPreamble().orElse("").equals(toSet)) {
+            if (!database.getPreamble().orElse("").equals(newPreamble)) {
 
                 panel.getUndoManager().addEdit(
-                        new UndoablePreambleChange(database, database.getPreamble().orElse(null), toSet));
-                database.setPreamble(toSet);
+                        new UndoablePreambleChange(database, database.getPreamble().orElse(null), newPreamble));
+                database.setPreamble(newPreamble);
 
                 panel.markBaseChanged();
             }

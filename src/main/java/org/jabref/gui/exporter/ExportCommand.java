@@ -38,25 +38,23 @@ public class ExportCommand extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportCommand.class);
     private final JabRefFrame frame;
     private final boolean selectedOnly;
+    private final JabRefPreferences preferences;
 
     /**
      * @param selectedOnly true if only the selected entries should be exported, otherwise all entries are exported
      */
-    public ExportCommand(JabRefFrame frame, boolean selectedOnly) {
+    public ExportCommand(JabRefFrame frame, boolean selectedOnly, JabRefPreferences preferences) {
         this.frame = frame;
         this.selectedOnly = selectedOnly;
-
+        this.preferences = preferences;
     }
 
     @Override
     public void execute() {
-
-        JabRefPreferences prefs = Globals.prefs; //TODO: Pass as param?
-
-        Map<String, TemplateExporter> customExporters = prefs.customExports.getCustomExportFormats(prefs, Globals.journalAbbreviationLoader);
-        LayoutFormatterPreferences layoutPreferences = prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
-        SavePreferences savePreferences = prefs.loadForExportFromPreferences();
-        XmpPreferences xmpPreferences = prefs.getXMPPreferences();
+        Map<String, TemplateExporter> customExporters = preferences.customExports.getCustomExportFormats(preferences, Globals.journalAbbreviationLoader);
+        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
+        SavePreferences savePreferences = preferences.loadForExportFromPreferences();
+        XmpPreferences xmpPreferences = preferences.getXMPPreferences();
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
         FileDialogConfiguration fileDialogConfiguration = createExportFileChooser(Globals.exportFactory, Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
         DialogService dialogService = frame.getDialogService();

@@ -66,6 +66,173 @@ public class MassSetFieldAction extends SimpleCommand {
         this.frame = frame;
     }
 
+    /**
+     * Set a given field to a given value for all entries in a Collection. This method DOES NOT update any UndoManager,
+     * but returns a relevant CompoundEdit that should be registered by the caller.
+     *
+     * @param entries         The entries to set the field for.
+     * @param field           The name of the field to set.
+     * @param textToSet       The value to set. This value can be null, indicating that the field should be cleared.
+     * @param overwriteValues Indicate whether the value should be set even if an entry already has the field set.
+     * @return A CompoundEdit for the entire operation.
+     */
+    private static UndoableEdit massSetField(Collection<BibEntry> entries, String field, String textToSet,
+                                             boolean overwriteValues) {
+
+        NamedCompound compoundEdit = new NamedCompound(Localization.lang("Set field"));
+        for (BibEntry entry : entries) {
+            Optional<String> oldValue = entry.getField(field);
+            // If we are not allowed to overwrite values, check if there is a
+            // nonempty
+            // value already for this entry:
+            if (!overwriteValues && (oldValue.isPresent()) && !oldValue.get().isEmpty()) {
+                continue;
+            }
+            if (textToSet == null) {
+                entry.clearField(field);
+            } else {
+                entry.setField(field, textToSet);
+            }
+            compoundEdit.addEdit(new UndoableFieldChange(entry, field, oldValue.orElse(null), textToSet));
+        }
+        compoundEdit.end();
+        return compoundEdit;
+    }
+
+    private void prepareDialog(boolean selection) {
+        selected.setEnabled(selection);
+        if (selection) {
+            selected.setSelected(true);
+        } else {
+            all.setSelected(true);
+        }
+        // Make sure one of the following ones is selected:
+        if (!set.isSelected() && !clear.isSelected() && !rename.isSelected()) {
+            set.setSelected(true);
+        }
+    }
+
+    @Override
+    public void execute() {
+        BasePanel bp = frame.getCurrentBasePanel();
+        if (bp == null) {
+            return;
+        }
+        List<BibEntry> entries = bp.getSelectedEntries();
+        // Lazy creation of the dialog:
+        if (diag == null) {
+            createDialog();
+        }
+        canceled = true;
+        prepareDialog(!entries.isEmpty());
+        if (diag != null) {
+            diag.setVisible(true);
+        }
+        if (canceled) {
+            return;
+        }
+
+        Collection<BibEntry> entryList;
+        // If all entries should be treated, change the entries array:
+        if (all.isSelected()) {
+            entryList = bp.getDatabase().getEntries();
+        } else {
+            entryList = entries;
+        }
+
+        String toSet = textFieldSet.getText();
+        if (toSet.isEmpty()) {
+            toSet = null;
+        }
+
+        String[] fields = getFieldNames(((String) field.getSelectedItem()).trim().toLowerCase(Locale.ROOT));
+        NamedCompound compoundEdit = new NamedCompound(Localization.lang("Set field"));
+        if (rename.isSelected()) {
+            if (fields.length > 1) {
+                frame.getDialogService().showErrorDialogAndWait(Localization.lang("You can only rename one field at a time"));
+                return; // Do not close the dialog.
+            } else {
+                compoundEdit.addEdit(MassSetFieldAction.massRenameField(entryList, fields[0], textFieldRename.getText(),
+                        overwrite.isSelected()));
+            }
+        } else if (append.isSelected()) {
+            for (String field : fields) {
+                compoundEdit.addEdit(MassSetFieldAction.massAppendField(entryList, field, textFieldAppend.getText()));
+            }
+        } else {
+            for (String field : fields) {
+                compoundEdit.addEdit(MassSetFieldAction.massSetField(entryList, field,
+                        set.isSelected() ? toSet : null,
+                        overwrite.isSelected()));
+            }
+        }
+        compoundEdit.end();
+        bp.getUndoManager().addEdit(compoundEdit);
+        bp.markBaseChanged();
+    }
+
+    /**
+     * Append a given value to a given field for all entries in a Collection. This method DOES NOT update any UndoManager,
+     * but returns a relevant CompoundEdit that should be registered by the caller.
+     *
+     * @param entries      The entries to process the operation for.
+     * @param field        The name of the field to append to.
+     * @param textToAppend The value to set. A null in this case will simply preserve the current field state.
+     * @return A CompoundEdit for the entire operation.
+     */
+    private static UndoableEdit massAppendField(Collection<BibEntry> entries, String field, String textToAppend) {
+
+        String newValue = "";
+
+        if (textToAppend != null) {
+            newValue = textToAppend;
+        }
+
+        NamedCompound compoundEdit = new NamedCompound(Localization.lang("Append field"));
+        for (BibEntry entry : entries) {
+            Optional<String> oldValue = entry.getField(field);
+            entry.setField(field, oldValue.orElse("") + newValue);
+            compoundEdit.addEdit(new UndoableFieldChange(entry, field, oldValue.orElse(null), newValue));
+        }
+        compoundEdit.end();
+        return compoundEdit;
+    }
+
+    /**
+     * Move contents from one field to another for a Collection of entries.
+     *
+     * @param entries         The entries to do this operation for.
+     * @param field           The field to move contents from.
+     * @param newField        The field to move contents into.
+     * @param overwriteValues If true, overwrites any existing values in the new field. If false, makes no change for
+     *                        entries with existing value in the new field.
+     * @return A CompoundEdit for the entire operation.
+     */
+    private static UndoableEdit massRenameField(Collection<BibEntry> entries, String field, String newField,
+                                                boolean overwriteValues) {
+        NamedCompound compoundEdit = new NamedCompound(Localization.lang("Rename field"));
+        for (BibEntry entry : entries) {
+            Optional<String> valToMove = entry.getField(field);
+            // If there is no value, do nothing:
+            if ((!valToMove.isPresent()) || valToMove.get().isEmpty()) {
+                continue;
+            }
+            // If we are not allowed to overwrite values, check if there is a
+            // non-empty value already for this entry for the new field:
+            Optional<String> valInNewField = entry.getField(newField);
+            if (!overwriteValues && (valInNewField.isPresent()) && !valInNewField.get().isEmpty()) {
+                continue;
+            }
+
+            entry.setField(newField, valToMove.get());
+            compoundEdit.addEdit(new UndoableFieldChange(entry, newField, valInNewField.orElse(null), valToMove.get()));
+            entry.clearField(field);
+            compoundEdit.addEdit(new UndoableFieldChange(entry, field, valToMove.get(), null));
+        }
+        compoundEdit.end();
+        return compoundEdit;
+    }
+
     private void createDialog() {
         diag = new JDialog((JFrame) null, Localization.lang("Set/clear/append/rename fields"), true);
 
@@ -96,8 +263,8 @@ public class MassSetFieldAction extends SimpleCommand {
         }
 
         set.addChangeListener(e ->
-        // Entering a setText is only relevant if we are setting, not clearing:
-        textFieldSet.setEnabled(set.isSelected()));
+                // Entering a setText is only relevant if we are setting, not clearing:
+                textFieldSet.setEnabled(set.isSelected()));
 
         append.addChangeListener(e -> {
             // Text to append is only required if we are appending:
@@ -107,12 +274,12 @@ public class MassSetFieldAction extends SimpleCommand {
         });
 
         clear.addChangeListener(e ->
-        // Overwrite protection makes no sense if we are clearing the field:
-        overwrite.setEnabled(!clear.isSelected() && !append.isSelected()));
+                // Overwrite protection makes no sense if we are clearing the field:
+                overwrite.setEnabled(!clear.isSelected() && !append.isSelected()));
 
         rename.addChangeListener(e ->
-        // Entering a setText is only relevant if we are renaming
-        textFieldRename.setEnabled(rename.isSelected()));
+                // Entering a setText is only relevant if we are renaming
+                textFieldRename.setEnabled(rename.isSelected()));
 
         overwrite = new JCheckBox(Localization.lang("Overwrite existing field values"), true);
         ButtonGroup bg = new ButtonGroup();
@@ -191,173 +358,6 @@ public class MassSetFieldAction extends SimpleCommand {
         InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         am.put("close", cancelAction);
-    }
-
-    private void prepareDialog(boolean selection) {
-        selected.setEnabled(selection);
-        if (selection) {
-            selected.setSelected(true);
-        } else {
-            all.setSelected(true);
-        }
-        // Make sure one of the following ones is selected:
-        if (!set.isSelected() && !clear.isSelected() && !rename.isSelected()) {
-            set.setSelected(true);
-        }
-    }
-
-    @Override
-    public void execute() {
-        BasePanel bp = frame.getCurrentBasePanel();
-        if (bp == null) {
-            return;
-        }
-        List<BibEntry> entries = bp.getSelectedEntries();
-        // Lazy creation of the dialog:
-        if (diag == null) {
-            createDialog();
-        }
-        canceled = true;
-        prepareDialog(!entries.isEmpty());
-        if (diag != null) {
-            diag.setVisible(true);
-        }
-        if (canceled) {
-            return;
-        }
-
-        Collection<BibEntry> entryList;
-        // If all entries should be treated, change the entries array:
-        if (all.isSelected()) {
-            entryList = bp.getDatabase().getEntries();
-        } else {
-            entryList = entries;
-        }
-
-        String toSet = textFieldSet.getText();
-        if (toSet.isEmpty()) {
-            toSet = null;
-        }
-
-        String[] fields = getFieldNames(((String) field.getSelectedItem()).trim().toLowerCase(Locale.ROOT));
-        NamedCompound compoundEdit = new NamedCompound(Localization.lang("Set field"));
-        if (rename.isSelected()) {
-            if (fields.length > 1) {
-                frame.getDialogService().showErrorDialogAndWait(Localization.lang("You can only rename one field at a time"));
-                return; // Do not close the dialog.
-            } else {
-                compoundEdit.addEdit(MassSetFieldAction.massRenameField(entryList, fields[0], textFieldRename.getText(),
-                        overwrite.isSelected()));
-            }
-        } else if (append.isSelected()) {
-            for (String field : fields) {
-                compoundEdit.addEdit(MassSetFieldAction.massAppendField(entryList, field, textFieldAppend.getText()));
-            }
-        } else {
-            for (String field : fields) {
-                compoundEdit.addEdit(MassSetFieldAction.massSetField(entryList, field,
-                        set.isSelected() ? toSet : null,
-                        overwrite.isSelected()));
-            }
-        }
-        compoundEdit.end();
-        bp.getUndoManager().addEdit(compoundEdit);
-        bp.markBaseChanged();
-    }
-
-    /**
-     * Set a given field to a given value for all entries in a Collection. This method DOES NOT update any UndoManager,
-     * but returns a relevant CompoundEdit that should be registered by the caller.
-     *
-     * @param entries         The entries to set the field for.
-     * @param field           The name of the field to set.
-     * @param textToSet            The value to set. This value can be null, indicating that the field should be cleared.
-     * @param overwriteValues Indicate whether the value should be set even if an entry already has the field set.
-     * @return A CompoundEdit for the entire operation.
-     */
-    private static UndoableEdit massSetField(Collection<BibEntry> entries, String field, String textToSet,
-            boolean overwriteValues) {
-
-        NamedCompound compoundEdit = new NamedCompound(Localization.lang("Set field"));
-        for (BibEntry entry : entries) {
-            Optional<String> oldValue = entry.getField(field);
-            // If we are not allowed to overwrite values, check if there is a
-            // nonempty
-            // value already for this entry:
-            if (!overwriteValues && (oldValue.isPresent()) && !oldValue.get().isEmpty()) {
-                continue;
-            }
-            if (textToSet == null) {
-                entry.clearField(field);
-            } else {
-                entry.setField(field, textToSet);
-            }
-            compoundEdit.addEdit(new UndoableFieldChange(entry, field, oldValue.orElse(null), textToSet));
-        }
-        compoundEdit.end();
-        return compoundEdit;
-    }
-
-    /**
-     * Append a given value to a given field for all entries in a Collection. This method DOES NOT update any UndoManager,
-     * but returns a relevant CompoundEdit that should be registered by the caller.
-     *
-     * @param entries         The entries to process the operation for.
-     * @param field           The name of the field to append to.
-     * @param textToAppend            The value to set. A null in this case will simply preserve the current field state.
-     * @return A CompoundEdit for the entire operation.
-     */
-    private static UndoableEdit massAppendField(Collection<BibEntry> entries, String field, String textToAppend) {
-
-        String newValue = "";
-
-        if (textToAppend != null) {
-            newValue = textToAppend;
-        }
-
-        NamedCompound compoundEdit = new NamedCompound(Localization.lang("Append field"));
-        for (BibEntry entry : entries) {
-            Optional<String> oldValue = entry.getField(field);
-            entry.setField(field, oldValue.orElse("") + newValue);
-            compoundEdit.addEdit(new UndoableFieldChange(entry, field, oldValue.orElse(null), newValue));
-        }
-        compoundEdit.end();
-        return compoundEdit;
-    }
-
-    /**
-     * Move contents from one field to another for a Collection of entries.
-     *
-     * @param entries         The entries to do this operation for.
-     * @param field           The field to move contents from.
-     * @param newField        The field to move contents into.
-     * @param overwriteValues If true, overwrites any existing values in the new field. If false, makes no change for
-     *                        entries with existing value in the new field.
-     * @return A CompoundEdit for the entire operation.
-     */
-    private static UndoableEdit massRenameField(Collection<BibEntry> entries, String field, String newField,
-            boolean overwriteValues) {
-        NamedCompound compoundEdit = new NamedCompound(Localization.lang("Rename field"));
-        for (BibEntry entry : entries) {
-            Optional<String> valToMove = entry.getField(field);
-            // If there is no value, do nothing:
-            if ((!valToMove.isPresent()) || valToMove.get().isEmpty()) {
-                continue;
-            }
-            // If we are not allowed to overwrite values, check if there is a
-            // non-empty value already for this entry for the new field:
-            Optional<String> valInNewField = entry.getField(newField);
-            if (!overwriteValues && (valInNewField.isPresent()) && !valInNewField.get().isEmpty()) {
-                continue;
-            }
-
-            entry.setField(newField, valToMove.get());
-            compoundEdit.addEdit(new UndoableFieldChange(entry, newField, valInNewField.orElse(null), valToMove.get()));
-            entry.clearField(field);
-            compoundEdit.addEdit(new UndoableFieldChange(entry, field, valToMove.get(), null));
-        }
-        compoundEdit.end();
-        return compoundEdit;
     }
 
     private static String[] getFieldNames(String s) {

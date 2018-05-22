@@ -1,6 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
@@ -17,10 +16,8 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class JournalEditor extends HBox implements FieldEditorFX {
 
-    @FXML
-    private JournalEditorViewModel viewModel;
-    @FXML
-    private EditorTextArea textArea;
+    @FXML private JournalEditorViewModel viewModel;
+    @FXML private EditorTextArea textArea;
 
     public JournalEditor(String fieldName, JournalAbbreviationLoader journalAbbreviationLoader, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
         this.viewModel = new JournalEditorViewModel(fieldName, suggestionProvider, journalAbbreviationLoader, preferences.getJournalAbbreviationPreferences(), fieldCheckers);
@@ -52,7 +49,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     }
 
     @FXML
-    private void toggleAbbreviation(ActionEvent unused) {
+    private void toggleAbbreviation() {
         viewModel.toggleAbbreviation();
     }
 }

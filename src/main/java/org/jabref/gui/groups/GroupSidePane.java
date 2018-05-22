@@ -1,6 +1,6 @@
 package org.jabref.gui.groups;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javafx.scene.Node;
@@ -35,15 +35,15 @@ public class GroupSidePane extends SidePaneComponent {
     }
 
     @Override
-    protected List<Node> getAddtionalHeaderButtons() {
+    protected List<Node> getAdditionalHeaderButtons() {
         intersectionUnionToggle.setOnAction(event -> toggleUnionIntersection());
-        return Arrays.asList(intersectionUnionToggle);
+        return Collections.singletonList(intersectionUnionToggle);
     }
 
     @Override
     public void afterOpening() {
         preferences.putBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
-        setGraphicsAndTooltipforButton(preferences.getGroupViewMode());
+        setGraphicsAndTooltipForButton(preferences.getGroupViewMode());
     }
 
     @Override
@@ -67,19 +67,18 @@ public class GroupSidePane extends SidePaneComponent {
         if (mode == GroupViewMode.UNION) {
             preferences.setGroupViewMode(GroupViewMode.INTERSECTION);
             dialogService.notify(Localization.lang("Group view mode set to intersection"));
-        }
-
-        if (mode == GroupViewMode.INTERSECTION) {
+        } else if (mode == GroupViewMode.INTERSECTION) {
             preferences.setGroupViewMode(GroupViewMode.UNION);
-
             dialogService.notify(Localization.lang("Group view mode set to union"));
         }
-        setGraphicsAndTooltipforButton(mode);
+
+        setGraphicsAndTooltipForButton(mode);
     }
 
-    private void setGraphicsAndTooltipforButton(GroupViewMode mode) {
-        intersectionUnionToggle.setGraphic(GroupModeViewModel.getUnionIntersectionGraphic(mode));
-        intersectionUnionToggle.setTooltip(GroupModeViewModel.getUnionIntersectionTooltip(mode));
+    private void setGraphicsAndTooltipForButton(GroupViewMode mode) {
+        GroupModeViewModel modeViewModel = new GroupModeViewModel(mode);
+        intersectionUnionToggle.setGraphic(modeViewModel.getUnionIntersectionGraphic());
+        intersectionUnionToggle.setTooltip(modeViewModel.getUnionIntersectionTooltip());
     }
 
     @Override

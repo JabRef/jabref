@@ -3,8 +3,8 @@ package org.jabref.gui.actions;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.jabref.Globals;
 import org.jabref.JabRefGUI;
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -20,9 +20,11 @@ import org.jabref.model.entry.FieldName;
 public class CopyBibTeXKeyAndLinkAction implements BaseAction {
 
     private final MainTable mainTable;
+    private final ClipBoardManager clipboardManager;
 
-    public CopyBibTeXKeyAndLinkAction(MainTable mainTable) {
+    public CopyBibTeXKeyAndLinkAction(MainTable mainTable, ClipBoardManager clipboardManager) {
         this.mainTable = mainTable;
+        this.clipboardManager = clipboardManager;
     }
 
     @Override
@@ -45,7 +47,7 @@ public class CopyBibTeXKeyAndLinkAction implements BaseAction {
                 sb.append(OS.NEWLINE);
             }
 
-            DefaultTaskExecutor.runInJavaFXThread(() -> Globals.clipboardManager.setClipboardHtmlContent(sb.toString()));
+            DefaultTaskExecutor.runInJavaFXThread(() -> clipboardManager.setClipboardHtmlContent(sb.toString()));
 
             int copied = entriesWithKey.size();
             int toCopy = entries.size();

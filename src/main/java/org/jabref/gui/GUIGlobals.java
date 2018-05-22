@@ -2,12 +2,10 @@ package org.jabref.gui;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Toolkit;
 
 import org.jabref.Globals;
 import org.jabref.gui.keyboard.EmacsKeyBindings;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -61,20 +59,6 @@ public class GUIGlobals {
 
         GUIGlobals.currentFont = new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY),
                 Globals.prefs.getInt(JabRefPreferences.FONT_STYLE), Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
-
-        // Set WM_CLASS using reflection for certain Un*x window managers
-        if (!OS.WINDOWS && !OS.OS_X) {
-            try {
-                // TODO: reflective access, should be removed (Java 9)
-                Toolkit xToolkit = Toolkit.getDefaultToolkit();
-                java.lang.reflect.Field awtAppClassNameField = xToolkit.getClass().getDeclaredField("awtAppClassName");
-                awtAppClassNameField.setAccessible(true);
-                awtAppClassNameField.set(xToolkit, "org-jabref-JabRefMain");
-            } catch (Exception e) {
-                // ignore any error since this code only works for certain toolkits
-            }
-        }
-
     }
 
     public static void setFont(int size) {

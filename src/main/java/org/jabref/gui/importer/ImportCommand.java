@@ -68,7 +68,7 @@ public class ImportCommand extends SimpleCommand {
             return;
         }
         Optional<Importer> format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
-        ImportMenuItem importMenu = new ImportMenuItem(frame, openInNew, format.orElse(null));
+        ImportAction importMenu = new ImportAction(frame, openInNew, format.orElse(null));
         importMenu.automatedImport(Collections.singletonList(file.toString()));
         // Set last working dir for import
         Globals.prefs.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, file.getParent().toString());

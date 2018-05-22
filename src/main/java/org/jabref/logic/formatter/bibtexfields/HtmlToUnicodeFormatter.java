@@ -12,7 +12,7 @@ public class HtmlToUnicodeFormatter implements LayoutFormatter, Formatter {
 
     @Override
     public String getName() {
-        return "HTML to Unicode";
+        return Localization.lang("HTML to Unicode");
     }
 
     @Override

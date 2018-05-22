@@ -63,11 +63,11 @@ import org.jabref.gui.actions.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.actions.CopyFilesAction;
 import org.jabref.gui.actions.CustomizeEntryAction;
 import org.jabref.gui.actions.CustomizeKeyBindingAction;
+import org.jabref.gui.actions.DatabasePropertiesAction;
 import org.jabref.gui.actions.EditExternalFileTypesAction;
 import org.jabref.gui.actions.ErrorConsoleAction;
 import org.jabref.gui.actions.FindUnlinkedFilesAction;
 import org.jabref.gui.actions.IntegrityCheckAction;
-import org.jabref.gui.actions.LibraryPropertiesAction;
 import org.jabref.gui.actions.LookupIdentifierAction;
 import org.jabref.gui.actions.ManageCustomExportsAction;
 import org.jabref.gui.actions.ManageCustomImportsAction;
@@ -725,10 +725,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 factory.createSubMenu(StandardActions.IMPORT_EXPORT,
                         factory.createMenuItem(StandardActions.MERGE_DATABASE, new OldDatabaseCommandWrapper(Actions.MERGE_DATABASE, this, Globals.stateManager)), // TODO: merge with import
-                        factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(this, true)),
-                        factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, false)),
-                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(this, false)),
-                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(this, true)),
+                        factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(this, false)),
+                        factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, true)),
+                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(this, false, Globals.prefs)),
+                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(this, true, Globals.prefs)),
                         factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new OldDatabaseCommandWrapper(Actions.SAVE_SELECTED_AS_PLAIN, this, Globals.stateManager))
                 ),
 
@@ -831,7 +831,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this)),
+                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new DatabasePropertiesAction(this)),
                 factory.createMenuItem(StandardActions.EDIT_PREAMBLE, new PreambleEditor(this)),
                 factory.createMenuItem(StandardActions.EDIT_STRINGS, new OldDatabaseCommandWrapper(Actions.EDIT_STRINGS, this, Globals.stateManager))
 
