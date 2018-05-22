@@ -2,13 +2,13 @@ package org.jabref.logic.formatter.minifier;
 
 import java.util.Objects;
 
-import org.jabref.logic.formatter.AbstractFormatter;
+import org.jabref.model.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
 /**
  * Replaces three or more authors with and others
  */
-public class MinifyNameListFormatter extends AbstractFormatter {
+public class MinifyNameListFormatter extends Formatter {
     @Override
     public String getName() {
         return Localization.lang("Minify list of person names");

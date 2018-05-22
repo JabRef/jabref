@@ -3,12 +3,12 @@ package org.jabref.logic.formatter.casechanger;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.logic.formatter.AbstractFormatter;
+import org.jabref.model.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.strings.StringLengthComparator;
 
-public class ProtectTermsFormatter extends AbstractFormatter {
+public class ProtectTermsFormatter extends Formatter {
 
     private final ProtectedTermsLoader protectedTermsLoader;
 

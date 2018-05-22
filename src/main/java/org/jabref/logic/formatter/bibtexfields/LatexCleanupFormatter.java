@@ -2,10 +2,10 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.regex.Pattern;
 
-import org.jabref.logic.formatter.AbstractFormatter;
+import org.jabref.model.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
-public class LatexCleanupFormatter extends AbstractFormatter {
+public class LatexCleanupFormatter extends Formatter {
 
     private static final Pattern REMOVE_REDUNDANT = Pattern
             .compile("(?<!\\\\[\\p{Alpha}]{0,100}\\{[^\\}]{0,100})\\}([-/ ]?)\\{");

@@ -3,11 +3,12 @@ package org.jabref.logic.formatter;
 import java.util.Objects;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.cleanup.Formatter;
 
 /**
  * It may seem useless, but is needed as a fallback option
  */
-public class IdentityFormatter extends AbstractFormatter {
+public class IdentityFormatter extends Formatter {
 
     @Override
     public String getName() {
