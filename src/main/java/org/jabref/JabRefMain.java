@@ -108,9 +108,6 @@ public class JabRefMain extends Application {
         PreferencesMigrations.addCrossRefRelatedFieldsForAutoComplete();
         PreferencesMigrations.upgradeObsoleteLookAndFeels();
 
-        // Process arguments
-        ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);
-
         FallbackExceptionHandler.installExceptionHandler();
 
         ensureCorrectJavaVersion();
@@ -140,6 +137,9 @@ public class JabRefMain extends Application {
         EntryTypes.loadCustomEntryTypes(preferences.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
         Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
+
+        // Process arguments
+        ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());
