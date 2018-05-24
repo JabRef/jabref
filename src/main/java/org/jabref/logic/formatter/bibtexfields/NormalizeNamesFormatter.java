@@ -2,8 +2,8 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
 
-import org.jabref.model.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.AuthorList;
 
 /**
@@ -37,5 +37,4 @@ public class NormalizeNamesFormatter extends Formatter {
     public String getExampleInput() {
         return "Albert Einstein and Alan Turing";
     }
-
 }

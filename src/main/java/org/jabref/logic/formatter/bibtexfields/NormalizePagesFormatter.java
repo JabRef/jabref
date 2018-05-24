@@ -4,8 +4,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.model.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.cleanup.Formatter;
 
 import com.google.common.base.Strings;
 
@@ -61,7 +61,7 @@ public class NormalizePagesFormatter extends Formatter {
         }
 
         // Remove pages prefix
-        String cleanValue = value.replace("pp.", "").replace("p.","");
+        String cleanValue = value.replace("pp.", "").replace("p.", "");
         // remove unwanted literals incl. whitespace
         cleanValue = cleanValue.replaceAll("\u2013|\u2014", "-").replaceAll(REJECT_LITERALS, "");
         // try to find pages pattern

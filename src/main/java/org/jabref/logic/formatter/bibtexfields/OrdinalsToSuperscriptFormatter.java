@@ -4,8 +4,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.model.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.cleanup.Formatter;
 
 /**
  * This class transforms ordinal numbers into LaTex superscripts.
@@ -61,5 +61,4 @@ public class OrdinalsToSuperscriptFormatter extends Formatter {
     public String getExampleInput() {
         return "11th";
     }
-
 }

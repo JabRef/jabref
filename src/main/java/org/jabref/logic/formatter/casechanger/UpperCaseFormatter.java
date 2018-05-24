@@ -1,7 +1,7 @@
 package org.jabref.logic.formatter.casechanger;
 
-import org.jabref.model.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.cleanup.Formatter;
 
 public class UpperCaseFormatter extends Formatter {
 
@@ -37,5 +37,4 @@ public class UpperCaseFormatter extends Formatter {
     public String getExampleInput() {
         return "Kde {Amarok}";
     }
-
 }
