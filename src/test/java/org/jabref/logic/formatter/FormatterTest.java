@@ -1,6 +1,7 @@
 package org.jabref.logic.formatter;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,10 +38,14 @@ public class FormatterTest {
     @Test
     public void allFormatterKeysAreUnique() {
         // idea for uniqueness checking by https://stackoverflow.com/a/44032568/873282
-       assertFalse(getFormatters().collect(Collectors.groupingBy(
-               formatter -> formatter.getKey(),
-               Collectors.counting()
-       )).entrySet().stream().anyMatch(e -> e.getValue() > 1));
+       assertEquals(Collections.emptyList(),
+               getFormatters().collect(Collectors.groupingBy(
+                 formatter -> formatter.getKey(),
+                 Collectors.counting()))
+               .entrySet().stream()
+               .filter(e -> e.getValue() > 1)
+               .map(Map.Entry::getKey)
+               .collect(Collectors.toList()));
     }
 
     @ParameterizedTest
