@@ -36,14 +36,19 @@ import org.slf4j.LoggerFactory;
  * JabRef MainClass
  */
 public class JabRefMain extends Application {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefMain.class);
+
     private static String[] arguments;
 
     public static void main(String[] args) {
         arguments = args;
-
         launch(arguments);
+    }
+
+    @Override
+    public void start(Stage mainStage) throws Exception {
+        Platform.setImplicitExit(false);
+        SwingUtilities.invokeLater(() -> start(arguments));
     }
 
     /**
@@ -97,16 +102,7 @@ public class JabRefMain extends Application {
         JabRefPreferences preferences = JabRefPreferences.getInstance();
         Globals.prefs = preferences;
         // Perform Migrations
-        // Perform checks and changes for users with a preference set from an older JabRef version.
-        PreferencesMigrations.upgradePrefsToOrgJabRef();
-        PreferencesMigrations.upgradeSortOrder();
-        PreferencesMigrations.upgradeFaultyEncodingStrings();
-        PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
-        PreferencesMigrations.upgradeImportFileAndDirePatterns();
-        PreferencesMigrations.upgradeStoredCustomEntryTypes();
-        PreferencesMigrations.upgradeKeyBindingsToJavaFX();
-        PreferencesMigrations.addCrossRefRelatedFieldsForAutoComplete();
-        PreferencesMigrations.upgradeObsoleteLookAndFeels();
+        migratePreferences();
 
         FallbackExceptionHandler.installExceptionHandler();
 
@@ -138,11 +134,11 @@ public class JabRefMain extends Application {
                 preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
         Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
 
-        // Process arguments
-        ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);
-
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());
+
+        // Process arguments
+        ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);
 
         // Check for running JabRef
         RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();
@@ -178,14 +174,21 @@ public class JabRefMain extends Application {
 
         // If not, start GUI
         SwingUtilities
-                .invokeLater(() -> new JabRefGUI(argumentProcessor.getParserResults(),
-                        argumentProcessor.isBlank()));
+                .invokeLater(() -> new JabRefGUI(argumentProcessor.getParserResults(), argumentProcessor.isBlank()));
     }
 
-    @Override
-    public void start(Stage mainStage) throws Exception {
-        Platform.setImplicitExit(false);
-        SwingUtilities.invokeLater(() -> start(arguments)
-        );
+    /**
+     * Perform checks and changes for users with a preference set from an older JabRef version.
+     */
+    private static void migratePreferences() {
+        PreferencesMigrations.upgradePrefsToOrgJabRef();
+        PreferencesMigrations.upgradeSortOrder();
+        PreferencesMigrations.upgradeFaultyEncodingStrings();
+        PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
+        PreferencesMigrations.upgradeImportFileAndDirePatterns();
+        PreferencesMigrations.upgradeStoredCustomEntryTypes();
+        PreferencesMigrations.upgradeKeyBindingsToJavaFX();
+        PreferencesMigrations.addCrossRefRelatedFieldsForAutoComplete();
+        PreferencesMigrations.upgradeObsoleteLookAndFeels();
     }
 }
