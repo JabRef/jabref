@@ -161,12 +161,13 @@ dependencies {
     // JAX-B is considered JavaEE API and is no longer part of JavaSE (JDK 9)
     compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
     compile group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0'
- 
+
 // TODO: recognized as 'latex2unicode.2.12', which is an invalid module name, temporarily removed
 //    compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
 
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.1.1'
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.1.1'
+    // can not upgrade to 2.* for Java 9 https://github.com/Microsoft/ApplicationInsights-Java/issues/661
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '1.0.10'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.10'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
     testCompile 'org.junit.jupiter:junit-jupiter-params:5.2.0'
