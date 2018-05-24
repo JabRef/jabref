@@ -5,7 +5,7 @@ import java.util.Objects;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
 
-public class AddBracesFormatter implements Formatter {
+public class AddBracesFormatter extends Formatter {
 
     @Override
     public String getName() {
@@ -38,5 +38,4 @@ public class AddBracesFormatter implements Formatter {
     public String getExampleInput() {
         return "In CDMA";
     }
-
 }
