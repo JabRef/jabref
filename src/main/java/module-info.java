@@ -21,7 +21,7 @@ open module org.jabref {
 
 	// SQL
 	requires java.sql;
-	requires pgjdbc.ng;
+	requires postgresql;
 
 	// JavaFX
 	requires javafx.graphics;
