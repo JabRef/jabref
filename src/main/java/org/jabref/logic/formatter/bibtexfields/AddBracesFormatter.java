@@ -2,10 +2,10 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
 
-import org.jabref.logic.formatter.AbstractFormatter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.cleanup.Formatter;
 
-public class AddBracesFormatter extends AbstractFormatter {
+public class AddBracesFormatter extends Formatter {
 
     @Override
     public String getName() {
@@ -38,5 +38,4 @@ public class AddBracesFormatter extends AbstractFormatter {
     public String getExampleInput() {
         return "In CDMA";
     }
-
 }

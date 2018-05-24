@@ -1,9 +1,9 @@
 package org.jabref.logic.formatter.casechanger;
 
-import org.jabref.logic.formatter.AbstractFormatter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.cleanup.Formatter;
 
-public class TitleCaseFormatter extends AbstractFormatter {
+public class TitleCaseFormatter extends Formatter {
 
     @Override
     public String getName() {
@@ -49,5 +49,4 @@ public class TitleCaseFormatter extends AbstractFormatter {
     public String getExampleInput() {
         return "{BPMN} conformance In open source Engines";
     }
-
 }

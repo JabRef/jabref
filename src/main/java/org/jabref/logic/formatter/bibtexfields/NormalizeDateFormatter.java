@@ -2,14 +2,14 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Optional;
 
-import org.jabref.logic.formatter.AbstractFormatter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.Date;
 
 /**
  * This class transforms date to the format yyyy-mm-dd or yyyy-mm..
  */
-public class NormalizeDateFormatter extends AbstractFormatter {
+public class NormalizeDateFormatter extends Formatter {
     @Override
     public String getName() {
         return Localization.lang("Normalize date");
