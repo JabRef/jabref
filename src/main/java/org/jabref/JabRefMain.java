@@ -118,14 +118,8 @@ public class JabRefMain extends Application {
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);
 
         // Check for running JabRef
-        if (!allowMultipleAppInstances(args)) {
-            return;
-        }
-
-        // See if we should shut down now
-        if (argumentProcessor.shouldShutDown()) {
-            Globals.shutdownThreadPools();
-            Platform.exit();
+        if (!handleMultipleAppInstances(args) || argumentProcessor.shouldShutDown()) {
+            shutdownCurrentInstance();
             return;
         }
 
@@ -134,7 +128,7 @@ public class JabRefMain extends Application {
                 .invokeLater(() -> new JabRefGUI(argumentProcessor.getParserResults(), argumentProcessor.isBlank()));
     }
 
-    private static boolean allowMultipleAppInstances(String[] args) {
+    private static boolean handleMultipleAppInstances(String[] args) {
         RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();
         if (remotePreferences.useRemoteServer()) {
             Globals.REMOTE_LISTENER.open(new JabRefMessageHandler(), remotePreferences.getPort());
@@ -145,9 +139,6 @@ public class JabRefMain extends Application {
                     // We have successfully sent our command line options through the socket to another JabRef instance.
                     // So we assume it's all taken care of, and quit.
                     LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
-                    Globals.shutdownThreadPools();
-                    // needed to tell JavaFx to stop
-                    Platform.exit();
                     return false;
                 }
             }
@@ -155,6 +146,12 @@ public class JabRefMain extends Application {
             Globals.REMOTE_LISTENER.start();
         }
         return true;
+    }
+
+    private static void shutdownCurrentInstance() {
+        Globals.shutdownThreadPools();
+        // needed to tell JavaFx to stop
+        Platform.exit();
     }
 
     private static void applyPreferences(JabRefPreferences preferences) {
