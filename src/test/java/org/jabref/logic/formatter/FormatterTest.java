@@ -32,36 +32,6 @@ class FormatterTest {
                         Collections.emptyList(), Collections.emptyList()));
     }
 
-    private static Stream<Formatter> getFormatters() {
-        // all classes implementing {@link net.sf.jabref.model.cleanup.Formatter}
-        // sorted alphabetically
-        // Alternative: Use reflection - https://github.com/ronmamo/reflections
-        return Stream.of(
-                new CapitalizeFormatter(),
-                new ClearFormatter(),
-                new HtmlToLatexFormatter(),
-                new HtmlToUnicodeFormatter(),
-                new IdentityFormatter(),
-                new LatexCleanupFormatter(),
-                new LatexToUnicodeFormatter(),
-                new LowerCaseFormatter(),
-                new MinifyNameListFormatter(),
-                new NormalizeDateFormatter(),
-                new NormalizeMonthFormatter(),
-                new NormalizeNamesFormatter(),
-                new NormalizePagesFormatter(),
-                new OrdinalsToSuperscriptFormatter(),
-                new ProtectTermsFormatter(protectedTermsLoader),
-                new RegexFormatter("(\" \",\"-\")"),
-                new RemoveBracesFormatter(),
-                new SentenceCaseFormatter(),
-                new TitleCaseFormatter(),
-                new UnicodeToLatexFormatter(),
-                new UnitsToLatexFormatter(),
-                new UpperCaseFormatter()
-        );
-    }
-
     /**
      * When a new formatter is added by copy and pasting another formatter, it may happen that the <code>getKey()</code> method is not adapted. This results in duplicate keys, which this test tests for.
      */
