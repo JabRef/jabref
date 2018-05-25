@@ -9,7 +9,7 @@ import org.jabref.model.cleanup.Formatter;
 /**
  * Removes all hyphenated line breaks in the string.
  */
-public class RemoveHyphenatedNewlinesFormatter implements Formatter {
+public class RemoveHyphenatedNewlinesFormatter extends Formatter {
     private static final Pattern HYPHENATED_WORDS = Pattern.compile("(-\r\n|-\n|-\r)");
 
     @Override
