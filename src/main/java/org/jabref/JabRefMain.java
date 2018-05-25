@@ -106,7 +106,7 @@ public class JabRefMain extends Application {
         final JabRefPreferences preferences = JabRefPreferences.getInstance();
         Globals.prefs = preferences;
         // Perform migrations
-        migratePreferences();
+        PreferencesMigrations.runMigrations();
 
         configureProxy(preferences.getProxyPreferences());
 
@@ -188,20 +188,5 @@ public class JabRefMain extends Application {
         if (proxyPreferences.isUseProxy() && proxyPreferences.isUseAuthentication()) {
             Authenticator.setDefault(new ProxyAuthenticator());
         }
-    }
-
-    /**
-     * Perform checks and changes for users with a preference set from an older JabRef version.
-     */
-    private static void migratePreferences() {
-        PreferencesMigrations.upgradePrefsToOrgJabRef();
-        PreferencesMigrations.upgradeSortOrder();
-        PreferencesMigrations.upgradeFaultyEncodingStrings();
-        PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
-        PreferencesMigrations.upgradeImportFileAndDirePatterns();
-        PreferencesMigrations.upgradeStoredCustomEntryTypes();
-        PreferencesMigrations.upgradeKeyBindingsToJavaFX();
-        PreferencesMigrations.addCrossRefRelatedFieldsForAutoComplete();
-        PreferencesMigrations.upgradeObsoleteLookAndFeels();
     }
 }
