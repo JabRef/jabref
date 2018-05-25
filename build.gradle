@@ -52,7 +52,7 @@ targetCompatibility = 1.8
 mainClassName = "org.jabref.JabRefMain"
 
 // These are the Java version requirements we will check on each start of JabRef
-ext.minRequiredJavaVersion = "1.8.0_144"
+ext.minRequiredJavaVersion = "1.8.0_172"
 ext.allowJava9 = false
 
 sourceSets {
@@ -311,7 +311,7 @@ test {
     useJUnitPlatform {
         excludeTags 'DatabaseTest', 'FetcherTest', 'GUITest', 'org.jabref.testutils.category.FetcherTest', 'org.jabref.testutils.category.GUITest'
     }
-    
+
     testLogging {
         // set options for log level LIFECYCLE
         events "failed"
@@ -372,7 +372,7 @@ checkstyle {
     // do not use other packages for checkstyle, excluding gen(erated) sources
     checkstyleMain.source = "src/main/java"
     toolVersion = '8.5'
-    
+
     // do not perform checkstyle checks by default
     sourceSets = []
 }
