@@ -76,6 +76,6 @@
    </header>
    <buttonTypes>
       <ButtonType fx:constant="CLOSE" />
-      <ButtonType fx:id="connectButton" text="Connect" />
+      <ButtonType fx:id="connectButton" text="%Connect" buttonData="OK_DONE"/>
    </buttonTypes>
 </DialogPane>

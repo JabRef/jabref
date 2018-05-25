@@ -8,6 +8,7 @@ import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -43,6 +44,12 @@ import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
 
+import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +58,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(SharedDatabaseLoginDialogViewModel.class);
 
     private final ListProperty<DBMSType> allDBMSTypes = new SimpleListProperty<>(FXCollections.observableArrayList(DBMSType.values()));
-    private final ObjectProperty<DBMSType> selectedDBMSType = new SimpleObjectProperty<>();
+    private final ObjectProperty<DBMSType> selectedDBMSType = new SimpleObjectProperty<>(allDBMSTypes.get(0));
 
     private final StringProperty db = new SimpleStringProperty("");
     private final StringProperty host = new SimpleStringProperty("");
@@ -61,10 +68,18 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final StringProperty folder = new SimpleStringProperty("");
     private final BooleanProperty autosave = new SimpleBooleanProperty();
     private final BooleanProperty rememberPassword = new SimpleBooleanProperty();
+    private final BooleanProperty loading = new SimpleBooleanProperty();
 
     private final JabRefFrame frame;
     private final DialogService dialogService;
     private final SharedDatabasePreferences prefs = new SharedDatabasePreferences();
+
+    private final Validator dbvalidator;
+    private final Validator hostvalidator;
+    private final Validator portValidator;
+    private final Validator uservalidator;
+    private final Validator folderValidator;
+    private final CompositeValidator formValidator;
 
     private DBMSConnectionProperties connectionProperties;
 
@@ -72,9 +87,20 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.frame = frame;
         this.dialogService = dialogService;
 
-        selectedDbmstypeProperty().addListener((observable, oldValue, newValue) -> {
-            port.setValue(Integer.toString(newValue.getDefaultPort()));
+        EasyBind.subscribe(selectedDBMSType, selected -> {
+            port.setValue(Integer.toString(selected.getDefaultPort()));
         });
+
+        Predicate<String> predicate = input -> (input != null) && !input.trim().isEmpty();
+
+        dbvalidator = new FunctionBasedValidator<>(db, predicate, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Library"))));
+        hostvalidator = new FunctionBasedValidator<>(host, predicate, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Port"))));
+        portValidator = new FunctionBasedValidator<>(port, predicate, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Host"))));
+        uservalidator = new FunctionBasedValidator<>(user, predicate, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("User"))));
+        folderValidator = new FunctionBasedValidator<>(folder, predicate, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
+
+        formValidator = new CompositeValidator();
+        formValidator.addValidators(dbvalidator, hostvalidator, portValidator, uservalidator);
     }
 
     public void openDatabase() {
@@ -114,7 +140,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
             }
         }
 
-        //  setLoadingConnectButtonText(true);
+        loading.set(true);
 
         try {
             SharedDatabaseUIManager manager = new SharedDatabaseUIManager(frame);
@@ -129,7 +155,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 }
             }
 
-            return; // setLoadingConnectButtonText(false) should not be reached regularly.
+            return;
         } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
 
             frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection error"), exception);
@@ -150,7 +176,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
             result.filter(btn -> btn == ButtonType.OK).ifPresent(btn -> openSharedDatabase());
 
         }
-
+        loading.set(false);
     }
 
     private void setPreferences() {
@@ -266,5 +292,33 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public ObjectProperty<DBMSType> selectedDbmstypeProperty() {
         return selectedDBMSType;
+    }
+
+    public BooleanProperty loadingProperty() {
+        return loading;
+    }
+
+    public ValidationStatus dbValidation() {
+        return dbvalidator.getValidationStatus();
+    }
+
+    public ValidationStatus hostValidation() {
+        return hostvalidator.getValidationStatus();
+    }
+
+    public ValidationStatus portValidation() {
+        return portValidator.getValidationStatus();
+    }
+
+    public ValidationStatus userValidation() {
+        return uservalidator.getValidationStatus();
+    }
+
+    public ValidationStatus folderValidation() {
+        return folderValidator.getValidationStatus();
+    }
+
+    public ValidationStatus formValidation() {
+        return formValidator.getValidationStatus();
     }
 }
