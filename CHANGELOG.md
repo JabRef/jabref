@@ -24,6 +24,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where JabRef would no longer start, when the option "Override default font settings" was activated. [#3986](https://github.com/JabRef/jabref/issues/3986)
 - We fixed an issue where JabRef removed whitespace from the Title-fetcher which resulting in no entries being found. [#4014](https://github.com/JabRef/jabref/issues/4014)
 - We fixed an issue where fetched entries from the ACM fetcher could not be imported. [#4018](https://github.com/JabRef/jabref/issues/4018)
+- We fixed an issue to enable push to application on macOs again [#4041](https://github.com/JabRef/jabref/issues/4041)
 
 ### Removed
 - We removed the GTK Look and Feel from the Options, as it leads to freezes in JabRef on MacOSX and Linux [#3995](https://github.com/JabRef/jabref/issues/3995).
