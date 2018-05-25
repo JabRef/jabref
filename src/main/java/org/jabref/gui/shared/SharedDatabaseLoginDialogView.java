@@ -78,7 +78,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         this.frame = frame;
         this.setTitle(Localization.lang("Connect to shared database"));
 
-        this.getDialogPane().getButtonTypes().add(connect);
+        this.getDialogPane().getButtonTypes().addAll(connect, ButtonType.CANCEL);
         this.btnConnect = (Button) this.getDialogPane().lookupButton(connect);
         btnConnect.setOnAction(this::openDatabase);
 
