@@ -234,7 +234,7 @@ public class PreferencesMigrations {
         }
     }
 
-    private static void upgradeImportFileAndDirePatterns() {
+    static void upgradeImportFileAndDirePatterns() {
         JabRefPreferences prefs = Globals.prefs;
 
         Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
