@@ -55,7 +55,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private Connection currentConnection;
     private final Character keywordSeparator;
     private final GlobalBibtexKeyPattern globalCiteKeyPattern;
-    private FileUpdateMonitor fileMonitor;
+    private final FileUpdateMonitor fileMonitor;
 
     public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
                             GlobalBibtexKeyPattern globalCiteKeyPattern, FileUpdateMonitor fileMonitor) {
@@ -128,13 +128,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             synchronizeSharedMetaData(event.getMetaData(), globalCiteKeyPattern);
             synchronizeLocalDatabase();
             applyMetaData();
-            dbmsProcessor.notifyClients();
-        }
-    }
-
-    @Subscribe
-    public void listen(EntryEvent event) {
-        if (isEventSourceAccepted(event)) {
             dbmsProcessor.notifyClients();
         }
     }
@@ -399,6 +392,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.metaData = metaData;
     }
 
+    @Override
     public void registerListener(Object listener) {
         eventBus.register(listener);
     }
