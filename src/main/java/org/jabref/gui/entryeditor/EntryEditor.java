@@ -133,6 +133,7 @@ public class EntryEditor extends BorderPane {
 
     @FXML
     public void generateKey() {
+        // TODO we need the confirmation dialogs here
         new BibtexKeyGenerator(bibDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences())
                 .generateAndSetKey(entry)
                 .ifPresent(change -> undoManager.addEdit(new UndoableKeyChange(change)));

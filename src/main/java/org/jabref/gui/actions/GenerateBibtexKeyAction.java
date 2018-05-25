@@ -49,7 +49,6 @@ public class GenerateBibtexKeyAction extends AbstractWorker {
         // We don't want to generate keys for entries which already have one thus remove the entries
         if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
             entries.removeIf(BibEntry::hasCiteKey);
-
             // if we're going to override some cite keys warn the user about it
         } else if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
             if (entries.parallelStream().anyMatch(BibEntry::hasCiteKey)) {

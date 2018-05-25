@@ -22,6 +22,7 @@ public class BibtexKeyEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void generateKey() {
+        // TODO we need the confirmation dialogs here
         new BibtexKeyGenerator(bibDatabaseContext, keyPatternPreferences)
                 .generateAndSetKey(entry)
                 .ifPresent(change -> undoManager.addEdit(new UndoableKeyChange(change)));
