@@ -20,6 +20,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 
 import org.jabref.Globals;
 import org.jabref.JabRefException;
@@ -27,8 +28,10 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
@@ -136,7 +139,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         });
     }
 
-    public void openSharedDatabase() {
+    private void openSharedDatabase() {
 
         if (isSharedDatabaseAlreadyPresent()) {
 
@@ -181,10 +184,23 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
             return; // setLoadingConnectButtonText(false) should not be reached regularly.
         } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
 
-          frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection error"), exception);
+            frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection error"), exception);
 
         } catch (DatabaseNotSupportedException exception) {
-            // new MigrationHelpDialog(this).setVisible(true);
+            ButtonType openHelp = new ButtonType("Open Help", ButtonData.OTHER);
+
+            Optional<ButtonType> result = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
+                                                                                      Localization.lang("Migration help information"),
+                                                                                      Localization.lang("Entered database has obsolete structure and is no longer supported.")
+                                                                                                                                       + "\n" +
+                                                                                                                                       Localization.lang("Click help to learn about the migration of pre-3.6 databases.")
+                                                                                                                                       + "\n" +
+                                                                                                                                       Localization.lang("However, a new database was created alongside the pre-3.6 one."),
+                                                                                      ButtonType.OK, openHelp);
+
+            result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> HelpAction.openHelpPage(HelpFile.SQL_DATABASE_MIGRATION));
+            result.filter(btn -> btn == ButtonType.OK).ifPresent(btn -> openSharedDatabase());
+
         }
 
         setLoadingConnectButtonText(false);
