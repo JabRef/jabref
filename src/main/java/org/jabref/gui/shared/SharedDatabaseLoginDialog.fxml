@@ -2,6 +2,7 @@
 
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonType?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DialogPane?>
@@ -71,4 +72,10 @@
          </center>
       </BorderPane>
    </content>
+   <header>
+   </header>
+   <buttonTypes>
+      <ButtonType fx:constant="CLOSE" />
+      <ButtonType fx:id="connectButton" text="Connect" />
+   </buttonTypes>
 </DialogPane>

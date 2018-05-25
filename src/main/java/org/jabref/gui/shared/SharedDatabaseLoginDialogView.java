@@ -30,6 +30,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -62,13 +63,12 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private TextField tbFolder;
     @FXML private Button btnBrowse;
     @FXML private CheckBox chkAutosave;
+    @FXML private ButtonType connectButton;
 
     @Inject private DialogService dialogService;
 
     private final SharedDatabasePreferences prefs = new SharedDatabasePreferences();
 
-    private final ButtonType connect = new ButtonType("Connect", ButtonData.YES);
-    private final Button btnConnect;
     private final JabRefFrame frame;
 
     private DBMSConnectionProperties connectionProperties;
@@ -78,17 +78,16 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         this.frame = frame;
         this.setTitle(Localization.lang("Connect to shared database"));
 
-        this.getDialogPane().getButtonTypes().addAll(connect, ButtonType.CANCEL);
-        this.btnConnect = (Button) this.getDialogPane().lookupButton(connect);
-        btnConnect.setOnAction(this::openDatabase);
-
         ViewLoader.view(this)
                   .load()
                   .setAsContent(this.getDialogPane());
 
+        ControlHelper.setAction(connectButton, this.getDialogPane(), event -> openDatabase());
+
     }
 
-    private void openDatabase(ActionEvent e) {
+    @FXML
+    private void openDatabase() {
 
         try {
             checkFields();
@@ -112,6 +111,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     private void initialize() {
 
         viewModel = new SharedDatabaseLoginDialogViewModel();
+
         cmbDbType.itemsProperty().bind(viewModel.dbmstypeProperty());
         cmbDbType.getSelectionModel().select(0);
         viewModel.selectedDbmstypeProperty().bind(cmbDbType.getSelectionModel().selectedItemProperty());
@@ -207,11 +207,11 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     }
 
     private void setLoadingConnectButtonText(boolean isLoading) {
-        btnConnect.setDisable(isLoading);
+
         if (isLoading) {
-            btnConnect.setText(Localization.lang("Connecting..."));
+            //    connectButton.setText(Localization.lang("Connecting..."));
         } else {
-            btnConnect.setText(Localization.lang("Connect"));
+            //  connectButton.setText(Localization.lang("Connect"));
         }
     }
 
