@@ -1,9 +1,9 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.jabref.logic.formatter.AbstractFormatter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.cleanup.Formatter;
 
-public class NormalizeEnDashesFormatter extends AbstractFormatter {
+public class NormalizeEnDashesFormatter extends Formatter {
 
     @Override
     public String getName() {
