@@ -2,6 +2,7 @@ package org.jabref.gui.shared;
 
 import javax.inject.Inject;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -21,6 +22,7 @@ import org.jabref.model.database.shared.DBMSType;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import org.fxmisc.easybind.EasyBind;
 
 public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
@@ -40,7 +42,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
     @Inject private DialogService dialogService;
 
-    // private final Button btnConnect;
+    private final Button btnConnect;
 
     private SharedDatabaseLoginDialogViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
@@ -54,10 +56,9 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                   .setAsDialogPane(this);
 
         ControlHelper.setAction(connectButton, this.getDialogPane(), event -> openDatabase());
-        //  btnConnect = (Button) this.getDialogPane().lookupButton(connectButton);
-        //setLoadingConnectButtonText();
-
-        //  btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not());
+        btnConnect = (Button) this.getDialogPane().lookupButton(connectButton);
+        setLoadingConnectButtonText();
+        btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not());
 
     }
 
@@ -86,18 +87,17 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         tbFolder.disableProperty().bind(chkAutosave.selectedProperty().not());
         chkAutosave.selectedProperty().bindBidirectional(viewModel.autosaveProperty());
 
-        /* TODO: java.lang.IllegalArgumentException: DialogPane@17ff695e[styleClass=root dialog-pane]is already inside a scene-graph and cannot be set as root
+        Platform.runLater(() -> {
+            visualizer.initVisualization(viewModel.dbValidation(), tbDb, true);
+            visualizer.initVisualization(viewModel.hostValidation(), tbHost, true);
+            visualizer.initVisualization(viewModel.portValidation(), tbPort, true);
+            visualizer.initVisualization(viewModel.userValidation(), tbUser, true);
 
-        visualizer.initVisualization(viewModel.dbValidation(), tbDb, true);
-        visualizer.initVisualization(viewModel.hostValidation(), tbHost, true);
-        visualizer.initVisualization(viewModel.portValidation(), tbPort, true);
-        visualizer.initVisualization(viewModel.userValidation(), tbUser, true);
-        */
-        /*
-        EasyBind.subscribe(chkAutosave.selectedProperty(), selected ->{
-            visualizer.initVisualization(viewModel.folderValidation(), tbFolder, true);
+            EasyBind.subscribe(chkAutosave.selectedProperty(), selected -> {
+                visualizer.initVisualization(viewModel.folderValidation(), tbFolder, true);
+            });
         });
-        */
+
         viewModel.applyPreferences();
 
     }
@@ -107,15 +107,14 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         viewModel.openFileDialog();
     }
 
-    /* private void setLoadingConnectButtonText() {
+    private void setLoadingConnectButtonText() {
 
         if (viewModel.loadingProperty().get()) {
             btnConnect.setText(Localization.lang("Connecting..."));
             btnConnect.setDisable(true);
         } else {
             btnConnect.setText(Localization.lang("Connect"));
-            btnConnect.setDisable(false);
         }
-    }*/
+    }
 
 }
