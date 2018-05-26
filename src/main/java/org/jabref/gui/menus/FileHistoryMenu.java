@@ -72,7 +72,7 @@ public class FileHistoryMenu extends Menu {
         if (!Files.exists(fileToOpen)) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("File not found"),
-                    Localization.lang("File not found") + ": " + fileToOpen.getFileName());
+                    Localization.lang("File not found") + ": " + fileName);
             history.removeItem(fileName);
             setItems();
             return;
