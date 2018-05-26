@@ -22,17 +22,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PreferencesMigrations {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesMigrations.class);
 
     private PreferencesMigrations() {
     }
 
     /**
+     * Perform checks and changes for users with a preference set from an older JabRef version.
+     */
+    public static void runMigrations() {
+        upgradePrefsToOrgJabRef();
+        upgradeSortOrder();
+        upgradeFaultyEncodingStrings();
+        upgradeLabelPatternToBibtexKeyPattern();
+        upgradeImportFileAndDirePatterns();
+        upgradeStoredCustomEntryTypes();
+        upgradeKeyBindingsToJavaFX();
+        addCrossRefRelatedFieldsForAutoComplete();
+        upgradeObsoleteLookAndFeels();
+    }
+
+    /**
      * Migrate all preferences from net/sf/jabref to org/jabref
      */
-    public static void upgradePrefsToOrgJabRef() {
-
+    private static void upgradePrefsToOrgJabRef() {
         JabRefPreferences prefs = Globals.prefs;
         Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
         try {
@@ -69,7 +82,7 @@ public class PreferencesMigrations {
     /**
      * Added from Jabref 2.11 beta 4 onwards to fix wrong encoding names
      */
-    public static void upgradeFaultyEncodingStrings() {
+    private static void upgradeFaultyEncodingStrings() {
         JabRefPreferences prefs = Globals.prefs;
         String defaultEncoding = prefs.get(JabRefPreferences.DEFAULT_ENCODING);
         if (defaultEncoding == null) {
@@ -110,7 +123,7 @@ public class PreferencesMigrations {
      * these preferences, but it is only used when the new preference does not
      * exist
      */
-    public static void upgradeSortOrder() {
+    private static void upgradeSortOrder() {
         JabRefPreferences prefs = Globals.prefs;
 
         if (prefs.get(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, null) == null) {
@@ -138,8 +151,7 @@ public class PreferencesMigrations {
     /**
      * Migrate all customized entry types from versions <=3.7
      */
-    public static void upgradeStoredCustomEntryTypes() {
-
+    private static void upgradeStoredCustomEntryTypes() {
         JabRefPreferences prefs = Globals.prefs;
         Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
 
@@ -159,8 +171,7 @@ public class PreferencesMigrations {
     /**
      * Migrate LabelPattern configuration from versions <=3.5 to new BibtexKeyPatterns
      */
-    public static void upgradeLabelPatternToBibtexKeyPattern() {
-
+    private static void upgradeLabelPatternToBibtexKeyPattern() {
         JabRefPreferences prefs = Globals.prefs;
 
         try {
@@ -223,7 +234,7 @@ public class PreferencesMigrations {
         }
     }
 
-    public static void upgradeImportFileAndDirePatterns() {
+    static void upgradeImportFileAndDirePatterns() {
         JabRefPreferences prefs = Globals.prefs;
 
         Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
@@ -244,7 +255,7 @@ public class PreferencesMigrations {
         // the user defined old-style patterns, and the default pattern is "".
     }
 
-    public static void upgradeKeyBindingsToJavaFX() {
+    private static void upgradeKeyBindingsToJavaFX() {
         UnaryOperator<String> replaceKeys = (str) -> {
             String result = str.replace("ctrl ", "ctrl+");
             result = result.replace("shift ", "shift+");
@@ -261,7 +272,7 @@ public class PreferencesMigrations {
 
     }
 
-    public static void addCrossRefRelatedFieldsForAutoComplete() {
+    private static void addCrossRefRelatedFieldsForAutoComplete() {
         JabRefPreferences prefs = Globals.prefs;
         //LinkedHashSet because we want to retain the order and add new fields to the end
         Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS));
@@ -283,7 +294,7 @@ public class PreferencesMigrations {
         prefs.putKeyPattern(keyPattern);
     }
 
-    public static void upgradeObsoleteLookAndFeels() {
+    private static void upgradeObsoleteLookAndFeels() {
         JabRefPreferences prefs = Globals.prefs;
         String currentLandF = prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
 
@@ -304,5 +315,4 @@ public class PreferencesMigrations {
                     }
                 });
     }
-
 }

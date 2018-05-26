@@ -8,11 +8,11 @@ import org.jabref.model.cleanup.Formatter;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 @ApacheCommonsLang3Allowed("There is no equivalent in Google's Guava")
-public class HtmlToUnicodeFormatter implements LayoutFormatter, Formatter {
+public class HtmlToUnicodeFormatter extends Formatter implements LayoutFormatter {
 
     @Override
     public String getName() {
-        return "HTML to Unicode";
+        return Localization.lang("HTML to Unicode");
     }
 
     @Override

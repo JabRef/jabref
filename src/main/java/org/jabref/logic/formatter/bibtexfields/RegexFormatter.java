@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
 
-public class RegexFormatter implements Formatter {
+public class RegexFormatter extends Formatter {
 
     private static final Pattern PATTERN_ESCAPED_OPENING_CURLY_BRACE = Pattern.compile("\\\\\\{");
 
@@ -101,5 +101,4 @@ public class RegexFormatter implements Formatter {
         String[] parts = rexToSet.split("\",\"");
         regex = parts;
     }
-
 }
