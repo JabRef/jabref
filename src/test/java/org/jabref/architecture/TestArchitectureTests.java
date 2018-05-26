@@ -32,7 +32,7 @@ public class TestArchitectureTests {
 
     private final String forbiddenPackage;
 
-    private List<String> exceptions;
+    private final List<String> exceptions;
 
     public TestArchitectureTests(String forbiddenPackage) {
         this.forbiddenPackage = forbiddenPackage;

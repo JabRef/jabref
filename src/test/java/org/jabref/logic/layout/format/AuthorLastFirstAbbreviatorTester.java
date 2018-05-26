@@ -7,9 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Test case  that verifies the functionalities of the
  * formater AuthorLastFirstAbbreviator.
- *
- * @author Carlos Silla
- * @author Christopher Oezbek <oezi@oezi.de>
  */
 class AuthorLastFirstAbbreviatorTester {
 

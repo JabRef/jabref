@@ -15,6 +15,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.SimpleStringProperty;
@@ -856,6 +857,13 @@ public class BibEntry implements Cloneable {
 
     public ObservableMap<String, String> getFieldsObservable() {
         return fields;
+    }
+
+    /**
+     * Returns a list of observables that represent the data of the entry.
+     */
+    public Observable[] getObservables() {
+        return new Observable[]{fields};
     }
 
     private interface GetFieldInterface {

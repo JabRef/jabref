@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -22,8 +23,7 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
 
     private final JCheckBox hideNonHits = new JCheckBox(Localization.lang("Hide non-hits"));
     private final JCheckBox grayOut = new JCheckBox(Localization.lang("Gray out non-hits"));
-    private final JCheckBox autoAssignGroup = new JCheckBox(
-            Localization.lang("Automatically assign new entry to selected groups"));
+    private final JCheckBox autoAssignGroup = new JCheckBox(Localization.lang("Automatically assign new entry to selected groups"));
     private final JRadioButton multiSelectionModeIntersection = new JRadioButton(Localization.lang("Intersection"));
     private final JRadioButton multiSelectionModeUnion = new JRadioButton(Localization.lang("Union"));
 
@@ -31,7 +31,6 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
     private final JTextField keywordSeparator = new JTextField(2);
 
     private final JabRefPreferences prefs;
-
 
     public GroupsPrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
@@ -59,9 +58,8 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         multiSelectionModeIntersection.setToolTipText(Localization.lang("Display only entries belonging to all selected groups."));
         multiSelectionModeUnion.setToolTipText(Localization.lang("Display all entries belonging to one or more of the selected groups."));
 
-
         FormLayout layout = new FormLayout("9dlu, pref", //500px",
-                "p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p");
+                                           "p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         builder.appendSeparator(Localization.lang("View"));
         builder.nextLine();
@@ -91,8 +89,7 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.nextColumn();
         // build subcomponent
-        FormLayout layout2 = new FormLayout("left:pref, 2dlu, left:pref",
-                "p, 3dlu, p");
+        FormLayout layout2 = new FormLayout("left:pref, 2dlu, left:pref", "p, 3dlu, p");
         DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
         builder2.append(new JLabel(Localization.lang("Default grouping field") + ":"));
         builder2.append(groupingField);
@@ -114,7 +111,14 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         groupingField.setText(prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
         keywordSeparator.setText(prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
         autoAssignGroup.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
-        multiSelectionModeIntersection.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS));
+
+        GroupViewMode mode = prefs.getGroupViewMode();
+        if (mode == GroupViewMode.INTERSECTION) {
+            multiSelectionModeIntersection.setSelected(true);
+        }
+        if (mode == GroupViewMode.UNION) {
+            multiSelectionModeUnion.setSelected(true);
+        }
     }
 
     @Override
@@ -123,7 +127,13 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         prefs.put(JabRefPreferences.GROUPS_DEFAULT_FIELD, groupingField.getText().trim());
         prefs.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroup.isSelected());
         prefs.put(JabRefPreferences.KEYWORD_SEPARATOR, keywordSeparator.getText());
-        prefs.putBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS, multiSelectionModeIntersection.isSelected());
+
+        if (multiSelectionModeIntersection.isSelected()) {
+            prefs.setGroupViewMode(GroupViewMode.INTERSECTION);
+        }
+        if (multiSelectionModeUnion.isSelected()) {
+            prefs.setGroupViewMode(GroupViewMode.UNION);
+        }
     }
 
     @Override

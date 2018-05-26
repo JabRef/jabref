@@ -10,7 +10,6 @@ import javax.swing.JTextField;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
@@ -40,6 +39,11 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected String commandPath;
     protected String commandPathPreferenceKey;
     protected FormBuilder builder;
+    protected DialogService dialogService;
+
+    public AbstractPushToApplication(DialogService dialogService) {
+        this.dialogService = dialogService;
+    }
 
     @Override
     public String getName() {
@@ -71,7 +75,19 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         try {
             if (OS.OS_X) {
                 String[] commands = getCommandLine(keyString);
-                ProcessBuilder processBuilder = new ProcessBuilder("open -a " + commands[0] + " -n --args " + commands[1] + " " + commands[2]);
+                if (commands.length < 3) {
+                    LOGGER.error("Commandline does not contain enough parameters to \"push to application\"");
+                    return;
+                }
+                ProcessBuilder processBuilder = new ProcessBuilder(
+                        "open",
+                        "-a",
+                        commands[0],
+                        "-n",
+                        "--args",
+                        commands[1],
+                        commands[2]
+                );
                 processBuilder.start();
             } else {
                 ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
@@ -164,10 +180,9 @@ public abstract class AbstractPushToApplication implements PushToApplication {
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-        DialogService ds = new FXDialogService();
 
         browse.addActionListener(
-                e -> DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration))
+                e -> DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showFileOpenDialog(fileDialogConfiguration))
                         .ifPresent(f -> path.setText(f.toAbsolutePath().toString())));
         builder.add(browse).xy(5, 1);
         settings = builder.build();

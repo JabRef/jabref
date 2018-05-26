@@ -5,7 +5,9 @@ import javax.swing.JComponent;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
+import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.undo.NamedCompound;
@@ -42,7 +44,7 @@ class EntryDeleteChangeViewModel extends ChangeViewModel {
         LOGGER.debug("Modified entry: " + memEntry.getCiteKeyOptional().orElse("<no BibTeX key set>")
                 + "\n Modified locally: " + isModifiedLocally);
 
-        PreviewPanel previewPanel = new PreviewPanel(null, null);
+        PreviewPanel previewPanel = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), new FXDialogService());
         previewPanel.setEntry(memEntry);
         container = CustomJFXPanel.wrap(new Scene(previewPanel));
     }

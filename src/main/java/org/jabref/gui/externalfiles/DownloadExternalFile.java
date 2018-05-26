@@ -10,12 +10,11 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntryEditor;
@@ -47,16 +46,16 @@ public class DownloadExternalFile {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadExternalFile.class);
 
-    private final JabRefFrame frame;
     private final BibDatabaseContext databaseContext;
     private final BibEntry entry;
+    private final DialogService dialogService;
+
     private FileListEntryEditor editor;
     private boolean downloadFinished;
     private boolean dontShowDialog;
 
-
-    public DownloadExternalFile(JabRefFrame frame, BibDatabaseContext databaseContext, BibEntry entry) {
-        this.frame = frame;
+    public DownloadExternalFile(DialogService dialogService, BibDatabaseContext databaseContext, BibEntry entry) {
+        this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.entry = entry;
     }
@@ -123,22 +122,21 @@ public class DownloadExternalFile {
      */
     public void download(final DownloadCallback callback) throws IOException {
         dontShowDialog = false;
-        final String res = JOptionPane.showInputDialog(frame, Localization.lang("Enter URL to download"));
 
-        if ((res == null) || res.trim().isEmpty()) {
-            return;
+        Optional<String> res = dialogService.showInputDialogAndWait(Localization.lang("Download file"), Localization.lang("Enter URL to download"));
+
+        if (res.isPresent()) {
+            URL url;
+            try {
+                url = new URL(res.get());
+            } catch (MalformedURLException ex1) {
+                dialogService.showErrorDialogAndWait(Localization.lang("Download file"),
+                        Localization.lang("Invalid URL"));
+
+                return;
+            }
+            download(url, callback);
         }
-
-        URL url;
-        try {
-            url = new URL(res);
-        } catch (MalformedURLException ex1) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL"), Localization.lang("Download file"),
-                    JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        download(url, callback);
     }
 
     public void download(URL url, final DownloadCallback callback) throws IOException {
@@ -180,9 +178,11 @@ public class DownloadExternalFile {
                 if ((editor != null) && editor.isVisible()) {
                     editor.setVisible(false, false);
                 }
-                JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": " + e.getMessage(),
-                        Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+
                 LOGGER.info("Error while downloading " + "'" + url + "'", e);
+
+                dialogService.showErrorDialogAndWait(Localization.lang("Download file"), Localization.lang("Invalid URL") + ": " + e.getMessage());
+
                 return;
             }
             // Download finished: call the method that stops the progress bar etc.:
@@ -218,14 +218,16 @@ public class DownloadExternalFile {
         editor.setExternalConfirm(closeEntry -> {
             File f = directory == null ? new File(closeEntry.getLink()) : expandFilename(directory, closeEntry.getLink());
             if (f.isDirectory()) {
-                JOptionPane.showMessageDialog(frame, Localization.lang("Target file cannot be a directory."),
-                        Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+                dialogService.showErrorDialogAndWait(Localization.lang("Download file"),
+                        Localization.lang("Target file cannot be a directory."));
+
                 return false;
             }
             if (f.exists()) {
-                return JOptionPane.showConfirmDialog(frame,
-                        Localization.lang("'%0' exists. Overwrite file?", f.getName()),
-                        Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION;
+                return dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
+                        Localization.lang("'%0' exists. Overwrite file?", f.getName()), Localization.lang("Overwrite file"),
+                        Localization.lang("Cancel"));
+
             } else {
                 return true;
             }
@@ -331,13 +333,13 @@ public class DownloadExternalFile {
         return plannedName;
     }
 
-
     /**
      * Callback interface that users of this class must implement in order to receive
      * notification when download is complete.
      */
     @FunctionalInterface
     public interface DownloadCallback {
+
         void downloadComplete(LinkedFile file);
     }
 }

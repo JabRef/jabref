@@ -5,14 +5,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
 import javax.swing.undo.CompoundEdit;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.MergeDialog;
 import org.jabref.gui.actions.BaseAction;
@@ -50,10 +48,12 @@ public class AppendDatabaseAction implements BaseAction {
     private final BasePanel panel;
 
     private final List<Path> filesToOpen = new ArrayList<>();
+    private final DialogService dialogService;
 
     public AppendDatabaseAction(JabRefFrame frame, BasePanel panel) {
         this.frame = frame;
         this.panel = panel;
+        dialogService = frame.getDialogService();
     }
 
     private static void mergeFromBibtex(BasePanel panel, ParserResult parserResult, boolean importEntries,
@@ -78,7 +78,7 @@ public class AppendDatabaseAction implements BaseAction {
                 database.insertEntry(entry);
                 appendedEntries.add(entry);
                 originalEntries.add(originalEntry);
-                ce.addEdit(new UndoableInsertEntry(database, entry, panel));
+                ce.addEdit(new UndoableInsertEntry(database, entry));
             }
         }
 
@@ -147,7 +147,6 @@ public class AppendDatabaseAction implements BaseAction {
     public void action() {
         filesToOpen.clear();
         final MergeDialog dialog = new MergeDialog(frame, Localization.lang("Append library"), true);
-        dialog.setLocationRelativeTo(panel);
         dialog.setVisible(true);
         if (dialog.isOkPressed()) {
 
@@ -155,7 +154,6 @@ public class AppendDatabaseAction implements BaseAction {
                     .withDefaultExtension(FileType.BIBTEX_DB)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                     .build();
-            DialogService dialogService = new FXDialogService();
 
             List<Path> chosen = DefaultTaskExecutor
                     .runInJavaFXThread(() -> dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));
@@ -187,8 +185,8 @@ public class AppendDatabaseAction implements BaseAction {
                 panel.output(Localization.lang("Imported from library") + " '" + file + "'");
             } catch (IOException | KeyCollisionException ex) {
                 LOGGER.warn("Could not open database", ex);
-                JOptionPane.showMessageDialog(panel, ex.getMessage(), Localization.lang("Open library"),
-                        JOptionPane.ERROR_MESSAGE);
+
+                dialogService.showErrorDialogAndWait(Localization.lang("Open library"), ex);
             }
         }
     }

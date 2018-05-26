@@ -11,10 +11,6 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * SAX-Handler to parse OAI2-xml files.
- *
- * @author Ulrich St&auml;rk
- * @author Christian Kopf
- * @author Christopher Oezbek
  */
 public class OAI2Handler extends DefaultHandler {
 

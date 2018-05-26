@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.jabref.model.database.shared.DBMSType;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.OfflineLockException;
+import org.jabref.model.database.shared.DBMSType;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.testutils.category.DatabaseTest;
 
 import org.junit.jupiter.api.AfterEach;

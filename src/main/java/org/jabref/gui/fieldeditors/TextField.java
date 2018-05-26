@@ -163,7 +163,7 @@ public class TextField extends JTextFieldWithPlaceholder implements FieldEditor 
         getInputMap().put(Globals.getKeyPrefs().getKey(org.jabref.gui.keyboard.KeyBinding.UNDO), "Undo");
 
         // Create a redo action and add it to the text component
-        getActionMap().put("Redo", new AbstractAction(Actions.REDO) {
+        getActionMap().put("Redo", new AbstractAction(Actions.REDO.name()) {
 
             @Override
             public void actionPerformed(ActionEvent evt) {

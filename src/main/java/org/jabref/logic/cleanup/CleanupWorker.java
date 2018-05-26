@@ -72,14 +72,14 @@ public class CleanupWorker {
             jobs.add(new FileLinksCleanup());
         }
         if (preset.isMovePDF()) {
-            jobs.add(new MoveFilesCleanup(databaseContext, fileDirPattern, fileDirectoryPreferences, layoutPrefs));
+            jobs.add(new MoveFilesCleanup(databaseContext, fileDirPattern, fileDirectoryPreferences));
         }
         if (preset.isMakePathsRelative()) {
             jobs.add(new RelativePathsCleanup(databaseContext, fileDirectoryPreferences));
         }
         if (preset.isRenamePDF()) {
             RenamePdfCleanup cleaner = new RenamePdfCleanup(preset.isRenamePdfOnlyRelativePaths(), databaseContext,
-                    fileNamePattern, layoutPrefs, fileDirectoryPreferences);
+                                                            fileNamePattern, fileDirectoryPreferences);
             jobs.add(cleaner);
             unsuccessfulRenames += cleaner.getUnsuccessfulRenames();
         }

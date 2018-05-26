@@ -38,6 +38,8 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.stateManager;
         } else if (clazz == FileUpdateMonitor.class) {
             return Globals.getFileUpdateMonitor();
+        } else if (clazz == ClipBoardManager.class) {
+            return Globals.clipboardManager;
         } else {
             try {
                 return clazz.newInstance();
@@ -56,5 +58,15 @@ public class DefaultInjector implements PresenterFactory {
         Injector.setInstanceSupplier(DefaultInjector::createDependency);
 
         return Injector.instantiatePresenter(clazz, injectionContext);
+    }
+
+    @Override
+    public void injectMembers(Object instance, Function<String, Object> injectionContext) {
+        LOGGER.debug("Inject into " + instance.getClass().getName());
+
+        // Use our own method to construct dependencies
+        Injector.setInstanceSupplier(DefaultInjector::createDependency);
+
+        Injector.injectMembers(instance, injectionContext);
     }
 }

@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
@@ -36,10 +35,8 @@ public class RenamePdfCleanup implements CleanupJob {
     private int unsuccessfulRenames;
     private LinkedFile singleFieldCleanup;
 
-    // FIXME: (S.G.) remove unused constructor argument 'layoutPreferences' later; for now,
-    // however, the argument is retained in order not to change the class interface:
+
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
-                            LayoutFormatterPreferences layoutPreferences,
                             FileDirectoryPreferences fileDirectoryPreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
@@ -48,11 +45,9 @@ public class RenamePdfCleanup implements CleanupJob {
     }
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
-                            LayoutFormatterPreferences layoutPreferences,
                             FileDirectoryPreferences fileDirectoryPreferences, LinkedFile singleField) {
 
-        this(onlyRelativePaths, databaseContext, fileNamePattern, layoutPreferences,
-                fileDirectoryPreferences);
+        this(onlyRelativePaths, databaseContext, fileNamePattern, fileDirectoryPreferences);
         this.singleFieldCleanup = singleField;
     }
 

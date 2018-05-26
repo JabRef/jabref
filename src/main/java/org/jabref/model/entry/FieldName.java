@@ -145,7 +145,6 @@ public class FieldName {
     // JabRef internal field names
     public static final String OWNER = "owner";
     public static final String TIMESTAMP = "timestamp"; // Not the actual field name, but the default value
-    public static final String NUMBER_COL = "#";
     public static final String GROUPS = "groups";
     public static final String SEARCH_INTERNAL = "__search";
     public static final String GROUPSEARCH_INTERNAL = "__groupsearch";
