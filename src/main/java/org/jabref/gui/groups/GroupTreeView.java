@@ -28,6 +28,8 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
@@ -178,6 +180,12 @@ public class GroupTreeView {
                     EasyBind.monadic(row.itemProperty())
                             .map(this::createContextMenuForGroup)
                             .orElse((ContextMenu) null));
+            row.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+                if (event.getButton() == MouseButton.SECONDARY) {
+                    // Prevent right-click to select group
+                    event.consume();
+                }
+            });
 
             // Drag and drop support
             row.setOnDragDetected(event -> {
