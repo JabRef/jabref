@@ -53,6 +53,8 @@ public class FieldCheckers {
         if (databaseContext.isBiblatexMode()) {
             fieldCheckers.put(FieldName.DATE, new DateChecker());
             fieldCheckers.put(FieldName.URLDATE, new DateChecker());
+            fieldCheckers.put(FieldName.EVENTDATE, new DateChecker());
+            fieldCheckers.put(FieldName.ORIGDATE, new DateChecker());
         }
 
         return fieldCheckers;
