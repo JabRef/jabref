@@ -44,9 +44,17 @@ public class Date {
      */
     public static Optional<Date> parse(String dateString) {
         Objects.requireNonNull(dateString);
-        List<String> formatStrings = Arrays.asList("uuuu-M-d", "uuuu-M", "d-M-uuuu", "M/uu", "M/uuuu", "MMMM d, uuuu",
+        List<String> formatStrings = Arrays.asList(
+                "uuuu-M-d",
+                "uuuu-M",
+                "d-M-uuuu",
+                "M-uuuu",
+                "M/uu",
+                "M/uuuu",
+                "MMMM d, uuuu",
                 "MMMM, uuuu",
-                "d.M.uuuu", "uuuu.M.d", "uuuu");
+                "d.M.uuuu",
+                "uuuu.M.d", "uuuu");
 
             for (String formatString : formatStrings) {
                 try {
