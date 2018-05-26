@@ -150,7 +150,10 @@ public class GroupTreeView {
                     disclosureNode.getChildren().add(disclosureNodeArrow);
                     return disclosureNode;
                 })
-                .withOnMouseClickedEvent(group -> event -> group.toggleExpansion()));
+                .withOnMouseClickedEvent(group -> event -> {
+                    group.toggleExpansion();
+                    event.consume();
+                }));
 
         // Set pseudo-classes to indicate if row is root or sub-item ( > 1 deep)
         PseudoClass rootPseudoClass = PseudoClass.getPseudoClass("root");
