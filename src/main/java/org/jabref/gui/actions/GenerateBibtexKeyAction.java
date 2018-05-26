@@ -36,27 +36,34 @@ public class GenerateBibtexKeyAction extends AbstractWorker {
         basePanel.output(formatOutputMessage(Localization.lang("Generating BibTeX key for"), entries.size()));
     }
 
+    public static boolean confirmOverwriteKeys(DialogService dialogService) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
+            return dialogService.showConfirmationDialogWithOptOutAndWait(
+                    Localization.lang("Overwrite keys"),
+                    Localization.lang("One or more keys will be overwritten. Continue?"),
+                    Localization.lang("Overwrite keys"),
+                    Localization.lang("Cancel"),
+                    Localization.lang("Disable this confirmation dialog"),
+                    optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !optOut));
+        } else {
+            // Always overwrite keys by default
+            return true;
+        }
+    }
+
     @Override
     public void run() {
         // We don't want to generate keys for entries which already have one thus remove the entries
         if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
             entries.removeIf(BibEntry::hasCiteKey);
             // if we're going to override some cite keys warn the user about it
-        } else if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
-            if (entries.parallelStream().anyMatch(BibEntry::hasCiteKey)) {
-                boolean overwriteKeysPressed = dialogService.showConfirmationDialogWithOptOutAndWait(
-                        Localization.lang("Overwrite keys"),
-                        Localization.lang("One or more keys will be overwritten. Continue?"),
-                        Localization.lang("Overwrite keys"),
-                        Localization.lang("Cancel"),
-                        Localization.lang("Disable this confirmation dialog"),
-                        optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !optOut));
+        } else if (entries.parallelStream().anyMatch(BibEntry::hasCiteKey)) {
+            boolean overwriteKeys = confirmOverwriteKeys(dialogService);
 
-                // The user doesn't want to override cite keys
-                if (!overwriteKeysPressed) {
-                    canceled = true;
-                    return;
-                }
+            // The user doesn't want to override cite keys
+            if (!overwriteKeys) {
+                canceled = true;
+                return;
             }
         }
 

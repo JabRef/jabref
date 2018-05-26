@@ -849,6 +849,10 @@ public class BibEntry implements Cloneable {
         return Bindings.valueAt(fields, fieldName);
     }
 
+    public ObjectBinding<String> getCiteKeyBinding() {
+        return getFieldBinding(KEY_FIELD);
+    }
+
     public Optional<FieldChange> addFile(LinkedFile file) {
         List<LinkedFile> linkedFiles = getFiles();
         linkedFiles.add(file);

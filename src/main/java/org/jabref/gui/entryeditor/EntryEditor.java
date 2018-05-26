@@ -22,17 +22,18 @@ import javafx.scene.layout.BorderPane;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.GenerateBibtexKeySingleAction;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.EntryFetchAndMergeWorker;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.TypedBibEntry;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -57,7 +58,7 @@ import org.fxmisc.easybind.Subscription;
  */
 public class EntryEditor extends BorderPane {
 
-    private final BibDatabaseContext bibDatabaseContext;
+    private final BibDatabaseContext databaseContext;
     private final CountingUndoManager undoManager;
     private final BasePanel panel;
     private final List<SearchQueryHighlightListener> searchListeners = new ArrayList<>();
@@ -74,12 +75,14 @@ public class EntryEditor extends BorderPane {
     @FXML private Button typeChangeButton;
     @FXML private Button fetcherButton;
     @FXML private Label typeLabel;
+    @FXML private Button generateCiteKeyButton;
+
     private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
 
     public EntryEditor(BasePanel panel, EntryEditorPreferences preferences, FileUpdateMonitor fileMonitor, DialogService dialogService) {
         this.panel = panel;
-        this.bibDatabaseContext = panel.getBibDatabaseContext();
+        this.databaseContext = panel.getBibDatabaseContext();
         this.undoManager = panel.getUndoManager();
         this.preferences = Objects.requireNonNull(preferences);
         this.fileMonitor = fileMonitor;
@@ -147,14 +150,6 @@ public class EntryEditor extends BorderPane {
     }
 
     @FXML
-    public void generateKey() {
-        // TODO we need the confirmation dialogs here
-        new BibtexKeyGenerator(bibDatabaseContext, preferences.getBibtexKeyPatternPreferences())
-                .generateAndSetKey(entry)
-                .ifPresent(change -> undoManager.addEdit(new UndoableKeyChange(change)));
-    }
-
-    @FXML
     private void deleteEntry() {
         panel.delete(entry);
     }
@@ -194,7 +189,7 @@ public class EntryEditor extends BorderPane {
         tabs.add(new RelatedArticlesTab(preferences));
 
         // Source tab
-        sourceTab = new SourceTab(bibDatabaseContext, undoManager, preferences.getLatexFieldFormatterPreferences(), preferences.getImportFormatPreferences(), fileMonitor);
+        sourceTab = new SourceTab(databaseContext, undoManager, preferences.getLatexFieldFormatterPreferences(), preferences.getImportFormatPreferences(), fileMonitor);
         tabs.add(sourceTab);
         return tabs;
     }
@@ -261,7 +256,7 @@ public class EntryEditor extends BorderPane {
         // subscribe to type changes for rebuilding the currently visible tab
         typeSubscription = EasyBind.subscribe(this.entry.typeProperty(), type -> {
             DefaultTaskExecutor.runInJavaFXThread(() -> {
-                typeLabel.setText(new TypedBibEntry(entry, bibDatabaseContext.getMode()).getTypeForDisplay());
+                typeLabel.setText(new TypedBibEntry(entry, databaseContext.getMode()).getTypeForDisplay());
                 recalculateVisibleTabs();
                 EntryEditorTab selectedTab = (EntryEditorTab) tabbed.getSelectionModel().getSelectedItem();
                 selectedTab.notifyAboutFocus(entry);
@@ -271,11 +266,11 @@ public class EntryEditor extends BorderPane {
 
     private void setupToolBar() {
         // Update type label
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, bibDatabaseContext.getMode());
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, databaseContext.getMode());
         typeLabel.setText(typedEntry.getTypeForDisplay());
 
         // Add type change menu
-        ContextMenu typeMenu = new ChangeEntryTypeMenu(preferences.getKeyBindings()).getChangeEntryTypePopupMenu(entry, bibDatabaseContext, undoManager);
+        ContextMenu typeMenu = new ChangeEntryTypeMenu(preferences.getKeyBindings()).getChangeEntryTypePopupMenu(entry, databaseContext, undoManager);
         typeLabel.setOnMouseClicked(event -> typeMenu.show(typeLabel, Side.RIGHT, 0, 0));
         typeChangeButton.setOnMouseClicked(event -> typeMenu.show(typeChangeButton, Side.RIGHT, 0, 0));
         // Add menu for fetching bibliographic information
@@ -286,6 +281,13 @@ public class EntryEditor extends BorderPane {
             fetcherMenu.getItems().add(fetcherMenuItem);
         }
         fetcherButton.setOnMouseClicked(event -> fetcherMenu.show(fetcherButton, Side.RIGHT, 0, 0));
+
+        // Configure cite key button
+        new ActionFactory(preferences.getKeyBindings())
+                .configureIconButton(
+                        StandardActions.GENERATE_CITE_KEY,
+                        new GenerateBibtexKeySingleAction(getEntry(), databaseContext, dialogService, preferences, undoManager),
+                        generateCiteKeyButton);
     }
 
     void addSearchListener(SearchQueryHighlightListener listener) {

@@ -3,6 +3,7 @@ package org.jabref.gui.actions;
 import java.util.Objects;
 
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
@@ -63,6 +64,11 @@ public class ActionFactory {
         button.graphicProperty().unbind();
         action.getIcon().ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
 
+        return button;
+    }
+
+    public ButtonBase configureIconButton(Action action, Command command, ButtonBase button) {
+        ActionUtils.configureButton(new JabRefAction(action, command, keyBindingRepository), button);
         return button;
     }
 }
