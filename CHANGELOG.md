@@ -18,6 +18,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added a formatter for adding braces around the `title` field. E.g., `title = {ExamPle}` becomes `title = {{ExamPle}}`, which prevents BibTeX to convert it to lower case. You can use it at the [cleanup entries](http://help.jabref.org/en/CleanupEntries) functionality.
 - We added a formatter to ensure correct en dashes in the `title` field. E.g., `title = {Example - illustrative}` becomes `title = {Example -- illustrative}`.
 - We streamlined the defaults for a [cleanup of entries](http://help.jabref.org/en/CleanupEntries) in the case of BibTeX.
+- The import inspection window now uses the same font size setting as the maintable [Feature request in the forum](http://discourse.jabref.org/t/inspection-window-and-others-line-height-of-table-too-small-for-fonts/1168)
 
 ### Fixed
 - We fixed an issue where the export to clipboard functionality could not be invoked. [#3994](https://github.com/JabRef/jabref/issues/3994)
