@@ -8,7 +8,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.strings.StringLengthComparator;
 import org.jabref.model.cleanup.Formatter;
 
-public class ProtectTermsFormatter implements Formatter {
+public class ProtectTermsFormatter extends Formatter {
 
     private final ProtectedTermsLoader protectedTermsLoader;
 
@@ -56,5 +56,4 @@ public class ProtectTermsFormatter implements Formatter {
     public String getKey() {
         return "protect_terms";
     }
-
 }

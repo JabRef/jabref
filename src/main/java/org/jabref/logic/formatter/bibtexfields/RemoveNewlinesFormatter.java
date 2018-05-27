@@ -9,7 +9,7 @@ import org.jabref.model.cleanup.Formatter;
 /**
  * Removes all line breaks in the string.
  */
-public class RemoveNewlinesFormatter implements Formatter {
+public class RemoveNewlinesFormatter extends Formatter {
     private static final Pattern LINEBREAKS = Pattern.compile("(\r?\n|\r)");
 
     @Override

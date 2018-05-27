@@ -301,6 +301,7 @@ public class BibtexKeyGeneratorTest {
         assertEquals("", BibtexKeyGenerator.firstAuthor(""));
     }
 
+    @Test
     public void testFirstAuthorNull() {
         assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.firstAuthor(null));
     }
@@ -424,6 +425,7 @@ public class BibtexKeyGeneratorTest {
         assertEquals("Newton", BibtexKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 7));
     }
 
+    @Test
     public void testAuthIniNNull() {
         assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.authIniN(null, 3));
     }
@@ -514,6 +516,7 @@ public class BibtexKeyGeneratorTest {
         assertEquals("", BibtexKeyGenerator.authNofMth("", 2, 4));
     }
 
+    @Test
     public void authNMThrowsNPE() {
         assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.authNofMth(null, 2, 4));
     }
@@ -709,6 +712,7 @@ public class BibtexKeyGeneratorTest {
         assertEquals("", BibtexKeyGenerator.pagePrefix("43+"));
     }
 
+    @Test
     public void testPagePrefixNull() {
         assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.pagePrefix(null));
     }
@@ -725,6 +729,7 @@ public class BibtexKeyGeneratorTest {
         assertEquals("43", BibtexKeyGenerator.lastPage("43+"));
     }
 
+    @Test
     public void testLastPageNull() {
         assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.lastPage(null));
     }
@@ -767,23 +772,30 @@ public class BibtexKeyGeneratorTest {
      */
     @Test
     public void shortTitle() {
-        // shortTitle is getTitleWords with "3" as count
+        // shortTitle is getTitleWords with "3" as count and removed small words
         int count = 3;
         assertEquals("application migration effort",
-                BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
-        assertEquals("BPEL conformance in", BibtexKeyGenerator.getTitleWords(count,
-                TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
-        assertEquals("Process Viewing Patterns", BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_CASED));
-        assertEquals("BPMN Conformance in",
-                BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
-        assertEquals("The Difference Between", BibtexKeyGenerator.getTitleWords(count,
-                TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING));
-        assertEquals("Cloud Computing: The",
-                BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
+                BibtexKeyGenerator.getTitleWords(count,
+                        BibtexKeyGenerator.removeSmallWords(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH)));
+        assertEquals("BPEL conformance open",
+                BibtexKeyGenerator.getTitleWords(count,
+                        BibtexKeyGenerator.removeSmallWords(TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON)));
+        assertEquals("Process Viewing Patterns",
+                BibtexKeyGenerator.getTitleWords(count,
+                        BibtexKeyGenerator.removeSmallWords(TITLE_STRING_CASED)));
+        assertEquals("BPMN Conformance Open",
+                BibtexKeyGenerator.getTitleWords(count,
+                        BibtexKeyGenerator.removeSmallWords(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD)));
+        assertEquals("Difference Graph Based",
+                BibtexKeyGenerator.getTitleWords(count,
+                        BibtexKeyGenerator.removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING)));
+        assertEquals("Cloud Computing: Next",
+                BibtexKeyGenerator.getTitleWords(count,
+                        BibtexKeyGenerator.removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON)));
         assertEquals("Towards Choreography based",
-                BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
-        assertEquals("On the Measurement",
-                BibtexKeyGenerator.getTitleWords(count, TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
+                BibtexKeyGenerator.getTitleWords(count, BibtexKeyGenerator.removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD)));
+        assertEquals("Measurement Design Time",
+                BibtexKeyGenerator.getTitleWords(count, BibtexKeyGenerator.removeSmallWords(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS)));
     }
 
     /**
@@ -935,7 +947,7 @@ public class BibtexKeyGeneratorTest {
         BibEntry entry = new BibEntry();
         entry.setField("title", "Green Scheduling of Whatever");
         assertEquals("GSo", BibtexKeyGenerator.generateKey(entry, "shorttitleINI"));
-        assertEquals("GreenSchedulingof", BibtexKeyGenerator.generateKey(entry, "shorttitle",
+        assertEquals("GreenSchedulingWhatever", BibtexKeyGenerator.generateKey(entry, "shorttitle",
                 new BibDatabase()));
     }
 
@@ -950,7 +962,7 @@ public class BibtexKeyGeneratorTest {
         database.insertEntry(entry1);
         entry2.setField("title", "Green Scheduling of Whatever");
 
-        assertEquals("GreenSchedulingof", BibtexKeyGenerator.generateKey(entry1, "shorttitle",
+        assertEquals("GreenSchedulingWhatever", BibtexKeyGenerator.generateKey(entry1, "shorttitle",
                 database));
     }
 
