@@ -12,7 +12,7 @@ import java.util.Objects;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.BasicFileType;
+import org.jabref.logic.util.FileType;
 
 /**
  * Object with data for a custom importer.
@@ -87,7 +87,7 @@ public class CustomImporter extends Importer {
     }
 
     @Override
-    public BasicFileType getFileType() {
+    public FileType getFileType() {
         return importer.getFileType();
     }
 

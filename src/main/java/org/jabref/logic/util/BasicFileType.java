@@ -1,11 +1,7 @@
 package org.jabref.logic.util;
 
 import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
@@ -71,14 +67,12 @@ public enum BasicFileType implements FileType {
     CSV(Localization.lang("%0 file", "CSV"), "csv"),
     DEFAULT(Localization.lang("%0 file", "DEFAULT"), "default");
 
-    private static Set<FileType> allfileTypes = new HashSet<>(EnumSet.allOf(BasicFileType.class));
-    private final String[] extensions;
-    //Needed for custom exporters
+    private final List<String> extensions;
     private String description;
 
     BasicFileType(String description, String... extensions) {
         this.description = description;
-        this.extensions = extensions;
+        this.extensions = Arrays.asList(extensions);
     }
 
     @Override
@@ -101,7 +95,8 @@ public enum BasicFileType implements FileType {
         return getExtensionsWithDot(extensions);
     }
 
-    public static FileType addnewFileType(String description, String... extensions) {
+    public static FileType addnewFileType(String description, String... extensionsToAdd) {
+        List<String> extensions = Arrays.asList(extensionsToAdd);
         FileType fileType = new FileType() {
 
             @Override
@@ -124,21 +119,13 @@ public enum BasicFileType implements FileType {
                 return BasicFileType.getDescription(description, extensions);
             }
         };
-        allfileTypes.add(fileType);
         return fileType;
 
     }
 
-    public static void addnewFileType(FileType fileType) {
-        allfileTypes.add(fileType);
-    }
 
-    public static FileType parse(String description) {
-        Optional<FileType> fileType = allfileTypes.stream().filter(filetype -> filetype.getDescription().equals(description)).findAny();
-        return fileType.orElse(BasicFileType.DEFAULT);
-    }
 
-    private static String getDescription(String description, String... extensions) {
+    private static String getDescription(String description, List<String> extensions) {
         StringJoiner sj = new StringJoiner(", ", description + " (", ")");
         for (String ext : extensions) {
             sj.add("*." + ext);
@@ -146,16 +133,16 @@ public enum BasicFileType implements FileType {
         return sj.toString();
     }
 
-    private static List<String> getExtensionsWithDot(String... extensions) {
-        return getExtensions(extensions).stream().map(extension -> "." + extension).collect(Collectors.toList());
+    private static List<String> getExtensionsWithDot(List<String> extensions) {
+        return extensions.stream().map(extension -> "." + extension).collect(Collectors.toList());
     }
 
-    private static String getFirstExtensionWithDot(String... extensions) {
-        return "." + extensions[0].trim();
+    private static String getFirstExtensionWithDot(List<String> extensions) {
+        return "." + extensions.get(0).trim();
     }
 
-    private static List<String> getExtensions(String... extensions) {
-        return Arrays.asList(extensions);
+    private static List<String> getExtensions(List<String> extensions) {
+        return extensions;
     }
 
 }

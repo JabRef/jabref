@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Objects;
 
-import org.jabref.logic.util.BasicFileType;
+import org.jabref.logic.util.FileType;
 
 /**
  * Role of an importer for JabRef.
@@ -134,9 +134,9 @@ public abstract class Importer implements Comparable<Importer> {
 
     /**
      * Returns the type of files that this importer can read
-     * @return {@link BasicFileType} corresponding to the importer
+     * @return {@link FileType} corresponding to the importer
      */
-    public abstract BasicFileType getFileType();
+    public abstract FileType getFileType();
 
     /**
      * Returns a one-word ID which identifies this importer.

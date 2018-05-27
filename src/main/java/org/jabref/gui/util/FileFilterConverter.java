@@ -11,7 +11,6 @@ import javafx.stage.FileChooser;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.BasicFileType;
 import org.jabref.logic.util.FileType;
 
 public class FileFilterConverter {
@@ -25,11 +24,11 @@ public class FileFilterConverter {
     }
 
     private static FileChooser.ExtensionFilter convertImporter(String description, Collection<Importer> formats) {
-        List<BasicFileType> fileTypes = formats.stream().map(Importer::getFileType).collect(Collectors.toList());
+        List<FileType> fileTypes = formats.stream().map(Importer::getFileType).collect(Collectors.toList());
         return toExtensionFilter(description, fileTypes);
     }
 
-    private static FileChooser.ExtensionFilter toExtensionFilter(String description, List<BasicFileType> fileTypes) {
+    private static FileChooser.ExtensionFilter toExtensionFilter(String description, List<FileType> fileTypes) {
         List<String> flatExtensions = fileTypes.stream().flatMap(extList -> extList.getExtensionsWithDot().stream())
                 .map(ending -> "*" + ending)
                 .collect(Collectors.toList());
