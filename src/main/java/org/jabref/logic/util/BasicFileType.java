@@ -123,8 +123,6 @@ public enum BasicFileType implements FileType {
 
     }
 
-
-
     private static String getDescription(String description, List<String> extensions) {
         StringJoiner sj = new StringJoiner(", ", description + " (", ")");
         for (String ext : extensions) {

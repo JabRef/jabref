@@ -3,6 +3,7 @@ package org.jabref.gui.exporter;
 import java.awt.event.ActionEvent;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
@@ -152,7 +153,7 @@ public class ExportAction {
     }
 
     private static FileDialogConfiguration createExportFileChooser(ExporterFactory exportFactory, String currentDir) {
-        List<FileType> fileTypes = exportFactory.getExporters().stream().map(Exporter::getFileType).collect(Collectors.toList());
+        Map<String, FileType> fileTypes = exportFactory.getExporters().stream().collect(Collectors.toMap(Exporter::getDescription, Exporter::getFileType));
         return new FileDialogConfiguration.Builder()
                 .addExtensionFilters(fileTypes)
                 .withDefaultExtension(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT))

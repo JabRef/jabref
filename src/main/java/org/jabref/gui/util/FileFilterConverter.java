@@ -23,13 +23,19 @@ public class FileFilterConverter {
                 fileType.getExtensions().stream().map(ending -> "*." + ending).collect(Collectors.toList()));
     }
 
+    public static FileChooser.ExtensionFilter toExtensionFilter(String description, FileType fileType) {
+        return new FileChooser.ExtensionFilter(description,
+                fileType.getExtensions().stream().map(ending -> "*." + ending).collect(Collectors.toList()));
+    }
+
     private static FileChooser.ExtensionFilter convertImporter(String description, Collection<Importer> formats) {
         List<FileType> fileTypes = formats.stream().map(Importer::getFileType).collect(Collectors.toList());
         return toExtensionFilter(description, fileTypes);
     }
 
     private static FileChooser.ExtensionFilter toExtensionFilter(String description, List<FileType> fileTypes) {
-        List<String> flatExtensions = fileTypes.stream().flatMap(extList -> extList.getExtensionsWithDot().stream())
+        List<String> flatExtensions = fileTypes.stream()
+                .flatMap(extList -> extList.getExtensionsWithDot().stream())
                 .map(ending -> "*" + ending)
                 .collect(Collectors.toList());
 

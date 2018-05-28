@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -66,8 +67,17 @@ public class FileDialogConfiguration {
             return this;
         }
 
+        public Builder addExtensionFilter(String description, FileType fileType) {
+            extensionFilters.add(FileFilterConverter.toExtensionFilter(description, fileType));
+            return this;
+        }
         public Builder addExtensionFilters(Collection<FileType> fileTypes) {
             fileTypes.forEach(this::addExtensionFilter);
+            return this;
+        }
+
+        public Builder addExtensionFilters(Map<String, FileType> fileTypesWithDescription) {
+            fileTypesWithDescription.forEach(this::addExtensionFilter);
             return this;
         }
 
@@ -107,6 +117,10 @@ public class FileDialogConfiguration {
             return this;
         }
 
+        public Builder withDefaultExtension(String description, BasicFileType fileType) {
+            defaultExtension = FileFilterConverter.toExtensionFilter(description, fileType);
+            return this;
+        }
         public Builder withInitialFileName(String initialFileName) {
             this.initialFileName = initialFileName;
             return this;
