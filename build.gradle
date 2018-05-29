@@ -116,7 +116,7 @@ dependencies {
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
-    compile 'com.google.guava:guava:25.0-jre'
+    compile 'com.google.guava:guava:25.1-jre'
 
     // JavaFX stuff
     compile 'com.airhacks:afterburner.fx:1.7.0'
@@ -167,7 +167,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.10'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.10.1'
 }
 
 jacoco {
