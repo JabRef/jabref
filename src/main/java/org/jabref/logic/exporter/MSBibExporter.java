@@ -26,7 +26,7 @@ import org.jabref.model.entry.BibEntry;
 class MSBibExporter extends Exporter {
 
     public MSBibExporter() {
-        super("MSBib", BasicFileType.MSBIB.getDescription(), BasicFileType.MSBIB);
+        super("MSBib", "MS Office 2007", BasicFileType.XML);
     }
 
     @Override

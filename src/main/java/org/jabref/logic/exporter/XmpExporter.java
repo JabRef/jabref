@@ -28,7 +28,7 @@ public class XmpExporter extends Exporter {
     private final XmpPreferences xmpPreferences;
 
     public XmpExporter(XmpPreferences xmpPreferences) {
-        super("xmp", BasicFileType.PLAIN_XMP.getDescription(), BasicFileType.PLAIN_XMP);
+        super("xmp", "Plain XMP", BasicFileType.PLAIN_XMP);
         this.xmpPreferences = xmpPreferences;
     }
 

@@ -27,6 +27,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BasicFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -47,7 +48,7 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenDocumentSpreadsheetCreator() {
-        super("ods", BasicFileType.ODS.getDescription(), BasicFileType.ODS);
+        super("ods", Localization.lang("OpenDocument spreadsheet"), BasicFileType.ODS);
     }
 
     private static void storeOpenDocumentSpreadsheetFile(Path file, InputStream source) throws IOException {

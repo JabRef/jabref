@@ -39,7 +39,6 @@ public class ExportAction {
     private ExportAction() {
     }
 
-
     /**
      * Create an AbstractAction for performing an export operation.
      *
@@ -70,9 +69,8 @@ public class ExportAction {
                 Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
                 FileDialogConfiguration fileDialogConfiguration = ExportAction.createExportFileChooser(Globals.exportFactory, Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
                 DialogService dialogService = new FXDialogService();
-                DefaultTaskExecutor.runInJavaFXThread(() ->
-                        dialogService.showFileSaveDialog(fileDialogConfiguration)
-                                .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), Globals.exportFactory.getExporters())));
+                DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showFileSaveDialog(fileDialogConfiguration)
+                        .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), Globals.exportFactory.getExporters())));
             }
 
             private void export(Path file, FileChooser.ExtensionFilter selectedExtensionFilter, List<Exporter> exporters) {
@@ -94,7 +92,8 @@ public class ExportAction {
                 // Set the global variable for this database's file directory before exporting,
                 // so formatters can resolve linked files correctly.
                 // (This is an ugly hack!)
-                Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext()
+                Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel()
+                        .getBibDatabaseContext()
                         .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
 
                 // Make sure we remember which filter was used, to set
@@ -112,7 +111,10 @@ public class ExportAction {
                         try {
                             format.export(frame.getCurrentBasePanel().getBibDatabaseContext(),
                                     file,
-                                    frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getEncoding()
+                                    frame.getCurrentBasePanel()
+                                            .getBibDatabaseContext()
+                                            .getMetaData()
+                                            .getEncoding()
                                             .orElse(Globals.prefs.getDefaultEncoding()),
                                     finEntries);
                         } catch (Exception ex) {
@@ -153,7 +155,7 @@ public class ExportAction {
     }
 
     private static FileDialogConfiguration createExportFileChooser(ExporterFactory exportFactory, String currentDir) {
-        Map<String, FileType> fileTypes = exportFactory.getExporters().stream().collect(Collectors.toMap(Exporter::getDescription, Exporter::getFileType));
+        Map<String, FileType> fileTypes = exportFactory.getExporters().stream().collect(Collectors.toMap(Exporter::getDisplayName, Exporter::getFileType));
         return new FileDialogConfiguration.Builder()
                 .addExtensionFilters(fileTypes)
                 .withDefaultExtension(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT))

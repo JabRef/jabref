@@ -71,6 +71,7 @@ public class FileDialogConfiguration {
             extensionFilters.add(FileFilterConverter.toExtensionFilter(description, fileType));
             return this;
         }
+
         public Builder addExtensionFilters(Collection<FileType> fileTypes) {
             fileTypes.forEach(this::addExtensionFilter);
             return this;
@@ -121,6 +122,7 @@ public class FileDialogConfiguration {
             defaultExtension = FileFilterConverter.toExtensionFilter(description, fileType);
             return this;
         }
+
         public Builder withInitialFileName(String initialFileName) {
             this.initialFileName = initialFileName;
             return this;

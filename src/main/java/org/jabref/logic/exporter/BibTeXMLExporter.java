@@ -55,7 +55,7 @@ public class BibTeXMLExporter extends Exporter {
     private JAXBContext context;
 
     public BibTeXMLExporter() {
-        super("bibtexml", BasicFileType.BIBTEXML_XML_ONLY.getDescription(), BasicFileType.BIBTEXML_XML_ONLY);
+        super("bibtexml", "BibTexXML", BasicFileType.XML);
     }
 
     @Override

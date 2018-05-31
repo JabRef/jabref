@@ -8,28 +8,20 @@ import java.util.stream.Collectors;
 import org.jabref.logic.l10n.Localization;
 
 /**
- * This enum contains a list of file types used in open and save dialogs.
  *
  * @implNote Enter the extensions without a dot! The dot is added implicitly.
  */
 public enum BasicFileType implements FileType {
     BIBTEX_DB(String.format("%1s %2s", "BibTex", Localization.lang("Library")), "bib"),
     BIBTEXML(Localization.lang("%0 file", "BibTeXML"), "bibx", "xml"),
-    BIBTEXML_XML_ONLY(Localization.lang("%0 file", "BibTeXML"), "xml"),
-    BIBORDF(Localization.lang("%0 file", "Bib 0"), "rdf"),
     BIBLIOSCAPE(Localization.lang("%0 file", "Biblioscape"), "txt"),
     COPAC(Localization.lang("%0 file", "Copac"), "txt"),
     CITATION_STYLE(Localization.lang("%0 file", "CSL"), "csl"),
-    DOCBOOK(Localization.lang("%0 file", "Docbook 4.4"), "xml"),
     DIN_1505(Localization.lang("%0 file", "DIN 1505"), "rtf"),
     ENDNOTE(Localization.lang("%0 file", "EndNote/Refer"), "ref", "enw"),
     ENDNOTE_XML(Localization.lang("%0 file", "EndNote XML"), "xml"),
-    ENDNOTE_TXT(Localization.lang("%0 file", "EndNote"), "txt"), //for export
     FREECITE(Localization.lang("%0 file", "FreeCite"), "txt", "xml"),
     HARVARD_RTF(Localization.lang("%0 file", "Harvard"), "rtf"),
-    HTML_LIST(Localization.lang("%0 file", Localization.lang("HTML list")), "html"),
-    HTML_TABLE(Localization.lang("%0 file", Localization.lang("HTML table")), "html"),
-    HTML_TABLE_WITH_ABSTRACT(Localization.lang("%0 file", Localization.lang("HTML table (with Abstract & BibTeX)")), "html"),
     INSPEC(Localization.lang("%0 file", "INSPEC"), "txt"),
     ISI(Localization.lang("%0 file", "ISI"), "isi", "txt"),
     ISO_690_RTF(Localization.lang("%0 file", "ISO 690"), "rtf"),
