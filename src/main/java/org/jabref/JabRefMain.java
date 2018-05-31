@@ -150,8 +150,10 @@ public class JabRefMain extends Application {
 
     private static void shutdownCurrentInstance() {
         Globals.shutdownThreadPools();
+        Globals.REMOTE_LISTENER.stop();
         // needed to tell JavaFx to stop
         Platform.exit();
+        System.exit(0);
     }
 
     private static void applyPreferences(JabRefPreferences preferences) {
@@ -185,5 +187,14 @@ public class JabRefMain extends Application {
         if (proxyPreferences.isUseProxy() && proxyPreferences.isUseAuthentication()) {
             Authenticator.setDefault(new ProxyAuthenticator());
         }
+    }
+
+    @Override
+    public void stop() {
+        Globals.shutdownThreadPools();
+        Globals.stopBackgroundTasks();
+        Globals.REMOTE_LISTENER.stop();
+        Platform.exit();
+        System.exit(0);
     }
 }
