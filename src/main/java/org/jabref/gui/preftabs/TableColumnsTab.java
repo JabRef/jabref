@@ -47,12 +47,12 @@ import org.jabref.preferences.JabRefPreferences;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class TableColumnsTab extends JPanel implements PrefsTab {
 
-    private static final Log LOGGER = LogFactory.getLog(TableColumnsTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TableColumnsTab.class);
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;
@@ -449,7 +449,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         ncWidth = prefs.getInt(JabRefPreferences.NUMBER_COL_WIDTH);
 
     }
-
 
     class DeleteRowAction extends AbstractAction {
 

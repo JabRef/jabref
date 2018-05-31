@@ -2,7 +2,6 @@ package org.jabref.gui.search;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
@@ -32,8 +31,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
+
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -42,6 +43,7 @@ import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.TransferableBibtexEntry;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.filelist.FileListEntry;
@@ -72,8 +74,8 @@ import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dialog to display search results, potentially from more than one BasePanel, with
@@ -81,11 +83,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SearchResultFrame {
 
-    private static final Log LOGGER = LogFactory.getLog(SearchResultFrame.class);
-
-    private final JabRefFrame frame;
-
-    private JFrame searchResultFrame;
     private static final String[] FIELDS = new String[] {
             FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, FieldName.JOURNAL
     };
@@ -93,12 +90,16 @@ public class SearchResultFrame {
     private static final int FILE_COL = 1;
     private static final int URL_COL = 2;
     private static final int PAD = 3;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchResultFrame.class);
+
+    private final JabRefFrame frame;
+    private JFrame searchResultFrame;
     private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
     private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
 
     private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
-    private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
     private final EventList<BibEntry> entries = new BasicEventList<>();
 
     private final Map<BibEntry, BasePanel> entryHome = new HashMap<>();
@@ -149,7 +150,9 @@ public class SearchResultFrame {
         entryTable.addMouseListener(new TableClickListener());
 
         contentPane.setTopComponent(sp);
-        contentPane.setBottomComponent(preview);
+
+        JFXPanel container = CustomJFXPanel.wrap(new Scene(preview));
+        contentPane.setBottomComponent(container);
 
         // Key bindings:
         AbstractAction closeAction = new AbstractAction() {
@@ -390,27 +393,27 @@ public class SearchResultFrame {
         entries.add(entry);
         entryHome.put(entry, panel);
 
-        if (preview.getEntry() == null || !preview.getBasePanel().isPresent()){
+        if (preview.getEntry() == null || !preview.getBasePanel().isPresent()) {
             preview.setEntry(entry);
             preview.setBasePanel(panel);
             preview.setDatabaseContext(panel.getBibDatabaseContext());
         }
     }
 
-    private void selectEntryInBasePanel(BibEntry entry){
+    private void selectEntryInBasePanel(BibEntry entry) {
         BasePanel basePanel = entryHome.get(entry);
         frame.showBasePanel(basePanel);
         basePanel.requestFocus();
         basePanel.highlightEntry(entry);
     }
 
-    public void dispose(){
+    public void dispose() {
         frame.getGlobalSearchBar().setSearchResultFrame(null);
         searchResultFrame.dispose();
         frame.getGlobalSearchBar().focus();
     }
 
-    public void focus(){
+    public void focus() {
         entryTable.requestFocus();
     }
 
@@ -547,7 +550,6 @@ public class SearchResultFrame {
                 preview.setBasePanel(entryHome.get(entry));
                 preview.setDatabaseContext(entryHome.get(entry).getBibDatabaseContext());
                 contentPane.setDividerLocation(0.5f);
-                SwingUtilities.invokeLater(() -> preview.scrollRectToVisible(toRect));
             }
         }
     }
@@ -567,7 +569,7 @@ public class SearchResultFrame {
         public String getColumnName(int column) {
             if (column >= PAD) {
                 return StringUtil.capitalizeFirst(FIELDS[column - PAD]);
-            } else if (column == DATABASE_COL){
+            } else if (column == DATABASE_COL) {
                 return Localization.lang("Library");
             } else {
                 return "";

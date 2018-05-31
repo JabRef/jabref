@@ -7,7 +7,7 @@ configurations {
 }
 
 dependencies {
-    jython 'org.python:jython-standalone:2.7.0'
+    jython 'org.python:jython-standalone:2.7.1'
 }
 
 task localizationStatusWithMarkdown(type: JavaExec) {

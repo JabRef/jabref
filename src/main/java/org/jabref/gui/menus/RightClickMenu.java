@@ -22,6 +22,7 @@ import org.jabref.gui.EntryMarker;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.Actions;
+import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
@@ -38,11 +39,11 @@ import org.jabref.model.entry.specialfields.SpecialFieldValue;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
-    private static final Log LOGGER = LogFactory.getLog(RightClickMenu.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RightClickMenu.class);
 
     private final BasePanel panel;
     private final JMenuItem groupAdd;
@@ -102,6 +103,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(new GeneralAction(Actions.SEND_AS_EMAIL, Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getSmallIcon()));
         addSeparator();
+        add(new CopyFilesAction());
 
         JMenu markSpecific = JabRefFrame.subMenu(Localization.menuTitle("Mark specific color"));
         markSpecific.setIcon(IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon());
@@ -213,14 +215,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         frame.createDisabledIconsForMenuEntries(this);
     }
 
-    private boolean areMultipleEntriesSelected() {
-        return panel.getMainTable().getSelectedRowCount() > 1;
-    }
-
-    private boolean areExactlyTwoEntriesSelected() {
-        return panel.getMainTable().getSelectedRowCount() == 2;
-    }
-
     /**
      * Remove all types from the menu.
      * Then cycle through all available values, and add them.
@@ -234,19 +228,24 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         }
     }
 
+    private boolean areMultipleEntriesSelected() {
+        return panel.getMainTable().getSelectedRowCount() > 1;
+    }
+
+    private boolean areExactlyTwoEntriesSelected() {
+        return panel.getMainTable().getSelectedRowCount() == 2;
+    }
+
     /**
      * Set the dynamic contents of "Add to group ..." submenu.
      */
     @Override
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-        panel.storeCurrentEdit();
-
         boolean groupsPresent = panel.getBibDatabaseContext().getMetaData().getGroups().isPresent();
         groupAdd.setEnabled(groupsPresent);
         groupRemove.setEnabled(groupsPresent);
         groupMoveTo.setEnabled(groupsPresent);
     }
-
 
     @Override
     public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
@@ -273,7 +272,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     private Icon getFileIconForSelectedEntry() {
         if (panel.getMainTable().getSelectedRowCount() == 1) {
             BibEntry entry = panel.getMainTable().getSelected().get(0);
-            if(entry.hasField(FieldName.FILE)) {
+            if (entry.hasField(FieldName.FILE)) {
                 JLabel label = FileListTableModel.getFirstLabel(entry.getField(FieldName.FILE).get());
                 if (label != null) {
                     return label.getIcon();

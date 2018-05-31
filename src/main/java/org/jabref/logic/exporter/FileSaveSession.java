@@ -11,8 +11,8 @@ import java.util.Set;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.logic.util.io.FileUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class used to handle safe storage to disk.
@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class FileSaveSession extends SaveSession {
 
-    private static final Log LOGGER = LogFactory.getLog(FileSaveSession.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileSaveSession.class);
 
     // Filenames.
     private static final String BACKUP_EXTENSION = ".bak";
@@ -91,7 +91,7 @@ public class FileSaveSession extends SaveSession {
                     PosixFilePermission.GROUP_READ,
                     PosixFilePermission.GROUP_WRITE,
                     PosixFilePermission.OTHERS_READ);
-            if (FileUtil.isPosixCompilant && Files.exists(file)) {
+            if (FileUtil.IS_POSIX_COMPILANT && Files.exists(file)) {
                 try {
                     oldFilePermissions = Files.getPosixFilePermissions(file);
                 } catch (IOException exception) {
@@ -102,7 +102,7 @@ public class FileSaveSession extends SaveSession {
             FileUtil.copyFile(temporaryFile, file, true);
 
             // Restore file permissions
-            if (FileUtil.isPosixCompilant) {
+            if (FileUtil.IS_POSIX_COMPILANT) {
                 try {
                     Files.setPosixFilePermissions(file, oldFilePermissions);
                 } catch (IOException exception) {

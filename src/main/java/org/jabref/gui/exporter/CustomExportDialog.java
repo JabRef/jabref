@@ -20,23 +20,27 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dialog for creating or modifying custom exports.
  */
 class CustomExportDialog extends JabRefDialog {
-    private static final Log LOGGER = LogFactory.getLog(CustomExportDialog.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomExportDialog.class);
 
     private final JTextField name = new JTextField(60);
     private final JTextField layoutFile = new JTextField(60);
@@ -89,12 +93,15 @@ class CustomExportDialog extends JabRefDialog {
         cancel.addActionListener(e -> dispose());
 
         JButton browse = new JButton(Localization.lang("Browse"));
-        FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.LAYOUT);
-        dialog.setDefaultExtension(FileExtensions.LAYOUT);
-        browse.addActionListener(e ->
-                dialog.showDialogAndGetSelectedFile()
-                        .ifPresent(f -> layoutFile.setText(f.toAbsolutePath().toString()))
-        );
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(FileType.LAYOUT)
+                .withDefaultExtension(FileType.LAYOUT)
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY)).build();
+        DialogService ds = new FXDialogService();
+        browse.addActionListener(
+                e -> DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration))
+                        .ifPresent(f -> layoutFile.setText(f.toAbsolutePath().toString())));
 
         AbstractAction cancelAction = new AbstractAction() {
 

@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
@@ -23,26 +22,24 @@ import javax.swing.ListSelectionModel;
 
 import org.jabref.Globals;
 import org.jabref.JabRefException;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinder;
 import org.jabref.gui.maintable.MainTable;
-import org.jabref.logic.exporter.ExportFormat;
-import org.jabref.logic.exporter.ExportFormats;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.util.FileType;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.JabRefPreferencesFilter;
-import org.jabref.shared.prefs.SharedDatabasePreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined in
@@ -54,7 +51,8 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 public class PreferencesDialog extends JabRefDialog {
-    private static final Log LOGGER = LogFactory.getLog(PreferencesDialog.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesDialog.class);
 
     private final JPanel main;
 
@@ -159,9 +157,15 @@ public class PreferencesDialog extends JabRefDialog {
 
         importPreferences.setToolTipText(Localization.lang("Import preferences from file"));
         importPreferences.addActionListener(e -> {
-            FileDialog dialog = new FileDialog(frame, getPrefsExportPath()).withExtension(FileExtensions.XML);
-            dialog.setDefaultExtension(FileExtensions.XML);
-            Optional<Path> fileName = dialog.showDialogAndGetSelectedFile();
+
+            FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                    .addExtensionFilter(FileType.XML)
+                    .withDefaultExtension(FileType.XML)
+                    .withInitialDirectory(getPrefsExportPath()).build();
+            DialogService ds = new FXDialogService();
+
+            Optional<Path> fileName = DefaultTaskExecutor
+                    .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
 
             if (fileName.isPresent()) {
                 try {
@@ -220,26 +224,22 @@ public class PreferencesDialog extends JabRefDialog {
 
     private void updateAfterPreferenceChanges() {
         setValues();
-        Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
-                Globals.journalAbbreviationLoader);
-        LayoutFormatterPreferences layoutPreferences = Globals.prefs
-                .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
-        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
-        ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
+
+        Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
 
         Globals.prefs.updateEntryEditorTabList();
     }
 
-    private void storeAllSettings(){
+    private void storeAllSettings() {
         // First check that all tabs are ready to close:
         Component[] preferenceTabs = main.getComponents();
-        for (Component tab: preferenceTabs) {
+        for (Component tab : preferenceTabs) {
             if (!((PrefsTab) tab).validateSettings()) {
                 return; // If not, break off.
             }
         }
         // Then store settings and close:
-        for (Component tab: preferenceTabs) {
+        for (Component tab : preferenceTabs) {
             ((PrefsTab) tab).storeSettings();
         }
         Globals.prefs.flush();
@@ -248,10 +248,17 @@ public class PreferencesDialog extends JabRefDialog {
         MainTable.updateRenderers();
         GUIGlobals.updateEntryEditorColors();
         frame.setupAllTables();
-        frame.getGroupSelector().revalidateGroups(); // icons may have changed
         frame.output(Localization.lang("Preferences recorded."));
     }
 
+    public void setValues() {
+        // Update all field values in the tabs:
+        int count = main.getComponentCount();
+        Component[] comps = main.getComponents();
+        for (int i = 0; i < count; i++) {
+            ((PrefsTab) comps[i]).setValues();
+        }
+    }
 
     class OkAction extends AbstractAction {
 
@@ -273,9 +280,14 @@ public class PreferencesDialog extends JabRefDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.XML);
-            dialog.setDefaultExtension(FileExtensions.XML);
-            Optional<Path> path = dialog.saveNewFile();
+
+            FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                    .addExtensionFilter(FileType.XML)
+                    .withDefaultExtension(FileType.XML)
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+            DialogService ds = new FXDialogService();
+            Optional<Path> path = DefaultTaskExecutor
+                    .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
 
             path.ifPresent(exportFile -> {
                 try {
@@ -290,17 +302,6 @@ public class PreferencesDialog extends JabRefDialog {
             });
         }
     }
-
-
-    public void setValues() {
-        // Update all field values in the tabs:
-        int count = main.getComponentCount();
-        Component[] comps = main.getComponents();
-        for (int i = 0; i < count; i++) {
-            ((PrefsTab) comps[i]).setValues();
-        }
-    }
-
 
     class CancelAction extends AbstractAction {
 

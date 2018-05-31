@@ -33,9 +33,8 @@ public class OSX implements NativeDesktop {
     }
 
     @Override
-    public void openFolderAndSelectFile(String filePath) throws IOException {
-        File file = new File(filePath);
-        Desktop.getDesktop().open(file.getParentFile());
+    public void openFolderAndSelectFile(Path file) throws IOException {
+        Desktop.getDesktop().open(file.getParent().toFile());
     }
 
     @Override

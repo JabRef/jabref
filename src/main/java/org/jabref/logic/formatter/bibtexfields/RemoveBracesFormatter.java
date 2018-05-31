@@ -5,10 +5,7 @@ import java.util.Objects;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
 
-/**
- * Removes all matching braces around the string.
- */
-public class RemoveBracesFormatter implements Formatter {
+public class RemoveBracesFormatter extends Formatter {
 
     @Override
     public String getName() {
@@ -32,7 +29,7 @@ public class RemoveBracesFormatter implements Formatter {
             // It could be that the removed braces were not matching
             // For example, "{A} test {B}" results in "A} test {B"
             // In this case, trimmed has a closing } without an opening { before that
-            if(hasNegativeBraceCount(trimmed)) {
+            if (hasNegativeBraceCount(trimmed)) {
                 return formatted;
             } else {
                 formatted = trimmed;

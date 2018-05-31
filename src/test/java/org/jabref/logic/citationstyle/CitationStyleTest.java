@@ -2,15 +2,16 @@ package org.jabref.logic.citationstyle;
 
 import org.jabref.logic.util.TestEntry;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CitationStyleTest {
 
     @Test
     public void getDefault() throws Exception {
-        Assert.assertNotNull(CitationStyle.getDefault());
+        assertNotNull(CitationStyle.getDefault());
     }
 
     @Test
@@ -24,7 +25,7 @@ public class CitationStyleTest {
                 "<i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016.</div>\n" +
                 "  </div>\n";
 
-        Assert.assertEquals(citation, expected);
+        assertEquals(expected, citation);
     }
 
 }

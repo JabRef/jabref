@@ -159,8 +159,6 @@ public class NameFormatter implements LayoutFormatter {
         return format(fieldText, parameter);
     }
 
-
-
     public void setParameter(String parameter) {
         this.parameter = parameter;
     }

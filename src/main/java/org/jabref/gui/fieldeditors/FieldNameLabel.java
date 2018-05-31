@@ -1,39 +1,20 @@
 package org.jabref.gui.fieldeditors;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import javafx.geometry.Insets;
+import javafx.scene.control.Label;
 
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-
-import org.jabref.gui.GUIGlobals;
 import org.jabref.model.entry.FieldName;
 
-public class FieldNameLabel extends JLabel {
+public class FieldNameLabel extends Label {
 
-    public FieldNameLabel(String name) {
-        super(FieldNameLabel.getFieldNameLabelText(name), SwingConstants.LEFT);
+    public FieldNameLabel(String fieldName) {
+        super(FieldName.getDisplayName(fieldName));
 
-        setVerticalAlignment(SwingConstants.TOP);
-        setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
-        setBorder(BorderFactory.createEmptyBorder());
+        setPadding(new Insets(4, 0, 0, 0));
+        // TODO: style!
+        //setVerticalAlignment(SwingConstants.TOP);
+        //setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
+        //setBorder(BorderFactory.createEmptyBorder());
     }
-
-    @Override
-    public void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g;
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_RENDERING,
-                RenderingHints.VALUE_RENDER_QUALITY);
-        super.paintComponent(g2);
-    }
-
-    private static String getFieldNameLabelText(String fieldName) {
-        return ' ' + FieldName.getDisplayName(fieldName) + ' ';
-    }
-
 
 }

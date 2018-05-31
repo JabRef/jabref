@@ -17,7 +17,6 @@ public class ImportInspectionCommandLine implements ImportInspector {
 
     private final OutputPrinter status = new SystemOutputPrinter();
 
-
     @Override
     public void addEntry(BibEntry entry) {
         entries.add(entry);
@@ -28,7 +27,6 @@ public class ImportInspectionCommandLine implements ImportInspector {
         status.setStatus(Localization.lang("Progress: %0 of %1", String.valueOf(current), String
                 .valueOf(max)));
     }
-
 
     public Collection<BibEntry> query(String query, EntryFetcher fetcher) {
         entries.clear();

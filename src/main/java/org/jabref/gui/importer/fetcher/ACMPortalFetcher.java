@@ -37,25 +37,19 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ACMPortalFetcher implements PreviewEntryFetcher {
 
-    private static final Log LOGGER = LogFactory.getLog(ACMPortalFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ACMPortalFetcher.class);
 
-    private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
-    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter(
-            new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences()));
-    private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
-    private String terms;
-
-    private static final String START_URL = "http://portal.acm.org/";
+    private static final String START_URL = "https://portal.acm.org/";
     private static final String SEARCH_URL_PART = "results.cfm?query=";
     private static final String SEARCH_URL_PART_II = "&dl=";
     private static final String END_URL = "&coll=Portal&short=0";//&start=";
@@ -75,19 +69,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private static final String START_BIBTEX_ENTRY = "@";
     private static final String END_BIBTEX_ENTRY_HTML = "</pre>";
 
-    private final JRadioButton acmButton = new JRadioButton(Localization.lang("The ACM Digital Library"));
-    private final JRadioButton guideButton = new JRadioButton(Localization.lang("The Guide to Computing Literature"));
-    private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);
-
     private static final int PER_PAGE = 20; // Fetch only one page. Otherwise, the user will get blocked by ACM. 100 has been the old setting. See Bug 3532752 - https://sourceforge.net/tracker/index.php?func=detail&aid=3532752&group_id=92314&atid=600306
     private static final int WAIT_TIME = 200;
-    private boolean shouldContinue;
-
-    // user settings
-    private boolean fetchAbstract;
-    private boolean acmOrGuide;
-
-    private int piv;
 
     private static final Pattern HITS_PATTERN = Pattern.compile("<strong>(\\d+,*\\d*)</strong> results found");
     private static final Pattern MAX_HITS_PATTERN = Pattern
@@ -95,12 +78,31 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private static final Pattern FULL_CITATION_PATTERN = Pattern.compile("<a href=\"(citation.cfm.*)\" target.*");
 
-    private static final Pattern ID_PATTERN = Pattern.compile("citation.cfm\\?id=(\\d+)&.*");
+    private static final Pattern ID_PATTERN = Pattern.compile("citation.cfm\\?id=(\\d+).*");
 
     // Patterns used to extract information for the preview:
     private static final Pattern TITLE_PATTERN = Pattern.compile("<a href=.*?\">([^<]*)</a>");
     private static final Pattern ABSTRACT_PATTERN = Pattern.compile("<div .*?>(.*?)</div>");
     private static final Pattern SOURCE_PATTERN = Pattern.compile("<span style=\"padding-left:10px\">([^<]*)</span>");
+
+    private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
+
+    private final Formatter protectTermsFormatter = new ProtectTermsFormatter(Globals.protectedTermsLoader);
+
+    private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
+    private String terms;
+    private final JRadioButton acmButton = new JRadioButton(Localization.lang("The ACM Digital Library"));
+
+    private final JRadioButton guideButton = new JRadioButton(Localization.lang("The Guide to Computing Literature"));
+    private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);
+
+    private boolean shouldContinue;
+    // user settings
+    private boolean fetchAbstract;
+
+    private boolean acmOrGuide;
+
+    private int piv;
 
     @Override
     public JPanel getOptionsPanel() {
@@ -321,7 +323,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 String htmlCode = in.lines().filter(s -> !s.isEmpty()).collect(Collectors.joining());
                 String bibtexString = htmlCode.substring(htmlCode.indexOf(START_BIBTEX_ENTRY),
                         htmlCode.indexOf(END_BIBTEX_ENTRY_HTML));
-                items = new BibtexParser(Globals.prefs.getImportFormatPreferences()).parseEntries(bibtexString);
+                items = new BibtexParser(Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor()).parseEntries(bibtexString);
 
             } catch (IOException | ParseException e) {
                 LOGGER.info("Download of BibTeX information from ACM Portal failed.", e);

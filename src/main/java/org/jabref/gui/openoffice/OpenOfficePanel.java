@@ -50,8 +50,8 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OOBibStyle;
@@ -76,8 +76,8 @@ import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This test panel can be opened by reflection from JabRef, passing the JabRefFrame as an
@@ -85,7 +85,7 @@ import org.apache.commons.logging.LogFactory;
  * between JabRef and OpenOffice.
  */
 public class OpenOfficePanel extends AbstractWorker {
-    private static final Log LOGGER = LogFactory.getLog(OpenOfficePanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficePanel.class);
 
     private OpenOfficeSidePanel sidePane;
     private JDialog diag;
@@ -129,7 +129,7 @@ public class OpenOfficePanel extends AbstractWorker {
         update = new JButton(IconTheme.JabRefIcon.REFRESH.getSmallIcon());
         update.setToolTipText(Localization.lang("Sync OpenOffice/LibreOffice bibliography"));
         update.setPreferredSize(new Dimension(24, 24));
-        preferences = new OpenOfficePreferences(Globals.prefs);
+        preferences = Globals.prefs.getOpenOfficePreferences();
         loader = new StyleLoader(preferences,
                 Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
                 Globals.prefs.getDefaultEncoding());
@@ -353,7 +353,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private List<BibDatabase> getBaseList() {
         List<BibDatabase> databases = new ArrayList<>();
-        if (preferences.useAllDatabases()) {
+        if (preferences.getUseAllDatabases()) {
             for (BasePanel basePanel : frame.getBasePanelList()) {
                 databases.add(basePanel.getDatabase());
             }
@@ -599,7 +599,7 @@ public class OpenOfficePanel extends AbstractWorker {
                         style = loader.getUsedStyle();
                     }
                     ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, withText, pageInfo,
-                            preferences.syncWhenCiting());
+                            preferences.getSyncWhenCiting());
                 } catch (FileNotFoundException ex) {
                     JOptionPane.showMessageDialog(frame,
                             Localization
@@ -660,14 +660,9 @@ public class OpenOfficePanel extends AbstractWorker {
             for (BibEntry entry : entries) {
                 if (!entry.getCiteKeyOptional().isPresent()) {
                     // Generate key
-                    BibtexKeyPatternUtil
-                            .makeAndSetLabel(
-                                    panel.getBibDatabaseContext().getMetaData().getCiteKeyPattern(prefs.getKeyPattern()),
-                                    panel.getDatabase(), entry,
-                            prefs);
-                    // Add undo change
-                    undoCompound.addEdit(
-                            new UndoableKeyChange(entry, null, entry.getCiteKeyOptional().get()));
+                    new BibtexKeyGenerator(panel.getBibDatabaseContext(), prefs)
+                            .generateAndSetKey(entry)
+                            .ifPresent(change -> undoCompound.addEdit(new UndoableKeyChange(change)));
                 }
             }
             undoCompound.end();
@@ -722,28 +717,38 @@ public class OpenOfficePanel extends AbstractWorker {
         JPopupMenu menu = new JPopupMenu();
         final JCheckBoxMenuItem autoSync = new JCheckBoxMenuItem(
                 Localization.lang("Automatically sync bibliography when inserting citations"),
-                preferences.syncWhenCiting());
+                preferences.getSyncWhenCiting());
         final JRadioButtonMenuItem useActiveBase = new JRadioButtonMenuItem(
                 Localization.lang("Look up BibTeX entries in the active tab only"));
         final JRadioButtonMenuItem useAllBases = new JRadioButtonMenuItem(
                 Localization.lang("Look up BibTeX entries in all open libraries"));
         final JMenuItem clearConnectionSettings = new JMenuItem(Localization.lang("Clear connection settings"));
-        ButtonGroup bg = new ButtonGroup();
-        bg.add(useActiveBase);
-        bg.add(useAllBases);
-        if (preferences.useAllDatabases()) {
+
+        ButtonGroup lookupButtonGroup = new ButtonGroup();
+        lookupButtonGroup.add(useActiveBase);
+        lookupButtonGroup.add(useAllBases);
+        if (preferences.getUseAllDatabases()) {
             useAllBases.setSelected(true);
         } else {
             useActiveBase.setSelected(true);
         }
 
-        autoSync.addActionListener(e -> preferences.setSyncWhenCiting(autoSync.isSelected()));
-
-        useAllBases.addActionListener(e -> preferences.setUseAllDatabases(useAllBases.isSelected()));
-
-        useActiveBase.addActionListener(e -> preferences.setUseAllDatabases(!useActiveBase.isSelected()));
-
-        clearConnectionSettings.addActionListener(e -> frame.output(preferences.clearConnectionSettings()));
+        autoSync.addActionListener(e -> {
+            preferences.setSyncWhenCiting(autoSync.isSelected());
+            Globals.prefs.setOpenOfficePreferences(preferences);
+        });
+        useAllBases.addActionListener(e -> {
+            preferences.setUseAllDatabases(useAllBases.isSelected());
+            Globals.prefs.setOpenOfficePreferences(preferences);
+        });
+        useActiveBase.addActionListener(e -> {
+            preferences.setUseAllDatabases(!useActiveBase.isSelected());
+            Globals.prefs.setOpenOfficePreferences(preferences);
+        });
+        clearConnectionSettings.addActionListener(e -> {
+            preferences.clearConnectionSettings();
+            Globals.prefs.setOpenOfficePreferences(preferences);
+        });
 
         menu.add(autoSync);
         menu.addSeparator();

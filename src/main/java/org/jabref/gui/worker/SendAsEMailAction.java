@@ -1,11 +1,11 @@
 package org.jabref.gui.worker;
 
 import java.awt.Desktop;
-import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,8 +20,8 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Sends the selected entry as email - by Oliver Kopp
@@ -35,10 +35,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SendAsEMailAction extends AbstractWorker {
 
-    private static final Log LOGGER = LogFactory.getLog(SendAsEMailAction.class);
-
-    private String message;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SendAsEMailAction.class);
     private final JabRefFrame frame;
+    private String message;
 
 
     public SendAsEMailAction(JabRefFrame frame) {
@@ -82,13 +81,13 @@ public class SendAsEMailAction extends AbstractWorker {
         //   the unofficial "mailto:attachment" property
         boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
-        List<File> fileList = FileUtil.getListOfLinkedFiles(bes, frame.getCurrentBasePanel().getBibDatabaseContext()
-                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences()));
-        for (File f : fileList) {
-            attachments.add(f.getPath());
+        List<Path> fileList = FileUtil.getListOfLinkedFiles(bes, frame.getCurrentBasePanel().getBibDatabaseContext()
+                .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()));
+        for (Path f : fileList) {
+            attachments.add(f.toAbsolutePath().toString());
             if (openFolders) {
                 try {
-                    JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
+                    JabRefDesktop.openFolderAndSelectFile(f.toAbsolutePath());
                 } catch (IOException e) {
                     LOGGER.debug("Cannot open file", e);
                 }

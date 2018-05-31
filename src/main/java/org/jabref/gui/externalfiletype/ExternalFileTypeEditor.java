@@ -235,7 +235,6 @@ public class ExternalFileTypeEditor extends JabRefDialog {
         return new EditExternalFileTypesAction(dialog);
     }
 
-
     class EditListener implements ActionListener {
 
         @Override
@@ -254,7 +253,6 @@ public class ExternalFileTypeEditor extends JabRefDialog {
     static class IconRenderer implements TableCellRenderer {
 
         private final JLabel lab = new JLabel();
-
 
         @Override
         public Component getTableCellRendererComponent(JTable tab, Object value, boolean isSelected, boolean hasFocus,

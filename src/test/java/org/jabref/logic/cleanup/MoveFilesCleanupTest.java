@@ -12,8 +12,8 @@ import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FileField;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.FileFieldWriter;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
 
@@ -30,8 +30,7 @@ import static org.mockito.Mockito.when;
 
 public class MoveFilesCleanupTest {
 
-    @Rule
-    public TemporaryFolder bibFolder = new TemporaryFolder();
+    @Rule public TemporaryFolder bibFolder = new TemporaryFolder();
 
     private File pdfFolder;
     private BibDatabaseContext databaseContext;
@@ -61,8 +60,8 @@ public class MoveFilesCleanupTest {
         assertTrue(fileBefore.createNewFile());
         assertTrue(new File(subfolder, "test.pdf").exists());
 
-        ParsedFileField fileField = new ParsedFileField("", fileBefore.getAbsolutePath(), "");
-        entry.setField("file", FileField.getStringRepresentation(fileField));
+        LinkedFile fileField = new LinkedFile("", fileBefore.getAbsolutePath(), "");
+        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
         cleanup = new MoveFilesCleanup(databaseContext, "", fileDirPrefs,
                 mock(LayoutFormatterPreferences.class));
         cleanup.cleanup(entry);
@@ -71,7 +70,7 @@ public class MoveFilesCleanupTest {
         File fileAfter = new File(pdfFolder, "test.pdf");
         assertTrue(fileAfter.exists());
 
-        assertEquals(Optional.of(FileField.getStringRepresentation(new ParsedFileField("", fileAfter.getName(), ""))),
+        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(new LinkedFile("", fileAfter.getName(), ""))),
                 entry.getField("file"));
     }
 
@@ -82,9 +81,9 @@ public class MoveFilesCleanupTest {
         assertTrue(fileBefore.createNewFile());
         assertTrue(fileBefore.exists());
 
-        ParsedFileField fileField = new ParsedFileField("", fileBefore.getAbsolutePath(), "");
-        entry.setField("file", FileField.getStringRepresentation(
-                Arrays.asList(new ParsedFileField("", "", ""), fileField, new ParsedFileField("", "", ""))));
+        LinkedFile fileField = new LinkedFile("", fileBefore.getAbsolutePath(), "");
+        entry.setField("file", FileFieldWriter.getStringRepresentation(
+                Arrays.asList(new LinkedFile("", "", ""), fileField, new LinkedFile("", "", ""))));
 
         cleanup = new MoveFilesCleanup(databaseContext, "", fileDirPrefs,
                 mock(LayoutFormatterPreferences.class));
@@ -95,8 +94,7 @@ public class MoveFilesCleanupTest {
         assertTrue(fileAfter.exists());
 
         assertEquals(
-                Optional.of(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("", "", ""),
-                        new ParsedFileField("", fileAfter.getName(), ""), new ParsedFileField("", "", "")))),
+                Optional.of(FileFieldWriter.getStringRepresentation(new LinkedFile("", fileAfter.getName(), ""))),
                 entry.getField("file"));
     }
 
@@ -108,10 +106,10 @@ public class MoveFilesCleanupTest {
         assertTrue(fileBefore.createNewFile());
         assertTrue(new File(subfolder, "test.pdf").exists());
 
-        ParsedFileField fileField = new ParsedFileField("", fileBefore.getAbsolutePath(), "");
-        entry.setField("file", FileField.getStringRepresentation(fileField));
+        LinkedFile fileField = new LinkedFile("", fileBefore.getAbsolutePath(), "");
+        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
-        cleanup = new MoveFilesCleanup(databaseContext, "\\EntryType", fileDirPrefs,
+        cleanup = new MoveFilesCleanup(databaseContext, "[entrytype]", fileDirPrefs,
                 mock(LayoutFormatterPreferences.class));
         cleanup.cleanup(entry);
 
@@ -121,7 +119,62 @@ public class MoveFilesCleanupTest {
         assertTrue(Files.exists(after));
 
         assertEquals(Optional
-                .of(FileField.getStringRepresentation(new ParsedFileField("", relativefileDir.toString(), ""))),
+                .of(FileFieldWriter.getStringRepresentation(new LinkedFile("", relativefileDir.toString(), ""))),
                 entry.getField("file"));
+    }
+
+    @Test
+    public void movesFileFromSubfolderWithSubdirPattern() throws IOException {
+        BibEntry local_entry = (BibEntry) entry.clone();
+        local_entry.setField("year", "1989");
+        File subfolder = bibFolder.newFolder();
+        File fileBefore = new File(subfolder, "test.pdf");
+
+        assertTrue(fileBefore.createNewFile());
+        assertTrue(new File(subfolder, "test.pdf").exists());
+
+        LinkedFile fileField = new LinkedFile("", fileBefore.getAbsolutePath(), "");
+        local_entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
+
+        cleanup = new MoveFilesCleanup(databaseContext, "[year]", fileDirPrefs,
+                mock(LayoutFormatterPreferences.class));
+        cleanup.cleanup(local_entry);
+
+        assertFalse(fileBefore.exists());
+        Path after = pdfFolder.toPath().resolve("1989").resolve("test.pdf");
+        Path relativefileDir = pdfFolder.toPath().relativize(after);
+        assertTrue(Files.exists(after));
+
+        assertEquals(Optional
+                .of(FileFieldWriter.getStringRepresentation(new LinkedFile("", relativefileDir.toString(), ""))),
+                local_entry.getField("file"));
+    }
+
+    @Test
+    public void movesFileFromSubfolderWithDeepSubdirPattern() throws IOException {
+        BibEntry local_entry = (BibEntry) entry.clone();
+        local_entry.setField("year", "1989");
+        local_entry.setField("author", "O. Kitsune");
+        File subfolder = bibFolder.newFolder();
+        File fileBefore = new File(subfolder, "test.pdf");
+
+        assertTrue(fileBefore.createNewFile());
+        assertTrue(new File(subfolder, "test.pdf").exists());
+
+        LinkedFile fileField = new LinkedFile("", fileBefore.getAbsolutePath(), "");
+        local_entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
+
+        cleanup = new MoveFilesCleanup(databaseContext, "[entrytype]/[year]/[auth]", fileDirPrefs,
+                mock(LayoutFormatterPreferences.class));
+        cleanup.cleanup(local_entry);
+
+        assertFalse(fileBefore.exists());
+        Path after = pdfFolder.toPath().resolve("Misc").resolve("1989").resolve("Kitsune").resolve("test.pdf");
+        Path relativefileDir = pdfFolder.toPath().relativize(after);
+        assertTrue(Files.exists(after));
+
+        assertEquals(Optional
+                .of(FileFieldWriter.getStringRepresentation(new LinkedFile("", relativefileDir.toString(), ""))),
+                local_entry.getField("file"));
     }
 }

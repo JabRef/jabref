@@ -84,7 +84,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
 
             // Write user comments
             String userComments = bibtexString.getUserComments();
-            if(!userComments.isEmpty()) {
+            if (!userComments.isEmpty()) {
                 getWriter().write(userComments + OS.NEWLINE);
             }
 
@@ -128,7 +128,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
 
     @Override
     protected void writePrelogue(BibDatabaseContext bibDatabaseContext, Charset encoding) throws SaveException {
-        if(encoding == null) {
+        if (encoding == null) {
             return;
         }
 

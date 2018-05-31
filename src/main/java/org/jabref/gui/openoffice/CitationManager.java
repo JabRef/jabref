@@ -40,21 +40,21 @@ import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dialog for modifying existing citations.
  */
 class CitationManager {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationManager.class);
     private final OOBibBase ooBase;
     private final JDialog diag;
     private final EventList<CitationEntry> list;
     private final JTable table;
-    private final DefaultEventTableModel<CitationEntry> tableModel;
 
-    private static final Log LOGGER = LogFactory.getLog(CitationManager.class);
+    private final DefaultEventTableModel<CitationEntry> tableModel;
 
 
     public CitationManager(final JabRefFrame frame, OOBibBase ooBase)
@@ -132,8 +132,6 @@ class CitationManager {
         diag.setLocationRelativeTo(diag.getParent());
         diag.setVisible(true);
     }
-
-
 
     private static class CitationEntryFormat implements TableFormat<CitationEntry> {
 

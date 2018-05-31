@@ -16,12 +16,12 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.util.OnlyIntegerFormatter;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 
 public class DocumentViewerController extends AbstractController<DocumentViewerViewModel> {
 
     @FXML private ScrollBar scrollBar;
-    @FXML private ComboBox<ParsedFileField> fileChoice;
+    @FXML private ComboBox<LinkedFile> fileChoice;
     @FXML private BorderPane mainPane;
     @FXML private ToggleButton modeLive;
     @FXML private TextField currentPage;
@@ -59,8 +59,8 @@ public class DocumentViewerController extends AbstractController<DocumentViewerV
     }
 
     private void setupFileChoice() {
-        ViewModelListCellFactory<ParsedFileField> cellFactory = new ViewModelListCellFactory<ParsedFileField>()
-                .withText(ParsedFileField::getLink);
+        ViewModelListCellFactory<LinkedFile> cellFactory = new ViewModelListCellFactory<LinkedFile>()
+                .withText(LinkedFile::getLink);
         fileChoice.setButtonCell(cellFactory.call(null));
         fileChoice.setCellFactory(cellFactory);
         fileChoice.getSelectionModel().selectedItemProperty().addListener(

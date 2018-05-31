@@ -9,7 +9,7 @@ import org.jabref.model.groups.GroupTreeNode;
 
 class UndoableModifyGroup extends AbstractUndoableJabRefEdit {
 
-    private final GroupSelector groupSelector;
+    private final GroupSidePane groupSidePane;
     private final AbstractGroup m_oldGroupBackup;
     private final AbstractGroup m_newGroupBackup;
     private final GroupTreeNode m_groupsRootHandle;
@@ -23,9 +23,9 @@ class UndoableModifyGroup extends AbstractUndoableJabRefEdit {
      *            The new group to replace the one currently stored in <b>node
      *            </b>.
      */
-    public UndoableModifyGroup(GroupSelector gs, GroupTreeNodeViewModel groupsRoot,
-            GroupTreeNodeViewModel node, AbstractGroup newGroup) {
-        groupSelector = gs;
+    public UndoableModifyGroup(GroupSidePane gs, GroupTreeNodeViewModel groupsRoot,
+                               GroupTreeNodeViewModel node, AbstractGroup newGroup) {
+        groupSidePane = gs;
         m_oldGroupBackup = node.getNode().getGroup().deepCopy();
         m_newGroupBackup = newGroup.deepCopy();
         m_pathToNode = node.getNode().getIndexedPathFromRoot();
@@ -43,7 +43,6 @@ class UndoableModifyGroup extends AbstractUndoableJabRefEdit {
         //TODO: NULL
         m_groupsRootHandle.getDescendant(m_pathToNode).get().setGroup(
                 m_oldGroupBackup.deepCopy());
-        groupSelector.revalidateGroups();
     }
 
     @Override
@@ -51,6 +50,5 @@ class UndoableModifyGroup extends AbstractUndoableJabRefEdit {
         super.redo();
         m_groupsRootHandle.getDescendant(m_pathToNode).get().setGroup(
                 m_newGroupBackup.deepCopy());
-        groupSelector.revalidateGroups();
     }
 }

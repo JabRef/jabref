@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -19,9 +18,9 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
-import org.jabref.logic.xmp.XMPUtil;
+import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
@@ -30,7 +29,7 @@ import org.jabref.model.entry.identifier.DOI;
 
 import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripper;
 
 /**
  * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
@@ -182,9 +181,8 @@ public class PdfContentImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
-        return false;
+    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+        return input.readLine().startsWith("%PDF");
     }
 
     @Override
@@ -196,10 +194,17 @@ public class PdfContentImporter extends Importer {
     }
 
     @Override
+    public ParserResult importDatabase(String data) throws IOException {
+        Objects.requireNonNull(data);
+        throw new UnsupportedOperationException(
+                "PdfContentImporter does not support importDatabase(String data)."
+                        + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+    }
+
+    @Override
     public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
         final ArrayList<BibEntry> result = new ArrayList<>(1);
-        try (FileInputStream fileStream = new FileInputStream(filePath.toFile());
-                PDDocument document = XMPUtil.loadWithAutomaticDecryption(fileStream)) {
+        try (PDDocument document = XmpUtilReader.loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
 
             Optional<DOI> doi = DOI.findInText(firstPageContents);
@@ -474,7 +479,7 @@ public class PdfContentImporter extends Importer {
             result.add(entry);
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
-        } catch(IOException exception) {
+        } catch (IOException exception) {
             return ParserResult.fromError(exception);
         } catch (FetcherException e) {
             return ParserResult.fromErrorMessage(e.getMessage());
@@ -587,8 +592,8 @@ public class PdfContentImporter extends Importer {
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return FileExtensions.PDF_CONTENT;
+    public FileType getFileType() {
+        return FileType.PDF_CONTENT;
     }
 
     @Override

@@ -14,10 +14,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,21 +60,24 @@ import javax.swing.text.StyledDocument;
 
 import org.jabref.Globals;
 import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.EntryMarker;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.component.OverlayPanel;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.FreeCiteImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.EntryTypes;
@@ -86,8 +89,8 @@ import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * import from plain text => simple mark/copy/paste into bibtex entry
@@ -101,7 +104,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class TextInputDialog extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(TextInputDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TextInputDialog.class);
 
     private final JButton okButton = new JButton(Localization.lang("Accept"));
     private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
@@ -519,7 +522,6 @@ public class TextInputDialog extends JabRefDialog {
         return allFields.toArray(new String[allFields.size()]);
     }
 
-
     private class PasteAction extends BasicAction {
 
         public PasteAction() {
@@ -553,16 +555,21 @@ public class TextInputDialog extends JabRefDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.TXT);
-                dialog.setDefaultExtension(FileExtensions.TXT);
-                Optional<Path> path = dialog.showDialogAndGetSelectedFile();
+                FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                        .addExtensionFilter(FileType.TXT)
+                        .withDefaultExtension(FileType.TXT)
+                        .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                DialogService ds = new FXDialogService();
+
+                Optional<Path> path = DefaultTaskExecutor
+                        .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
 
                 if (path.isPresent()) {
-                    File newFile = path.get().toFile();
+                    Path file = path.get();
                     document.remove(0, document.getLength());
                     EditorKit eKit = textPane.getEditorKit();
                     if (eKit != null) {
-                        try (FileInputStream fis = new FileInputStream(newFile)) {
+                        try (InputStream fis = Files.newInputStream(file)) {
                             eKit.read(fis, document, 0);
                             document.setLogicalStyle(0, document.getStyle("regular"));
                         }
@@ -589,7 +596,6 @@ public class TextInputDialog extends JabRefDialog {
     class FieldListSelectionHandler implements ListSelectionListener {
 
         private int lastIndex = -1;
-
 
         @Override
         public void valueChanged(ListSelectionEvent e) {

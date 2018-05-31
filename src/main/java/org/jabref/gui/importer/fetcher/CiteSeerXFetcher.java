@@ -20,8 +20,8 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CiteSeerXFetcher implements EntryFetcher {
 
@@ -31,8 +31,6 @@ public class CiteSeerXFetcher implements EntryFetcher {
     private static final String SEARCH_URL = CiteSeerXFetcher.URL_START + "/search?q=" + CiteSeerXFetcher.QUERY_MARKER
             + "&submit=Search&sort=rlv&t=doc";
     private static final Pattern CITE_LINK_PATTERN = Pattern.compile("<a class=\"remove doc_details\" href=\"(.*)\">");
-
-    private boolean stopFetching;
 
     private static final String BASE_PATTERN = "<meta name=\"" + CiteSeerXFetcher.QUERY_MARKER
             + "\" content=\"(.*)\" />";
@@ -44,7 +42,9 @@ public class CiteSeerXFetcher implements EntryFetcher {
             .compile(CiteSeerXFetcher.BASE_PATTERN.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_year"));
     private static final Pattern ABSTRACT_PATTERN = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
 
-    private static final Log LOGGER = LogFactory.getLog(CiteSeerXFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CiteSeerXFetcher.class);
+
+    private boolean stopFetching;
 
     @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
@@ -123,8 +123,6 @@ public class CiteSeerXFetcher implements EntryFetcher {
 
         return null;
     }
-
-
 
     private static BibEntry getSingleCitation(String urlString) throws IOException {
         String cont = new URLDownload(urlString).asString();

@@ -1,8 +1,11 @@
 package org.jabref.gui;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
+import javafx.concurrent.Task;
+import javafx.print.PrinterJob;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
@@ -11,10 +14,14 @@ import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 
+import org.controlsfx.dialog.ProgressDialog;
+
 /**
  * This interface provides methods to create dialogs and show them to the user.
  */
 public interface DialogService {
+
+    Optional<String> showInputDialogAndWait(String title, String content);
 
     /**
      * This will create and display a new information dialog.
@@ -42,13 +49,15 @@ public interface DialogService {
 
     /**
      * Create and display error dialog displaying the given exception.
-     * @param message the error message
+     *
+     * @param message   the error message
      * @param exception the exception causing the error
      */
     void showErrorDialogAndWait(String message, Throwable exception);
 
     /**
      * Create and display error dialog displaying the given exception.
+     *
      * @param exception the exception causing the error
      */
     default void showErrorDialogAndWait(Exception exception) {
@@ -57,6 +66,7 @@ public interface DialogService {
 
     /**
      * Create and display error dialog displaying the given message.
+     *
      * @param message the error message
      */
     void showErrorDialogAndWait(String message);
@@ -99,7 +109,7 @@ public interface DialogService {
      * @return Optional with the pressed Button as ButtonType
      */
     Optional<ButtonType> showCustomButtonDialogAndWait(Alert.AlertType type, String title, String content,
-            ButtonType... buttonTypes);
+                                                       ButtonType... buttonTypes);
 
     /**
      * This will create and display a new dialog showing a custom {@link DialogPane}
@@ -118,7 +128,15 @@ public interface DialogService {
     <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog);
 
     /**
+     * Constructs and shows a canceable {@link ProgressDialog}. Clicking cancel will cancel the underlying service and close the dialog
+     *
+     * @param task The {@link Task} which executes the work and for which to show the dialog
+     */
+    <V> void showCanceableProgressDialogAndWait(Task<V> task);
+
+    /**
      * Notify the user in an non-blocking way (i.e., update status message instead of showing a dialog).
+     *
      * @param message the message to show.
      */
     void notify(String message);
@@ -127,6 +145,7 @@ public interface DialogService {
      * Shows a new file save dialog. The method doesn't return until the
      * displayed file save dialog is dismissed. The return value specifies the
      * file chosen by the user or an empty {@link Optional} if no selection has been made.
+     * After a file was selected, the given file dialog configuration is updated with the selected extension type (if any).
      *
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
@@ -137,10 +156,21 @@ public interface DialogService {
      * displayed open dialog is dismissed. The return value specifies
      * the file chosen by the user or an empty {@link Optional} if no selection has been
      * made.
+     * After a file was selected, the given file dialog configuration is updated with the selected extension type (if any).
      *
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
     Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration);
+
+    /**
+     * Shows a new file open dialog. The method doesn't return until the
+     * displayed open dialog is dismissed. The return value specifies
+     * the files chosen by the user or an empty {@link List} if no selection has been
+     * made.
+     *
+     * @return the selected files or an empty {@link List} if no file has been selected
+     */
+    List<Path> showFileOpenDialogAndGetMultipleFiles(FileDialogConfiguration fileDialogConfiguration);
 
     /**
      * Shows a new directory selection dialog. The method doesn't return until the
@@ -151,4 +181,14 @@ public interface DialogService {
      * @return the selected directory or an empty {@link Optional} if no directory has been selected
      */
     Optional<Path> showDirectorySelectionDialog(DirectoryDialogConfiguration directoryDialogConfiguration);
+
+    /**
+     * Displays a Print Dialog. Allow the user to update job state such as printer and settings. These changes will be
+     * available in the appropriate properties after the print dialog has returned. The print dialog is also used to
+     * confirm the user wants to proceed with printing.
+     *
+     * @param job the print job to customize
+     * @return false if the user opts to cancel printing
+     */
+    boolean showPrintDialog(PrinterJob job);
 }

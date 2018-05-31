@@ -1,49 +1,20 @@
 package org.jabref.logic.util.io;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.jabref.model.entry.BibEntry;
 
-public class FileFinder {
+public interface FileFinder {
 
-    private static final Log LOGGER = LogFactory.getLog(FileFinder.class);
-
-    private FileFinder() {
-    }
-
-    public static Set<Path> findFiles(List<String> extensions, List<File> directories) {
-
-        Objects.requireNonNull(directories, "Directories must not be null!");
-        Objects.requireNonNull(extensions, "Extensions must not be null!");
-
-        BiPredicate<Path, BasicFileAttributes> isDirectoryAndContainsExtension = (path,
-                attr) -> !Files.isDirectory(path)
-                        && extensions.contains(FileUtil.getFileExtension(path.toFile()).orElse(""));
-
-        Set<Path> result = new HashSet<>();
-        for (File directory : directories) {
-
-            try (Stream<Path> files = Files.find(directory.toPath(), Integer.MAX_VALUE,
-                    isDirectoryAndContainsExtension)) {
-                result.addAll(files.collect(Collectors.toSet()));
-
-            } catch (IOException e) {
-                LOGGER.error("Problem in finding files", e);
-            }
-        }
-        return result;
-
-    }
+    /**
+     * Finds all files in the given directories that are probably associated with the given entries and have one of the
+     * passed extensions.
+     *
+     * @param entry       The entry to search files for.
+     * @param directories The root directories to search.
+     * @param extensions  The extensions that are acceptable.
+     */
+    List<Path> findAssociatedFiles(BibEntry entry, List<Path> directories, List<String> extensions) throws IOException;
 }

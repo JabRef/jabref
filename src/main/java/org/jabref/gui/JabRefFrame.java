@@ -19,6 +19,8 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,9 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.TimerTask;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -59,13 +59,10 @@ import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
-import com.google.common.eventbus.Subscribe;
-import com.jgoodies.looks.HeaderStyle;
-import com.jgoodies.looks.Options;
 import javafx.application.Platform;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 import org.jabref.Globals;
+import org.jabref.JabRefExecutorService;
 import org.jabref.bibsonomy.BibSonomySidePaneComponent;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.AutoLinkFilesAction;
@@ -82,10 +79,11 @@ import org.jabref.gui.actions.NewSubDatabaseAction;
 import org.jabref.gui.actions.OpenBrowserAction;
 import org.jabref.gui.actions.SearchForUpdateAction;
 import org.jabref.gui.actions.SortTabsAction;
-import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
+import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.customentrytypes.EntryCustomizationDialog;
 import org.jabref.gui.dbproperties.DatabasePropertiesDialog;
+import org.jabref.gui.dialogs.AutosaveUIManager;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.exporter.ExportAction;
 import org.jabref.gui.exporter.ExportCustomizationDialog;
@@ -93,7 +91,7 @@ import org.jabref.gui.exporter.SaveAllAction;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiletype.ExternalFileTypeEditor;
 import org.jabref.gui.groups.EntryTableTransferHandler;
-import org.jabref.gui.groups.GroupSelector;
+import org.jabref.gui.groups.GroupSidePane;
 import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.ImportCustomizationDialog;
@@ -135,7 +133,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.database.DatabaseLocation;
+import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
@@ -144,13 +142,17 @@ import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.LastFocusedTabPreferences;
 import org.jabref.preferences.SearchPreferences;
+
+import com.google.common.eventbus.Subscribe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import osx.macadapter.MacAdapter;
 
 /**
  * The main window of the application.
  */
 public class JabRefFrame extends JFrame implements OutputPrinter {
-    private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
 
     // Frame titles.
     private static final String FRAME_TITLE = "JabRef";
@@ -173,7 +175,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
     private final EditModeAction editModeAction = new EditModeAction();
 
-
     // Here we instantiate menu/toolbar actions. Actions regarding
     // the currently open database are defined as a GeneralAction
     // with a unique command string. This causes the appropriate
@@ -192,6 +193,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction jabrefFacebookAction = new OpenBrowserAction("https://www.facebook.com/JabRef/",
             "Facebook", Localization.lang("Opens JabRef's Facebook page"),
             IconTheme.JabRefIcon.FACEBOOK.getSmallIcon(), IconTheme.JabRefIcon.FACEBOOK.getIcon());
+    private final AbstractAction jabrefTwitterAction = new OpenBrowserAction("https://twitter.com/jabref_org",
+            "Twitter", Localization.lang("Opens JabRef's Twitter page"),
+            IconTheme.JabRefIcon.TWITTER.getSmallIcon(), IconTheme.JabRefIcon.TWITTER.getIcon());
     private final AbstractAction jabrefBlogAction = new OpenBrowserAction("https://blog.jabref.org/",
             Localization.menuTitle("Blog"), Localization.lang("Opens JabRef's blog"),
             IconTheme.JabRefIcon.BLOG.getSmallIcon(), IconTheme.JabRefIcon.BLOG.getIcon());
@@ -203,7 +207,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("See what has been changed in the JabRef versions"));
     private final AbstractAction forkMeOnGitHubAction = new OpenBrowserAction("https://github.com/JabRef/jabref",
             Localization.menuTitle("Fork me on GitHub"), Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcon.GITHUB.getSmallIcon(), IconTheme.JabRefIcon.GITHUB.getIcon());
-    private final AbstractAction donationAction = new OpenBrowserAction("https://github.com/JabRef/jabref/wiki/Donations",
+    private final AbstractAction donationAction = new OpenBrowserAction("https://donations.jabref.org",
             Localization.menuTitle("Donate to JabRef"), Localization.lang("Donate to JabRef"), IconTheme.JabRefIcon.DONATE.getSmallIcon(), IconTheme.JabRefIcon.DONATE.getIcon());
     private final AbstractAction openForumAction = new OpenBrowserAction("http://discourse.jabref.org/",
             Localization.menuTitle("Online help forum"), Localization.lang("Online help forum"), IconTheme.JabRefIcon.FORUM.getSmallIcon(), IconTheme.JabRefIcon.FORUM.getIcon());
@@ -252,8 +256,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Globals.getKeyPrefs().getKey(KeyBinding.OPEN_CONSOLE),
             IconTheme.JabRefIcon.CONSOLE.getIcon());
     private final AbstractAction pullChangesFromSharedDatabase = new GeneralAction(Actions.PULL_CHANGES_FROM_SHARED_DATABASE,
-            Localization.menuTitle("Pull_changes_from_shared_database"),
-            Localization.lang("Pull_changes_from_shared_database"),
+            Localization.menuTitle("Pull changes from shared database"),
+            Localization.lang("Pull changes from shared database"),
             Globals.getKeyPrefs().getKey(KeyBinding.PULL_CHANGES_FROM_SHARED_DATABASE),
             IconTheme.JabRefIcon.PULL.getIcon());
     private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, Localization.menuTitle("Mark entries"),
@@ -387,6 +391,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Unabbreviate journal names"),
             Localization.lang("Unabbreviate journal names of the selected entries"),
             Globals.getKeyPrefs().getKey(KeyBinding.UNABBREVIATE));
+    private final AbstractAction exportLinkedFiles = new CopyFilesAction();
     private final AbstractAction manageJournals = new ManageJournalsAction();
     private final AbstractAction databaseProperties = new DatabasePropertiesAction();
     private final AbstractAction bibtexKeyPattern = new BibtexKeyPatternAction();
@@ -402,7 +407,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             IconTheme.JabRefIcon.MERGE_ENTRIES.getIcon());
     private final AbstractAction downloadFullText = new GeneralAction(Actions.DOWNLOAD_FULL_TEXT,
             Localization.menuTitle("Look up full text documents"),
-            Localization.lang("Look up full text documents"));
+            Globals.getKeyPrefs().getKey(KeyBinding.DOWNLOAD_FULL_TEXT));
     private final AbstractAction increaseFontSize = new IncreaseTableFontSizeAction();
     private final AbstractAction defaultFontSize = new DefaultTableFontSizeAction();
     private final AbstractAction decreseFontSize = new DecreaseTableFontSizeAction();
@@ -457,7 +462,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private PushToApplications pushApplications;
     private GeneralFetcher generalFetcher;
     private OpenOfficePanel openOfficePanel;
-    private GroupSelector groupSelector;
+    private GroupSidePane groupSidePane;
     private int previousTabCount = -1;
     private BibSonomySidePaneComponent bibsonomySidePaneComponent;
     private JMenu newSpec;
@@ -623,12 +628,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 if (currentSearchQuery.isPresent()) {
                     content = currentSearchQuery.get().getQuery();
                 }
-                globalSearchBar.setSearchTerm(content, true);
+                globalSearchBar.setSearchTerm(content);
             }
 
             currentBasePanel.getPreviewPanel().updateLayout();
 
-            groupSelector.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GroupSelector.class));
+            groupSidePane.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
             previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
             generalFetcher.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GeneralFetcher.class));
             openOfficePanel.getToggleAction().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
@@ -650,18 +655,24 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             try {
                 new MacAdapter().registerMacEvents(this);
             } catch (Exception e) {
-                LOGGER.fatal("Could not interface with Mac OS X methods.", e);
+                LOGGER.error("Could not interface with Mac OS X methods.", e);
             }
         }
 
         initShowTrackingNotification();
-
     }
 
     private void initShowTrackingNotification() {
         if (!Globals.prefs.shouldAskToCollectTelemetry()) {
-            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-            scheduler.schedule(() -> DefaultTaskExecutor.runInJavaFXThread(this::showTrackingNotification), 1, TimeUnit.MINUTES);
+            JabRefExecutorService.INSTANCE.submit(new TimerTask() {
+
+                @Override
+                public void run() {
+                    SwingUtilities.invokeLater(() -> {
+                        DefaultTaskExecutor.runInJavaFXThread(JabRefFrame.this::showTrackingNotification);
+                    });
+                }
+            }, 60000); // run in one minute
         }
     }
 
@@ -706,7 +717,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             String changeFlag = panel.isModified() && !isAutosaveEnabled ? "*" : "";
             String databaseFile = panel.getBibDatabaseContext().getDatabaseFile().map(File::getPath)
                     .orElse(GUIGlobals.UNTITLED_TITLE);
-                setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
+            setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
         } else if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
             setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBMSSynchronizer().getDBName() + " ["
                     + Localization.lang("shared") + "]" + modeInfo);
@@ -716,21 +727,21 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private void initSidePane() {
         sidePaneManager = new SidePaneManager(this);
 
-        groupSelector = new GroupSelector(this, sidePaneManager);
+        groupSidePane = new GroupSidePane(this, sidePaneManager);
         openOfficePanel = new OpenOfficePanel(this, sidePaneManager);
         generalFetcher = new GeneralFetcher(this, sidePaneManager);
 
-        sidePaneManager.register(groupSelector);
+        sidePaneManager.register(groupSidePane);
 
         bibsonomySidePaneComponent = new BibSonomySidePaneComponent(sidePaneManager, this);
-        sidePaneManager.register( bibsonomySidePaneComponent);
+        sidePaneManager.register(bibsonomySidePaneComponent);
     }
 
     /**
      * The MacAdapter calls this method when a "BIB" file has been double-clicked from the Finder.
      */
     public void openAction(String filePath) {
-        File file = new File(filePath);
+        Path file = Paths.get(filePath);
         // all the logic is done in openIt. Even raising an existing panel
         getOpenDatabaseAction().openFile(file, true);
     }
@@ -794,7 +805,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 File focusedDatabase = getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null);
                 new LastFocusedTabPreferences(prefs).setLastFocusedTab(focusedDatabase);
             }
-
         }
 
         fileHistory.storeHistory();
@@ -889,7 +899,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void initLayout() {
-        tabbedPane.putClientProperty(Options.NO_CONTENT_BORDER_KEY, Boolean.TRUE);
 
         setProgressBarVisible(false);
 
@@ -958,11 +967,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     /**
      * Returns a list of BasePanel.
-     *
      */
     public List<BasePanel> getBasePanelList() {
         List<BasePanel> returnList = new ArrayList<>();
-        for (int i=0; i< getBasePanelCount(); i++) {
+        for (int i = 0; i < getBasePanelCount(); i++) {
             returnList.add((BasePanel) tabbedPane.getComponentAt(i));
         }
         return returnList;
@@ -1055,6 +1063,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         file.add(importCurrent);
         file.add(exportAll);
         file.add(exportSelected);
+        file.add(exportLinkedFiles);
         file.addSeparator();
         file.add(connectToSharedDatabaseAction);
         file.add(pullChangesFromSharedDatabase);
@@ -1152,10 +1161,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
         mb.add(search);
 
-        groups.add(new JCheckBoxMenuItem(groupSelector.getToggleAction()));
+        groups.add(new JCheckBoxMenuItem(groupSidePane.getToggleAction()));
         if (prefs.getBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE)) {
-            sidePaneManager.register(groupSelector);
-            sidePaneManager.show(GroupSelector.class);
+            sidePaneManager.register(groupSidePane);
+            sidePaneManager.show(GroupSidePane.class);
         }
 
         groups.addSeparator();
@@ -1177,7 +1186,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.addSeparator();
         view.add(new JCheckBoxMenuItem(toggleToolbar));
         view.add(new JCheckBoxMenuItem(enableToggle(generalFetcher.getToggleAction())));
-        view.add(new JCheckBoxMenuItem(groupSelector.getToggleAction()));
+        view.add(new JCheckBoxMenuItem(groupSidePane.getToggleAction()));
         view.add(new JCheckBoxMenuItem(togglePreview));
         view.add(showPdvViewer);
         view.add(getNextPreviewStyleAction());
@@ -1264,6 +1273,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         webMenu.add(jabrefWebPageAction);
         webMenu.add(jabrefBlogAction);
         webMenu.add(jabrefFacebookAction);
+        webMenu.add(jabrefTwitterAction);
         webMenu.addSeparator();
         webMenu.add(forkMeOnGitHubAction);
         webMenu.add(developmentVersionAction);
@@ -1277,37 +1287,42 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         createDisabledIconsForMenuEntries(mb);
     }
 
-    public void addParserResult(ParserResult pr, boolean focusPanel) {
-        if (pr.toOpenTab()) {
+    public void addParserResult(ParserResult parserResult, boolean focusPanel) {
+        if (parserResult.toOpenTab()) {
             // Add the entries to the open tab.
             BasePanel panel = getCurrentBasePanel();
             if (panel == null) {
                 // There is no open tab to add to, so we create a new tab:
-                addTab(pr.getDatabaseContext(), focusPanel);
+                panel = addTab(parserResult.getDatabaseContext(), focusPanel);
+                if (parserResult.wasChangedOnMigration()) {
+                    panel.markBaseChanged();
+                }
             } else {
-                List<BibEntry> entries = new ArrayList<>(pr.getDatabase().getEntries());
+                List<BibEntry> entries = new ArrayList<>(parserResult.getDatabase().getEntries());
                 addImportedEntries(panel, entries, false);
             }
         } else {
             // only add tab if DB is not already open
             Optional<BasePanel> panel = getBasePanelList().stream()
-                    .filter(p -> p.getBibDatabaseContext().getDatabaseFile().equals(pr.getFile())).findFirst();
+                    .filter(p -> p.getBibDatabaseContext().getDatabaseFile().equals(parserResult.getFile())).findFirst();
 
             if (panel.isPresent()) {
                 tabbedPane.setSelectedComponent(panel.get());
             } else {
-                addTab(pr.getDatabaseContext(), focusPanel);
+                BasePanel basePanel = addTab(parserResult.getDatabaseContext(), focusPanel);
+                if (parserResult.wasChangedOnMigration()) {
+                    basePanel.markBaseChanged();
+                }
             }
         }
     }
 
     private void createToolBar() {
-        tlb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         tlb.setBorder(null);
         tlb.setRollover(true);
 
         tlb.setFloatable(false);
-        if(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
             tlb.addAction(newBiblatexDatabaseAction);
         } else {
             tlb.addAction(newBibtexDatabaseAction);
@@ -1377,7 +1392,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         previewToggle = new JToggleButton(togglePreview);
         tlb.addJToggleButton(previewToggle);
 
-        tlb.addJToggleButton(new JToggleButton(groupSelector.getToggleAction()));
+        tlb.addJToggleButton(new JToggleButton(groupSidePane.getToggleAction()));
 
         tlb.addSeparator();
 
@@ -1385,6 +1400,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
         tlb.add(donationAction);
         tlb.add(forkMeOnGitHubAction);
+        tlb.add(jabrefFacebookAction);
+        tlb.add(jabrefTwitterAction);
 
         createDisabledIconsForButtons(tlb);
     }
@@ -1404,7 +1421,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save, copyPreview,
                 saveAs, saveSelectedAs, saveSelectedAsPlain, editModeAction, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
                 unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, copyKeyAndLink, editPreamble, editStrings,
-                groupSelector.getToggleAction(), makeKeyAction, normalSearch, generalFetcher.getToggleAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
+                groupSidePane.getToggleAction(), makeKeyAction, normalSearch, generalFetcher.getToggleAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
                 sendAsEmail, downloadFullText, lookupIdentifiers, writeXmpAction, openOfficePanel.getToggleAction(), findUnlinkedFiles, addToGroup, removeFromGroup,
                 moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
                 dupliCheck, autoSetFile, newEntryAction, newSpec, customizeAction, plainTextImport, getMassSetField(), getManageKeywords(),
@@ -1438,10 +1455,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         twoEntriesOnlyActions.addAll(Arrays.asList(mergeEntries));
 
         atLeastOneEntryActions.clear();
-        atLeastOneEntryActions.addAll(Arrays.asList(downloadFullText, lookupIdentifiers));
+        atLeastOneEntryActions.addAll(Arrays.asList(downloadFullText, lookupIdentifiers, exportLinkedFiles));
 
         tabbedPane.addChangeListener(event -> updateEnabledState());
-
     }
 
     /**
@@ -1504,7 +1520,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             // Update tables:
             if (bf.getDatabase() != null) {
                 bf.setupMainPanel();
-
             }
         }
     }
@@ -1555,7 +1570,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    public void addTab(BasePanel basePanel, boolean raisePanel) {
+    public BasePanel addTab(BasePanel basePanel, boolean raisePanel) {
         // add tab
         tabbedPane.add(basePanel.getTabTitle(), basePanel);
 
@@ -1580,22 +1595,23 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         // Track opening
         trackOpenNewDatabase(basePanel);
+        return basePanel;
     }
 
     private void trackOpenNewDatabase(BasePanel basePanel) {
 
         Map<String, String> properties = new HashMap<>();
         Map<String, Double> measurements = new HashMap<>();
-        measurements.put("NumberOfEntries", (double)basePanel.getDatabaseContext().getDatabase().getEntryCount());
+        measurements.put("NumberOfEntries", (double) basePanel.getBibDatabaseContext().getDatabase().getEntryCount());
 
-        Globals.getTelemetryClient().trackEvent("OpenNewDatabase", properties, measurements);
+        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("OpenNewDatabase", properties, measurements));
     }
 
     public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
-        BasePanel bp = new BasePanel(JabRefFrame.this, databaseContext);
-        addTab(bp, raisePanel);
-        return bp;
+        BasePanel basePanel = new BasePanel(JabRefFrame.this, databaseContext);
+        addTab(basePanel, raisePanel);
+        return basePanel;
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {
@@ -1721,7 +1737,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         } else {
             SwingUtilities.invokeLater(() -> progressBar.setValue(value));
         }
-
     }
 
     /**
@@ -1736,7 +1751,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         } else {
             SwingUtilities.invokeLater(() -> progressBar.setIndeterminate(value));
         }
-
     }
 
     /**
@@ -1753,11 +1767,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         } else {
             SwingUtilities.invokeLater(() -> progressBar.setMaximum(value));
         }
-
     }
 
     /**
      * Return a boolean, if the selected entry have file
+     *
      * @param selectEntryList A selected entries list of the current base pane
      * @return true, if the selected entry contains file.
      * false, if multiple entries are selected or the selected entry doesn't contains file
@@ -1772,6 +1786,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     /**
      * Return a boolean, if the selected entry have url or doi
+     *
      * @param selectEntryList A selected entries list of the current base pane
      * @return true, if the selected entry contains url or doi.
      * false, if multiple entries are selected or the selected entry doesn't contains url or doi
@@ -1851,7 +1866,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 if (saveAction.isSuccess()) {
                     close = true;
                 }
-            } catch (Throwable ex) {
+            } catch (Exception ex) {
                 // do not close
                 LOGGER.info("Minor exception", ex);
             }
@@ -1917,10 +1932,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public SidePaneManager getSidePaneManager() {
         return sidePaneManager;
-    }
-
-    public GroupSelector getGroupSelector() {
-        return groupSelector;
     }
 
     public void setPreviewToggle(boolean enabled) {
@@ -2134,7 +2145,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             putValue(Action.SHORT_DESCRIPTION, description);
         }
 
-        @Override public void actionPerformed(ActionEvent e) {
+        @Override
+        public void actionPerformed(ActionEvent e) {
 
             LOGGER.debug(Globals.getFocusListener().getFocused().toString());
             JComponent source = Globals.getFocusListener().getFocused();
@@ -2196,7 +2208,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             GenFieldsCustomizer gf = new GenFieldsCustomizer(JabRefFrame.this);
             gf.setLocationRelativeTo(JabRefFrame.this);
             gf.setVisible(true);
-
         }
     }
 
@@ -2208,8 +2219,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ProtectedTermsDialog protectTermsDialog = new ProtectedTermsDialog(JabRefFrame.this,
-                    Globals.protectedTermsLoader);
+            ProtectedTermsDialog protectTermsDialog = new ProtectedTermsDialog(JabRefFrame.this);
             protectTermsDialog.setVisible(true);
         }
     }
@@ -2232,7 +2242,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             propertiesDialog.setLocationRelativeTo(JabRefFrame.this);
             propertiesDialog.setVisible(true);
         }
-
     }
 
     private class BibtexKeyPatternAction extends MnemonicAwareAction {
@@ -2256,7 +2265,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             bibtexKeyPatternDialog.setLocationRelativeTo(JabRefFrame.this);
             bibtexKeyPatternDialog.setVisible(true);
         }
-
     }
 
     private class DefaultTableFontSizeAction extends MnemonicAwareAction {

@@ -34,7 +34,7 @@ public class SpecialFieldDatabaseChangeListener {
         // NamedCompount code similar to SpecialFieldUpdateListener
         NamedCompound nc = new NamedCompound(Localization.lang("Synchronized special fields based on keywords"));
         List<FieldChange> changes = SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, Globals.prefs.getKeywordDelimiter());
-        for(FieldChange change: changes) {
+        for (FieldChange change: changes) {
             nc.addEdit(new UndoableFieldChange(change));
         }
         // Don't insert the compound into the undoManager,

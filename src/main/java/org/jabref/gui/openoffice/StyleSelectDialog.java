@@ -29,26 +29,32 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+
 import org.jabref.Globals;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.WindowLocation;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -66,15 +72,15 @@ import ca.odell.glazedlists.swing.GlazedListsSwing;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class produces a dialog box for choosing a style file.
  */
 class StyleSelectDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(StyleSelectDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StyleSelectDialog.class);
 
     private final JabRefFrame frame;
     private EventList<OOBibStyle> styles;
@@ -100,7 +106,6 @@ class StyleSelectDialog {
     private boolean okPressed;
     private final StyleLoader loader;
     private final OpenOfficePreferences preferences;
-
 
     public StyleSelectDialog(JabRefFrame frame, OpenOfficePreferences preferences, StyleLoader loader) {
 
@@ -152,7 +157,8 @@ class StyleSelectDialog {
         builder.add(new JScrollPane(table)).xyw(1, 3, 5);
         builder.add(addButton).xy(3, 5);
         builder.add(removeButton).xy(5, 5);
-        builder.add(preview).xyw(1, 7, 5);
+        JFXPanel container = CustomJFXPanel.wrap(new Scene(preview));
+        builder.add(container).xyw(1, 7, 5);
         builder.padding("5dlu, 5dlu, 5dlu, 5dlu");
 
         diag.add(builder.getPanel(), BorderLayout.CENTER);
@@ -395,7 +401,6 @@ class StyleSelectDialog {
         }
     }
 
-
     public boolean isOkPressed() {
         return okPressed;
     }
@@ -426,7 +431,6 @@ class StyleSelectDialog {
         dd.setVisible(true);
     }
 
-
     /**
      * The listener for the Glazed list monitoring the current selection.
      * When selection changes, we need to update the preview panel.
@@ -453,12 +457,6 @@ class StyleSelectDialog {
 
                 // Set new preview layout
                 preview.setLayout(style.getReferenceFormat("default"));
-
-                // Update the preview's entry:
-                SwingUtilities.invokeLater(() -> {
-                    preview.update();
-                    preview.scrollRectToVisible(toRect);
-                });
             }
         }
     }
@@ -468,15 +466,19 @@ class StyleSelectDialog {
         private final JTextField newFile = new JTextField();
         private boolean addOKPressed;
 
-
         public AddFileDialog() {
             super(diag, Localization.lang("Add style file"), true, AddFileDialog.class);
 
             JButton browse = new JButton(Localization.lang("Browse"));
-            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.JSTYLE);
-            dialog.setDefaultExtension(FileExtensions.JSTYLE);
+            FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                    .addExtensionFilter(FileType.JSTYLE)
+                    .withDefaultExtension(FileType.JSTYLE)
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+            DialogService ds = new FXDialogService();
+
             browse.addActionListener(e -> {
-                Optional<Path> file = dialog.showDialogAndGetSelectedFile();
+                Optional<Path> file = DefaultTaskExecutor
+                        .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
                 file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
             });
 

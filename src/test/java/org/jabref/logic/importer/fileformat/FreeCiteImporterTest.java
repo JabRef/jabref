@@ -6,32 +6,36 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
+@FetcherTest //we mark this as fetcher test, because it depends on the avaiability of the FreeCite online library
 public class FreeCiteImporterTest {
 
     private FreeCiteImporter importer;
 
-
-    @Before
+    @BeforeEach
     public void setUp() {
-        importer = new FreeCiteImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
+        importer = new FreeCiteImporter(mock(ImportFormatPreferences.class));
     }
 
     @Test
     public void freeCiteReturnsSomething() throws IOException {
         String entryText = "Kopp, O.; Martin, D.; Wutke, D. & Leymann, F. The Difference Between Graph-Based and Block-Structured Business Process Modelling Languages Enterprise Modelling and Information Systems, Gesellschaft für Informatik e.V. (GI), 2009, 4, 3-13";
         BufferedReader input = new BufferedReader(new StringReader(entryText));
+
         List<BibEntry> bibEntries = importer.importDatabase(input).getDatabase().getEntries();
-        assertEquals(1, bibEntries.size());
         BibEntry bibEntry = bibEntries.get(0);
+
+        assertEquals(1, bibEntries.size());
         assertEquals(bibEntry.getField("author"), Optional.of("O Kopp and D Martin and D Wutke and F Leymann"));
     }
 
@@ -42,7 +46,7 @@ public class FreeCiteImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(FileExtensions.FREECITE, importer.getExtensions());
+        assertEquals(FileType.FREECITE, importer.getFileType());
     }
 
     @Test

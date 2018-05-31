@@ -1,0 +1,14 @@
+.tagBar > HBox {
+    -fx-spacing: 3;
+}
+
+.tagBar .tag {
+    -fx-background-color: transparent;
+    -fx-alignment: center;
+    -fx-border-width: 1;
+    -fx-border-color: darkgrey;
+}
+
+.tagBar .tag .button {
+    -fx-background-color: transparent;
+}

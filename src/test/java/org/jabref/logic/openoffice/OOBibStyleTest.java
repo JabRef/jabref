@@ -13,33 +13,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jabref.JabRefMain;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class OOBibStyleTest {
     private LayoutFormatterPreferences layoutFormatterPreferences;
+    private ImportFormatPreferences importFormatPreferences;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        layoutFormatterPreferences = JabRefPreferences.getInstance()
-                .getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class));
+        layoutFormatterPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @Test
@@ -57,12 +58,9 @@ public class OOBibStyleTest {
 
     @Test
     public void testAuthorYearAsFile() throws URISyntaxException, IOException {
-
-        File defFile = Paths.get(JabRefMain.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+        File defFile = Paths.get(OOBibStyleTest.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                 .toFile();
-
-        OOBibStyle style = new OOBibStyle(defFile, layoutFormatterPreferences,
-                JabRefPreferences.getInstance().getDefaultEncoding());
+        OOBibStyle style = new OOBibStyle(defFile, layoutFormatterPreferences, StandardCharsets.UTF_8);
         assertTrue(style.isValid());
         assertFalse(style.isFromResource());
         assertFalse(style.isBibtexKeyCiteMarkers());
@@ -75,7 +73,6 @@ public class OOBibStyleTest {
 
     @Test
     public void testNumerical() throws IOException {
-
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
         assertTrue(style.isValid());
@@ -85,7 +82,6 @@ public class OOBibStyleTest {
         assertFalse(style.isItalicCitations());
         assertTrue(style.isNumberEntries());
         assertTrue(style.isSortByPosition());
-
     }
 
     @Test
@@ -136,10 +132,13 @@ public class OOBibStyleTest {
         assertTrue(journals.contains("Journal name 1"));
     }
 
+    /**
+     * In IntelliJ: When running this test, ensure that the working directory is <code>%MODULE_WORKING_DIR%"</code>
+     */
     @Test
     public void testGetCitationMarker() throws IOException {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
-        ParserResult result = new BibtexParser(JabRefPreferences.getInstance().getImportFormatPreferences()).parse(Importer.getReader(testBibtexFile, StandardCharsets.UTF_8));
+        ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(Importer.getReader(testBibtexFile, StandardCharsets.UTF_8));
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
@@ -157,10 +156,13 @@ public class OOBibStyleTest {
                 style.getCitationMarker(Arrays.asList(entry), entryDBMap, true, null, new int[] {5}));
     }
 
+    /**
+     * In IntelliJ: When running this test, ensure that the working directory is <code>%MODULE_WORKING_DIR%"</code>
+     */
     @Test
     public void testLayout() throws IOException {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
-        ParserResult result = new BibtexParser(JabRefPreferences.getInstance().getImportFormatPreferences()).parse(Importer.getReader(testBibtexFile, StandardCharsets.UTF_8));
+        ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(Importer.getReader(testBibtexFile, StandardCharsets.UTF_8));
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
         BibDatabase db = result.getDatabase();
@@ -508,7 +510,5 @@ public class OOBibStyleTest {
         entryDBMap.put(entry, database);
         assertEquals("von Beta, Epsilon, & Tau, 2016",
                 style.getCitationMarker(entries, entryDBMap, true, null, null));
-
     }
-
 }

@@ -10,45 +10,6 @@ import java.util.Set;
 
 public class AuthorListParser {
 
-    /** the raw bibtex author/editor field */
-    private String original;
-
-    /** index of the start in original, for example to point to 'abc' in 'abc xyz', tokenStart=2 */
-    private int tokenStart;
-
-    /** index of the end in original, for example to point to 'abc' in 'abc xyz', tokenEnd=5 */
-    private int tokenEnd;
-
-    /** end of token abbreviation (always: tokenStart < tokenAbbr <= tokenEnd), only valid if getToken returns TOKEN_WORD */
-    private int tokenAbbr;
-
-    /** either space of dash */
-    private char tokenTerm;
-
-    /** true if upper-case token, false if lower-case */
-    private boolean tokenCase;
-
-
-    // Constant HashSet containing names of TeX special characters
-    private static final Set<String> TEX_NAMES = new HashSet<>();
-
-    // and static constructor to initialize it
-    static {
-        TEX_NAMES.add("aa");
-        TEX_NAMES.add("ae");
-        TEX_NAMES.add("l");
-        TEX_NAMES.add("o");
-        TEX_NAMES.add("oe");
-        TEX_NAMES.add("i");
-        TEX_NAMES.add("AA");
-        TEX_NAMES.add("AE");
-        TEX_NAMES.add("L");
-        TEX_NAMES.add("O");
-        TEX_NAMES.add("OE");
-        TEX_NAMES.add("j");
-    }
-
-
     private static final int TOKEN_GROUP_LENGTH = 4; // number of entries for a token
 
     // the following are offsets of an entry in a group of entries for one token
@@ -67,6 +28,50 @@ public class AuthorListParser {
     private static final int TOKEN_COMMA = 2;
 
     private static final int TOKEN_WORD = 3;
+
+    // Constant HashSet containing names of TeX special characters
+    private static final Set<String> TEX_NAMES = new HashSet<>();
+
+    static {
+        TEX_NAMES.add("aa");
+        TEX_NAMES.add("ae");
+        TEX_NAMES.add("l");
+        TEX_NAMES.add("o");
+        TEX_NAMES.add("oe");
+        TEX_NAMES.add("i");
+        TEX_NAMES.add("AA");
+        TEX_NAMES.add("AE");
+        TEX_NAMES.add("L");
+        TEX_NAMES.add("O");
+        TEX_NAMES.add("OE");
+        TEX_NAMES.add("j");
+    }
+
+    /**
+     * the raw bibtex author/editor field
+     */
+    private String original;
+    /**
+     * index of the start in original, for example to point to 'abc' in 'abc xyz', tokenStart=2
+     */
+    private int tokenStart;
+    /**
+     * index of the end in original, for example to point to 'abc' in 'abc xyz', tokenEnd=5
+     */
+    private int tokenEnd;
+    /**
+     * end of token abbreviation (always: tokenStart < tokenAbbrEnd <= tokenEnd), only valid if getToken returns
+     * TOKEN_WORD
+     */
+    private int tokenAbbrEnd;
+    /**
+     * either space of dash
+     */
+    private char tokenTerm;
+    /**
+     * true if upper-case token, false if lower-case
+     */
+    private boolean tokenCase;
 
     /**
      * Parses the String containing person names and returns a list of person information.
@@ -123,7 +128,7 @@ public class AuthorListParser {
                 break;
             case TOKEN_WORD:
                 tokens.add(original.substring(tokenStart, tokenEnd));
-                tokens.add(original.substring(tokenStart, tokenAbbr));
+                tokens.add(original.substring(tokenStart, tokenAbbrEnd));
                 tokens.add(tokenTerm);
                 tokens.add(tokenCase);
                 if (commaFirst >= 0) {
@@ -135,10 +140,17 @@ public class AuthorListParser {
                 if (vonStart < 0) {
                     if (!tokenCase) {
                         int previousTermToken = (tokens.size() - TOKEN_GROUP_LENGTH - TOKEN_GROUP_LENGTH) + OFFSET_TOKEN_TERM;
-                        if((previousTermToken >= 0) && tokens.get(previousTermToken).equals('-')) {
+                        if ((previousTermToken >= 0) && tokens.get(previousTermToken).equals('-')) {
                             // We are in a first name which contained a hyphen
                             break;
                         }
+
+                        int thisTermToken = previousTermToken + TOKEN_GROUP_LENGTH;
+                        if ((thisTermToken >= 0) && tokens.get(thisTermToken).equals('-')) {
+                            // We are in a name which contained a hyphen
+                            break;
+                        }
+
                         vonStart = tokens.size() - TOKEN_GROUP_LENGTH;
                         break;
                     }
@@ -196,14 +208,16 @@ public class AuthorListParser {
                     firstPartStart = 0;
                 }
             }
-        } else { // commas are present: it affects only 'first part' and
-            // 'junior part'
+        } else {
+            // commas are present: it affects only 'first part' and 'junior part'
             firstPartEnd = tokens.size();
-            if (commaSecond < 0) { // one comma
+            if (commaSecond < 0) {
+                // one comma
                 if (commaFirst < firstPartEnd) {
                     firstPartStart = commaFirst;
                 }
-            } else { // two or more commas
+            } else {
+                // two or more commas
                 if (commaSecond < firstPartEnd) {
                     firstPartStart = commaSecond;
                 }
@@ -250,7 +264,7 @@ public class AuthorListParser {
                 false);
         String jrPart = jrPartStart < 0 ? null : concatTokens(tokens, jrPartStart, jrPartEnd, OFFSET_TOKEN, false);
 
-        if((firstPart != null) && (lastPart != null) && lastPart.equals(lastPart.toUpperCase(Locale.ROOT)) && (lastPart.length() < 5)) {
+        if ((firstPart != null) && (lastPart != null) && lastPart.equals(lastPart.toUpperCase(Locale.ROOT)) && (lastPart.length() < 5)) {
             // The last part is a small string in complete upper case, so interpret it as initial of the first name
             // This is the case for example in "Smith SH" which we think of as lastname=Smith and firstname=SH
             // The length < 5 constraint should allow for "Smith S.H." as input
@@ -309,14 +323,14 @@ public class AuthorListParser {
      * additional information is given in global variables <CODE>token_start</CODE>,
      * <CODE>token_end</CODE>, <CODE>token_abbr</CODE>, <CODE>token_term</CODE>,
      * and <CODE>token_case</CODE>; namely: <CODE>orig.substring(token_start,token_end)</CODE>
-     * is the thext of the token, <CODE>orig.substring(token_start,token_abbr)</CODE>
+     * is the text of the token, <CODE>orig.substring(token_start,token_abbr)</CODE>
      * is the token abbreviation, <CODE>token_term</CODE> contains token
      * terminator (space or dash), and <CODE>token_case</CODE> is <CODE>true</CODE>,
      * if token is upper-case and <CODE>false</CODE> if token is lower-case.
      *
      * @return <CODE>TOKEN_EOF</CODE> -- no more tokens, <CODE>TOKEN_COMMA</CODE> --
      * token is comma, <CODE>TOKEN_AND</CODE> -- token is the word
-     * "and" (or "And", or "aND", etc.) or a colon, <CODE>TOKEN_WORD</CODE> --
+     * "and" (or "And", or "aND", etc.) or a semicolon, <CODE>TOKEN_WORD</CODE> --
      * token is a word; additional information is given in global
      * variables <CODE>token_start</CODE>, <CODE>token_end</CODE>,
      * <CODE>token_abbr</CODE>, <CODE>token_term</CODE>, and
@@ -339,12 +353,12 @@ public class AuthorListParser {
             tokenEnd++;
             return TOKEN_COMMA;
         }
-        // Colon is considered to separate names like "and"
+        // Semicolon is considered to separate names like "and"
         if (original.charAt(tokenStart) == ';') {
             tokenEnd++;
             return TOKEN_AND;
         }
-        tokenAbbr = -1;
+        tokenAbbrEnd = -1;
         tokenTerm = ' ';
         tokenCase = true;
         int bracesLevel = 0;
@@ -355,8 +369,9 @@ public class AuthorListParser {
             if (c == '{') {
                 bracesLevel++;
             }
-            if (firstLetterIsFound && (tokenAbbr < 0) && ((bracesLevel == 0) || (c == '{'))) {
-                tokenAbbr = tokenEnd;
+
+            if (firstLetterIsFound && (tokenAbbrEnd < 0) && ((bracesLevel == 0) || (c == '{'))) {
+                tokenAbbrEnd = tokenEnd;
             }
             if ((c == '}') && (bracesLevel > 0)) {
                 bracesLevel--;
@@ -390,8 +405,8 @@ public class AuthorListParser {
             }
             tokenEnd++;
         }
-        if (tokenAbbr < 0) {
-            tokenAbbr = tokenEnd;
+        if (tokenAbbrEnd < 0) {
+            tokenAbbrEnd = tokenEnd;
         }
         if ((tokenEnd < original.length()) && (original.charAt(tokenEnd) == '-')) {
             tokenTerm = '-';

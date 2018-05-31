@@ -5,11 +5,9 @@ import java.time.format.DateTimeFormatter;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
 
-
 public class DateFormatter implements ParamLayoutFormatter {
 
     private String formatString = "yyyy-MM-dd"; // Use ISO-format as default
-
 
     @Override
     public String format(String fieldText) {

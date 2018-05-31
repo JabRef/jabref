@@ -5,8 +5,8 @@ import java.net.BindException;
 
 import org.jabref.JabRefExecutorService;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages the RemoteListenerServerThread through typical life cycle methods.
@@ -18,9 +18,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RemoteListenerServerLifecycle implements AutoCloseable {
 
-    private RemoteListenerServerThread remoteListenerServerThread;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteListenerServerLifecycle.class);
 
-    private static final Log LOGGER = LogFactory.getLog(RemoteListenerServerLifecycle.class);
+    private RemoteListenerServerThread remoteListenerServerThread;
 
     public void stop() {
         if (isOpen()) {

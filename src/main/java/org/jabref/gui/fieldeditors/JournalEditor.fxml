@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.HBox?>
+<?import org.jabref.gui.fieldeditors.EditorTextArea?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112">
+    <EditorTextArea fx:id="textArea" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
+    <Button onAction="#toggleAbbreviation"
+            styleClass="flatButton">
+        <graphic>
+            <MaterialDesignIconView glyphName="TEXT_SHADOW"/>
+        </graphic>
+        <tooltip>
+            <Tooltip text="%Switches between full and abbreviated journal name if the journal name is known."/>
+        </tooltip>
+    </Button>
+</fx:root>

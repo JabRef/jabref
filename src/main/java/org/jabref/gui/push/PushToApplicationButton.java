@@ -44,6 +44,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
  */
 public class PushToApplicationButton implements ActionListener {
 
+    private static final Icon ARROW_ICON = IconTheme.JabRefIcon.DOWN.getSmallIcon();
     private final JabRefFrame frame;
     private final List<PushToApplication> pushActions;
     private JPanel comp;
@@ -52,7 +53,6 @@ public class PushToApplicationButton implements ActionListener {
     private JPopupMenu popup;
     private final Map<PushToApplication, PushToApplicationAction> actions = new HashMap<>();
     private final Dimension buttonDim = new Dimension(23, 23);
-    private static final Icon ARROW_ICON = IconTheme.JabRefIcon.DOWN.getSmallIcon();
     private final MenuAction mAction = new MenuAction();
     private final JPopupMenu optPopup = new JPopupMenu();
     private final JMenuItem settings = new JMenuItem(Localization.lang("Settings"));
@@ -181,7 +181,6 @@ public class PushToApplicationButton implements ActionListener {
         action.actionPerformed(new ActionEvent(toApp, 0, "push"));
     }
 
-
     private static class BooleanHolder {
 
         public boolean value;
@@ -191,7 +190,6 @@ public class PushToApplicationButton implements ActionListener {
             this.value = value;
         }
     }
-
 
     public static void showSettingsDialog(JFrame parent, PushToApplication toApp, JPanel options) {
 
@@ -236,7 +234,6 @@ public class PushToApplicationButton implements ActionListener {
             toApp.storeSettings();
         }
     }
-
 
     class PopupItemActionListener implements ActionListener {
 

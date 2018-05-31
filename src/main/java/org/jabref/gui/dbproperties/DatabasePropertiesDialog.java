@@ -22,19 +22,23 @@ import javax.swing.JTextField;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.SaveOrderConfigDisplay;
 import org.jabref.gui.cleanup.FieldFormatterCleanupsPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.DatabaseLocation;
+import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -65,14 +69,13 @@ public class DatabasePropertiesDialog extends JabRefDialog {
 
     private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
 
-
     public DatabasePropertiesDialog(JFrame parent) {
         super(parent, Localization.lang("Library properties"), true, DatabasePropertiesDialog.class);
         encoding = new JComboBox<>();
         encoding.setModel(new DefaultComboBoxModel<>(Encodings.ENCODINGS));
         ok = new JButton(Localization.lang("OK"));
         cancel = new JButton(Localization.lang("Cancel"));
-        init(parent);
+        init();
     }
 
     public void setPanel(BasePanel panel) {
@@ -90,19 +93,21 @@ public class DatabasePropertiesDialog extends JabRefDialog {
         protect.setEnabled(!isShared);
     }
 
-    private void init(JFrame parent) {
+    private void init() {
+
+        DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+        DialogService ds = new FXDialogService();
 
         JButton browseFile = new JButton(Localization.lang("Browse"));
         JButton browseFileIndv = new JButton(Localization.lang("Browse"));
 
-        browseFile.addActionListener(e ->
-                new FileDialog(parent).showDialogAndGetSelectedDirectory()
-                        .ifPresent(f -> fileDir.setText(f.toAbsolutePath().toString()))
-        );
-        browseFileIndv.addActionListener(e ->
-                new FileDialog(parent).showDialogAndGetSelectedDirectory()
-                        .ifPresent(f -> fileDirIndv.setText(f.toAbsolutePath().toString()))
-        );
+        browseFile.addActionListener(e -> DefaultTaskExecutor
+                .runInJavaFXThread(() -> ds.showDirectorySelectionDialog(directoryDialogConfiguration))
+                .ifPresent(f -> fileDir.setText(f.toAbsolutePath().toString())));
+        browseFileIndv.addActionListener(e -> DefaultTaskExecutor
+                .runInJavaFXThread(() -> ds.showDirectorySelectionDialog(directoryDialogConfiguration))
+                .ifPresent(f -> fileDirIndv.setText(f.toAbsolutePath().toString())));
 
         setupSortOrderConfiguration();
         FormLayout form = new FormLayout("left:pref, 4dlu, pref:grow, 4dlu, pref:grow, 4dlu, pref",
@@ -150,6 +155,7 @@ public class DatabasePropertiesDialog extends JabRefDialog {
         pack();
 
         AbstractAction closeAction = new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -161,11 +167,36 @@ public class DatabasePropertiesDialog extends JabRefDialog {
         am.put("close", closeAction);
 
         ok.addActionListener(e -> {
-            storeSettings();
+            if (propertiesChanged()) {
+                storeSettings();
+            }
             dispose();
         });
 
         cancel.addActionListener(e -> dispose());
+    }
+
+    private boolean propertiesChanged() {
+        Charset oldEncoding = panel.getBibDatabaseContext().getMetaData().getEncoding()
+                .orElse(Globals.prefs.getDefaultEncoding());
+        Charset newEncoding = (Charset) encoding.getSelectedItem();
+        boolean saveActionsChanged = fieldFormatterCleanupsPanel.hasChanged();
+        boolean saveOrderConfigChanged = !getNewSaveOrderConfig().equals(oldSaveOrderConfig);
+        boolean changed = saveOrderConfigChanged || !newEncoding.equals(oldEncoding)
+                || !oldFileVal.equals(fileDir.getText()) || !oldFileIndvVal.equals(fileDirIndv.getText())
+                || (oldProtectVal != protect.isSelected()) || saveActionsChanged;
+        return changed;
+    }
+
+    private SaveOrderConfig getNewSaveOrderConfig() {
+        SaveOrderConfig saveOrderConfig = null;
+        if (saveInOriginalOrder.isSelected()) {
+            saveOrderConfig = SaveOrderConfig.getDefaultSaveOrder();
+        } else {
+            saveOrderConfig = saveOrderPanel.getSaveOrderConfig();
+            saveOrderConfig.setSaveInSpecifiedOrder();
+        }
+        return saveOrderConfig;
     }
 
     private void setupSortOrderConfiguration() {
@@ -238,7 +269,6 @@ public class DatabasePropertiesDialog extends JabRefDialog {
     }
 
     private void storeSettings() {
-
         Charset oldEncoding = panel.getBibDatabaseContext().getMetaData().getEncoding()
                 .orElse(Globals.prefs.getDefaultEncoding());
         Charset newEncoding = (Charset) encoding.getSelectedItem();
@@ -264,22 +294,11 @@ public class DatabasePropertiesDialog extends JabRefDialog {
             metaData.markAsNotProtected();
         }
 
-        SaveOrderConfig newSaveOrderConfig;
-        if (saveInOriginalOrder.isSelected()) {
-            newSaveOrderConfig = SaveOrderConfig.getDefaultSaveOrder();
-        } else {
-            newSaveOrderConfig = saveOrderPanel.getSaveOrderConfig();
-            newSaveOrderConfig.setSaveInSpecifiedOrder();
-        }
+        SaveOrderConfig newSaveOrderConfig = getNewSaveOrderConfig();
+
+        boolean saveOrderConfigChanged = !getNewSaveOrderConfig().equals(oldSaveOrderConfig);
 
         // See if any of the values have been modified:
-        boolean saveOrderConfigChanged;
-        if (newSaveOrderConfig.equals(oldSaveOrderConfig)) {
-            saveOrderConfigChanged = false;
-        } else {
-            saveOrderConfigChanged = true;
-        }
-
         if (saveOrderConfigChanged) {
             if (newSaveOrderConfig.equals(SaveOrderConfig.getDefaultSaveOrder())) {
                 metaData.clearSaveOrderConfig();

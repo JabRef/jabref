@@ -19,19 +19,21 @@ public class CanonicalBibtexEntry {
      *
      * Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key
      */
-    public static String getCanonicalRepresentation(BibEntry e) {
+    public static String getCanonicalRepresentation(BibEntry entry) {
         StringBuilder sb = new StringBuilder();
 
+        sb.append(entry.getUserComments());
+
         // generate first line: type and bibtex key
-        String citeKey = e.getCiteKeyOptional().orElse("");
-        sb.append(String.format("@%s{%s,", e.getType().toLowerCase(Locale.US), citeKey)).append('\n');
+        String citeKey = entry.getCiteKeyOptional().orElse("");
+        sb.append(String.format("@%s{%s,", entry.getType().toLowerCase(Locale.US), citeKey)).append('\n');
 
         // we have to introduce a new Map as fields are stored case-sensitive in JabRef (see https://github.com/koppor/jabref/issues/45).
         Map<String, String> mapFieldToValue = new HashMap<>();
 
         // determine sorted fields -- all fields lower case
         SortedSet<String> sortedFields = new TreeSet<>();
-        for (Entry<String, String> field : e.getFieldMap().entrySet()) {
+        for (Entry<String, String> field : entry.getFieldMap().entrySet()) {
             String fieldName = field.getKey();
             String fieldValue = field.getValue();
             // JabRef stores the key in the field KEY_FIELD, which must not be serialized

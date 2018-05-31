@@ -4,11 +4,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 public class SearchQueryTest {
 
@@ -20,15 +21,15 @@ public class SearchQueryTest {
 
     @Test
     public void testIsContainsBasedSearch() {
-        assertFalse(new SearchQuery("asdf", true, false).isContainsBasedSearch());
-        assertFalse(new SearchQuery("asdf", true, true).isContainsBasedSearch());
+        assertTrue(new SearchQuery("asdf", true, false).isContainsBasedSearch());
+        assertTrue(new SearchQuery("asdf", true, true).isContainsBasedSearch());
         assertFalse(new SearchQuery("author=asdf", true, false).isContainsBasedSearch());
     }
 
     @Test
     public void testIsGrammarBasedSearch() {
-        assertTrue(new SearchQuery("asdf", true, false).isGrammarBasedSearch());
-        assertTrue(new SearchQuery("asdf", true, true).isGrammarBasedSearch());
+        assertFalse(new SearchQuery("asdf", true, false).isGrammarBasedSearch());
+        assertFalse(new SearchQuery("asdf", true, true).isGrammarBasedSearch());
         assertTrue(new SearchQuery("author=asdf", true, false).isGrammarBasedSearch());
     }
 
@@ -183,6 +184,15 @@ public class SearchQueryTest {
 
         assertTrue(new SearchQuery("text AND author=asdf", true, true).isMatch(entry));
 
+    }
+
+    @Test
+    public void testSimpleTerm() {
+        String query = "progress";
+
+        SearchQuery result = new SearchQuery(query, false, false);
+
+        assertFalse(result.isGrammarBasedSearch());
     }
 
 }

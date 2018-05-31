@@ -18,6 +18,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
@@ -26,12 +28,13 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fetch or search from PubMed <a href="http://www.ncbi.nlm.nih.gov/sites/entrez/">www.ncbi.nlm.nih.gov</a>
@@ -39,7 +42,7 @@ import org.apache.http.client.utils.URIBuilder;
  * See <a href="http://help.jabref.org/en/MedlineRIS">help.jabref.org</a> for a detailed documentation of the available fields.
  */
 public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher {
-    private static final Log LOGGER = LogFactory.getLog(MedlineFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MedlineFetcher.class);
 
     private static final int NUMBER_TO_FETCH = 50;
     private static final String ID_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
@@ -144,10 +147,11 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        entry.clearField("journal-abbreviation");
-        entry.clearField("status");
-        entry.clearField("copyright");
-        entry.getField("month").ifPresent(month -> entry.setField("month", MonthUtil.getMonth(month).bibtexFormat));
+        new FieldFormatterCleanup("journal-abbreviation", new ClearFormatter()).cleanup(entry);
+        new FieldFormatterCleanup("status", new ClearFormatter()).cleanup(entry);
+        new FieldFormatterCleanup("copyright", new ClearFormatter()).cleanup(entry);
+
+        new FieldFormatterCleanup(FieldName.MONTH, new NormalizeMonthFormatter()).cleanup(entry);
     }
 
     @Override

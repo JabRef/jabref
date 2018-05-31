@@ -12,6 +12,9 @@ import javafx.util.Callback;
 
 import org.jabref.model.strings.StringUtil;
 
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
+
 /**
  * Constructs a {@link TreeTableCell} based on the view model of the row and a bunch of specified converter methods.
  *
@@ -35,10 +38,9 @@ public class ViewModelTreeTableCellFactory<S, T> implements Callback<TreeTableCo
         return this;
     }
 
-    public ViewModelTreeTableCellFactory<S, T> withIcon(Callback<S, String> toIcon, Callback<S, Paint> toColor) {
+    public ViewModelTreeTableCellFactory<S, T> withIcon(Callback<S, MaterialDesignIcon> toIcon, Callback<S, Paint> toColor) {
         this.toGraphic = viewModel -> {
-            Text graphic = new Text(toIcon.call(viewModel));
-            graphic.getStyleClass().add("icon");
+            Text graphic = MaterialDesignIconFactory.get().createIcon(toIcon.call(viewModel));
             graphic.setFill(toColor.call(viewModel));
             return graphic;
         };

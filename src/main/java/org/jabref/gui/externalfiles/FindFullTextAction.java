@@ -2,6 +2,7 @@ package org.jabref.gui.externalfiles;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,25 +14,26 @@ import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
  */
 public class FindFullTextAction extends AbstractWorker {
 
-    private static final Log LOGGER = LogFactory.getLog(FindFullTextAction.class);
-
-    private static final int warningLimit = 5; // The minimum number of selected entries to ask the user for confirmation
+    private static final Logger LOGGER = LoggerFactory.getLogger(FindFullTextAction.class);
+    // The minimum number of selected entries to ask the user for confirmation
+    private static final int WARNING_LIMIT = 5;
 
     private final BasePanel basePanel;
     private final Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
@@ -51,7 +53,7 @@ public class FindFullTextAction extends AbstractWorker {
 
     @Override
     public void run() {
-        if (basePanel.getSelectedEntries().size() >= warningLimit) {
+        if (basePanel.getSelectedEntries().size() >= WARNING_LIMIT) {
             String[] options = new String[] {Localization.lang("Look up full text documents"),
                     Localization.lang("Cancel")};
             int answer = JOptionPane.showOptionDialog(basePanel.frame(),
@@ -68,59 +70,62 @@ public class FindFullTextAction extends AbstractWorker {
                 return;
             }
         }
+
         for (BibEntry entry : basePanel.getSelectedEntries()) {
-            FulltextFetchers fft = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
-            downloads.put(fft.findFullTextPDF(entry), entry);
+            FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
+            downloads.put(fetchers.findFullTextPDF(entry), entry);
         }
     }
 
     @Override
     public void update() {
-        List<Optional<URL>> remove = new ArrayList<>();
+        List<Optional<URL>> finishedTasks = new ArrayList<>();
         for (Entry<Optional<URL>, BibEntry> download : downloads.entrySet()) {
             BibEntry entry = download.getValue();
             Optional<URL> result = download.getKey();
             if (result.isPresent()) {
-                List<String> dirs = basePanel.getBibDatabaseContext()
-                        .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
-                if (dirs.isEmpty()) {
+                Optional<Path> dir = basePanel.getBibDatabaseContext().getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences());
+
+                if (!dir.isPresent()) {
                     JOptionPane.showMessageDialog(basePanel.frame(),
                             Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
                                     + " -> " + Localization.lang("File"),
                             Localization.lang("Directory not found"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(),
+                DownloadExternalFile fileDownload = new DownloadExternalFile(basePanel.frame(),
                         basePanel.getBibDatabaseContext(), entry);
                 try {
-                    def.download(result.get(), file -> {
-                        FileListTableModel fileLinkModel = new FileListTableModel();
-                        entry.getField(FieldName.FILE).ifPresent(fileLinkModel::setContent);
-                        // add full text file link at first position
-                        fileLinkModel.addEntry(0, file);
-                        String newValue = fileLinkModel.getStringRepresentation();
-                        UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
-                                entry.getField(FieldName.FILE).orElse(null), newValue);
-                        entry.setField(FieldName.FILE, newValue);
-                        basePanel.getUndoManager().addEdit(edit);
-                        basePanel.markBaseChanged();
+                    fileDownload.download(result.get(), "application/pdf", file -> {
+                        DefaultTaskExecutor.runInJavaFXThread(() -> {
+                            Optional<FieldChange> fieldChange = entry.addFile(file);
+                            if (fieldChange.isPresent()) {
+                                UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
+                                        entry.getField(FieldName.FILE).orElse(null), fieldChange.get().getNewValue());
+                                basePanel.getUndoManager().addEdit(edit);
+                                basePanel.markBaseChanged();
+                            }
+                        });
+
                     });
                 } catch (IOException e) {
                     LOGGER.warn("Problem downloading file", e);
+                    basePanel.output(Localization.lang("Full text document download failed for entry %0",
+                            entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
                 }
                 basePanel.output(Localization.lang("Finished downloading full text document for entry %0.",
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
             } else {
-                String title = Localization.lang("Full text document download failed");
-                String message = Localization.lang("Full text document download failed for entry %0.",
+                String title = Localization.lang("No full text document found");
+                String message = Localization.lang("No full text document found for entry %0.",
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined")));
 
                 basePanel.output(message);
                 JOptionPane.showMessageDialog(basePanel.frame(), message, title, JOptionPane.ERROR_MESSAGE);
             }
-            remove.add(result);
+            finishedTasks.add(result);
         }
-        for (Optional<URL> result : remove) {
+        for (Optional<URL> result : finishedTasks) {
             downloads.remove(result);
         }
     }

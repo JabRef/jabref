@@ -1,75 +1,59 @@
 package org.jabref.gui.fieldeditors;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
-import org.jabref.Globals;
-import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.autocompleter.AutoCompleteListener;
-import org.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.customjfx.CustomJFXPanel;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * An implementation of the FieldEditor backed by a JTextArea.
+ * An implementation of the FieldEditor backed by a {@link EditorTextArea}.
  * Used for multi-line input, currently all BibTexFields except Bibtex key!
  */
-public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
+public class TextArea implements FieldEditor {
 
-    private static final Log LOGGER = LogFactory.getLog(TextArea.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TextArea.class);
 
-    private final JScrollPane scrollPane;
+    private final JFXPanel swingPanel;
 
-    private final FieldNameLabel label;
-
+    private final EditorTextArea textArea;
     private String fieldName;
-
-    private AutoCompleteListener autoCompleteListener;
-
 
     public TextArea(String fieldName, String content) {
         this(fieldName, content, "");
     }
 
     public TextArea(String fieldName, String content, String title) {
-        super(content, title);
+        textArea = new EditorTextArea(content);
+        textArea.setPromptText(title);
+
+        swingPanel = CustomJFXPanel.wrap(new Scene(textArea));
+        swingPanel.setBackground(GUIGlobals.activeBackgroundColor);
 
 
-        updateFont();
-
+        /*
         // Add the global focus listener, so a menu item can see if this field
         // was focused when an action was called.
         addFocusListener(Globals.getFocusListener());
         addFocusListener(new FieldEditorFocusListener());
-        scrollPane = new JScrollPane(this, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setMinimumSize(new Dimension(200, 1));
+        */
 
-        setLineWrap(true);
-        setWrapStyleWord(true);
         this.fieldName = fieldName;
 
-        label = new FieldNameLabel(fieldName);
-        setBackground(GUIGlobals.validFieldBackgroundColor);
-        setForeground(GUIGlobals.editorTextColor);
-
-
+        /*
         FieldTextMenu popMenu = new FieldTextMenu(this);
         this.addMouseListener(popMenu);
         label.addMouseListener(popMenu);
-    }
-
-    @Override
-    public Dimension getPreferredScrollableViewportSize() {
-        return getPreferredSize();
+        */
     }
 
     @Override
@@ -82,23 +66,23 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
     }
 
     @Override
-    public JLabel getLabel() {
-        return label;
-    }
-
-    @Override
-    public void setLabelColor(Color color) {
-        label.setForeground(color);
+    public void setBackground(Color color) {
+        //not needed
     }
 
     @Override
     public JComponent getPane() {
-        return scrollPane;
+        return swingPanel;
     }
 
     @Override
     public JComponent getTextComponent() {
-        return this;
+        return null;
+    }
+
+    @Override
+    public boolean hasFocus() {
+        return false;
     }
 
     @Override
@@ -129,18 +113,35 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
     }
 
     @Override
-    public void updateFontColor() {
-        setForeground(GUIGlobals.editorTextColor);
+    public String getText() {
+        return textArea.getText();
     }
 
     @Override
-    public void updateFont() {
-        setFont(GUIGlobals.currentFont);
+    public void setText(String newText) {
+        textArea.setText(newText);
+    }
+
+    @Override
+    public void append(String text) {
+        // not needed
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        // not needed
     }
 
     @Override
     public void paste(String textToInsert) {
+        /*
         replaceSelection(textToInsert);
+        */
+    }
+
+    @Override
+    public String getSelectedText() {
+        return null;
     }
 
     @Override
@@ -154,14 +155,7 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
     }
 
     @Override
-    public void setAutoCompleteListener(AutoCompleteListener listener) {
-        autoCompleteListener = listener;
-    }
-
-    @Override
-    public void clearAutoCompleteSuggestion() {
-        if (autoCompleteListener != null) {
-            autoCompleteListener.clearCurrentSuggestion(this);
-        }
+    public void requestFocus() {
+        // not needed
     }
 }

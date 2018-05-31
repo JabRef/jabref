@@ -10,9 +10,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
+import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
@@ -27,6 +29,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.helper.StringUtil;
@@ -118,7 +121,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(preferences);
+        return new BibtexParser(preferences, new DummyFileUpdateMonitor());
     }
 
     @Override
@@ -130,7 +133,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
         try {
             URLConnection connection = getURLForQuery(query).openConnection();
             connection.setRequestProperty("User-Agent", URLDownload.USER_AGENT);
-            try(InputStream stream = connection.getInputStream()) {
+            try (InputStream stream = connection.getInputStream()) {
                 List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
                 // Post-cleanup
@@ -151,11 +154,15 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
     @Override
     public void doPostCleanup(BibEntry entry) {
         new FieldFormatterCleanup(FieldName.ABSTRACT, new RemoveBracesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(FieldName.ABSTRACT, new RemoveNewlinesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(FieldName.TITLE, new RemoveBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(FieldName.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
 
-        // Remove url to ADS page
+        // Remove ADS note
         new FieldFormatterCleanup("adsnote", new ClearFormatter()).cleanup(entry);
-        new FieldFormatterCleanup("adsurl", new ClearFormatter()).cleanup(entry);
+        // Move adsurl to url field
+        new MoveFieldCleanup("adsurl", FieldName.URL).cleanup(entry);
+        // The fetcher adds some garbage (number of found entries etc before)
+        entry.setCommentsBeforeEntry("");
     }
 }

@@ -15,6 +15,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.FileSaveSession;
 import org.jabref.logic.exporter.SaveException;
@@ -22,11 +23,12 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
+import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Backups the given bib database file from {@link BibDatabaseContext} on every {@link BibDatabaseContextChangedEvent}.
@@ -36,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class BackupManager {
 
-    private static final Log LOGGER = LogFactory.getLog(BackupManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BackupManager.class);
 
     private static final String BACKUP_EXTENSION = ".sav";
 
@@ -46,7 +48,7 @@ public class BackupManager {
     private final JabRefPreferences preferences;
     private final ExecutorService executor;
     private final Runnable backupTask = () -> determineBackupPath().ifPresent(this::performBackup);
-
+    private final CoarseChangeFilter changeFilter;
 
     private BackupManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;
@@ -54,9 +56,8 @@ public class BackupManager {
         BlockingQueue<Runnable> workerQueue = new ArrayBlockingQueue<>(1);
         this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, workerQueue);
 
-        // Listen for change events
-        bibDatabaseContext.getDatabase().registerListener(this);
-        bibDatabaseContext.getMetaData().registerListener(this);
+        changeFilter = new CoarseChangeFilter(bibDatabaseContext);
+        changeFilter.registerListener(this);
     }
 
     static Path getBackupPath(Path originalPath) {
@@ -118,11 +119,24 @@ public class BackupManager {
     private void performBackup(Path backupPath) {
         try {
             Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(preferences.getDefaultEncoding());
-            SavePreferences savePreferences = SavePreferences.loadForSaveFromPreferences(preferences).withEncoding
+            SavePreferences savePreferences = preferences.loadForSaveFromPreferences().withEncoding
                     (charset).withMakeBackup(false);
             new BibtexDatabaseWriter<>(FileSaveSession::new).saveDatabase(bibDatabaseContext, savePreferences).commit
                     (backupPath);
         } catch (SaveException e) {
+            logIfCritical(e);
+        }
+    }
+
+    private void logIfCritical(SaveException e) {
+        Throwable innermostCause = e;
+        while (innermostCause.getCause() != null) {
+            innermostCause = innermostCause.getCause();
+        }
+        boolean isErrorInField = innermostCause instanceof InvalidFieldValueException;
+
+        // do not print errors in field values into the log during autosave
+        if (!isErrorInField) {
             LOGGER.error("Error while saving file.", e);
         }
     }
@@ -145,8 +159,8 @@ public class BackupManager {
      * This method should only be used when closing a database/JabRef legally.
      */
     private void shutdown() {
-        bibDatabaseContext.getDatabase().unregisterListener(this);
-        bibDatabaseContext.getMetaData().unregisterListener(this);
+        changeFilter.unregisterListener(this);
+        changeFilter.shutdown();
         executor.shutdown();
         determineBackupPath().ifPresent(this::deleteBackupFile);
     }

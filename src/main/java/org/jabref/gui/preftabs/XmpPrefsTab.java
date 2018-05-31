@@ -151,7 +151,6 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
         add(pan, BorderLayout.CENTER);
     }
 
-
     class DeleteRowAction extends AbstractAction {
 
         public DeleteRowAction() {

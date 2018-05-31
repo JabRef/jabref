@@ -2,8 +2,8 @@ package org.jabref.logic.bibtex;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
@@ -58,7 +58,7 @@ public class BibEntryWriter {
     private void writeUserComments(BibEntry entry, Writer out) throws IOException {
         String userComments = entry.getUserComments();
 
-        if(!userComments.isEmpty()) {
+        if (!userComments.isEmpty()) {
             out.write(userComments + OS.NEWLINE);
         }
     }
@@ -95,7 +95,7 @@ public class BibEntryWriter {
         EntryType type = EntryTypes.getTypeOrDefault(entry.getType(), bibDatabaseMode);
 
         // Write required fields first.
-        List<String> fields = type.getRequiredFieldsFlat();
+        Collection<String> fields = type.getRequiredFieldsFlat();
         if (fields != null) {
             for (String value : fields) {
                 writeField(entry, out, value, indentation);
@@ -153,7 +153,7 @@ public class BibEntryWriter {
                 out.write(fieldFormatter.format(field.get(), name));
                 out.write(',' + OS.NEWLINE);
             } catch (InvalidFieldValueException ex) {
-                throw new IOException("Error in field '" + name + "': " + ex.getMessage());
+                throw new IOException("Error in field '" + name + "': " + ex.getMessage(), ex);
             }
         }
     }

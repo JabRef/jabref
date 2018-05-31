@@ -29,7 +29,6 @@ public class OracleConnection implements Connection {
     public static String DCN_NOTIFY_ROWIDS;
     public static String DCN_QUERY_CHANGE_NOTIFICATION;
 
-
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
         //  Auto-generated method stub

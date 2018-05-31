@@ -24,19 +24,22 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * FulltextFetcher implementation that attempts to find a PDF URL at GoogleScholar.
+ *
+ * Search String infos: https://scholar.google.com/intl/en/scholar/help.html#searching
  */
 public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
-    private static final Log LOGGER = LogFactory.getLog(GoogleScholar.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoogleScholar.class);
 
     private static final Pattern LINK_TO_BIB_PATTERN = Pattern.compile("(https:\\/\\/scholar.googleusercontent.com\\/scholar.bib[^\"]*)");
 
@@ -49,7 +52,6 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
 
     public GoogleScholar(ImportFormatPreferences importFormatPreferences) {
         Objects.requireNonNull(importFormatPreferences);
-
         this.importFormatPreferences = importFormatPreferences;
     }
 
@@ -64,33 +66,48 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
         }
 
         try {
+            // title search
             URIBuilder uriBuilder = new URIBuilder(SEARCH_IN_TITLE_URL);
             uriBuilder.addParameter("as_q", "");
+            // as_epq as exact phrase
             uriBuilder.addParameter("as_epq", entry.getField(FieldName.TITLE).orElse(null));
+            // as_occt field to search in
             uriBuilder.addParameter("as_occt", "title");
 
-            Document doc = Jsoup.connect(uriBuilder.toString()).userAgent(URLDownload.USER_AGENT).get();
-            // Check results for PDF link
-            // TODO: link always on first result or none?
-            for (int i = 0; i < NUM_RESULTS; i++) {
-                Elements link = doc.select(String.format("#gs_ggsW%s a", i));
-
-                if (link.first() != null) {
-                    String s = link.first().attr("href");
-                    // link present?
-                    if (!"".equals(s)) {
-                        // TODO: check title inside pdf + length?
-                        // TODO: report error function needed?! query -> result
-                        LOGGER.info("Fulltext PDF found @ Google: " + s);
-                        pdfLink = Optional.of(new URL(s));
-                        break;
-                    }
-                }
-            }
+            pdfLink = search(uriBuilder.toString());
         } catch (URISyntaxException e) {
             throw new FetcherException("Building URI failed.", e);
         }
 
+        return pdfLink;
+    }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.META_SEARCH;
+    }
+
+    private Optional<URL> search(String url) throws IOException {
+        Optional<URL> pdfLink = Optional.empty();
+
+        Document doc = Jsoup.connect(url).userAgent(URLDownload.USER_AGENT).get();
+        // Check results for PDF link
+        // TODO: link always on first result or none?
+        for (int i = 0; i < NUM_RESULTS; i++) {
+            Elements link = doc.select(String.format("div[data-rp=%S] div.gs_or_ggsm a", i));
+
+            if (link.first() != null) {
+                String target = link.first().attr("href");
+                // link present?
+                if (!target.isEmpty() && new URLDownload(target).isPdf()) {
+                    // TODO: check title inside pdf + length?
+                    // TODO: report error function needed?! query -> result
+                    LOGGER.info("Fulltext PDF found @ Google: " + target);
+                    pdfLink = Optional.of(new URL(target));
+                    break;
+                }
+            }
+        }
         return pdfLink;
     }
 
@@ -117,14 +134,14 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
 
             addHitsFromQuery(foundEntries, uriBuilder.toString());
 
-            if(foundEntries.size()==10) {
+            if (foundEntries.size() == 10) {
                 uriBuilder.addParameter("start", "10");
                 addHitsFromQuery(foundEntries, uriBuilder.toString());
             }
 
             return foundEntries;
         } catch (URISyntaxException e) {
-            throw new FetcherException("Error while fetching from "+getName(), e);
+            throw new FetcherException("Error while fetching from " + getName(), e);
         } catch (IOException e) {
             // if there are too much requests from the same IP adress google is answering with a 503 and redirecting to a captcha challenge
             // The caught IOException looks for example like this:
@@ -133,7 +150,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
                 throw new FetcherException("Fetching from Google Scholar failed.",
                         Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
             } else {
-                throw new FetcherException("Error while fetching from "+getName(), e);
+                throw new FetcherException("Error while fetching from " + getName(), e);
             }
         }
     }
@@ -151,7 +168,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
 
     private BibEntry downloadEntry(String link) throws IOException, FetcherException {
         String downloadedContent = new URLDownload(link).asString();
-        BibtexParser parser = new BibtexParser(importFormatPreferences);
+        BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
         ParserResult result = parser.parse(new StringReader(downloadedContent));
         if ((result == null) || (result.getDatabase() == null)) {
             throw new FetcherException("Parsing entries from Google Scholar bib file failed.");

@@ -12,23 +12,16 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.Month;
 
-/**
- * Imports a Biblioscape Tag File. The format is described on
- * http://www.biblioscape.com/manual_bsp/Biblioscape_Tag_File.htm
- * Several Biblioscape field types are ignored. Others are only included in the BibTeX
- * field "comment".
- */
 public class RisImporter extends Importer {
 
     private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
-
 
     @Override
     public String getName() {
@@ -36,8 +29,8 @@ public class RisImporter extends Importer {
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return FileExtensions.RIS;
+    public FileType getFileType() {
+        return FileType.RIS;
     }
 
     @Override
@@ -56,8 +49,7 @@ public class RisImporter extends Importer {
         List<BibEntry> bibitems = new ArrayList<>();
 
         //use optional here, so that no exception will be thrown if the file is empty
-        Optional<String> OptionalLines = reader.lines().reduce((line, nextline) -> line + "\n" + nextline);
-        String linesAsString = OptionalLines.isPresent() ? OptionalLines.get() : "";
+        String linesAsString = reader.lines().reduce((line, nextline) -> line + "\n" + nextline).orElse("");
 
         String[] entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
                 .split("ER  -.*\\n");
@@ -70,6 +62,7 @@ public class RisImporter extends Importer {
             String startPage = "";
             String endPage = "";
             String comment = "";
+            Optional<Month> month = Optional.empty();
             Map<String, String> fields = new HashMap<>();
 
             String[] lines = entry1.split("\n");
@@ -129,21 +122,21 @@ public class RisImporter extends Importer {
                         fields.put(FieldName.TITLE, fields.get(FieldName.TITLE).replaceAll("\\s+", " ")); // Normalize whitespaces
                     } else if ("BT".equals(tag)) {
                         fields.put(FieldName.BOOKTITLE, value);
-                    } else if ("T2".equals(tag) && (fields.get(FieldName.JOURNAL) == null || "".equals(fields.get(FieldName.JOURNAL)))) {
+                    } else if (("T2".equals(tag) || "J2".equals(tag) || "JA".equals(tag)) && (fields.get(FieldName.JOURNAL) == null || "".equals(fields.get(FieldName.JOURNAL)))) {
                         //if there is no journal title, then put second title as journal title
                         fields.put(FieldName.JOURNAL, value);
-                    } else if ("JO".equals(tag)) {
+                    } else if ("JO".equals(tag) || "J1".equals(tag) || "JF".equals(tag)) {
                         //if this field appears then this should be the journal title
                         fields.put(FieldName.JOURNAL, value);
                     } else if ("T3".equals(tag)) {
                         fields.put(FieldName.SERIES, value);
-                    } else if ("AU".equals(tag) || "A1".equals(tag)) {
+                    } else if ("AU".equals(tag) || "A1".equals(tag) || "A2".equals(tag) || "A3".equals(tag) || "A4".equals(tag)) {
                         if ("".equals(author)) {
                             author = value;
                         } else {
                             author += " and " + value;
                         }
-                    } else if ("A2".equals(tag) || "A3".equals(tag) || "A4".equals(tag)) {
+                    } else if ("ED".equals(tag)) {
                         if (editor.isEmpty()) {
                             editor = value;
                         } else {
@@ -161,7 +154,7 @@ public class RisImporter extends Importer {
                         fields.put("caption", value);
                     } else if ("DB".equals(tag)) {
                         fields.put("database", value);
-                    } else if ("IS".equals(tag)) {
+                    } else if ("IS".equals(tag) || "AN".equals(tag) || "C7".equals(tag) || "M1".equals(tag)) {
                         fields.put(FieldName.NUMBER, value);
                     } else if ("SP".equals(tag)) {
                         startPage = value;
@@ -171,7 +164,7 @@ public class RisImporter extends Importer {
                         } else {
                             fields.put(FieldName.PUBLISHER, value);
                         }
-                    } else if ("AD".equals(tag) || "CY".equals(tag)) {
+                    } else if ("AD".equals(tag) || "CY".equals(tag) || "PP".equals(tag)) {
                         fields.put(FieldName.ADDRESS, value);
                     } else if ("EP".equals(tag)) {
                         endPage = value;
@@ -191,18 +184,15 @@ public class RisImporter extends Importer {
                         } else {
                             fields.put(FieldName.ABSTRACT, oldAb + OS.NEWLINE + value);
                         }
-                    } else if ("UR".equals(tag)) {
+                    } else if ("UR".equals(tag) || "L2".equals(tag) || "LK".equals(tag)) {
                         fields.put(FieldName.URL, value);
-                    } else if (("Y1".equals(tag) || "PY".equals(tag) || "DA".equals(tag)) && (value.length() >= 4)) {
+                    } else if (("Y1".equals(tag) || "Y2".equals(tag) || "PY".equals(tag) || "DA".equals(tag)) && (value.length() >= 4)) {
                         fields.put(FieldName.YEAR, value.substring(0, 4));
                         String[] parts = value.split("/");
                         if ((parts.length > 1) && !parts[1].isEmpty()) {
                             try {
                                 int monthNumber = Integer.parseInt(parts[1]);
-                                MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
-                                if (month.isValid()) {
-                                    fields.put(FieldName.MONTH, month.bibtexFormat);
-                                }
+                                month = Month.getMonthByNumber(monthNumber);
                             } catch (NumberFormatException ex) {
                                 // The month part is unparseable, so we ignore it.
                             }
@@ -216,15 +206,42 @@ public class RisImporter extends Importer {
                         }
                     } else if ("U1".equals(tag) || "U2".equals(tag) || "N1".equals(tag)) {
                         if (!comment.isEmpty()) {
-                            comment = comment + " ";
+                            comment = comment + OS.NEWLINE;
                         }
                         comment = comment + value;
-                    }
-                    // Added ID import 2005.12.01, Morten Alver:
-                    else if ("ID".equals(tag)) {
-                        fields.put("refid", value);
-                    } else if ("M3".equals(tag) || "DO".equals(tag)) {
+                    }  else if ("M3".equals(tag) || "DO".equals(tag)) {
                         addDoi(fields, value);
+                    } else if ("C3".equals(tag)) {
+                        fields.put(FieldName.EVENTTITLE, value);
+                    } else if ("N1".equals(tag) || "RN".equals(tag)) {
+                        fields.put(FieldName.NOTE, value);
+                    } else if ("ST".equals(tag)) {
+                        fields.put(FieldName.SHORTTITLE, value);
+                    } else if ("C2".equals(tag)) {
+                        fields.put(FieldName.EPRINT, value);
+                        fields.put(FieldName.EPRINTTYPE, "pubmed");
+                    } else if ("TA".equals(tag)) {
+                        fields.put(FieldName.TRANSLATOR, value);
+                    }
+                    // fields for which there is no direct mapping in the bibtext standard
+                    else if ("AV".equals(tag)) {
+                        fields.put("archive_location", value);
+                    } else if ("CN".equals(tag) || "VO".equals(tag)) {
+                        fields.put("call-number", value);
+                    } else if ("DB".equals(tag)) {
+                        fields.put("archive", value);
+                    } else if ("NV".equals(tag)) {
+                        fields.put("number-of-volumes", value);
+                    } else if ("OP".equals(tag)) {
+                        fields.put("original-title", value);
+                    } else if ("RI".equals(tag)) {
+                        fields.put("reviewed-title", value);
+                    } else if ("RP".equals(tag)) {
+                        fields.put("status", value);
+                    } else if ("SE".equals(tag)) {
+                        fields.put("section", value);
+                    } else if ("ID".equals(tag)) {
+                        fields.put("refid", value);
                     }
                 }
                 // fix authors
@@ -242,14 +259,17 @@ public class RisImporter extends Importer {
 
                 fields.put(FieldName.PAGES, startPage + endPage);
             }
-            BibEntry b = new BibEntry(type);
 
             // Remove empty fields:
             fields.entrySet().removeIf(key -> (key.getValue() == null) || key.getValue().trim().isEmpty());
 
             // create one here
-            b.setField(fields);
-            bibitems.add(b);
+            // type is set in the loop above
+            BibEntry entry = new BibEntry(type);
+            entry.setField(fields);
+            // month has a special treatment as we use the separate method "setMonth" of BibEntry instead of directly setting the value
+            month.ifPresent(entry::setMonth);
+            bibitems.add(entry);
 
         }
         return new ParserResult(bibitems);

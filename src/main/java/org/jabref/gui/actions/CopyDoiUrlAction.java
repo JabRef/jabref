@@ -4,7 +4,8 @@ import java.awt.event.ActionEvent;
 import java.util.Optional;
 
 import javax.swing.AbstractAction;
-import javax.swing.text.JTextComponent;
+
+import javafx.scene.control.TextArea;
 
 import org.jabref.JabRefGUI;
 import org.jabref.gui.ClipBoardManager;
@@ -16,7 +17,7 @@ import org.jabref.model.entry.identifier.DOI;
  */
 public class CopyDoiUrlAction extends AbstractAction {
 
-    private JTextComponent component = null;
+    private TextArea component = null;
     private String identifier;
 
     public CopyDoiUrlAction(String identifier) {
@@ -24,7 +25,7 @@ public class CopyDoiUrlAction extends AbstractAction {
         this.identifier = identifier;
     }
 
-    public CopyDoiUrlAction(JTextComponent component) {
+    public CopyDoiUrlAction(TextArea component) {
         this(component.getText());
         this.component = component;
     }
@@ -33,7 +34,7 @@ public class CopyDoiUrlAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         identifier = component == null ? identifier : component.getText();
 
-        Optional<String> urlOptional = DOI.build(identifier).map(DOI::getURIAsASCIIString);
+        Optional<String> urlOptional = DOI.parse(identifier).map(DOI::getURIAsASCIIString);
         if (urlOptional.isPresent()) {
             ClipBoardManager clipBoard = new ClipBoardManager();
             clipBoard.setClipboardContents(urlOptional.get());

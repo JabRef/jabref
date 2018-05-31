@@ -2,65 +2,46 @@ package org.jabref.logic.util.io;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.UncheckedIOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.jabref.logic.layout.Layout;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.layout.LayoutHelper;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.bibtexkeypattern.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FileField;
-import org.jabref.model.entry.ParsedFileField;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.util.OptionalUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileUtil {
-    private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
-    private static final Pattern SLASH = Pattern.compile("/");
-    private static final Pattern BACKSLASH = Pattern.compile("\\\\");
-
-    public static final boolean isPosixCompilant = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
+    public static final boolean IS_POSIX_COMPILANT = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
+    public static final int MAXIMUM_FILE_NAME_LENGTH = 255;
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
 
     private FileUtil() {
     }
 
     /**
-     * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
-     *
-     * @param file
-     * @return The extension, trimmed and in lowercase.
-     */
-    public static Optional<String> getFileExtension(File file) {
-        return getFileExtension(file.getName());
-    }
-
-    /**
      * Returns the extension of a file name or Optional.empty() if the file does not have one (no "." in name).
      *
-     * @param fileName
      * @return The extension (without leading dot), trimmed and in lowercase.
      */
     public static Optional<String> getFileExtension(String fileName) {
@@ -73,22 +54,44 @@ public class FileUtil {
     }
 
     /**
-     * Returns the name part of a file name (i.e., everything in front of last ".").
+     * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
+     *
+     * @return The extension, trimmed and in lowercase.
      */
-    public static String getFileName(String fileNameWithExtension) {
-        int dotPosition = fileNameWithExtension.lastIndexOf('.');
-        if (dotPosition >= 0) {
-            return fileNameWithExtension.substring(0, dotPosition);
-        } else {
-            return fileNameWithExtension;
-        }
+    public static Optional<String> getFileExtension(File file) {
+        return getFileExtension(file.getName());
     }
 
     /**
-     * Adds an extension to the given file name. The original extension is not replaced. That means,
-     * "demo.bib", ".sav" gets "demo.bib.sav" and not "demo.sav"
+     * Returns the name part of a file name (i.e., everything in front of last ".").
+     */
+    public static String getBaseName(String fileNameWithExtension) {
+        return FilenameUtils.getBaseName(fileNameWithExtension);
+    }
+
+    /**
+     * Returns a valid filename for most operating systems.
      *
-     * @param path the path to add the extension to
+     * Currently, only the length is restricted to 255 chars, see MAXIMUM_FILE_NAME_LENGTH.
+     */
+    public static String getValidFileName(String fileName) {
+        String nameWithoutExtension = getBaseName(fileName);
+
+        if (nameWithoutExtension.length() > MAXIMUM_FILE_NAME_LENGTH) {
+            Optional<String> extension = getFileExtension(fileName);
+            String shortName = nameWithoutExtension.substring(0, MAXIMUM_FILE_NAME_LENGTH);
+            LOGGER.info(String.format("Truncated the too long filename '%s' (%d characters) to '%s'.", fileName, fileName.length(), shortName));
+            return extension.map(s -> shortName + "." + s).orElse(shortName);
+        }
+
+        return fileName;
+    }
+
+    /**
+     * Adds an extension to the given file name. The original extension is not replaced. That means, "demo.bib", ".sav"
+     * gets "demo.bib.sav" and not "demo.sav"
+     *
+     * @param path      the path to add the extension to
      * @param extension the extension to add
      * @return the with the modified file name
      */
@@ -145,7 +148,6 @@ public class FileUtil {
      * @param pathToDestinationFile Path Destination file
      * @param replaceExisting       boolean Determines whether the copy goes on even if the file exists.
      * @return boolean Whether the copy succeeded, or was stopped due to the file already existing.
-     * @throws IOException
      */
     public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean replaceExisting) {
         // Check if the file already exists.
@@ -158,7 +160,10 @@ public class FileUtil {
             return false;
         }
         try {
-            return Files.copy(pathToSourceFile, pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING) != null;
+            // Preserve Hard Links with OpenOption defaults included for clarity
+            Files.write(pathToDestinationFile, Files.readAllBytes(pathToSourceFile),
+                    StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+            return true;
         } catch (IOException e) {
             LOGGER.error("Copying Files failed.", e);
             return false;
@@ -179,239 +184,66 @@ public class FileUtil {
     /**
      * Renames a given file
      *
-     * @param fromFile The source filename to rename
-     * @param toFile   The target fileName
+     * @param fromFile        The source filename to rename
+     * @param toFile          The target fileName
      * @param replaceExisting Wether to replace existing files or not
      * @return True if the rename was successful, false if an exception occurred
-     *
      */
     public static boolean renameFile(Path fromFile, Path toFile, boolean replaceExisting) {
         try {
-            if (replaceExisting) {
-                return Files.move(fromFile, fromFile.resolveSibling(toFile),
-                        StandardCopyOption.REPLACE_EXISTING) != null;
-            } else {
-                return Files.move(fromFile, fromFile.resolveSibling(toFile)) != null;
-            }
+            return renameFileWithException(fromFile, toFile, replaceExisting);
         } catch (IOException e) {
             LOGGER.error("Renaming Files failed", e);
             return false;
         }
     }
 
+    public static boolean renameFileWithException(Path fromFile, Path toFile, boolean replaceExisting) throws IOException {
+        if (replaceExisting) {
+            return Files.move(fromFile, fromFile.resolveSibling(toFile),
+                    StandardCopyOption.REPLACE_EXISTING) != null;
+        } else {
+            return Files.move(fromFile, fromFile.resolveSibling(toFile)) != null;
+        }
+    }
+
     /**
-     * Converts a relative filename to an absolute one, if necessary. Returns an empty optional if the file does not
-     * exist.<br/>
+     * Converts an absolute file to a relative one, if possible. Returns the parameter file itself if no shortening is
+     * possible.
      * <p>
-     * Uses <ul>
-     * <li>the default directory associated with the extension of the file</li>
-     * <li>the standard file directory</li>
-     * <li>the directory of the BIB file</li>
-     * </ul>
+     * This method works correctly only if dirs are sorted decent in their length i.e. /home/user/literature/important before /home/user/literature.
      *
-     * @param databaseContext The database this file belongs to.
-     * @param name     The filename, may also be a relative path to the file
+     * @param file the file to be shortened
+     * @param dirs directories to check
      */
-    public static Optional<File> expandFilename(final BibDatabaseContext databaseContext, String name,
-            FileDirectoryPreferences fileDirectoryPreferences) {
-        Optional<String> extension = getFileExtension(name);
-        // Find the default directory for this field type, if any:
-        List<String> directories = databaseContext.getFileDirectories(extension.orElse(null), fileDirectoryPreferences);
-        // Include the standard "file" directory:
-        List<String> fileDir = databaseContext.getFileDirectories(fileDirectoryPreferences);
-        // Include the directory of the BIB file:
-        List<String> al = new ArrayList<>();
-        for (String dir : directories) {
-            if (!al.contains(dir)) {
-                al.add(dir);
+    public static Path shortenFileName(Path file, List<Path> dirs) {
+        if (!file.isAbsolute()) {
+            return file;
+        }
+
+        for (Path dir : dirs) {
+            if (file.startsWith(dir)) {
+                return dir.relativize(file);
             }
         }
-        for (String aFileDir : fileDir) {
-            if (!al.contains(aFileDir)) {
-                al.add(aFileDir);
-            }
-        }
-
-        return expandFilename(name, al);
-    }
-
-    /**
-     * Converts a relative filename to an absolute one, if necessary. Returns
-     * null if the file does not exist.
-     * <p>
-     * Will look in each of the given dirs starting from the beginning and
-     * returning the first found file to match if any.
-     */
-    public static Optional<File> expandFilename(String name, List<String> directories) {
-        for (String dir : directories) {
-            if (dir != null) {
-                Optional<File> result = expandFilename(name, dir);
-                if (result.isPresent()) {
-                    return result;
-                }
-            }
-        }
-
-        return Optional.empty();
-    }
-
-    /**
-     * Converts a relative filename to an absolute one, if necessary. Returns
-     * an empty optional if the file does not exist.
-     */
-    private static Optional<File> expandFilename(String filename, String dir) {
-
-        if ((filename == null) || filename.isEmpty()) {
-            return Optional.empty();
-        }
-
-        String name = filename;
-
-        File file = new File(name);
-        if (file.exists() || (dir == null)) {
-            return Optional.of(file);
-        }
-
-        if (dir.endsWith(OS.FILE_SEPARATOR)) {
-            name = dir + name;
-        } else {
-            name = dir + OS.FILE_SEPARATOR + name;
-        }
-
-        // fix / and \ problems:
-        if (OS.WINDOWS) {
-            name = SLASH.matcher(name).replaceAll("\\\\");
-        } else {
-            name = BACKSLASH.matcher(name).replaceAll("/");
-        }
-
-        File fileInDir = new File(name);
-        if (fileInDir.exists()) {
-            return Optional.of(fileInDir);
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    /**
-     * Converts an absolute filename to a relative one, if necessary.
-     * Returns the parameter fileName itself if no shortening is possible
-     * <p>
-     * This method works correctly only if dirs are sorted decent in their length
-     * i.e. /home/user/literature/important before /home/user/literature
-     *
-     * @param fileName the filename to be shortened
-     * @param dirs     directories to check.
-     */
-    public static File shortenFileName(File fileName, List<String> dirs) {
-        if ((fileName == null) || !fileName.isAbsolute() || (dirs == null)) {
-            return fileName;
-        }
-
-        for (String dir : dirs) {
-            if (dir != null) {
-                File result = shortenFileName(fileName, dir);
-                if ((result != null) && !result.equals(fileName)) {
-                    return result;
-                }
-            }
-        }
-        return fileName;
-    }
-
-    private static File shortenFileName(File fileName, String directory) {
-        if ((fileName == null) || !fileName.isAbsolute() || (directory == null)) {
-            return fileName;
-        }
-
-        String dir = directory;
-        String longName;
-        if (OS.WINDOWS) {
-            // case-insensitive matching on Windows
-            longName = fileName.toString().toLowerCase(Locale.ROOT);
-            dir = dir.toLowerCase(Locale.ROOT);
-        } else {
-            longName = fileName.toString();
-        }
-
-        if (!dir.endsWith(OS.FILE_SEPARATOR)) {
-            dir = dir.concat(OS.FILE_SEPARATOR);
-        }
-
-        if (longName.startsWith(dir)) {
-            // result is based on original name, not on lower-cased name
-            String newName = fileName.toString().substring(dir.length());
-            return new File(newName);
-        } else {
-            return fileName;
-        }
-    }
-
-    public static Map<BibEntry, List<File>> findAssociatedFiles(List<BibEntry> entries, List<String> extensions,
-            List<File> directories, boolean autolinkExactKeyOnly) {
-        Map<BibEntry, List<File>> result = new HashMap<>();
-
-        // First scan directories
-        Set<Path> filesWithExtension = FileFinder.findFiles(extensions, directories);
-
-        // Initialize Result-Set
-        for (BibEntry entry : entries) {
-            result.put(entry, new ArrayList<>());
-        }
-
-        // Now look for keys
-        nextFile: for (Path file : filesWithExtension) {
-
-            String name = file.getFileName().toString();
-            int dot = name.lastIndexOf('.');
-            // First, look for exact matches:
-            for (BibEntry entry : entries) {
-                Optional<String> citeKey = entry.getCiteKeyOptional();
-                if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && (dot > 0)
-                        && name.substring(0, dot).equals(citeKey.get())) {
-                    result.get(entry).add(file.toFile());
-                    continue nextFile;
-                }
-            }
-            // If we get here, we did not find any exact matches. If non-exact
-            // matches are allowed, try to find one:
-            if (!autolinkExactKeyOnly) {
-                for (BibEntry entry : entries) {
-                    Optional<String> citeKey = entry.getCiteKeyOptional();
-                    if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && name.startsWith(citeKey.get())) {
-                        result.get(entry).add(file.toFile());
-                        continue nextFile;
-                    }
-                }
-            }
-        }
-
-        return result;
+        return file;
     }
 
     /**
      * Returns the list of linked files. The files have the absolute filename
      *
-     * @param bes list of BibTeX entries
+     * @param bes      list of BibTeX entries
      * @param fileDirs list of directories to try for expansion
-     *
      * @return list of files. May be empty
      */
-    public static List<File> getListOfLinkedFiles(List<BibEntry> bes, List<String> fileDirs) {
+    public static List<Path> getListOfLinkedFiles(List<BibEntry> bes, List<Path> fileDirs) {
         Objects.requireNonNull(bes);
         Objects.requireNonNull(fileDirs);
 
-        List<File> result = new ArrayList<>();
-        for (BibEntry entry : bes) {
-            entry.getField(FieldName.FILE).ifPresent(fileField -> {
-                List<ParsedFileField> fileList = FileField.parse(fileField);
-                for (ParsedFileField file : fileList) {
-                    expandFilename(file.getLink(), fileDirs).ifPresent(result::add);
-                }
-            });
-        }
-
-        return result;
+        return bes.stream()
+                .flatMap(entry -> entry.getFiles().stream())
+                .flatMap(file -> OptionalUtil.toStream(file.findIn(fileDirs)))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -420,57 +252,63 @@ public class FileUtil {
      * @param database        the database, where the entry is located
      * @param entry           the entry to which the file should be linked to
      * @param fileNamePattern the filename pattern
-     * @param prefs           the layout preferences
      * @return a suggested fileName
      */
-    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern,
-            LayoutFormatterPreferences prefs) {
-        String targetName = null;
+    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
+        String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
 
-        StringReader sr = new StringReader(fileNamePattern);
-        Layout layout = null;
-        try {
-            layout = new LayoutHelper(sr, prefs).getLayoutFromText();
-        } catch (IOException e) {
-            LOGGER.info("Wrong format " + e.getMessage(), e);
-        }
-        if (layout != null) {
-            targetName = layout.doLayout(entry, database);
-        }
-
-        if ((targetName == null) || targetName.isEmpty()) {
+        if (targetName.isEmpty()) {
             targetName = entry.getCiteKeyOptional().orElse("default");
         }
+
         //Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);
         return targetName;
     }
 
     /**
-     * Finds a file inside a directory structure.
-     * Will also look for the file inside nested directories.
+     * Determines filename provided by an entry in a database
      *
-     * @param filename the name of the file that should be found
+     * @param database        the database, where the entry is located
+     * @param entry           the entry to which the file should be linked to
+     * @param fileNamePattern the filename pattern
+     * @return a suggested fileName
+     */
+    public static String createDirNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
+        String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
+
+        if (targetName.isEmpty()) {
+            targetName = entry.getCiteKeyOptional().orElse("default");
+        }
+
+        //Removes illegal characters from filename
+        targetName = FileNameCleaner.cleanDirectoryName(targetName);
+        return targetName;
+    }
+
+    /**
+     * Finds a file inside a directory structure. Will also look for the file inside nested directories.
+     *
+     * @param filename      the name of the file that should be found
      * @param rootDirectory the rootDirectory that will be searched
      * @return the path to the first file that matches the defined conditions
      */
     public static Optional<Path> find(String filename, Path rootDirectory) {
-        try {
-            return Files.walk(rootDirectory)
+        try (Stream<Path> pathStream = Files.walk(rootDirectory)) {
+            return pathStream
                     .filter(Files::isRegularFile)
                     .filter(f -> f.getFileName().toString().equals(filename))
                     .findFirst();
-        } catch(IOException ex) {
+        } catch (UncheckedIOException | IOException ex) {
             LOGGER.error("Error trying to locate the file " + filename + " inside the directory " + rootDirectory);
         }
         return Optional.empty();
     }
 
     /**
-     * Finds a file inside a list of directory structures.
-     * Will also look for the file inside nested directories.
+     * Finds a file inside a list of directory structures. Will also look for the file inside nested directories.
      *
-     * @param filename the name of the file that should be found
+     * @param filename    the name of the file that should be found
      * @param directories the directories that will be searched
      * @return a list including all found paths to files that match the defined conditions
      */
@@ -482,8 +320,12 @@ public class FileUtil {
         return files;
     }
 
-    public static Optional<Path> toPath(ParsedFileField parsedFileField, BibDatabaseContext database, FileDirectoryPreferences directoryPreferences) {
-        Optional<File> path = expandFilename(database, parsedFileField.getLink(), directoryPreferences);
-        return path.map(File::toPath);
+    /**
+     * Creates a string representation of the given path that should work on all systems.
+     * This method should be used when a path needs to be stored in the bib file or preferences.
+     */
+    public static String toPortableString(Path path) {
+        return path.toString()
+                   .replace('\\', '/');
     }
 }

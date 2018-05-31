@@ -7,8 +7,8 @@ import org.jabref.Globals;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Collection of user defined custom import formats.
@@ -18,9 +18,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CustomImportList extends TreeSet<CustomImporter> {
 
-    private final JabRefPreferences prefs;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomImportList.class);
 
-    private static final Log LOGGER = LogFactory.getLog(CustomImportList.class);
+    private final JabRefPreferences prefs;
 
 
     public CustomImportList(JabRefPreferences prefs) {

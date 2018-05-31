@@ -16,10 +16,10 @@ import org.jabref.model.strings.StringUtil;
  */
 public class FieldContentParser {
 
-    private final Set<String> multiLineFields;
-
     // 's' matches a space, tab, new line, carriage return.
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
+
+    private final Set<String> multiLineFields;
 
 
     public FieldContentParser(FieldContentParserPreferences prefs) {
@@ -28,6 +28,7 @@ public class FieldContentParser {
         multiLineFields = new HashSet<>();
         // the following two are also coded in org.jabref.logic.bibtex.LatexFieldFormatter.format(String, String)
         multiLineFields.add(FieldName.ABSTRACT);
+        multiLineFields.add(FieldName.COMMENT);
         multiLineFields.add(FieldName.REVIEW);
         // the file field should not be formatted, therefore we treat it as a multi line field
         multiLineFields.addAll(prefs.getNonWrappableFields());

@@ -21,8 +21,8 @@ public class ContentSelectors {
     }
 
     public List<String> getSelectorValuesForField(String fieldName) {
-        for(ContentSelector selector: contentSelectors) {
-            if(selector.getFieldName().equals(fieldName)){
+        for (ContentSelector selector: contentSelectors) {
+            if (selector.getFieldName().equals(fieldName)) {
                 return selector.getValues();
             }
         }
@@ -40,12 +40,12 @@ public class ContentSelectors {
             }
         }
 
-        if(toRemove != null){
+        if (toRemove != null) {
             contentSelectors.remove(toRemove);
         }
     }
 
-    public List<ContentSelector> getContentSelectors(){
+    public List<ContentSelector> getContentSelectors() {
         return Collections.unmodifiableList(contentSelectors);
     }
 
@@ -61,7 +61,7 @@ public class ContentSelectors {
     public List<String> getFieldNamesWithSelectors() {
         List<String> result = new ArrayList<>(contentSelectors.size());
 
-        for(ContentSelector selector: contentSelectors) {
+        for (ContentSelector selector: contentSelectors) {
             result.add(selector.getFieldName());
         }
 

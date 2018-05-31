@@ -26,7 +26,7 @@ public class Windows implements NativeDesktop {
             openFileWithApplication(filePath, type.get().getOpenWithApplication());
         } else {
             // quote String so explorer handles URL query strings correctly
-            String quotePath = "\"" + filePath +"\"";
+            String quotePath = "\"" + filePath + "\"";
             new ProcessBuilder("explorer.exe", quotePath).start();
         }
     }
@@ -59,8 +59,8 @@ public class Windows implements NativeDesktop {
     }
 
     @Override
-    public void openFolderAndSelectFile(String filePath) throws IOException {
-        new ProcessBuilder("explorer.exe", "/select,", filePath).start();
+    public void openFolderAndSelectFile(Path filePath) throws IOException {
+        new ProcessBuilder("explorer.exe", "/select,", filePath.toString()).start();
     }
 
     @Override

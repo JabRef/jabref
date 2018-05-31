@@ -27,8 +27,12 @@ import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+
 import org.jabref.Globals;
 import org.jabref.gui.PreviewPanel;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.util.component.DiffHighlightingTextPane;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
@@ -44,8 +48,8 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Oscar Gustafsson
@@ -55,8 +59,19 @@ import org.apache.commons.logging.LogFactory;
 
 public class MergeEntries {
 
-    private static final Log LOGGER = LogFactory.getLog(MergeEntries.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MergeEntries.class);
 
+
+    private static final String MARGIN = "10px";
+
+    private static final List<JLabel> HEADING_LABELS = new ArrayList<>(6);
+
+    private static final CellConstraints CELL_CONSTRAINTS = new CellConstraints();
+    private static final String[] DIFF_MODES = {Localization.lang("Plain text"),
+            Localization.lang("Show diff") + " - " + Localization.lang("word"),
+            Localization.lang("Show diff") + " - " + Localization.lang("character"),
+            Localization.lang("Show symmetric diff") + " - " + Localization.lang("word"),
+            Localization.lang("Show symmetric diff") + " - " + Localization.lang("character")};
 
     // Headings
     private final List<String> columnHeadings = Arrays.asList(Localization.lang("Field"),
@@ -65,12 +80,6 @@ public class MergeEntries {
             Localization.lang("None"),
             Localization.lang("Right"),
             Localization.lang("Right entry"));
-    private static final String[] DIFF_MODES = {Localization.lang("Plain text"),
-            Localization.lang("Show diff") + " - " + Localization.lang("word"),
-            Localization.lang("Show diff") + " - " + Localization.lang("character"),
-            Localization.lang("Show symmetric diff") + " - " + Localization.lang("word"),
-            Localization.lang("Show symmetric diff") + " - " + Localization.lang("character")};
-
     private final Set<String> identicalFields = new HashSet<>();
     private final Set<String> differentFields = new HashSet<>();
     private final BibEntry mergedEntry = new BibEntry();
@@ -87,15 +96,10 @@ public class MergeEntries {
     private final JComboBox<String> diffMode = new JComboBox<>();
     private final Map<String, JTextPane> leftTextPanes = new HashMap<>();
     private final Map<String, JTextPane> rightTextPanes = new HashMap<>();
+
     private final Map<String, List<JRadioButton>> radioButtons = new HashMap<>();
 
     private final JPanel mainPanel = new JPanel();
-
-    private static final String MARGIN = "10px";
-
-    private static final List<JLabel> HEADING_LABELS = new ArrayList<>(6);
-
-    private static final CellConstraints CELL_CONSTRAINTS = new CellConstraints();
 
 
 
@@ -166,7 +170,6 @@ public class MergeEntries {
 
         int maxLabelWidth = setupFieldRows(mergePanel);
 
-
         // Create and add scrollpane
         scrollPane = new JScrollPane(mergePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -180,8 +183,10 @@ public class MergeEntries {
         // Setup a PreviewPanel and a Bibtex source box for the merged entry
         mainPanel.add(boldFontLabel(Localization.lang("Merged entry")), CELL_CONSTRAINTS.xyw(1, 6, 6));
 
-        entryPreview = new PreviewPanel(null, mergedEntry, null);
-        mainPanel.add(entryPreview, CELL_CONSTRAINTS.xyw(1, 8, 6));
+        entryPreview = new PreviewPanel(null, null);
+        entryPreview.setEntry(mergedEntry);
+        JFXPanel container = CustomJFXPanel.wrap(new Scene(entryPreview));
+        mainPanel.add(container, CELL_CONSTRAINTS.xyw(1, 8, 6));
 
         mainPanel.add(boldFontLabel(Localization.lang("Merged BibTeX source code")), CELL_CONSTRAINTS.xyw(8, 6, 4));
 

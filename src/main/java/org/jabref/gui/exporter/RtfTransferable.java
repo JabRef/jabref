@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-
 public class RtfTransferable implements Transferable {
 
     private static final DataFlavor RTF_FLAVOR = new DataFlavor("text/rtf; class=java.io.InputStream", "RTF Format");

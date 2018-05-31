@@ -1,0 +1,123 @@
+
+
+.editorPane {
+    -fx-hgap: 10;
+    -fx-vgap: 6;
+    -fx-background-color: -fx-light-background;
+    -fx-padding: 5 5 5 15;
+}
+
+.date-picker > .date-picker-display-node {
+    -fx-text-fill: text-area-foreground;
+    -fx-text-origin: baseline;
+}
+
+.date-picker > .date-picker-display-node *.text {
+    -fx-text-origin: bottom;
+}
+
+.combo-box > *.text {
+    -fx-text-fill: text-area-foreground;
+    -fx-text-origin: baseline;
+}
+
+.list-cell:odd {
+    -fx-background: text-area-background;
+}
+
+/* Selected rows */
+.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.tree-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected,
+.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell:filled:selected,
+.tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell:filled:selected,
+.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:selected,
+.tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell .tree-table-cell:selected {
+    -fx-background: -fx-selection-bar;
+}
+/* Selected when control is not focused */
+.list-cell:filled:selected,
+.tree-cell:filled:selected,
+.table-row-cell:filled:selected,
+.tree-table-row-cell:filled:selected,
+.table-row-cell:filled > .table-cell:selected,
+.tree-table-row-cell:filled > .tree-table-cell:selected {
+    -fx-background: -fx-selection-bar-non-focused;
+}
+/* focused cell (keyboard navigation) */
+.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:focused,
+.tree-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-cell:focused,
+.table-view:focused:row-selection > .virtual-flow > .clipped-container > .sheet > .table-row-cell:focused,
+.tree-table-view:focused:row-selection > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell:focused,
+.table-view:focused:cell-selection > .virtual-flow > .clipped-container > .sheet > .table-row-cell > .table-cell:focused,
+.tree-table-view:focused:cell-selection > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell > .tree-table-cell:focused {
+    -fx-background: -fx-selection-bar;
+}
+
+#typeLabel {
+    -fx-padding: 0.1em;
+    -fx-font-size: 1.166667em;
+    -fx-font-weight: bold;
+}
+
+.flatButton.narrow {
+    -fx-padding: 0.1em;
+}
+
+.flatButtonNoSpaceBottom.narrow {
+    -fx-padding: 0.1em 0.1em -0.2em 0.1em;
+}
+
+.flatButtonNoSpaceTop.narrow {
+    -fx-padding: -0.2em 0.1em 0.1em 0.1em;
+}
+
+#tabbed {
+    -fx-open-tab-animation: NONE;
+    -fx-close-tab-animation: NONE;
+}
+
+#tabbed > .tab-header-area > .tab-header-background {
+    -fx-background-color: #dadad8;
+}
+
+#tabbed > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-light-background;
+}
+
+#tabbed > .tab-header-area .glyph-icon {
+    -glyph-size: 13px;
+}
+
+#tabbed > .tab-header-area {
+    -fx-padding: 0.416667em 5 0.0em 0em;
+}
+
+.editorPane .glyph-icon {
+    -glyph-size: 16px;
+}
+
+.tool-bar {
+    -fx-background-color: #dadad8;
+    -fx-background-insets: 0;
+}
+
+.tool-bar > .container > .separator {
+    -fx-background-color: #5e5f5e;
+}
+
+.warning-icon {
+    -fx-fill: #ffb500;
+}
+
+.error-icon {
+    -fx-text-fill: #bb0613;
+    -fx-fill: #bb0613;
+}
+
+.tooltip-warning {
+    -fx-background-color: #d69600;
+}
+
+.tooltip-error {
+    -fx-background-color: #a80511;
+}

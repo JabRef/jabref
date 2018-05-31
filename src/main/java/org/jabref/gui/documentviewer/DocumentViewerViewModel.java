@@ -19,10 +19,8 @@ import javafx.collections.ListChangeListener;
 import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
-import org.jabref.logic.TypedBibEntry;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.fxmisc.easybind.EasyBind;
@@ -31,7 +29,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
     private StateManager stateManager;
     private ObjectProperty<DocumentViewModel> currentDocument = new SimpleObjectProperty<>();
-    private ListProperty<ParsedFileField> files = new SimpleListProperty<>();
+    private ListProperty<LinkedFile> files = new SimpleListProperty<>();
     private BooleanProperty liveMode = new SimpleBooleanProperty();
     private ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>();
     private IntegerProperty maxPages = new SimpleIntegerProperty();
@@ -79,7 +77,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         return currentDocument;
     }
 
-    public ListProperty<ParsedFileField> filesProperty() {
+    public ListProperty<LinkedFile> filesProperty() {
         return files;
     }
 
@@ -90,10 +88,9 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         }
     }
 
-    private void setCurrentEntry(BibEntry rawEntry) {
+    private void setCurrentEntry(BibEntry entry) {
         stateManager.getActiveDatabase().ifPresent(database -> {
-            TypedBibEntry entry = new TypedBibEntry(rawEntry, database);
-            List<ParsedFileField> linkedFiles = entry.getFiles();
+            List<LinkedFile> linkedFiles = entry.getFiles();
             // We don't need to switch to the first file, this is done automatically in the UI part
             files.setValue(FXCollections.observableArrayList(linkedFiles));
         });
@@ -107,10 +104,10 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         }
     }
 
-    public void switchToFile(ParsedFileField file) {
+    public void switchToFile(LinkedFile file) {
         if (file != null) {
             stateManager.getActiveDatabase().ifPresent(database ->
-                    FileUtil.toPath(file, database, Globals.prefs.getFileDirectoryPreferences())
+                    file.findIn(database, Globals.prefs.getFileDirectoryPreferences())
                             .ifPresent(this::setCurrentDocument));
         }
     }

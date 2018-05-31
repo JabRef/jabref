@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.strings.StringUtil;
 
 public class TitleChecker implements ValueChecker {
 
@@ -28,6 +29,10 @@ public class TitleChecker implements ValueChecker {
      */
     @Override
     public Optional<String> checkValue(String value) {
+        if (StringUtil.isBlank(value)) {
+            return Optional.empty();
+        }
+
         if (databaseContext.isBiblatexMode()) {
             return Optional.empty();
         }

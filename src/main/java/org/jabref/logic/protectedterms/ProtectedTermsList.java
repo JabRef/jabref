@@ -12,12 +12,12 @@ import java.util.Objects;
 
 import org.jabref.logic.util.OS;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
 
-    private static final Log LOGGER = LogFactory.getLog(ProtectedTermsList.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsList.class);
 
     private String description;
     private final List<String> termsList;
@@ -41,11 +41,9 @@ public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
         return description;
     }
 
-
     public List<String> getTermList() {
         return termsList;
     }
-
 
     public String getLocation() {
         return location;

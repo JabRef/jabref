@@ -11,6 +11,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.cleanup.CleanupPresetPanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.component.CheckBoxMessage;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.cleanup.CleanupPreset;
@@ -61,14 +62,14 @@ public class CleanupAction extends AbstractWorker {
             return;
         }
         CleanupPresetPanel presetPanel = new CleanupPresetPanel(panel.getBibDatabaseContext(),
-                CleanupPreset.loadFromPreferences(preferences));
+                preferences.getCleanupPreset());
         int choice = showDialog(presetPanel);
         if (choice != JOptionPane.OK_OPTION) {
             canceled = true;
             return;
         }
         CleanupPreset cleanupPreset = presetPanel.getCleanupPreset();
-        cleanupPreset.storeInPreferences(preferences);
+        preferences.setCleanupPreset(cleanupPreset);
 
         if (cleanupPreset.isRenamePDF() && Globals.prefs.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
             CheckBoxMessage cbm = new CheckBoxMessage(
@@ -144,7 +145,7 @@ public class CleanupAction extends AbstractWorker {
         // Create and run cleaner
         CleanupWorker cleaner = new CleanupWorker(panel.getBibDatabaseContext(), preferences.getCleanupPreferences(
                 Globals.journalAbbreviationLoader));
-        List<FieldChange> changes = cleaner.cleanup(preset, entry);
+        List<FieldChange> changes = DefaultTaskExecutor.runInJavaFXThread(() -> cleaner.cleanup(preset, entry));
 
         unsuccessfulRenames = cleaner.getUnsuccessfulRenames();
 

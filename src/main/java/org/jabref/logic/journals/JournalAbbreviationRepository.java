@@ -1,30 +1,22 @@
 package org.jabref.logic.journals;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A repository for all journal abbreviations, including add and find methods.
  */
 public class JournalAbbreviationRepository {
 
-    private final Map<String, Abbreviation> fullNameLowerCase2Abbreviation = new HashMap<>();
-    private final Map<String, Abbreviation> isoLowerCase2Abbreviation = new HashMap<>();
-    private final Map<String, Abbreviation> medlineLowerCase2Abbreviation = new HashMap<>();
-
-    private final SortedSet<Abbreviation> abbreviations = new TreeSet<>();
-
-    private static final Log LOGGER = LogFactory.getLog(JournalAbbreviationRepository.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationRepository.class);
+    private final Set<Abbreviation> abbreviations = new HashSet<>(16000); // We have over 15.000 abbreviations in the built-in lists
 
     public JournalAbbreviationRepository(Abbreviation... abbreviations) {
         for (Abbreviation abbreviation : abbreviations) {
@@ -32,19 +24,27 @@ public class JournalAbbreviationRepository {
         }
     }
 
+    private static boolean isMatched(String name, Abbreviation abbreviation) {
+        return name.equalsIgnoreCase(abbreviation.getName())
+                || name.equalsIgnoreCase(abbreviation.getIsoAbbreviation())
+                || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation());
+    }
+
+    private static boolean isMatchedAbbreviated(String name, Abbreviation abbreviation) {
+        return name.equalsIgnoreCase(abbreviation.getIsoAbbreviation())
+                || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation());
+    }
+
     public int size() {
         return abbreviations.size();
     }
 
     public boolean isKnownName(String journalName) {
-        String nameKey = Objects.requireNonNull(journalName).trim().toLowerCase(Locale.ENGLISH);
-        return (fullNameLowerCase2Abbreviation.containsKey(nameKey)) || (isoLowerCase2Abbreviation.containsKey(nameKey))
-                || (medlineLowerCase2Abbreviation.containsKey(nameKey));
+        return abbreviations.stream().anyMatch(abbreviation -> isMatched(journalName.trim(), abbreviation));
     }
 
     public boolean isAbbreviatedName(String journalName) {
-        String nameKey = Objects.requireNonNull(journalName).trim().toLowerCase(Locale.ENGLISH);
-        return (isoLowerCase2Abbreviation.containsKey(nameKey)) || (medlineLowerCase2Abbreviation.containsKey(nameKey));
+        return abbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journalName.trim(), abbreviation));
     }
 
     /**
@@ -54,75 +54,37 @@ public class JournalAbbreviationRepository {
      * @return The abbreviated name
      */
     public Optional<Abbreviation> getAbbreviation(String journalName) {
-        String nameKey = Objects.requireNonNull(journalName).toLowerCase(Locale.ENGLISH).trim();
-
-        if (fullNameLowerCase2Abbreviation.containsKey(nameKey)) {
-            return Optional.of(fullNameLowerCase2Abbreviation.get(nameKey));
-        } else if (isoLowerCase2Abbreviation.containsKey(nameKey)) {
-            return Optional.of(isoLowerCase2Abbreviation.get(nameKey));
-        } else if (medlineLowerCase2Abbreviation.containsKey(nameKey)) {
-            return Optional.of(medlineLowerCase2Abbreviation.get(nameKey));
-        } else {
-            return Optional.empty();
-        }
+        return abbreviations.stream().filter(abbreviation -> isMatched(journalName.trim(), abbreviation)).findFirst();
     }
 
     public void addEntry(Abbreviation abbreviation) {
         Objects.requireNonNull(abbreviation);
 
-        if (isKnownName(abbreviation.getName())) {
-            Abbreviation previous = getAbbreviation(abbreviation.getName()).get();
-            abbreviations.remove(previous);
-            LOGGER.info("Duplicate journal abbreviation - old one will be overwritten by new one\nOLD: "
-                    + previous + "\nNEW: " + abbreviation);
+        // Abbreviation equality is tested on name only, so we might have to remove an old abbreviation
+        if (abbreviations.contains(abbreviation)) {
+            abbreviations.remove(abbreviation);
         }
 
         abbreviations.add(abbreviation);
-
-        fullNameLowerCase2Abbreviation.put(abbreviation.getName().toLowerCase(Locale.ENGLISH), abbreviation);
-        isoLowerCase2Abbreviation.put(abbreviation.getIsoAbbreviation().toLowerCase(Locale.ENGLISH), abbreviation);
-        medlineLowerCase2Abbreviation.put(abbreviation.getMedlineAbbreviation().toLowerCase(Locale.ENGLISH),
-                abbreviation);
     }
 
-    public void addEntries(List<Abbreviation> abbreviationsToAdd) {
+    public void addEntries(Collection<Abbreviation> abbreviationsToAdd) {
         abbreviationsToAdd.forEach(this::addEntry);
     }
 
-    public SortedSet<Abbreviation> getAbbreviations() {
-        return Collections.unmodifiableSortedSet(abbreviations);
+    public Set<Abbreviation> getAbbreviations() {
+        return Collections.unmodifiableSet(abbreviations);
     }
 
     public Optional<String> getNextAbbreviation(String text) {
-        Optional<Abbreviation> abbreviation = getAbbreviation(text);
-
-        if (!abbreviation.isPresent()) {
-            return Optional.empty();
-        }
-
-        Abbreviation abbr = abbreviation.get();
-        return Optional.of(abbr.getNext(text));
+        return getAbbreviation(text).map(abbreviation -> abbreviation.getNext(text));
     }
 
     public Optional<String> getMedlineAbbreviation(String text) {
-        Optional<Abbreviation> abbreviation = getAbbreviation(text);
-
-        if (!abbreviation.isPresent()) {
-            return Optional.empty();
-        }
-
-        Abbreviation abbr = abbreviation.get();
-        return Optional.of(abbr.getMedlineAbbreviation());
+        return getAbbreviation(text).map(Abbreviation::getMedlineAbbreviation);
     }
 
     public Optional<String> getIsoAbbreviation(String text) {
-        Optional<Abbreviation> abbreviation = getAbbreviation(text);
-
-        if (!abbreviation.isPresent()) {
-            return Optional.empty();
-        }
-
-        Abbreviation abbr = abbreviation.get();
-        return Optional.of(abbr.getIsoAbbreviation());
+        return getAbbreviation(text).map(Abbreviation::getIsoAbbreviation);
     }
 }

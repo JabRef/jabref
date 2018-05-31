@@ -1,39 +1,59 @@
 package org.jabref.migrations;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.UnaryOperator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import java.util.stream.Stream;
 
 import org.jabref.Globals;
 import org.jabref.JabRefMain;
+import org.jabref.logic.util.OS;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PreferencesMigrations {
-
-    private static final Log LOGGER = LogFactory.getLog(PreferencesMigrations.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesMigrations.class);
 
     private PreferencesMigrations() {
     }
 
     /**
+     * Perform checks and changes for users with a preference set from an older JabRef version.
+     */
+    public static void runMigrations() {
+        upgradePrefsToOrgJabRef();
+        upgradeSortOrder();
+        upgradeFaultyEncodingStrings();
+        upgradeLabelPatternToBibtexKeyPattern();
+        upgradeImportFileAndDirePatterns();
+        upgradeStoredCustomEntryTypes();
+        upgradeKeyBindingsToJavaFX();
+        addCrossRefRelatedFieldsForAutoComplete();
+        upgradeObsoleteLookAndFeels();
+    }
+
+    /**
      * Migrate all preferences from net/sf/jabref to org/jabref
      */
-    public static void upgradePrefsToOrgJabRef() {
-
+    private static void upgradePrefsToOrgJabRef() {
         JabRefPreferences prefs = Globals.prefs;
         Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
         try {
-            if (mainPrefsNode.childrenNames().length!=0) {
+            if (mainPrefsNode.childrenNames().length != 0) {
                 // skip further processing as prefs already have been migrated
                 LOGGER.debug("New prefs node already exists with content - skipping migration");
             } else {
-                if( mainPrefsNode.parent().parent().nodeExists("net/sf/jabref")) {
+                if (mainPrefsNode.parent().parent().nodeExists("net/sf/jabref")) {
                     LOGGER.info("Migrating old preferences.");
                     Preferences oldNode = mainPrefsNode.parent().parent().node("net/sf/jabref");
                     copyPrefsRecursively(oldNode, mainPrefsNode);
@@ -44,9 +64,8 @@ public class PreferencesMigrations {
         }
     }
 
-
     private static void copyPrefsRecursively(Preferences from, Preferences to) throws BackingStoreException {
-        for(String key : from.keys()) {
+        for (String key : from.keys()) {
             String newValue = from.get(key, "");
             if (newValue.contains("net.sf")) {
                 newValue = newValue.replaceAll("net\\.sf", "org");
@@ -63,7 +82,7 @@ public class PreferencesMigrations {
     /**
      * Added from Jabref 2.11 beta 4 onwards to fix wrong encoding names
      */
-    public static void upgradeFaultyEncodingStrings() {
+    private static void upgradeFaultyEncodingStrings() {
         JabRefPreferences prefs = Globals.prefs;
         String defaultEncoding = prefs.get(JabRefPreferences.DEFAULT_ENCODING);
         if (defaultEncoding == null) {
@@ -104,7 +123,7 @@ public class PreferencesMigrations {
      * these preferences, but it is only used when the new preference does not
      * exist
      */
-    public static void upgradeSortOrder() {
+    private static void upgradeSortOrder() {
         JabRefPreferences prefs = Globals.prefs;
 
         if (prefs.get(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, null) == null) {
@@ -132,14 +151,13 @@ public class PreferencesMigrations {
     /**
      * Migrate all customized entry types from versions <=3.7
      */
-    public static void upgradeStoredCustomEntryTypes() {
-
+    private static void upgradeStoredCustomEntryTypes() {
         JabRefPreferences prefs = Globals.prefs;
         Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
 
         try {
             if (mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBTEX_TYPES) ||
-                    mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBLATEX_TYPES) ) {
+                    mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBLATEX_TYPES)) {
                 // skip further processing as prefs already have been migrated
             } else {
                 LOGGER.info("Migrating old custom entry types.");
@@ -153,20 +171,19 @@ public class PreferencesMigrations {
     /**
      * Migrate LabelPattern configuration from versions <=3.5 to new BibtexKeyPatterns
      */
-    public static void upgradeLabelPatternToBibtexKeyPattern() {
-
+    private static void upgradeLabelPatternToBibtexKeyPattern() {
         JabRefPreferences prefs = Globals.prefs;
 
         try {
             Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
 
             // Migrate default pattern
-            if (mainPrefsNode.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, null)==null) {
+            if (mainPrefsNode.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, null) == null) {
                 // Check whether old defaultLabelPattern is set
                 String oldDefault = mainPrefsNode.get("defaultLabelPattern", null);
-                if(oldDefault!=null) {
+                if (oldDefault != null) {
                     prefs.put(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, oldDefault);
-                    LOGGER.info("Upgraded old default key generator pattern '"+oldDefault+"' to new version.");
+                    LOGGER.info("Upgraded old default key generator pattern '" + oldDefault + "' to new version.");
                 }
 
             }
@@ -189,17 +206,113 @@ public class PreferencesMigrations {
         }
     }
 
+    /**
+     * Migrate Import File Name and Directory name Patterns from versions <=4.0 to new BracketedPatterns
+     */
+    private static void migrateFileImportPattern(String oldStylePattern, String newStylePattern,
+            JabRefPreferences prefs, Preferences mainPrefsNode) {
+        String preferenceFileNamePattern = mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null);
+
+        if ((preferenceFileNamePattern != null) &&
+                oldStylePattern.equals(preferenceFileNamePattern)) {
+            // Upgrade the old-style File Name pattern to new one:
+            mainPrefsNode.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
+            LOGGER.info("migrated old style " + JabRefPreferences.IMPORT_FILENAMEPATTERN +
+                    " value \"" + oldStylePattern + "\" to new value \"" +
+                    newStylePattern + "\" in the preference file");
+
+            if (prefs.hasKey(JabRefPreferences.IMPORT_FILENAMEPATTERN)) {
+                // Update also the key in the current application settings, if necessary:
+                String fileNamePattern = prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN);
+                if (oldStylePattern.equals(fileNamePattern)) {
+                    prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
+                    LOGGER.info("migrated old style " + JabRefPreferences.IMPORT_FILENAMEPATTERN +
+                            " value \"" + oldStylePattern + "\" to new value \"" +
+                            newStylePattern + "\" in the running application");
+                }
+            }
+        }
+    }
+
+    static void upgradeImportFileAndDirePatterns() {
+        JabRefPreferences prefs = Globals.prefs;
+
+        Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+
+        // Migrate Import patterns
+        // Check for prefs node for Version <= 4.0
+        if (mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null) != null) {
+
+            String[] oldStylePatterns = new String[] {"\\bibtexkey",
+                    "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
+            String[] newStylePatterns = new String[] {"[bibtexkey]",
+                    "[bibtexkey] - [fulltitle]"};
+            for (int i = 0; i < oldStylePatterns.length; i++) {
+                migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
+            }
+        }
+        // Directory preferences are not yet migrated, since it is not quote clear how to parse and reinterpret
+        // the user defined old-style patterns, and the default pattern is "".
+    }
+
+    private static void upgradeKeyBindingsToJavaFX() {
+        UnaryOperator<String> replaceKeys = (str) -> {
+            String result = str.replace("ctrl ", "ctrl+");
+            result = result.replace("shift ", "shift+");
+            result = result.replace("alt ", "alt+");
+            result = result.replace("meta ", "meta+");
+
+            return result;
+        };
+
+        JabRefPreferences prefs = Globals.prefs;
+        List<String> keys = prefs.getStringList(JabRefPreferences.BINDINGS);
+        keys.replaceAll(replaceKeys);
+        prefs.putStringList(JabRefPreferences.BINDINGS, keys);
+
+    }
+
+    private static void addCrossRefRelatedFieldsForAutoComplete() {
+        JabRefPreferences prefs = Globals.prefs;
+        //LinkedHashSet because we want to retain the order and add new fields to the end
+        Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS));
+        keys.add("crossref");
+        keys.add("related");
+        keys.add("entryset");
+        prefs.putStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS, new ArrayList<>(keys));
+    }
+
     private static void migrateTypedKeyPrefs(JabRefPreferences prefs, Preferences oldPatternPrefs)
             throws BackingStoreException {
         LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
 
         GlobalBibtexKeyPattern keyPattern = GlobalBibtexKeyPattern.fromPattern(
-                prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)
-        );
+                prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         for (String key : oldPatternPrefs.keys()) {
             keyPattern.addBibtexKeyPattern(key, oldPatternPrefs.get(key, null));
         }
         prefs.putKeyPattern(keyPattern);
     }
 
+    private static void upgradeObsoleteLookAndFeels() {
+        JabRefPreferences prefs = Globals.prefs;
+        String currentLandF = prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
+
+        Stream.of("com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
+                "com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel",
+                "com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
+                .filter(style -> style.equals(currentLandF))
+                .findAny()
+                .ifPresent(loolAndFeel -> {
+                    if (OS.WINDOWS) {
+                        String windowsLandF = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+                        prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, windowsLandF);
+                        LOGGER.info("Switched from obsolete look and feel " + currentLandF + " to " + windowsLandF);
+                    } else {
+                        String nimbusLandF = "javax.swing.plaf.nimbus.NimbusLookAndFeel";
+                        prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, nimbusLandF);
+                        LOGGER.info("Switched from obsolete look and feel " + currentLandF + " to " + nimbusLandF);
+                    }
+                });
+    }
 }

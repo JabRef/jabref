@@ -15,8 +15,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
 import com.google.common.base.Strings;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -24,7 +24,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class GvkParser implements Parser {
-    private static final Log LOGGER = LogFactory.getLog(GvkParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GvkParser.class);
 
     @Override
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
@@ -32,7 +32,7 @@ public class GvkParser implements Parser {
             DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document content = dbuild.parse(inputStream);
             return this.parseEntries(content);
-        } catch (ParserConfigurationException|SAXException|IOException exception) {
+        } catch (ParserConfigurationException | SAXException | IOException exception) {
             throw new ParseException(exception);
         }
     }
@@ -353,7 +353,6 @@ public class GvkParser implements Parser {
             //entryType = "online";
         }
 
-
         /*
          * Wahrscheinlichkeit, dass ZDB-ID
          * vorhanden ist, ist größer als ISBN bei
@@ -451,6 +450,9 @@ public class GvkParser implements Parser {
     }
 
     private Element getChild(String name, Element e) {
+        if (e == null) {
+            return null;
+        }
         NodeList children = e.getChildNodes();
 
         int j = children.getLength();

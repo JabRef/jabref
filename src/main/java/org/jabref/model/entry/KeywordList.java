@@ -47,6 +47,9 @@ public class KeywordList implements Iterable<Keyword> {
             return new KeywordList();
         }
 
+        Objects.requireNonNull(delimiter);
+        Objects.requireNonNull(hierarchicalDelimiter);
+
         KeywordList keywordList = new KeywordList();
 
         StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
@@ -59,7 +62,11 @@ public class KeywordList implements Iterable<Keyword> {
     }
 
     /**
+     * Parses the keyword list and uses {@link Keyword#DEFAULT_HIERARCHICAL_DELIMITER} as hierarchical delimiter.
+     *
      * @param keywordString a String of keywordChains
+     * @param delimiter The delimiter used for separating the keywords
+     *
      * @return an parsed list containing the keywordChains
      */
     public static KeywordList parse(String keywordString, Character delimiter) {

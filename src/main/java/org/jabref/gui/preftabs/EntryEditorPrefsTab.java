@@ -9,19 +9,20 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JSpinner;
 import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
 
+import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
+import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.keyboard.EmacsKeyBindings;
-import org.jabref.logic.autocompleter.AutoCompleteFirstNameMode;
-import org.jabref.logic.autocompleter.AutoCompletePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+
+import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_ABBREVIATED;
+import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_FULL;
 
 class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
@@ -32,13 +33,13 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
     private final JCheckBox emacsRebindCtrlF;
     private final JCheckBox autoComplete;
     private final JCheckBox recommendations;
+    private final JCheckBox validation;
     private final JRadioButton autoCompBoth;
     private final JRadioButton autoCompFF;
     private final JRadioButton autoCompLF;
     private final JRadioButton firstNameModeFull;
     private final JRadioButton firstNameModeAbbr;
     private final JRadioButton firstNameModeBoth;
-    private final JSpinner shortestToComplete;
 
     private final JTextField autoCompFields;
     private final JabRefPreferences prefs;
@@ -47,7 +48,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 
     public EntryEditorPrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
-        autoCompletePreferences = new AutoCompletePreferences(prefs);
+        autoCompletePreferences = prefs.getAutoCompletePreferences();
         setLayout(new BorderLayout());
 
         autoOpenForm = new JCheckBox(Localization.lang("Open editor when a new entry is created"));
@@ -56,10 +57,8 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         emacsRebindCtrlA = new JCheckBox(Localization.lang("Rebind C-a, too"));
         emacsRebindCtrlF = new JCheckBox(Localization.lang("Rebind C-f, too"));
         autoComplete = new JCheckBox(Localization.lang("Enable word/name autocompletion"));
-        recommendations = new JCheckBox(Localization.lang("Show recommendations"));
-
-        shortestToComplete = new JSpinner(
-                new SpinnerNumberModel(autoCompletePreferences.getShortestLengthToComplete(), 1, 5, 1));
+        recommendations = new JCheckBox(Localization.lang("Show 'Related Articles' tab"));
+        validation = new JCheckBox(Localization.lang("Show validation messages"));
 
         // allowed name formats
         autoCompFF = new JRadioButton(Localization.lang("Autocomplete names in 'Firstname Lastname' format only"));
@@ -99,11 +98,11 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
                 (// columns
                  "8dlu, left:pref, 8dlu, fill:150dlu, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
                  // rows  1 to 10
-                 "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, " +
+                 "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu," +
                 // rows 11 to 16
                         "pref, 6dlu, pref, 6dlu, pref, 6dlu, " +
                         // rows 17 to 27
-                 "pref, 6dlu, pref, pref, pref, pref, 6dlu, pref, pref, pref, pref");
+                 "pref, 6dlu, pref, pref, pref, pref, 6dlu, pref, pref, pref, pref, pref");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         CellConstraints cc = new CellConstraints();
         builder.addSeparator(Localization.lang("Editor options"), cc.xyw(1, 1, 5));
@@ -113,29 +112,27 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         builder.add(emacsRebindCtrlA, cc.xy(2, 9));
         builder.add(emacsRebindCtrlF, cc.xy(2, 11));
         builder.add(recommendations, cc.xy(2,13));
+        builder.add(validation, cc.xy(2,15));
 
-        builder.addSeparator(Localization.lang("Autocompletion options"), cc.xyw(1, 15, 5));
-        builder.add(autoComplete, cc.xy(2, 17));
+        builder.addSeparator(Localization.lang("Autocompletion options"), cc.xyw(1, 17, 5));
+        builder.add(autoComplete, cc.xy(2, 19));
 
         DefaultFormBuilder builder3 = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:150dlu",""));
-        JLabel label = new JLabel(Localization.lang("Use autocompletion for the following fields")+":");
+        JLabel label = new JLabel(Localization.lang("Use autocompletion for the following fields") + ":");
 
         builder3.append(label);
         builder3.append(autoCompFields);
-        JLabel label2 = new JLabel(Localization.lang("Autocomplete after following number of characters") + ":");
-        builder3.append(label2);
-        builder3.append(shortestToComplete);
-        builder.add(builder3.getPanel(), cc.xyw(2, 19, 3));
+        builder.add(builder3.getPanel(), cc.xyw(2, 21, 3));
 
-        builder.addSeparator(Localization.lang("Name format used for autocompletion"), cc.xyw(2, 21, 4));
-        builder.add(autoCompFF, cc.xy(2, 22));
-        builder.add(autoCompLF, cc.xy(2, 23));
-        builder.add(autoCompBoth, cc.xy(2, 24));
+        builder.addSeparator(Localization.lang("Name format used for autocompletion"), cc.xyw(2, 23, 4));
+        builder.add(autoCompFF, cc.xy(2, 24));
+        builder.add(autoCompLF, cc.xy(2, 25));
+        builder.add(autoCompBoth, cc.xy(2, 26));
 
-        builder.addSeparator(Localization.lang("Treatment of first names"), cc.xyw(2, 26, 4));
-        builder.add(firstNameModeAbbr, cc.xy(2, 27));
-        builder.add(firstNameModeFull, cc.xy(2, 28));
-        builder.add(firstNameModeBoth, cc.xy(2, 29));
+        builder.addSeparator(Localization.lang("Treatment of first names"), cc.xyw(2, 29, 4));
+        builder.add(firstNameModeAbbr, cc.xy(2, 30));
+        builder.add(firstNameModeFull, cc.xy(2, 31));
+        builder.add(firstNameModeBoth, cc.xy(2, 32));
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -150,7 +147,6 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         firstNameModeAbbr.setEnabled(enabled);
         firstNameModeFull.setEnabled(enabled);
         firstNameModeBoth.setEnabled(enabled);
-        shortestToComplete.setEnabled(enabled);
     }
 
     @Override
@@ -161,9 +157,8 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         emacsRebindCtrlA.setSelected(prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA));
         emacsRebindCtrlF.setSelected(prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF));
         recommendations.setSelected(prefs.getBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS));
-        autoComplete.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE));
+        autoComplete.setSelected(autoCompletePreferences.shouldAutoComplete());
         autoCompFields.setText(autoCompletePreferences.getCompleteNamesAsString());
-        shortestToComplete.setValue(autoCompletePreferences.getShortestLengthToComplete());
 
         if (autoCompletePreferences.getOnlyCompleteFirstLast()) {
             autoCompFF.setSelected(true);
@@ -173,7 +168,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
             autoCompBoth.setSelected(true);
         }
 
-        switch (autoCompletePreferences.getFirstnameMode()) {
+        switch (autoCompletePreferences.getFirstNameMode()) {
         case ONLY_ABBREVIATED:
             firstNameModeAbbr.setSelected(true);
             break;
@@ -189,6 +184,8 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         emacsRebindCtrlA.setEnabled(emacsMode.isSelected());
         // Autocomplete fields is only enabled when autocompletion is selected
         setAutoCompleteElementsEnabled(autoComplete.isSelected());
+
+        validation.setSelected(prefs.getBoolean(JabRefPreferences.VALIDATE_IN_ENTRY_EDITOR));
     }
 
     @Override
@@ -196,6 +193,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.AUTO_OPEN_FORM, autoOpenForm.isSelected());
         prefs.putBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE, defSource.isSelected());
         prefs.putBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS, recommendations.isSelected());
+        prefs.putBoolean(JabRefPreferences.VALIDATE_IN_ENTRY_EDITOR, validation.isSelected());
         boolean emacsModeChanged = prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS) != emacsMode.isSelected();
         boolean emacsRebindCtrlAChanged = prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA) != emacsRebindCtrlA.isSelected();
         boolean emacsRebindCtrlFChanged = prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF) != emacsRebindCtrlF.isSelected();
@@ -218,8 +216,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
                 EmacsKeyBindings.load();
             }
         }
-        autoCompletePreferences.setShortestLengthToComplete((Integer) shortestToComplete.getValue());
-        prefs.putBoolean(JabRefPreferences.AUTO_COMPLETE, autoComplete.isSelected());
+        autoCompletePreferences.setShouldAutoComplete(autoComplete.isSelected());
         autoCompletePreferences.setCompleteNames(autoCompFields.getText());
         if (autoCompBoth.isSelected()) {
             autoCompletePreferences.setOnlyCompleteFirstLast(false);
@@ -234,12 +231,13 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
             autoCompletePreferences.setOnlyCompleteLastFirst(true);
         }
         if (firstNameModeAbbr.isSelected()) {
-            autoCompletePreferences.setFirstnameMode(AutoCompleteFirstNameMode.ONLY_ABBREVIATED);
+            autoCompletePreferences.setFirstNameMode(ONLY_ABBREVIATED);
         } else if (firstNameModeFull.isSelected()) {
-            autoCompletePreferences.setFirstnameMode(AutoCompleteFirstNameMode.ONLY_FULL);
+            autoCompletePreferences.setFirstNameMode(ONLY_FULL);
         } else {
-            autoCompletePreferences.setFirstnameMode(AutoCompleteFirstNameMode.BOTH);
+            autoCompletePreferences.setFirstNameMode(AutoCompleteFirstNameMode.BOTH);
         }
+        prefs.storeAutoCompletePreferences(autoCompletePreferences);
     }
 
     @Override

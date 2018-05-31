@@ -20,86 +20,6 @@ public class SaveOrderConfig {
     // quick hack for outside modifications
     public final SortCriterion[] sortCriteria = new SortCriterion[3];
 
-    public static SaveOrderConfig parse(List<String> orderedData) {
-        return new SaveOrderConfig(orderedData);
-    }
-
-    public static class SortCriterion {
-
-        public String field;
-        public boolean descending;
-
-
-        public SortCriterion() {
-            this.field = "";
-        }
-
-        public SortCriterion(String field, String descending) {
-            this.field = field;
-            this.descending = Boolean.parseBoolean(descending);
-        }
-
-        public SortCriterion(String field, boolean descending) {
-            this.field = field;
-            this.descending = descending;
-        }
-
-        @Override
-        public String toString() {
-            final StringBuilder sb = new StringBuilder("SortCriterion{");
-            sb.append("field='").append(field).append('\'');
-            sb.append(", descending=").append(descending);
-            sb.append('}');
-            return sb.toString();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if ((o == null) || (getClass() != o.getClass())) {
-                return false;
-            }
-            SortCriterion that = (SortCriterion) o;
-            return Objects.equals(descending, that.descending) &&
-                    Objects.equals(field, that.field);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(field, descending);
-        }
-    }
-
-    public SaveOrderConfig(boolean saveInOriginalOrder, SortCriterion first, SortCriterion second,
-            SortCriterion third) {
-        this.saveInOriginalOrder = saveInOriginalOrder;
-        sortCriteria[0] = first;
-        sortCriteria[1] = second;
-        sortCriteria[2] = third;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o instanceof SaveOrderConfig) {
-            SaveOrderConfig that = (SaveOrderConfig) o;
-            boolean sortCriteriaEquals = sortCriteria[0].equals(that.sortCriteria[0])
-                    && sortCriteria[1].equals(that.sortCriteria[1]) && sortCriteria[2].equals(that.sortCriteria[2]);
-
-            return Objects.equals(saveInOriginalOrder, that.saveInOriginalOrder) && sortCriteriaEquals;
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(saveInOriginalOrder, Arrays.hashCode(sortCriteria));
-    }
-
     public SaveOrderConfig() {
         // fill default values
         setSaveInOriginalOrder();
@@ -108,13 +28,12 @@ public class SaveOrderConfig {
         sortCriteria[2] = new SortCriterion();
     }
 
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("SaveOrderConfig{");
-        sb.append("saveInOriginalOrder=").append(saveInOriginalOrder);
-        sb.append(", sortCriteria=").append(Arrays.toString(sortCriteria));
-        sb.append('}');
-        return sb.toString();
+    public SaveOrderConfig(boolean saveInOriginalOrder, SortCriterion first, SortCriterion second,
+                           SortCriterion third) {
+        this.saveInOriginalOrder = saveInOriginalOrder;
+        sortCriteria[0] = first;
+        sortCriteria[1] = second;
+        sortCriteria[2] = third;
     }
 
     private SaveOrderConfig(List<String> data) {
@@ -146,6 +65,86 @@ public class SaveOrderConfig {
         } else {
             sortCriteria[2] = new SortCriterion();
         }
+    }
+    public static SaveOrderConfig parse(List<String> orderedData) {
+        return new SaveOrderConfig(orderedData);
+    }
+
+    public static class SortCriterion {
+
+        public String field;
+
+        public boolean descending;
+
+        public SortCriterion() {
+            this.field = "";
+        }
+
+        public SortCriterion(String field, String descending) {
+            this.field = field;
+            this.descending = Boolean.parseBoolean(descending);
+        }
+
+        public SortCriterion(String field, boolean descending) {
+            this.field = field;
+            this.descending = descending;
+        }
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder("SortCriterion{");
+            sb.append("field='").append(field).append('\'');
+            sb.append(", descending=").append(descending);
+            sb.append('}');
+            return sb.toString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if ((o == null) || (getClass() != o.getClass())) {
+                return false;
+            }
+            SortCriterion that = (SortCriterion) o;
+            return Objects.equals(descending, that.descending) &&
+                    Objects.equals(field, that.field);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(field, descending);
+        }
+
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o instanceof SaveOrderConfig) {
+            SaveOrderConfig that = (SaveOrderConfig) o;
+            boolean sortCriteriaEquals = sortCriteria[0].equals(that.sortCriteria[0])
+                    && sortCriteria[1].equals(that.sortCriteria[1]) && sortCriteria[2].equals(that.sortCriteria[2]);
+
+            return Objects.equals(saveInOriginalOrder, that.saveInOriginalOrder) && sortCriteriaEquals;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(saveInOriginalOrder, Arrays.hashCode(sortCriteria));
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("SaveOrderConfig{");
+        sb.append("saveInOriginalOrder=").append(saveInOriginalOrder);
+        sb.append(", sortCriteria=").append(Arrays.toString(sortCriteria));
+        sb.append('}');
+        return sb.toString();
     }
 
     public void setSaveInOriginalOrder() {

@@ -15,8 +15,8 @@ import org.jabref.gui.help.NewVersionDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.Version;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class VersionWorker extends SwingWorker<List<Version>, Void> {
 
-    private static final Log LOGGER = LogFactory.getLog(VersionWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VersionWorker.class);
 
     private final JabRefFrame mainFrame;
 
@@ -60,8 +60,8 @@ public class VersionWorker extends SwingWorker<List<Version>, Void> {
     }
 
     @Override
-    public void done(){
-        if (this.isCancelled()){
+    public void done() {
+        if (this.isCancelled()) {
             return;
         }
 

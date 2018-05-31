@@ -35,7 +35,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -44,11 +45,13 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.WindowLocation;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
@@ -56,15 +59,15 @@ import org.jabref.preferences.JabRefPreferences;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class produces a dialog box for managing term list files.
  */
 public class ProtectedTermsDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(ProtectedTermsDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsDialog.class);
 
     private final JabRefFrame frame;
     private JDialog diag;
@@ -87,11 +90,10 @@ public class ProtectedTermsDialog {
     private boolean okPressed;
     private final ProtectedTermsLoader loader;
 
-
-    public ProtectedTermsDialog(JabRefFrame frame, ProtectedTermsLoader loader) {
+    public ProtectedTermsDialog(JabRefFrame frame) {
 
         this.frame = Objects.requireNonNull(frame);
-        this.loader = Objects.requireNonNull(loader);
+        this.loader = Globals.protectedTermsLoader;
         init();
 
     }
@@ -116,7 +118,6 @@ public class ProtectedTermsDialog {
             tableModel.fireTableDataChanged();
         });
         newButton.setToolTipText(Localization.lang("New protected terms file"));
-
 
         setupTable();
 
@@ -282,7 +283,6 @@ public class ProtectedTermsDialog {
         diag.setVisible(visible);
     }
 
-
     /**
      * Get the currently selected term list.
      * @return the selected term list, or empty if no term list is selected.
@@ -294,8 +294,8 @@ public class ProtectedTermsDialog {
         return Optional.empty();
     }
 
-
     class TermTableModel extends DefaultTableModel {
+
         @Override
         public int getColumnCount() {
             return 3;
@@ -396,7 +396,6 @@ public class ProtectedTermsDialog {
         dd.setVisible(true);
     }
 
-
     /**
      * The listener for the table monitoring the current selection.
      */
@@ -427,15 +426,19 @@ public class ProtectedTermsDialog {
         private final JTextField newFile = new JTextField();
         private boolean addOKPressed;
 
-
         public AddFileDialog() {
             super(diag, Localization.lang("Add protected terms file"), true, AddFileDialog.class);
 
             JButton browse = new JButton(Localization.lang("Browse"));
-            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.TERMS);
-            dialog.setDefaultExtension(FileExtensions.TERMS);
+            FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                    .addExtensionFilter(FileType.TERMS)
+                    .withDefaultExtension(FileType.TERMS)
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+            DialogService ds = new FXDialogService();
+
             browse.addActionListener(e -> {
-                Optional<Path> file = dialog.showDialogAndGetSelectedFile();
+                Optional<Path> file = DefaultTaskExecutor
+                        .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
                 file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
             });
 
@@ -489,7 +492,6 @@ public class ProtectedTermsDialog {
         }
 
     }
-
 
     private void storePreferences() {
         Globals.prefs.setProtectedTermsPreferences(loader);

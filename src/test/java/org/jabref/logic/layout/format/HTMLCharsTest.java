@@ -2,16 +2,16 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HTMLCharsTest {
 
     private LayoutFormatter layout;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         layout = new HTMLChars();
     }
@@ -83,6 +83,11 @@ public class HTMLCharsTest {
     /*
      * Is missing a lot of test cases for the individual chars...
      */
+
+    @Test
+    public void testQuoteSingle() {
+        assertEquals("&#39;", layout.format("{\\textquotesingle}"));
+    }
 
     @Test
     public void unknownCommandIsKept() {

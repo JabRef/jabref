@@ -1,7 +1,6 @@
 package org.jabref.gui.exporter;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
@@ -13,12 +12,15 @@ import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import org.jabref.collab.ChangeScanner;
-import org.jabref.collab.FileUpdatePanel;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
+import org.jabref.gui.collab.ChangeScanner;
+import org.jabref.gui.collab.FileUpdatePanel;
+import org.jabref.gui.dialogs.AutosaveUIManager;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
@@ -29,20 +31,19 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.SaveSession;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.DatabaseLocation;
 import org.jabref.model.database.event.ChangePropagation;
+import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.shared.DBMSConnectionProperties;
-import org.jabref.shared.prefs.SharedDatabasePreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for
@@ -52,7 +53,8 @@ import org.apache.commons.logging.LogFactory;
  * Callers can query whether the operation was canceled, or whether it was successful.
  */
 public class SaveDatabaseAction extends AbstractWorker {
-    private static final Log LOGGER = LogFactory.getLog(SaveDatabaseAction.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);
 
     private final BasePanel panel;
     private final JabRefFrame frame;
@@ -61,7 +63,6 @@ public class SaveDatabaseAction extends AbstractWorker {
     private boolean fileLockedError;
 
     private Optional<Path> filePath;
-
 
     public SaveDatabaseAction(BasePanel panel) {
         this.panel = panel;
@@ -126,9 +127,6 @@ public class SaveDatabaseAction extends AbstractWorker {
         }
 
         try {
-            // Make sure the current edit is stored
-            panel.storeCurrentEdit();
-
             // If set in preferences, generate missing BibTeX keys
             panel.autoGenerateKeysBeforeSaving();
 
@@ -142,9 +140,10 @@ public class SaveDatabaseAction extends AbstractWorker {
 
                 // Save the database
                 success = saveDatabase(panel.getBibDatabaseContext().getDatabaseFile().get(), false,
-                        panel.getBibDatabaseContext().getMetaData().getEncoding().orElse(Globals.prefs.getDefaultEncoding()));
+                        panel.getBibDatabaseContext().getMetaData().getEncoding()
+                                .orElse(Globals.prefs.getDefaultEncoding()));
 
-                Globals.getFileUpdateMonitor().updateTimeStamp(panel.getFileMonitorHandle());
+                panel.updateTimeStamp();
             } else {
                 success = false;
                 fileLockedError = true;
@@ -160,7 +159,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 // since last save:
                 panel.setNonUndoableChange(false);
                 panel.setBaseChanged(false);
-                panel.setUpdatedExternally(false);
+                panel.markExternalChangesAsResolved();
             }
         } catch (SaveException ex) {
             if (ex == SaveException.FILE_LOCKED) {
@@ -179,11 +178,12 @@ public class SaveDatabaseAction extends AbstractWorker {
         frame.block();
 
         try {
-            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(encoding);
+            SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences().withEncoding(encoding);
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
 
             if (selectedOnly) {
-                session = databaseWriter.savePartOfDatabase(panel.getBibDatabaseContext(), panel.getSelectedEntries(), prefs);
+                session = databaseWriter.savePartOfDatabase(panel.getBibDatabaseContext(), panel.getSelectedEntries(),
+                        prefs);
             } else {
                 session = databaseWriter.saveDatabase(panel.getBibDatabaseContext(), prefs);
             }
@@ -221,10 +221,12 @@ public class SaveDatabaseAction extends AbstractWorker {
         // handle encoding problems
         boolean success = true;
         if (!session.getWriter().couldEncodeAll()) {
-            FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, fill:pref", "pref, 4dlu, pref"));
+            FormBuilder builder = FormBuilder.create()
+                    .layout(new FormLayout("left:pref, 4dlu, fill:pref", "pref, 4dlu, pref"));
             JTextArea ta = new JTextArea(session.getWriter().getProblemCharacters());
             ta.setEditable(false);
-            builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters:", session.getEncoding().displayName())).xy(1, 1);
+            builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters:",
+                    session.getEncoding().displayName())).xy(1, 1);
             builder.add(ta).xy(3, 1);
             builder.add(Localization.lang("What do you want to do?")).xy(1, 3);
             String tryDiff = Localization.lang("Try different encoding");
@@ -289,11 +291,15 @@ public class SaveDatabaseAction extends AbstractWorker {
 
     public void saveAs() throws Exception {
         // configure file dialog
-        FileDialog dialog = new FileDialog(frame);
-        dialog.withExtension(FileExtensions.BIBTEX_DB);
-        dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
 
-        Optional<Path> path = dialog.saveNewFile();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(FileType.BIBTEX_DB)
+                .withDefaultExtension(FileType.BIBTEX_DB)
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+        DialogService ds = new FXDialogService();
+
+        Optional<Path> path = DefaultTaskExecutor
+                .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
         if (path.isPresent()) {
             saveAs(path.get().toFile());
         } else {
@@ -311,8 +317,9 @@ public class SaveDatabaseAction extends AbstractWorker {
 
         if (context.getLocation() == DatabaseLocation.SHARED) {
             // Save all properties dependent on the ID. This makes it possible to restore them.
-            DBMSConnectionProperties properties = context.getDBMSSynchronizer().getDBProcessor().getDBMSConnectionProperties();
-            new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID()).putAllDBMSConnectionProperties(properties);
+            new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID())
+                    .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
+
         }
 
         context.setDatabaseFile(file);
@@ -324,14 +331,19 @@ public class SaveDatabaseAction extends AbstractWorker {
         if (!success) {
             return;
         }
-        // Register so we get notifications about outside changes to the file.
 
-        try {
-            panel.setFileMonitorHandle(Globals.getFileUpdateMonitor().addUpdateListener(panel,
-                    context.getDatabaseFile().orElse(null)));
-        } catch (IOException ex) {
-            LOGGER.error("Problem registering file change notifications", ex);
+        Optional<Path> databasePath = context.getDatabasePath();
+        if (databasePath.isPresent()) {
+            final Path oldFile = databasePath.get();
+            context.setDatabaseFile(oldFile.toFile());
+            //closing AutosaveManager and BackupManager for original library
+            AutosaveManager.shutdown(context);
+            BackupManager.shutdown(context);
+        } else {
+            LOGGER.info("Old file not found, just creating a new file");
         }
+        context.setDatabaseFile(file);
+        panel.resetChangeMonitor();
 
         if (readyForAutosave(context)) {
             AutosaveManager autosaver = AutosaveManager.start(context);
@@ -347,13 +359,15 @@ public class SaveDatabaseAction extends AbstractWorker {
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {
-        return (context.getLocation() == DatabaseLocation.SHARED ||
-                ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE))) &&
+        return ((context.getLocation() == DatabaseLocation.SHARED) ||
+                ((context.getLocation() == DatabaseLocation.LOCAL)
+                        && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
+                &&
                 context.getDatabaseFile().isPresent();
     }
 
     private boolean readyForBackup(BibDatabaseContext context) {
-        return context.getLocation() == DatabaseLocation.LOCAL && context.getDatabaseFile().isPresent();
+        return (context.getLocation() == DatabaseLocation.LOCAL) && context.getDatabaseFile().isPresent();
     }
 
     /**
@@ -384,8 +398,7 @@ public class SaveDatabaseAction extends AbstractWorker {
      */
     private boolean checkExternalModification() {
         // Check for external modifications:
-        if (panel.isUpdatedExternally()
-                || Globals.getFileUpdateMonitor().hasBeenModified(panel.getFileMonitorHandle())) {
+        if (panel.isUpdatedExternally()) {
             String[] opts = new String[] {Localization.lang("Review changes"), Localization.lang("Save"),
                     Localization.lang("Cancel")};
             int answer = JOptionPane.showOptionDialog(panel.frame(),
@@ -408,13 +421,14 @@ public class SaveDatabaseAction extends AbstractWorker {
                     }
 
                     ChangeScanner scanner = new ChangeScanner(panel.frame(), panel,
-                            panel.getBibDatabaseContext().getDatabaseFile().get());
+                            panel.getBibDatabaseContext().getDatabaseFile().get(), panel.getTempFile());
                     JabRefExecutorService.INSTANCE.executeInterruptableTaskAndWait(scanner);
                     if (scanner.changesFound()) {
                         scanner.displayResult(resolved -> {
                             if (resolved) {
-                                panel.setUpdatedExternally(false);
-                                SwingUtilities.invokeLater(() -> panel.getSidePaneManager().hide(FileUpdatePanel.class));
+                                panel.markExternalChangesAsResolved();
+                                SwingUtilities
+                                        .invokeLater(() -> panel.getSidePaneManager().hide(FileUpdatePanel.class));
                             } else {
                                 canceled = true;
                             }
@@ -431,7 +445,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                             Localization.lang("Protected library"), JOptionPane.ERROR_MESSAGE);
                     canceled = true;
                 } else {
-                    panel.setUpdatedExternally(false);
+                    panel.markExternalChangesAsResolved();
                     panel.getSidePaneManager().hide(FileUpdatePanel.class);
                 }
             }

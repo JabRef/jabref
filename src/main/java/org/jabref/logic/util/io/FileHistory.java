@@ -6,9 +6,9 @@ import java.util.Objects;
 
 public class FileHistory {
 
-    private final LinkedList<String> history;
-
     private static final int HISTORY_SIZE = 8;
+
+    private final LinkedList<String> history;
 
 
     public FileHistory(List<String> fileList) {

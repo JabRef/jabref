@@ -5,7 +5,6 @@ import java.util.Objects;
 
 import org.jabref.gui.search.SearchDisplayMode;
 
-
 public class SearchPreferences {
 
     private static final String SEARCH_GLOBAL = "searchGlobal";

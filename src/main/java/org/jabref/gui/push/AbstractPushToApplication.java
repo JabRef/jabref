@@ -9,7 +9,10 @@ import javax.swing.JTextField;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
@@ -19,15 +22,15 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract class for pushing entries into different editors.
  */
 public abstract class AbstractPushToApplication implements PushToApplication {
 
-    private static final Log LOGGER = LogFactory.getLog(AbstractPushToApplication.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPushToApplication.class);
 
     protected boolean couldNotCall; // Set to true in case the command could not be executed, e.g., if the file is not found
     protected boolean couldNotConnect; // Set to true in case the tunnel to the program (if one is used) does not operate
@@ -37,7 +40,6 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected String commandPath;
     protected String commandPathPreferenceKey;
     protected FormBuilder builder;
-
 
     @Override
     public String getName() {
@@ -69,9 +71,23 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         try {
             if (OS.OS_X) {
                 String[] commands = getCommandLine(keyString);
-                Runtime.getRuntime().exec("open -a " + commands[0] + " -n --args " + commands[1] + " " + commands[2]);
+                if (commands.length < 3) {
+                    LOGGER.error("Commandline does not contain enough parameters to \"push to application\"");
+                    return;
+                }
+                ProcessBuilder processBuilder = new ProcessBuilder(
+                        "open",
+                        "-a",
+                        commands[0],
+                        "-n",
+                        "--args",
+                        commands[1],
+                        commands[2]
+                );
+                processBuilder.start();
             } else {
-                Runtime.getRuntime().exec(getCommandLine(keyString));
+                ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
+                processBuilder.start();
             }
         }
 
@@ -157,10 +173,14 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         builder.add(label.toString()).xy(1, 1);
         builder.add(path).xy(3, 1);
         JButton browse = new JButton(Localization.lang("Browse"));
-        browse.addActionListener(e ->
-                new FileDialog(null).showDialogAndGetSelectedFile()
-                        .ifPresent(f -> path.setText(f.toAbsolutePath().toString()))
-        );
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+        DialogService ds = new FXDialogService();
+
+        browse.addActionListener(
+                e -> DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration))
+                        .ifPresent(f -> path.setText(f.toAbsolutePath().toString())));
         builder.add(browse).xy(5, 1);
         settings = builder.build();
     }

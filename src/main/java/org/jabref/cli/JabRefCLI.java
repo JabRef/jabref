@@ -1,10 +1,8 @@
 package org.jabref.cli;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.Globals;
-import org.jabref.logic.exporter.ExportFormats;
 import org.jabref.logic.l10n.Localization;
 
 import org.apache.commons.cli.CommandLine;
@@ -13,16 +11,14 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JabRefCLI {
 
-    private static final Log LOGGER = LogFactory.getLog(JabRefCLI.class);
-
-    private List<String> leftOver;
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCLI.class);
     private final CommandLine cl;
-
+    private List<String> leftOver;
 
     public JabRefCLI(String[] args) {
 
@@ -30,13 +26,20 @@ public class JabRefCLI {
 
         try {
             this.cl = new DefaultParser().parse(options, args);
-            this.leftOver = Arrays.asList(cl.getArgs());
+            this.leftOver = cl.getArgList();
         } catch (ParseException e) {
             LOGGER.warn("Problem parsing arguments", e);
 
             this.printUsage();
             throw new RuntimeException();
         }
+    }
+
+    public static String getExportMatchesSyntax() {
+        return String.format("[%s]searchTerm,outputFile: %s[,%s]",
+                Localization.lang("field"),
+                Localization.lang("file"),
+                Localization.lang("exportFormat"));
     }
 
     public boolean isHelp() {
@@ -91,6 +94,14 @@ public class JabRefCLI {
         return cl.getOptionValue("output");
     }
 
+    public boolean isBibtexImport() {
+        return cl.hasOption("importBibtex");
+    }
+
+    public String getBibtexImport() {
+        return cl.getOptionValue("importBibtex");
+    }
+
     public boolean isFileImport() {
         return cl.hasOption("import");
     }
@@ -137,7 +148,7 @@ public class JabRefCLI {
 
     public boolean isGenerateBibtexKeys() { return cl.hasOption("generateBibtexKeys"); }
 
-    public boolean isAutomaticallySetFileLinks() { return cl.hasOption("automaticallySetFileLinks");}
+    public boolean isAutomaticallySetFileLinks() { return cl.hasOption("automaticallySetFileLinks"); }
 
     private Options getOptions() {
         Options options = new Options();
@@ -149,12 +160,23 @@ public class JabRefCLI {
         options.addOption("b", "blank", false, Localization.lang("Do not open any files at startup"));
         options.addOption(null, "debug", false, Localization.lang("Show debug level messages"));
 
+        // The "-console" option is handled by the install4j launcher
+        options.addOption(null, "console", false, Localization.lang("Show console output (only necessary when the launcher is used)"));
+
         options.addOption(Option.builder("i").
                 longOpt("import").
                 desc(String.format("%s: %s[,import format]", Localization.lang("Import file"),
                         Localization.lang("filename"))).
                 hasArg().
                 argName("FILE").build());
+
+        options.addOption(
+                Option.builder("ib")
+                      .longOpt("importBibtex")
+                      .desc(String.format("%s: %s[,importBibtex bibtexString]", Localization.lang("Import") + " " + Localization.BIBTEX, Localization.lang("filename")))
+                      .hasArg()
+                      .argName("FILE")
+                      .build());
 
         options.addOption(Option.builder("o").
                 longOpt("output").
@@ -237,10 +259,10 @@ public class JabRefCLI {
         String importFormats = Globals.IMPORT_FORMAT_READER.getImportFormatList();
         String importFormatsList = String.format("%s:%n%s%n", Localization.lang("Available import formats"), importFormats);
 
-        String outFormats = ExportFormats.getConsoleExportList(70, 20, "");
+        String outFormats = Globals.exportFactory.getExportersAsString(70, 20, "");
         String outFormatsList = String.format("%s: %s%n", Localization.lang("Available export formats"), outFormats);
 
-        String footer = '\n' + importFormatsList + outFormatsList + "\nPlease report issues at https://github.com/JabRef/jabref/issues";
+        String footer = '\n' + importFormatsList + outFormatsList + "\nPlease report issues at https://github.com/JabRef/jabref/issues.";
 
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("jabref [OPTIONS] [BIBTEX_FILE]\n\nOptions:", header, getOptions(), footer, true);
@@ -252,12 +274,5 @@ public class JabRefCLI {
 
     public List<String> getLeftOver() {
         return leftOver;
-    }
-
-    public static String getExportMatchesSyntax() {
-        return String.format("[%s]searchTerm,outputFile: %s[,%s]",
-                Localization.lang("field"),
-                Localization.lang("file"),
-                Localization.lang("exportFormat"));
     }
 }

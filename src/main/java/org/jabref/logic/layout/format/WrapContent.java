@@ -18,7 +18,6 @@ public class WrapContent extends AbstractParamLayoutFormatter {
     private String before;
     private String after;
 
-
     @Override
     public void setArgument(String arg) {
         List<String> parts = AbstractParamLayoutFormatter.parseArgument(arg);

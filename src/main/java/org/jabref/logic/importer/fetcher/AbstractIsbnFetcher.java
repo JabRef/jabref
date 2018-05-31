@@ -8,6 +8,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.identifier.ISBN;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 public abstract class AbstractIsbnFetcher implements IdBasedParserFetcher {
 
@@ -25,13 +26,13 @@ public abstract class AbstractIsbnFetcher implements IdBasedParserFetcher {
     protected void ensureThatIsbnIsValid(String identifier) throws FetcherException {
         ISBN isbn = new ISBN(identifier);
         if (!isbn.isValid()) {
-            throw new FetcherException(Localization.lang("Invalid_ISBN:_'%0'.", identifier));
+            throw new FetcherException(Localization.lang("Invalid ISBN: '%0'.", identifier));
         }
     }
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(importFormatPreferences);
+        return new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
     }
 
 }

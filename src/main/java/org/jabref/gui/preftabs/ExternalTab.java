@@ -129,7 +129,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         pdfLayoutConstrains.gridx = 2;
         pdfOptionPanel.add(browseAdobeAcrobatReader, pdfLayoutConstrains);
 
-        if(OS.WINDOWS){
+        if (OS.WINDOWS) {
             readerOptions.add(sumatraReader);
             browseSumatraReader.addActionListener(e -> showSumatraChooser());
             pdfLayoutConstrains.gridy = 1;
@@ -221,10 +221,10 @@ class ExternalTab extends JPanel implements PrefsTab {
         consoleCommand.setText(Globals.prefs.get(JabRefPreferences.CONSOLE_COMMAND));
 
         adobeAcrobatReaderPath.setText(Globals.prefs.get(JabRefPreferences.ADOBE_ACROBAT_COMMAND));
-        if(OS.WINDOWS){
+        if (OS.WINDOWS) {
             sumatraReaderPath.setText(Globals.prefs.get(JabRefPreferences.SUMATRA_PDF_COMMAND));
 
-            if(Globals.prefs.get(JabRefPreferences.USE_PDF_READER).equals(adobeAcrobatReaderPath.getText())){
+            if (Globals.prefs.get(JabRefPreferences.USE_PDF_READER).equals(adobeAcrobatReaderPath.getText())) {
                 adobeAcrobatReader.setSelected(true);
             } else if (Globals.prefs.get(JabRefPreferences.USE_PDF_READER).equals(sumatraReaderPath.getText())) {
                 sumatraReader.setSelected(true);
@@ -242,7 +242,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION, defaultConsole.isSelected());
         prefs.put(JabRefPreferences.CONSOLE_COMMAND, consoleCommand.getText());
         prefs.put(JabRefPreferences.ADOBE_ACROBAT_COMMAND, adobeAcrobatReaderPath.getText());
-        if(OS.WINDOWS) {
+        if (OS.WINDOWS) {
             prefs.put(JabRefPreferences.SUMATRA_PDF_COMMAND, sumatraReaderPath.getText());
         }
         readerSelected();
@@ -271,7 +271,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         }
     }
 
-    private void showAdobeChooser(){
+    private void showAdobeChooser() {
         JFileChooser adobeChooser = new JFileChooser();
         int answer = adobeChooser.showOpenDialog(ExternalTab.this);
         if (answer == JFileChooser.APPROVE_OPTION) {
@@ -288,7 +288,7 @@ class ExternalTab extends JPanel implements PrefsTab {
     }
 
     private void readerSelected() {
-        if(adobeAcrobatReader.isSelected()) {
+        if (adobeAcrobatReader.isSelected()) {
             prefs.put(JabRefPreferences.USE_PDF_READER, adobeAcrobatReaderPath.getText());
         }
         else if (sumatraReader.isSelected()) {

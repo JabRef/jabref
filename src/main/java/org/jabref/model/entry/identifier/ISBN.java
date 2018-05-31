@@ -1,10 +1,15 @@
 package org.jabref.model.entry.identifier;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ISBN {
+import org.jabref.model.entry.FieldName;
+
+public class ISBN implements Identifier {
 
     private static final Pattern ISBN_PATTERN = Pattern.compile("^(\\d{9}[\\dxX]|\\d{13})$");
 
@@ -15,12 +20,18 @@ public class ISBN {
         this.isbnString = Objects.requireNonNull(isbnString).trim().replace("-", "");
     }
 
+    public static Optional<ISBN> parse(String input) {
+        ISBN isbn = new ISBN(input);
+        if (isbn.isValid()) {
+            return Optional.of(isbn);
+        } else {
+            return Optional.empty();
+        }
+    }
+
     public boolean isValidFormat() {
         Matcher isbnMatcher = ISBN_PATTERN.matcher(isbnString);
-        if (isbnMatcher.matches()) {
-            return true;
-        }
-        return false;
+        return isbnMatcher.matches();
     }
 
     public boolean isValidChecksum() {
@@ -75,5 +86,24 @@ public class ISBN {
 
     public boolean isValid() {
         return isValidFormat() && isValidChecksum();
+    }
+
+    @Override
+    public String getDefaultField() {
+        return FieldName.ISBN;
+    }
+
+    @Override
+    public String getNormalized() {
+        return isbnString;
+    }
+
+    @Override
+    public Optional<URI> getExternalURI() {
+        try {
+            return Optional.of(new URI("http://www.worldcat.org/isbn/" + isbnString));
+        } catch (URISyntaxException e) {
+            return Optional.empty();
+        }
     }
 }

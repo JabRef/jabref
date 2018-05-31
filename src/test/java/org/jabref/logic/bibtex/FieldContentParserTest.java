@@ -4,19 +4,19 @@ import java.util.Collections;
 
 import org.jabref.logic.util.OS;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FieldContentParserTest {
 
     private FieldContentParser parser;
-    private FieldContentParserPreferences prefs;
 
-    @Before
+
+    @BeforeEach
     public void setUp() throws Exception {
-        prefs = new FieldContentParserPreferences(Collections.emptyList());
+        FieldContentParserPreferences prefs = new FieldContentParserPreferences(Collections.emptyList());
         parser = new FieldContentParser(prefs);
     }
 

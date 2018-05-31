@@ -14,12 +14,12 @@ import javax.swing.text.LayeredHighlighter.LayerPainter;
 import org.jabref.gui.fieldeditors.JTextAreaWithHighlighting;
 import org.jabref.logic.search.SearchQueryHighlightListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JEditorPaneWithHighlighting extends JEditorPane implements SearchQueryHighlightListener {
 
-    private static final Log LOGGER = LogFactory.getLog(JTextAreaWithHighlighting.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JTextAreaWithHighlighting.class);
 
     public void highlightPattern(Optional<Pattern> highlightPattern) {
         Highlighter highlighter = getHighlighter();
@@ -42,7 +42,6 @@ public class JEditorPaneWithHighlighting extends JEditorPane implements SearchQu
             }
         }
     }
-
 
     private String getDocumentText() {
         Document doc = getDocument();

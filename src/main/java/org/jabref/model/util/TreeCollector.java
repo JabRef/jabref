@@ -40,7 +40,7 @@ public class TreeCollector<T> implements Collector<T, ObservableList<T>, Observa
     }
 
     public static <T extends TreeNode<T>> TreeCollector<T> mergeIntoTree(BiPredicate<T, T> equivalence) {
-        return new TreeCollector<T>(
+        return new TreeCollector<>(
                 TreeNode::getChildren,
                 (parent, child) -> child.moveTo(parent),
                 equivalence);

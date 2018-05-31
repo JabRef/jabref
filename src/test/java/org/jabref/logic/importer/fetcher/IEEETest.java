@@ -5,92 +5,88 @@ import java.net.URL;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.support.DevEnvironment;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.support.DisabledOnCIServer;
+import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-@Category(FetcherTests.class)
-public class IEEETest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@FetcherTest
+class IEEETest {
+
     private IEEE finder;
     private BibEntry entry;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         finder = new IEEE();
         entry = new BibEntry();
     }
 
     @Test
-    public void doiNotPresent() throws IOException {
-        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void rejectNullParameter() throws IOException {
-        finder.findFullText(null);
-        Assert.fail();
-    }
-
-    @Test
-    public void findByDOI() throws IOException {
+    void findByDOI() throws IOException {
         entry.setField("doi", "10.1109/ACCESS.2016.2535486");
 
-        Assert.assertEquals(
+        assertEquals(
                 Optional.of(
-                        new URL("http://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
+                        new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
                 finder.findFullText(entry));
     }
 
     @Test
-    public void findByURL() throws IOException {
-        entry.setField("url", "http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7421926");
-
-        Assert.assertEquals(
+    void findByDocumentUrl() throws IOException {
+        entry.setField("url", "https://ieeexplore.ieee.org/document/7421926/");
+        assertEquals(
                 Optional.of(
-                        new URL("http://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
+                        new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
                 finder.findFullText(entry));
     }
 
     @Test
-    public void findByOldURL() throws IOException {
-        entry.setField("url", "http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7421926");
+    void findByURL() throws IOException {
+        entry.setField("url", "https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7421926");
 
-        Assert.assertEquals(
+        assertEquals(
                 Optional.of(
-                        new URL("http://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
+                        new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
                 finder.findFullText(entry));
     }
 
     @Test
-    public void findByDOIButNotURL() throws IOException {
+    void findByOldURL() throws IOException {
+        entry.setField("url", "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7421926");
+
+        assertEquals(
+                Optional.of(
+                        new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
+                finder.findFullText(entry));
+    }
+
+    @Test
+    void findByDOIButNotURL() throws IOException {
         entry.setField("doi", "10.1109/ACCESS.2016.2535486");
         entry.setField("url", "http://dx.doi.org/10.1109/ACCESS.2016.2535486");
 
-        Assert.assertEquals(
+        assertEquals(
                 Optional.of(
-                        new URL("http://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
+                        new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
                 finder.findFullText(entry));
     }
 
     @Test
-    public void notFoundByURL() throws IOException {
-        // CI server is unreliable
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
+    @DisabledOnCIServer("CI server is unreliable")
+    void notFoundByURL() throws IOException {
         entry.setField("url", "http://dx.doi.org/10.1109/ACCESS.2016.2535486");
 
-        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
+        assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
-    public void notFoundByDOI() throws IOException {
+    void notFoundByDOI() throws IOException {
         entry.setField("doi", "10.1021/bk-2006-WWW.ch014");
 
-        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
+        assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 }

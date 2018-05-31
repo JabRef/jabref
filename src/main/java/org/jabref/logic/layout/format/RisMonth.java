@@ -1,9 +1,10 @@
 package org.jabref.logic.layout.format;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import org.jabref.logic.layout.LayoutFormatter;
-import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.Month;
 
 public class RisMonth implements LayoutFormatter {
 
@@ -13,12 +14,7 @@ public class RisMonth implements LayoutFormatter {
             return "";
         }
 
-        MonthUtil.Month m = MonthUtil.getMonthByShortName(month);
-        if (m.isValid()) {
-            return m.twoDigitNumber;
-        } else {
-            return month.toLowerCase(Locale.ROOT);
-        }
+        Optional<Month> parsedMonth = Month.getMonthByShortName(month);
+        return parsedMonth.map(Month::getTwoDigitNumber).orElse(month.toLowerCase(Locale.ROOT));
     }
-
 }

@@ -5,31 +5,31 @@ import java.util.Locale;
 
 import javax.swing.filechooser.FileFilter;
 
-import org.jabref.logic.exporter.IExportFormat;
+import org.jabref.logic.exporter.Exporter;
+import org.jabref.logic.util.FileType;
 
 /**
  * File filter that lets the user choose export format while choosing file to
- * export to. Contains a reference to the ExportFormat in question.
+ * export to. Contains a reference to the TemplateExporter in question.
  */
 public class ExportFileFilter extends FileFilter implements Comparable<ExportFileFilter> {
 
-    private final IExportFormat format;
-    private final String extension;
+    private final Exporter format;
+    private final FileType extension;
     private final String name;
 
-
-    public ExportFileFilter(IExportFormat format) {
+    public ExportFileFilter(Exporter format) {
         this.format = format;
-        this.extension = format.getExtension();
+        this.extension = format.getFileType();
         this.name = format.getDisplayName() + " (*" + extension
                 + ')';
     }
 
-    public IExportFormat getExportFormat() {
+    public Exporter getExportFormat() {
         return format;
     }
 
-    public String getExtension() {
+    public FileType getExtension() {
         return extension;
     }
 
@@ -38,7 +38,7 @@ public class ExportFileFilter extends FileFilter implements Comparable<ExportFil
         if (file.isDirectory()) {
             return true;
         } else {
-            return file.getPath().toLowerCase(Locale.ROOT).endsWith(extension);
+            return file.getPath().toLowerCase(Locale.ROOT).endsWith(extension.getExtensions().toString());
         }
     }
 

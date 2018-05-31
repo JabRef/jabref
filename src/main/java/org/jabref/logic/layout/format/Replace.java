@@ -38,7 +38,6 @@ public class Replace extends AbstractParamLayoutFormatter {
     private String regex;
     private String replaceWith;
 
-
     @Override
     public void setArgument(String arg) {
         List<String> parts = AbstractParamLayoutFormatter.parseArgument(arg);

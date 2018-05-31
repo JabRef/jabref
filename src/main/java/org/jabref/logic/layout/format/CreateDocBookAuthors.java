@@ -12,7 +12,6 @@ public class CreateDocBookAuthors implements LayoutFormatter {
 
     private static final XMLChars XML_CHARS = new XMLChars();
 
-
     @Override
     public String format(String fieldText) {
 

@@ -31,7 +31,7 @@ public class CrossrefFetcherEvaluator {
     public static void main(String[] args) throws IOException, InterruptedException {
         Globals.prefs = JabRefPreferences.getInstance();
         try (FileReader reader = new FileReader(args[0])) {
-            BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
+            BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
             ParserResult result = parser.parse(reader);
             BibDatabase db = result.getDatabase();
 
@@ -53,7 +53,7 @@ public class CrossrefFetcherEvaluator {
 
                     @Override
                     public void run() {
-                        Optional<DOI> origDOI = entry.getField(FieldName.DOI).flatMap(DOI::build);
+                        Optional<DOI> origDOI = entry.getField(FieldName.DOI).flatMap(DOI::parse);
                         if (origDOI.isPresent()) {
                             dois.incrementAndGet();
                             try {

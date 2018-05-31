@@ -9,7 +9,6 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.swing.Icon;
@@ -31,6 +30,7 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.menus.RightClickMenu;
@@ -39,39 +39,36 @@ import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
-import org.jabref.preferences.PreviewPreferences;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * List event, mouse, key and focus listener for the main table that makes up the
  * most part of the BasePanel for a single BIB database.
  */
 public class MainTableSelectionListener implements ListEventListener<BibEntry>, MouseListener, KeyListener, FocusListener {
-    private static final Log LOGGER = LogFactory.getLog(MainTableSelectionListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainTableSelectionListener.class);
 
     private final MainTable table;
     private final BasePanel panel;
 
     private final EventList<BibEntry> tableRows;
-    private PreviewPanel preview;
-    private boolean previewActive = Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled();
-
-    private boolean workingOnPreview;
-
-    private boolean enabled = true;
     // Register the last character pressed to quick jump in the table. Together
     // with storing the last row number jumped to, this is used to let multiple
     // key strokes cycle between all entries starting with the same letter:
     private final int[] lastPressed = new int[20];
+    private PreviewPanel preview;
+    private boolean workingOnPreview;
+    private boolean enabled = true;
     private int lastPressedCount;
 
     private long lastPressedTime;
@@ -80,13 +77,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         this.table = table;
         this.panel = panel;
         this.tableRows = table.getTableModel().getTableRows();
-        PreviewPanel previewPanel = panel.getPreviewPanel();
-        if (previewPanel != null){
-            preview = previewPanel;
-        } else {
-            preview = new PreviewPanel(panel.getBibDatabaseContext(), null, panel);
-            panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview);
-        }
+        preview = panel.getPreviewPanel();
     }
 
     public void setEnabled(boolean enabled) {
@@ -100,13 +91,13 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
 
         EventList<BibEntry> selected = e.getSourceList();
-        if (selected.isEmpty()){
+        if (selected.isEmpty()) {
             return;
         }
 
         final BibEntry newSelected = selected.get(0);
         if ((panel.getMode() == BasePanelMode.SHOWING_EDITOR || panel.getMode() == BasePanelMode.WILL_SHOW_EDITOR)
-                && panel.getCurrentEditor() != null && newSelected == panel.getCurrentEditor().getEntry()) {
+                && panel.getEntryEditor() != null && newSelected == panel.getEntryEditor().getEntry()) {
             // entry already selected and currently editing it, do not steal the focus from the selected textfield
             return;
         }
@@ -114,46 +105,25 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         if (newSelected != null) {
             final BasePanelMode mode = panel.getMode(); // What is the panel already showing?
             if ((mode == BasePanelMode.WILL_SHOW_EDITOR) || (mode == BasePanelMode.SHOWING_EDITOR)) {
-                // An entry is currently being edited.
-                EntryEditor oldEditor = panel.getCurrentEditor();
-                String visName = null;
-                if (oldEditor != null) {
-                    visName = oldEditor.getVisiblePanelName();
-                }
-                // Get a new editor for the entry to edit:
-                EntryEditor newEditor = panel.getEntryEditor(newSelected);
-
-                // Show the new editor unless it was already visible:
-                if (!Objects.equals(newEditor, oldEditor) || (mode != BasePanelMode.SHOWING_EDITOR)) {
-
-                    if (visName != null) {
-                        newEditor.setVisiblePanel(visName);
-                    }
-                    panel.showEntryEditor(newEditor);
-                    SwingUtilities.invokeLater(() -> table.ensureVisible(table.getSelectedRow()));
-                } else {
-                    // if not used destroy the EntryEditor
-                    newEditor.setMovingToDifferentEntry();
-                }
-            } else {
+                panel.showAndEdit(newSelected);
+                SwingUtilities.invokeLater(() -> table.ensureVisible(table.getSelectedRow()));
+            } else if (panel.getMode() == BasePanelMode.SHOWING_NOTHING || panel.getMode() == BasePanelMode.SHOWING_PREVIEW) {
                 // Either nothing or a preview was shown. Update the preview.
-                if (previewActive) {
-                    updatePreview(newSelected, false);
-                }
+                updatePreview(newSelected);
             }
         }
     }
 
-    private void updatePreview(final BibEntry toShow, final boolean changedPreview) {
-        updatePreview(toShow, changedPreview, 0);
+    private void updatePreview(final BibEntry toShow) {
+        updatePreview(toShow, 0);
     }
 
-    private void updatePreview(final BibEntry toShow, final boolean changedPreview, int repeats) {
+    private void updatePreview(final BibEntry toShow, int repeats) {
         if (workingOnPreview) {
             if (repeats > 0) {
                 return; // We've already waited once. Give up on this selection.
             }
-            Timer t = new Timer(50, actionEvent -> updatePreview(toShow, changedPreview, 1));
+            Timer t = new Timer(50, actionEvent -> updatePreview(toShow, 1));
             t.setRepeats(false);
             t.start();
             return;
@@ -163,16 +133,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         if ((list.size() != 1) || (list.get(0) != toShow)) {
             return;
         }
-        final BasePanelMode mode = panel.getMode();
         workingOnPreview = true;
         SwingUtilities.invokeLater(() -> {
-            preview.setEntry(toShow);
-
-            // If nothing was already shown, set the preview and move the separator:
-            if (changedPreview || (mode == BasePanelMode.SHOWING_NOTHING)) {
-                panel.showPreview(preview);
-                panel.adjustSplitter();
-            }
+            panel.showPreview(toShow);
             workingOnPreview = false;
         });
     }
@@ -184,11 +147,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     }
 
     public void editSignalled(BibEntry entry) {
-        final BasePanelMode mode = panel.getMode();
-        if (mode != BasePanelMode.SHOWING_EDITOR) {
-            panel.showEntryEditor(panel.getEntryEditor(entry));
-        }
-        panel.getCurrentEditor().requestFocus();
+        panel.showAndEdit(entry);
     }
 
     @Override
@@ -370,8 +329,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
 
         // See if this is a simple file link field, or if it is a file-list
         // field that can specify a list of links:
-        if(!column.getBibtexFields().isEmpty()) {
-            for(String field : column.getBibtexFields()) {
+        if (!column.getBibtexFields().isEmpty()) {
+            for (String field : column.getBibtexFields()) {
                 if (FieldName.FILE.equals(field)) {
                     // We use a FileListTableModel to parse the field content:
                     FileListTableModel fileList = new FileListTableModel();
@@ -386,9 +345,16 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                         if ((description == null) || (description.trim().isEmpty())) {
                             description = flEntry.getLink();
                         }
+
+                        Optional<ExternalFileType> fileType = flEntry.getType();
+
+                        // file type might be unknown
+                        if (!fileType.isPresent()) {
+                            String fileExtension = FileUtil.getFileExtension(flEntry.getLink()).orElse("");
+                            fileType = Optional.of(new UnknownExternalFileType(fileExtension.toUpperCase(), fileExtension));
+                        }
                         menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry.getLink(),
-                                flEntry.getType().get().getIcon(), panel.getBibDatabaseContext(),
-                                flEntry.getType()));
+                                fileType.get().getIcon(), panel.getBibDatabaseContext(), fileType));
                         showDefaultPopup = false;
                     }
                 } else {
@@ -424,13 +390,12 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     }
 
     public void entryEditorClosing(EntryEditor editor) {
-        preview.setEntry(editor.getEntry());
-        if (previewActive) {
-            panel.showPreview(preview);
+        if (Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled()) {
+            panel.showPreview(editor.getEntry());
         } else {
             panel.hideBottomComponent();
+            panel.adjustSplitter();
         }
-        panel.adjustSplitter();
         table.requestFocus();
     }
 
@@ -442,40 +407,6 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     @Override
     public void mouseExited(MouseEvent e) {
         // Do nothing
-    }
-
-    public void setPreviewActive(boolean enabled) {
-        previewActive = enabled;
-        if (previewActive) {
-            if (!table.getSelected().isEmpty()) {
-                updatePreview(table.getSelected().get(0), false);
-            }
-        } else {
-            panel.hideBottomComponent();
-        }
-    }
-
-    public void nextPreviewStyle(){
-        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() + 1);
-    }
-
-    public void previousPreviewStyle(){
-        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() - 1);
-    }
-
-    private void cyclePreview(int newPosition) {
-        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
-                .getBuilder()
-                .withPreviewCyclePosition(newPosition)
-                .build();
-        Globals.prefs.storePreviewPreferences(previewPreferences);
-
-        preview.updateLayout();
-        preview.update();
-        panel.showPreview(preview);
-        if (!table.getSelected().isEmpty()) {
-            updatePreview(table.getSelected().get(0), true);
-        }
     }
 
     /**

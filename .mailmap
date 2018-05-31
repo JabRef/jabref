@@ -1,8 +1,13 @@
+
 # Generate AUTHORS: scripts/generate-authors.sh
 
 # Tip for finding duplicates (besides scanning the output of AUTHORS for name
 # duplicates that aren't also email duplicates): scan the output of:
 #   git log --format='%aE - %aN' | sort --unique --ignore-case
+#
+# One can find out the real name by using the GitHub user page and API.
+# https://github.com/sauliusg
+# https://api.github.com/users/sauliusg/events/public
 #
 # For explanation on this file format: man git-shortlog
 Ruy Minoru Ito Takata <ruy.takata@gmail.com>
@@ -109,3 +114,32 @@ Arno Blouin <blouin.arno@gmail.com>
 Jeff Miller <miller@psy.otago.ac.nz>
 Alain Vaucher <avaucher@users.noreply.github.com>
 Daniel Mair <mairdl.dev@gmail.com> <mairdl.dev@googlemail.com>
+Sven Jäger <svenjaeger@gmx.de>
+Tim van Rossum <trvanrossum@gmail.com>
+Saulius Gražulis <grazulis@ibt.lt>
+Rolf Starre <RolfStarre@users.noreply.github.com>
+Owen Huang <ohuang12@users.noreply.github.com>
+Anita Armbruster <armbruan@gmail.com>
+Fabian Bauer <125m125@users.noreply.github.com>
+Jong-Ho Shinn <jhshinn@kaist.edu>
+Nadeem Mahmood <mahmoodn@purdue.edu>
+Foivos Christoulakis <halx4@users.noreply.github.com>
+Predrag Milanovic <pmilanovic@gmail.com>
+Karsten Hiekmann <sammann-fnordbedarf-de@users.noreply.github.com>
+Karsten Hiekmann <h.k.hiekmann@nanooq.org>
+Andrew Levit <dreyskiy@gmail.com>
+Berk Gureken <berkgureken@gmail.com>
+Abhishek Rai <abhisheksavitarai@gmail.com>
+Abhishek Rai <betheunique@users.noreply.github.com>
+Stéphane Curet <stephane.curet@orange.fr>
+Erdem Derebasoglu <erdemderebasoglu@hotmail.com>
+Domenico Cufalo <cufalo@gmail.com>
+Tobias Bouschen <tobias.bouschen@googlemail.com>
+József Pallagi <pallagijoe@gmail.com>
+Mattia Bunel <MBunel@users.noreply.github.com>
+Waida Fan <31742543+weidafan@users.noreply.github.com>
+Johannes Manner <johannes.manner@web.de>
+Dominik Traczyk <dominik646@gmail.com>
+Cerrianne Santos <cerrianne.santos@gmail.com>
+Stefan Scheffel <st155160@stud.uni-stuttgart.de>
+Stefan Gerzmann <steppery@gmx.de>

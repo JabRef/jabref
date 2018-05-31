@@ -1,25 +1,16 @@
 ## Understanding the basics
 We welcome contributions to JabRef and encourage to create a fork, clone, **create a new branch** (such as `fix-for-issue-121`), **work on the new branch — not master**, and create a pull request.
 Be sure to create a **separate branch** for each improvement you implement.
-Take a look at GitHub's excellent [help documentation] for a detailed explanation.
+Take a look at GitHub's excellent [help documentation] for a detailed explanation and the explanation of [Feature Branch Workflow](https://de.atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
 
 We also have [code howtos](https://github.com/JabRef/jabref/wiki/Code-Howtos) and [guidelines for setting up a local workspace](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace).
 
-For newcomers, [FLOSS Coach](http://www.flosscoach.com/) might be helpful.
-It contains steps to get started with JabRef development.
-
 In case you have any question, do not hesitate to write one of our [JabRef developers](https://github.com/orgs/JabRef/teams/developers) an email.
+We should also be online at [gitter](https://gitter.im/JabRef/jabref).
 
 
 ## Formal requirements for a pull request
 The main goal of the formal requirements is to provide credit to you and to be able to understand the patch.
-Nevertheless we aim to keep the code consistently formatted, therefore we additionally have a requirement regarding the source formatter.
-
-
-### Ensure consistent formatting
-Ensure your code is formatted according the JabRef formatting guidelines.
-When you use Eclipse, the required configuration is generated automatically by `gradlew cleanEclipse eclipse`.
-
 
 ### Add your change to CHANGELOG.md
 You should edit the [CHANGELOG.md](CHANGELOG.md) located in the root directory of the JabRef source.
@@ -49,7 +40,7 @@ Please make sure there are no duplicates or alternate spellings of your name lis
 If you need to merge different Git usernames or email addresses you can do so by editing `.mailmap`.
 More information on this can be found via `man git-shortlog`.
 
-Please, **do not add yourself at `@authors`**.
+Please, **do not add yourself at JavaDoc's `@authors`**.
 The contribution information is tracked via the version control system.
 
 Your contribution is considered being made under [MIT license](https://tldrlegal.com/license/mit-license).
@@ -57,6 +48,8 @@ Your contribution is considered being made under [MIT license](https://tldrlegal
 
 ### Write a good commit message
 See [good commit message] or [commit guidelines section of Pro Git].
+The first line of your commit message is automatically taken as title for the pull-request.
+All other lines make up the body of the pull request. Add the words `fixes #xxx` to your PR to auto-close the corresponding issue.
 
 
 ### Test your code
@@ -75,29 +68,45 @@ You can see the result in `build\resources\main\help\en\About.html` or when clic
 
 
 ### When making an architectural decision
-In case you add a library or do mayor code rewrites, we ask you to document your decision.
-Recommended reading: http://www.infoq.com/articles/sustainable-architectural-design-decisions
+In case you add a library or do major code rewrites, we ask you to document your decision.
+Recommended reading: <https://adr.github.io/>.
 
-Template:
+We simply ask to create a new markdown file in `docs/adr` following the template presented at <https://adr.github.io/madr/>.
+
+In case you want to directly add a comment to a class, simply use following template (based on [sustainable architectural decisions](https://www.infoq.com/articles/sustainable-architectural-design-decisions)):
+
 ```
 In the context of <use case/user story u>,
 facing <concern c>
 we decided for <option o>
 and neglected <other options>,
 to achieve <system qualities/desired consequences>,
-accepting <downside d/undesired consequences>,
+accepting <downside / undesired consequences>,
 because <additional rationale>.
 ```
 
 
 ### When adding a new Localization.lang entry
 Add new `Localization.lang("KEY")` to Java file.
-Tests fail. In the test output a snippet is generated which must be added to the English translation file. There is also a snippet generated for the non-English files, but this is irrelevant.
-Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
-With `gradlew localizationUpdate` the "KEY" is added to the other translation files as well.
-Tests are green again.
+Tests fail. In the test output a snippet is generated which must be added to the English translation file.
 
-You can also directly run the specific test in your IDE. The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java`
+Example:
+
+```
+java.lang.AssertionError: DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE
+PASTE THESE INTO THE ENGLISH LANGUAGE FILE
+[
+Opens\ JabRef's\ Twitter\ page=Opens JabRef's Twitter page
+]
+Expected :[]
+Actual   :[Opens\ JabRef's\ Twitter\ page (src\main\java\org\jabref\gui\JabRefFrame.java LANG)]
+```
+
+Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`.
+[Crowdin](http://translate.jabref.org/) will automatically pick up the new string and add it to the other translations.
+
+You can also directly run the specific test in your IDE.
+The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java`
 Find more information in the [JabRef Wiki](https://github.com/JabRef/jabref/wiki/Code-Howtos#using-localization-correctly).
 
 

@@ -56,7 +56,7 @@ public class FieldFormatterCleanup implements CleanupJob {
         if (oldValue.equals(newValue)) {
             return new ArrayList<>();
         } else {
-            if(newValue.isEmpty()) {
+            if (newValue.isEmpty()) {
                 entry.clearField(fieldKey);
                 newValue = null;
             } else {

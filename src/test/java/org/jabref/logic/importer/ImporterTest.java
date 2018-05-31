@@ -1,5 +1,6 @@
 package org.jabref.logic.importer;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,8 +24,8 @@ import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.importer.fileformat.SilverPlatterImporter;
-import org.jabref.logic.xmp.XMPPreferences;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,22 +35,32 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mockito;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(Parameterized.class)
 public class ImporterTest {
 
-    @Parameter
-    public Importer format;
+    @Parameter public Importer format;
 
     @Test(expected = NullPointerException.class)
-    public void isRecognizedFormatWithNullThrowsException() throws IOException {
-        format.isRecognizedFormat(null);
+    public void isRecognizedFormatWithNullForBufferedReaderThrowsException() throws IOException {
+        format.isRecognizedFormat((BufferedReader) null);
     }
 
     @Test(expected = NullPointerException.class)
-    public void importDatabaseWithNullThrowsException() throws IOException {
-        format.importDatabase(null);
+    public void isRecognizedFormatWithNullForStringThrowsException() throws IOException {
+        format.isRecognizedFormat((String) null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void importDatabaseWithNullForBufferedReaderThrowsException() throws IOException {
+        format.importDatabase((BufferedReader) null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void importDatabaseWithNullForStringThrowsException() throws IOException {
+        format.importDatabase((String) null);
     }
 
     @Test
@@ -58,8 +69,8 @@ public class ImporterTest {
     }
 
     @Test
-    public void getExtensionsDoesNotReturnNull() {
-        Assert.assertNotNull(format.getExtensions());
+    public void getFileTypeDoesNotReturnNull() {
+        Assert.assertNotNull(format.getFileType());
     }
 
     @Test
@@ -75,7 +86,7 @@ public class ImporterTest {
 
     @Test
     public void getIdStripsSpecialCharactersAndConvertsToLowercase() {
-        Importer importer = Mockito.mock(Importer.class, Mockito.CALLS_REAL_METHODS);
+        Importer importer = mock(Importer.class, Mockito.CALLS_REAL_METHODS);
         when(importer.getName()).thenReturn("*Test-Importer");
         Assert.assertEquals("testimporter", importer.getId());
     }
@@ -90,12 +101,12 @@ public class ImporterTest {
         // all classes implementing {@link Importer}
         // sorted alphabetically
 
-        ImportFormatPreferences importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
-        XMPPreferences xmpPreferences = JabRefPreferences.getInstance().getXMPPreferences();
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        XmpPreferences xmpPreferences = mock(XmpPreferences.class);
         // @formatter:off
         return Arrays.asList(
                 new Object[]{new BiblioscapeImporter()},
-                new Object[]{new BibtexImporter(importFormatPreferences)},
+                new Object[]{new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor())},
                 new Object[]{new BibTeXMLImporter()},
                 new Object[]{new CopacImporter()},
                 new Object[]{new EndnoteImporter(importFormatPreferences)},
@@ -104,7 +115,7 @@ public class ImporterTest {
                 new Object[]{new IsiImporter()},
                 new Object[]{new MedlineImporter()},
                 new Object[]{new MedlinePlainImporter()},
-                new Object[]{new ModsImporter()},
+                new Object[]{new ModsImporter(importFormatPreferences)},
                 new Object[]{new MsBibImporter()},
                 new Object[]{new OvidImporter()},
                 new Object[]{new PdfContentImporter(importFormatPreferences)},

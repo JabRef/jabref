@@ -19,15 +19,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PushToVim extends AbstractPushToApplication implements PushToApplication {
 
-    private static final Log LOGGER = LogFactory.getLog(PushToVim.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PushToVim.class);
 
     private final JTextField vimServer = new JTextField(30);
-
 
     @Override
     public String getApplicationName() {

@@ -134,7 +134,7 @@ public class EntryTypes {
     }
 
     public static void addOrModifyCustomEntryType(CustomEntryType customEntryType, BibDatabaseMode mode) {
-        if(BibDatabaseMode.BIBLATEX == mode) {
+        if (BibDatabaseMode.BIBLATEX == mode) {
             BIBLATEX.addOrModifyEntryType(customEntryType);
         } else if (BibDatabaseMode.BIBTEX == mode) {
             BIBTEX.addOrModifyEntryType(customEntryType);
@@ -159,7 +159,7 @@ public class EntryTypes {
      */
     public static List<EntryType> getAllCustomTypes(BibDatabaseMode mode) {
         Collection<EntryType> allTypes = getAllValues(mode);
-        if(mode == BibDatabaseMode.BIBTEX) {
+        if (mode == BibDatabaseMode.BIBTEX) {
             return allTypes.stream().filter(entryType -> !BibtexEntryTypes.getType(entryType.getName()).isPresent())
                     .filter(entryType -> !IEEETranEntryTypes.getType(entryType.getName()).isPresent())
                     .collect(Collectors.toList());
@@ -198,8 +198,8 @@ public class EntryTypes {
     }
 
     public static void removeAllCustomEntryTypes() {
-        for(BibDatabaseMode type : BibDatabaseMode.values()) {
-            for(String typeName : new HashSet<>(getAllTypes(type))) {
+        for (BibDatabaseMode type : BibDatabaseMode.values()) {
+            for (String typeName : new HashSet<>(getAllTypes(type))) {
                 getType(typeName, type).ifPresent(entryType -> {
                     if (entryType instanceof CustomEntryType) {
                         removeType(typeName, type);

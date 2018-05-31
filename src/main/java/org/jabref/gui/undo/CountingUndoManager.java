@@ -47,7 +47,6 @@ public class CountingUndoManager extends UndoManager {
         return (current != unchangedPoint);
     }
 
-
     public void registerListener(Object object) {
         this.eventBus.register(object);
         postUndoRedoEvent(); // Send event to trigger changes

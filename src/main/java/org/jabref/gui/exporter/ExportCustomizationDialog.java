@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -74,10 +73,9 @@ public class ExportCustomizationDialog extends JabRefDialog {
             CustomExportDialog ecd = new CustomExportDialog(frame);
             ecd.setVisible(true);
             if (ecd.okPressed()) {
-                List<String> newFormat = Arrays.asList(ecd.name(), ecd.layoutFile(), ecd.extension());
-                Globals.prefs.customExports.addFormat(newFormat,
+                Globals.prefs.customExports.addFormat(ecd.name(), ecd.layoutFile(), ecd.extension(),
                         Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
-                        SavePreferences.loadForExportFromPreferences(Globals.prefs));
+                        Globals.prefs.loadForExportFromPreferences());
                 Globals.prefs.customExports.store(Globals.prefs);
             }
         });
@@ -113,7 +111,7 @@ public class ExportCustomizationDialog extends JabRefDialog {
             }
             LayoutFormatterPreferences layoutPreferences = Globals.prefs
                     .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
-            SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+            SavePreferences savePreferences = Globals.prefs.loadForExportFromPreferences();
             for (List<String> list : entries) {
                 Globals.prefs.customExports.remove(list, layoutPreferences, savePreferences);
             }
@@ -159,7 +157,6 @@ public class ExportCustomizationDialog extends JabRefDialog {
         setLocationRelativeTo(frame);
         table.requestFocus();
     }
-
 
     private static class ExportTableFormat implements TableFormat<List<String>> {
 

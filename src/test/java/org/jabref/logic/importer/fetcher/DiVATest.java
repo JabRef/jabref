@@ -3,26 +3,27 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Optional;
 
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
-@Category(FetcherTests.class)
+@FetcherTest
 public class DiVATest {
 
     private DiVA fetcher;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        fetcher = new DiVA(JabRefPreferences.getInstance().getImportFormatPreferences());
+        fetcher = new DiVA(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     @Test
@@ -49,6 +50,8 @@ public class DiVATest {
         entry.setField("title", "Lower bounds for constant multiplication problems");
         entry.setField("volume", "54");
         entry.setField("year", "2007");
+        entry.setField("abstract", "Lower bounds for problems related to realizing multiplication by constants with shifts, adders, and subtracters are presented. These lower bounds are straightforwardly calculated and have applications in proving the optimality of solutions obtained by heuristics. ");
+        entry.setField("doi", "10.1109/TCSII.2007.903212");
 
         assertEquals(Optional.of(entry), fetcher.performSearchById("diva2:260746"));
     }

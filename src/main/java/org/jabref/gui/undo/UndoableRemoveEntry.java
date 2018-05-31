@@ -7,8 +7,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class represents the removal of an entry. The constructor needs
@@ -18,11 +18,11 @@ import org.apache.commons.logging.LogFactory;
  */
 public class UndoableRemoveEntry extends AbstractUndoableJabRefEdit {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UndoableRemoveEntry.class);
     private final BibDatabase base;
     private final BibEntry entry;
-    private final BasePanel panel;
 
-    private static final Log LOGGER = LogFactory.getLog(UndoableRemoveEntry.class);
+    private final BasePanel panel;
 
     public UndoableRemoveEntry(BibDatabase base, BibEntry entry,
                                BasePanel panel) {

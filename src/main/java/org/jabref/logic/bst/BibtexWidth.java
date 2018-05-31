@@ -1,7 +1,7 @@
 package org.jabref.logic.bst;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class BibtexWidth {
 
-    private static final Log LOGGER = LogFactory.getLog(BibtexWidth.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexWidth.class);
 
     /*
      * Quoted from Bibtex:
@@ -159,7 +159,6 @@ public class BibtexWidth {
     }
 
     public static int getCharWidth(char c) {
-
 
         if ((c >= 0) && (c < 128)) {
             return BibtexWidth.widths[c];

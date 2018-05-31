@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -47,8 +47,8 @@ public class OvidImporter extends Importer {
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return FileExtensions.OVID;
+    public FileType getFileType() {
+        return FileType.OVID;
     }
 
     @Override
@@ -124,7 +124,7 @@ public class OvidImporter extends Importer {
                         h.put(FieldName.ISSUE, matcher.group(3));
                         h.put(FieldName.PAGES, matcher.group(4));
                         h.put(FieldName.YEAR, matcher.group(5));
-                    } else if ((matcher = OvidImporter.OVID_SOURCE_PATTERN_NO_ISSUE.matcher(content)).find()) {// may be missing the issue
+                    } else if ((matcher = OvidImporter.OVID_SOURCE_PATTERN_NO_ISSUE.matcher(content)).find()) { // may be missing the issue
                         h.put(FieldName.JOURNAL, matcher.group(1));
                         h.put(FieldName.VOLUME, matcher.group(2));
                         h.put(FieldName.PAGES, matcher.group(3));

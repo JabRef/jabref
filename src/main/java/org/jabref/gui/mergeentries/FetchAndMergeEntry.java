@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -27,6 +28,10 @@ public class FetchAndMergeEntry {
      */
     public FetchAndMergeEntry(BibEntry entry, BasePanel panel, String field) {
         this(entry, panel, Arrays.asList(field));
+    }
+
+    public FetchAndMergeEntry(BibEntry entry, String field) {
+        this(entry, JabRefGUI.getMainFrame().getCurrentBasePanel(), field);
     }
 
     /**

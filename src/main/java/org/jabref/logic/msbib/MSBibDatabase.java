@@ -15,8 +15,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -31,10 +31,10 @@ import org.xml.sax.SAXException;
  */
 public class MSBibDatabase {
 
-    private static final Log LOGGER = LogFactory.getLog(MSBibDatabase.class);
-
     public static final String NAMESPACE = "http://schemas.openxmlformats.org/officeDocument/2006/bibliography";
     public static final String PREFIX = "b:";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MSBibDatabase.class);
 
     private Set<MSBibEntry> entries;
 

@@ -5,9 +5,7 @@ import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
-import org.jabref.logic.util.OS;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
-import org.jabref.preferences.JabRefPreferences;
 
 public class CleanupPreset {
 
@@ -30,44 +28,6 @@ public class CleanupPreset {
     public CleanupPreset(Set<CleanupStep> activeJobs, FieldFormatterCleanups formatterCleanups) {
         this.activeJobs = activeJobs;
         this.formatterCleanups = Objects.requireNonNull(formatterCleanups);
-    }
-
-    public static CleanupPreset loadFromPreferences(JabRefPreferences preferences) {
-
-        Set<CleanupStep> activeJobs = EnumSet.noneOf(CleanupStep.class);
-
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_DOI)) {
-            activeJobs.add(CleanupStep.CLEAN_UP_DOI);
-        }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_ISSN)) {
-            activeJobs.add(CleanupStep.CLEAN_UP_ISSN);
-        }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_MOVE_PDF)) {
-            activeJobs.add(CleanupStep.MOVE_PDF);
-        }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_MAKE_PATHS_RELATIVE)) {
-            activeJobs.add(CleanupStep.MAKE_PATHS_RELATIVE);
-        }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_RENAME_PDF)) {
-            activeJobs.add(CleanupStep.RENAME_PDF);
-        }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS)) {
-            activeJobs.add(CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
-        }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_UPGRADE_EXTERNAL_LINKS)) {
-            activeJobs.add(CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
-        }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX)) {
-            activeJobs.add(CleanupStep.CONVERT_TO_BIBLATEX);
-        }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_FIX_FILE_LINKS)) {
-            activeJobs.add(CleanupStep.FIX_FILE_LINKS);
-        }
-
-        FieldFormatterCleanups formatterCleanups = Cleanups.parse(
-                preferences.getStringList(JabRefPreferences.CLEANUP_FORMATTERS));
-
-        return new CleanupPreset(activeJobs, formatterCleanups);
     }
 
     public boolean isCleanUpUpgradeExternalLinks() {
@@ -102,27 +62,15 @@ public class CleanupPreset {
         return isActive(CleanupStep.CONVERT_TO_BIBLATEX);
     }
 
+    public boolean isConvertToBibtex() {
+        return isActive(CleanupStep.CONVERT_TO_BIBTEX);
+    }
+
     public boolean isRenamePdfOnlyRelativePaths() {
         return isActive(CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
     }
 
-    public void storeInPreferences(JabRefPreferences preferences) {
-        preferences.putBoolean(JabRefPreferences.CLEANUP_DOI, isActive(CleanupStep.CLEAN_UP_DOI));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_ISSN, isActive(CleanupStep.CLEAN_UP_ISSN));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_MOVE_PDF, isActive(CleanupStep.MOVE_PDF));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_MAKE_PATHS_RELATIVE, isActive(CleanupStep.MAKE_PATHS_RELATIVE));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_RENAME_PDF, isActive(CleanupStep.RENAME_PDF));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS,
-                isActive(CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_UPGRADE_EXTERNAL_LINKS,
-                isActive(CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX, isActive(CleanupStep.CONVERT_TO_BIBLATEX));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_FIX_FILE_LINKS, isActive(CleanupStep.FIX_FILE_LINKS));
-
-        preferences.putStringList(JabRefPreferences.CLEANUP_FORMATTERS, formatterCleanups.getAsStringList(OS.NEWLINE));
-    }
-
-    private Boolean isActive(CleanupStep step) {
+    public Boolean isActive(CleanupStep step) {
         return activeJobs.contains(step);
     }
 
@@ -146,6 +94,10 @@ public class CleanupPreset {
          * Converts to biblatex format
          */
         CONVERT_TO_BIBLATEX,
+        /**
+         * Converts to bibtex format
+         */
+        CONVERT_TO_BIBTEX,
         MOVE_PDF,
         FIX_FILE_LINKS,
         CLEAN_UP_ISSN

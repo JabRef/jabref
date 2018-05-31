@@ -30,7 +30,7 @@ public class URLUtil {
     public static String cleanGoogleSearchURL(String url) {
         Objects.requireNonNull(url);
 
-        if(!url.matches(GOOGLE_SEARCH_EXP)) {
+        if (!url.matches(GOOGLE_SEARCH_EXP)) {
             return url;
         }
         // Extract destination URL
@@ -52,7 +52,7 @@ public class URLUtil {
 
                     String decode = URLDecoder.decode(value, StandardCharsets.UTF_8.name());
                     // url?
-                    if(decode.matches(URL_EXP)) {
+                    if (decode.matches(URL_EXP)) {
                         return decode;
                     }
                 }

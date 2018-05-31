@@ -19,16 +19,13 @@ public class HtmlTransferable implements Transferable {
 
     public static final DataFlavor HTML_FLAVOR = new DataFlavor("text/html;charset=utf-8;class=java.lang.String", "HTML Format");
     public static final DataFlavor TEXT_FLAVOR = DataFlavor.stringFlavor;
-
     private static final List<DataFlavor> ALL_FLAVORS = Arrays.asList(HTML_FLAVOR, DataFlavor.allHtmlFlavor, TEXT_FLAVOR);
-
-    private final String htmlText;
-    private final String plainText;
-
     private static final Pattern HTML_NEWLINE = Pattern.compile(" ?<br>|<BR>");
     private static final Pattern REMOVE_HTML = Pattern.compile("<(?!br)(?!BR).*?>");
     private static final Pattern WHITESPACE_AROUND_NEWLINE = Pattern.compile("(?m)^\\s+|\\v+");
     private static final Pattern DOUBLE_WHITESPACES = Pattern.compile("[ ]{2,}");
+    private final String htmlText;
+    private final String plainText;
 
     public HtmlTransferable(String html) {
         this.htmlText = html;

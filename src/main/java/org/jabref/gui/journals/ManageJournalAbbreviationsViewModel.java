@@ -24,13 +24,11 @@ import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.util.FileType;
+import org.jabref.preferences.PreferencesService;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import static org.jabref.Globals.journalAbbreviationLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class provides a model for managing journal abbreviation lists.
@@ -40,7 +38,7 @@ import static org.jabref.Globals.journalAbbreviationLoader;
  */
 public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
 
-    private final Log logger = LogFactory.getLog(ManageJournalAbbreviationsViewModel.class);
+    private final Logger logger = LoggerFactory.getLogger(ManageJournalAbbreviationsViewModel.class);
     private final SimpleListProperty<AbbreviationsFileViewModel> journalFiles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final SimpleListProperty<AbbreviationViewModel> abbreviations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final SimpleIntegerProperty abbreviationsCount = new SimpleIntegerProperty();
@@ -51,14 +49,19 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     private final SimpleBooleanProperty isLoadingBuiltIn = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isLoadingIeee = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty();
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
+    private final JournalAbbreviationPreferences abbreviationsPreferences;
+    private final JournalAbbreviationLoader journalAbbreviationLoader;
+    private boolean shouldWriteLists = false;
 
-    public ManageJournalAbbreviationsViewModel(JabRefPreferences preferences, DialogService dialogService, TaskExecutor taskExecutor) {
+    public ManageJournalAbbreviationsViewModel(PreferencesService preferences, DialogService dialogService, TaskExecutor taskExecutor, JournalAbbreviationLoader journalAbbreviationLoader) {
         this.preferences = Objects.requireNonNull(preferences);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
+        this.journalAbbreviationLoader = Objects.requireNonNull(journalAbbreviationLoader);
+        this.abbreviationsPreferences = preferences.getJournalAbbreviationPreferences();
 
         abbreviationsCount.bind(abbreviations.sizeProperty());
         currentAbbreviation.addListener((observable, oldvalue, newvalue) -> {
@@ -124,7 +127,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
 
         BackgroundTask
                 .wrap(() -> {
-                    if (preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
+                    if (abbreviationsPreferences.useIEEEAbbreviations()) {
                         return JournalAbbreviationLoader.getOfficialIEEEAbbreviations();
                     } else {
                         return JournalAbbreviationLoader.getStandardIEEEAbbreviations();
@@ -150,7 +153,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      * Read all saved file paths and read their abbreviations
      */
     public void createFileObjects() {
-        List<String> externalFiles = preferences.getStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
+        List<String> externalFiles = abbreviationsPreferences.getExternalJournalLists();
         externalFiles.forEach(name -> openFile(Paths.get(name)));
     }
 
@@ -161,7 +164,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      */
     public void addNewFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileExtensions.TXT)
+                .addExtensionFilter(FileType.TXT)
                 .build();
 
         dialogService.showFileSaveDialog(fileDialogConfiguration).ifPresent(this::openFile);
@@ -193,7 +196,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
 
     public void openFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileExtensions.TXT)
+                .addExtensionFilter(FileType.TXT)
                 .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(this::openFile);
@@ -232,6 +235,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         } else {
             abbreviations.add(abbreviationViewModel);
             currentAbbreviation.set(abbreviationViewModel);
+            shouldWriteLists = true;
         }
     }
 
@@ -272,6 +276,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         }
         currentAbbreviation.get().setName(name);
         currentAbbreviation.get().setAbbreviation(abbreviation);
+        shouldWriteLists = true;
     }
 
     /**
@@ -292,6 +297,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
                     currentAbbreviation.set(null);
                 }
                 abbreviations.remove(index);
+                shouldWriteLists = true;
             }
         }
     }
@@ -316,14 +322,14 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      * This method stores all file paths of the files in the journalFiles property
      * to the global JabRef preferences. Pseudo abbreviation files will not be stored.
      */
-    public void saveExternalFilesList() {
+    private void saveExternalFilesList() {
         List<String> extFiles = new ArrayList<>();
         journalFiles.forEach(file -> {
             if (!file.isBuiltInListProperty().get()) {
                 file.getAbsolutePath().ifPresent(path -> extFiles.add(path.toAbsolutePath().toString()));
             }
         });
-        preferences.putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, extFiles);
+        abbreviationsPreferences.setExternalJournalLists(extFiles);
     }
 
     /**
@@ -345,9 +351,16 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      */
     public void saveEverythingAndUpdateAutoCompleter() {
         saveExternalFilesList();
-        saveJournalAbbreviationFiles();
+
+        if (shouldWriteLists) {
+            saveJournalAbbreviationFiles();
+            shouldWriteLists = false;
+        }
+
         // Update journal abbreviation loader
-        journalAbbreviationLoader.update(JournalAbbreviationPreferences.fromPreferences(preferences));
+        journalAbbreviationLoader.update(abbreviationsPreferences);
+
+        preferences.storeJournalAbbreviationPreferences(abbreviationsPreferences);
     }
 
     public SimpleListProperty<AbbreviationsFileViewModel> journalFilesProperty() {

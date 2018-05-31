@@ -1,7 +1,8 @@
 package org.jabref.logic.layout.format;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test case  that verifies the functionalities of the
@@ -10,7 +11,7 @@ import org.junit.Test;
  * @author Carlos Silla
  * @author Christopher Oezbek <oezi@oezi.de>
  */
-public class AuthorLastFirstAbbreviatorTester {
+class AuthorLastFirstAbbreviatorTester {
 
     /**
      * Verifies the Abbreviation of one single author with a simple name.
@@ -18,8 +19,8 @@ public class AuthorLastFirstAbbreviatorTester {
      * Ex: Lastname, Name
      */
     @Test
-    public void testOneAuthorSimpleName() {
-        Assert.assertEquals("Abbreviator Test", "Lastname, N.", abbreviate("Lastname, Name"));
+    void testOneAuthorSimpleName() {
+        assertEquals("Lastname, N.", abbreviate("Lastname, Name"));
     }
 
     /**
@@ -28,8 +29,8 @@ public class AuthorLastFirstAbbreviatorTester {
      * Ex: Lastname, Name Middlename
      */
     @Test
-    public void testOneAuthorCommonName() {
-        Assert.assertEquals("Abbreviator Test", "Lastname, N. M.", abbreviate("Lastname, Name Middlename"));
+    void testOneAuthorCommonName() {
+        assertEquals("Lastname, N. M.", abbreviate("Lastname, Name Middlename"));
     }
 
     /**
@@ -38,28 +39,28 @@ public class AuthorLastFirstAbbreviatorTester {
      * Ex: Lastname, Name Middlename
      */
     @Test
-    public void testTwoAuthorsCommonName() {
+    void testTwoAuthorsCommonName() {
         String result = abbreviate("Lastname, Name Middlename and Sobrenome, Nome Nomedomeio");
         String expectedResult = "Lastname, N. M. and Sobrenome, N. N.";
 
-        Assert.assertEquals("Abbreviator Test", expectedResult, result);
+        assertEquals(expectedResult, result);
     }
 
     @Test
-    public void testJrAuthor() {
-        Assert.assertEquals("Other, Jr., A. N.", abbreviate("Other, Jr., Anthony N."));
+    void testJrAuthor() {
+        assertEquals("Other, Jr., A. N.", abbreviate("Other, Jr., Anthony N."));
     }
 
     @Test
-    public void testFormat() {
-        Assert.assertEquals("", abbreviate(""));
-        Assert.assertEquals("Someone, V. S.", abbreviate("Someone, Van Something"));
-        Assert.assertEquals("Smith, J.", abbreviate("Smith, John"));
-        Assert.assertEquals("von Neumann, J. and Smith, J. and Black Brown, P.",
+    void testFormat() {
+        assertEquals("", abbreviate(""));
+        assertEquals("Someone, V. S.", abbreviate("Someone, Van Something"));
+        assertEquals("Smith, J.", abbreviate("Smith, John"));
+        assertEquals("von Neumann, J. and Smith, J. and Black Brown, P.",
                 abbreviate("von Neumann, John and Smith, John and Black Brown, Peter"));
     }
 
-    protected String abbreviate(String name) {
+    private String abbreviate(String name) {
         return new AuthorLastFirstAbbreviator().format(name);
     }
 

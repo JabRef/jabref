@@ -3,21 +3,25 @@ package org.jabref.gui.externalfiletype;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import javax.swing.Icon;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.FileHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The menu item used in the popup menu for opening external resources associated
@@ -25,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
  * to process the request if the user clicks this menu item.
  */
 public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
-    private static final Log LOGGER = LogFactory.getLog(ExternalFileMenuItem.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalFileMenuItem.class);
 
     private final BibEntry entry;
     private final String link;
@@ -56,7 +60,8 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         boolean success = openLink();
         if (!success) {
-            frame.output(Localization.lang("Unable to open link."));
+            List<Path> searchedDirs = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+            frame.output(Localization.lang("Unable to open %0", link) + " " + Arrays.toString(searchedDirs.toArray()));
         }
     }
 
@@ -67,7 +72,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
             if (!this.fileType.isPresent()) {
                 if (this.fieldName == null) {
                     // We don't already know the file type, so we try to deduce it from the extension:
-                    Optional<String> extension = FileUtil.getFileExtension(link);
+                    Optional<String> extension = FileHelper.getFileExtension(link);
                     // Now we know the extension, check if it is one we know about:
                     type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.orElse(null));
                     fileType = type;

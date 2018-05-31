@@ -25,12 +25,13 @@ import org.jabref.logic.importer.fileformat.bibtexml.Entry;
 import org.jabref.logic.importer.fileformat.bibtexml.File;
 import org.jabref.logic.importer.fileformat.bibtexml.Inbook;
 import org.jabref.logic.importer.fileformat.bibtexml.Incollection;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Importer for the BibTeXML format.
@@ -40,13 +41,12 @@ import org.apache.commons.logging.LogFactory;
  */
 public class BibTeXMLImporter extends Importer {
 
-    private static final Log LOGGER = LogFactory.getLog(BibTeXMLImporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibTeXMLImporter.class);
 
     private static final Pattern START_PATTERN = Pattern.compile("<(bibtex:)?file .*");
 
     private static final List<String> IGNORED_METHODS = Arrays.asList("getClass", "getAnnotate", "getContents",
             "getPrice", "getSize", "getChapter");
-
 
     @Override
     public String getName() {
@@ -54,8 +54,8 @@ public class BibTeXMLImporter extends Importer {
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return FileExtensions.BIBTEXML;
+    public FileType getFileType() {
+        return FileType.BIBTEXML;
     }
 
     @Override
@@ -92,50 +92,50 @@ public class BibTeXMLImporter extends Importer {
             for (Entry entry : entries) {
                 BibEntry bibEntry = new BibEntry();
                 if (entry.getArticle() != null) {
-                    bibEntry.setType("article");
+                    bibEntry.setType(BibtexEntryTypes.ARTICLE);
                     parse(entry.getArticle(), fields);
                 } else if (entry.getBook() != null) {
-                    bibEntry.setType("book");
+                    bibEntry.setType(BibtexEntryTypes.BOOK);
                     parse(entry.getBook(), fields);
                 } else if (entry.getBooklet() != null) {
-                    bibEntry.setType("booklet");
+                    bibEntry.setType(BibtexEntryTypes.BOOKLET);
                     parse(entry.getBooklet(), fields);
                 } else if (entry.getConference() != null) {
-                    bibEntry.setType("conference");
+                    bibEntry.setType(BibtexEntryTypes.CONFERENCE);
                     parse(entry.getConference(), fields);
                 } else if (entry.getInbook() != null) {
-                    bibEntry.setType("inbook");
+                    bibEntry.setType(BibtexEntryTypes.INBOOK);
                     parseInbook(entry.getInbook(), fields);
                 } else if (entry.getIncollection() != null) {
-                    bibEntry.setType("incollection");
+                    bibEntry.setType(BibtexEntryTypes.INCOLLECTION);
                     Incollection incollection = entry.getIncollection();
                     if (incollection.getChapter() != null) {
                         fields.put(FieldName.CHAPTER, String.valueOf(incollection.getChapter()));
                     }
                     parse(incollection, fields);
                 } else if (entry.getInproceedings() != null) {
-                    bibEntry.setType("inproceedings");
+                    bibEntry.setType(BibtexEntryTypes.INPROCEEDINGS);
                     parse(entry.getInproceedings(), fields);
                 } else if (entry.getManual() != null) {
-                    bibEntry.setType("manual");
+                    bibEntry.setType(BibtexEntryTypes.MANUAL);
                     parse(entry.getManual(), fields);
                 } else if (entry.getMastersthesis() != null) {
-                    bibEntry.setType("mastersthesis");
+                    bibEntry.setType(BibtexEntryTypes.MASTERSTHESIS);
                     parse(entry.getMastersthesis(), fields);
                 } else if (entry.getMisc() != null) {
-                    bibEntry.setType("misc");
+                    bibEntry.setType(BibtexEntryTypes.MISC);
                     parse(entry.getMisc(), fields);
                 } else if (entry.getPhdthesis() != null) {
-                    bibEntry.setType("phdthesis");
+                    bibEntry.setType(BibtexEntryTypes.PHDTHESIS);
                     parse(entry.getPhdthesis(), fields);
                 } else if (entry.getProceedings() != null) {
-                    bibEntry.setType("proceedings");
+                    bibEntry.setType(BibtexEntryTypes.PROCEEDINGS);
                     parse(entry.getProceedings(), fields);
                 } else if (entry.getTechreport() != null) {
-                    bibEntry.setType("techreport");
+                    bibEntry.setType(BibtexEntryTypes.TECHREPORT);
                     parse(entry.getTechreport(), fields);
                 } else if (entry.getUnpublished() != null) {
-                    bibEntry.setType("unpublished");
+                    bibEntry.setType(BibtexEntryTypes.UNPUBLISHED);
                     parse(entry.getUnpublished(), fields);
                 }
 

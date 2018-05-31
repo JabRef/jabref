@@ -17,19 +17,20 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AboutDialogViewModel extends AbstractViewModel {
 
-    private static final String homepageUrl = "https://www.jabref.org";
-    private static final String donationUrl = "https://donations.jabref.org";
-    private static final String librariesUrl = "https://github.com/JabRef/jabref/blob/master/external-libraries.txt";
-    private static final String githubUrl = "https://github.com/JabRef/jabref";
-    private static final String licenseUrl = "https://github.com/JabRef/jabref/blob/master/LICENSE.md";
+    private static final String HOMEPAGE_URL = "https://www.jabref.org";
+    private static final String DONATION_URL = "https://donations.jabref.org";
+    private static final String LIBRARIES_URL = "https://github.com/JabRef/jabref/blob/master/external-libraries.txt";
+    private static final String GITHUB_URL = "https://github.com/JabRef/jabref";
+    private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/master/LICENSE.md";
     private final String changelogUrl;
     private final String versionInfo;
-    private final Log logger = LogFactory.getLog(AboutDialogViewModel.class);
+    private final ReadOnlyStringWrapper environmentInfo = new ReadOnlyStringWrapper();
+    private final Logger logger = LoggerFactory.getLogger(AboutDialogViewModel.class);
     private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper authors = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper developers = new ReadOnlyStringWrapper();
@@ -85,6 +86,10 @@ public class AboutDialogViewModel extends AbstractViewModel {
         return authors.get();
     }
 
+    public String getVersionInfo() {
+        return versionInfo;
+    }
+
     public ReadOnlyStringProperty developersProperty() {
         return developers.getReadOnlyProperty();
     }
@@ -109,21 +114,25 @@ public class AboutDialogViewModel extends AbstractViewModel {
         return license.get();
     }
 
+    public String getEnvironmentInfo() {
+        return environmentInfo.get();
+    }
+
     public void copyVersionToClipboard() {
         clipBoardManager.setClipboardContents(versionInfo);
         dialogService.notify(Localization.lang("Copied version to clipboard"));
     }
 
     public void openJabrefWebsite() {
-        openWebsite(homepageUrl);
+        openWebsite(HOMEPAGE_URL);
     }
 
     public void openExternalLibrariesWebsite() {
-        openWebsite(librariesUrl);
+        openWebsite(LIBRARIES_URL);
     }
 
     public void openGithub() {
-        openWebsite(githubUrl);
+        openWebsite(GITHUB_URL);
     }
 
     public void openChangeLog() {
@@ -131,11 +140,11 @@ public class AboutDialogViewModel extends AbstractViewModel {
     }
 
     public void openLicense() {
-        openWebsite(licenseUrl);
+        openWebsite(LICENSE_URL);
     }
 
     public void openDonation() {
-        openWebsite(donationUrl);
+        openWebsite(DONATION_URL);
     }
 
     private void openWebsite(String url) {

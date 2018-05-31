@@ -42,7 +42,6 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
     private final List<TableRow> tableRows = new ArrayList<>(10);
 
-
     static class TableRow {
 
         private String name;
@@ -210,7 +209,6 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         }
         rowCount = tableRows.size() + 5;
     }
-
 
     class DeleteRowAction extends AbstractAction {
 

@@ -1,9 +1,9 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
@@ -12,7 +12,7 @@ public class NormalizeNamesFormatterTest {
 
     private NormalizeNamesFormatter formatter;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         formatter = new NormalizeNamesFormatter();
     }
@@ -111,7 +111,7 @@ public class NormalizeNamesFormatterTest {
 
     @Test
     public void formatExample() {
-        assertEquals(formatter.format(formatter.getExampleInput()), "Einstein, Albert and Turing, Alan");
+        assertEquals("Einstein, Albert and Turing, Alan", formatter.format(formatter.getExampleInput()));
     }
 
     @Test
@@ -157,8 +157,13 @@ public class NormalizeNamesFormatterTest {
     }
 
     @Test
+    public void testOneCommaUntouched() {
+        assertEquals("Canon der Barbar, Alexander der Große", formatter.format("Canon der Barbar, Alexander der Große"));
+    }
+
+    @Test
     public void testAvoidNameAffixes() {
-        assertEquals("der Barbar, Canon and der Große, Alexander", formatter.format("Canon der Barbar, Alexander der Große"));
+        assertEquals("der Barbar, Canon and der Große, Alexander and der Alexander, Peter", formatter.format("Canon der Barbar, Alexander der Große, Peter der Alexander"));
     }
 
     @Test

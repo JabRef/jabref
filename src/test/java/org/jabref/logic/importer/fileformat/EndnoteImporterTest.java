@@ -12,25 +12,26 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class EndnoteImporterTest {
 
     private EndnoteImporter importer;
 
-
-    @Before
+    @BeforeEach
     public void setUp() {
-        importer = new EndnoteImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
+        importer = new EndnoteImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     @Test
@@ -45,9 +46,7 @@ public class EndnoteImporterTest {
 
     @Test
     public void testsGetExtensions() {
-
-        assertEquals(FileExtensions.ENDNOTE, importer.getExtensions());
-
+        assertEquals(FileType.ENDNOTE, importer.getFileType());
     }
 
     @Test
@@ -60,8 +59,8 @@ public class EndnoteImporterTest {
     public void testIsRecognizedFormat() throws IOException, URISyntaxException {
         List<String> list = Arrays.asList("Endnote.pattern.A.enw", "Endnote.pattern.E.enw", "Endnote.book.example.enw");
 
-        for (String str : list) {
-            Path file = Paths.get(EndnoteImporterTest.class.getResource(str).toURI());
+        for (String string : list) {
+            Path file = Paths.get(EndnoteImporterTest.class.getResource(string).toURI());
             assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
@@ -72,8 +71,8 @@ public class EndnoteImporterTest {
                 "IsiImporterTestWOS.isi", "IsiImporterTestMedline.isi", "RisImporterTest1.ris",
                 "Endnote.pattern.no_enw", "empty.pdf", "annotated.pdf");
 
-        for (String str : list) {
-            Path file = Paths.get(EndnoteImporterTest.class.getResource(str).toURI());
+        for (String string : list) {
+            Path file = Paths.get(EndnoteImporterTest.class.getResource(string).toURI());
             assertFalse(importer.isRecognizedFormat(file, Charset.defaultCharset()));
         }
     }
@@ -85,57 +84,57 @@ public class EndnoteImporterTest {
 
         assertEquals(5, bibEntries.size());
 
-        BibEntry be0 = bibEntries.get(0);
-        assertEquals("misc", be0.getType());
-        assertEquals(Optional.of("testA0 and testA1"), be0.getField("author"));
-        assertEquals(Optional.of("testE0 and testE1"), be0.getField("editor"));
-        assertEquals(Optional.of("testT"), be0.getField("title"));
+        BibEntry first = bibEntries.get(0);
+        assertEquals("misc", first.getType());
+        assertEquals(Optional.of("testA0 and testA1"), first.getField("author"));
+        assertEquals(Optional.of("testE0 and testE1"), first.getField("editor"));
+        assertEquals(Optional.of("testT"), first.getField("title"));
 
-        BibEntry be1 = bibEntries.get(1);
-        assertEquals("misc", be1.getType());
-        assertEquals(Optional.of("testC"), be1.getField("address"));
-        assertEquals(Optional.of("testB2"), be1.getField("booktitle"));
-        assertEquals(Optional.of("test8"), be1.getField("date"));
-        assertEquals(Optional.of("test7"), be1.getField("edition"));
-        assertEquals(Optional.of("testJ"), be1.getField("journal"));
-        assertEquals(Optional.of("testD"), be1.getField("year"));
+        BibEntry second = bibEntries.get(1);
+        assertEquals("misc", second.getType());
+        assertEquals(Optional.of("testC"), second.getField("address"));
+        assertEquals(Optional.of("testB2"), second.getField("booktitle"));
+        assertEquals(Optional.of("test8"), second.getField("date"));
+        assertEquals(Optional.of("test7"), second.getField("edition"));
+        assertEquals(Optional.of("testJ"), second.getField("journal"));
+        assertEquals(Optional.of("testD"), second.getField("year"));
 
-        BibEntry be2 = bibEntries.get(2);
-        assertEquals("article", be2.getType());
-        assertEquals(Optional.of("testB0"), be2.getField("journal"));
+        BibEntry third = bibEntries.get(2);
+        assertEquals("article", third.getType());
+        assertEquals(Optional.of("testB0"), third.getField("journal"));
 
-        BibEntry be3 = bibEntries.get(3);
-        assertEquals("book", be3.getType());
-        assertEquals(Optional.of("testI0"), be3.getField("publisher"));
-        assertEquals(Optional.of("testB1"), be3.getField("series"));
+        BibEntry fourth = bibEntries.get(3);
+        assertEquals("book", fourth.getType());
+        assertEquals(Optional.of("testI0"), fourth.getField("publisher"));
+        assertEquals(Optional.of("testB1"), fourth.getField("series"));
 
-        BibEntry be4 = bibEntries.get(4);
-        assertEquals("mastersthesis", be4.getType());
-        assertEquals(Optional.of("testX"), be4.getField("abstract"));
-        assertEquals(Optional.of("testF"), be4.getField("bibtexkey"));
-        assertEquals(Optional.of("testR"), be4.getField("doi"));
-        assertEquals(Optional.of("testK"), be4.getField("keywords"));
-        assertEquals(Optional.of("testO1"), be4.getField("note"));
-        assertEquals(Optional.of("testN"), be4.getField("number"));
-        assertEquals(Optional.of("testP"), be4.getField("pages"));
-        assertEquals(Optional.of("testI1"), be4.getField("school"));
-        assertEquals(Optional.of("testU"), be4.getField("url"));
-        assertEquals(Optional.of("testV"), be4.getField("volume"));
+        BibEntry fifth = bibEntries.get(4);
+        assertEquals("mastersthesis", fifth.getType());
+        assertEquals(Optional.of("testX"), fifth.getField("abstract"));
+        assertEquals(Optional.of("testF"), fifth.getField("bibtexkey"));
+        assertEquals(Optional.of("testR"), fifth.getField("doi"));
+        assertEquals(Optional.of("testK"), fifth.getField("keywords"));
+        assertEquals(Optional.of("testO1"), fifth.getField("note"));
+        assertEquals(Optional.of("testN"), fifth.getField("number"));
+        assertEquals(Optional.of("testP"), fifth.getField("pages"));
+        assertEquals(Optional.of("testI1"), fifth.getField("school"));
+        assertEquals(Optional.of("testU"), fifth.getField("url"));
+        assertEquals(Optional.of("testV"), fifth.getField("volume"));
     }
 
     @Test
     public void testImportEntries1() throws IOException {
-        String s = "%O Artn\\\\s testO\n%A testA,\n%E testE0, testE1";
-        List<BibEntry> bibEntries = importer.importDatabase(new BufferedReader(new StringReader(s))).getDatabase()
+        String medlineString = "%O Artn\\\\s testO\n%A testA,\n%E testE0, testE1";
+        List<BibEntry> bibEntries = importer.importDatabase(new BufferedReader(new StringReader(medlineString))).getDatabase()
                 .getEntries();
 
-        assertEquals(1, bibEntries.size());
+        BibEntry entry = bibEntries.get(0);
 
-        BibEntry be = bibEntries.get(0);
-        assertEquals("misc", be.getType());
-        assertEquals(Optional.of("testA"), be.getField("author"));
-        assertEquals(Optional.of("testE0, testE1"), be.getField("editor"));
-        assertEquals(Optional.of("testO"), be.getField("pages"));
+        assertEquals(1, bibEntries.size());
+        assertEquals("misc", entry.getType());
+        assertEquals(Optional.of("testA"), entry.getField("author"));
+        assertEquals(Optional.of("testE0, testE1"), entry.getField("editor"));
+        assertEquals(Optional.of("testO"), entry.getField("pages"));
     }
 
     @Test
@@ -143,19 +142,19 @@ public class EndnoteImporterTest {
         Path file = Paths.get(EndnoteImporterTest.class.getResource("Endnote.book.example.enw").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
-        assertEquals(1, bibEntries.size());
+        BibEntry entry = bibEntries.get(0);
 
-        BibEntry be = bibEntries.get(0);
-        assertEquals("book", be.getType());
-        assertEquals(Optional.of("Heidelberg"), be.getField("address"));
-        assertEquals(Optional.of("Preißel, René and Stachmann, Bjørn"), be.getField("author"));
-        assertEquals(Optional.of("3., aktualisierte und erweiterte Auflage"), be.getField("edition"));
-        assertEquals(Optional.of("Versionsverwaltung"), be.getField("keywords"));
-        assertEquals(Optional.of("XX, 327"), be.getField("pages"));
-        assertEquals(Optional.of("dpunkt.verlag"), be.getField("publisher"));
+        assertEquals(1, bibEntries.size());
+        assertEquals("book", entry.getType());
+        assertEquals(Optional.of("Heidelberg"), entry.getField("address"));
+        assertEquals(Optional.of("Preißel, René and Stachmann, Bjørn"), entry.getField("author"));
+        assertEquals(Optional.of("3., aktualisierte und erweiterte Auflage"), entry.getField("edition"));
+        assertEquals(Optional.of("Versionsverwaltung"), entry.getField("keywords"));
+        assertEquals(Optional.of("XX, 327"), entry.getField("pages"));
+        assertEquals(Optional.of("dpunkt.verlag"), entry.getField("publisher"));
         assertEquals(Optional.of("Git : dezentrale Versionsverwaltung im Team : Grundlagen und Workflows"),
-                be.getField("title"));
-        assertEquals(Optional.of("http://d-nb.info/107601965X"), be.getField("url"));
-        assertEquals(Optional.of("2016"), be.getField("year"));
+                entry.getField("title"));
+        assertEquals(Optional.of("http://d-nb.info/107601965X"), entry.getField("url"));
+        assertEquals(Optional.of("2016"), entry.getField("year"));
     }
 }

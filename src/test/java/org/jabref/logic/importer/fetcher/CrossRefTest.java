@@ -4,21 +4,20 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Category(FetcherTests.class)
+@FetcherTest
 public class CrossRefTest {
 
     private CrossRef fetcher;
     private BibEntry barrosEntry;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         fetcher = new CrossRef();
 
@@ -112,5 +111,18 @@ public class CrossRefTest {
         entry.setField("author", "Barros, Alistair and Dumas, Marlon and Arthur H.M. ter Hofstede");
         entry.setField("year", "2005");
         assertEquals(Optional.of(barrosEntry), fetcher.performSearch(entry).stream().findFirst());
+    }
+
+    @Test
+    public void performSearchByIdFindsPaperWithoutTitle() throws Exception {
+        BibEntry entry = new BibEntry("article");
+        entry.setField("author", "Dominik Wujastyk");
+        entry.setField("doi", "10.1023/a:1003473214310");
+        entry.setField("issn", "0019-7246");
+        entry.setField("pages", "172-176");
+        entry.setField("volume", "42");
+        entry.setField("year", "1999");
+
+        assertEquals(Optional.of(entry), fetcher.performSearchById("10.1023/a:1003473214310"));
     }
 }

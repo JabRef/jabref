@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.jabref.gui.IconTheme;
 import org.jabref.logic.util.OS;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import com.google.common.base.Throwables;
 import org.apache.logging.log4j.core.LogEvent;
 
 public class LogEventViewModel {
@@ -46,7 +46,7 @@ public class LogEventViewModel {
     }
 
     public Optional<String> getStackTrace() {
-        return Optional.ofNullable(logEvent.getMessage().getThrowable()).map(ExceptionUtils::getStackTrace);
+        return Optional.ofNullable(logEvent.getMessage().getThrowable()).map(Throwables::getStackTraceAsString);
     }
 
     public String getDetailedText() {

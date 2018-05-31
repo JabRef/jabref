@@ -60,6 +60,7 @@ public class MetaData {
     private static final Log LOGGER = LogFactory.getLog(MetaData.class);
 
     private Map<String, List<String>> unkownMetaData = new HashMap<>();
+    private boolean isEventPropagationEnabled = true;
 
 
     public void addBibsonomyData(String key, Vector<String> value){
@@ -91,6 +92,7 @@ public class MetaData {
         groupsRoot = Objects.requireNonNull(root);
         groupsRoot.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
         eventBus.post(new GroupUpdatedEvent(this));
+        postChange();
     }
 
     /**
@@ -236,7 +238,9 @@ public class MetaData {
      * Posts a new {@link MetaDataChangedEvent} on the {@link EventBus}.
      */
     private void postChange() {
-        eventBus.post(new MetaDataChangedEvent(this));
+        if (isEventPropagationEnabled) {
+            eventBus.post(new MetaDataChangedEvent(this));
+        }
     }
 
     /**
@@ -258,6 +262,13 @@ public class MetaData {
         if (postChanges == ChangePropagation.POST_EVENT) {
             postChange();
         }
+    }
+
+    /**
+     * If disabled {@link MetaDataChangedEvent} will not be posted.
+     */
+    public void setEventPropagation(boolean enabled) {
+        this.isEventPropagationEnabled = enabled;
     }
 
     public void registerListener(Object listener) {

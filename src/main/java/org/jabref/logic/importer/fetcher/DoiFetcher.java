@@ -21,9 +21,10 @@ import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
-    public static final String name = "DOI";
+    public static final String NAME = "DOI";
 
     private final ImportFormatPreferences preferences;
 
@@ -33,7 +34,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
     @Override
     public String getName() {
-        return DoiFetcher.name;
+        return DoiFetcher.NAME;
     }
 
     @Override
@@ -43,8 +44,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        Optional<DOI> doi = DOI.build(identifier);
-
+        Optional<DOI> doi = DOI.parse(identifier);
         try {
             if (doi.isPresent()) {
                 URL doiURL = new URL(doi.get().getURIAsASCIIString());
@@ -55,11 +55,11 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 String bibtexString = download.asString();
 
                 // BibTeX entry
-                Optional<BibEntry> fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences);
+                Optional<BibEntry> fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences, new DummyFileUpdateMonitor());
                 fetchedEntry.ifPresent(this::doPostCleanup);
                 return fetchedEntry;
             } else {
-                throw new FetcherException(Localization.lang("Invalid_DOI:_'%0'.", identifier));
+                throw new FetcherException(Localization.lang("Invalid DOI: '%0'.", identifier));
             }
         } catch (IOException e) {
             throw new FetcherException(Localization.lang("Connection error"), e);
@@ -80,5 +80,4 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         bibEntry.ifPresent(list::add);
         return list;
     }
-
 }

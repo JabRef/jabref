@@ -18,7 +18,7 @@ import com.google.common.base.Strings;
  * To make it easier to maintain Scribe-compatible databases, the standard styles convert
  * a single dash (as in 7-33) to the double dash used in TEX to denote number ranges (as in 7--33).
  */
-public class NormalizePagesFormatter implements Formatter {
+public class NormalizePagesFormatter extends Formatter {
 
     // "startpage" and "endpage" are named groups. See http://stackoverflow.com/a/415635/873282 for a documentation
     private static final Pattern PAGES_DETECT_PATTERN = Pattern.compile("\\A(?<startpage>(\\d+:)?\\d+)(?:-{1,2}(?<endpage>(\\d+:)?\\d+))?\\Z");
@@ -26,7 +26,6 @@ public class NormalizePagesFormatter implements Formatter {
     private static final String REJECT_LITERALS = "[^a-zA-Z0-9,\\-\\+,:]";
     private static final String PAGES_REPLACE_PATTERN = "${startpage}--${endpage}";
     private static final String SINGLE_PAGE_REPLACE_PATTERN = "$1";
-
 
     @Override
     public String getName() {
@@ -62,7 +61,7 @@ public class NormalizePagesFormatter implements Formatter {
         }
 
         // Remove pages prefix
-        String cleanValue = value.replace("pp.", "").replace("p.","");
+        String cleanValue = value.replace("pp.", "").replace("p.", "");
         // remove unwanted literals incl. whitespace
         cleanValue = cleanValue.replaceAll("\u2013|\u2014", "-").replaceAll(REJECT_LITERALS, "");
         // try to find pages pattern
@@ -87,15 +86,5 @@ public class NormalizePagesFormatter implements Formatter {
     @Override
     public String getExampleInput() {
         return "1 - 2";
-    }
-
-    @Override
-    public int hashCode() {
-        return defaultHashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return defaultEquals(obj);
     }
 }

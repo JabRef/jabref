@@ -2,12 +2,20 @@ package org.jabref.gui;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import javafx.concurrent.Task;
+import javafx.print.PrinterJob;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
@@ -17,6 +25,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 
 import org.controlsfx.dialog.ExceptionDialog;
+import org.controlsfx.dialog.ProgressDialog;
 
 /**
  * This class provides methods to create default
@@ -33,7 +42,16 @@ public class FXDialogService implements DialogService {
         FXDialog alert = new FXDialog(type, title, true);
         alert.setHeaderText(null);
         alert.setContentText(content);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         return alert;
+    }
+
+    @Override
+    public Optional<String> showInputDialogAndWait(String title, String content) {
+        TextInputDialog inputDialog = new TextInputDialog();
+        inputDialog.setHeaderText(title);
+        inputDialog.setContentText(content);
+        return inputDialog.showAndWait();
     }
 
     @Override
@@ -82,7 +100,8 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
-    public boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel, String cancelButtonLabel) {
+    public boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel,
+            String cancelButtonLabel) {
         FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelButtonType = new ButtonType(cancelButtonLabel, ButtonBar.ButtonData.NO);
@@ -113,6 +132,20 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
+    public <V> void showCanceableProgressDialogAndWait(Task<V> task) {
+        ProgressDialog progressDialog = new ProgressDialog(task);
+        progressDialog.setOnCloseRequest(evt -> task.cancel());
+        DialogPane dialogPane = progressDialog.getDialogPane();
+        dialogPane.getButtonTypes().add(ButtonType.CANCEL);
+        Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
+        cancelButton.setOnAction(evt -> {
+            task.cancel();
+            progressDialog.close();
+        });
+        progressDialog.show();
+    }
+
+    @Override
     public void notify(String message) {
         JabRefGUI.getMainFrame().output(message);
     }
@@ -121,6 +154,7 @@ public class FXDialogService implements DialogService {
     public Optional<Path> showFileSaveDialog(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
         File file = chooser.showSaveDialog(null);
+        Optional.ofNullable(chooser.getSelectedExtensionFilter()).ifPresent(fileDialogConfiguration::setSelectedExtensionFilter);
         return Optional.ofNullable(file).map(File::toPath);
     }
 
@@ -128,6 +162,7 @@ public class FXDialogService implements DialogService {
     public Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
         File file = chooser.showOpenDialog(null);
+        Optional.ofNullable(chooser.getSelectedExtensionFilter()).ifPresent(fileDialogConfiguration::setSelectedExtensionFilter);
         return Optional.ofNullable(file).map(File::toPath);
     }
 
@@ -136,6 +171,13 @@ public class FXDialogService implements DialogService {
         DirectoryChooser chooser = getConfiguredDirectoryChooser(directoryDialogConfiguration);
         File file = chooser.showDialog(null);
         return Optional.ofNullable(file).map(File::toPath);
+    }
+
+    @Override
+    public List<Path> showFileOpenDialogAndGetMultipleFiles(FileDialogConfiguration fileDialogConfiguration) {
+        FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
+        List<File> files = chooser.showOpenMultipleDialog(null);
+        return files != null ? files.stream().map(File::toPath).collect(Collectors.toList()) : Collections.emptyList();
     }
 
     private DirectoryChooser getConfiguredDirectoryChooser(DirectoryDialogConfiguration directoryDialogConfiguration) {
@@ -151,5 +193,10 @@ public class FXDialogService implements DialogService {
         chooser.setInitialFileName(fileDialogConfiguration.getInitialFileName());
         fileDialogConfiguration.getInitialDirectory().map(Path::toFile).ifPresent(chooser::setInitialDirectory);
         return chooser;
+    }
+
+    @Override
+    public boolean showPrintDialog(PrinterJob job) {
+        return job.showPrintDialog(null);
     }
 }

@@ -11,7 +11,6 @@ import org.jabref.gui.IconTheme;
 import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.logic.l10n.Localization;
 
-
 public class ShowDocumentViewerAction extends MnemonicAwareAction {
 
     public ShowDocumentViewerAction(String title, String tooltip, Icon iconFile) {

@@ -3,9 +3,12 @@ package org.jabref.gui.actions;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+
 import org.jabref.JabRefGUI;
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.maintable.MainTable;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
@@ -44,8 +47,13 @@ public class CopyBibTeXKeyAndLinkAction implements BaseAction {
                 sb.append(OS.NEWLINE);
             }
 
-            ClipBoardManager clipboard = new ClipBoardManager();
-            clipboard.setClipboardContents(sb.toString());
+            // This works on Mac and Windows 10, but not on Ubuntu 16.04
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                final Clipboard clipboard = Clipboard.getSystemClipboard();
+                final ClipboardContent content = new ClipboardContent();
+                content.putHtml(sb.toString());
+                clipboard.setContent(content);
+            });
 
             int copied = entriesWithKey.size();
             int toCopy = entries.size();

@@ -25,8 +25,8 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -40,7 +40,13 @@ import org.apache.commons.logging.LogFactory;
 
 public class VM implements Warn {
 
-    private static final Log LOGGER = LogFactory.getLog(VM.class);
+    public static final Integer FALSE = 0;
+
+    public static final Integer TRUE = 1;
+
+    private static final Pattern ADD_PERIOD_PATTERN = Pattern.compile("([^\\.\\?\\!\\}\\s])(\\}|\\s)*$");
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(VM.class);
 
     private List<BstEntry> entries;
 
@@ -52,10 +58,6 @@ public class VM implements Warn {
 
     private Stack<Object> stack = new Stack<>();
 
-    public static final Integer FALSE = 0;
-
-    public static final Integer TRUE = 1;
-
     private final Map<String, BstFunction> buildInFunctions;
 
     private File file;
@@ -65,9 +67,6 @@ public class VM implements Warn {
     private StringBuilder bbl;
 
     private String preamble = "";
-
-    private static final Pattern ADD_PERIOD_PATTERN = Pattern.compile("([^\\.\\?\\!\\}\\s])(\\}|\\s)*$");
-
 
     public static class Identifier {
 
@@ -501,7 +500,7 @@ public class VM implements Warn {
          */
         buildInFunctions.put("stack$", context -> {
             while (!stack.empty()) {
-                LOGGER.debug(stack.pop());
+                LOGGER.debug("Stack entry", stack.pop());
             }
         });
 
@@ -565,7 +564,7 @@ public class VM implements Warn {
         /**
          * Pops and prints the top of the stack to the log file. It's useful for debugging.
          */
-        buildInFunctions.put("top$", context -> LOGGER.debug(stack.pop()));
+        buildInFunctions.put("top$", context -> LOGGER.debug("Stack entry", stack.pop()));
 
         /**
          * Pushes the current entry's type (book, article, etc.), but pushes
@@ -830,7 +829,6 @@ public class VM implements Warn {
         return false;
     }
 
-
     public String run(BibDatabase db) {
         preamble = db.getPreamble().orElse("");
         return run(db.getEntries());
@@ -946,7 +944,6 @@ public class VM implements Warn {
         functions.put(name, new MacroFunction(replacement));
     }
 
-
     public class MacroFunction implements BstFunction {
 
         private final String replacement;
@@ -1047,7 +1044,6 @@ public class VM implements Warn {
         execute(child.getChild(0).getText(), null);
     }
 
-
     public class StackFunction implements BstFunction {
 
         private final Tree localTree;
@@ -1100,7 +1096,6 @@ public class VM implements Warn {
 
         }
     }
-
 
     private void push(Tree t) {
         stack.push(t);
@@ -1182,7 +1177,6 @@ public class VM implements Warn {
         }
     }
 
-
     public static class BstEntry {
 
         private final BibEntry entry;
@@ -1206,7 +1200,6 @@ public class VM implements Warn {
             return entry;
         }
     }
-
 
     private void push(Integer integer) {
         stack.push(integer);

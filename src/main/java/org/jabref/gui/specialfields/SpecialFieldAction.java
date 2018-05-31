@@ -14,18 +14,18 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.specialfields.SpecialField;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SpecialFieldAction implements BaseAction {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpecialFieldAction.class);
     private final JabRefFrame frame;
     private final SpecialField specialField;
     private final String value;
     private final boolean nullFieldIfValueIsTheSame;
-    private final String undoText;
 
-    private static final Log LOGGER = LogFactory.getLog(SpecialFieldAction.class);
+    private final String undoText;
 
 
     /**
@@ -55,7 +55,7 @@ public class SpecialFieldAction implements BaseAction {
             for (BibEntry be : bes) {
                 // if (value==null) and then call nullField has been omitted as updatefield also handles value==null
                 List<FieldChange> changes = SpecialFieldsUtils.updateField(specialField, value, be, nullFieldIfValueIsTheSame, Globals.prefs.isKeywordSyncEnabled(), Globals.prefs.getKeywordDelimiter());
-                for(FieldChange change: changes) {
+                for (FieldChange change: changes) {
                     ce.addEdit(new UndoableFieldChange(change));
                 }
             }

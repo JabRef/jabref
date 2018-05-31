@@ -1,17 +1,16 @@
 package org.jabref.logic.journals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class JournalAbbreviationRepositoryTest {
 
     @Test
     public void empty() {
         JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
-        assertEquals(0, repository.size());
         assertTrue(repository.getAbbreviations().isEmpty());
     }
 
@@ -41,15 +40,6 @@ public class JournalAbbreviationRepositoryTest {
     }
 
     @Test
-    public void testSorting() {
-        JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
-        repository.addEntry(new Abbreviation("Long Name", "L. N."));
-        repository.addEntry(new Abbreviation("A Long Name", "AL. N."));
-        assertEquals("A Long Name", repository.getAbbreviations().first().getName());
-        assertEquals("Long Name", repository.getAbbreviations().last().getName());
-    }
-
-    @Test
     public void testDuplicates() {
         JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
         repository.addEntry(new Abbreviation("Long Name", "L. N."));
@@ -63,9 +53,6 @@ public class JournalAbbreviationRepositoryTest {
         repository.addEntry(new Abbreviation("Old Long Name", "L. N."));
         repository.addEntry(new Abbreviation("New Long Name", "L. N."));
         assertEquals(2, repository.size());
-
-        assertEquals("L N", repository.getNextAbbreviation("L. N.").orElse("WRONG"));
-        assertEquals("New Long Name", repository.getNextAbbreviation("L N").orElse("WRONG"));
     }
 
     @Test

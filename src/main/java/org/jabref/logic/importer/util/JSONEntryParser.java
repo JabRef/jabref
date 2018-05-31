@@ -2,19 +2,20 @@ package org.jabref.logic.importer.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.Month;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JSONEntryParser {
 
-    private static final Log LOGGER = LogFactory.getLog(JSONEntryParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSONEntryParser.class);
 
     /**
      * Convert a JSONObject containing a bibJSON entry to a BibEntry
@@ -28,8 +29,6 @@ public class JSONEntryParser {
 
         // Fields that are accessible in the journal part of the BibJson object
         String[] journalSingleFieldStrings = {FieldName.PUBLISHER, FieldName.NUMBER, FieldName.VOLUME};
-
-
 
         BibEntry entry = new BibEntry();
         entry.setType("article");
@@ -211,7 +210,8 @@ public class JSONEntryParser {
             entry.setField(FieldName.DATE, date); // For biblatex
             String[] dateparts = date.split("-");
             entry.setField(FieldName.YEAR, dateparts[0]);
-            entry.setField(FieldName.MONTH, MonthUtil.getMonthByNumber(Integer.parseInt(dateparts[1])).bibtexFormat);
+            Optional<Month> month = Month.getMonthByNumber(Integer.parseInt(dateparts[1]));
+            month.ifPresent(entry::setMonth);
         }
 
         // Clean up abstract (often starting with Abstract)

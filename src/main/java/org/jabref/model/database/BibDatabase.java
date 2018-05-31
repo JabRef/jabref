@@ -27,7 +27,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.InternalBibtexFields;
-import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.Month;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
@@ -35,14 +35,14 @@ import org.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A bibliography database.
  */
 public class BibDatabase {
-    private static final Log LOGGER = LogFactory.getLog(BibDatabase.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
     /**
      * State attributes
@@ -99,11 +99,13 @@ public class BibDatabase {
     }
 
     /**
-     * Returns an EntrySorter with the sorted entries from this base,
-     * sorted by the given Comparator.
+     * Returns the list of entries sorted by the given comparator.
      */
-    public synchronized EntrySorter getSorter(Comparator<BibEntry> comp) {
-        return new EntrySorter(new ArrayList<>(getEntries()), comp);
+    public synchronized List<BibEntry> getEntriesSorted(Comparator<BibEntry> comparator) {
+        List<BibEntry> entriesSorted = new ArrayList<>(entries);
+        entriesSorted.sort(comparator);
+
+        return entriesSorted;
     }
 
     /**
@@ -316,6 +318,18 @@ public class BibDatabase {
     }
 
     /**
+     * Returns the string with the given name.
+     */
+    public Optional<BibtexString> getStringByName(String name) {
+        for (BibtexString string : getStringValues()) {
+            if (string.getName().equals(name)) {
+                return Optional.of(string);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
      * Returns the number of strings.
      */
     public int getStringCount() {
@@ -336,18 +350,6 @@ public class BibDatabase {
      */
     public void copyPreamble(BibDatabase database) {
         setPreamble(database.getPreamble().orElse(""));
-    }
-
-    /**
-     * Copies all Strings from another BibDatabase.
-     *
-     * @param database another BibDatabase
-     */
-    public void copyStrings(BibDatabase database) {
-        for (String key : database.getStringKeySet()) {
-            BibtexString string = database.getString(key);
-            addString(string);
-        }
     }
 
     /**
@@ -488,12 +490,8 @@ public class BibDatabase {
 
         // If we get to this point, the string has obviously not been defined locally.
         // Check if one of the standard BibTeX month strings has been used:
-        MonthUtil.Month month = MonthUtil.getMonthByShortName(label);
-        if (month.isValid()) {
-            return month.fullName;
-        } else {
-            return null;
-        }
+        Optional<Month> month = Month.getMonthByShortName(label);
+        return month.map(Month::getFullName).orElse(null);
     }
 
     private String resolveContent(String result, Set<String> usedIds, Set<String> allUsedIds) {
@@ -575,7 +573,7 @@ public class BibDatabase {
             this.eventBus.unregister(listener);
         } catch (IllegalArgumentException e) {
             // occurs if the event source has not been registered, should not prevent shutdown
-            LOGGER.debug(e);
+            LOGGER.debug("Problem unregistering", e);
         }
     }
 
@@ -617,4 +615,5 @@ public class BibDatabase {
     public DuplicationChecker getDuplicationChecker() {
         return duplicationChecker;
     }
+
 }

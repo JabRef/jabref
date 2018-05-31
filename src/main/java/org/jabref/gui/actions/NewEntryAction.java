@@ -1,10 +1,13 @@
 package org.jabref.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
+import org.jabref.Globals;
 import org.jabref.gui.EntryTypeDialog;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
@@ -13,11 +16,11 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NewEntryAction extends MnemonicAwareAction {
-    private static final Log LOGGER = LogFactory.getLog(NewEntryAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryAction.class);
 
     private final JabRefFrame jabRefFrame;
     private String type; // The type of item to create.
@@ -58,6 +61,8 @@ public class NewEntryAction extends MnemonicAwareAction {
                 return;
             }
             thisType = tp.getName();
+
+            trackNewEntry(tp);
         }
 
         if (jabRefFrame.getBasePanelCount() > 0) {
@@ -67,5 +72,13 @@ public class NewEntryAction extends MnemonicAwareAction {
         } else {
             LOGGER.info("Action 'New entry' must be disabled when no database is open.");
         }
+    }
+
+    private void trackNewEntry(EntryType type) {
+        Map<String, String> properties = new HashMap<>();
+        properties.put("EntryType", type.getName());
+        Map<String, Double> measurements = new HashMap<>();
+
+        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("NewEntry", properties, measurements));
     }
 }

@@ -4,14 +4,13 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultDesktop implements NativeDesktop {
-    private static final Log LOGGER = LogFactory.getLog(NativeDesktop.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NativeDesktop.class);
 
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
@@ -24,8 +23,8 @@ public class DefaultDesktop implements NativeDesktop {
     }
 
     @Override
-    public void openFolderAndSelectFile(String filePath) throws IOException {
-        File file = Paths.get(filePath).toAbsolutePath().getParent().toFile();
+    public void openFolderAndSelectFile(Path filePath) throws IOException {
+        File file = filePath.toAbsolutePath().getParent().toFile();
         Desktop.getDesktop().open(file);
     }
 

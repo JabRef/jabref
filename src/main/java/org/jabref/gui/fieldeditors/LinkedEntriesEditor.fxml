@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.HBox?>
+<?import org.jabref.gui.util.component.TagBar?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112">
+    <TagBar fx:id="linkedEntriesBar" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+</fx:root>

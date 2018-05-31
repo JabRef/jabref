@@ -16,8 +16,8 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -29,9 +29,9 @@ import org.w3c.dom.Text;
  */
 class OOCalcDatabase {
 
-    private final List<BibEntry> entries;
+    private static final Logger LOGGER = LoggerFactory.getLogger(OOCalcDatabase.class);
 
-    private static final Log LOGGER = LogFactory.getLog(OOCalcDatabase.class);
+    private final List<BibEntry> entries;
 
 
     public OOCalcDatabase(BibDatabase bibtex, List<BibEntry> entries) {

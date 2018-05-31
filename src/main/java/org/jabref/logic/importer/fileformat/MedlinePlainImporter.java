@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -34,15 +34,14 @@ public class MedlinePlainImporter extends Importer {
     private static final Pattern CREATE_DATE_PATTERN = Pattern.compile("\\d{4}/[0123]?\\d/\\s?[012]\\d:[0-5]\\d");
     private static final Pattern COMPLETE_DATE_PATTERN = Pattern.compile("\\d{8}");
 
-
     @Override
     public String getName() {
         return "Medline/PubMed Plain";
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return FileExtensions.MEDLINE_PLAIN;
+    public FileType getFileType() {
+        return FileType.MEDLINE_PLAIN;
     }
 
     @Override

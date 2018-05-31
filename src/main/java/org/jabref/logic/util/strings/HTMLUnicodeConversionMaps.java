@@ -5,18 +5,25 @@ import java.util.Map;
 
 public class HTMLUnicodeConversionMaps {
 
+    // most of the LaTeX commands can be read at http://en.wikibooks.org/wiki/LaTeX/Accents
+    // The symbols can be seen at http://www.fileformat.info/info/unicode/char/a4/index.htm. Replace "a4" with the U+ number
+    // http://detexify.kirelabs.org/classify.html and http://www.ctan.org/tex-archive/info/symbols/comprehensive/ might help to find the right LaTeX command
+    // http://llg.cubic.org/docs/ent2latex.html and http://www.w3.org/TR/xml-entity-names/byalpha.html are also useful
+    public static final Map<String, String> HTML_LATEX_CONVERSION_MAP = new HashMap<>();
+    public static final Map<Integer, String> ESCAPED_ACCENTS = new HashMap<>();
+    public static final Map<String, String> UNICODE_ESCAPED_ACCENTS = new HashMap<>();
+    public static final Map<Integer, String> NUMERICAL_LATEX_CONVERSION_MAP = new HashMap<>();
+    public static final Map<String, String> UNICODE_LATEX_CONVERSION_MAP = new HashMap<>();
+    public static final Map<String, String> LATEX_HTML_CONVERSION_MAP = new HashMap<>();
+    public static final Map<String, String> LATEX_UNICODE_CONVERSION_MAP = new HashMap<>();
+
     /*   Portions © International Organization for Standardization 1986:
      Permission to copy in any form is granted for use with
      conforming SGML systems and applications as defined in
      ISO 8879, provided this notice is included in all copies.
      */
 
-    // most of the LaTeX commands can be read at http://en.wikibooks.org/wiki/LaTeX/Accents
-    // The symbols can be seen at http://www.fileformat.info/info/unicode/char/a4/index.htm. Replace "a4" with the U+ number
-    // http://detexify.kirelabs.org/classify.html and http://www.ctan.org/tex-archive/info/symbols/comprehensive/ might help to find the right LaTeX command
-    // http://llg.cubic.org/docs/ent2latex.html and http://www.w3.org/TR/xml-entity-names/byalpha.html are also useful
     // as well as http://www.w3.org/Math/characters/unicode.xml
-
     // An array of arrays of strings in the format:
     // {"decimal number of HTML entity", "text HTML entity", "corresponding LaTeX command"}
     // Leaving a field empty is OK as it then will not be included
@@ -287,6 +294,8 @@ public class HTMLUnicodeConversionMaps {
             {"982", "piv", "$\\varphi$"}, // greek pi symbol, U+03D6 ISOgrk3
 
             /* General Punctuation */
+            {"8211", "ndash", "$\\textendash$"},
+            {"8212", "mdash", "$\\textemdash$"},
             {"8226", "bull", "$\\bullet$"}, // bullet = black small circle,
             //                                    U+2022 ISOpub
             /* bullet is NOT the same as bullet operator, U+2219 */
@@ -464,7 +473,7 @@ public class HTMLUnicodeConversionMaps {
             /* Manually added */
             {"35", "", "\\#"}, // Hash
             {"36", "dollar", "\\$"}, // Dollar
-            {"37", "percnt", "\\%"}, // Percent
+            {"37", "#37", "\\%"}, // Percent (&percnt; is not displayed correctly in the entry preview)
             {"39", "apos", "'"}, // Apostrophe
             {"40", "lpar", "("}, // Left bracket
             {"41", "rpar", ")"}, // Right bracket
@@ -755,6 +764,7 @@ public class HTMLUnicodeConversionMaps {
             {"119984", "Uscr", "$\\mathcal{U}$"} // script capital U -- possibly use \mathscr
 
     };
+
     // List of combining accents
     private static final String[][] ACCENT_LIST = new String[][] {{"768", "`"}, // Grave
             {"769", "'"}, // Acute
@@ -843,15 +853,6 @@ public class HTMLUnicodeConversionMaps {
             {"866", "sliding"}, // Double rightwards arrow below - requires extraipa
     };
 
-    public static final Map<String, String> HTML_LATEX_CONVERSION_MAP = new HashMap<>();
-    public static final Map<Integer, String> ESCAPED_ACCENTS = new HashMap<>();
-    public static final Map<String, String> UNICODE_ESCAPED_ACCENTS = new HashMap<>();
-    public static final Map<Integer, String> NUMERICAL_LATEX_CONVERSION_MAP = new HashMap<>();
-    public static final Map<String, String> UNICODE_LATEX_CONVERSION_MAP = new HashMap<>();
-    public static final Map<String, String> LATEX_HTML_CONVERSION_MAP = new HashMap<>();
-    public static final Map<String, String> LATEX_UNICODE_CONVERSION_MAP = new HashMap<>();
-
-
     static {
         for (String[] aConversionList : CONVERSION_LIST) {
             if (!(aConversionList[2].isEmpty())) {
@@ -894,7 +895,9 @@ public class HTMLUnicodeConversionMaps {
         // Support relax to the extent that it is simply removed
         LATEX_HTML_CONVERSION_MAP.put("relax", "");
         LATEX_UNICODE_CONVERSION_MAP.put("relax", "");
-
+        // Support a special version of apostrophe
+        LATEX_HTML_CONVERSION_MAP.put("textquotesingle", "&#39;");
+        LATEX_UNICODE_CONVERSION_MAP.put("textquotesingle", "'"); // apostrophe, U+00027
     }
 
     private HTMLUnicodeConversionMaps() {

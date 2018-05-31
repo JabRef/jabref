@@ -3,6 +3,7 @@ package org.jabref.gui.auximport;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import javax.swing.AbstractAction;
@@ -22,15 +23,20 @@ import javax.swing.JTextField;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.logic.auxparser.AuxParser;
-import org.jabref.logic.auxparser.AuxParserResult;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
+import org.jabref.model.auxparser.AuxParser;
+import org.jabref.model.auxparser.AuxParserResult;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -58,10 +64,9 @@ public class FromAuxDialog extends JabRefDialog {
 
     private boolean generatePressed;
 
-    private AuxParser auxParser;
+    private AuxParserResult auxParserResult;
 
     private final JabRefFrame parentFrame;
-
 
     public FromAuxDialog(JabRefFrame frame, String title, boolean modal, JTabbedPane viewedDBs) {
         super(frame, title, modal, FromAuxDialog.class);
@@ -155,10 +160,15 @@ public class FromAuxDialog extends JabRefDialog {
         auxFileField = new JTextField("", 25);
         JButton browseAuxFileButton = new JButton(Localization.lang("Browse"));
 
-        FileDialog dialog = new FileDialog(parentFrame).withExtension(FileExtensions.AUX);
-        dialog.setDefaultExtension(FileExtensions.AUX);
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(FileType.AUX)
+                .withDefaultExtension(FileType.AUX)
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+        DialogService ds = new FXDialogService();
+
         browseAuxFileButton.addActionListener(e -> {
-            Optional<Path> file = dialog.showDialogAndGetSelectedFile();
+            Optional<Path> file = DefaultTaskExecutor
+                    .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
             file.ifPresent(f -> auxFileField.setText(f.toAbsolutePath().toString()));
         });
 
@@ -168,7 +178,8 @@ public class FromAuxDialog extends JabRefDialog {
         JScrollPane statusScrollPane = new JScrollPane(statusInfos);
         statusInfos.setEditable(false);
 
-        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, left:pref", ""), buttons);
+        DefaultFormBuilder b = new DefaultFormBuilder(
+                new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, left:pref", ""), buttons);
         b.appendSeparator(Localization.lang("Options"));
         b.append(Localization.lang("Reference library") + ":");
         b.append(dbChooser, 3);
@@ -198,15 +209,15 @@ public class FromAuxDialog extends JabRefDialog {
         String auxName = auxFileField.getText();
 
         if ((auxName != null) && (refBase != null) && !auxName.isEmpty()) {
-            auxParser = new AuxParser(auxName, refBase);
-            AuxParserResult result = auxParser.parse();
-            notFoundList.setListData(result.getUnresolvedKeys().toArray(new String[result.getUnresolvedKeys().size()]));
-            statusInfos.append(result.getInformation(false));
+            AuxParser auxParser = new DefaultAuxParser(refBase);
+            auxParserResult = auxParser.parse(Paths.get(auxName));
+            notFoundList.setListData(auxParserResult.getUnresolvedKeys().toArray(new String[auxParserResult.getUnresolvedKeys().size()]));
+            statusInfos.append(new AuxParserResultViewModel(auxParserResult).getInformation(false));
 
             generateButton.setEnabled(true);
 
             // the generated database contains no entries -> no active generate-button
-            if (!result.getGeneratedBibDatabase().hasEntries()) {
+            if (!auxParserResult.getGeneratedBibDatabase().hasEntries()) {
                 statusInfos.append("\n" + Localization.lang("empty library"));
                 generateButton.setEnabled(false);
             }
@@ -222,7 +233,7 @@ public class FromAuxDialog extends JabRefDialog {
     }
 
     public BibDatabase getGenerateDB() {
-        return auxParser.parse().getGeneratedBibDatabase();
+        return auxParserResult.getGeneratedBibDatabase();
     }
 
 }

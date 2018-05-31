@@ -32,7 +32,7 @@ public class DoiCleanup implements CleanupJob {
         if (entry.hasField(FieldName.DOI)) {
             String doiFieldValue = entry.getField(FieldName.DOI).orElse(null);
 
-            Optional<DOI> doi = DOI.build(doiFieldValue);
+            Optional<DOI> doi = DOI.parse(doiFieldValue);
 
             if (doi.isPresent()) {
                 String newValue = doi.get().getDOI();
@@ -45,14 +45,14 @@ public class DoiCleanup implements CleanupJob {
 
                 // Doi field seems to contain Doi -> cleanup note, url, ee field
                 for (String field : FIELDS) {
-                    entry.getField(field).flatMap(DOI::build)
+                    entry.getField(field).flatMap(DOI::parse)
                             .ifPresent(unused -> removeFieldValue(entry, field, changes));
                 }
             }
         } else {
             // As the Doi field is empty we now check if note, url, or ee field contains a Doi
             for (String field : FIELDS) {
-                Optional<DOI> doi = entry.getField(field).flatMap(DOI::build);
+                Optional<DOI> doi = entry.getField(field).flatMap(DOI::parse);
 
                 if (doi.isPresent()) {
                     // update Doi

@@ -65,7 +65,7 @@ public class SidePane extends JPanel {
             gridBagLayout.setConstraints(c, constraint);
             mainPanel.add(c);
         }
-        if(totalWeights <= 0) {
+        if (totalWeights <= 0) {
             // Fill vertical space so that components start at top
             constraint.weighty = 1;
             Component bx = Box.createVerticalGlue();

@@ -8,29 +8,12 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.strings.StringLengthComparator;
 import org.jabref.model.cleanup.Formatter;
 
-public class ProtectTermsFormatter implements Formatter {
+public class ProtectTermsFormatter extends Formatter {
 
-    private static ProtectedTermsLoader protectedTermsLoader;
-
-    /**
-     * @Deprecated use ProtectTermsFormatter(ProtectedTermsLoader) instead
-     */
-    @Deprecated
-    public ProtectTermsFormatter() {
-    }
+    private final ProtectedTermsLoader protectedTermsLoader;
 
     public ProtectTermsFormatter(ProtectedTermsLoader protectedTermsLoader) {
-        ProtectTermsFormatter.protectedTermsLoader = protectedTermsLoader;
-    }
-
-    /**
-     * This must be called from JabRefMain
-     *
-     * @deprecated use ProtectTermsFormatter(ProtectedTermsLoader) instead
-     */
-    @Deprecated
-    public static void setProtectedTermsLoader(ProtectedTermsLoader loader) {
-        protectedTermsLoader = loader;
+        this.protectedTermsLoader = protectedTermsLoader;
     }
 
     private String format(String text, List<String> listOfWords) {
@@ -50,8 +33,7 @@ public class ProtectTermsFormatter implements Formatter {
         if (text.isEmpty()) {
             return text;
         }
-        Objects.requireNonNull(ProtectTermsFormatter.protectedTermsLoader);
-        return this.format(text, ProtectTermsFormatter.protectedTermsLoader.getProtectedTerms());
+        return this.format(text, this.protectedTermsLoader.getProtectedTerms());
     }
 
     @Override
@@ -74,5 +56,4 @@ public class ProtectTermsFormatter implements Formatter {
     public String getKey() {
         return "protect_terms";
     }
-
 }

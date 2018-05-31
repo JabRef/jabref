@@ -70,8 +70,8 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         icon = IconTheme.JabRefIcon.FILE.getSmallIcon();
 
         // check whether there is another icon defined for this file type
-        for(ExternalFileType fileType : ExternalFileTypes.getDefaultExternalFileTypes()) {
-            if(fileType.getName().equals(name)) {
+        for (ExternalFileType fileType : ExternalFileTypes.getDefaultExternalFileTypes()) {
+            if (fileType.getName().equals(name)) {
                 icon = fileType.icon;
                 break;
             }

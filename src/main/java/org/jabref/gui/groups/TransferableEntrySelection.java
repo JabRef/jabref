@@ -5,6 +5,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -67,11 +68,12 @@ public class TransferableEntrySelection implements Transferable {
 
         else if (someFlavor.equals(DataFlavor.getTextPlainUnicodeFlavor())) {
 
-            String charset = TransferableEntrySelection.FLAVOR_EXTERNAL.getParameter("charset");
-            if (charset == null) {
-                charset = "";
+            String charsetName = TransferableEntrySelection.FLAVOR_EXTERNAL.getParameter("charset");
+            if (charsetName == null) {
+                charsetName = "";
             }
-            return new ByteArrayInputStream(s.getBytes(charset.trim()));
+            Charset charset = Charset.forName(charsetName.trim());
+            return new ByteArrayInputStream(s.getBytes(charset));
         }
 
         //The text/plain DataFormat of javafx uses the String.class directly as representative class and no longer an InputStream

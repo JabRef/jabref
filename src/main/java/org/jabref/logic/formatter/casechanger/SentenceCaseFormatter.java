@@ -3,7 +3,7 @@ package org.jabref.logic.formatter.casechanger;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
 
-public class SentenceCaseFormatter implements Formatter {
+public class SentenceCaseFormatter extends Formatter {
 
     @Override
     public String getName() {
@@ -16,7 +16,7 @@ public class SentenceCaseFormatter implements Formatter {
     }
 
     /**
-     * Converts the first character of the first word of the given string to upper case (and the remaining characters of the first word to lower case), but does not change anything if word starts with "{"
+     * Converts the first character of the first word of the given string to upper case (and the remaining characters of the first word to lower case) and changes other words to lower case, but does not change anything if word starts with "{"
      */
     @Override
     public String format(String input) {
@@ -37,5 +37,4 @@ public class SentenceCaseFormatter implements Formatter {
     public String getExampleInput() {
         return "i have {Aa} DREAM";
     }
-
 }

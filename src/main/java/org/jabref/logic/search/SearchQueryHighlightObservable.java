@@ -42,6 +42,7 @@ public class SearchQueryHighlightObservable {
      *
      * @param searchQuery the search query
      */
+
     public void fireSearchlistenerEvent(SearchQuery searchQuery) {
         Objects.requireNonNull(searchQuery);
 

@@ -5,17 +5,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Objects;
 
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 
 /**
  * Role of an importer for JabRef.
  */
 public abstract class Importer implements Comparable<Importer> {
+
     /**
      * Check whether the source is in the correct format for this importer.
      *
@@ -28,8 +30,29 @@ public abstract class Importer implements Comparable<Importer> {
      */
     public abstract boolean isRecognizedFormat(BufferedReader input) throws IOException;
 
+    /**
+     * Check whether the source is in the correct format for this importer.
+     *
+     * @param filePath the path of the file to check
+     * @param encoding the encoding of the file
+     * @return true, if the file is in a recognized format
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public boolean isRecognizedFormat(Path filePath, Charset encoding) throws IOException {
         try (BufferedReader bufferedReader = getReader(filePath, encoding)) {
+            return isRecognizedFormat(bufferedReader);
+        }
+    }
+
+    /**
+     * Check whether the source is in the correct format for this importer.
+     *
+     * @param data the data to check
+     * @return true, if the data is in a recognized format
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public boolean isRecognizedFormat(String data) throws IOException {
+        try (StringReader stringReader = new StringReader(data); BufferedReader bufferedReader = new BufferedReader(stringReader)) {
             return isRecognizedFormat(bufferedReader);
         }
     }
@@ -49,7 +72,7 @@ public abstract class Importer implements Comparable<Importer> {
      *
      * @param input the input to read from
      */
-    public abstract ParserResult importDatabase(BufferedReader input) throws IOException ;
+    public abstract ParserResult importDatabase(BufferedReader input) throws IOException;
 
     /**
      * Parse the database in the specified file.
@@ -65,6 +88,23 @@ public abstract class Importer implements Comparable<Importer> {
             ParserResult parserResult = importDatabase(bufferedReader);
             parserResult.getMetaData().setEncoding(encoding);
             parserResult.setFile(filePath.toFile());
+            return parserResult;
+        }
+    }
+
+    /**
+     * Parse the database in the specified string.
+     *
+     * Importer having the facilities to detect the correct encoding of a string should overwrite this method,
+     * determine the encoding and then call {@link #importDatabase(BufferedReader)}.
+     *
+     * @param data the string which should be imported
+     * @return the parsed result
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public ParserResult importDatabase(String data) throws IOException {
+        try (StringReader stringReader = new StringReader(data); BufferedReader bufferedReader = new BufferedReader(stringReader)) {
+            ParserResult parserResult = importDatabase(bufferedReader);
             return parserResult;
         }
     }
@@ -92,16 +132,15 @@ public abstract class Importer implements Comparable<Importer> {
      */
     public abstract String getName();
 
-
     /**
-     * Returns the file extensions that this importer can read
-     * @return {@link FileExtensions} correspoding to the importer
+     * Returns the type of files that this importer can read
+     * @return {@link FileType} corresponding to the importer
      */
-    public abstract FileExtensions getExtensions();
+    public abstract FileType getFileType();
 
     /**
-     * Returns a one-word ID which identifies this import format.
-     * Used for example, to identify the format when used from the command line.
+     * Returns a one-word ID which identifies this importer.
+     * Used for example, to identify the importer when used from the command line.
      *
      * @return ID, must be unique and not <code>null</code>
      */
@@ -141,10 +180,10 @@ public abstract class Importer implements Comparable<Importer> {
         if (this == obj) {
             return true;
         }
-        if(!(obj instanceof Importer)) {
+        if (!(obj instanceof Importer)) {
             return false;
         }
-        Importer other = (Importer)obj;
+        Importer other = (Importer) obj;
         return Objects.equals(this.getName(), other.getName());
     }
 

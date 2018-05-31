@@ -16,20 +16,20 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.MappedList;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.logging.LogMessages;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.core.LogEvent;
+import org.fxmisc.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ErrorConsoleViewModel extends AbstractViewModel {
-    private static final Log LOGGER = LogFactory.getLog(ErrorConsoleViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorConsoleViewModel.class);
 
     private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     private final Date date = new Date();
@@ -42,7 +42,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
         this.dialogService = Objects.requireNonNull(dialogService);
         this.clipBoardManager = Objects.requireNonNull(clipBoardManager);
         this.buildInfo = Objects.requireNonNull(buildInfo);
-        ObservableList<LogEventViewModel> eventViewModels = new MappedList<>(LogMessages.getInstance().getMessages(), LogEventViewModel::new);
+        ObservableList<LogEventViewModel> eventViewModels = EasyBind.map(LogMessages.getInstance().getMessages(), LogEventViewModel::new);
         allMessagesData = new ReadOnlyListWrapper<>(eventViewModels);
     }
 
@@ -118,7 +118,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
                     .setParameter("body", issueBody);
             JabRefDesktop.openBrowser(uriBuilder.build().toString());
         } catch (IOException | URISyntaxException e) {
-            LOGGER.error(e);
+            LOGGER.error("Problem opening url", e);
         }
     }
 }

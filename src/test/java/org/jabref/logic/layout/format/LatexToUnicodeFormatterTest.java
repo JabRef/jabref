@@ -1,10 +1,9 @@
 package org.jabref.logic.layout.format;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LatexToUnicodeFormatterTest {
 
@@ -29,7 +28,7 @@ public class LatexToUnicodeFormatterTest {
     @Test
     public void testFormatTextit() {
         // See #1464
-        assertEquals("text", formatter.format("\\textit{text}"));
+        assertEquals("\uD835\uDC61\uD835\uDC52\uD835\uDC65\uD835\uDC61", formatter.format("\\textit{text}"));
     }
 
 
@@ -103,7 +102,7 @@ public class LatexToUnicodeFormatterTest {
         assertEquals("ḩ", formatter.format("{\\c{h}}"));
     }
 
-    @Ignore("This is not a standard LaTeX command. It is debatable why we should convert this.")
+    @Disabled("This is not a standard LaTeX command. It is debatable why we should convert this.")
     @Test
     public void testCombiningAccentsCase2() {
         assertEquals("a͍", formatter.format("\\spreadlips{a}"));
@@ -165,6 +164,31 @@ public class LatexToUnicodeFormatterTest {
     @Test
     public void testConversionOfUnderscoreWithBraces() {
         assertEquals("Lorem ipsum_(lorem ipsum)", formatter.format("Lorem ipsum_{lorem ipsum}"));
+    }
+
+    @Test
+    public void testConversionOfOrdinal1st() {
+        assertEquals("1ˢᵗ", formatter.format("1\\textsuperscript{st}"));
+    }
+
+    @Test
+    public void testConversionOfOrdinal2nd() {
+        assertEquals("2ⁿᵈ", formatter.format("2\\textsuperscript{nd}"));
+    }
+
+    @Test
+    public void testConversionOfOrdinal3rd() {
+        assertEquals("3ʳᵈ", formatter.format("3\\textsuperscript{rd}"));
+    }
+
+    @Test
+    public void testConversionOfOrdinal4th() {
+        assertEquals("4ᵗʰ", formatter.format("4\\textsuperscript{th}"));
+    }
+
+    @Test
+    public void testConversionOfOrdinal9th() {
+        assertEquals("9ᵗʰ", formatter.format("9\\textsuperscript{th}"));
     }
 
 }

@@ -1,11 +1,10 @@
 package org.jabref.gui.importer;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
@@ -17,20 +16,21 @@ import javax.swing.JOptionPane;
 import javafx.stage.FileChooser;
 
 import org.jabref.Globals;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class ImportFormats {
-    private static final Log LOGGER = LogFactory.getLog(ImportFormats.class);
+
 
     private ImportFormats() {
     }
@@ -46,11 +46,9 @@ public class ImportFormats {
 
         class ImportAction extends MnemonicAwareAction {
 
-            private final JabRefFrame frame;
             private final boolean newDatabase;
 
-            public ImportAction(JabRefFrame frame, boolean newDatabase) {
-                this.frame = frame;
+            public ImportAction(boolean newDatabase) {
                 this.newDatabase = newDatabase;
 
                 if (newDatabase) {
@@ -58,48 +56,45 @@ public class ImportFormats {
                     putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.IMPORT_INTO_NEW_DATABASE));
                 } else {
                     putValue(Action.NAME, Localization.menuTitle("Import into current library"));
-                    putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.IMPORT_INTO_CURRENT_DATABASE));
+                    putValue(Action.ACCELERATOR_KEY,
+                            Globals.getKeyPrefs().getKey(KeyBinding.IMPORT_INTO_CURRENT_DATABASE));
                 }
             }
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 SortedSet<Importer> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
-                List<FileExtensions> extensions = importers.stream().map(Importer::getExtensions).collect(Collectors.toList());
-                FileDialog dialog = new FileDialog(frame, Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY));
-                // Add file filter for all supported types
-                FileChooser.ExtensionFilter allImports = ImportFileFilter.convert(Localization.lang("Available import formats"), importers);
-                dialog.setFileFilter(allImports);
-                // Add filters for extensions
-                dialog.withExtensions(extensions);
-
-                Optional<Path> selectedFile = dialog.showDialogAndGetSelectedFile();
-
-                selectedFile.ifPresent(sel -> {
-                    try {
-                        File file = sel.toFile();
-
-                        if (!file.exists()) {
-                            JOptionPane.showMessageDialog(frame,
-                                    Localization.lang("File not found") + ": '" + file.getName() + "'.",
-                                    Localization.lang("Import"), JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
-
-                        Optional<Importer> format = importers.stream()
-                                .filter(i -> Objects.equals(i.getExtensions().getDescription(), dialog.getFileFilter().getDescription()))
-                                .findFirst();
-                        ImportMenuItem importMenu = new ImportMenuItem(frame, newDatabase, format.orElse(null));
-                        importMenu.automatedImport(Collections.singletonList(file.getAbsolutePath()));
-                        // Set last working dir for import
-                        Globals.prefs.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, file.getParent());
-                    } catch (Exception ex) {
-                        LOGGER.warn("Cannot import file", ex);
-                    }
+                List<FileType> extensions = importers.stream().map(Importer::getFileType)
+                        .collect(Collectors.toList());
+                FileChooser.ExtensionFilter allImports = FileFilterConverter.forAllImporters(importers);
+                FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                        .addExtensionFilter(allImports)
+                        .addExtensionFilters(extensions)
+                        .withInitialDirectory(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY))
+                        .build();
+                fileDialogConfiguration.getExtensionFilters().add(new FileChooser.ExtensionFilter(Localization.lang("Any file"), "*.*"));
+                DialogService dialogService = new FXDialogService();
+                DefaultTaskExecutor.runInJavaFXThread(() -> {
+                    dialogService.showFileOpenDialog(fileDialogConfiguration)
+                            .ifPresent(path -> doImport(path, importers, fileDialogConfiguration.getSelectedExtensionFilter()));
                 });
+            }
+
+            private void doImport(Path file, SortedSet<Importer> importers, FileChooser.ExtensionFilter selectedExtensionFilter) {
+                if (!Files.exists(file)) {
+                    JOptionPane.showMessageDialog(frame,
+                            Localization.lang("File not found") + ": '" + file.getFileName() + "'.",
+                            Localization.lang("Import"), JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                Optional<Importer> format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
+                ImportMenuItem importMenu = new ImportMenuItem(frame, newDatabase, format.orElse(null));
+                importMenu.automatedImport(Collections.singletonList(file.toString()));
+                // Set last working dir for import
+                Globals.prefs.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, file.getParent().toString());
             }
         }
 
-        return new ImportAction(frame, openInNew);
+        return new ImportAction(openInNew);
     }
 }

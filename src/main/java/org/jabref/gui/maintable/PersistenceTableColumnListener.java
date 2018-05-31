@@ -27,13 +27,13 @@ import org.jabref.preferences.JabRefPreferences;
  */
 public class PersistenceTableColumnListener implements TableColumnModelListener {
 
+    private static final String RECEIVED_NULL_EVENT = " received null event";
+
     private static final String SIMPLE_CLASS_NAME = PersistenceTableColumnListener.class.getSimpleName();
 
     // needed to get column names / indices mapped from view to model
     // and to access the table model
     private final MainTable mainTable;
-
-    private static final String RECEIVED_NULL_EVENT = " received null event";
 
     /**
      * @param mainTable

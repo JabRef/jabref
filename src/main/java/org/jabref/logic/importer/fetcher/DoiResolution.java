@@ -14,26 +14,27 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * FulltextFetcher implementation that follows the DOI resolution redirects and scans for a full-text PDF URL.
  */
 public class DoiResolution implements FulltextFetcher {
-    private static final Log LOGGER = LogFactory.getLog(DoiResolution.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DoiResolution.class);
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
         Optional<URL> pdfLink = Optional.empty();
 
-        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
+        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::parse);
 
         if (doi.isPresent()) {
             String sciLink = doi.get().getURIAsASCIIString();
@@ -48,9 +49,10 @@ public class DoiResolution implements FulltextFetcher {
                     connection.followRedirects(true);
                     connection.ignoreHttpErrors(true);
                     // some publishers are quite slow (default is 3s)
-                    connection.timeout(5000);
+                    connection.timeout(10000);
 
                     Document html = connection.get();
+
                     // scan for PDF
                     Elements elements = html.body().select("a[href]");
                     List<Optional<URL>> links = new ArrayList<>();
@@ -70,11 +72,22 @@ public class DoiResolution implements FulltextFetcher {
                         LOGGER.info("Fulltext PDF found @ " + sciLink);
                         pdfLink = links.get(0);
                     }
+                } catch (UnsupportedMimeTypeException type) {
+                    // this might be the PDF already as we follow redirects
+                    if (type.getMimeType().startsWith("application/pdf")) {
+                        return Optional.of(new URL(type.getUrl()));
+                    }
+                    LOGGER.warn("DoiResolution fetcher failed: ", type);
                 } catch (IOException e) {
                     LOGGER.warn("DoiResolution fetcher failed: ", e);
                 }
             }
         }
         return pdfLink;
+    }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.SOURCE;
     }
 }

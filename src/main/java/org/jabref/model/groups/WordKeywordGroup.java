@@ -23,8 +23,8 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
     private final boolean onlySplitWordsAtSeparator;
 
     public WordKeywordGroup(String name, GroupHierarchyType context, String searchField,
-                            String searchExpression, boolean caseSensitive, Character keywordSeparator,
-                            boolean onlySplitWordsAtSeparator) {
+            String searchExpression, boolean caseSensitive, Character keywordSeparator,
+            boolean onlySplitWordsAtSeparator) {
         super(name, context, searchField, searchExpression, caseSensitive);
 
         this.keywordSeparator = keywordSeparator;
@@ -92,13 +92,13 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
             return false;
         }
         WordKeywordGroup other = (WordKeywordGroup) o;
-        return getName().equals(other.getName())
-                && (getHierarchicalContext() == other.getHierarchicalContext())
-                && searchField.equals(other.searchField)
-                && searchExpression.equals(other.searchExpression)
-                && (caseSensitive == other.caseSensitive)
-                && keywordSeparator == other.keywordSeparator
-                && onlySplitWordsAtSeparator == other.onlySplitWordsAtSeparator;
+        return Objects.equals(getName(), other.getName())
+                && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext())
+                && Objects.equals(searchField, other.searchField)
+                && Objects.equals(searchExpression, other.searchExpression)
+                && Objects.equals(caseSensitive, other.caseSensitive)
+                && Objects.equals(keywordSeparator, other.keywordSeparator)
+                && Objects.equals(onlySplitWordsAtSeparator, other.onlySplitWordsAtSeparator);
     }
 
     @Override

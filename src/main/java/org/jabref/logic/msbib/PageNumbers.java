@@ -8,11 +8,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class PageNumbers {
+    private static final Pattern PAGE_PATTERN = Pattern.compile("\\s*(\\d+)\\s*-{1,2}\\s*(\\d+)\\s*");
     private String freeform;
     private int start;
-    private int end;
 
-    private static final Pattern PAGE_PATTERN = Pattern.compile("\\s*(\\d+)\\s*-{1,2}\\s*(\\d+)\\s*");
+    private int end;
 
     public PageNumbers(String pages) {
         parsePageNums(pages);

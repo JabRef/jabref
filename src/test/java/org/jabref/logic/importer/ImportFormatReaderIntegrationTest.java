@@ -1,19 +1,25 @@
 package org.jabref.logic.importer;
 
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(Parameterized.class)
 public class ImportFormatReaderIntegrationTest {
@@ -23,7 +29,6 @@ public class ImportFormatReaderIntegrationTest {
     private final int count;
     public final String format;
     private final Path file;
-
 
     public ImportFormatReaderIntegrationTest(String resource, String format, int count) throws URISyntaxException {
         this.format = format;
@@ -35,19 +40,26 @@ public class ImportFormatReaderIntegrationTest {
     @Before
     public void setUp() {
         reader = new ImportFormatReader();
-        reader.resetImportFormats(JabRefPreferences.getInstance().getImportFormatPreferences(),
-                JabRefPreferences.getInstance().getXMPPreferences());
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
+        reader.resetImportFormats(importFormatPreferences, mock(XmpPreferences.class), new DummyFileUpdateMonitor());
     }
 
     @Test
     public void testImportUnknownFormat() throws Exception {
-        ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(file);
+        ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(file, new DummyFileUpdateMonitor());
         assertEquals(count, unknownFormat.parserResult.getDatabase().getEntryCount());
     }
 
     @Test
     public void testImportFormatFromFile() throws Exception {
         assertEquals(count, reader.importFromFile(format, file).getDatabase().getEntries().size());
+    }
+
+    @Test
+    public void testImportUnknownFormatFromString() throws Exception {
+        String data = new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
+        assertEquals(count, reader.importUnknownFormat(data).parserResult.getDatabase().getEntries().size());
     }
 
     @Parameterized.Parameters(name = "{index}: {1}")

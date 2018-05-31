@@ -14,7 +14,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 
-
 public class EntryLinkChecker implements Checker {
 
     private final BibDatabase database;

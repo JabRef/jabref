@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-
 public class XmlTransferable implements Transferable {
 
     private static final DataFlavor XML_FLAVOR = new DataFlavor("application/xml;charset=utf-8;class=java.lang.String", "XML Format");

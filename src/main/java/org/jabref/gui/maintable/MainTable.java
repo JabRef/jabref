@@ -59,32 +59,10 @@ import ca.odell.glazedlists.matchers.Matcher;
 import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MainTable extends JTable {
-    private static final Log LOGGER = LogFactory.getLog(MainTable.class);
-
-    private final MainTableFormat tableFormat;
-    private final BasePanel panel;
-
-    private final boolean tableColorCodes;
-    private final boolean tableResolvedColorCodes;
-    private final DefaultEventSelectionModel<BibEntry> localSelectionModel;
-    private final TableComparatorChooser<BibEntry> comparatorChooser;
-    private final JScrollPane pane;
-
-    // needed to activate/deactivate the listener
-    private final PersistenceTableColumnListener tableColumnListener;
-    private final MainTableDataModel model;
-
-    // Enum used to define how a cell should be rendered.
-    private enum CellRendererMode {
-        REQUIRED,
-        RESOLVED,
-        OPTIONAL,
-        OTHER
-    }
     private static GeneralRenderer defRenderer;
     private static GeneralRenderer reqRenderer;
     private static GeneralRenderer optRenderer;
@@ -101,6 +79,28 @@ public class MainTable extends JTable {
 
     private static List<CompleteRenderer> markedNumberRenderers;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainTable.class);
+    private final MainTableFormat tableFormat;
+
+    private final BasePanel panel;
+    private final boolean tableColorCodes;
+    private final boolean tableResolvedColorCodes;
+    private final DefaultEventSelectionModel<BibEntry> localSelectionModel;
+    private final TableComparatorChooser<BibEntry> comparatorChooser;
+
+    private final JScrollPane pane;
+    // needed to activate/deactivate the listener
+    private final PersistenceTableColumnListener tableColumnListener;
+
+    private final MainTableDataModel model;
+    // Enum used to define how a cell should be rendered.
+    private enum CellRendererMode {
+        REQUIRED,
+        RESOLVED,
+        OPTIONAL,
+        OTHER
+        }
+
     static {
         MainTable.updateRenderers();
     }
@@ -115,7 +115,6 @@ public class MainTable extends JTable {
 
         this.tableFormat = tableFormat;
         this.panel = panel;
-
 
         setModel(GlazedListsSwing
                 .eventTableModelWithThreadProxyList(model.getTableRows(), tableFormat));
@@ -538,12 +537,7 @@ public class MainTable extends JTable {
     }
 
     private boolean matches(int row, Matcher<BibEntry> m) {
-        Optional<BibEntry> bibEntry = getBibEntry(row);
-
-        if (bibEntry.isPresent()) {
-            return m.matches(bibEntry.get());
-        }
-        return m.matches(null);
+        return getBibEntry(row).map(m::matches).orElse(false);
     }
 
     private boolean isComplete(int row) {

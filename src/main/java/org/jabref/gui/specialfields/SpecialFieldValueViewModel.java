@@ -13,7 +13,7 @@ public class SpecialFieldValueViewModel {
 
     private final SpecialFieldValue value;
 
-    public SpecialFieldValueViewModel(SpecialFieldValue value){
+    public SpecialFieldValueViewModel(SpecialFieldValue value) {
         Objects.requireNonNull(value);
 
         this.value = value;
@@ -67,7 +67,7 @@ public class SpecialFieldValueViewModel {
 
     public String getMenuString() {
 
-        switch(value){
+        switch (value) {
             case PRINTED:
                 return Localization.lang("Toggle print status");
             case CLEAR_PRIORITY:
@@ -107,7 +107,7 @@ public class SpecialFieldValueViewModel {
 
     public String getToolTipText() {
 
-        switch(value){
+        switch (value) {
             case PRINTED:
                 return Localization.lang("Toggle print status");
             case CLEAR_PRIORITY:
@@ -147,7 +147,7 @@ public class SpecialFieldValueViewModel {
 
     public String getActionName() {
 
-        switch(value){
+        switch (value) {
             case PRINTED:
                 return "togglePrinted";
             case CLEAR_PRIORITY:

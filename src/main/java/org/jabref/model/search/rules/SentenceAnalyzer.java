@@ -20,7 +20,7 @@ public class SentenceAnalyzer {
         StringBuilder stringBuilder = new StringBuilder();
         boolean escaped = false;
         boolean quoted = false;
-        for(char c : query.toCharArray()) {
+        for (char c : query.toCharArray()) {
             // Check if we are entering an escape sequence:
             if (!escaped && c == ESCAPE_CHAR) {
                 escaped = true;

@@ -4,11 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class WrapFileLinksTest {
@@ -16,7 +16,7 @@ public class WrapFileLinksTest {
     private WrapFileLinks formatter;
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         FileLinkPreferences preferences = new FileLinkPreferences(Collections.emptyList(), Collections.emptyList());
         formatter = new WrapFileLinks(preferences);
@@ -32,10 +32,9 @@ public class WrapFileLinksTest {
         assertEquals("", formatter.format(null));
     }
 
-    @Test(expected = NullPointerException.class)
     public void testNoFormatSetNonEmptyString() {
-        formatter.format("test.pdf");
-        fail();
+        assertThrows(NullPointerException.class, () -> formatter.format("test.pdf"));
+
     }
 
     @Test

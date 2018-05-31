@@ -31,33 +31,38 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
+import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.shared.DBMSConnection;
+import org.jabref.logic.shared.DBMSConnectionProperties;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.shared.security.Password;
+import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.DatabaseLocation;
-import org.jabref.shared.DBMSConnection;
-import org.jabref.shared.DBMSConnectionProperties;
-import org.jabref.shared.DBMSType;
-import org.jabref.shared.exception.DatabaseNotSupportedException;
-import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.shared.prefs.SharedDatabasePreferences;
-import org.jabref.shared.security.Password;
+import org.jabref.model.database.shared.DBMSType;
+import org.jabref.model.database.shared.DatabaseLocation;
+import org.jabref.model.database.shared.DatabaseNotSupportedException;
+import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConnectToSharedDatabaseDialog extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(ConnectToSharedDatabaseDialog.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectToSharedDatabaseDialog.class);
 
     private final JabRefFrame frame;
 
@@ -67,9 +72,9 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
     private final JPanel filePanel = new JPanel();
     private final JPanel buttonPanel = new JPanel();
 
-    private final JLabel databaseTypeLabel = new JLabel(Localization.lang("Library type") + ":");
+    private final JLabel databaseTypeLabel = new JLabel(Localization.lang("Database type") + ":");
     private final JLabel hostPortLabel = new JLabel(Localization.lang("Host") + "/" + Localization.lang("Port") + ":");
-    private final JLabel databaseLabel = new JLabel(Localization.lang("Library") + ":");
+    private final JLabel databaseLabel = new JLabel(Localization.lang("Database") + ":");
     private final JLabel userLabel = new JLabel(Localization.lang("User") + ":");
     private final JLabel passwordLabel = new JLabel(Localization.lang("Password") + ":");
 
@@ -93,7 +98,6 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
     private final SharedDatabasePreferences prefs = new SharedDatabasePreferences();
 
     private DBMSConnectionProperties connectionProperties;
-
 
     /**
      * @param frame the JabRef Frame
@@ -164,6 +168,7 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
     private void setupActions() {
 
         Action openAction = new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -191,6 +196,7 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
          * Set up a listener which updates the default port number once the selection in dbmsTypeDropDown has changed.
          */
         Action dbmsTypeDropDownAction = new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 portField.setText(Integer.toString(((DBMSType) dbmsTypeDropDown.getSelectedItem()).getDefaultPort()));
@@ -245,7 +251,8 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
 
         if (sharedDatabasePassword.isPresent() && sharedDatabaseUser.isPresent()) {
             try {
-                passwordField.setText(new Password(sharedDatabasePassword.get().toCharArray(), sharedDatabaseUser.get()).decrypt());
+                passwordField.setText(
+                        new Password(sharedDatabasePassword.get().toCharArray(), sharedDatabaseUser.get()).decrypt());
             } catch (GeneralSecurityException | UnsupportedEncodingException e) {
                 LOGGER.error("Could not read the password due to decryption problems.", e);
             }
@@ -263,7 +270,8 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
 
         Insets defautInsets = new Insets(4, 15, 4, 4);
 
-        connectionPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Connection")));
+        connectionPanel.setBorder(
+                BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Connection")));
         connectionPanel.setLayout(gridBagLayout);
 
         Set<DBMSType> availableDBMSTypes = DBMSConnection.getAvailableDBMSTypes();
@@ -453,18 +461,21 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
         List<BasePanel> panels = JabRefGUI.getMainFrame().getBasePanelList();
         return panels.parallelStream().anyMatch(panel -> {
             BibDatabaseContext context = panel.getBibDatabaseContext();
+
             return ((context.getLocation() == DatabaseLocation.SHARED) &&
-                    this.connectionProperties.equals(context.getDBMSSynchronizer()
-                    .getDBProcessor().getDBMSConnectionProperties()));
+                    this.connectionProperties.equals(context.getDBMSSynchronizer().getConnectionProperties()));
         });
     }
 
     private void showFileChooser() {
-        FileDialog dialog = new FileDialog(this);
-        dialog.withExtension(FileExtensions.BIBTEX_DB);
-        dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(FileType.BIBTEX_DB)
+                .withDefaultExtension(FileType.BIBTEX_DB)
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+        DialogService ds = new FXDialogService();
 
-        Optional<Path> path = dialog.showDialogAndGetSelectedFile();
+        Optional<Path> path = DefaultTaskExecutor
+                .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
         path.ifPresent(p -> fileLocationField.setText(p.toString()));
     }
 

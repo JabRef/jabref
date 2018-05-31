@@ -1,5 +1,7 @@
 package org.jabref.gui.filelist;
 
+import org.jabref.model.entry.LinkedFile;
+
 /**
  * An implementation of this interface is called to confirm whether a FileListEntryEditor
  * is ready to close when Ok is pressed, or whether there is a problem that needs to be
@@ -8,5 +10,5 @@ package org.jabref.gui.filelist;
 @FunctionalInterface
 public interface ConfirmCloseFileListEntryEditor {
 
-    boolean confirmClose(FileListEntry entry);
+    boolean confirmClose(LinkedFile entry);
 }

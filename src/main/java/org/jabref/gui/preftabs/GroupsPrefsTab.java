@@ -9,6 +9,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import org.jabref.logic.l10n.Localization;
@@ -23,6 +24,9 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
     private final JCheckBox grayOut = new JCheckBox(Localization.lang("Gray out non-hits"));
     private final JCheckBox autoAssignGroup = new JCheckBox(
             Localization.lang("Automatically assign new entry to selected groups"));
+    private final JRadioButton multiSelectionModeIntersection = new JRadioButton(Localization.lang("Intersection"));
+    private final JRadioButton multiSelectionModeUnion = new JRadioButton(Localization.lang("Union"));
+
     private final JTextField groupingField = new JTextField(20);
     private final JTextField keywordSeparator = new JTextField(2);
 
@@ -49,8 +53,15 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         hideMode.add(grayOut);
         hideMode.add(hideNonHits);
 
+        ButtonGroup multiSelectionMode = new ButtonGroup();
+        multiSelectionMode.add(multiSelectionModeIntersection);
+        multiSelectionMode.add(multiSelectionModeUnion);
+        multiSelectionModeIntersection.setToolTipText(Localization.lang("Display only entries belonging to all selected groups."));
+        multiSelectionModeUnion.setToolTipText(Localization.lang("Display all entries belonging to one or more of the selected groups."));
+
+
         FormLayout layout = new FormLayout("9dlu, pref", //500px",
-                "p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p");
+                "p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         builder.appendSeparator(Localization.lang("View"));
         builder.nextLine();
@@ -61,6 +72,14 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.nextColumn();
         builder.append(grayOut);
+        builder.nextLine();
+        builder.nextLine();
+        builder.nextColumn();
+        builder.append(multiSelectionModeIntersection);
+        builder.nextLine();
+        builder.nextLine();
+        builder.nextColumn();
+        builder.append(multiSelectionModeUnion);
         builder.nextLine();
         builder.nextLine();
         builder.nextColumn();
@@ -95,6 +114,7 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         groupingField.setText(prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
         keywordSeparator.setText(prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
         autoAssignGroup.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
+        multiSelectionModeIntersection.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS));
     }
 
     @Override
@@ -103,6 +123,7 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         prefs.put(JabRefPreferences.GROUPS_DEFAULT_FIELD, groupingField.getText().trim());
         prefs.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroup.isSelected());
         prefs.put(JabRefPreferences.KEYWORD_SEPARATOR, keywordSeparator.getText());
+        prefs.putBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS, multiSelectionModeIntersection.isSelected());
     }
 
     @Override

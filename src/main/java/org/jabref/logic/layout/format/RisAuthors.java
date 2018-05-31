@@ -8,7 +8,6 @@ public class RisAuthors implements ParamLayoutFormatter {
 
     private String arg = "";
 
-
     @Override
     public String format(String s) {
         if (s == null) {

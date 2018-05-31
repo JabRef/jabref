@@ -18,17 +18,16 @@ import javax.swing.undo.UndoManager;
 
 import org.jabref.Globals;
 import org.jabref.gui.actions.Actions;
-import org.jabref.gui.actions.PasteAction;
 import org.jabref.gui.util.component.JTextAreaWithPlaceholder;
 import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JTextAreaWithHighlighting extends JTextAreaWithPlaceholder implements SearchQueryHighlightListener {
 
-    private static final Log LOGGER = LogFactory.getLog(JTextAreaWithHighlighting.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JTextAreaWithHighlighting.class);
 
     private Optional<Pattern> highlightPattern = Optional.empty();
 
@@ -56,8 +55,6 @@ public class JTextAreaWithHighlighting extends JTextAreaWithPlaceholder implemen
     }
 
     private void setupPasteListener() {
-        //register "Paste" action
-        getActionMap().put(Actions.PASTE, new PasteAction(this));
         // Bind paste command to KeyBinds.PASTE
         getInputMap().put(Globals.getKeyPrefs().getKey(org.jabref.gui.keyboard.KeyBinding.PASTE), Actions.PASTE);
     }

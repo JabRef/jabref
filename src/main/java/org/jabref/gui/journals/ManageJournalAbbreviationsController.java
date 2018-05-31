@@ -20,10 +20,13 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.preferences.PreferencesService;
 
 public class ManageJournalAbbreviationsController extends AbstractController<ManageJournalAbbreviationsViewModel> {
 
+    @FXML public Label loadingLabel;
+    @FXML public ProgressIndicator progressIndicator;
     @FXML private TableView<AbbreviationViewModel> journalAbbreviationsTable;
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableNameColumn;
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableAbbreviationColumn;
@@ -34,17 +37,14 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
     @FXML private Button addJournalFileButton;
     @FXML private Button addNewJournalFileButton;
     @FXML private Button removeJournalAbbreviationsButton;
-    @FXML public Label loadingLabel;
-    @FXML public ProgressIndicator progressIndicator;
-
-
-    @Inject private JabRefPreferences preferences;
+    @Inject private PreferencesService preferences;
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
+    @Inject private JournalAbbreviationLoader journalAbbreviationLoader;
 
     @FXML
     private void initialize() {
-        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor);
+        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, journalAbbreviationLoader);
 
         setUpTable();
         setBindings();
@@ -199,7 +199,6 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
         private String oldName;
         private int editingIndex;
 
-
         @Override
         public void startEdit() {
             if (!isEmpty() && viewModel.isAbbreviationEditableAndRemovableProperty().get()) {
@@ -286,7 +285,6 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
         private TextField textField;
         private String oldAbbreviation;
         private int editingIndex;
-
 
         @Override
         public void startEdit() {

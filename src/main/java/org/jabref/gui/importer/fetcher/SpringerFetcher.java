@@ -18,19 +18,18 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SpringerFetcher implements EntryFetcher {
 
     private static final String API_URL = "http://api.springer.com/metadata/json?q=";
     private static final String API_KEY = "b0c7151179b3d9c1119cf325bca8460d";
-    private static final Log LOGGER = LogFactory.getLog(SpringerFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringerFetcher.class);
     private static final int MAX_PER_PAGE = 100;
     private boolean shouldContinue;
-
 
     @Override
     public void stopFetching() {

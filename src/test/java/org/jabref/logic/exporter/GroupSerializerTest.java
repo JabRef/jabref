@@ -1,11 +1,14 @@
 package org.jabref.logic.exporter;
 
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import javafx.scene.paint.Color;
 
+import org.jabref.logic.auxparser.DefaultAuxParser;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
@@ -17,18 +20,20 @@ import org.jabref.model.groups.GroupTreeNodeTest;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GroupSerializerTest {
 
     private GroupSerializer groupSerializer;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         groupSerializer = new GroupSerializer();
     }
@@ -50,7 +55,7 @@ public class GroupSerializerTest {
     @Test
     public void serializeSingleExplicitGroupWithIconAndDescription() {
         ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
-        group.setIconCode("test icon");
+        group.setIconName("test icon");
         group.setExpanded(true);
         group.setColor(Color.ALICEBLUE);
         group.setDescription("test description");
@@ -106,6 +111,13 @@ public class GroupSerializerTest {
         AutomaticPersonsGroup group = new AutomaticPersonsGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, "authors");
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(Collections.singletonList("0 AutomaticPersonsGroup:myAutomaticGroup;0;authors;1;;;;"), serialization);
+    }
+
+    @Test
+    public void serializeSingleTexGroup() throws Exception {
+        TexGroup group = new TexGroup("myTexGroup", GroupHierarchyType.INDEPENDENT, Paths.get("path", "To", "File"), new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor());
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
+        assertEquals(Collections.singletonList("0 TexGroup:myTexGroup;0;path/To/File;1;;;;"), serialization);
     }
 
     @Test

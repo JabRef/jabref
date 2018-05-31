@@ -13,10 +13,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,11 +28,14 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.mockito.Answers;
 import org.xmlunit.builder.Input;
 import org.xmlunit.builder.Input.Builder;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 import org.xmlunit.matchers.CompareMatcher;
+
+import static org.mockito.Mockito.mock;
 
 @RunWith(Parameterized.class)
 public class BibTeXMLExporterTestFiles {
@@ -39,7 +43,7 @@ public class BibTeXMLExporterTestFiles {
     public BibDatabaseContext databaseContext;
     public Charset charset;
     public File tempFile;
-    public BibTeXMLExportFormat bibtexmlExportFormat;
+    public BibTeXMLExporter bibtexmlExportFormat;
     public BibtexImporter testImporter;
 
     @Parameter
@@ -62,9 +66,9 @@ public class BibTeXMLExporterTestFiles {
         resourceDir = Paths.get(BibTeXMLExporterTestFiles.class.getResource("").toURI());
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
-        bibtexmlExportFormat = new BibTeXMLExportFormat();
+        bibtexmlExportFormat = new BibTeXMLExporter();
         tempFile = testFolder.newFile();
-        testImporter = new BibtexImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
+        testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
     }
 
     @Test
@@ -76,7 +80,7 @@ public class BibTeXMLExporterTestFiles {
         List<BibEntry> entries = testImporter.importDatabase(importFile, StandardCharsets.UTF_8).getDatabase()
                 .getEntries();
 
-        bibtexmlExportFormat.performExport(databaseContext, tempFile.getPath(), charset, entries);
+        bibtexmlExportFormat.export(databaseContext, tempFile.toPath(), charset, entries);
 
         Builder control = Input.from(Files.newInputStream(resourceDir.resolve(xmlFileName)));
         Builder test = Input.from(Files.newInputStream(Paths.get(tempFilename)));

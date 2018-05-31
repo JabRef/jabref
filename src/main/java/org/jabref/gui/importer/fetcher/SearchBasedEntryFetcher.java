@@ -14,15 +14,15 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wrapper around {@link SearchBasedFetcher} which implements the old {@link EntryFetcher} interface.
  */
-public class SearchBasedEntryFetcher implements EntryFetcher{
+public class SearchBasedEntryFetcher implements EntryFetcher {
 
-    private static final Log LOGGER = LogFactory.getLog(SearchBasedEntryFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchBasedEntryFetcher.class);
     private final SearchBasedFetcher fetcher;
 
     public SearchBasedEntryFetcher(SearchBasedFetcher fetcher) {

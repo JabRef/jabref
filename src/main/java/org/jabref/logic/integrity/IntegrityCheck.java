@@ -17,16 +17,18 @@ public class IntegrityCheck {
     private final FileDirectoryPreferences fileDirectoryPreferences;
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final boolean enforceLegalKey;
 
     public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
                           FileDirectoryPreferences fileDirectoryPreferences,
                           BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
-                          JournalAbbreviationRepository journalAbbreviationRepository
-    ) {
+                          JournalAbbreviationRepository journalAbbreviationRepository,
+                          boolean enforceLegalKey) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.fileDirectoryPreferences = Objects.requireNonNull(fileDirectoryPreferences);
         this.bibtexKeyPatternPreferences = Objects.requireNonNull(bibtexKeyPatternPreferences);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
+        this.enforceLegalKey = enforceLegalKey;
     }
 
     public List<IntegrityMessage> checkBibtexDatabase() {
@@ -46,7 +48,8 @@ public class IntegrityCheck {
             return result;
         }
 
-        for (FieldChecker checker : FieldCheckers.getAll(bibDatabaseContext, fileDirectoryPreferences)) {
+        FieldCheckers fieldCheckers = new FieldCheckers(bibDatabaseContext, fileDirectoryPreferences, journalAbbreviationRepository, enforceLegalKey);
+        for (FieldChecker checker : fieldCheckers.getAll()) {
             result.addAll(checker.check(entry));
         }
 
@@ -66,10 +69,10 @@ public class IntegrityCheck {
         result.addAll(new HTMLCharacterChecker().check(entry));
         result.addAll(new EntryLinkChecker(bibDatabaseContext.getDatabase()).check(entry));
         result.addAll(new BibtexkeyDeviationChecker(bibDatabaseContext, bibtexKeyPatternPreferences).check(entry));
+        result.addAll(new BibtexKeyDuplicationChecker(bibDatabaseContext.getDatabase()).check(entry));
 
         return result;
     }
-
 
     @FunctionalInterface
     public interface Checker {

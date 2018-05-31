@@ -20,15 +20,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PushToEmacs extends AbstractPushToApplication implements PushToApplication {
 
-    private static final Log LOGGER = LogFactory.getLog(PushToEmacs.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PushToEmacs.class);
 
     private final JTextField additionalParams = new JTextField(30);
-
 
     @Override
     public String getApplicationName() {

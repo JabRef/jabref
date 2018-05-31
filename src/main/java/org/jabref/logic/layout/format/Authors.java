@@ -98,7 +98,6 @@ public class Authors extends AbstractParamLayoutFormatter {
     private String lastSeparator = Authors.AND;
     private String etAlString = " et al.";
 
-
     @Override
     public void setArgument(String arg) {
         List<String> parts = AbstractParamLayoutFormatter.parseArgument(arg);

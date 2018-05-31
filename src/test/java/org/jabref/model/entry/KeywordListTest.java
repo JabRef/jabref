@@ -1,15 +1,15 @@
 package org.jabref.model.entry;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class KeywordListTest {
 
     private KeywordList keywords;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         keywords = new KeywordList();
         keywords.add("keywordOne");
@@ -88,4 +88,5 @@ public class KeywordListTest {
         assertEquals(new KeywordList(expectedOne, expectedTwo),
                 KeywordList.parse("Parent1 > Node1 > Child1, Parent2 > Node2 > Child2", ',', '>'));
     }
+
 }

@@ -89,8 +89,8 @@ import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for manipulating the Bibliography of the currently start document in OpenOffice.
@@ -110,6 +110,7 @@ class OOBibBase {
     private static final int AUTHORYEAR_INTEXT = 2;
     private static final int INVISIBLE_CIT = 3;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(OOBibBase.class);
     private XMultiServiceFactory mxDocFactory;
     private XTextDocument mxDoc;
     private XText text;
@@ -117,23 +118,22 @@ class OOBibBase {
     private XTextViewCursorSupplier xViewCursorSupplier;
     private XComponent xCurrentComponent;
     private XPropertySet propertySet;
-    private XPropertyContainer userProperties;
 
+    private XPropertyContainer userProperties;
     private final boolean atEnd;
     private final Comparator<BibEntry> entryComparator;
     private final Comparator<BibEntry> yearAuthorTitleComparator;
     private final FieldComparator authComp = new FieldComparator(FieldName.AUTHOR);
     private final FieldComparator yearComp = new FieldComparator(FieldName.YEAR);
-    private final FieldComparator titleComp = new FieldComparator(FieldName.TITLE);
 
+    private final FieldComparator titleComp = new FieldComparator(FieldName.TITLE);
     private final List<Comparator<BibEntry>> authorYearTitleList = new ArrayList<>(3);
+
     private final List<Comparator<BibEntry>> yearAuthorTitleList = new ArrayList<>(3);
 
     private final Map<String, String> uniquefiers = new HashMap<>();
 
     private List<String> sortedReferenceMarks;
-
-    private static final Log LOGGER = LogFactory.getLog(OOBibBase.class);
 
 
     public OOBibBase(String pathToOO, boolean atEnd) throws IOException, IllegalAccessException,
@@ -1025,7 +1025,7 @@ class OOBibBase {
         // Create a new TextSection from the document factory and access it's XNamed interface
         XNamed xChildNamed;
         try {
-            xChildNamed= UnoRuntime.queryInterface(XNamed.class,
+            xChildNamed = UnoRuntime.queryInterface(XNamed.class,
                 mxDocFactory.createInstance("com.sun.star.text.TextSection"));
         } catch (Exception e) {
             throw new CreationException(e.getMessage());
@@ -1343,7 +1343,6 @@ class OOBibBase {
         }
 
     }
-
 
     public BibDatabase generateDatabase(List<BibDatabase> databases)
             throws NoSuchElementException, WrappedTargetException {
