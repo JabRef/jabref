@@ -167,7 +167,7 @@ public class RepecNepImporter extends Importer {
 
     @Override
     public BasicFileType getFileType() {
-        return BasicFileType.REPEC;
+        return BasicFileType.TXT;
     }
 
     @Override

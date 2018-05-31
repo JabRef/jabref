@@ -70,7 +70,7 @@ public class RepecNepImporterTest {
 
     @Test
     public void testGetExtension() {
-        assertEquals(BasicFileType.REPEC, testImporter.getFileType());
+        assertEquals(BasicFileType.TXT, testImporter.getFileType());
     }
 
     @Test

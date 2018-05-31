@@ -59,7 +59,7 @@ public class OvidImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(BasicFileType.OVID, importer.getFileType());
+        assertEquals(BasicFileType.TXT, importer.getFileType());
     }
 
     @Test

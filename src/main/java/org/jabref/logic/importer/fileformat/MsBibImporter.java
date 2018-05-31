@@ -77,7 +77,7 @@ public class MsBibImporter extends Importer {
 
     @Override
     public BasicFileType getFileType() {
-        return BasicFileType.MSBIB;
+        return BasicFileType.XML;
     }
 
     @Override

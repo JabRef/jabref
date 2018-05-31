@@ -43,7 +43,7 @@ public class FileFilterConverter {
     }
 
     public static Optional<Importer> getImporter(FileChooser.ExtensionFilter extensionFilter, Collection<Importer> importers) {
-        return importers.stream().filter(importer -> importer.getFileType().getDescription().equals(extensionFilter.getDescription())).findFirst();
+        return importers.stream().filter(importer -> importer.getName().equals(extensionFilter.getDescription())).findFirst();
     }
 
     public static Optional<Exporter> getExporter(FileChooser.ExtensionFilter extensionFilter, Collection<Exporter> exporters) {

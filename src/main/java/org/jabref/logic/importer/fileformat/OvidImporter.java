@@ -48,7 +48,7 @@ public class OvidImporter extends Importer {
 
     @Override
     public BasicFileType getFileType() {
-        return BasicFileType.OVID;
+        return BasicFileType.TXT;
     }
 
     @Override

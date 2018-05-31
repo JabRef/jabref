@@ -31,7 +31,7 @@ public class CopacImporter extends Importer {
 
     @Override
     public BasicFileType getFileType() {
-        return BasicFileType.COPAC;
+        return BasicFileType.TXT;
     }
 
     @Override

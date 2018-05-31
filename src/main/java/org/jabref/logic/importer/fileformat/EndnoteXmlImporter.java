@@ -81,7 +81,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
     @Override
     public BasicFileType getFileType() {
-        return BasicFileType.ENDNOTE_XML;
+        return BasicFileType.XML;
     }
 
     @Override

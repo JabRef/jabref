@@ -26,7 +26,7 @@ public class BibtexImporter extends Importer {
     private static final String SIGNATURE = "This file was created with JabRef";
 
     private final ImportFormatPreferences importFormatPreferences;
-    private FileUpdateMonitor fileMonitor;
+    private final FileUpdateMonitor fileMonitor;
 
     public BibtexImporter(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = importFormatPreferences;

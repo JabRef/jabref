@@ -29,7 +29,7 @@ public class InspecImporter extends Importer {
 
     @Override
     public BasicFileType getFileType() {
-        return BasicFileType.INSPEC;
+        return BasicFileType.TXT;
     }
 
     @Override

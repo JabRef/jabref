@@ -9,7 +9,7 @@ public class FileTypeTest {
     @Test
     public void testSingleFileExtensionDescription() {
         String singleDescription = "INSPEC file (*.txt)";
-        assertEquals(singleDescription, BasicFileType.INSPEC.getDescription());
+        assertEquals(singleDescription, BasicFileType.TXT.getDescription());
     }
 
     @Test

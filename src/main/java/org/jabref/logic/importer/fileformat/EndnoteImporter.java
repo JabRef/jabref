@@ -45,7 +45,7 @@ public class EndnoteImporter extends Importer {
 
     @Override
     public BasicFileType getFileType() {
-        return BasicFileType.ENDNOTE;
+        return BasicFileType.XML;
     }
 
     @Override

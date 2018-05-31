@@ -25,7 +25,7 @@ public class CopacImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(BasicFileType.COPAC, importer.getFileType());
+        assertEquals(BasicFileType.TXT, importer.getFileType());
 
     }
 

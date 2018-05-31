@@ -478,7 +478,7 @@ public class ModsImporter extends Importer implements Parser {
 
     @Override
     public BasicFileType getFileType() {
-        return BasicFileType.MODS;
+        return BasicFileType.XML;
     }
 
     @Override

@@ -22,7 +22,7 @@ public class MsBibImporterTest {
     @Test
     public void testsGetExtensions() {
         MsBibImporter importer = new MsBibImporter();
-        assertEquals(BasicFileType.MSBIB, importer.getFileType());
+        assertEquals(BasicFileType.XML, importer.getFileType());
     }
 
     @Test

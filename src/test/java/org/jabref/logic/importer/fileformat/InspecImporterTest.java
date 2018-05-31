@@ -119,7 +119,7 @@ public class InspecImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(BasicFileType.INSPEC, importer.getFileType());
+        assertEquals(BasicFileType.TXT, importer.getFileType());
     }
 
     @Test
