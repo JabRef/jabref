@@ -30,7 +30,7 @@ public class DeletePostsWorker extends AbstractBibSonomyWorker {
 
 			if ((intrahashOpt.isPresent()) || intrahashOpt.get().isEmpty() || (usernameOpt.isPresent() && !intrahashOpt.isPresent() && !(BibSonomyProperties.getUsername().equals(usernameOpt.get())))) {
 				try {
-                    LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
+                    LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getBibDatabaseContext());
                     logic.deletePosts(BibSonomyProperties.getUsername(), Collections.singletonList(intrahashOpt.get()));
 					jabRefFrame.output(Localization.lang("Deleting post %0", intrahashOpt.get()));
 					entry.clearField(FieldName.INTRAHASH);

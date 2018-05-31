@@ -36,7 +36,7 @@ public class UploadDocumentsWorker extends AbstractBibSonomyWorker {
 			return;
 		}
 
-        LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
+        LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getBibDatabaseContext());
 
 		// split the filey by ; character
 		for (String file : files.split(";")) {

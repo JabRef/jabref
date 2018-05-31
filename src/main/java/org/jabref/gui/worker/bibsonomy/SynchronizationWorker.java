@@ -54,7 +54,7 @@ public class SynchronizationWorker extends AbstractBibSonomyWorker {
         // Set of id to be removed from the database
         final HashSet<BibEntry> removeIds = new HashSet<>();
 
-        LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
+        LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getBibDatabaseContext());
 
         for (final BibEntry entry : bibDatabase.getEntries()) {
 

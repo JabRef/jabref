@@ -47,7 +47,7 @@ public class DownloadDocumentsWorker extends AbstractBibSonomyWorker {
 
 		Optional<String> intrahashOpt = entry.getField(FieldName.INTRAHASH);
 		if (intrahashOpt.isPresent() && !intrahashOpt.get().isEmpty()) {
-            LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
+            LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getBibDatabaseContext());
 			final Post<? extends Resource> post;
 			try {
                 post = logic.getPostDetails(intrahashOpt.get(), BibSonomyProperties.getUsername()); // client.executeQuery(getPostDetailsQuery);

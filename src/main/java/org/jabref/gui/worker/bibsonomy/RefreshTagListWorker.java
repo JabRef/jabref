@@ -58,7 +58,7 @@ public class RefreshTagListWorker extends AbstractBibSonomyWorker {
 		if (grouping == GroupingEntity.ALL && BibSonomyProperties.getTagCloudSize() > 100)
 			end = 100;
 
-        LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
+        LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getBibDatabaseContext());
         final List<Tag> result = logic.getTags(BibTex.class, grouping, groupingValue, null, null, null, null, null, BibSonomyProperties.getTagCloudOrder(), null, null, start, end);
 		tags.addAll(result);
 

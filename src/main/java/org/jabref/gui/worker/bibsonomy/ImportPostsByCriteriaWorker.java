@@ -29,7 +29,7 @@ import org.bibsonomy.model.logic.LogicInterface;
 import org.bibsonomy.rest.exceptions.AuthenticationException;
 
 /**
- * Import a posts from the service
+ * Imports a posts from the service
  */
 public class ImportPostsByCriteriaWorker extends AbstractBibSonomyWorker {
 
@@ -93,7 +93,7 @@ public class ImportPostsByCriteriaWorker extends AbstractBibSonomyWorker {
 			}
 
 			try {
-                LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
+                LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getBibDatabaseContext());
 				final Collection<Post<BibTex>> result = logic.getPosts(BibTex.class, grouping, groupingValue, tags, null, search, null, null, null, null, null, start, end);
 				for (Post<? extends Resource> post : result) {
 					dialog.setProgress(numberOfPosts++, numberOfPostsPerRequest);

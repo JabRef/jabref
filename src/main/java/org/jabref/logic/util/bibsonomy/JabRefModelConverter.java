@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,7 +21,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.Month;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -59,24 +60,23 @@ public class JabRefModelConverter {
 			"description", "keywords", "comment", "id"}));
 
 	/**
-	 * date's in JabRef are stored as strings, in BibSonomy as Date objects. We
+	 * dates in JabRef are stored as strings, in BibSonomy as Date objects. We
 	 * have to supply two formats - the first is the one which exists when
 	 * having downloaded entries from BibSonomy, the second one when entries
 	 * were created from scratch within JabRef.
 	 */
-	private static final SimpleDateFormat bibsonomyDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+	private static final SimpleDateFormat BIBSONOMY_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
-	private static final SimpleDateFormat jabrefDateFormat = new SimpleDateFormat("yyyy.MM.dd");
+	private static final SimpleDateFormat JABREF_DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
 
 	/**
 	 * separates tags
 	 */
-	private static final String jabRefKeywordSeparator = JabRefPreferences.getInstance().get("groupKeywordSeparator", ", ");
+	private static final String JABREF_KEYWORD_SEPARATOR = JabRefPreferences.getInstance().get("groupKeywordSeparator", ", ");
 
 	/**
 	 * Converts a BibSonomy post into a JabRef BibEntry
 	 *
-	 <<<<<<< HEAD
 	 * @param post A Post you need to convert
 	 * @return An optional BibEntry
 	 * @since 3.7
@@ -152,7 +152,7 @@ public class JabRefModelConverter {
 				}
 
 				if (present(post.getDate())) {
-					entry.setField(FieldName.TIMESTAMP, bibsonomyDateFormat.format(post.getDate()));
+					entry.setField(FieldName.TIMESTAMP, BIBSONOMY_DATE_FORMAT.format(post.getDate()));
 				}
 
 				if (present(post.getUser()))
@@ -188,26 +188,35 @@ public class JabRefModelConverter {
 		final Set<Tag> tags = post.getTags();
 		final StringBuffer tagsBuffer = new StringBuffer();
 		for (final Tag tag : tags) {
-			tagsBuffer.append(tag.getName() + jabRefKeywordSeparator);
+			tagsBuffer.append(tag.getName() + JABREF_KEYWORD_SEPARATOR);
 		}
         /*
 		 * remove last separator
 		 */
 		if (!tags.isEmpty()) {
-			tagsBuffer.delete(tagsBuffer.lastIndexOf(jabRefKeywordSeparator), tagsBuffer.length());
+			tagsBuffer.delete(tagsBuffer.lastIndexOf(JABREF_KEYWORD_SEPARATOR), tagsBuffer.length());
 		}
 		final String tagsBufferString = tagsBuffer.toString();
 		if (present(tagsBufferString))
 			entry.setField("keywords", tagsBufferString);
 	}
 
+    /**
+     * Copies the month from Bibsonomy's month to JabRef's month field
+     *
+     * @param entry the entry to copy to
+     * @param bibtex the entry to copy from
+     */
 	public static void copyMonth(final BibEntry entry, final BibTex bibtex) {
+        Objects.requireNonNull(entry);
+        Objects.requireNonNull(bibtex);
 		final String month = bibtex.getMonth();
 		if (present(month)) {
-			final String longMonth = MonthUtil.getMonth(month).fullName;
-			if (present(longMonth)) {
-				entry.setField("month", longMonth);
+            final Optional<Month> parsedMonth = Month.parse(month);
+			if (parsedMonth.isPresent()) {
+			    entry.setMonth(parsedMonth.get());
 			} else {
+			    // fallback if it could not be parsed: just write the plain value
 				entry.setField("month", month);
 			}
 		}
@@ -318,12 +327,12 @@ public class JabRefModelConverter {
 		final Optional<String> entryTimestampOpt = entry.getField(FieldName.TIMESTAMP);
 		entryTimestampOpt.ifPresent(entryTimestamp -> {
 			try {
-				post.setDate(bibsonomyDateFormat.parse(StringUtil.toUTF8(entryTimestamp)));
+				post.setDate(BIBSONOMY_DATE_FORMAT.parse(StringUtil.toUTF8(entryTimestamp)));
 			} catch (ParseException ex) {
 				LOGGER.debug("Could not parse BibSonomy date format - trying JabrefDateFormat...");
 			}
 			try {
-				post.setDate(jabrefDateFormat.parse(StringUtil.toUTF8(entryTimestamp)));
+				post.setDate(JABREF_DATE_FORMAT.parse(StringUtil.toUTF8(entryTimestamp)));
 			} catch (ParseException ex) {
 				LOGGER.debug("Could not parse Jabref date format - set date to NULL");
 				post.setDate(null); // this is null anyway, but just to make it clear
@@ -335,7 +344,7 @@ public class JabRefModelConverter {
 
 		final Optional<String> entryKeywordsOpt = entry.getField(FieldName.KEYWORDS);
 		entryKeywordsOpt.ifPresent(entryKeywords -> {
-			for (String keyword : entryKeywords.split(jabRefKeywordSeparator)) {
+			for (String keyword : entryKeywords.split(JABREF_KEYWORD_SEPARATOR)) {
 				post.addTag(keyword);
 			}
 		});

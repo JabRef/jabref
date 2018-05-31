@@ -32,11 +32,16 @@ public class ExportWorker extends AbstractBibSonomyWorker {
 
 	private List<BibEntry> entries;
 
+    public ExportWorker(JabRefFrame jabRefFrame, List<BibEntry> entries) {
+        super(jabRefFrame);
+        this.entries = entries;
+    }
+
 	public void run() {
 		try {
 			for (BibEntry entry : entries) {
 				Optional<String> citeKeyOpt = entry.getCiteKeyOptional();
-				if(citeKeyOpt.isPresent()) {
+				if (citeKeyOpt.isPresent()) {
 					jabRefFrame.output("Exporting post " + citeKeyOpt.get());
 				}else {
 					jabRefFrame.output("Exporting post");
@@ -89,7 +94,7 @@ public class ExportWorker extends AbstractBibSonomyWorker {
 	}
 
 	private void changePost(Post<? extends Resource> post) throws Exception {
-        LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
+        LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getBibDatabaseContext());
         final List<String> hashes = logic.updatePosts(Collections.singletonList(post), PostUpdateOperation.UPDATE_ALL);
 		if (hashes.size() != 1) {
 			throw new IllegalStateException("changePosts returned " + hashes.size() + " hashes");
@@ -98,7 +103,7 @@ public class ExportWorker extends AbstractBibSonomyWorker {
 	}
 
 	private void createPost(Post<? extends Resource> post) throws Exception {
-        LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
+        LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getBibDatabaseContext());
         final List<String> hashes = logic.createPosts(Collections.singletonList(post));
 		if (hashes.size() != 1) {
 			throw new IllegalStateException("createPosts returned " + hashes.size() + " hashes");
@@ -106,8 +111,4 @@ public class ExportWorker extends AbstractBibSonomyWorker {
 		post.getResource().setIntraHash(hashes.get(0));
 	}
 
-	public ExportWorker(JabRefFrame jabRefFrame, List<BibEntry> entries) {
-		super(jabRefFrame);
-		this.entries = entries;
-	}
 }
