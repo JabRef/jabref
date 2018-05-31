@@ -131,19 +131,19 @@ public class JabRefMain extends Application {
     private static boolean handleMultipleAppInstances(String[] args) {
         RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();
         if (remotePreferences.useRemoteServer()) {
-            Globals.REMOTE_LISTENER.open(new JabRefMessageHandler(), remotePreferences.getPort());
-
-            if (!Globals.REMOTE_LISTENER.isOpen()) {
-                // we are not alone, there is already a server out there, try to contact already running JabRef:
-                if (new RemoteClient(remotePreferences.getPort()).sendCommandLineArguments(args)) {
-                    // We have successfully sent our command line options through the socket to another JabRef instance.
+            // Try to contact already running JabRef
+            RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
+            if (remoteClient.ping()) {
+                // We are not alone, there is already a server out there, send command line arguments to other instance
+                if (remoteClient.sendCommandLineArguments(args)) {
                     // So we assume it's all taken care of, and quit.
                     LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
                     return false;
                 }
+            } else {
+                // We are alone, so we start the server
+                Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort());
             }
-            // we are alone, we start the server
-            Globals.REMOTE_LISTENER.start();
         }
         return true;
     }
