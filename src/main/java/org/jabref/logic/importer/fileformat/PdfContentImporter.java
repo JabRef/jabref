@@ -593,7 +593,7 @@ public class PdfContentImporter extends Importer {
 
     @Override
     public BasicFileType getFileType() {
-        return BasicFileType.PDF_CONTENT;
+        return BasicFileType.PDF;
     }
 
     @Override

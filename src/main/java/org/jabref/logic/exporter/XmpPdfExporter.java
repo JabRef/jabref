@@ -17,7 +17,7 @@ public class XmpPdfExporter extends Exporter {
     private final XmpPreferences xmpPreferences;
 
     public XmpPdfExporter(XmpPreferences xmpPreferences) {
-        super("pdf", Localization.lang("XMP-annotated PDF"), BasicFileType.PDF_XMP);
+        super("pdf", Localization.lang("XMP-annotated PDF"), BasicFileType.PDF);
         this.xmpPreferences = xmpPreferences;
     }
 

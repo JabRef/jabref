@@ -12,7 +12,6 @@ import org.jabref.logic.l10n.Localization;
  * @implNote Enter the extensions without a dot! The dot is added implicitly.
  */
 public enum BasicFileType implements FileType {
-    BIBTEX_DB(String.format("%1s %2s", "BibTex", Localization.lang("Library")), "bib"),
     BIBTEXML(Localization.lang("%0 file", "BibTeXML"), "bibx", "xml"),
     ENDNOTE(Localization.lang("%0 file", "EndNote/Refer"), "ref", "enw"),
     FREECITE(Localization.lang("%0 file", "FreeCite"), "txt", "xml"),
@@ -21,26 +20,26 @@ public enum BasicFileType implements FileType {
     MEDLINE_PLAIN(Localization.lang("%0 file", "MedlinePlain"), "nbib", "txt"),
     PUBMED(Localization.lang("%0 file", "PubMed"), "fcgi"),
     SILVER_PLATTER(Localization.lang("%0 file", "SilverPlatter"), "dat", "txt"),
-    PDF_XMP(Localization.lang("XMP-annotated PDF"), "pdf"),
-    PDF_CONTENT(Localization.lang("%0 file", "PDF content "), "pdf"),
-    PLAIN_XMP(Localization.lang("%0 file", "XMP"), "xmp"),
 
     AUX(Localization.lang("%0 file", "AUX"), "aux"),
+    BIBTEX_DB(String.format("%1s %2s", "BibTex", Localization.lang("Library")), "bib"),
     CITATION_STYLE(Localization.lang("%0 file", "CSL"), "csl"),
+    CLASS(Localization.lang("%0 file", "CLASS"), "class"),
     CSV(Localization.lang("%0 file", "CSV"), "csv"),
     HTML(Localization.lang("%0 file", "HTML"), "html"),
     JAR(Localization.lang("%0 file", "JAR"), "jar"),
     JSTYLE(Localization.lang("Style file"), "jstyle"),
     LAYOUT(Localization.lang("Custom layout file"), "layout"),
+    ODS(Localization.lang("%0 file", Localization.lang("OpenDocument spreadsheet")), "ods"),
+    PDF(Localization.lang("%0 file"), "pdf"),
     RIS(Localization.lang("%0 file", "RIS"), "ris"),
     TERMS(Localization.lang("Protected terms file"), "terms"),
     TXT(Localization.lang("%0 file", Localization.lang("Plain text")), "txt"),
-    CLASS(Localization.lang("%0 file", "CLASS"), "class"),
-    ODS(Localization.lang("%0 file", Localization.lang("OpenDocument spreadsheet")), "ods"),
-    SXC(Localization.lang("%0 file", "OpenOffice/LibreOffice Calc"), "sxc"),
     RDF(Localization.lang("%0 file", "RDF"), "rdf"),
     RTF(Localization.lang("%0 file", "RTF"), "rtf"),
+    SXC(Localization.lang("%0 file", "OpenOffice/LibreOffice Calc"), "sxc"),
     XML(Localization.lang("%0 file", "XML"), "xml"),
+    XMP(Localization.lang("%0 file", "XMP"), "xmp"),
     ZIP(Localization.lang("%0 file", "ZIP"), "zip"),
 
     DEFAULT(Localization.lang("%0 file", "DEFAULT"), "default");

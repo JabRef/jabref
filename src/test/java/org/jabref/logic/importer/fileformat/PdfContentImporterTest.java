@@ -28,7 +28,7 @@ public class PdfContentImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(BasicFileType.PDF_CONTENT, importer.getFileType());
+        assertEquals(BasicFileType.PDF, importer.getFileType());
     }
 
     @Test

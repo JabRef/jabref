@@ -138,6 +138,7 @@ public abstract class Importer implements Comparable<Importer> {
      */
     public abstract FileType getFileType();
 
+
     /**
      * Returns a one-word ID which identifies this importer.
      * Used for example, to identify the importer when used from the command line.
@@ -169,6 +170,7 @@ public abstract class Importer implements Comparable<Importer> {
      * @return description of the import format
      */
     public abstract String getDescription();
+
 
     @Override
     public int hashCode() {
