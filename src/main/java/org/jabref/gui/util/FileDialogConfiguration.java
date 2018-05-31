@@ -142,6 +142,11 @@ public class FileDialogConfiguration {
             return this;
         }
 
+        public Builder addExtensionFilter(String description, String extension) {
+            extensionFilters.add(new FileChooser.ExtensionFilter(description, extension));
+            return this;
+        }
+
         public Builder withDefaultExtension(FileChooser.ExtensionFilter extensionFilter) {
             defaultExtension = extensionFilter;
             return this;

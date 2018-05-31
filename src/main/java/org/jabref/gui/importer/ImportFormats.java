@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
@@ -30,7 +30,6 @@ import org.jabref.logic.util.FileType;
 import org.jabref.preferences.JabRefPreferences;
 
 public class ImportFormats {
-
 
     private ImportFormats() {
     }
@@ -63,17 +62,11 @@ public class ImportFormats {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 SortedSet<Importer> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
-                List<FileType> extensions = importers.stream()
-                        .map(Importer::getFileType)
-                        .collect(Collectors.toList());
-                FileChooser.ExtensionFilter allImports = FileFilterConverter.forAllImporters(importers);
-                FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                        .addExtensionFilter(allImports)
-                        .addExtensionFilters(extensions)
-                        .withInitialDirectory(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY))
-                        .build();
-                fileDialogConfiguration.getExtensionFilters().add(new FileChooser.ExtensionFilter(Localization.lang("Any file"), "*.*"));
+                String workingDirectory = Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY);
+                FileDialogConfiguration fileDialogConfiguration = createImportFileChooser(importers, workingDirectory);
+
                 DialogService dialogService = new FXDialogService();
                 DefaultTaskExecutor.runInJavaFXThread(() -> {
                     dialogService.showFileOpenDialog(fileDialogConfiguration)
@@ -97,5 +90,16 @@ public class ImportFormats {
         }
 
         return new ImportAction(openInNew);
+    }
+
+    private static FileDialogConfiguration createImportFileChooser(SortedSet<Importer> allImporters, String currentDir) {
+        Map<String, FileType> fileTypes = allImporters.stream().collect(Collectors.toMap(Importer::getName, Importer::getFileType));
+        FileChooser.ExtensionFilter allImports = FileFilterConverter.forAllImporters(allImporters);
+        return new FileDialogConfiguration.Builder()
+                .addExtensionFilter(allImports)
+                .addExtensionFilter(Localization.lang("Any file"), "*.*")
+                .addExtensionFilters(fileTypes)
+                .withInitialDirectory(currentDir)
+                .build();
     }
 }
