@@ -8,7 +8,7 @@ Here, the categories "Changed" for added and changed functionality,
 
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
-## [Unreleased]
+## [4.3] - 2018-06-01
 
 ### Changed
 - We changed the minimum required version of Java to 1.8.0_172, as 1.8.0_162 has introduced a CPU leak [3943](https://github.com/JabRef/jabref/issues/3943)
@@ -32,73 +32,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Removed
 - We removed the GTK Look and Feel from the Options, as it leads to freezes in JabRef on MacOSX and Linux [#3995](https://github.com/JabRef/jabref/issues/3995).
 The GTK Look and Feel is now replaced with the "Nimbus" style as default.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ## [4.2] - 2018-04-26
@@ -435,7 +368,7 @@ The new default removes the linked file from the entry instead of deleting the f
 The changelog of versions 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of 2.11 and versions before is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v4.2...HEAD
+[4.3]: https://github.com/JabRef/jabref/compare/v4.2...v4.3
 [4.2]: https://github.com/JabRef/jabref/compare/v4.1...v4.2
 [4.1]: https://github.com/JabRef/jabref/compare/v4.0...v4.1
 [4.0]: https://github.com/JabRef/jabref/compare/v4.0-beta3...v4.0
