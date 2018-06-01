@@ -1,6 +1,11 @@
 package org.jabref.gui;
 
-import com.google.common.eventbus.Subscribe;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Optional;
+import java.util.concurrent.Future;
+import java.util.regex.Pattern;
+
 import javafx.print.PrinterJob;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -11,6 +16,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.web.WebView;
+
 import org.jabref.Globals;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -28,14 +34,10 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.preferences.PreviewPreferences;
+
+import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.Optional;
-import java.util.concurrent.Future;
-import java.util.regex.Pattern;
 
 /**
  * Displays an BibEntry using the given layout format.

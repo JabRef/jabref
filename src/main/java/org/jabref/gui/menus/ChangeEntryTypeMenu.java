@@ -1,10 +1,22 @@
 package org.jabref.gui.menus;
 
+import java.awt.Font;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
+import javax.swing.undo.UndoManager;
+
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.actions.ChangeTypeAction;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -18,14 +30,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.IEEETranEntryTypes;
-
-import javax.swing.*;
-import javax.swing.undo.UndoManager;
-import java.awt.*;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class ChangeEntryTypeMenu {
     public final Map<String, KeyStroke> entryShortCuts = new HashMap<>();

@@ -1,14 +1,16 @@
 package org.jabref.gui.actions;
 
+import java.awt.event.ActionEvent;
+import java.util.Optional;
+
+import javax.swing.AbstractAction;
+
 import javafx.scene.control.TextArea;
+
 import org.jabref.JabRefGUI;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.identifier.DOI;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.Optional;
 
 /**
  * Copies the doi url to the clipboard

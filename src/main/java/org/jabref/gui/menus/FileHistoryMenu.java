@@ -1,17 +1,18 @@
 package org.jabref.gui.menus;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.preferences.JabRefPreferences;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class FileHistoryMenu extends Menu {
 
