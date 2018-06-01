@@ -11,6 +11,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- We changed the minimum required version of Java to 1.8.0_172, as 1.8.0_162 has introduced a CPU leak [3943](https://github.com/JabRef/jabref/issues/3943)
 - We added a validity check for dates in the `date` and `urldate` fields.
 - We added a text file export for 'Find Unlinked Files'. [#3341](https://github.com/JabRef/jabref/issues/3341)
 - We added a fetcher based on RFC-IDs. [#3971](https://github.com/JabRef/jabref/issues/3971)
