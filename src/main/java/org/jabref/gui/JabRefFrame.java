@@ -1,93 +1,27 @@
 package org.jabref.gui;
 
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.TimerTask;
-
-import javax.swing.Action;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-
+import com.google.common.eventbus.Subscribe;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.ToolBar;
-import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
-
+import org.eclipse.fx.ui.controls.tabpane.DndTabPane;
+import org.eclipse.fx.ui.controls.tabpane.DndTabPaneFactory;
+import org.fxmisc.easybind.EasyBind;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.Actions;
-import org.jabref.gui.actions.AutoLinkFilesAction;
-import org.jabref.gui.actions.BibtexKeyPatternAction;
-import org.jabref.gui.actions.ConnectToSharedDatabaseCommand;
-import org.jabref.gui.actions.CopyFilesAction;
-import org.jabref.gui.actions.CustomizeEntryAction;
-import org.jabref.gui.actions.CustomizeKeyBindingAction;
-import org.jabref.gui.actions.DatabasePropertiesAction;
-import org.jabref.gui.actions.EditExternalFileTypesAction;
-import org.jabref.gui.actions.ErrorConsoleAction;
-import org.jabref.gui.actions.FindUnlinkedFilesAction;
-import org.jabref.gui.actions.IntegrityCheckAction;
-import org.jabref.gui.actions.LookupIdentifierAction;
-import org.jabref.gui.actions.ManageCustomExportsAction;
-import org.jabref.gui.actions.ManageCustomImportsAction;
-import org.jabref.gui.actions.ManageJournalsAction;
-import org.jabref.gui.actions.ManageKeywordsAction;
-import org.jabref.gui.actions.ManageProtectedTermsAction;
-import org.jabref.gui.actions.MassSetFieldAction;
-import org.jabref.gui.actions.MergeEntriesAction;
-import org.jabref.gui.actions.NewDatabaseAction;
-import org.jabref.gui.actions.NewEntryAction;
-import org.jabref.gui.actions.NewEntryFromPlainTextAction;
-import org.jabref.gui.actions.NewSubLibraryAction;
-import org.jabref.gui.actions.OldDatabaseCommandWrapper;
-import org.jabref.gui.actions.OpenBrowserAction;
-import org.jabref.gui.actions.SearchForUpdateAction;
-import org.jabref.gui.actions.SetupGeneralFieldsAction;
-import org.jabref.gui.actions.ShowDocumentViewerAction;
-import org.jabref.gui.actions.ShowPreferencesAction;
-import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.actions.*;
 import org.jabref.gui.dialogs.AutosaveUIManager;
 import org.jabref.gui.exporter.ExportCommand;
 import org.jabref.gui.exporter.SaveAllAction;
@@ -130,14 +64,20 @@ import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.LastFocusedTabPreferences;
 import org.jabref.preferences.SearchPreferences;
-
-import com.google.common.eventbus.Subscribe;
-import org.eclipse.fx.ui.controls.tabpane.DndTabPane;
-import org.eclipse.fx.ui.controls.tabpane.DndTabPaneFactory;
-import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osx.macadapter.MacAdapter;
+
+import javax.swing.Action;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.List;
 
 /**
  * The main window of the application.
@@ -708,14 +648,14 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
     private MenuBar createMenu() {
         ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
-        Menu file = new Menu(Localization.menuTitle("File"));
-        Menu edit = new Menu(Localization.menuTitle("Edit"));
+        Menu file = new Menu(Localization.lang("File"));
+        Menu edit = new Menu(Localization.lang("Edit"));
         Menu library = new Menu(Localization.lang("Library"));
-        Menu quality = new Menu(Localization.menuTitle("Quality"));
-        Menu view = new Menu(Localization.menuTitle("View"));
-        Menu tools = new Menu(Localization.menuTitle("Tools"));
-        Menu options = new Menu(Localization.menuTitle("Options"));
-        Menu help = new Menu(Localization.menuTitle("Help"));
+        Menu quality = new Menu(Localization.lang("Quality"));
+        Menu view = new Menu(Localization.lang("View"));
+        Menu tools = new Menu(Localization.lang("Tools"));
+        Menu options = new Menu(Localization.lang("Options"));
+        Menu help = new Menu(Localization.lang("Help"));
 
         file.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_LIBRARY_BIBTEX, new NewDatabaseAction(this, BibDatabaseMode.BIBTEX)),

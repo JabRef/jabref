@@ -1,18 +1,13 @@
 package org.jabref.cli;
 
-import java.util.List;
-
+import org.apache.commons.cli.*;
 import org.jabref.Globals;
 import org.jabref.logic.l10n.Localization;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.jabref.model.database.BibDatabaseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class JabRefCLI {
 
@@ -173,7 +168,7 @@ public class JabRefCLI {
         options.addOption(
                 Option.builder("ib")
                       .longOpt("importBibtex")
-                      .desc(String.format("%s: %s[,importBibtex bibtexString]", Localization.lang("Import") + " " + Localization.BIBTEX, Localization.lang("filename")))
+                        .desc(String.format("%s: %s[,importBibtex bibtexString]", Localization.lang("Import") + " " + BibDatabaseMode.BIBTEX.getFormattedName(), Localization.lang("filename")))
                       .hasArg()
                       .argName("FILE")
                       .build());

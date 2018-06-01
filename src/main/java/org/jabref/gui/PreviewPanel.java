@@ -1,11 +1,6 @@
 package org.jabref.gui;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.Optional;
-import java.util.concurrent.Future;
-import java.util.regex.Pattern;
-
+import com.google.common.eventbus.Subscribe;
 import javafx.print.PrinterJob;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -16,7 +11,6 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.web.WebView;
-
 import org.jabref.Globals;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -34,10 +28,14 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.preferences.PreviewPreferences;
-
-import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Optional;
+import java.util.concurrent.Future;
+import java.util.regex.Pattern;
 
 /**
  * Displays an BibEntry using the given layout format.
@@ -127,10 +125,10 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         copyPreview.setOnAction(event -> copyPreviewToClipBoard());
         MenuItem printEntryPreview = new MenuItem(Localization.lang("Print entry preview"), IconTheme.JabRefIcons.PRINTED.getGraphicNode());
         printEntryPreview.setOnAction(event -> print());
-        MenuItem previousPreviewLayout = new MenuItem(Localization.menuTitle("Previous preview layout"));
+        MenuItem previousPreviewLayout = new MenuItem(Localization.lang("Previous preview layout"));
         previousPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.PREVIOUS_PREVIEW_LAYOUT));
         previousPreviewLayout.setOnAction(event -> basePanel.ifPresent(BasePanel::previousPreviewStyle));
-        MenuItem nextPreviewLayout = new MenuItem(Localization.menuTitle("Next preview layout"));
+        MenuItem nextPreviewLayout = new MenuItem(Localization.lang("Next preview layout"));
         nextPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.NEXT_PREVIEW_LAYOUT));
         nextPreviewLayout.setOnAction(event -> basePanel.ifPresent(BasePanel::nextPreviewStyle));
 

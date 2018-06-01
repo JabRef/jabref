@@ -1,7 +1,19 @@
 package org.jabref.gui.externalfiletype;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
+import com.jgoodies.forms.builder.ButtonStackBuilder;
+import javafx.scene.control.ButtonType;
+import javafx.stage.Modality;
+import org.jabref.gui.actions.MnemonicAwareAction;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
+import org.jabref.logic.l10n.Localization;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -10,30 +22,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
-
-import javafx.scene.control.ButtonType;
-import javafx.stage.Modality;
-
-import org.jabref.gui.actions.MnemonicAwareAction;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.ControlHelper;
-import org.jabref.logic.l10n.Localization;
-
-import com.jgoodies.forms.builder.ButtonStackBuilder;
 
 /**
  * Editor for external file types.
@@ -306,7 +294,7 @@ public class ExternalFileTypeEditor extends BaseDialog<Void> {
 
         public EditExternalFileTypesAction() {
             super();
-            putValue(Action.NAME, Localization.menuTitle("Manage external file types"));
+            putValue(Action.NAME, Localization.lang("Manage external file types"));
         }
 
         @Override
