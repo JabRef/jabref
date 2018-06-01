@@ -431,8 +431,8 @@ public class ProtectedTermsDialog {
 
             JButton browse = new JButton(Localization.lang("Browse"));
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(BasicFileType.TERMS)
-                    .withDefaultExtension(BasicFileType.TERMS)
+                    .addExtensionFilter(Localization.lang("Protected terms file"), BasicFileType.TERMS)
+                    .withDefaultExtension(Localization.lang("Protected terms file"), BasicFileType.TERMS)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
             DialogService ds = new FXDialogService();
 

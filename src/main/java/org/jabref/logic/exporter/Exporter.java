@@ -51,8 +51,6 @@ public abstract class Exporter {
      */
     public abstract void export(BibDatabaseContext databaseContext, Path file, Charset encoding, List<BibEntry> entries) throws Exception;
 
-    public String getDescription() {
-        return fileType.getDescription();
-    }
+
 
 }

@@ -95,8 +95,8 @@ class CustomExportDialog extends JabRefDialog {
         JButton browse = new JButton(Localization.lang("Browse"));
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(BasicFileType.LAYOUT)
-                .withDefaultExtension(BasicFileType.LAYOUT)
+                .addExtensionFilter(Localization.lang("Custom layout file"), BasicFileType.LAYOUT)
+                .withDefaultExtension(Localization.lang("Custom layout file"), BasicFileType.LAYOUT)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY)).build();
         DialogService ds = new FXDialogService();
         browse.addActionListener(

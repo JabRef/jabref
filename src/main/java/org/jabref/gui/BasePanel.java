@@ -2221,7 +2221,7 @@ public class BasePanel extends JPanel implements ClipboardOwner {
         public void action() throws SaveException {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .withDefaultExtension(BasicFileType.BIBTEX_DB)
-                    .addExtensionFilter(BasicFileType.BIBTEX_DB)
+                    .addExtensionFilter(String.format("%1s %2s", "BibTex", Localization.lang("Library")), BasicFileType.BIBTEX_DB)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                     .build();
 

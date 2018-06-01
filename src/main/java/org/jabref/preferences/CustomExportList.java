@@ -97,7 +97,7 @@ public class CustomExportList {
         if (extension.contains(".")) {
             extension = extension.substring(extension.indexOf('.') + 1, extension.length());
         }
-        FileType fileType = BasicFileType.addnewFileType(exporterName, extension);
+        FileType fileType = BasicFileType.addnewFileType(extension);
         TemplateExporter format = new TemplateExporter(exporterName, exporterName, lfFileName, null, fileType, layoutPreferences,
                 savePreferences);
         format.setCustomExport(true);

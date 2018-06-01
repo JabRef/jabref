@@ -6,8 +6,12 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
 import javax.swing.AbstractAction;
@@ -39,6 +43,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BasicFileType;
+import org.jabref.logic.util.FileType;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -117,8 +122,14 @@ public class ImportCustomizationDialog extends JabRefDialog {
 
         JButton addFromJarButton = new JButton(Localization.lang("Add from JAR"));
         addFromJarButton.addActionListener(e -> {
+
+            Map<String, FileType> fileTypes = Collections.unmodifiableMap(Stream.of(
+                    new SimpleEntry<>(Localization.lang("%0 file", "JAR"), BasicFileType.JAR),
+                    new SimpleEntry<>(Localization.lang("%0 file", "ZIP"), BasicFileType.ZIP))
+                    .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
+
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilters(Arrays.asList(BasicFileType.ZIP, BasicFileType.JAR))
+                    .addExtensionFilters(fileTypes)
                     .withDefaultExtension(BasicFileType.JAR)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
             DialogService ds = new FXDialogService();

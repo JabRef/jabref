@@ -8,8 +8,6 @@ import java.util.List;
  */
 public interface FileType {
 
-    String getDescription();
-
     String getFirstExtensionWithDot();
 
     List<String> getExtensionsWithDot();

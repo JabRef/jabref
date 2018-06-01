@@ -4,7 +4,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -12,6 +11,7 @@ import java.util.Optional;
 
 import javafx.stage.FileChooser;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BasicFileType;
 import org.jabref.logic.util.FileType;
 
@@ -62,18 +62,8 @@ public class FileDialogConfiguration {
         private FileChooser.ExtensionFilter defaultExtension;
         private String initialFileName;
 
-        public Builder addExtensionFilter(FileType fileType) {
-            extensionFilters.add(FileFilterConverter.toExtensionFilter(fileType));
-            return this;
-        }
-
         public Builder addExtensionFilter(String description, FileType fileType) {
             extensionFilters.add(FileFilterConverter.toExtensionFilter(description, fileType));
-            return this;
-        }
-
-        public Builder addExtensionFilters(Collection<FileType> fileTypes) {
-            fileTypes.forEach(this::addExtensionFilter);
             return this;
         }
 
@@ -114,7 +104,8 @@ public class FileDialogConfiguration {
         }
 
         public Builder withDefaultExtension(BasicFileType fileType) {
-            defaultExtension = FileFilterConverter.toExtensionFilter(fileType);
+            String defaultDescription = Localization.lang("%0 file", fileType.toString());
+            defaultExtension = FileFilterConverter.toExtensionFilter(defaultDescription, fileType);
             return this;
         }
 
@@ -147,9 +138,16 @@ public class FileDialogConfiguration {
             return this;
         }
 
+        public Builder addExtensionFilter(BasicFileType fileType) {
+            String defaultDescription = Localization.lang("%0 file", fileType.toString());
+            extensionFilters.add(FileFilterConverter.toExtensionFilter(defaultDescription, fileType));
+            return this;
+        }
+
         public Builder withDefaultExtension(FileChooser.ExtensionFilter extensionFilter) {
             defaultExtension = extensionFilter;
             return this;
         }
+
     }
 }

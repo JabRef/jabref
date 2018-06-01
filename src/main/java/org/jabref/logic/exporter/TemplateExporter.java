@@ -103,7 +103,7 @@ public class TemplateExporter extends Exporter {
      * @param deleteBlankLines If blank lines should be remove (default: false)
      */
     public TemplateExporter(String consoleName, String lfFileName, String directory, BasicFileType extension, LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, boolean deleteBlankLines) {
-        this(extension.getDescription(), consoleName, lfFileName, directory, extension, layoutPreferences, savePreferences);
+        this(consoleName, consoleName, lfFileName, directory, extension, layoutPreferences, savePreferences);
         this.deleteBlankLines = deleteBlankLines;
     }
 

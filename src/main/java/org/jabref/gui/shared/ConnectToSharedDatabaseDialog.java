@@ -469,8 +469,8 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
 
     private void showFileChooser() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(BasicFileType.BIBTEX_DB)
-                .withDefaultExtension(BasicFileType.BIBTEX_DB)
+                .addExtensionFilter(String.format("%1s %2s", "BibTex", Localization.lang("Library")), BasicFileType.BIBTEX_DB)
+                .withDefaultExtension(String.format("%1s %2s", "BibTex", Localization.lang("Library")), BasicFileType.BIBTEX_DB)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
         DialogService ds = new FXDialogService();
 

@@ -4,14 +4,15 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BasicFileType;
 import org.jabref.logic.util.FileType;
 
@@ -77,28 +78,28 @@ public class FileDialogConfigurationTest {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withDefaultExtension(BasicFileType.BIBTEX_DB).build();
 
-        FileChooser.ExtensionFilter filter = toFilter(BasicFileType.BIBTEX_DB);
+        FileChooser.ExtensionFilter filter = toFilter(String.format("%1s %2s", "BibTex", Localization.lang("Library")), BasicFileType.BIBTEX_DB);
 
         assertEquals(filter.getExtensions(), fileDialogConfiguration.getDefaultExtension().getExtensions());
     }
 
     @Test
     public void testMultipleExtension() {
-        Set<FileType> extensions = new HashSet<>(EnumSet.allOf(BasicFileType.class));
+        Map<String, FileType> extensions = EnumSet.allOf(BasicFileType.class).stream().collect(Collectors.toMap(Object::toString, Function.identity()));
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilters(extensions).build();
 
-        List<FileChooser.ExtensionFilter> extensionFilters = extensions.stream().map(this::toFilter)
-                .collect(Collectors.toList());
+
+        List<FileChooser.ExtensionFilter> extensionFilters = extensions.entrySet().stream().map(entry -> toFilter(entry.getKey(), entry.getValue())).collect(Collectors.toList());
 
         //We use size here as we otherwise would compare object references, as extension filters does not override equals
         assertEquals(extensionFilters.size(), fileDialogConfiguration.getExtensionFilters().size());
 
     }
 
-    private FileChooser.ExtensionFilter toFilter(FileType extension) {
-        return new FileChooser.ExtensionFilter(extension.getDescription(),
+    private FileChooser.ExtensionFilter toFilter(String description, FileType extension) {
+        return new FileChooser.ExtensionFilter(description,
                 extension.getExtensions().stream().map(ending -> "*." + ending).collect(Collectors.toList()));
     }
 

@@ -556,8 +556,8 @@ public class TextInputDialog extends JabRefDialog {
         public void actionPerformed(ActionEvent e) {
             try {
                 FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                        .addExtensionFilter(BasicFileType.TXT)
-                        .withDefaultExtension(BasicFileType.TXT)
+                        .addExtensionFilter(Localization.lang("Plain text"), BasicFileType.TXT)
+                        .withDefaultExtension(Localization.lang("Plain text"), BasicFileType.TXT)
                         .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
                 DialogService ds = new FXDialogService();
 
