@@ -44,15 +44,15 @@ apply from: 'localization.gradle'
 apply from: 'xjc.gradle'
 
 group = "org.jabref"
-version = "4.3-dev"
-project.ext.threeDotVersion = "4.2.0.1"
+version = "4.4-dev"
+project.ext.threeDotVersion = "4.3.0.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j7' : 'install4j7')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 mainClassName = "org.jabref.JabRefMain"
 
 // These are the Java version requirements we will check on each start of JabRef
-ext.minRequiredJavaVersion = "1.8.0_144"
+ext.minRequiredJavaVersion = "1.8.0_172"
 ext.allowJava9 = false
 
 sourceSets {
@@ -117,7 +117,7 @@ dependencies {
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
-    compile 'com.google.guava:guava:25.0-jre'
+    compile 'com.google.guava:guava:25.1-jre'
 
     // JavaFX stuff
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
@@ -169,7 +169,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.10'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.10.1'
 }
 
 jacoco {
