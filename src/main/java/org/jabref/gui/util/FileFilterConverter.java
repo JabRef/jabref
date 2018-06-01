@@ -18,7 +18,6 @@ public class FileFilterConverter {
     private FileFilterConverter() {
     }
 
-
     public static FileChooser.ExtensionFilter toExtensionFilter(String description, FileType fileType) {
         return new FileChooser.ExtensionFilter(description,
                 fileType.getExtensions().stream().map(ending -> "*." + ending).collect(Collectors.toList()));
