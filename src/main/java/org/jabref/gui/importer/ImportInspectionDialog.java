@@ -1347,7 +1347,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
 
             setFont(GUIGlobals.currentFont);
             int maxOfIconsAndFontSize = Math.max(GUIGlobals.currentFont.getSize(), Globals.prefs.getInt(JabRefPreferences.ICON_SIZE_SMALL));
-            setRowHeight(Globals.prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING) + maxOfIconsAndFontSize);
+            setRowHeight(maxOfIconsAndFontSize);
             // Update Table header with new settings
             this.getTableHeader().resizeAndRepaint();
         }
