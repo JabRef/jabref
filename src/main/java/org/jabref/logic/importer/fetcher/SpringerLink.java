@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 public class SpringerLink implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerLink.class);
 
-    private static final String API_URL = "http://api.springer.com/meta/v1/json";
+    private static final String API_URL = "https://api.springer.com/meta/v1/json";
     private static final String API_KEY = "b0c7151179b3d9c1119cf325bca8460d";
     private static final String CONTENT_HOST = "link.springer.com";
 
