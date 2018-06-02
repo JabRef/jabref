@@ -23,11 +23,11 @@ import org.apache.http.client.utils.URIBuilder;
 /**
  * Fetches BibTeX data from DBLP (dblp.org)
  *
- * @see <a href="http://dblp.dagstuhl.de/faq/13501473">Basic API documentation</a>
+ * @see <a href="https://dblp.dagstuhl.de/faq/13501473">Basic API documentation</a>
  */
 public class DBLPFetcher implements SearchBasedParserFetcher {
 
-    private static final String BASIC_SEARCH_URL = "http://dblp.org/search/publ/api";
+    private static final String BASIC_SEARCH_URL = "https://dblp.org/search/publ/api";
 
     private final ImportFormatPreferences importFormatPreferences;
 
