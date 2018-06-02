@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * @see https://arxiv.org/hypertex/bibstyles/
  */
 public class Eprint implements Identifier {
-    public static final URI RESOLVER = URI.create("http://arxiv.org");
+    public static final URI RESOLVER = URI.create("https://arxiv.org");
     private static final Logger LOGGER = LoggerFactory.getLogger(Eprint.class);
 
     // Regex
