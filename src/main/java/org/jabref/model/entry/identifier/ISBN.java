@@ -101,7 +101,7 @@ public class ISBN implements Identifier {
     @Override
     public Optional<URI> getExternalURI() {
         try {
-            return Optional.of(new URI("http://www.worldcat.org/isbn/" + isbnString));
+            return Optional.of(new URI("https://www.worldcat.org/isbn/" + isbnString));
         } catch (URISyntaxException e) {
             return Optional.empty();
         }
