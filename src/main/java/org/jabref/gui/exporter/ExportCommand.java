@@ -87,7 +87,7 @@ public class ExportCommand extends SimpleCommand {
 
         // Make sure we remember which filter was used, to set
         // the default for next time:
-        Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, format.getDescription());
+        Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, format.getName());
         Globals.prefs.put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, file.getParent().toString());
 
         final List<BibEntry> finEntries = entries;
@@ -120,7 +120,7 @@ public class ExportCommand extends SimpleCommand {
             public void update() {
                 // No error message. Report success:
                 if (errorMessage == null) {
-                    frame.output(Localization.lang("%0 export successful", format.getDisplayName()));
+                    frame.output(Localization.lang("%0 export successful", format.getName()));
                 }
                 // ... or show an error dialog:
                 else {
@@ -141,7 +141,7 @@ public class ExportCommand extends SimpleCommand {
     private static FileDialogConfiguration createExportFileChooser(ExporterFactory exportFactory, String currentDir) {
         List<FileType> fileTypes = exportFactory.getExporters().stream().map(Exporter::getFileType).collect(Collectors.toList());
         return new FileDialogConfiguration.Builder()
-                .addExtensionFilters(fileTypes)
+                .addExtensionFilter(fileTypes.toArray(new FileType[fileTypes.size()]))
                 .withDefaultExtension(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT))
                 .withInitialDirectory(currentDir)
                 .build();

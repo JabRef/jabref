@@ -51,7 +51,7 @@ public class ImportCommand extends SimpleCommand {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(anyFile)
                 .addExtensionFilter(allImports)
-                .addExtensionFilters(extensions)
+                .addExtensionFilter(extensions.toArray(new FileType[extensions.size()]))
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY))
                 .build();
         DefaultTaskExecutor.runInJavaFXThread(() -> {
