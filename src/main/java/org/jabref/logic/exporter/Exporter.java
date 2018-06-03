@@ -30,7 +30,7 @@ public abstract class Exporter {
     /**
      * Returns the name of the exporter (to display to the user).
      */
-    public String getDisplayName() {
+    public String getName() {
         return displayName;
     }
 

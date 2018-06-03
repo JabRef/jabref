@@ -4,10 +4,8 @@ import java.awt.event.ActionEvent;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 import java.util.SortedSet;
-import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -26,7 +24,6 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileType;
 import org.jabref.preferences.JabRefPreferences;
 
 public class ImportFormats {
@@ -65,7 +62,12 @@ public class ImportFormats {
 
                 SortedSet<Importer> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
                 String workingDirectory = Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY);
-                FileDialogConfiguration fileDialogConfiguration = createImportFileChooser(importers, workingDirectory);
+                FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                        .addExtensionFilter(FileFilterConverter.forAllImporters(importers))
+                        .addExtensionFilter(FileFilterConverter.ANY_FILE)
+                        .addExtensionFilter(FileFilterConverter.importerToExtensionFilter(importers))
+                        .withInitialDirectory(workingDirectory)
+                        .build();
 
                 DialogService dialogService = new FXDialogService();
                 DefaultTaskExecutor.runInJavaFXThread(() -> {
@@ -90,16 +92,5 @@ public class ImportFormats {
         }
 
         return new ImportAction(openInNew);
-    }
-
-    private static FileDialogConfiguration createImportFileChooser(SortedSet<Importer> allImporters, String currentDir) {
-        Map<String, FileType> fileTypes = allImporters.stream().collect(Collectors.toMap(Importer::getName, Importer::getFileType));
-        FileChooser.ExtensionFilter allImports = FileFilterConverter.forAllImporters(allImporters);
-        return new FileDialogConfiguration.Builder()
-                .addExtensionFilter(allImports)
-                .addExtensionFilter(Localization.lang("Any file"), "*.*")
-                .addExtensionFilters(fileTypes)
-                .withInitialDirectory(currentDir)
-                .build();
     }
 }

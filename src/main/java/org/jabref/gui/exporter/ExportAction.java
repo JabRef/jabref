@@ -3,8 +3,6 @@ package org.jabref.gui.exporter;
 import java.awt.event.ActionEvent;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -22,9 +20,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.exporter.Exporter;
-import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
@@ -67,7 +63,11 @@ public class ExportAction {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
-                FileDialogConfiguration fileDialogConfiguration = ExportAction.createExportFileChooser(Globals.exportFactory, Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
+                FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                        .addExtensionFilter(FileFilterConverter.exporterToExtensionFilter(Globals.exportFactory.getExporters()))
+                        .withDefaultExtension(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT))
+                        .withInitialDirectory(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY))
+                        .build();
                 DialogService dialogService = new FXDialogService();
                 DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showFileSaveDialog(fileDialogConfiguration)
                         .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), Globals.exportFactory.getExporters())));
@@ -98,7 +98,7 @@ public class ExportAction {
 
                 // Make sure we remember which filter was used, to set
                 // the default for next time:
-                Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, format.getDisplayName());
+                Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, format.getName());
                 Globals.prefs.put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, file.getParent().toString());
 
                 final List<BibEntry> finEntries = entries;
@@ -131,7 +131,7 @@ public class ExportAction {
                     public void update() {
                         // No error message. Report success:
                         if (errorMessage == null) {
-                            frame.output(Localization.lang("%0 export successful", format.getDisplayName()));
+                            frame.output(Localization.lang("%0 export successful", format.getName()));
                         }
                         // ... or show an error dialog:
                         else {
@@ -153,14 +153,4 @@ public class ExportAction {
 
         return new InternalExportAction(frame, selectedOnly);
     }
-
-    private static FileDialogConfiguration createExportFileChooser(ExporterFactory exportFactory, String currentDir) {
-        Map<String, FileType> fileTypes = exportFactory.getExporters().stream().collect(Collectors.toMap(Exporter::getDisplayName, Exporter::getFileType));
-        return new FileDialogConfiguration.Builder()
-                .addExtensionFilters(fileTypes)
-                .withDefaultExtension(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT))
-                .withInitialDirectory(currentDir)
-                .build();
-    }
-
 }

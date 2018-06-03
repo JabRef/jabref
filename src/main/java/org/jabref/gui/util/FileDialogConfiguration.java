@@ -5,14 +5,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javafx.stage.FileChooser;
 
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.BasicFileType;
 import org.jabref.logic.util.FileType;
 
 public class FileDialogConfiguration {
@@ -62,16 +60,6 @@ public class FileDialogConfiguration {
         private FileChooser.ExtensionFilter defaultExtension;
         private String initialFileName;
 
-        public Builder addExtensionFilter(String description, FileType fileType) {
-            extensionFilters.add(FileFilterConverter.toExtensionFilter(description, fileType));
-            return this;
-        }
-
-        public Builder addExtensionFilters(Map<String, FileType> fileTypesWithDescription) {
-            fileTypesWithDescription.forEach(this::addExtensionFilter);
-            return this;
-        }
-
         public FileDialogConfiguration build() {
             return new FileDialogConfiguration(initialDirectory, extensionFilters, defaultExtension, initialFileName);
         }
@@ -103,19 +91,23 @@ public class FileDialogConfiguration {
             return this;
         }
 
-        public Builder withDefaultExtension(BasicFileType fileType) {
-            String defaultDescription = Localization.lang("%0 file", fileType.toString());
-            defaultExtension = FileFilterConverter.toExtensionFilter(defaultDescription, fileType);
-            return this;
-        }
-
-        public Builder withDefaultExtension(String description, BasicFileType fileType) {
-            defaultExtension = FileFilterConverter.toExtensionFilter(description, fileType);
-            return this;
-        }
-
         public Builder withInitialFileName(String initialFileName) {
             this.initialFileName = initialFileName;
+            return this;
+        }
+
+        public Builder withDefaultExtension(FileChooser.ExtensionFilter extensionFilter) {
+            defaultExtension = extensionFilter;
+            return this;
+        }
+
+        public Builder withDefaultExtension(FileType fileType) {
+            defaultExtension = FileFilterConverter.toExtensionFilter(fileType);
+            return this;
+        }
+
+        public Builder withDefaultExtension(String description, FileType fileType) {
+            defaultExtension = FileFilterConverter.toExtensionFilter(description, fileType);
             return this;
         }
 
@@ -128,26 +120,26 @@ public class FileDialogConfiguration {
             return this;
         }
 
-        public Builder addExtensionFilter(FileChooser.ExtensionFilter extensionFilter) {
-            extensionFilters.add(extensionFilter);
+        public Builder addExtensionFilter(FileChooser.ExtensionFilter filter) {
+            extensionFilters.add(filter);
             return this;
         }
 
-        public Builder addExtensionFilter(String description, String extension) {
-            extensionFilters.add(new FileChooser.ExtensionFilter(description, extension));
+        public Builder addExtensionFilter(List<FileChooser.ExtensionFilter> filters) {
+            extensionFilters.addAll(filters);
             return this;
         }
 
-        public Builder addExtensionFilter(BasicFileType fileType) {
-            String defaultDescription = Localization.lang("%0 file", fileType.toString());
-            extensionFilters.add(FileFilterConverter.toExtensionFilter(defaultDescription, fileType));
+        public Builder addExtensionFilter(FileType... fileTypes) {
+            Stream.of(fileTypes)
+                  .map(FileFilterConverter::toExtensionFilter)
+                  .forEachOrdered(this::addExtensionFilter);
             return this;
         }
 
-        public Builder withDefaultExtension(FileChooser.ExtensionFilter extensionFilter) {
-            defaultExtension = extensionFilter;
+        public Builder addExtensionFilter(String description, FileType fileType) {
+            extensionFilters.add(FileFilterConverter.toExtensionFilter(description, fileType));
             return this;
         }
-
     }
 }
