@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JOptionPane;
 
 import javafx.stage.FileChooser;
 
@@ -56,8 +55,8 @@ public class ExportAction {
             public InternalExportAction(JabRefFrame frame, boolean selectedOnly) {
                 this.frame = frame;
                 this.selectedOnly = selectedOnly;
-                putValue(Action.NAME, selectedOnly ? Localization.menuTitle("Export selected entries") : Localization
-                        .menuTitle("Export"));
+                putValue(Action.NAME, selectedOnly ? Localization.lang("Export selected entries") : Localization
+                        .lang("Export"));
             }
 
             @Override
@@ -137,9 +136,12 @@ public class ExportAction {
                         else {
                             frame.output(Localization.lang("Could not save file.") + " - " + errorMessage);
                             // Need to warn the user that saving failed!
+                            // FIXME: This should be JavaFX
+                            /*
                             JOptionPane.showMessageDialog(frame,
                                     Localization.lang("Could not save file.") + "\n" + errorMessage,
                                     Localization.lang("Save library"), JOptionPane.ERROR_MESSAGE);
+                                    */
                         }
                     }
                 };
