@@ -54,7 +54,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -375,28 +375,28 @@ class StyleSelectDialog {
         @Override
         public String getColumnName(int i) {
             switch (i) {
-            case 0:
-                return Localization.lang("Name");
-            case 1:
-                return Localization.lang("Journals");
-            case 2:
-                return Localization.lang("File");
-            default:
-                return "";
+                case 0:
+                    return Localization.lang("Name");
+                case 1:
+                    return Localization.lang("Journals");
+                case 2:
+                    return Localization.lang("File");
+                default:
+                    return "";
             }
         }
 
         @Override
         public Object getColumnValue(OOBibStyle style, int i) {
             switch (i) {
-            case 0:
-                return style.getName();
-            case 1:
-                return String.join(", ", style.getJournals());
-            case 2:
-                return style.isFromResource() ? Localization.lang("Internal style") : style.getFile().getName();
-            default:
-                return "";
+                case 0:
+                    return style.getName();
+                case 1:
+                    return String.join(", ", style.getJournals());
+                case 2:
+                    return style.isFromResource() ? Localization.lang("Internal style") : style.getFile().getName();
+                default:
+                    return "";
             }
         }
     }
@@ -471,9 +471,10 @@ class StyleSelectDialog {
 
             JButton browse = new JButton(Localization.lang("Browse"));
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileType.JSTYLE)
-                    .withDefaultExtension(FileType.JSTYLE)
-                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                    .addExtensionFilter(Localization.lang("Style file"), StandardFileType.JSTYLE)
+                    .withDefaultExtension(Localization.lang("Style file"), StandardFileType.JSTYLE)
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                    .build();
             DialogService ds = new FXDialogService();
 
             browse.addActionListener(e -> {
@@ -517,7 +518,8 @@ class StyleSelectDialog {
             addCancelButton.addActionListener(cancelAction);
 
             // Key bindings:
-            bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+            bb.getPanel()
+                    .getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                     .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
             bb.getPanel().getActionMap().put("close", cancelAction);
             pack();

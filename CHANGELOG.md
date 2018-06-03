@@ -13,6 +13,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Changed
 
 ### Fixed
+- We fixed an issue where custom exports could not be selected in the 'Export (selected) entries' dialog [#4013](https://github.com/JabRef/jabref/issues/4013)
 
 ### Removed
 

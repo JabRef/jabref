@@ -25,7 +25,7 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -60,9 +60,10 @@ public class NewProtectedTermsFileDialog extends JabRefDialog {
         JButton browse = new JButton(Localization.lang("Browse"));
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileType.TERMS)
-                .withDefaultExtension(FileType.TERMS)
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                .addExtensionFilter(Localization.lang("Protected terms file"), StandardFileType.TERMS)
+                .withDefaultExtension(Localization.lang("Protected terms file"), StandardFileType.TERMS)
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                .build();
         DialogService ds = new FXDialogService();
 
         browse.addActionListener(e -> {
@@ -112,7 +113,8 @@ public class NewProtectedTermsFileDialog extends JabRefDialog {
         addCancelButton.addActionListener(cancelAction);
 
         // Key bindings:
-        bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        bb.getPanel()
+                .getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         bb.getPanel().getActionMap().put("close", cancelAction);
         pack();

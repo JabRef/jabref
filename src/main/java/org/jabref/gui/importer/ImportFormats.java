@@ -4,10 +4,8 @@ import java.awt.event.ActionEvent;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.SortedSet;
-import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -26,11 +24,9 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileType;
 import org.jabref.preferences.JabRefPreferences;
 
 public class ImportFormats {
-
 
     private ImportFormats() {
     }
@@ -63,16 +59,16 @@ public class ImportFormats {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 SortedSet<Importer> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
-                List<FileType> extensions = importers.stream().map(Importer::getFileType)
-                        .collect(Collectors.toList());
-                FileChooser.ExtensionFilter allImports = FileFilterConverter.forAllImporters(importers);
+                String workingDirectory = Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY);
                 FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                        .addExtensionFilter(allImports)
-                        .addExtensionFilters(extensions)
-                        .withInitialDirectory(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY))
+                        .addExtensionFilter(FileFilterConverter.forAllImporters(importers))
+                        .addExtensionFilter(FileFilterConverter.ANY_FILE)
+                        .addExtensionFilter(FileFilterConverter.importerToExtensionFilter(importers))
+                        .withInitialDirectory(workingDirectory)
                         .build();
-                fileDialogConfiguration.getExtensionFilters().add(new FileChooser.ExtensionFilter(Localization.lang("Any file"), "*.*"));
+
                 DialogService dialogService = new FXDialogService();
                 DefaultTaskExecutor.runInJavaFXThread(() -> {
                     dialogService.showFileOpenDialog(fileDialogConfiguration)

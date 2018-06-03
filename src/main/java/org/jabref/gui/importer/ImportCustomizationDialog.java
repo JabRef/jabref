@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.EnumSet;
 import java.util.Optional;
 import java.util.zip.ZipFile;
 
@@ -38,7 +37,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -83,8 +82,8 @@ public class ImportCustomizationDialog extends JabRefDialog {
         addFromFolderButton.addActionListener(e -> {
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileType.CLASS)
-                    .withDefaultExtension(FileType.JAR)
+                    .addExtensionFilter(StandardFileType.CLASS, StandardFileType.JAR)
+                    .withDefaultExtension(StandardFileType.JAR)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
             DialogService ds = new FXDialogService();
 
@@ -118,8 +117,8 @@ public class ImportCustomizationDialog extends JabRefDialog {
         JButton addFromJarButton = new JButton(Localization.lang("Add from JAR"));
         addFromJarButton.addActionListener(e -> {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilters(EnumSet.of(FileType.ZIP, FileType.JAR))
-                    .withDefaultExtension(FileType.JAR)
+                    .addExtensionFilter(StandardFileType.JAR, StandardFileType.ZIP)
+                    .withDefaultExtension(StandardFileType.JAR)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
             DialogService ds = new FXDialogService();
 

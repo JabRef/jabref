@@ -51,8 +51,8 @@ public class ExportToClipboardAction extends AbstractWorker {
             return;
         }
 
-        List<Exporter> sortedExporters = Globals.exportFactory.getExporters().stream().sorted(Comparator.comparing(Exporter::getDisplayName)).collect(Collectors.toList());
-        List<String> exportFormatDisplayNames = sortedExporters.stream().map(Exporter::getDisplayName).collect(Collectors.toList());
+        List<Exporter> sortedExporters = Globals.exportFactory.getExporters().stream().sorted(Comparator.comparing(Exporter::getName)).collect(Collectors.toList());
+        List<String> exportFormatDisplayNames = sortedExporters.stream().map(Exporter::getName).collect(Collectors.toList());
 
         JList<String> list = new JList<>(exportFormatDisplayNames.toArray(new String[exportFormatDisplayNames.size()]));
         list.setBorder(BorderFactory.createEtchedBorder());
