@@ -11,15 +11,43 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- The special fields like `Printed` and `Read status` now show gray icons when the row is hovered.
+- We added a button in the tab header which allows you to close the database with one click. https://github.com/JabRef/jabref/issues/494
+- Sorting in the main table now takes information from cross-referenced entries into account. https://github.com/JabRef/jabref/issues/2808
+- If a group has a color specified, then entries matched by this group have a small colored bar in front of them in the main table.
+- Change default icon for groups to a circle because a colored version of the old icon was hard to distinguish from its black counterpart.
+- In the main table, the context menu appears now when you press the "context menu" button on the keyboard. [feature request in the forum](http://discourse.jabref.org/t/how-to-enable-keyboard-context-key-windows)
+- We added icons to the group side panel to quickly switch between `union` and `intersection` group view mode https://github.com/JabRef/jabref/issues/3269
 
 ### Fixed
 - We fixed an issue where custom exports could not be selected in the 'Export (selected) entries' dialog [#4013](https://github.com/JabRef/jabref/issues/4013)
+- Italic text is now rendered correctly. https://github.com/JabRef/jabref/issues/3356
+- The entry editor no longer gets corrupted after using the source tab. https://github.com/JabRef/jabref/issues/3532 https://github.com/JabRef/jabref/issues/3608 https://github.com/JabRef/jabref/issues/3616
+- We fixed multiple issues where entries did not show up after import if a search was active. https://github.com/JabRef/jabref/issues/1513 https://github.com/JabRef/jabref/issues/3219
+- We fixed an issue where the group tree was not updated correctly after an entry was changed. https://github.com/JabRef/jabref/issues/3618
+- We fixed an issue where a right-click in the main table selected a wrong entry. https://github.com/JabRef/jabref/issues/3267
+- We fixed an issue where in rare cases entries where overlayed in the main table. https://github.com/JabRef/jabref/issues/3281
+- We fixed an issue where selecting a group messed up the focus of the main table / entry editor. https://github.com/JabRef/jabref/issues/3367
+- We fixed an issue where composite author names were sorted incorrectly. https://github.com/JabRef/jabref/issues/2828
+- We fixed an issue where the custom file column were sorted incorrectly. https://github.com/JabRef/jabref/issues/3119
+- We fixed an issues where the entry losses focus when a field is edited and at the same time used for sorting. https://github.com/JabRef/jabref/issues/3373
+- We fixed an issue where the menu on Mac OS was not displayed in the usual Mac-specific way. https://github.com/JabRef/jabref/issues/3146
+- We fixed an issue where the groups tree of the last database was still shown even after the database was already closed.
+- We fixed an issue where the "Open file dialog" may disappear behind other windows. https://github.com/JabRef/jabref/issues/3410
+- We fixed an issue where the default icon of a group was not colored correctly.
+- We reworked the "Edit file" dialog to make it resizeable and improved the workflow for adding and editing files https://github.com/JabRef/jabref/issues/2970
+- We fixed an issue where the month was not shown in the preview https://github.com/JabRef/jabref/issues/3239.
 
 ### Removed
-
-
-
-
+- The feature to "mark entries" was removed and merged with the groups functionality.  For migration, a group is created for every value of the `__markedentry` field and the entry is added to this group.
+- The number column was removed.
+- We removed the coloring of cells in the maintable according to whether the field is optional/required.
+- We removed a few commands from the right-click menu that are not needed often and thus don't need to be placed that prominently:
+  - Print entry preview: available through entry preview
+  - All commands related to marking: marking is not yet reimplemented
+  - Set/clear/append/rename fields: available through Edit menu
+  - Manage keywords: available through Edit menu
+  - Copy linked files to folder: available through File menu
 
 
 
