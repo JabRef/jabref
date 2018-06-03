@@ -11,13 +11,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javafx.scene.input.ClipboardContent;
 
 import org.jabref.Globals;
+import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.ImportFormatReader.UnknownFormatImport;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
 
@@ -77,10 +83,40 @@ public class ClipBoardManager implements ClipboardOwner {
         return result;
     }
 
+    public void setClipboardHtmlContent(String html) {
+        // TODO: This works on Mac and Windows 10, but not on Ubuntu 16.04
+        final javafx.scene.input.Clipboard clipboard = javafx.scene.input.Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        content.putHtml(html);
+        clipboard.setContent(content);
+    }
+
+    public void setClipboardContent(String string) {
+        // TODO: This works on Mac and Windows 10, but not on Ubuntu 16.04
+        final javafx.scene.input.Clipboard clipboard = javafx.scene.input.Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        content.putString(string);
+        clipboard.setContent(content);
+    }
+
+    public void setClipboardContent(List<BibEntry> entries) throws IOException {
+        // TODO: This works on Mac and Windows 10, but not on Ubuntu 16.04
+        final javafx.scene.input.Clipboard clipboard = javafx.scene.input.Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        BibEntryWriter writer = new BibEntryWriter(new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()), false);
+        String serializedEntries = writer.serializeAll(entries, BibDatabaseMode.BIBTEX);
+        content.put(DragAndDropDataFormats.ENTRIES, serializedEntries);
+        content.putString(serializedEntries);
+        clipboard.setContent(content);
+    }
+
     /**
      * Place a String on the clipboard, and make this class the
      * owner of the Clipboard's contents.
+     *
+     * @deprecated use {@link #setClipboardContent(String)} instead
      */
+    @Deprecated
     public void setClipboardContents(String aString) {
         StringSelection stringSelection = new StringSelection(aString);
         clipboard.setContents(stringSelection, this);
@@ -96,7 +132,8 @@ public class ClipBoardManager implements ClipboardOwner {
             try {
                 @SuppressWarnings("unchecked")
                 List<BibEntry> contents = (List<BibEntry>) content.getTransferData(TransferableBibtexEntry.ENTRY_FLAVOR);
-                result = contents;
+                // We clone the entries to make sure we don't accidentally paste references
+                result = contents.stream().map(entry -> (BibEntry) entry.clone()).collect(Collectors.toList());
             } catch (UnsupportedFlavorException | ClassCastException ex) {
                 LOGGER.warn("Could not paste this type", ex);
             } catch (IOException ex) {

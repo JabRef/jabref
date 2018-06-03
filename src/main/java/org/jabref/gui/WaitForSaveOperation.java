@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.Timer;
@@ -33,7 +34,7 @@ public class WaitForSaveOperation implements ActionListener {
         JProgressBar prog = new JProgressBar(0);
         prog.setIndeterminate(true);
         prog.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        diag = new JDialog(frame, Localization.lang("Please wait..."), true);
+        diag = new JDialog((JFrame) null, Localization.lang("Please wait..."), true);
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
@@ -55,7 +56,6 @@ public class WaitForSaveOperation implements ActionListener {
     }
 
     public void show() {
-        diag.setLocationRelativeTo(frame);
         t.start();
         diag.setVisible(true);
 

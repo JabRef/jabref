@@ -33,14 +33,11 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionListener;
 
 import org.jabref.Globals;
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-/**
- * @author alver
- */
 class FieldSetComponent extends JPanel {
 
     protected final JList<String> list;
@@ -125,8 +122,8 @@ class FieldSetComponent extends JPanel {
         con.gridwidth = 1;
         if (arrows) {
             con.weightx = 0;
-            up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
-            down = new JButton(IconTheme.JabRefIcon.DOWN.getSmallIcon());
+            up = new JButton(IconTheme.JabRefIcons.UP.getSmallIcon());
+            down = new JButton(IconTheme.JabRefIcons.DOWN.getSmallIcon());
             up.addActionListener(e -> move(-1));
             down.addActionListener(e -> move(1));
             up.setToolTipText(Localization.lang("Move up"));

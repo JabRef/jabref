@@ -36,9 +36,6 @@ import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author alver
- */
 public class OpenDocumentSpreadsheetCreator extends Exporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenDocumentSpreadsheetCreator.class);

@@ -49,6 +49,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         this.cache = cache;
         this.entry = entry;
         this.fileMonitor = fileMonitor;
+
         fileAnnotations = this.cache.getFromCache(this.entry);
         files.setAll(fileAnnotations.keySet());
     }

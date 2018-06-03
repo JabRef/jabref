@@ -20,9 +20,9 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.NameFormatter;
@@ -213,7 +213,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     class DeleteRowAction extends AbstractAction {
 
         public DeleteRowAction() {
-            super("Delete row", IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
+            super("Delete row", IconTheme.JabRefIcons.REMOVE_NOBOX.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete rows"));
         }
 
@@ -246,7 +246,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     class AddRowAction extends AbstractAction {
 
         public AddRowAction() {
-            super("Add row", IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
+            super("Add row", IconTheme.JabRefIcons.ADD_NOBOX.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Insert rows"));
         }
 

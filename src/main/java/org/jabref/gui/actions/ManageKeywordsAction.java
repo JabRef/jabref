@@ -21,6 +21,7 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -48,7 +49,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * An Action for launching keyword managing dialog
  *
  */
-public class ManageKeywordsAction extends MnemonicAwareAction {
+public class ManageKeywordsAction extends SimpleCommand {
 
     private final JabRefFrame frame;
     private final KeywordList sortedKeywordsOfAllEntriesBeforeUpdateByUser = new KeywordList();
@@ -60,7 +61,6 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
 
     public ManageKeywordsAction(JabRefFrame frame) {
-        putValue(Action.NAME, Localization.menuTitle("Manage keywords"));
         this.frame = frame;
     }
 
@@ -76,7 +76,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         keywordList.setVisibleRowCount(8);
         JScrollPane kPane = new JScrollPane(keywordList);
 
-        diag = new JDialog(frame, Localization.lang("Manage keywords"), true);
+        diag = new JDialog((JFrame) null, Localization.lang("Manage keywords"), true);
 
         JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
@@ -197,7 +197,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         // Key bindings:
         ActionMap am = builder.getPanel().getActionMap();
         InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         am.put("close", cancelAction);
 
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
@@ -240,7 +240,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void execute() {
         BasePanel bp = frame.getCurrentBasePanel();
         if (bp == null) {
             return;
@@ -258,7 +258,6 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         fillKeyWordList();
 
         diag.pack();
-        diag.setLocationRelativeTo(frame);
         diag.setVisible(true);
         if (canceled) {
             return;

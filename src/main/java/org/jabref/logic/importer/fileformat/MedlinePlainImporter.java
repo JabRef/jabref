@@ -23,8 +23,6 @@ import org.jabref.model.entry.FieldName;
  *
  * check here for details on the format
  * http://www.nlm.nih.gov/bsd/mms/medlineelements.html
- *
- * @author vegeziel
  */
 public class MedlinePlainImporter extends Importer {
 

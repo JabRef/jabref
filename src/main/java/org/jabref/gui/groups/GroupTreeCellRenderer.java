@@ -16,8 +16,6 @@ import org.jabref.model.groups.GroupTreeNode;
 
 /**
  * Renders a GroupTreeNode using its group's getName() method, rather that its toString() method.
- *
- * @author jzieren
  */
 public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
 

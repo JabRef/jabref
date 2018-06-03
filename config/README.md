@@ -15,3 +15,16 @@ Style-checks are done for each pull request and installing this cody style confi
 10. Press "OK"
 
 * Please let `.editorconfig` override the settings of IntelliJ
+
+
+# Eclipse:
+
+The Eclipse code formatter style is stored in the `eclipse.gradle` file and gets imported automatically.
+In case the formatter style needs to be adapted, configure it and export in in eclipse.
+
+1. Right click on the eclipse project "JabRef"
+2. Select "Export > General > Preferences"
+3. Select "Java Code Style preferences"
+4. Choose output file
+5. Compare the formatter settings in the epf file with the ones in the eclipse.gradle file (`org.eclipse.jdt.core.formatter.`)
+6. Replace the Eclipse Code Style.epf with the exported epf file

@@ -10,13 +10,13 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefDialog;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinder;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
@@ -26,28 +26,18 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class BibtexKeyPatternDialog extends JabRefDialog {
 
-    private MetaData metaData;
-    private BasePanel panel;
+    private final MetaData metaData;
+    private final BasePanel panel;
     private final BibtexKeyPatternPanel bibtexKeyPatternPanel;
 
-
-    public BibtexKeyPatternDialog(JabRefFrame parent, BasePanel panel) {
-        super(parent, Localization.lang("BibTeX key patterns"), true, BibtexKeyPatternDialog.class);
+    public BibtexKeyPatternDialog(BasePanel panel) {
+        super((JFrame) null, Localization.lang("BibTeX key patterns"), true, BibtexKeyPatternDialog.class);
         this.bibtexKeyPatternPanel = new BibtexKeyPatternPanel(panel);
-        setPanel(panel);
-        init();
-    }
-
-    /**
-     * Used for updating an existing Dialog
-     *
-     * @param panel the panel to read the data from
-     */
-    public void setPanel(BasePanel panel) {
         this.panel = panel;
         this.metaData = panel.getBibDatabaseContext().getMetaData();
-        AbstractBibtexKeyPattern keypatterns = metaData.getCiteKeyPattern(Globals.prefs.getKeyPattern());
-        bibtexKeyPatternPanel.setValues(keypatterns);
+        AbstractBibtexKeyPattern keyPattern = metaData.getCiteKeyPattern(Globals.prefs.getKeyPattern());
+        bibtexKeyPatternPanel.setValues(keyPattern);
+        init();
     }
 
     private void init() {

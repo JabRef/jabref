@@ -33,6 +33,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     private static final DataFlavor FLAVOR;
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeNodeViewModel.class);
+
     private static final DataFlavor[] FLAVORS;
 
     static {

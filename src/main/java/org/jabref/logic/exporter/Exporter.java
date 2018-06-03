@@ -41,6 +41,11 @@ public abstract class Exporter {
         return fileType;
     }
 
+    @Override
+    public String toString() {
+        return displayName;
+    }
+
     /**
      * Performs the export.
      *

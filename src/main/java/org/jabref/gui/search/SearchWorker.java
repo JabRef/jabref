@@ -9,9 +9,8 @@ import javax.swing.SwingWorker;
 
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.BasePanelMode;
-import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -64,54 +63,10 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
     private void updateUIWithSearchResult(List<BibEntry> matchedEntries) {
         GlobalSearchBar globalSearchBar = JabRefGUI.getMainFrame().getGlobalSearchBar();
 
-        // check if still the current query
-        if (!globalSearchBar.isStillValidQuery(searchQuery)) {
-            // do not update - another search was already issued
-            return;
-        }
-
-        // clear
-        for (BibEntry entry : basePanel.getDatabase().getEntries()) {
-            entry.setSearchHit(false);
-        }
-        // and mark
-        for (BibEntry entry : matchedEntries) {
-            entry.setSearchHit(true);
-        }
-
-        basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
-        // Show the result in the chosen way:
-        switch (searchDisplayMode) {
-            case FLOAT:
-                basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FLOAT);
-                break;
-            case FILTER:
-                basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FILTER);
-                break;
-            default:
-                LOGGER.error("Following searchDisplayMode was not defined: " + searchDisplayMode);
-                break;
-        }
-
-        // only selects the first match if the selected entries are no hits or no entry is selected
-        // and no editor is open (to avoid jumping around when editing an entry)
-        if (basePanel.getMode() != BasePanelMode.SHOWING_EDITOR && basePanel.getMode() != BasePanelMode.WILL_SHOW_EDITOR) {
-            List<BibEntry> selectedEntries = basePanel.getSelectedEntries();
-            boolean isHitSelected = selectedEntries.stream().anyMatch(BibEntry::isSearchHit);
-            if (!isHitSelected && !matchedEntries.isEmpty()) {
-                for (int i = 0; i < basePanel.getMainTable().getRowCount(); i++) {
-                    BibEntry entry = basePanel.getMainTable().getEntryAt(i);
-                    if (entry.isSearchHit()) {
-                        basePanel.getMainTable().setSelected(i);
-                        break;
-                    }
-                }
-            }
-        }
-
-        globalSearchBar.updateResults(matchedEntries.size(),
-                SearchDescribers.getSearchDescriberFor(searchQuery).getDescription(),
-                searchQuery.isGrammarBasedSearch());
+        DefaultTaskExecutor.runInJavaFXThread(() ->
+                globalSearchBar.updateResults(matchedEntries.size(),
+                        SearchDescribers.getSearchDescriberFor(searchQuery).getDescription(),
+                        searchQuery.isGrammarBasedSearch()));
         globalSearchBar.getSearchQueryHighlightObservable().fireSearchlistenerEvent(searchQuery);
     }
 

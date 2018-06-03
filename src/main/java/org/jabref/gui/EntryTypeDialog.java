@@ -20,7 +20,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -66,7 +65,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
     public EntryTypeDialog(JabRefFrame frame) {
         // modal dialog
-        super(frame, true, EntryTypeDialog.class);
+        super(null, true, EntryTypeDialog.class);
 
         this.frame = frame;
 
@@ -118,7 +117,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
         cancel.addActionListener(this);
 
         // Make ESC close dialog, equivalent to clicking Cancel.
-        cancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        cancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         cancel.getActionMap().put("close", cancelAction);
 
         JPanel buttons = new JPanel();
@@ -313,12 +312,11 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                     final BibEntry bibEntry = result.get();
                     if ((DuplicateCheck.containsDuplicate(frame.getCurrentBasePanel().getDatabase(), bibEntry, frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).isPresent())) {
                         //If there are duplicates starts ImportInspectionDialog
-                        final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
+                        final BasePanel panel = frame.getCurrentBasePanel();
 
                         ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"), false);
                         diag.addEntry(bibEntry);
                         diag.entryListComplete();
-                        diag.setLocationRelativeTo(frame);
                         diag.setVisible(true);
                         diag.toFront();
                     } else {
@@ -333,13 +331,13 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
                     dispose();
                 } else if (searchID.trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("The given search ID was empty."), Localization.lang("Empty search ID"), JOptionPane.WARNING_MESSAGE);
+                    frame.getDialogService().showWarningDialogAndWait(Localization.lang("Empty search ID"),
+                            Localization.lang("The given search ID was empty."));
                 } else if (!fetcherException) {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("No files found.",
+                            Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage));
                 } else {
-                    JOptionPane.showMessageDialog(frame,
-                            Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage,
-                            Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Error"), Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage);
                 }
                 fetcherWorker = new FetcherWorker();
                 SwingUtilities.invokeLater(() -> {

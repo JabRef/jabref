@@ -17,9 +17,7 @@ import javax.swing.JTextField;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefDialog;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -39,21 +37,22 @@ public class NewProtectedTermsFileDialog extends JabRefDialog {
     private final JCheckBox enabled = new JCheckBox(Localization.lang("Enabled"));
     private boolean addOKPressed;
     private final ProtectedTermsLoader loader;
-    private JFrame parent;
+    private final DialogService dialogService;
 
-    public NewProtectedTermsFileDialog(JDialog parent, ProtectedTermsLoader loader) {
+    public NewProtectedTermsFileDialog(JDialog parent, ProtectedTermsLoader loader, DialogService dialogService) {
         super(parent, Localization.lang("New protected terms file"), true, NewProtectedTermsFileDialog.class);
         this.loader = loader;
+        this.dialogService = dialogService;
+
         setupDialog();
         setLocationRelativeTo(parent);
     }
 
-    public NewProtectedTermsFileDialog(JabRefFrame mainFrame, ProtectedTermsLoader loader) {
-        super(mainFrame, Localization.lang("New protected terms file"), true, NewProtectedTermsFileDialog.class);
-        parent = mainFrame;
+    public NewProtectedTermsFileDialog(DialogService dialogService, ProtectedTermsLoader loader) {
+        super((JFrame) null, Localization.lang("New protected terms file"), true, NewProtectedTermsFileDialog.class);
         this.loader = loader;
+        this.dialogService = dialogService;
         setupDialog();
-        setLocationRelativeTo(mainFrame);
     }
 
     private void setupDialog() {
@@ -64,11 +63,10 @@ public class NewProtectedTermsFileDialog extends JabRefDialog {
                 .withDefaultExtension(Localization.lang("Protected terms file"), StandardFileType.TERMS)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                 .build();
-        DialogService ds = new FXDialogService();
 
         browse.addActionListener(e -> {
             Optional<Path> file = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
+                    .runInJavaFXThread(() -> dialogService.showFileSaveDialog(fileDialogConfiguration));
             file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
         });
 
@@ -113,9 +111,8 @@ public class NewProtectedTermsFileDialog extends JabRefDialog {
         addCancelButton.addActionListener(cancelAction);
 
         // Key bindings:
-        bb.getPanel()
-                .getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        bb.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+          .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         bb.getPanel().getActionMap().put("close", cancelAction);
         pack();
     }

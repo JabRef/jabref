@@ -1,10 +1,9 @@
 .tree-table-view, .tree-table-row-cell {
-    -fx-background-color: #dadad8;
+    -fx-background-color: -jr-sidepane-background;
     -fx-table-cell-border-color: transparent; /* hide grid lines */
 }
 
 .tree-table-cell {
-    -fx-font-size: 105%;
     -fx-padding: 0.35em 0em 0.25em 0em;
 }
 
@@ -15,18 +14,22 @@
 
 .numberColumn > .hits {
     -fx-font-size: 85%;
-    -fx-background-color: #c6c6c4;
+    -fx-background-color: -jr-group-hits-bg;
     -fx-padding: 0.1em 0.4em 0.1em 0.4em;
     -fx-background-insets: 0;
     -fx-background-radius: 0.8em;
 }
 
+.numberColumn > .hits .text {
+    -fx-fill: -jr-group-hits-fg;
+}
+
 .numberColumn > .hits:any-selected {
-    -fx-background-color: #c6c44f;
+    -fx-background-color: derive(-jr-green, 70%);
 }
 
 .numberColumn > .hits:all-selected {
-    -fx-background-color: #4dc64f;
+    -fx-background-color: -jr-green;
 }
 
 .disclosureNodeColumn {
@@ -34,19 +37,19 @@
 }
 
 .tree-table-row-cell:dragOver-bottom {
-    -fx-border-color: #eea82f;
+    -fx-border-color: -jr-drag-target;
     -fx-border-width: 0 0 2 0;
     -fx-padding: 0 0 -2 0;
 }
 
 .tree-table-row-cell:dragOver-center {
-    -fx-border-color: #eea82f;
+    -fx-border-color: -jr-drag-target;
     -fx-border-width: 2 2 2 2;
     -fx-padding: -2 -2 -2 -2;
 }
 
 .tree-table-row-cell:dragOver-top {
-    -fx-border-color: #eea82f;
+    -fx-border-color: -jr-drag-target;
     -fx-border-width: 2 0 0 0;
     -fx-padding: -2 0 0 0;
 }
@@ -61,7 +64,7 @@
 
 .tree-table-row-cell:root {
     -fx-border-width: 0 0 1 0;
-    -fx-border-color: darkgrey;
+    -fx-border-color: -jr-separator;
 }
 
 .tree-table-row-cell:root > .tree-table-cell {
@@ -76,24 +79,6 @@
     -fx-padding: 0.45em 0.2em 0.45em 0.2em;
 }
 
-.tree-table-row-cell:hover {
-    -fx-background-color: lightgrey;
-}
-
-.tree-table-row-cell:selected {
-    -fx-background-color: #6A9FCD;
-    -fx-text-fill: white;
-    -fx-fill: white;
-}
-
-.tree-table-row-cell:selected > .tree-table-cell > .icon {
-    -fx-fill: white;
-}
-
-.tree-table-row-cell:selected > .tree-table-cell > .tree-disclosure-node > .arrow {
-    -fx-background-color: white;
-}
-
 .tree-table-row-cell:empty {
     -fx-background-color: transparent; /* hide cells which are not bound to a group */
 }
@@ -104,9 +89,9 @@
 }
 
 .tree-table-row-cell > .tree-table-cell > .tree-disclosure-node > .arrow {
+    -fx-background-color: -fx-mid-text-color;
     -fx-max-height: 0.5em;
     -fx-max-width: 0.5em;
-    -fx-background-color: #5e5f5e;
     -fx-padding: 0.333333em 0.229em 0.333333em 0.229em; /* 4 */
     -fx-shape: "m64,416l96,96l256,-256l-256,-256l-96,96l160,160l-160,160z";
 }
@@ -120,19 +105,12 @@
 }
 
 #barBottom {
-    -fx-background-color: #dadad8;
-    -fx-border-color: dimgray;
+    -fx-background-color: -jr-sidepane-header-background;
+    -fx-border-color: -jr-separator;
     -fx-border-width: 1 0 0 0;
     -fx-padding: 0em 1em 0em 1em;
 }
 
-.flatButton {
-    -fx-shadow-highlight-color: transparent;
-    -fx-outer-border: transparent;
-    -fx-inner-border: transparent;
-    -fx-focus-color: #6A9FCD;
-    -fx-faint-focus-color: transparent;
-    -fx-background-color: transparent;
-    -fx-text-background-color: dimgray;
-    -fx-padding: 0.5em;
+#barBottom .glyph-icon {
+    -fx-font-size: 2em;
 }

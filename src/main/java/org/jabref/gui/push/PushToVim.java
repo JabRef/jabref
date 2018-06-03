@@ -4,15 +4,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.swing.Icon;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -25,8 +25,11 @@ import org.slf4j.LoggerFactory;
 public class PushToVim extends AbstractPushToApplication implements PushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToVim.class);
-
     private final JTextField vimServer = new JTextField(30);
+
+    public PushToVim(DialogService dialogService) {
+        super(dialogService);
+    }
 
     @Override
     public String getApplicationName() {
@@ -34,8 +37,8 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
     }
 
     @Override
-    public Icon getIcon() {
-        return IconTheme.getImage("vim");
+    public JabRefIcon getIcon() {
+        return IconTheme.JabRefIcons.APPLICATION_VIM;
     }
 
     @Override
@@ -78,7 +81,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
             String[] com = new String[] {commandPath, "--servername",
                     Globals.prefs.get(JabRefPreferences.VIM_SERVER), "--remote-send",
                     "<C-\\><C-N>a" + getCiteCommand() +
-                    "{" + keys + "}"};
+                            "{" + keys + "}"};
 
             final Process p = Runtime.getRuntime().exec(com);
 
@@ -112,18 +115,14 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
     @Override
     public void operationCompleted(BasePanel panel) {
         if (couldNotConnect) {
-            JOptionPane.showMessageDialog(
-                    panel.frame(),
-                    "<HTML>" +
-                            Localization.lang("Could not connect to Vim server. Make sure that "
-                                    + "Vim is running<BR>with correct server name.")
-                    + "</HTML>",
-                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+
+            dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
+                    Localization.lang("Could not connect to Vim server. Make sure that Vim is running with correct server name."));
+
         } else if (couldNotCall) {
-            JOptionPane.showMessageDialog(
-                    panel.frame(),
-                    Localization.lang("Could not run the 'vim' program."),
-                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+            dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
+                    Localization.lang("Could not run the 'vim' program."));
+
         } else {
             super.operationCompleted(panel);
         }
