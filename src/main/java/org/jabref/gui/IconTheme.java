@@ -56,6 +56,8 @@ public class IconTheme {
     // Christmas edition
     //public static final Color DEFAULT_COLOR = new Color(0x155115);
     //public static final Color DEFAULT_DISABLED_COLOR = new Color(0x990000);
+    private static Font FONT_16;
+    private static javafx.scene.text.Font FX_FONT;
 
     static {
         try (InputStream stream = getMaterialDesignIconsStream()) {
