@@ -1,5 +1,6 @@
 package org.jabref.model.strings;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +33,7 @@ public class StringUtil {
     /**
      * Quote special characters.
      *
-     * @param toQuote         The String which may contain special characters.
+     * @param toQuote   The String which may contain special characters.
      * @param specials  A String containing all special characters except the quoting
      *                  character itself, which is automatically quoted.
      * @param quoteChar The quoting character.
@@ -64,11 +65,6 @@ public class StringUtil {
 
     /**
      * Creates a substring from a text
-     *
-     * @param text
-     * @param startIndex
-     * @param terminateOnEndBraceOnly
-     * @return
      */
     public static String getPart(String text, int startIndex, boolean terminateOnEndBraceOnly) {
         char c;
@@ -103,9 +99,6 @@ public class StringUtil {
     /**
      * Returns the string, after shaving off whitespace at the beginning and end,
      * and removing (at most) one pair of braces or " surrounding it.
-     *
-     * @param toShave
-     * @return
      */
 
     public static String shaveString(String toShave) {
@@ -128,11 +121,7 @@ public class StringUtil {
      * String[] s = "ab/cd/ed".split("/"); join(s, "\\", 0, s.length) ->
      * "ab\\cd\\ed"
      *
-     * @param strings
-     * @param separator
-     * @param from
-     * @param to        Excluding strings[to]
-     * @return
+     * @param to Excluding strings[to]
      */
     public static String join(String[] strings, String separator, int from, int to) {
         if ((strings.length == 0) || (from >= to)) {
@@ -151,9 +140,6 @@ public class StringUtil {
 
     /**
      * Removes optional square brackets from the string s
-     *
-     * @param toStrip
-     * @return
      */
     public static String stripBrackets(String toStrip) {
         if (isInSquareBrackets(toStrip)) {
@@ -187,9 +173,6 @@ public class StringUtil {
      * Formats field contents for output. Must be "symmetric" with the parse method above,
      * so stored and reloaded fields are not mangled.
      *
-     * @param in
-     * @param wrapAmount
-     * @param newline
      * @return the wrapped String.
      */
     public static String wrap(String in, int wrapAmount, String newline) {
@@ -231,7 +214,6 @@ public class StringUtil {
             result.deleteCharAt(current);
             result.insert(current, newline + "\t");
             length = current + newline.length();
-
         }
     }
 
@@ -251,6 +233,7 @@ public class StringUtil {
      * Decodes an encoded double String array back into array form. The array
      * is assumed to be square, and delimited by the characters ';' (first dim) and
      * ':' (second dim).
+     *
      * @param value The encoded String to be decoded.
      * @return The decoded String array.
      */
@@ -300,8 +283,7 @@ public class StringUtil {
      * braces. Ignore letters within a pair of # character, as these are part of
      * a string label that should not be modified.
      *
-     * @param s
-     *            The string to modify.
+     * @param s The string to modify.
      * @return The resulting string after wrapping capitals.
      */
     public static String putBracesAroundCapitals(String s) {
@@ -342,7 +324,6 @@ public class StringUtil {
 
             // Check if we are entering an escape sequence:
             escaped = (c == '\\') && !escaped;
-
         }
         // Check if we have an unclosed brace:
         if (isBracing) {
@@ -357,8 +338,7 @@ public class StringUtil {
      * arbitrary number of pairs of braces, e.g. "{AB}" or "{{T}}". All of these
      * pairs of braces are removed.
      *
-     * @param s
-     *            The String to analyze.
+     * @param s The String to analyze.
      * @return A new String with braces removed.
      */
     public static String removeBracesAroundCapitals(String s) {
@@ -375,8 +355,7 @@ public class StringUtil {
      * of braces, e.g. "{AB}". All these are replaced by only the capitals in
      * between the braces.
      *
-     * @param s
-     *            The String to analyze.
+     * @param s The String to analyze.
      * @return A new String with braces removed.
      */
     private static String removeSingleBracesAroundCapitals(String s) {
@@ -410,6 +389,7 @@ public class StringUtil {
     /**
      * Checks if the given String has exactly one pair of surrounding curly braces <br>
      * Strings with escaped characters in curly braces at the beginning and end are respected, too
+     *
      * @param toCheck The string to check
      * @return True, if the check was succesful. False otherwise.
      */
@@ -435,7 +415,6 @@ public class StringUtil {
             }
             return false;
         }
-
     }
 
     public static boolean isInSquareBrackets(String toCheck) {
@@ -460,8 +439,8 @@ public class StringUtil {
      * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
      *
      * @param str the String holding an Integer value
-     * @throws NumberFormatException if str cannot be parsed to an int
      * @return the int value of str
+     * @throws NumberFormatException if str cannot be parsed to an int
      */
     public static int intValueOf(String str) {
         int idx = 0;
@@ -474,7 +453,7 @@ public class StringUtil {
         }
 
         int ival = 0;
-        for (;; ival *= 10) {
+        for (; ; ival *= 10) {
             ival += '0' - ch;
             if (++idx == end) {
                 return sign ? ival : -ival;
@@ -504,7 +483,7 @@ public class StringUtil {
         }
 
         int ival = 0;
-        for (;; ival *= 10) {
+        for (; ; ival *= 10) {
             ival += '0' - ch;
             if (++idx == end) {
                 return Optional.of(sign ? ival : -ival);
@@ -546,10 +525,10 @@ public class StringUtil {
     }
 
     /*
-         * @param  buf       String to be tokenized
-         * @param  delimstr  Delimiter string
-         * @return list      {@link java.util.List} of <tt>String</tt>
-         */
+     * @param  buf       String to be tokenized
+     * @param  delimstr  Delimiter string
+     * @return list      {@link java.util.List} of <tt>String</tt>
+     */
     public static List<String> tokenizeToList(String buf, String delimstr) {
         List<String> list = new ArrayList<>();
         String buffer = buf + '\n';
@@ -612,7 +591,6 @@ public class StringUtil {
         }
 
         return resultSB.toString();
-
     }
 
     public static boolean isNullOrEmpty(String toTest) {
@@ -660,7 +638,7 @@ public class StringUtil {
     /**
      * Unquote special characters.
      *
-     * @param toUnquote         The String which may contain quoted special characters.
+     * @param toUnquote The String which may contain quoted special characters.
      * @param quoteChar The quoting character.
      * @return A String with all quoted characters unquoted.
      */
@@ -700,7 +678,6 @@ public class StringUtil {
         } else {
             return toCapitalize.toUpperCase(Locale.ROOT);
         }
-
     }
 
     /**
@@ -712,6 +689,16 @@ public class StringUtil {
      */
     public static List<String> getStringAsWords(String text) {
         return Arrays.asList(text.split("[\\s,;]+"));
+    }
+
+    /**
+     * Encodes a string to UTF8
+     *
+     * @param string the string which should be encoded
+     * @return the encoded string or null
+     */
+    public static String toUTF8(String string) {
+        return Optional.ofNullable(string).map(s -> s.getBytes(StandardCharsets.UTF_8)).map(bytes -> new String(bytes)).orElse(null);
     }
 
     @ApacheCommonsLang3Allowed("No direct Guava equivalent existing - see https://stackoverflow.com/q/16560635/873282")

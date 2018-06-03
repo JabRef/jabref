@@ -73,6 +73,9 @@ repositories {
     maven {
         url 'https://oss.sonatype.org/content/groups/public'
     }
+    maven {
+        url "http://dev.bibsonomy.org/maven2/"
+    }
 }
 
 configurations {
@@ -94,6 +97,8 @@ dependencies {
     compile 'org.bouncycastle:bcprov-jdk15on:1.59'
 
     compile 'commons-cli:commons-cli:1.4'
+
+    compile 'org.bibsonomy:bibsonomy-rest-client:3.7.3'
 
     compile "org.libreoffice:juh:5.4.2"
     compile "org.libreoffice:jurt:5.4.2"

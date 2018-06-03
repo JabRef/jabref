@@ -36,6 +36,10 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon.CLOUD_DOWNLOAD;
+import static de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon.CLOUD_SYNC;
+import static de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon.TAG_TEXT_OUTLINE;
+
 public class IconTheme {
 
     /**
@@ -224,6 +228,7 @@ public class IconTheme {
         GROUP_REFINING(MaterialDesignIcon.FILTER) /*css: filter*/,
         AUTO_GROUP(MaterialDesignIcon.AUTO_FIX), /*css: auto-fix*/
         EMAIL(MaterialDesignIcon.EMAIL) /*css: email*/,
+        EXPORT(MaterialDesignIcon.EXPORT),
         EXPORT_TO_CLIPBOARD(MaterialDesignIcon.CLIPBOARD_ARROW_LEFT) /*css: clipboard-arrow-left */,
         ATTACH_FILE(MaterialDesignIcon.PAPERCLIP) /*css: paperclip*/,
         AUTO_FILE_LINK(MaterialDesignIcon.FILE_FIND) /*css: file-find */,
@@ -274,6 +279,10 @@ public class IconTheme {
         BLOG(MaterialDesignIcon.RSS), /* css: rss */
         GLOBAL_SEARCH(MaterialDesignIcon.EARTH), /* css: earth */
         DATE_PICKER(MaterialDesignIcon.CALENDAR), /* css: calendar */
+        CANCEL(MaterialDesignIcon.CANCEL),
+        CLOUD_DOWNLOAD(MaterialDesignIcon.CLOUD_DOWNLOAD),
+        CLOUD_SYNC(MaterialDesignIcon.CLOUD_SYNC),
+        TAG_TEXT_OUTLINE(MaterialDesignIcon.TAG_TEXT_OUTLINE),
         DEFAULT_GROUP_ICON(MaterialDesignIcon.LABEL_OUTLINE), /* css: label-outline */
         ALL_ENTRIES_GROUP_ICON(DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON),
         // STILL MISSING:

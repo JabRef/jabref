@@ -24,7 +24,7 @@ import org.w3c.dom.Text;
 
 /**
  * @author Morten O. Alver.
- * Based on net.sf.jabref.MODSDatabase by Michael Wrighton
+ * Based on org.jabref.MODSDatabase by Michael Wrighton
  *
  */
 class OOCalcDatabase {

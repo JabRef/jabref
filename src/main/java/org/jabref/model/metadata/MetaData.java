@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -42,6 +45,8 @@ public class MetaData {
     private final EventBus eventBus = new EventBus();
     private final Map<String, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
+    private final Map<String, Vector<String>> bibsonomyData = new HashMap<>();
+
     private GroupTreeNode groupsRoot;
     private Charset encoding;
     private SaveOrderConfig saveOrderConfig;
@@ -51,14 +56,19 @@ public class MetaData {
     private boolean isProtected;
     private String defaultFileDirectory;
     private ContentSelectors contentSelectors = new ContentSelectors();
+
+    private static final Log LOGGER = LogFactory.getLog(MetaData.class);
+
     private Map<String, List<String>> unkownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
 
-    /**
-     * Constructs an empty metadata.
-     */
-    public MetaData() {
-        // Do nothing
+
+    public void addBibsonomyData(String key, Vector<String> value){
+        bibsonomyData.put(key,value);
+    }
+
+    public Vector<String> getBibsonomyData(String key){
+        return bibsonomyData.get(key);
     }
 
     public Optional<SaveOrderConfig> getSaveOrderConfig() {
@@ -270,6 +280,7 @@ public class MetaData {
             this.eventBus.unregister(listener);
         } catch (IllegalArgumentException e) {
             // occurs if the event source has not been registered, should not prevent shutdown
+            LOGGER.info("Minor exception", e);
         }
     }
 

@@ -63,6 +63,7 @@ import javafx.application.Platform;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.bibsonomy.BibSonomySidePaneComponent;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.AutoLinkFilesAction;
 import org.jabref.gui.actions.ConnectToSharedDatabaseAction;
@@ -425,6 +426,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Globals.getKeyPrefs().getKey(KeyBinding.FIND_UNLINKED_FILES)
     );
     private final AutoLinkFilesAction autoLinkFile = new AutoLinkFilesAction();
+
     // The action for adding a new entry of unspecified type.
     private final NewEntryAction newEntryAction = new NewEntryAction(this, Globals.getKeyPrefs().getKey(KeyBinding.NEW_ENTRY));
     private final List<NewEntryAction> newSpecificEntryAction = getNewEntryActions();
@@ -462,6 +464,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private OpenOfficePanel openOfficePanel;
     private GroupSidePane groupSidePane;
     private int previousTabCount = -1;
+    private BibSonomySidePaneComponent bibsonomySidePaneComponent;
     private JMenu newSpec;
 
     public JabRefFrame() {
@@ -729,6 +732,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         generalFetcher = new GeneralFetcher(this, sidePaneManager);
 
         sidePaneManager.register(groupSidePane);
+
+        bibsonomySidePaneComponent = new BibSonomySidePaneComponent(sidePaneManager, this);
+        sidePaneManager.register(bibsonomySidePaneComponent);
     }
 
     /**
@@ -855,7 +861,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                                 output(Localization.lang("Unable to save library"));
                                 close = false;
                             }
-                        } catch (Throwable ex) {
+                        } catch (Exception ex) {
                             // Something prevented the file
                             // from being saved. Break!!!
                             close = false;
@@ -1240,6 +1246,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tools.add(abbreviateMedline);
         tools.add(unabbreviate);
         mb.add(tools);
+
+        mb.add(bibsonomySidePaneComponent.getMenuItem());
 
         options.add(showPrefs);
 
@@ -1858,8 +1866,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 if (saveAction.isSuccess()) {
                     close = true;
                 }
-            } catch (Throwable ex) {
+            } catch (Exception ex) {
                 // do not close
+                LOGGER.info("Minor exception", ex);
             }
         } else if (answer == JOptionPane.NO_OPTION) {
             // discard changes

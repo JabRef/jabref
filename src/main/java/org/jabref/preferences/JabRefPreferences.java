@@ -91,6 +91,7 @@ import org.slf4j.LoggerFactory;
 public class JabRefPreferences implements PreferencesService {
 
     // Push to application preferences
+    public static final String BIBSONOMY_PROPERTIES = "bibsonomyProperties";
     public static final String EMACS_PATH = "emacsPath";
     public static final String EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
 
@@ -1095,6 +1096,7 @@ public class JabRefPreferences implements PreferencesService {
             }
         } catch (IOException ignored) {
             // Ignored
+            LOGGER.info("Minor exception", ignored);
         }
         return res;
     }

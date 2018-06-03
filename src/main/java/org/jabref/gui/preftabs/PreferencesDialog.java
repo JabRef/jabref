@@ -87,6 +87,7 @@ public class PreferencesDialog extends JabRefDialog {
         tabs.add(new PreviewPrefsTab());
         tabs.add(new ExternalTab(frame, this, prefs));
         tabs.add(new GroupsPrefsTab(prefs));
+        tabs.add(new BibSonomyPrefsTab());
         tabs.add(new EntryEditorPrefsTab(prefs));
         tabs.add(new BibtexKeyPatternPrefTab(prefs, parent.getCurrentBasePanel()));
         tabs.add(new ImportSettingsTab(prefs));
