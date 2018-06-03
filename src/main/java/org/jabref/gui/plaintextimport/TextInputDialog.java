@@ -77,8 +77,8 @@ import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.FreeCiteImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.BasicFileType;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.entry.BibEntry;
@@ -556,8 +556,8 @@ public class TextInputDialog extends JabRefDialog {
         public void actionPerformed(ActionEvent e) {
             try {
                 FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                        .addExtensionFilter(Localization.lang("Plain text"), BasicFileType.TXT)
-                        .withDefaultExtension(Localization.lang("Plain text"), BasicFileType.TXT)
+                        .addExtensionFilter(Localization.lang("Plain text"), StandardFileType.TXT)
+                        .withDefaultExtension(Localization.lang("Plain text"), StandardFileType.TXT)
                         .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
                 DialogService ds = new FXDialogService();
 

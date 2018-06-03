@@ -24,7 +24,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.BasicFileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -152,7 +152,7 @@ public class AppendDatabaseAction implements BaseAction {
         if (dialog.isOkPressed()) {
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .withDefaultExtension(BasicFileType.BIBTEX_DB)
+                    .withDefaultExtension(StandardFileType.BIBTEX_DB)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                     .build();
             DialogService dialogService = new FXDialogService();

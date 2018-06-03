@@ -12,8 +12,8 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.util.BasicFileType;
 import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -97,7 +97,7 @@ public class CustomExportList {
         if (extension.contains(".")) {
             extension = extension.substring(extension.indexOf('.') + 1, extension.length());
         }
-        FileType fileType = BasicFileType.addnewFileType(extension);
+        FileType fileType = StandardFileType.newFileType(extension);
         TemplateExporter format = new TemplateExporter(exporterName, exporterName, lfFileName, null, fileType, layoutPreferences,
                 savePreferences);
         format.setCustomExport(true);

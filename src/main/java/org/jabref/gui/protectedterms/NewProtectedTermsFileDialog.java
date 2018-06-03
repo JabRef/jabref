@@ -25,7 +25,7 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.logic.util.BasicFileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -60,8 +60,8 @@ public class NewProtectedTermsFileDialog extends JabRefDialog {
         JButton browse = new JButton(Localization.lang("Browse"));
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(Localization.lang("Protected terms file"), BasicFileType.TERMS)
-                .withDefaultExtension(Localization.lang("Protected terms file"), BasicFileType.TERMS)
+                .addExtensionFilter(Localization.lang("Protected terms file"), StandardFileType.TERMS)
+                .withDefaultExtension(Localization.lang("Protected terms file"), StandardFileType.TERMS)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                 .build();
         DialogService ds = new FXDialogService();

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.util.BasicFileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -46,7 +46,7 @@ public class FreeCiteImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(BasicFileType.FREECITE, importer.getFileType());
+        assertEquals(StandardFileType.FREECITE, importer.getFileType());
     }
 
     @Test

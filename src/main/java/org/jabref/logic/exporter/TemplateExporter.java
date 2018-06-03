@@ -19,8 +19,8 @@ import java.util.regex.Pattern;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
-import org.jabref.logic.util.BasicFileType;
 import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -102,7 +102,7 @@ public class TemplateExporter extends Exporter {
      * @param savePreferences Preferences for saving
      * @param deleteBlankLines If blank lines should be remove (default: false)
      */
-    public TemplateExporter(String consoleName, String lfFileName, String directory, BasicFileType extension, LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, boolean deleteBlankLines) {
+    public TemplateExporter(String consoleName, String lfFileName, String directory, StandardFileType extension, LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, boolean deleteBlankLines) {
         this(consoleName, consoleName, lfFileName, directory, extension, layoutPreferences, savePreferences);
         this.deleteBlankLines = deleteBlankLines;
     }

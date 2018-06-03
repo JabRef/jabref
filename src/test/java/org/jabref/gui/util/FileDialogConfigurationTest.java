@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import javafx.stage.FileChooser;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.BasicFileType;
 import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -70,9 +70,9 @@ public class FileDialogConfigurationTest {
     @Test
     public void testSingleExtension() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withDefaultExtension(BasicFileType.BIBTEX_DB).build();
+                .withDefaultExtension(StandardFileType.BIBTEX_DB).build();
 
-        FileChooser.ExtensionFilter filter = toFilter(String.format("%1s %2s", "BibTex", Localization.lang("Library")), BasicFileType.BIBTEX_DB);
+        FileChooser.ExtensionFilter filter = toFilter(String.format("%1s %2s", "BibTex", Localization.lang("Library")), StandardFileType.BIBTEX_DB);
 
         assertEquals(filter.getExtensions(), fileDialogConfiguration.getDefaultExtension().getExtensions());
     }

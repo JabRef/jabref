@@ -23,8 +23,8 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.BasicFileType;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
@@ -219,8 +219,8 @@ public class FreeCiteImporter extends Importer {
     }
 
     @Override
-    public BasicFileType getFileType() {
-        return BasicFileType.FREECITE;
+    public StandardFileType getFileType() {
+        return StandardFileType.FREECITE;
     }
 
     @Override

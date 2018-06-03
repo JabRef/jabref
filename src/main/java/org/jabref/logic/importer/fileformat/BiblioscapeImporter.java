@@ -11,7 +11,7 @@ import java.util.Objects;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.BasicFileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
@@ -29,8 +29,8 @@ public class BiblioscapeImporter extends Importer {
     }
 
     @Override
-    public BasicFileType getFileType() {
-        return BasicFileType.TXT;
+    public StandardFileType getFileType() {
+        return StandardFileType.TXT;
     }
 
     @Override

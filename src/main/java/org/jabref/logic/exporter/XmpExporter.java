@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.logic.util.BasicFileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
@@ -28,7 +28,7 @@ public class XmpExporter extends Exporter {
     private final XmpPreferences xmpPreferences;
 
     public XmpExporter(XmpPreferences xmpPreferences) {
-        super("xmp", "Plain XMP", BasicFileType.XMP);
+        super("xmp", "Plain XMP", StandardFileType.XMP);
         this.xmpPreferences = xmpPreferences;
     }
 

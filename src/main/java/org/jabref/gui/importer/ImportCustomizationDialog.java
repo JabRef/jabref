@@ -37,7 +37,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.BasicFileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -82,8 +82,8 @@ public class ImportCustomizationDialog extends JabRefDialog {
         addFromFolderButton.addActionListener(e -> {
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(BasicFileType.CLASS, BasicFileType.JAR)
-                    .withDefaultExtension(BasicFileType.JAR)
+                    .addExtensionFilter(StandardFileType.CLASS, StandardFileType.JAR)
+                    .withDefaultExtension(StandardFileType.JAR)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
             DialogService ds = new FXDialogService();
 
@@ -117,8 +117,8 @@ public class ImportCustomizationDialog extends JabRefDialog {
         JButton addFromJarButton = new JButton(Localization.lang("Add from JAR"));
         addFromJarButton.addActionListener(e -> {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(BasicFileType.JAR, BasicFileType.ZIP)
-                    .withDefaultExtension(BasicFileType.JAR)
+                    .addExtensionFilter(StandardFileType.JAR, StandardFileType.ZIP)
+                    .withDefaultExtension(StandardFileType.JAR)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
             DialogService ds = new FXDialogService();
 

@@ -11,7 +11,7 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.BasicFileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.util.FileUpdateMonitor;
 
 /**
@@ -78,8 +78,8 @@ public class BibtexImporter extends Importer {
     }
 
     @Override
-    public BasicFileType getFileType() {
-        return BasicFileType.BIBTEX_DB;
+    public StandardFileType getFileType() {
+        return StandardFileType.BIBTEX_DB;
     }
 
     @Override

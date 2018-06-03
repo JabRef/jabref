@@ -50,7 +50,7 @@ import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
-import org.jabref.logic.util.BasicFileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.database.shared.DatabaseLocation;
@@ -469,8 +469,8 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
 
     private void showFileChooser() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(String.format("%1s %2s", "BibTex", Localization.lang("Library")), BasicFileType.BIBTEX_DB)
-                .withDefaultExtension(String.format("%1s %2s", "BibTex", Localization.lang("Library")), BasicFileType.BIBTEX_DB)
+                .addExtensionFilter(String.format("%1s %2s", "BibTex", Localization.lang("Library")), StandardFileType.BIBTEX_DB)
+                .withDefaultExtension(String.format("%1s %2s", "BibTex", Localization.lang("Library")), StandardFileType.BIBTEX_DB)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
         DialogService ds = new FXDialogService();
 

@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.util.BasicFileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ public class MsBibImporterTest {
     @Test
     public void testsGetExtensions() {
         MsBibImporter importer = new MsBibImporter();
-        assertEquals(BasicFileType.XML, importer.getFileType());
+        assertEquals(StandardFileType.XML, importer.getFileType());
     }
 
     @Test
