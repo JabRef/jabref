@@ -157,6 +157,7 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.2.0'
     testCompile 'org.junit.platform:junit-platform-launcher:1.2.0'
+    testCompile 'org.junit-pioneer:junit-pioneer:0.1-SNAPSHOT'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
     testCompile 'org.mockito:mockito-core:2.18.3'
