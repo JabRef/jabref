@@ -418,6 +418,7 @@ The changelog of versions 3.x is available at the [v3.8.2 tag](https://github.co
 The changelog of 2.11 and versions before is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
 [Unreleased]: https://github.com/JabRef/jabref/compare/v4.3...HEAD
+[Unreleased - v4.x]: https://github.com/JabRef/jabref/compare/v4.3...v4.x
 [4.3]: https://github.com/JabRef/jabref/compare/v4.2...v4.3
 [4.2]: https://github.com/JabRef/jabref/compare/v4.1...v4.2
 [4.1]: https://github.com/JabRef/jabref/compare/v4.0...v4.1
