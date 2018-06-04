@@ -53,7 +53,7 @@ class LocalizationTest {
     @Test
     void testKnownGermanTranslation() {
         Localization.setLanguage("de");
-        assertEquals("Alle speichern", Localization.lang("Save all"));
+        assertEquals("Zeige Einstellungen", Localization.lang("Show preferences"));
     }
 
     @Test
