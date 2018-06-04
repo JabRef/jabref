@@ -39,6 +39,13 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 
 
+## [Unreleased - v4.x]
+
+## Fixed
+
+- BACKPORT: Rewritten logic to detect a second jabref instance. [#4023](https://github.com/JabRef/jabref/issues/4023)
+
+
 
 
 
