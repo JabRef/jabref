@@ -3,7 +3,6 @@ package org.jabref.gui.exporter;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 
@@ -11,7 +10,6 @@ import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.gui.worker.AbstractWorker;
@@ -21,7 +19,6 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -39,6 +36,7 @@ public class ExportCommand extends SimpleCommand {
     private final JabRefFrame frame;
     private final boolean selectedOnly;
     private final JabRefPreferences preferences;
+    private final DialogService dialogService;
 
     /**
      * @param selectedOnly true if only the selected entries should be exported, otherwise all entries are exported
@@ -47,6 +45,7 @@ public class ExportCommand extends SimpleCommand {
         this.frame = frame;
         this.selectedOnly = selectedOnly;
         this.preferences = preferences;
+        this.dialogService = frame.getDialogService();
     }
 
     @Override
@@ -55,11 +54,15 @@ public class ExportCommand extends SimpleCommand {
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
         SavePreferences savePreferences = preferences.loadForExportFromPreferences();
         XmpPreferences xmpPreferences = preferences.getXMPPreferences();
+
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
-        FileDialogConfiguration fileDialogConfiguration = createExportFileChooser(Globals.exportFactory, Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
-        DialogService dialogService = frame.getDialogService();
-        DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showFileSaveDialog(fileDialogConfiguration)
-                .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), Globals.exportFactory.getExporters())));
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(FileFilterConverter.exporterToExtensionFilter(Globals.exportFactory.getExporters()))
+                .withDefaultExtension(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT))
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY))
+                .build();
+        dialogService.showFileSaveDialog(fileDialogConfiguration)
+                     .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), Globals.exportFactory.getExporters()));
     }
 
     private void export(Path file, FileChooser.ExtensionFilter selectedExtensionFilter, List<Exporter> exporters) {
@@ -68,7 +71,8 @@ public class ExportCommand extends SimpleCommand {
             FileUtil.addExtension(file, selectedExtension);
         }
 
-        final Exporter format = FileFilterConverter.getExporter(selectedExtensionFilter, exporters).orElseThrow(() -> new IllegalStateException("User didn't selected a file type for the extension"));
+        final Exporter format = FileFilterConverter.getExporter(selectedExtensionFilter, exporters)
+                                                   .orElseThrow(() -> new IllegalStateException("User didn't selected a file type for the extension"));
         List<BibEntry> entries;
         if (selectedOnly) {
             // Selected entries
@@ -137,14 +141,4 @@ public class ExportCommand extends SimpleCommand {
         // Run the update method:
         exportWorker.update();
     }
-
-    private static FileDialogConfiguration createExportFileChooser(ExporterFactory exportFactory, String currentDir) {
-        List<FileType> fileTypes = exportFactory.getExporters().stream().map(Exporter::getFileType).collect(Collectors.toList());
-        return new FileDialogConfiguration.Builder()
-                .addExtensionFilter(fileTypes.toArray(new FileType[fileTypes.size()]))
-                .withDefaultExtension(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT))
-                .withInitialDirectory(currentDir)
-                .build();
-    }
-
 }

@@ -3,10 +3,8 @@ package org.jabref.gui.importer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.SortedSet;
-import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 
@@ -14,12 +12,10 @@ import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileType;
 import org.jabref.preferences.JabRefPreferences;
 
 /**
@@ -43,21 +39,15 @@ public class ImportCommand extends SimpleCommand {
     @Override
     public void execute() {
         SortedSet<Importer> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
-        List<FileType> extensions = importers.stream().map(Importer::getFileType)
-                                             .collect(Collectors.toList());
 
-        FileChooser.ExtensionFilter allImports = FileFilterConverter.forAllImporters(importers);
-        FileChooser.ExtensionFilter anyFile = new FileChooser.ExtensionFilter(Localization.lang("Any file"), "*.*");
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(anyFile)
-                .addExtensionFilter(allImports)
-                .addExtensionFilter(extensions.toArray(new FileType[extensions.size()]))
+                .addExtensionFilter(FileFilterConverter.ANY_FILE)
+                .addExtensionFilter(FileFilterConverter.forAllImporters(importers))
+                .addExtensionFilter(FileFilterConverter.importerToExtensionFilter(importers))
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY))
                 .build();
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            dialogService.showFileOpenDialog(fileDialogConfiguration)
-                         .ifPresent(path -> doImport(path, importers, fileDialogConfiguration.getSelectedExtensionFilter()));
-        });
+        dialogService.showFileOpenDialog(fileDialogConfiguration)
+                     .ifPresent(path -> doImport(path, importers, fileDialogConfiguration.getSelectedExtensionFilter()));
     }
 
     private void doImport(Path file, SortedSet<Importer> importers, FileChooser.ExtensionFilter selectedExtensionFilter) {
