@@ -316,10 +316,10 @@ public class PreferencesMigrations {
               });
     }
 
-    private static void upgradePreviewStyleFromReviewToComment() {
+    static void upgradePreviewStyleFromReviewToComment() {
         JabRefPreferences prefs = Globals.prefs;
         String currentPreviewStyle = prefs.get(JabRefPreferences.PREVIEW_STYLE);
-        String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}</dd>", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}");
+        String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}");
         prefs.put(JabRefPreferences.PREVIEW_STYLE, migratedStyle);
     }
 }
