@@ -52,7 +52,7 @@ targetCompatibility = 1.8
 mainClassName = "org.jabref.JabRefMain"
 
 // These are the Java version requirements we will check on each start of JabRef
-ext.minRequiredJavaVersion = "1.8.0_172"
+ext.minRequiredJavaVersion = "1.8.0_171"
 ext.allowJava9 = false
 
 sourceSets {
