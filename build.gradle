@@ -487,3 +487,19 @@ jmh {
     iterations = 10
     fork = 2
 }
+
+// Source: https://stackoverflow.com/a/44168582/873282
+task downloadDependencies {
+  description "Pre-downloads *most* dependencies"
+  doLast {
+    configurations.getAsMap().each { name, config ->
+      println "Retrieving dependencies for $name"
+      try {
+        config.files
+      } catch (e) {
+        // some cannot be resolved, just log them
+        project.logger.info e.message
+      }
+    }
+  }
+}
