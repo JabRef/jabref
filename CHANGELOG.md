@@ -8,30 +8,15 @@ Here, the categories "Changed" for added and changed functionality,
 
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
-## [Unreleased - v4.x]
+## [4.3.1] - 2018-06-05
 
 ### Changed
 - BACKPORT: We use `https` for [fetching from most online bibliographic database](https://help.jabref.org/en/#-using-online-bibliographic-database).
+- BACKPORT: We changed the minimum required version of Java to 1.8.0_171, as this is the latest release for which the automatic Java update works.  [4093](https://github.com/JabRef/jabref/issues/4093)
 
 ### Fixed
 - BACKPORT: We fixed an issue where custom exports could not be selected in the 'Export (selected) entries' dialog [#4013](https://github.com/JabRef/jabref/issues/4013)
 - BACKPORT: Rewritten logic to detect a second jabref instance. [#4023](https://github.com/JabRef/jabref/issues/4023)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ## [4.3] - 2018-06-01
