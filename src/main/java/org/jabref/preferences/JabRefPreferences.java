@@ -366,6 +366,15 @@ public class JabRefPreferences implements PreferencesService {
     // Id Entry Generator Preferences
     public static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
 
+    // Preview
+    //public because needed for pref migration
+    public static final String PREVIEW_STYLE = "previewStyle";
+
+    private static final String CYCLE_PREVIEW_POS = "cyclePreviewPos";
+    private static final String CYCLE_PREVIEW = "cyclePreview";
+    private static final String PREVIEW_PANEL_HEIGHT = "previewPanelHeightFX";
+    private static final String PREVIEW_ENABLED = "previewEnabled";
+
     // Auto completion
     private static final String AUTO_COMPLETE = "autoComplete";
     private static final String AUTOCOMPLETER_FIRSTNAME_MODE = "autoCompFirstNameMode";
@@ -395,13 +404,6 @@ public class JabRefPreferences implements PreferencesService {
 
     //GroupViewMode
     private static final String GROUP_INTERSECT_UNION_VIEW_MODE = "groupIntersectUnionViewModes";
-
-    // Preview
-    private static final String CYCLE_PREVIEW_POS = "cyclePreviewPos";
-    private static final String CYCLE_PREVIEW = "cyclePreview";
-    private static final String PREVIEW_PANEL_HEIGHT = "previewPanelHeightFX";
-    private static final String PREVIEW_STYLE = "previewStyle";
-    private static final String PREVIEW_ENABLED = "previewEnabled";
 
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
@@ -788,7 +790,7 @@ public class JabRefPreferences implements PreferencesService {
                         + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
                         + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
                         + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
-                        + "\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}"
+                        + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}"
                         + "</dd>__NEWLINE__<p></p></font>");
 
         setLanguageDependentDefaultValues();
