@@ -2,7 +2,6 @@ package org.jabref.migrations;
 
 import java.util.prefs.Preferences;
 
-import org.jabref.Globals;
 import org.jabref.JabRefMain;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -14,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class PreferencesMigrationsTest {
 
     private JabRefPreferences prefs;
+    private Preferences mainPrefsNode;
 
     private final String[] oldStylePatterns = new String[] {"\\bibtexkey",
                                                             "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
@@ -23,18 +23,18 @@ public class PreferencesMigrationsTest {
     @BeforeEach
     public void setUp() {
         prefs = JabRefPreferences.getInstance();
-        Globals.prefs = prefs;
+        mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+
     }
 
     @Test
     public void testOldStyleBibtexkeyPattern0() {
         String previousFileNamePattern = prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN);
-        final Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
 
         prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, oldStylePatterns[0]);
         mainPrefsNode.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, oldStylePatterns[0]);
 
-        PreferencesMigrations.upgradeImportFileAndDirePatterns();
+        PreferencesMigrations.upgradeImportFileAndDirePatterns(prefs, mainPrefsNode);
 
         String updatedPrefsFileNamePattern = prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN);
         String updatedMainNodeFileNamePattern = mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null);
@@ -49,12 +49,11 @@ public class PreferencesMigrationsTest {
     @Test
     public void testOldStyleBibtexkeyPattern1() {
         String previousFileNamePattern = prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN);
-        final Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
 
         prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, oldStylePatterns[1]);
         mainPrefsNode.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, oldStylePatterns[1]);
 
-        PreferencesMigrations.upgradeImportFileAndDirePatterns();
+        PreferencesMigrations.upgradeImportFileAndDirePatterns(prefs, mainPrefsNode);
 
         String updatedPrefsFileNamePattern = prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN);
         String updatedMainNodeFileNamePattern = mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null);
@@ -69,13 +68,12 @@ public class PreferencesMigrationsTest {
     @Test
     public void testArbitraryBibtexkeyPattern() {
         String previousFileNamePattern = prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN);
-        final Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
         String arbitraryPattern = "[anyUserPrividedString]";
 
         prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, arbitraryPattern);
         mainPrefsNode.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, arbitraryPattern);
 
-        PreferencesMigrations.upgradeImportFileAndDirePatterns();
+        PreferencesMigrations.upgradeImportFileAndDirePatterns(prefs, mainPrefsNode);
 
         String updatedPrefsFileNamePattern = prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN);
         String updatedMainNodeFileNamePattern = mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null);
