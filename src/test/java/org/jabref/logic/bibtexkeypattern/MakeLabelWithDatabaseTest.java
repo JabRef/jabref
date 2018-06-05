@@ -231,7 +231,7 @@ public class MakeLabelWithDatabaseTest {
     public void generateKeyShorttitle() {
         bibtexKeyPattern.setDefaultValue("[shorttitle]");
         new BibtexKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
-        assertEquals(Optional.of("Anawesomepaper"), entry.getCiteKeyOptional());
+        assertEquals(Optional.of("awesomepaperJabRef"), entry.getCiteKeyOptional());
     }
 
     @Test
@@ -239,7 +239,7 @@ public class MakeLabelWithDatabaseTest {
         bibtexKeyPattern.setDefaultValue("[shorttitle:lower]");
         entry.setField("title", "An aweSOme Paper on JabRef");
         new BibtexKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
-        assertEquals(Optional.of("anawesomepaper"), entry.getCiteKeyOptional());
+        assertEquals(Optional.of("awesomepaperjabref"), entry.getCiteKeyOptional());
     }
 
     @Test
@@ -247,7 +247,7 @@ public class MakeLabelWithDatabaseTest {
         bibtexKeyPattern.setDefaultValue("[shorttitle:upper]");
         entry.setField("title", "An aweSOme Paper on JabRef");
         new BibtexKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
-        assertEquals(Optional.of("ANAWESOMEPAPER"), entry.getCiteKeyOptional());
+        assertEquals(Optional.of("AWESOMEPAPERJABREF"), entry.getCiteKeyOptional());
     }
 
     @Test
@@ -255,7 +255,7 @@ public class MakeLabelWithDatabaseTest {
         bibtexKeyPattern.setDefaultValue("[shorttitle:title_case]");
         entry.setField("title", "An aweSOme Paper on JabRef");
         new BibtexKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
-        assertEquals(Optional.of("AnAwesomePaper"), entry.getCiteKeyOptional());
+        assertEquals(Optional.of("AwesomePaperJabref"), entry.getCiteKeyOptional());
     }
 
     @Test
@@ -263,7 +263,7 @@ public class MakeLabelWithDatabaseTest {
         bibtexKeyPattern.setDefaultValue("[shorttitle:sentence_case]");
         entry.setField("title", "An aweSOme Paper on JabRef");
         new BibtexKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
-        assertEquals(Optional.of("Anawesomepaper"), entry.getCiteKeyOptional());
+        assertEquals(Optional.of("Awesomepaperjabref"), entry.getCiteKeyOptional());
     }
 
     @Test
@@ -271,7 +271,7 @@ public class MakeLabelWithDatabaseTest {
         bibtexKeyPattern.setDefaultValue("[shorttitle:capitalize]");
         entry.setField("title", "An aweSOme Paper on JabRef");
         new BibtexKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
-        assertEquals(Optional.of("AnAwesomePaper"), entry.getCiteKeyOptional());
+        assertEquals(Optional.of("AwesomePaperJabref"), entry.getCiteKeyOptional());
     }
 
     @Test

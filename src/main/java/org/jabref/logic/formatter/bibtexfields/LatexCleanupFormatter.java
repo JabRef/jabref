@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
 
-public class LatexCleanupFormatter implements Formatter {
+public class LatexCleanupFormatter extends Formatter {
 
     private static final Pattern REMOVE_REDUNDANT = Pattern
             .compile("(?<!\\\\[\\p{Alpha}]{0,100}\\{[^\\}]{0,100})\\}([-/ ]?)\\{");
@@ -62,5 +62,4 @@ public class LatexCleanupFormatter implements Formatter {
     public String getExampleInput() {
         return "{VLSI} {DSP}";
     }
-
 }

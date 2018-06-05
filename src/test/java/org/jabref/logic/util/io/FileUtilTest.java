@@ -150,13 +150,8 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testGetFileExtensionLowerCaseAndTrimmingFile() {
-        assertEquals("pdf", FileHelper.getFileExtension(Paths.get("test.PdF  ")).get());
-    }
-
-    @Test
     public void testGetFileExtensionMultipleDotsFile() {
-        assertEquals("pdf", FileHelper.getFileExtension(Paths.get("te.st.PdF  ")).get());
+        assertEquals("pdf", FileHelper.getFileExtension(Paths.get("te.st.PdF")).get());
     }
 
     @Test

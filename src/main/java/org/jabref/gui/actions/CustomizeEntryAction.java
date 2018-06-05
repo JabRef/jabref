@@ -7,16 +7,15 @@ import org.jabref.gui.customentrytypes.EntryCustomizationDialog;
 
 public class CustomizeEntryAction extends SimpleCommand {
 
-    private final JabRefFrame jabRefFrame;
+    private final JabRefFrame frame;
 
-    public CustomizeEntryAction(JabRefFrame jabRefFrame) {
-        this.jabRefFrame = jabRefFrame;
+    public CustomizeEntryAction(JabRefFrame frame) {
+        this.frame = frame;
     }
+    
     @Override
     public void execute() {
-        JDialog dl = new EntryCustomizationDialog(jabRefFrame);
-        dl.setVisible(true);
-
+        JDialog dialog = new EntryCustomizationDialog(frame);
+        dialog.setVisible(true);
     }
-
 }

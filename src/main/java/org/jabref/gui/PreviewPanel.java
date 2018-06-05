@@ -79,8 +79,6 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     /**
      * @param panel           (may be null) Only set this if the preview is associated to the main window.
      * @param databaseContext (may be null) Used for resolving pdf directories for links.
-     * @param preferences
-     * @param dialogService
      */
     public PreviewPanel(BasePanel panel, BibDatabaseContext databaseContext, KeyBindingRepository keyBindingRepository, PreviewPreferences preferences, DialogService dialogService, ExternalFileTypes externalFileTypes) {
         this.databaseContext = Optional.ofNullable(databaseContext);
@@ -158,7 +156,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
 
     private void createKeyBindings() {
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
+            Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
                     case COPY_PREVIEW:
@@ -181,10 +179,10 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         copyPreview.setOnAction(event -> copyPreviewToClipBoard());
         MenuItem printEntryPreview = new MenuItem(Localization.lang("Print entry preview"), IconTheme.JabRefIcons.PRINTED.getGraphicNode());
         printEntryPreview.setOnAction(event -> print());
-        MenuItem previousPreviewLayout = new MenuItem(Localization.menuTitle("Previous preview layout"));
+        MenuItem previousPreviewLayout = new MenuItem(Localization.lang("Previous preview layout"));
         previousPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.PREVIOUS_PREVIEW_LAYOUT));
         previousPreviewLayout.setOnAction(event -> basePanel.ifPresent(BasePanel::previousPreviewStyle));
-        MenuItem nextPreviewLayout = new MenuItem(Localization.menuTitle("Next preview layout"));
+        MenuItem nextPreviewLayout = new MenuItem(Localization.lang("Next preview layout"));
         nextPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.NEXT_PREVIEW_LAYOUT));
         nextPreviewLayout.setOnAction(event -> basePanel.ifPresent(BasePanel::nextPreviewStyle));
 
@@ -236,9 +234,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     private void updatePreviewLayout(String layoutFile, LayoutFormatterPreferences layoutFormatterPreferences) {
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         try {
-            layout = Optional.of(
-                                 new LayoutHelper(sr, layoutFormatterPreferences)
-                                                                                 .getLayoutFromText());
+            layout = Optional.of(new LayoutHelper(sr, layoutFormatterPreferences).getLayoutFromText());
         } catch (IOException e) {
             layout = Optional.empty();
             LOGGER.debug("no layout could be set", e);
@@ -283,22 +279,22 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         if (layout.isPresent()) {
             StringBuilder sb = new StringBuilder();
             bibEntry.ifPresent(entry -> sb.append(layout.get()
-                                                        .doLayout(entry, databaseContext.map(BibDatabaseContext::getDatabase).orElse(null))));
+                    .doLayout(entry, databaseContext.map(BibDatabaseContext::getDatabase).orElse(null))));
             setPreviewLabel(sb.toString());
         } else if (basePanel.isPresent() && bibEntry.isPresent()) {
             Future<?> citationStyleWorker = BackgroundTask
-                                                          .wrap(() -> basePanel.get().getCitationStyleCache().getCitationFor(bibEntry.get()))
-                                                          .onRunning(() -> {
-                                                              CitationStyle citationStyle = basePanel.get().getCitationStyleCache().getCitationStyle();
-                                                              setPreviewLabel("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) +
-                                                                              ": " + citationStyle.getTitle() + " ..." + "</i>");
-                                                          })
-                                                          .onSuccess(this::setPreviewLabel)
-                                                          .onFailure(exception -> {
-                                                              LOGGER.error("Error while generating citation style", exception);
-                                                              setPreviewLabel(Localization.lang("Error while generating citation style"));
-                                                          })
-                                                          .executeWith(Globals.TASK_EXECUTOR);
+                    .wrap(() -> basePanel.get().getCitationStyleCache().getCitationFor(bibEntry.get()))
+                    .onRunning(() -> {
+                        CitationStyle citationStyle = basePanel.get().getCitationStyleCache().getCitationStyle();
+                        setPreviewLabel("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) +
+                                ": " + citationStyle.getTitle() + " ..." + "</i>");
+                    })
+                    .onSuccess(this::setPreviewLabel)
+                    .onFailure(exception -> {
+                        LOGGER.error("Error while generating citation style", exception);
+                        setPreviewLabel(Localization.lang("Error while generating citation style"));
+                    })
+                    .executeWith(Globals.TASK_EXECUTOR);
             this.citationStyleFuture = Optional.of(citationStyleWorker);
         }
     }
@@ -339,8 +335,8 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
             job.endJob();
             return null;
         })
-                      .onFailure(exception -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), exception))
-                      .executeWith(Globals.TASK_EXECUTOR);
+                .onFailure(exception -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), exception))
+                .executeWith(Globals.TASK_EXECUTOR);
     }
 
     public void close() {

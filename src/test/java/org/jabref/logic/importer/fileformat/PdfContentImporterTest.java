@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +28,7 @@ public class PdfContentImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(FileType.PDF_CONTENT, importer.getFileType());
+        assertEquals(StandardFileType.PDF, importer.getFileType());
     }
 
     @Test

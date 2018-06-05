@@ -44,3 +44,11 @@
 	-fx-max-height: 0;
 	-fx-pref-height: 0;
 }
+
+.logo-pane {
+    fx-fill: transparent;
+}
+
+.logo-pane SVGPath {
+    -fx-fill: #4f5f8f;
+}

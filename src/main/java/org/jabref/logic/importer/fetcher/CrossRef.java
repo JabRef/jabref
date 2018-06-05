@@ -39,7 +39,7 @@ import org.json.JSONObject;
  */
 public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, SearchBasedParserFetcher, IdBasedParserFetcher {
 
-    private static final String API_URL = "http://api.crossref.org/works";
+    private static final String API_URL = "https://api.crossref.org/works";
 
     private static final RemoveBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveBracesFormatter();
 

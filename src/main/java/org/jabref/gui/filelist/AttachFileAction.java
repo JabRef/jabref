@@ -32,24 +32,23 @@ public class AttachFileAction extends SimpleCommand {
         }
         BibEntry entry = panel.getSelectedEntries().get(0);
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                               .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
-                                                                                               .build();
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
             LinkedFile newLinkedFile = new LinkedFile("", newFile.toString(), "");
 
             LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(newLinkedFile);
 
-            Optional<LinkedFile> editedLinkeDfile = dialog.showAndWait();
-            editedLinkeDfile.ifPresent(file -> {
-
-                Optional<FieldChange> fieldChange = entry.addFile(file);
-                fieldChange.ifPresent(change -> {
-                    UndoableFieldChange ce = new UndoableFieldChange(change);
-                    panel.getUndoManager().addEdit(ce);
-                    panel.markBaseChanged();
-                });
-            });
+            dialog.showAndWait()
+                  .ifPresent(editedLinkedFile -> {
+                      Optional<FieldChange> fieldChange = entry.addFile(editedLinkedFile);
+                      fieldChange.ifPresent(change -> {
+                          UndoableFieldChange ce = new UndoableFieldChange(change);
+                          panel.getUndoManager().addEdit(ce);
+                          panel.markBaseChanged();
+                      });
+                  });
         });
     }
 }

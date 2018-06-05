@@ -43,6 +43,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 import org.controlsfx.control.Rating;
@@ -164,7 +165,9 @@ class MainTableColumnFactory {
     private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(SpecialField specialField) {
         TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> column = new TableColumn<>();
         SpecialFieldViewModel specialFieldViewModel = new SpecialFieldViewModel(specialField, undoManager);
-        column.setGraphic(specialFieldViewModel.getIcon().getGraphicNode());
+        Node headerGraphic = specialFieldViewModel.getIcon().getGraphicNode();
+        Tooltip.install(headerGraphic, new Tooltip(specialFieldViewModel.getLocalization()));
+        column.setGraphic(headerGraphic);
         column.getStyleClass().add(ICON_COLUMN);
         if (specialField == SpecialField.RANKING) {
             setExactWidth(column, GUIGlobals.WIDTH_ICON_COL_RANKING);
@@ -239,7 +242,9 @@ class MainTableColumnFactory {
 
     private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createFileColumn() {
         TableColumn<BibEntryTableViewModel, List<LinkedFile>> column = new TableColumn<>();
-        column.setGraphic(IconTheme.JabRefIcons.FILE.getGraphicNode());
+        Node headerGraphic = IconTheme.JabRefIcons.FILE.getGraphicNode();
+        Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Linked files")));
+        column.setGraphic(headerGraphic);
         column.getStyleClass().add(ICON_COLUMN);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         column.setCellValueFactory(cellData -> cellData.getValue().getLinkedFiles());
@@ -289,7 +294,9 @@ class MainTableColumnFactory {
      */
     private TableColumn<BibEntryTableViewModel, String> createUrlOrDoiColumn(JabRefIcon icon, String firstField, String secondField) {
         TableColumn<BibEntryTableViewModel, String> column = new TableColumn<>();
-        column.setGraphic(icon.getGraphicNode());
+        Node headerGraphic = icon.getGraphicNode();
+        Tooltip.install(headerGraphic, new Tooltip(StringUtil.capitalizeFirst(firstField) + " / " + StringUtil.capitalizeFirst(secondField)));
+        column.setGraphic(headerGraphic);
         column.getStyleClass().add(ICON_COLUMN);
         setExactWidth(column, GUIGlobals.WIDTH_ICON_COL);
         // icon is chosen based on field name in cell, so map fields to its names

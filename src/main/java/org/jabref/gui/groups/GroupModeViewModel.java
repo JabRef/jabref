@@ -8,27 +8,29 @@ import org.jabref.logic.l10n.Localization;
 
 public class GroupModeViewModel {
 
-    public static Tooltip getUnionIntersectionTooltip(GroupViewMode mode) {
+    private GroupViewMode mode;
+
+    public GroupModeViewModel(GroupViewMode mode) {
+        this.mode = mode;
+    }
+
+    public Node getUnionIntersectionGraphic() {
+        if (mode == GroupViewMode.UNION) {
+            return JabRefIcons.GROUP_UNION.getGraphicNode();
+        } else if (mode == GroupViewMode.INTERSECTION) {
+            return JabRefIcons.GROUP_INTERSECTION.getGraphicNode();
+        }
+
+        // As there is no concept like an empty node/icon, we return simply the other icon
+        return JabRefIcons.GROUP_INTERSECTION.getGraphicNode();
+    }
+
+    public Tooltip getUnionIntersectionTooltip() {
         if (mode == GroupViewMode.UNION) {
             return new Tooltip(Localization.lang("Toogle intersection"));
-        }
-        if (mode == GroupViewMode.INTERSECTION) {
+        } else if (mode == GroupViewMode.INTERSECTION) {
             return new Tooltip(Localization.lang("Toogle union"));
         }
         return new Tooltip();
-
-    }
-
-    public static Node getUnionIntersectionGraphic(GroupViewMode mode) {
-
-        if (mode == GroupViewMode.UNION) {
-            return JabRefIcons.GROUP_UNION.getGraphicNode();
-        }
-        if (mode == GroupViewMode.INTERSECTION) {
-            return JabRefIcons.GROUP_INTERSECTION.getGraphicNode();
-        }
-        //as there is no concept like an empty node/icon, we return simply the other icon
-        return JabRefIcons.GROUP_INTERSECTION.getGraphicNode();
-
     }
 }

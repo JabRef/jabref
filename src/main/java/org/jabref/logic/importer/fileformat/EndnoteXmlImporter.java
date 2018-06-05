@@ -47,7 +47,7 @@ import org.jabref.logic.importer.fileformat.endnote.Urls;
 import org.jabref.logic.importer.fileformat.endnote.Volume;
 import org.jabref.logic.importer.fileformat.endnote.Xml;
 import org.jabref.logic.importer.fileformat.endnote.Year;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryType;
 import org.jabref.model.entry.BiblatexEntryTypes;
@@ -80,8 +80,8 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.ENDNOTE_XML;
+    public StandardFileType getFileType() {
+        return StandardFileType.XML;
     }
 
     @Override

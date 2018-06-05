@@ -26,7 +26,6 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -50,7 +49,7 @@ import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.database.shared.DatabaseLocation;
@@ -156,8 +155,9 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
 
             return; // setLoadingConnectButtonText(false) should not be reached regularly.
         } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
-            JOptionPane.showMessageDialog(ConnectToSharedDatabaseDialog.this, exception.getMessage(),
-                    Localization.lang("Connection error"), JOptionPane.ERROR_MESSAGE);
+
+            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection error"), exception));
+
         } catch (DatabaseNotSupportedException exception) {
             new MigrationHelpDialog(this).setVisible(true);
         }
@@ -187,8 +187,7 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
 
                     openSharedDatabase();
                 } catch (JabRefException exception) {
-                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Warning"), exception);
-
+                    DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showErrorDialogAndWait(Localization.lang("Warning"), exception));
                 }
             }
         };
@@ -472,8 +471,8 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
 
     private void showFileChooser() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileType.BIBTEX_DB)
-                .withDefaultExtension(FileType.BIBTEX_DB)
+                .addExtensionFilter(String.format("%1s %2s", "BibTex", Localization.lang("Library")), StandardFileType.BIBTEX_DB)
+                .withDefaultExtension(String.format("%1s %2s", "BibTex", Localization.lang("Library")), StandardFileType.BIBTEX_DB)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                 .build();
         DialogService ds = frame.getDialogService();
