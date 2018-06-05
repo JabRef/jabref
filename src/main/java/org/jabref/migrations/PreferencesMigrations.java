@@ -41,7 +41,7 @@ public class PreferencesMigrations {
         upgradeKeyBindingsToJavaFX();
         addCrossRefRelatedFieldsForAutoComplete();
         upgradeObsoleteLookAndFeels();
-        upgradePreviewStyleFromReviewToComment();
+        upgradePreviewStyleFromReviewToComment(Globals.prefs);
     }
 
     /**
@@ -296,7 +296,7 @@ public class PreferencesMigrations {
 
     private static void upgradeObsoleteLookAndFeels() {
         JabRefPreferences prefs = Globals.prefs;
-        String currentLandF = prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
+        String currentLandF = prefs.getLookAndFeel();
 
         Stream.of("com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
                   "com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel",
@@ -306,20 +306,19 @@ public class PreferencesMigrations {
               .ifPresent(loolAndFeel -> {
                   if (OS.WINDOWS) {
                       String windowsLandF = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-                      prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, windowsLandF);
+                      prefs.setLookAndFeel(windowsLandF);
                       LOGGER.info("Switched from obsolete look and feel " + currentLandF + " to " + windowsLandF);
                   } else {
                       String nimbusLandF = "javax.swing.plaf.nimbus.NimbusLookAndFeel";
-                      prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, nimbusLandF);
+                      prefs.setLookAndFeel(nimbusLandF);
                       LOGGER.info("Switched from obsolete look and feel " + currentLandF + " to " + nimbusLandF);
                   }
               });
     }
 
-    static void upgradePreviewStyleFromReviewToComment() {
-        JabRefPreferences prefs = Globals.prefs;
-        String currentPreviewStyle = prefs.get(JabRefPreferences.PREVIEW_STYLE);
+    static void upgradePreviewStyleFromReviewToComment(JabRefPreferences prefs) {
+        String currentPreviewStyle = prefs.getPreviewStyle();
         String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}");
-        prefs.put(JabRefPreferences.PREVIEW_STYLE, migratedStyle);
+        prefs.setPreviewStyle(migratedStyle);
     }
 }
