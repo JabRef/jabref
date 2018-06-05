@@ -5,11 +5,13 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.application.Platform;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -199,7 +201,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     public void requestFocus(String fieldName) {
         if (editors.containsKey(fieldName)) {
             activeField = editors.get(fieldName);
-            activeField.requestFocus();
+            activeField.focus();
         }
     }
 
@@ -212,14 +214,25 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     @Override
     public void handleFocus() {
         if (activeField != null) {
-            activeField.requestFocus();
+            activeField.focus();
         }
     }
 
     @Override
     protected void bindToEntry(BibEntry entry) {
+        Optional<String> selectedFieldName = editors.entrySet()
+                                                    .stream()
+                                                    .filter(editor -> editor.getValue().childIsFocused())
+                                                    .map(Map.Entry::getKey)
+                                                    .findFirst();
+
         Region panel = setupPanel(entry, isCompressed, suggestionProviders, undoManager);
         setContent(panel);
+
+        Platform.runLater(() -> {
+            // Restore focus to field (run this async so that editor is already initialized correctly)
+            selectedFieldName.ifPresent(this::requestFocus);
+        });
     }
 
     protected abstract Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType);
