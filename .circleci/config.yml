@@ -1,0 +1,64 @@
+version: 2
+jobs:
+  prepareInstall4J:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - restore_cache:
+          keys:
+            - install4j-cache
+      - checkout
+      - run: scripts/prepare-install4j.sh
+      - save_cache:
+          key: install4j-cache
+          paths:
+            - "~/downloads"
+            - "~/.install4j7"
+
+  buildDev:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - restore_cache:
+          keys:
+            - dependency-cache
+            - install4j-cache
+      - run: install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
+      - run: ./gradlew -Pinstall4jDir="install4j7" clean release --stacktrace
+      - save_cache:
+          key: dependency-cache
+          paths:
+            - "~/.gradle"
+      - store_artifacts:
+          path: build/releases
+          destination: build
+    deploy:
+      command: scripts/upload-to-builds.jabref.org.sh
+
+  buildRelease:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - restore_cache:
+          keys:
+            - dependency-cache
+            - install4j-cache
+      - checkout
+      - run: echo "something"
+    deploy:
+      command: scripts/upload-to-builds.jabref.org.sh
+
+workflows:
+  version: 2
+  release:
+    jobs:
+      - prepareInstall4J
+      - buildDev:
+          requires:
+            - prepareInstall4J
+      - buildRelease:
+          requires:
+            - buildDev
+          filters:
+            branches:
+              only: circleci20
