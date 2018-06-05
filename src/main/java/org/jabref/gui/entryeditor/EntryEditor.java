@@ -126,6 +126,14 @@ public class EntryEditor extends BorderPane {
                         tabbed.getSelectionModel().selectPrevious();
                         event.consume();
                         break;
+                    case ENTRY_EDITOR_NEXT_ENTRY:
+                        panel.selectNextEntry();
+                        event.consume();
+                        break;
+                    case ENTRY_EDITOR_PREVIOUS_ENTRY:
+                        panel.selectPreviousEntry();
+                        event.consume();
+                        break;
                     case HELP:
                         HelpAction.openHelpPage(HelpFile.ENTRY_EDITOR);
                         event.consume();
