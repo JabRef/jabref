@@ -47,7 +47,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
 
     @Override
     public String getName() {
-        return Localization.menuTitle("Push entries to external application (%0)", getApplicationName());
+        return Localization.lang("Push entries to external application (%0)", getApplicationName());
     }
 
     @Override

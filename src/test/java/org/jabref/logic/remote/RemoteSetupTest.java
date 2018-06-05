@@ -129,4 +129,15 @@ class RemoteSetupTest {
 
         assertFalse(new RemoteClient(port).ping());
     }
+
+    @Test
+    void pingReturnsTrueWhenServerIsRunning() {
+        final int port = 34567;
+
+        try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
+            server.openAndStart(messageHandler, port);
+
+            assertTrue(new RemoteClient(port).ping());
+        }
+    }
 }

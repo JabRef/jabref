@@ -49,7 +49,7 @@ public class MathSciNetId implements Identifier {
     @Override
     public Optional<URI> getExternalURI() {
         try {
-            return Optional.of(new URI("http://www.ams.org/mathscinet-getitem?mr=" + identifier));
+            return Optional.of(new URI("https://www.ams.org/mathscinet-getitem?mr=" + identifier));
         } catch (URISyntaxException e) {
             return Optional.empty();
         }

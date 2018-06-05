@@ -306,7 +306,7 @@ public class ExternalFileTypeEditor extends BaseDialog<Void> {
 
         public EditExternalFileTypesAction() {
             super();
-            putValue(Action.NAME, Localization.menuTitle("Manage external file types"));
+            putValue(Action.NAME, Localization.lang("Manage external file types"));
         }
 
         @Override

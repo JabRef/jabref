@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,7 +70,7 @@ public class RepecNepImporterTest {
 
     @Test
     public void testGetExtension() {
-        assertEquals(FileType.REPEC, testImporter.getFileType());
+        assertEquals(StandardFileType.TXT, testImporter.getFileType());
     }
 
     @Test

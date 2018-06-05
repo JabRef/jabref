@@ -45,8 +45,8 @@ import org.xml.sax.SAXException;
 /**
  * Fetcher for the arXiv.
  *
- * @see <a href="http://arxiv.org/help/api/index">ArXiv API</a> for an overview of the API
- * @see <a href="http://arxiv.org/help/api/user-manual#_calling_the_api">ArXiv API User's Manual</a> for a detailed
+ * @see <a href="https://arxiv.org/help/api/index">ArXiv API</a> for an overview of the API
+ * @see <a href="https://arxiv.org/help/api/user-manual#_calling_the_api">ArXiv API User's Manual</a> for a detailed
  * description on how to use the API
  *
  * Similar implementions:
@@ -56,7 +56,7 @@ import org.xml.sax.SAXException;
 public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArXiv.class);
 
-    private static final String API_URL = "http://export.arxiv.org/api/query";
+    private static final String API_URL = "https://export.arxiv.org/api/query";
 
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -222,9 +222,9 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
         // Check if the API returned an error
         // In case of an error, only one entry will be returned with the error information. For example:
-        // http://export.arxiv.org/api/query?id_list=0307015
+        // https://export.arxiv.org/api/query?id_list=0307015
         // <entry>
-        //      <id>http://arxiv.org/api/errors#incorrect_id_format_for_0307015</id>
+        //      <id>https://arxiv.org/api/errors#incorrect_id_format_for_0307015</id>
         //      <title>Error</title>
         //      <summary>incorrect id format for 0307015</summary>
         // </entry>
@@ -293,7 +293,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
 
         public ArXivEntry(Node item) {
-            // see http://arxiv.org/help/api/user-manual#_details_of_atom_results_returned
+            // see https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned
 
             // Title of the article
             // The result from the arXiv contains hard line breaks, try to remove them
@@ -346,7 +346,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             journalReferenceText = XMLUtil.getNodeContent(item, "arxiv:journal_ref");
 
             // Primary category
-            // Ex: <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+            // Ex: <arxiv:primary_category xmlns:arxiv="https://arxiv.org/schemas/atom" term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
             primaryCategory = XMLUtil.getNode(item, "arxiv:primary_category")
                     .flatMap(node -> XMLUtil.getAttributeContent(node, "term"));
         }
@@ -362,8 +362,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
          * Returns the arXiv identifier
          */
         public Optional<String> getIdString() {
-            // remove leading http://arxiv.org/abs/ from abstract url to get arXiv ID
-            String prefix = "http://arxiv.org/abs/";
+            // remove leading https://arxiv.org/abs/ from abstract url to get arXiv ID
+            String prefix = "https://arxiv.org/abs/";
             return urlAbstractPage.map(abstractUrl -> {
                 if (abstractUrl.startsWith(prefix)) {
                     return abstractUrl.substring(prefix.length());

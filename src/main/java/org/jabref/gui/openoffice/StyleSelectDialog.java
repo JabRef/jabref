@@ -51,7 +51,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
@@ -469,10 +469,10 @@ class StyleSelectDialog {
 
             JButton browse = new JButton(Localization.lang("Browse"));
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                                   .addExtensionFilter(FileType.JSTYLE)
-                                                                                                   .withDefaultExtension(FileType.JSTYLE)
-                                                                                                   .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
-                                                                                                   .build();
+                    .addExtensionFilter(Localization.lang("Style file"), StandardFileType.JSTYLE)
+                    .withDefaultExtension(Localization.lang("Style file"), StandardFileType.JSTYLE)
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                    .build();
 
             browse.addActionListener(e -> {
                 Optional<Path> file = DefaultTaskExecutor

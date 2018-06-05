@@ -14,10 +14,10 @@ public abstract class Exporter {
     private final String displayName;
     private final FileType fileType;
 
-    public Exporter(String id, String displayName, FileType fileType) {
+    public Exporter(String id, String displayName, FileType extension) {
         this.id = id;
         this.displayName = displayName;
-        this.fileType = fileType;
+        this.fileType = extension;
     }
 
     /**
@@ -30,7 +30,7 @@ public abstract class Exporter {
     /**
      * Returns the name of the exporter (to display to the user).
      */
-    public String getDisplayName() {
+    public String getName() {
         return displayName;
     }
 
@@ -56,7 +56,4 @@ public abstract class Exporter {
      */
     public abstract void export(BibDatabaseContext databaseContext, Path file, Charset encoding, List<BibEntry> entries) throws Exception;
 
-    public String getDescription() {
-        return getFileType().getDescription();
-    }
 }
