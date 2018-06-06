@@ -45,6 +45,9 @@ jobs:
             - install4j-cache
       - checkout
       - run: - run: ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
+      - store_artifacts:
+          path: build/releases
+          destination: release
     deploy:
       command: scripts/upload-to-builds.jabref.org.sh
 
