@@ -6,13 +6,17 @@ jobs:
     steps:
       - restore_cache:
           keys:
-            - install4j-cache
+            - install4j-downloads
+            - install4j-home
       - checkout
       - run: scripts/prepare-install4j.sh
       - save_cache:
-          key: install4j-cache
+          key: install4j-downloads
           paths:
             - "~/downloads"
+      - save_cache:
+          key: install4j-home
+          paths:
             - "~/.install4j7"
 
   buildDev:
@@ -22,10 +26,10 @@ jobs:
       - restore_cache:
           keys:
             - dependency-cache
-            - install4j-cache
+            - install4j-home
       - checkout
-      - run: install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
-      - run: ./gradlew -Pinstall4jDir="install4j7" release --stacktrace
+      - run: cd project && install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
+      - run: cd project && ./gradlew -Pinstall4jDir="install4j7" release --stacktrace
       - save_cache:
           key: dependency-cache
           paths:
@@ -43,9 +47,9 @@ jobs:
       - restore_cache:
           keys:
             - dependency-cache
-            - install4j-cache
+            - install4j-home
       - checkout
-      - run: ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
+      - run: cd project && ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
       - store_artifacts:
           path: build/releases
           destination: release
