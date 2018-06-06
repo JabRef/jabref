@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  prepareInstall4J:
+  downloadinstall4j:
     docker:
       - image: circleci/openjdk:8-jdk
     steps:
@@ -9,7 +9,7 @@ jobs:
             - install4j-downloads
             - install4j-home
       - checkout
-      - run: scripts/prepare-install4j.sh
+      - run: scripts/download-install4j-and-jres.sh
       - save_cache:
           key: install4j-downloads
           paths:
@@ -30,8 +30,13 @@ jobs:
       - checkout
       - run: pwd
       - run: ls -la
-      - run: cd ~/project && install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
-      - run: cd ~/project && ./gradlew -Pinstall4jDir="install4j7" release --stacktrace
+      - run: scripts/extract-install4j.sh
+      - run: pwd
+      - run: ls -la
+      - run: install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
+      - run: pwd
+      - run: ls -la
+      - run: ./gradlew -Pinstall4jDir="install4j7" release --stacktrace
       - save_cache:
           key: dependency-cache
           paths:
@@ -51,21 +56,22 @@ jobs:
             - dependency-cache
             - install4j-home
       - checkout
-      - run: cd ~/project && ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
+      - run: scripts/extract-install4j.sh
+      - run: ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
       - store_artifacts:
           path: build/releases
           destination: release
     deploy:
-      command: cd ~/project && scripts/upload-to-builds.jabref.org.sh
+      command: scripts/upload-to-builds.jabref.org.sh
 
 workflows:
   version: 2
   release:
     jobs:
-      - prepareInstall4J
+      - downloadinstall4j
       - buildDev:
           requires:
-            - prepareInstall4J
+            - downloadinstall4j
           filters:
             branches:
               only: circleci20
