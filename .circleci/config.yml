@@ -56,7 +56,7 @@ jobs:
 
 workflows:
   version: 2
-  release:
+  build:
     jobs:
       - downloadinstall4j
       - buildDev:
@@ -67,7 +67,7 @@ workflows:
               only: circleci20
       - buildRelease:
           requires:
-            - buildDev
+            - downloadinstall4j
           filters:
             tags:
               only: /.*/
