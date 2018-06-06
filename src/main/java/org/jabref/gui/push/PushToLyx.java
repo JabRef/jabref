@@ -63,14 +63,6 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
     }
 
     @Override
-    protected void initSettingsPanel() {
-        super.initSettingsPanel();
-        settings = new JPanel();
-        settings.add(new JLabel(Localization.lang("Path to LyX pipe") + ":"));
-        settings.add(path);
-    }
-
-    @Override
     public void pushEntries(BibDatabase database, final List<BibEntry> entries, final String keyString, MetaData metaData) {
 
         couldNotConnect = false;

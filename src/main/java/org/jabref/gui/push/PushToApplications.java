@@ -10,9 +10,7 @@ public class PushToApplications {
     private final List<PushToApplication> applications;
 
     public PushToApplications(DialogService dialogService) {
-        /**
-         * Set up the current available hoices:
-         */
+        // Set up the current available choices:
 
         applications = new ArrayList<>();
 
@@ -26,5 +24,9 @@ public class PushToApplications {
 
     public List<PushToApplication> getApplications() {
         return applications;
+    }
+
+    public static PushToApplicationSettings getSettings(PushToApplication application) {
+        return null;
     }
 }
