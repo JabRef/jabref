@@ -71,6 +71,3 @@ workflows:
       - buildRelease:
           requires:
             - downloadinstall4j
-          filters:
-            tags:
-              only: /.*/
