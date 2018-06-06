@@ -21,9 +21,9 @@ jobs:
       - image: circleci/openjdk:8-jdk
     steps:
       - restore_cache:
-          keys:
-            - dependency-cache
-            - install4j
+          key: dependency-cache
+      - restore_cache:
+          key: install4j
       - checkout
       - run: scripts/extract-install4j.sh
       - run: install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
@@ -42,9 +42,9 @@ jobs:
       - image: circleci/openjdk:8-jdk
     steps:
       - restore_cache:
-          keys:
-            - dependency-cache
-            - install4j
+          key: dependency-cache
+      - restore_cache:
+          key: install4j
       - checkout
       - run: scripts/extract-install4j.sh
       - run: ./gradlew -Pinstall4jDir="install4j7" release --stacktrace
