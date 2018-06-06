@@ -56,9 +56,12 @@ workflows:
       - buildDev:
           requires:
             - prepareInstall4J
+          filters:
+            branches:
+              only: circleci20
       - buildRelease:
           requires:
             - buildDev
           filters:
-            branches:
-              only: circleci20
+            tags:
+              ignore: circleci20tag
