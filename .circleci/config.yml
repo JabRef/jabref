@@ -44,7 +44,7 @@ jobs:
             - dependency-cache
             - install4j-cache
       - checkout
-      - run: - run: ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
+      - run: ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
       - store_artifacts:
           path: build/releases
           destination: release
