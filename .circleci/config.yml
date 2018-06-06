@@ -1,4 +1,5 @@
 version: 2
+
 jobs:
   downloadinstall4j:
     docker:
@@ -34,8 +35,7 @@ jobs:
       - store_artifacts:
           path: build/releases
           destination: build
-    deploy:
-      command: scripts/upload-to-builds.jabref.org.sh
+      - run: scripts/upload-to-builds.jabref.org.sh
 
   buildRelease:
     docker:
@@ -51,8 +51,7 @@ jobs:
       - store_artifacts:
           path: build/releases
           destination: release
-    deploy:
-      command: scripts/upload-to-builds.jabref.org.sh
+      - run: scripts/upload-to-builds.jabref.org.sh
 
 workflows:
   version: 2
