@@ -62,9 +62,6 @@ workflows:
       - buildDev:
           requires:
             - downloadinstall4j
-          filters:
-            branches:
-              only: circleci20
       - buildRelease:
           requires:
             - downloadinstall4j
