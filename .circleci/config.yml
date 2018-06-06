@@ -24,15 +24,9 @@ jobs:
             - dependency-cache
             - install4j
       - checkout
-      - run: pwd
-      - run: ls -la
       - run: scripts/extract-install4j.sh
-      - run: pwd
-      - run: ls -la
       - run: install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
-      - run: pwd
-      - run: ls -la
-      - run: ./gradlew -Pinstall4jDir="install4j7" release --stacktrace
+      - run: ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
       - save_cache:
           key: dependency-cache
           paths:
@@ -53,7 +47,7 @@ jobs:
             - install4j
       - checkout
       - run: scripts/extract-install4j.sh
-      - run: ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
+      - run: ./gradlew -Pinstall4jDir="install4j7" release --stacktrace
       - store_artifacts:
           path: build/releases
           destination: release
