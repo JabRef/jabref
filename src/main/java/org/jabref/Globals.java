@@ -26,6 +26,7 @@ import org.jabref.preferences.JabRefPreferences;
 import com.google.common.base.StandardSystemProperty;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryConfiguration;
+import com.microsoft.applicationinsights.internal.shutdown.SDKShutdownActivity;
 import com.microsoft.applicationinsights.telemetry.SessionState;
 
 public class Globals {
@@ -91,10 +92,13 @@ public class Globals {
     }
 
     private static void stopTelemetryClient() {
-        if (Globals.prefs.shouldCollectTelemetry()) {
-            getTelemetryClient().ifPresent(client -> client.trackSessionState(SessionState.End));
-            getTelemetryClient().ifPresent(client -> client.flush());
-        }
+        getTelemetryClient().ifPresent(client -> {
+            client.trackSessionState(SessionState.End);
+            client.flush();
+
+            // Workaround for bug https://github.com/Microsoft/ApplicationInsights-Java/issues/662
+            SDKShutdownActivity.INSTANCE.stopAll();
+        });
     }
 
     private static void startTelemetryClient() {
