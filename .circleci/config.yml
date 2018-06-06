@@ -23,6 +23,7 @@ jobs:
           keys:
             - dependency-cache
             - install4j-cache
+      - checkout
       - run: install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
       - run: ./gradlew -Pinstall4jDir="install4j7" release --stacktrace
       - save_cache:
