@@ -28,8 +28,10 @@ jobs:
             - dependency-cache
             - install4j-home
       - checkout
-      - run: cd project && install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
-      - run: cd project && ./gradlew -Pinstall4jDir="install4j7" release --stacktrace
+      - run: pwd
+      - run: ls -la
+      - run: cd ~/project && install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
+      - run: cd ~/project && ./gradlew -Pinstall4jDir="install4j7" release --stacktrace
       - save_cache:
           key: dependency-cache
           paths:
@@ -38,7 +40,7 @@ jobs:
           path: build/releases
           destination: build
     deploy:
-      command: scripts/upload-to-builds.jabref.org.sh
+      command: cd ~/project && scripts/upload-to-builds.jabref.org.sh
 
   buildRelease:
     docker:
@@ -49,12 +51,12 @@ jobs:
             - dependency-cache
             - install4j-home
       - checkout
-      - run: cd project && ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
+      - run: cd ~/project && ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
       - store_artifacts:
           path: build/releases
           destination: release
     deploy:
-      command: scripts/upload-to-builds.jabref.org.sh
+      command: cd ~/project && scripts/upload-to-builds.jabref.org.sh
 
 workflows:
   version: 2
