@@ -61,9 +61,15 @@ workflows:
       - buildDev:
           requires:
             - downloadinstall4j
+            tags:
+              ignore: /.*/
+            branches:
+              only: /.*/
       - buildRelease:
           requires:
             - downloadinstall4j
           filters:
             tags:
               only: /.*/
+            branches:
+              ignore: /.*/
