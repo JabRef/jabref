@@ -1,7 +1,6 @@
 package org.jabref.gui;
 
 import java.awt.Component;
-import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -22,7 +21,6 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -530,8 +528,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         });
 
         setCenter(splitPane);
-
-        UIManager.put("TabbedPane.contentBorderInsets", new Insets(0, 0, 0, 0));
 
         /*
         GridBagLayout gbl = new GridBagLayout();
@@ -1227,16 +1223,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     /**
      * Set the visibility of the progress bar in the right end of the
      * status line at the bottom of the frame.
-     * <p>
-     * If not called on the event dispatch thread, this method uses
-     * SwingUtilities.invokeLater() to do the actual operation on the EDT.
      */
     public void setProgressBarVisible(final boolean visible) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            progressBar.setVisible(visible);
-        } else {
-            SwingUtilities.invokeLater(() -> progressBar.setVisible(visible));
-        }
+        progressBar.setVisible(visible);
     }
 
     /**
