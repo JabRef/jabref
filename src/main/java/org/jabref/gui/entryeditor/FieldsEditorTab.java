@@ -80,6 +80,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         fields = determineFieldsToShow(entry, entryType);
 
         List<Label> labels = new ArrayList<>();
+        boolean isFirstField = true;
         for (String fieldName : fields) {
             FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.TASK_EXECUTOR, dialogService,
                     Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs,
@@ -88,12 +89,10 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             fieldEditor.bindToEntry(entry);
 
             editors.put(fieldName, fieldEditor);
-            /*
-            // TODO: Reenable this
-            if (i == 0) {
+            if (isFirstField) {
                 activeField = fieldEditor;
+                isFirstField = false;
             }
-            */
 
             labels.add(new FieldNameLabel(fieldName));
         }
