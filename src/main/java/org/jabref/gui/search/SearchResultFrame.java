@@ -2,7 +2,6 @@ package org.jabref.gui.search;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -41,7 +40,6 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
-import org.jabref.gui.TransferableBibtexEntry;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
@@ -219,10 +217,11 @@ public class SearchResultFrame {
             public void actionPerformed(ActionEvent e) {
                 if (!selectionModel.getSelected().isEmpty()) {
                     List<BibEntry> bes = selectionModel.getSelected();
-                    TransferableBibtexEntry trbe = new TransferableBibtexEntry(bes);
-                    // ! look at ClipBoardManager
-                    Toolkit.getDefaultToolkit().getSystemClipboard()
-                            .setContents(trbe, frame.getCurrentBasePanel());
+                    try {
+                        Globals.clipboardManager.setContent(bes);
+                    } catch (IOException e1) {
+                        LOGGER.error("Error while serializing entries for clipboard", e1);
+                    }
                     frame.output(Localization.lang("Copied") + ' ' + (bes.size() > 1 ? bes.size() + " "
                             + Localization.lang("entries")
                             : "1 " + Localization.lang("entry") + '.'));

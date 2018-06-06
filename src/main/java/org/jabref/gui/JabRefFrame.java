@@ -418,11 +418,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
      * @param filenames the filenames of all currently opened files - used for storing them if prefs openLastEdited is set to true
      */
     private void tearDownJabRef(List<String> filenames) {
-        Globals.stopBackgroundTasks();
-        Globals.shutdownThreadPools();
-
-        //dispose();
-
         //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
 
         if (prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
