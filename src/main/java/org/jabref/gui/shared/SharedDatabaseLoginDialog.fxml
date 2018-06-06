@@ -36,17 +36,17 @@
                     </rowConstraints>
                      <children>
                         <Label text="%Database Type:" />
-                        <ComboBox fx:id="cmbDbType" prefHeight="25.0" prefWidth="606.0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+                        <ComboBox fx:id="databaseType" prefHeight="25.0" prefWidth="606.0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
                         <Label text="%Host/Port:" GridPane.rowIndex="1" />
-                        <TextField fx:id="tbHost" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <TextField fx:id="tbDb" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                        <TextField fx:id="tbPort" prefHeight="25.0" prefWidth="66.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <TextField fx:id="host" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField fx:id="database" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                        <TextField fx:id="port" prefHeight="25.0" prefWidth="66.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                         <Label text="%Database:" GridPane.rowIndex="2" />
                         <Label text="%User:" GridPane.rowIndex="3" />
-                        <TextField fx:id="tbUser" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                        <TextField fx:id="user" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                         <Label text="%Password:" GridPane.rowIndex="4" />
-                        <PasswordField fx:id="tbPwd" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4" />
-                        <CheckBox fx:id="chkRememberPassword" mnemonicParsing="false" text="%Remember Password" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="5" />
+                        <PasswordField fx:id="password" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                        <CheckBox fx:id="rememberPassword" mnemonicParsing="false" text="%Remember Password" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="5" />
                      </children>
                   </GridPane>
                </center>
@@ -61,9 +61,9 @@
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <CheckBox fx:id="chkAutosave" mnemonicParsing="false" text="%Automatically save library to" GridPane.columnSpan="2" />
-                        <TextField fx:id="tbFolder" GridPane.rowIndex="1" />
-                        <Button fx:id="btnBrowse" mnemonicParsing="false" onAction="#openFileDialog" text="%Browse" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <CheckBox fx:id="autosave" mnemonicParsing="false" text="%Automatically save library to" GridPane.columnSpan="2" />
+                        <TextField fx:id="folder" GridPane.rowIndex="1" />
+                        <Button fx:id="browseButton" mnemonicParsing="false" onAction="#openFileDialog" text="%Browse" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <Group />
                      </children>
                   </GridPane>

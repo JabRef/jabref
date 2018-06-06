@@ -28,16 +28,16 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
     private final JabRefFrame frame;
 
-    @FXML private ComboBox<DBMSType> cmbDbType;
-    @FXML private TextField tbHost;
-    @FXML private TextField tbDb;
-    @FXML private TextField tbPort;
-    @FXML private TextField tbUser;
-    @FXML private PasswordField tbPwd;
-    @FXML private CheckBox chkRememberPassword;
-    @FXML private TextField tbFolder;
-    @FXML private Button btnBrowse;
-    @FXML private CheckBox chkAutosave;
+    @FXML private ComboBox<DBMSType> databaseType;
+    @FXML private TextField host;
+    @FXML private TextField database;
+    @FXML private TextField port;
+    @FXML private TextField user;
+    @FXML private PasswordField password;
+    @FXML private CheckBox rememberPassword;
+    @FXML private TextField folder;
+    @FXML private Button browseButton;
+    @FXML private CheckBox autosave;
     @FXML private ButtonType connectButton;
 
     @Inject private DialogService dialogService;
@@ -57,9 +57,9 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
         ControlHelper.setAction(connectButton, this.getDialogPane(), event -> openDatabase());
         btnConnect = (Button) this.getDialogPane().lookupButton(connectButton);
-        setLoadingConnectButtonText();
+        //must be set here, because in initialize the button is still null
         btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not());
-
+        btnConnect.textProperty().bind(EasyBind.map(viewModel.loadingProperty(), loading -> (loading) ? Localization.lang("Connecting...") : Localization.lang("Connect")));
     }
 
     @FXML
@@ -72,29 +72,30 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         visualizer.setDecoration(new IconValidationDecorator());
 
         viewModel = new SharedDatabaseLoginDialogViewModel(frame, dialogService);
-        cmbDbType.itemsProperty().bind(viewModel.dbmstypeProperty());
-        cmbDbType.getSelectionModel().select(0);
+        databaseType.getItems().addAll(DBMSType.values());
+        databaseType.getSelectionModel().select(0);
 
-        tbDb.textProperty().bindBidirectional(viewModel.dbProperty());
-        tbHost.textProperty().bindBidirectional(viewModel.hostProperty());
-        tbUser.textProperty().bindBidirectional(viewModel.userProperty());
-        tbPwd.textProperty().bindBidirectional(viewModel.passwordProperty());
-        tbPort.textProperty().bindBidirectional(viewModel.portProperty());
-        cmbDbType.valueProperty().bindBidirectional(viewModel.selectedDbmstypeProperty());
+        database.textProperty().bindBidirectional(viewModel.databaseproperty());
+        host.textProperty().bindBidirectional(viewModel.hostProperty());
+        user.textProperty().bindBidirectional(viewModel.userProperty());
+        password.textProperty().bindBidirectional(viewModel.passwordProperty());
+        port.textProperty().bindBidirectional(viewModel.portProperty());
+        databaseType.valueProperty().bindBidirectional(viewModel.selectedDbmstypeProperty());
 
-        tbFolder.textProperty().bindBidirectional(viewModel.folderProperty());
-        btnBrowse.disableProperty().bind(chkAutosave.selectedProperty().not());
-        tbFolder.disableProperty().bind(chkAutosave.selectedProperty().not());
-        chkAutosave.selectedProperty().bindBidirectional(viewModel.autosaveProperty());
+        folder.textProperty().bindBidirectional(viewModel.folderProperty());
+        browseButton.disableProperty().bind(autosave.selectedProperty().not());
+        folder.disableProperty().bind(autosave.selectedProperty().not());
+        autosave.selectedProperty().bindBidirectional(viewModel.autosaveProperty());
 
+        //Must be executed after the initaliztion of the view, otherwise it doesn't work
         Platform.runLater(() -> {
-            visualizer.initVisualization(viewModel.dbValidation(), tbDb, true);
-            visualizer.initVisualization(viewModel.hostValidation(), tbHost, true);
-            visualizer.initVisualization(viewModel.portValidation(), tbPort, true);
-            visualizer.initVisualization(viewModel.userValidation(), tbUser, true);
+            visualizer.initVisualization(viewModel.dbValidation(), database, true);
+            visualizer.initVisualization(viewModel.hostValidation(), host, true);
+            visualizer.initVisualization(viewModel.portValidation(), port, true);
+            visualizer.initVisualization(viewModel.userValidation(), user, true);
 
-            EasyBind.subscribe(chkAutosave.selectedProperty(), selected -> {
-                visualizer.initVisualization(viewModel.folderValidation(), tbFolder, true);
+            EasyBind.subscribe(autosave.selectedProperty(), selected -> {
+                visualizer.initVisualization(viewModel.folderValidation(), folder, true);
             });
         });
 
@@ -105,16 +106,6 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML
     void openFileDialog(ActionEvent event) {
         viewModel.openFileDialog();
-    }
-
-    private void setLoadingConnectButtonText() {
-
-        if (viewModel.loadingProperty().get()) {
-            btnConnect.setText(Localization.lang("Connecting..."));
-            btnConnect.setDisable(true);
-        } else {
-            btnConnect.setText(Localization.lang("Connect"));
-        }
     }
 
 }
