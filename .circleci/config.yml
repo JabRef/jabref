@@ -24,7 +24,7 @@ jobs:
             - dependency-cache
             - install4j-cache
       - run: install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
-      - run: ./gradlew -Pinstall4jDir="install4j7" clean release --stacktrace
+      - run: ./gradlew -Pinstall4jDir="install4j7" release --stacktrace
       - save_cache:
           key: dependency-cache
           paths:
@@ -44,7 +44,7 @@ jobs:
             - dependency-cache
             - install4j-cache
       - checkout
-      - run: echo "something"
+      - run: - run: ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
     deploy:
       command: scripts/upload-to-builds.jabref.org.sh
 
