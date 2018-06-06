@@ -6,17 +6,13 @@ jobs:
     steps:
       - restore_cache:
           keys:
-            - install4j-downloads
-            - install4j-home
+            - install4j
       - checkout
       - run: scripts/download-install4j-and-jres.sh
       - save_cache:
-          key: install4j-downloads
+          key: install4j
           paths:
             - "~/downloads"
-      - save_cache:
-          key: install4j-home
-          paths:
             - "~/.install4j7"
 
   buildDev:
@@ -26,7 +22,7 @@ jobs:
       - restore_cache:
           keys:
             - dependency-cache
-            - install4j-home
+            - install4j
       - checkout
       - run: pwd
       - run: ls -la
@@ -54,7 +50,7 @@ jobs:
       - restore_cache:
           keys:
             - dependency-cache
-            - install4j-home
+            - install4j
       - checkout
       - run: scripts/extract-install4j.sh
       - run: ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
