@@ -41,7 +41,7 @@ jobs:
           path: build/releases
           destination: build
     deploy:
-      command: cd ~/project && scripts/upload-to-builds.jabref.org.sh
+      command: scripts/upload-to-builds.jabref.org.sh
 
   buildRelease:
     docker:
@@ -76,4 +76,4 @@ workflows:
             - buildDev
           filters:
             tags:
-              ignore: circleci20tag
+              only: /.*/
