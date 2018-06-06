@@ -1,9 +1,10 @@
 package org.jabref;
 
 import java.awt.GraphicsEnvironment;
-import java.awt.Toolkit;
 import java.util.Optional;
 import java.util.UUID;
+
+import javafx.stage.Screen;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.GlobalFocusListener;
@@ -107,8 +108,7 @@ public class Globals {
         telemetryClient.getContext().getSession().setId(UUID.randomUUID().toString());
         telemetryClient.getContext().getDevice().setOperatingSystem(StandardSystemProperty.OS_NAME.value());
         telemetryClient.getContext().getDevice().setOperatingSystemVersion(StandardSystemProperty.OS_VERSION.value());
-        telemetryClient.getContext().getDevice().setScreenResolution(
-                Toolkit.getDefaultToolkit().getScreenSize().toString());
+        telemetryClient.getContext().getDevice().setScreenResolution(Screen.getPrimary().getVisualBounds().toString());
 
         telemetryClient.trackSessionState(SessionState.Start);
     }

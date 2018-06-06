@@ -67,7 +67,7 @@ public class JabRefMain extends Application {
 
         // Check for running JabRef
         if (!handleMultipleAppInstances(arguments) || argumentProcessor.shouldShutDown()) {
-            shutdownCurrentInstance();
+            Platform.exit();
             return;
         }
 
@@ -77,8 +77,8 @@ public class JabRefMain extends Application {
 
     @Override
     public void stop() {
-        Platform.exit();
-        System.exit(0);
+        Globals.stopBackgroundTasks();
+        Globals.shutdownThreadPools();
     }
 
     /**
@@ -143,13 +143,6 @@ public class JabRefMain extends Application {
             }
         }
         return true;
-    }
-
-    private static void shutdownCurrentInstance() {
-        Globals.stopBackgroundTasks();
-        Globals.shutdownThreadPools();
-        Platform.exit();
-        System.exit(0);
     }
 
     private static void applyPreferences(JabRefPreferences preferences) {
