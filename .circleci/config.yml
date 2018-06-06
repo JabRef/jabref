@@ -52,6 +52,8 @@ jobs:
           path: build/releases
           destination: release
       - run: scripts/upload-to-builds.jabref.org.sh
+    tags:
+      only: /.*/
 
 workflows:
   version: 2
