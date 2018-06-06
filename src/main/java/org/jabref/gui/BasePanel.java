@@ -100,7 +100,7 @@ import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
@@ -131,7 +131,6 @@ import org.jabref.preferences.PreviewPreferences;
 import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.lang3.NotImplementedException;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.Subscription;
 import org.slf4j.Logger;
@@ -1182,7 +1181,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 pane = entryEditor;
                 break;
             default:
-                throw new NotImplementedException("new mode not recognized: " + newMode.name());
+                throw new UnsupportedOperationException("new mode not recognized: " + newMode.name());
         }
         if (splitPane.getItems().size() == 2) {
             splitPane.getItems().set(1, pane);
@@ -1821,8 +1820,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         @Override
         public void action() throws SaveException {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .withDefaultExtension(FileType.BIBTEX_DB)
-                    .addExtensionFilter(FileType.BIBTEX_DB)
+                    .withDefaultExtension(StandardFileType.BIBTEX_DB)
+                    .addExtensionFilter(String.format("%1s %2s", "BibTex", Localization.lang("Library")), StandardFileType.BIBTEX_DB)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                     .build();
 

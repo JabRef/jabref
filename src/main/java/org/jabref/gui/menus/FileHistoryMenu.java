@@ -22,7 +22,7 @@ public class FileHistoryMenu extends Menu {
     private final DialogService dialogService;
 
     public FileHistoryMenu(JabRefPreferences preferences, JabRefFrame frame) {
-        setText(Localization.menuTitle("Recent libraries"));
+        setText(Localization.lang("Recent libraries"));
 
         this.frame = frame;
         this.preferences = preferences;
@@ -72,7 +72,7 @@ public class FileHistoryMenu extends Menu {
         if (!Files.exists(fileToOpen)) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("File not found"),
-                    Localization.lang("File not found") + ": " + fileToOpen.getFileName());
+                    Localization.lang("File not found") + ": " + fileName);
             history.removeItem(fileName);
             setItems();
             return;

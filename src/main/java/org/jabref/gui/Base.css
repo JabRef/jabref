@@ -257,8 +257,6 @@
        the text is always vertically centered within the bounds. Based on
        the cap height of the text. */
     -fx-bounds-type: logical_vertical_center;
-    /* Enable LCD text rendering */
-    -fx-font-smoothing-type: lcd;
 }
 
 .tooltip {

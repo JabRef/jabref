@@ -35,7 +35,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.migrations.FileLinksUpgradeWarning;
 import org.jabref.model.database.BibDatabase;
@@ -90,8 +90,8 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         DialogService ds = frame.getDialogService();
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileType.BIBTEX_DB)
-                .withDefaultExtension(FileType.BIBTEX_DB)
+                .addExtensionFilter(StandardFileType.BIBTEX_DB)
+                .withDefaultExtension(StandardFileType.BIBTEX_DB)
                 .withInitialDirectory(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)))
                 .build();
 

@@ -10,7 +10,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.msbib.MSBibDatabase;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 
 import org.w3c.dom.Document;
 import org.xml.sax.ErrorHandler;
@@ -76,8 +76,8 @@ public class MsBibImporter extends Importer {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.MSBIB;
+    public StandardFileType getFileType() {
+        return StandardFileType.XML;
     }
 
     @Override
