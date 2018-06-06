@@ -43,9 +43,9 @@ command="${command}exit\n"
 # now $command is complete
 
 # add host key of build-upload.jabref.org to SSH known hosts
-cat << EOF
+cat <<EOF >> ~/.ssh/known_hosts
 |1|/E0gFRKMKG83OQVcwqFPIy3mnE4=|tLYRVZQ/3nCkBTZ9NtBVxx3si+Y= ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNjYLP9C+PhQrpKfYsdgr8dDB/50S3BnaXAYQOVC5o3H0SqKisWw8iTkij/u8H20Rmsf/ABduOLPOBubfPFlE34=
 |1|dEeue80RCldo/x5XyhbGIkS72d8=|09t8muprLf6YoXsc3r3kxicBykI= ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNjYLP9C+PhQrpKfYsdgr8dDB/50S3BnaXAYQOVC5o3H0SqKisWw8iTkij/u8H20Rmsf/ABduOLPOBubfPFlE34=
-EOF >> ~/.ssh/known_hosts
+EOF
 
 echo -e "$command" | sftp -P 9922 builds_jabref_org@build-upload.jabref.org
