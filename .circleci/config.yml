@@ -15,10 +15,9 @@ jobs:
           paths:
             - "~/downloads"
             - "~/.install4j7"
-    branches:
-      only: /.*/
-    tags:
-      only: /.*/
+    filters:
+      tags:
+        only: /.*/
 
   buildDev:
     docker:
@@ -57,8 +56,9 @@ jobs:
           path: build/releases
           destination: release
       - run: scripts/upload-to-builds.jabref.org.sh
-    tags:
-      only: /.*/
+    filters:
+      tags:
+        only: /.*/
 
 workflows:
   version: 2
@@ -68,11 +68,6 @@ workflows:
       - buildDev:
           requires:
             - downloadinstall4j
-          filters:
-            tags:
-              ignore: /.*/
-            branches:
-              only: /.*/
       - buildRelease:
           requires:
             - downloadinstall4j
