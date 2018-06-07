@@ -27,6 +27,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.worker.VersionWorker;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
@@ -95,60 +96,26 @@ public class JabRefGUI {
         // look and feel. This MUST be the first thing to do before loading any Swing-specific code!
         setLookAndFeel();
 
-        // If the option is enabled, open the last edited libraries, if any.
-        if (!isBlank && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
-            openLastEditedDatabases();
-        }
-
         GUIGlobals.init();
 
         LOGGER.debug("Initializing frame");
         JabRefGUI.mainFrame = new JabRefFrame(mainStage);
 
-        // Add all bibDatabases databases to the frame:
-        boolean first = false;
-        if (!bibDatabases.isEmpty()) {
-            for (Iterator<ParserResult> parserResultIterator = bibDatabases.iterator(); parserResultIterator.hasNext();) {
-                ParserResult pr = parserResultIterator.next();
-                // Define focused tab
-                if (pr.getFile().filter(path -> path.getAbsolutePath().equals(focusedFile)).isPresent()) {
-                    first = true;
-                }
+        BackgroundTask.wrap(this::openLastEditedDatabases)
+                      .thenRun(lastDatabases -> {
+                          bibDatabases.addAll(lastDatabases);
+                          return openDatabases();
+                      })
+                      .thenRun(first -> {
+                          // finally add things to the currently opened tab
+                          for (ParserResult pr : toOpenTab) {
+                              JabRefGUI.getMainFrame().addParserResult(pr, first);
+                              first = false;
+                          }
+                      })
+                      .executeWith(Globals.TASK_EXECUTOR);
 
-                if (pr.isInvalid()) {
-                    failed.add(pr);
-                    parserResultIterator.remove();
-                } else if (pr.getDatabase().isShared()) {
-                    try {
-                        new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
-                    } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
-                             NotASharedDatabaseException e) {
-                        pr.getDatabaseContext().clearDatabaseFile(); // do not open the original file
-                        pr.getDatabase().clearSharedDatabaseID();
 
-                        LOGGER.error("Connection error", e);
-                        dialogService.showErrorDialogAndWait(
-                                                             Localization.lang("Connection error"),
-                                                             Localization.lang("A local copy will be opened."),
-                                                             e);
-                    }
-                    toOpenTab.add(pr);
-                } else if (pr.toOpenTab()) {
-                    // things to be appended to an opened tab should be done after opening all tabs
-                    // add them to the list
-                    toOpenTab.add(pr);
-                } else {
-                    JabRefGUI.getMainFrame().addParserResult(pr, first);
-                    first = false;
-                }
-            }
-        }
-
-        // finally add things to the currently opened tab
-        for (ParserResult pr : toOpenTab) {
-            JabRefGUI.getMainFrame().addParserResult(pr, first);
-            first = false;
-        }
 
         // If we are set to remember the window location, we also remember the maximised
         // state. This needs to be set after the window has been made visible, so we
@@ -162,6 +129,8 @@ public class JabRefGUI {
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
         mainStage.setScene(scene);
+        mainStage.setHeight(800);
+        mainStage.setWidth(800);
         mainStage.show();
 
         mainStage.setOnCloseRequest(event -> {
@@ -203,9 +172,60 @@ public class JabRefGUI {
         LOGGER.debug("Finished adding panels");
     }
 
-    private void openLastEditedDatabases() {
+    private boolean openDatabases() {
+        // Add all bibDatabases databases to the frame:
+        boolean first = false;
+        if (!bibDatabases.isEmpty()) {
+            for (Iterator<ParserResult> parserResultIterator = bibDatabases.iterator(); parserResultIterator.hasNext(); ) {
+                ParserResult pr = parserResultIterator.next();
+                // Define focused tab
+                if (pr.getFile().filter(path -> path.getAbsolutePath().equals(focusedFile)).isPresent()) {
+                    first = true;
+                }
+
+                if (pr.isInvalid()) {
+                    failed.add(pr);
+                    parserResultIterator.remove();
+                } else if (pr.getDatabase().isShared()) {
+                    try {
+                        new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
+                    } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
+                            NotASharedDatabaseException e) {
+                        pr.getDatabaseContext().clearDatabaseFile(); // do not open the original file
+                        pr.getDatabase().clearSharedDatabaseID();
+
+                        LOGGER.error("Connection error", e);
+                        dialogService.showErrorDialogAndWait(
+                                Localization.lang("Connection error"),
+                                Localization.lang("A local copy will be opened."),
+                                e);
+                    }
+                    toOpenTab.add(pr);
+                } else if (pr.toOpenTab()) {
+                    // things to be appended to an opened tab should be done after opening all tabs
+                    // add them to the list
+                    toOpenTab.add(pr);
+                } else {
+                    JabRefGUI.getMainFrame().addParserResult(pr, first);
+                    first = false;
+                }
+            }
+        }
+        return first;
+    }
+
+    /**
+     * If the option is enabled, open the last edited libraries, if any.
+     */
+    private List<ParserResult> openLastEditedDatabases() {
+        if (isBlank || !Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
+            return Collections.emptyList();
+        }
+
+        List<ParserResult> lastDatabases = new ArrayList<>(5);
+
         if (Globals.prefs.get(JabRefPreferences.LAST_EDITED) == null) {
-            return;
+            return lastDatabases;
         }
         List<String> lastFiles = Globals.prefs.getStringList(JabRefPreferences.LAST_EDITED);
 
@@ -227,9 +247,11 @@ public class JabRefGUI {
             if (parsedDatabase.isEmpty()) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
             } else {
-                bibDatabases.add(parsedDatabase);
+                lastDatabases.add(parsedDatabase);
             }
         }
+
+        return lastDatabases;
     }
 
     private boolean isLoaded(File fileToOpen) {

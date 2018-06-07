@@ -29,7 +29,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 
 import org.jabref.gui.util.ColorUtil;
-import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 import de.jensd.fx.glyphs.GlyphIcons;
@@ -292,7 +291,7 @@ public class IconTheme {
         DATE_PICKER(MaterialDesignIcon.CALENDAR), /* css: calendar */
         DEFAULT_GROUP_ICON_COLORED(MaterialDesignIcon.PLAY),
         DEFAULT_GROUP_ICON(MaterialDesignIcon.LABEL_OUTLINE),
-        ALL_ENTRIES_GROUP_ICON(DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON),
+        ALL_ENTRIES_GROUP_ICON(MaterialDesignIcon.DATABASE),
         IMPORT_EXPORT(MaterialDesignIcon.SWAP_VERTICAL),
         PREVIOUS_LEFT(MaterialDesignIcon.CHEVRON_LEFT),
         PREVIOUS_UP(MaterialDesignIcon.CHEVRON_UP),

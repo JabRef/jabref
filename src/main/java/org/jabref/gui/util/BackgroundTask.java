@@ -42,6 +42,16 @@ public abstract class BackgroundTask<V> {
         };
     }
 
+    public static BackgroundTask<Void> wrap(Runnable runnable) {
+        return new BackgroundTask<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                runnable.run();
+                return null;
+            }
+        };
+    }
+
     public double getWorkDonePercentage() {
         return workDonePercentage.get();
     }
@@ -133,6 +143,41 @@ public abstract class BackgroundTask<V> {
             protected T call() throws Exception {
                 V result = BackgroundTask.this.call();
                 BackgroundTask<T> nextTask = nextTaskFactory.apply(result);
+                EasyBind.subscribe(nextTask.progressProperty(), this::updateProgress);
+                return nextTask.call();
+            }
+        };
+    }
+
+    /**
+     * Creates a {@link BackgroundTask} that first runs this task and based on the result runs a second task.
+     *
+     * @param nextOperation the function that performs the next operation
+     * @param <T>           type of the return value of the second task
+     */
+    public <T> BackgroundTask<T> thenRun(Function<V, T> nextOperation) {
+        return new BackgroundTask<T>() {
+            @Override
+            protected T call() throws Exception {
+                V result = BackgroundTask.this.call();
+                BackgroundTask<T> nextTask = BackgroundTask.wrap(() -> nextOperation.apply(result));
+                EasyBind.subscribe(nextTask.progressProperty(), this::updateProgress);
+                return nextTask.call();
+            }
+        };
+    }
+
+    /**
+     * Creates a {@link BackgroundTask} that first runs this task and based on the result runs a second task.
+     *
+     * @param nextOperation the function that performs the next operation
+     */
+    public BackgroundTask<Void> thenRun(Consumer<V> nextOperation) {
+        return new BackgroundTask<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                V result = BackgroundTask.this.call();
+                BackgroundTask<Void> nextTask = BackgroundTask.wrap(() -> nextOperation.accept(result));
                 EasyBind.subscribe(nextTask.progressProperty(), this::updateProgress);
                 return nextTask.call();
             }

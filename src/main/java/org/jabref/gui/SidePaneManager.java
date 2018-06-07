@@ -38,11 +38,11 @@ public class SidePaneManager {
               .forEach(pane -> components.put(pane.getType(), pane));
 
         if (preferences.getBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE)) {
-            show(SidePaneType.GROUPS);
+            //show(SidePaneType.GROUPS);
         }
 
         if (openOfficePreferences.getShowPanel()) {
-            show(SidePaneType.OPEN_OFFICE);
+            //show(SidePaneType.OPEN_OFFICE);
         }
 
         updateView();
