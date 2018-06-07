@@ -15,6 +15,10 @@ jobs:
           paths:
             - "~/downloads"
             - "~/.install4j7"
+    branches:
+      only: /.*/
+    tags:
+      only: /.*/
 
   buildDev:
     docker:
