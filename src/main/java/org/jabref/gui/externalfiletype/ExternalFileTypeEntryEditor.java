@@ -1,6 +1,7 @@
 package org.jabref.gui.externalfiletype;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.nio.file.Path;
@@ -11,7 +12,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -22,7 +22,7 @@ import javax.swing.event.DocumentListener;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
@@ -38,14 +38,12 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class ExternalFileTypeEntryEditor {
 
-    private JFrame fParent;
-    private JDialog dParent;
     private JDialog diag;
     private final JTextField extension = new JTextField();
     private final JTextField name = new JTextField();
     private final JTextField mimeType = new JTextField();
     private final JTextField application = new JTextField();
-    private final JLabel icon = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
+    private final JLabel icon = new JLabel(IconTheme.JabRefIcons.FILE.getSmallIcon());
     private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JRadioButton useDefault = new JRadioButton(Localization.lang("Default"));
@@ -53,7 +51,7 @@ public class ExternalFileTypeEntryEditor {
     private final String editFileTitle = Localization.lang("Edit file type");
     private final String newFileTitle = Localization.lang("Add new file type");
 
-    private ExternalFileType entry;
+    private CustomExternalFileType entry;
     private boolean okPressed;
 
     private final ActionListener browsePressed = e -> {
@@ -77,17 +75,11 @@ public class ExternalFileTypeEntryEditor {
         });
     };
 
-    public ExternalFileTypeEntryEditor(JFrame parent, ExternalFileType entry) {
-        fParent = parent;
+    public ExternalFileTypeEntryEditor(CustomExternalFileType entry) {
         init(entry);
     }
 
-    public ExternalFileTypeEntryEditor(JDialog parent, ExternalFileType entry) {
-        dParent = parent;
-        init(entry);
-    }
-
-    private void init(ExternalFileType inEntry) {
+    private void init(CustomExternalFileType inEntry) {
         entry = inEntry;
         icon.setText(null);
 
@@ -176,27 +168,17 @@ public class ExternalFileTypeEntryEditor {
             title = newFileTitle;
         }
 
-        if (dParent == null) {
-            diag = new JDialog(fParent, title, true);
-        } else {
-            diag = new JDialog(dParent, title, true);
-        }
+        diag = new JDialog((Dialog) null, title, true);
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
 
         browseBut.addActionListener(browsePressed);
 
-        if (dParent == null) {
-            diag.setLocationRelativeTo(fParent);
-        } else {
-            diag.setLocationRelativeTo(dParent);
-        }
-
         setValues(entry);
     }
 
-    public void setEntry(ExternalFileType entry) {
+    public void setEntry(CustomExternalFileType entry) {
         this.entry = entry;
         if (entry.getName().isEmpty()) {
             diag.setTitle(newFileTitle);
@@ -218,7 +200,7 @@ public class ExternalFileTypeEntryEditor {
         extension.setText(entry.getExtension());
         mimeType.setText(entry.getMimeType());
         application.setText(entry.getOpenWithApplication());
-        icon.setIcon(entry.getIcon());
+        icon.setIcon(entry.getIcon().getSmallIcon());
         if (application.getText().isEmpty()) {
             useDefault.setSelected(true);
         } else {
@@ -226,7 +208,7 @@ public class ExternalFileTypeEntryEditor {
         }
     }
 
-    private void storeSettings(ExternalFileType fileTypeEntry) {
+    private void storeSettings(CustomExternalFileType fileTypeEntry) {
         fileTypeEntry.setName(name.getText().trim());
         fileTypeEntry.setMimeType(mimeType.getText().trim());
         // Set extension, but remove initial dot if user has added that:

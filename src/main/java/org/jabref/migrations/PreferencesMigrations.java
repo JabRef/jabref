@@ -185,7 +185,6 @@ public class PreferencesMigrations {
                     prefs.put(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, oldDefault);
                     LOGGER.info("Upgraded old default key generator pattern '" + oldDefault + "' to new version.");
                 }
-
             }
             //Pref node already exists do not migrate from previous version
             if (mainPrefsNode.nodeExists(JabRefPreferences.BIBTEX_KEY_PATTERNS_NODE)) {
@@ -210,7 +209,7 @@ public class PreferencesMigrations {
      * Migrate Import File Name and Directory name Patterns from versions <=4.0 to new BracketedPatterns
      */
     private static void migrateFileImportPattern(String oldStylePattern, String newStylePattern,
-            JabRefPreferences prefs, Preferences mainPrefsNode) {
+                                                 JabRefPreferences prefs, Preferences mainPrefsNode) {
         String preferenceFileNamePattern = mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null);
 
         if ((preferenceFileNamePattern != null) &&
@@ -243,9 +242,9 @@ public class PreferencesMigrations {
         // Check for prefs node for Version <= 4.0
         if (mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null) != null) {
 
-            String[] oldStylePatterns = new String[] {"\\bibtexkey",
+            String[] oldStylePatterns = new String[]{"\\bibtexkey",
                     "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
-            String[] newStylePatterns = new String[] {"[bibtexkey]",
+            String[] newStylePatterns = new String[]{"[bibtexkey]",
                     "[bibtexkey] - [fulltitle]"};
             for (int i = 0; i < oldStylePatterns.length; i++) {
                 migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
@@ -269,7 +268,6 @@ public class PreferencesMigrations {
         List<String> keys = prefs.getStringList(JabRefPreferences.BINDINGS);
         keys.replaceAll(replaceKeys);
         prefs.putStringList(JabRefPreferences.BINDINGS, keys);
-
     }
 
     private static void addCrossRefRelatedFieldsForAutoComplete() {

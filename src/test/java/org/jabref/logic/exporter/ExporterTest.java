@@ -62,7 +62,7 @@ public class ExporterTest {
         ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
 
         for (Exporter format : exporterFactory.getExporters()) {
-            result.add(new Object[]{format, format.getDisplayName()});
+            result.add(new Object[]{format, format.getName()});
         }
         return result;
     }

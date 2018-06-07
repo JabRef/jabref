@@ -58,7 +58,7 @@ public class RenamePdfCleanupTest {
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                mock(LayoutFormatterPreferences.class), fileDirPrefs);
+                                                        fileDirPrefs);
         cleanup.cleanup(entry);
 
         LinkedFile newFileField = new LinkedFile("", "Toot.tmp", "");
@@ -75,7 +75,7 @@ public class RenamePdfCleanupTest {
                 new LinkedFile("", tempFile.getAbsolutePath(), ""), new LinkedFile("", "", ""))));
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                mock(LayoutFormatterPreferences.class), fileDirPrefs);
+                                                        fileDirPrefs);
         cleanup.cleanup(entry);
 
         assertEquals(
@@ -93,7 +93,7 @@ public class RenamePdfCleanupTest {
         entry.setField("title", "test title");
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                mock(LayoutFormatterPreferences.class), fileDirPrefs);
+                                                        fileDirPrefs);
         cleanup.cleanup(entry);
 
         LinkedFile newFileField = new LinkedFile("", "Toot - test title.tmp", "");
@@ -108,9 +108,7 @@ public class RenamePdfCleanupTest {
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                layoutFormatterPreferences,
-                fileDirPrefs);
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPrefs);
         cleanup.cleanup(entry);
 
         LinkedFile newFileField = new LinkedFile("", "Toot - test title.pdf", "PDF");
@@ -125,7 +123,6 @@ public class RenamePdfCleanupTest {
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
         entry.setField("title", "test title");
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                layoutFormatterPreferences,
                 fileDirPrefs, fileField);
 
         cleanup.cleanup(entry);
@@ -140,9 +137,7 @@ public class RenamePdfCleanupTest {
         String fileNamePattern = "[bibtexkey] - [fulltitle]";
         testFolder.newFile("Toot.pdf");
         LinkedFile fileField = new LinkedFile("", "Toot.pdf", "PDF");
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                layoutFormatterPreferences,
-                fileDirPrefs);
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPrefs);
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 

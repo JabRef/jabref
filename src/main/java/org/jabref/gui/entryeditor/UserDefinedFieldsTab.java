@@ -5,8 +5,9 @@ import java.util.List;
 
 import javax.swing.undo.UndoManager;
 
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
@@ -14,12 +15,12 @@ import org.jabref.model.entry.EntryType;
 public class UserDefinedFieldsTab extends FieldsEditorTab {
     private final List<String> fields;
 
-    public UserDefinedFieldsTab(String name, List<String> fields, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager) {
-        super(false, databaseContext, suggestionProviders, undoManager);
+    public UserDefinedFieldsTab(String name, List<String> fields, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService) {
+        super(false, databaseContext, suggestionProviders, undoManager, dialogService);
         this.fields = fields;
 
         setText(name);
-        setGraphic(IconTheme.JabRefIcon.OPTIONAL.getGraphicNode());
+        setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());
     }
 
     @Override

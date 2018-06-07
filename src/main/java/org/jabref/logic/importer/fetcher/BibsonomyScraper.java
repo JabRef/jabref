@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BibsonomyScraper {
 
-    private static final String BIBSONOMY_SCRAPER = "http://scraper.bibsonomy.org/service?url=";
+    private static final String BIBSONOMY_SCRAPER = "https://scraper.bibsonomy.org/service?url=";
     private static final String BIBSONOMY_SCRAPER_POST = "&format=bibtex";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibsonomyScraper.class);

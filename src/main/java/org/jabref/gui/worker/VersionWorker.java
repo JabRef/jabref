@@ -12,6 +12,7 @@ import javax.swing.SwingWorker;
 
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.help.NewVersionDialog;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.Version;
 
@@ -87,7 +88,7 @@ public class VersionWorker extends SwingWorker<List<Version>, Void> {
         String couldNotConnect = Localization.lang("Could not connect to the update server.");
         String tryLater = Localization.lang("Please try again later and/or check your network connection.");
         if (manualExecution) {
-            JOptionPane.showMessageDialog(this.mainFrame, couldNotConnect + "\n" + tryLater,
+            JOptionPane.showMessageDialog(null, couldNotConnect + "\n" + tryLater,
                     couldNotConnect, JOptionPane.ERROR_MESSAGE);
         }
         this.mainFrame.output(couldNotConnect + " " + tryLater);
@@ -105,13 +106,13 @@ public class VersionWorker extends SwingWorker<List<Version>, Void> {
         if (!newerVersion.isPresent() || (newerVersion.get().equals(toBeIgnored) && !manualExecution)) {
             String upToDate = Localization.lang("JabRef is up-to-date.");
             if (manualExecution) {
-                JOptionPane.showMessageDialog(this.mainFrame, upToDate, upToDate, JOptionPane.INFORMATION_MESSAGE);
+                DefaultTaskExecutor.runInJavaFXThread(() -> mainFrame.getDialogService().showInformationDialogAndWait(upToDate, upToDate));
             }
             this.mainFrame.output(upToDate);
 
         } else {
             // notify the user about a newer version
-            new NewVersionDialog(this.mainFrame, installedVersion, newerVersion.get());
+            new NewVersionDialog(null, installedVersion, newerVersion.get());
         }
     }
 

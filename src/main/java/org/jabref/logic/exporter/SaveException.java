@@ -24,6 +24,11 @@ public class SaveException extends Exception {
         entry = null;
     }
 
+    public SaveException(String message, Throwable exception) {
+        super(message, exception);
+        entry = null;
+    }
+
     public SaveException(String message, String localizedMessage) {
         super(message);
         this.localizedMessage = localizedMessage;

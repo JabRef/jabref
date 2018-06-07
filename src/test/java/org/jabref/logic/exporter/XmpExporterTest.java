@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Answers;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
@@ -49,22 +49,20 @@ public class XmpExporterTest {
 
     @Test
     public void exportSingleEntry() throws Exception {
-
         Path file = testFolder.newFile().toPath();
 
         BibEntry entry = new BibEntry();
         entry.setField("author", "Alan Turing");
 
-        exporter.export(databaseContext, file, encoding, Arrays.asList(entry));
+        exporter.export(databaseContext, file, encoding, Collections.singletonList(entry));
 
         List<String> lines = Files.readAllLines(file);
-        assertTrue(lines.size() == 18);
-        assertEquals("<rdf:li>Alan Turing</rdf:li>", lines.get(6).trim());
+        assertEquals(15, lines.size());
+        assertEquals("<rdf:li>Alan Turing</rdf:li>", lines.get(4).trim());
     }
 
     @Test
-    public void writeMutlipleEntriesInASingleFile() throws Exception {
-
+    public void writeMultipleEntriesInASingleFile() throws Exception {
         Path file = testFolder.newFile().toPath();
 
         BibEntry entryTuring = new BibEntry();
@@ -77,14 +75,13 @@ public class XmpExporterTest {
         exporter.export(databaseContext, file, encoding, Arrays.asList(entryTuring, entryArmbrust));
 
         List<String> lines = Files.readAllLines(file);
-        assertTrue(lines.size() == 36);
-        assertEquals("<rdf:li>Alan Turing</rdf:li>", lines.get(6).trim());
-        assertEquals("<rdf:li>Michael Armbrust</rdf:li>", lines.get(19).trim());
+        assertEquals(33, lines.size());
+        assertEquals("<rdf:li>Alan Turing</rdf:li>", lines.get(4).trim());
+        assertEquals("<rdf:li>Michael Armbrust</rdf:li>", lines.get(17).trim());
     }
 
     @Test
     public void writeMultipleEntriesInDifferentFiles() throws Exception {
-
         Path file = testFolder.newFile("split").toPath();
 
         BibEntry entryTuring = new BibEntry();
@@ -97,16 +94,16 @@ public class XmpExporterTest {
         exporter.export(databaseContext, file, encoding, Arrays.asList(entryTuring, entryArmbrust));
 
         List<String> lines = Files.readAllLines(file);
-        assertTrue(lines.size() == 0);
+        assertEquals(Collections.emptyList(), lines);
 
         Path fileTuring = Paths.get(file.getParent().toString() + "/" + entryTuring.getId() + "_null.xmp");
         List<String> linesTuring = Files.readAllLines(fileTuring);
-        assertTrue(linesTuring.size() == 18);
-        assertEquals("<rdf:li>Alan Turing</rdf:li>", linesTuring.get(6).trim());
+        assertEquals(15, linesTuring.size());
+        assertEquals("<rdf:li>Alan Turing</rdf:li>", linesTuring.get(4).trim());
 
         Path fileArmbrust = Paths.get(file.getParent().toString() + "/" + entryArmbrust.getId() + "_Armbrust2010.xmp");
         List<String> linesArmbrust = Files.readAllLines(fileArmbrust);
-        assertTrue(linesArmbrust.size() == 23);
-        assertEquals("<rdf:li>Michael Armbrust</rdf:li>", linesArmbrust.get(6).trim());
+        assertEquals(20, linesArmbrust.size());
+        assertEquals("<rdf:li>Michael Armbrust</rdf:li>", linesArmbrust.get(4).trim());
     }
 }

@@ -19,8 +19,8 @@ import javax.swing.JTextField;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
@@ -135,7 +135,7 @@ public class BibtexKeyPatternPanel extends JPanel {
         con.weighty = 0;
         con.anchor = GridBagConstraints.SOUTHEAST;
         con.insets = new Insets(0, 5, 0, 5);
-        JButton hlb = new JButton(IconTheme.JabRefIcon.HELP.getSmallIcon());
+        JButton hlb = new JButton(IconTheme.JabRefIcons.HELP.getSmallIcon());
         hlb.setToolTipText(Localization.lang("Help on key patterns"));
         gbl.setConstraints(hlb, con);
         add(hlb);

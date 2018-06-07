@@ -53,11 +53,10 @@ import javafx.scene.Scene;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.BasePanelPreferences;
 import org.jabref.gui.DuplicateResolverDialog;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
-import org.jabref.gui.EntryMarker;
 import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
@@ -66,19 +65,21 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiles.AutoSetLinks;
 import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiletype.ExternalFileMenuItem;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntry;
-import org.jabref.gui.filelist.FileListEntryEditor;
 import org.jabref.gui.filelist.FileListTableModel;
+import org.jabref.gui.filelist.LinkedFileEditDialogView;
 import org.jabref.gui.groups.GroupTreeNodeViewModel;
 import org.jabref.gui.groups.UndoableChangeEntriesOfGroup;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.renderer.GeneralRenderer;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.comparator.IconComparator;
-import org.jabref.gui.util.component.CheckBoxMessage;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
@@ -175,14 +176,13 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
     private final PreviewPanel preview;
     private final Map<BibEntry, Set<GroupTreeNode>> groupAdditions = new HashMap<>();
     private final JCheckBox autoGenerate = new JCheckBox(Localization.lang("Generate keys"),
-            Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION));
-    private final JLabel duplLabel = new JLabel(IconTheme.JabRefIcon.DUPLICATE.getSmallIcon());
-    private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
-    private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
+                                                         Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION));
+    private final JLabel duplLabel = new JLabel(IconTheme.JabRefIcons.DUPLICATE.getSmallIcon());
+    private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcons.FILE.getSmallIcon());
+    private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcons.WWW.getSmallIcon());
     private BasePanel panel;
     private boolean generatedKeys; // Set to true after keys have been generated.
     private boolean defaultSelected = true;
-
 
     /**
      * Creates a dialog that displays the given list of fields in the table. The
@@ -193,20 +193,20 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
      * @param panel
      */
     public ImportInspectionDialog(JabRefFrame frame, BasePanel panel, String undoName, boolean newDatabase) {
-        super(frame, ImportInspectionDialog.class);
+        super(null, ImportInspectionDialog.class);
         this.frame = frame;
         this.panel = panel;
         this.bibDatabaseContext = (panel == null) ? null : panel.getBibDatabaseContext();
         this.undoName = undoName;
         this.newDatabase = newDatabase;
         setIconImages(IconTheme.getLogoSet());
-        preview = new PreviewPanel(panel, bibDatabaseContext);
+        preview = DefaultTaskExecutor.runInJavaFXThread(() -> new PreviewPanel(panel, bibDatabaseContext, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), frame.getDialogService()));
 
         duplLabel.setToolTipText(Localization.lang("Possible duplicate of existing entry. Click to resolve."));
 
         sortedList = new SortedList<>(entries);
         DefaultEventTableModel<BibEntry> tableModelGl = (DefaultEventTableModel<BibEntry>) GlazedListsSwing
-                .eventTableModelWithThreadProxyList(sortedList, new EntryTableFormat());
+                                                                                                           .eventTableModelWithThreadProxyList(sortedList, new EntryTableFormat());
         glTable = new EntryTable(tableModelGl);
         GeneralRenderer renderer = new GeneralRenderer(Color.white);
         glTable.setDefaultRenderer(JLabel.class, renderer);
@@ -216,11 +216,11 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         glTable.getActionMap().put("delete", deleteListener);
 
         selectionModel = (DefaultEventSelectionModel<BibEntry>) GlazedListsSwing
-                .eventSelectionModelWithThreadProxyList(sortedList);
+                                                                                .eventSelectionModelWithThreadProxyList(sortedList);
         glTable.setSelectionModel(selectionModel);
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
         comparatorChooser = TableComparatorChooser.install(glTable, sortedList,
-                AbstractTableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
+                                                           AbstractTableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
         setupComparatorChooser();
         glTable.addMouseListener(new TableClickListener());
 
@@ -316,7 +316,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
 
         // Remember and default to last size:
         setSize(new Dimension(Globals.prefs.getInt(JabRefPreferences.IMPORT_INSPECTION_DIALOG_WIDTH),
-                Globals.prefs.getInt(JabRefPreferences.IMPORT_INSPECTION_DIALOG_HEIGHT)));
+                              Globals.prefs.getInt(JabRefPreferences.IMPORT_INSPECTION_DIALOG_HEIGHT)));
         addWindowListener(new WindowAdapter() {
 
             @Override
@@ -340,7 +340,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         };
         ActionMap am = contentPane.getActionMap();
         InputMap im = contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         am.put("close", closeAction);
 
     }
@@ -380,8 +380,8 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             // database (if
             // applicable) and against entries already in the table.
             if ((panel != null) && (DuplicateCheck
-                    .containsDuplicate(panel.getDatabase(), entry, panel.getBibDatabaseContext().getMode()).isPresent()
-                    || (internalDuplicate(this.entries, entry).isPresent()))) {
+                                                  .containsDuplicate(panel.getDatabase(), entry, panel.getBibDatabaseContext().getMode()).isPresent()
+                                    || (internalDuplicate(this.entries, entry).isPresent()))) {
                 entry.setGroupHit(true);
                 SwingUtilities.invokeLater(() -> deselectAllDuplicates.setEnabled(true));
             }
@@ -457,7 +457,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
 
             // Generate a unique key:
             new BibtexKeyGenerator(localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
-                    database, Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(entry);
+                                   database, Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(entry);
             // Remove the entry from the database again, since we only added it in
             // order to
             // make sure the key was unique:
@@ -499,7 +499,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 database.insertEntry(entry);
 
                 new BibtexKeyGenerator(localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
-                        database, Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(entry);
+                                       database, Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(entry);
                 // Add the generated key to our list:   -- TODO: Why??
                 keys.add(entry.getCiteKeyOptional());
             }
@@ -580,8 +580,8 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         }
 
         for (int i = 0; i < INSPECTION_FIELDS.size(); i++) {
-            int width = InternalBibtexFields.getFieldLength(INSPECTION_FIELDS.get(i));
-            glTable.getColumnModel().getColumn(i + PAD).setPreferredWidth(width);
+            Double width = InternalBibtexFields.getFieldLength(INSPECTION_FIELDS.get(i));
+            glTable.getColumnModel().getColumn(i + PAD).setPreferredWidth(width.intValue());
         }
     }
 
@@ -649,9 +649,9 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
      */
     public void showErrorMessage(String fetcherTitle, String localizedException) {
         showMessage(Localization.lang("Error while fetching from %0", fetcherTitle) + "\n" +
-                        Localization.lang("Please try again later and/or check your network connection.") + "\n" +
-                        localizedException,
-                Localization.lang("Search %0", fetcherTitle), JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Please try again later and/or check your network connection.") + "\n" +
+                    localizedException,
+                    Localization.lang("Search %0", fetcherTitle), JOptionPane.ERROR_MESSAGE);
     }
 
     public JabRefFrame getFrame() {
@@ -678,7 +678,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
     class AddToGroupAction extends AbstractAction {
 
         private final GroupTreeNode node;
-
 
         public AddToGroupAction(GroupTreeNode node) {
             super(node.getName());
@@ -730,16 +729,17 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                     // This status
                     // is indicated by the entry's group hit status:
                     if (entry.isGroupHit()) {
-                        CheckBoxMessage cbm = new CheckBoxMessage(
-                                Localization
-                                        .lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
-                                Localization.lang("Disable this confirmation dialog"), false);
-                        int answer = JOptionPane.showConfirmDialog(ImportInspectionDialog.this, cbm,
-                                Localization.lang("Duplicates found"), JOptionPane.YES_NO_OPTION);
-                        if (cbm.isSelected()) {
-                            Globals.prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, false);
-                        }
-                        if (answer == JOptionPane.NO_OPTION) {
+
+                        boolean continuePressed =
+                                DefaultTaskExecutor.runInJavaFXThread(() ->
+                                        frame.getDialogService().showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
+                                                                                                                   Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
+                                                                                                                   Localization.lang("Continue"),
+                                                                                                                   Localization.lang("Cancel"),
+                                                                                                                   Localization.lang("Disable this confirmation dialog"),
+                                                optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, !optOut)));
+
+                        if (!continuePressed) {
                             return;
                         }
                         break;
@@ -798,26 +798,13 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             if (newDatabase) {
                 // Create a new BasePanel for the entries:
                 Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
-                panel = new BasePanel(frame, new BibDatabaseContext(defaults));
+                panel = new BasePanel(frame, BasePanelPreferences.from(Globals.prefs), new BibDatabaseContext(defaults), ExternalFileTypes.getInstance());
             }
 
             boolean groupingCanceled = false;
 
             // Set owner/timestamp if options are enabled:
             UpdateField.setAutomaticFields(selected, Globals.prefs.getUpdateFieldPreferences());
-
-            // Mark entries if we should
-            if (EntryMarker.shouldMarkEntries()) {
-                for (BibEntry entry : selected) {
-                    EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
-                }
-            }
-            // Check if we should unmark entries before adding the new ones:
-            if (Globals.prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING)) {
-                for (BibEntry entry : panel.getDatabase().getEntries()) {
-                    EntryMarker.unmarkEntry(entry, true, panel.getDatabase(), ce);
-                }
-            }
 
             for (BibEntry entry : selected) {
                 // Remove settings to group/search hit status:
@@ -831,7 +818,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 }
 
                 entry.setId(IdGenerator.next());
-                ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
+                ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
             }
             panel.getDatabase().insertEntries(selected);
 
@@ -847,10 +834,13 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 // The best course of action is probably to ask the
                 // user if a key should be generated
                 // immediately.
-                int answer = JOptionPane.showConfirmDialog(ImportInspectionDialog.this,
-                        Localization.lang("Cannot add entries to group without generating keys. Generate keys now?"),
-                        Localization.lang("Add to group"), JOptionPane.YES_NO_OPTION);
-                if (answer == JOptionPane.YES_OPTION) {
+
+                boolean generateKeysPressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Add to group"),
+                                                                                                     Localization.lang("Cannot add entries to group without generating keys. Generate keys now?"),
+                                                                                                     Localization.lang("Generate keys"),
+                                                                                                     Localization.lang("Cancel"));
+
+                if (generateKeysPressed) {
                     generateKeys();
                 } else {
                     groupingCanceled = true;
@@ -862,11 +852,11 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 for (GroupTreeNode node : groups) {
                     if (node.getGroup() instanceof GroupEntryChanger) {
                         // Add the entry:
-                        GroupEntryChanger entryChanger = (GroupEntryChanger)node.getGroup();
+                        GroupEntryChanger entryChanger = (GroupEntryChanger) node.getGroup();
                         List<FieldChange> undo = entryChanger.add(Collections.singletonList(entry));
                         if (!undo.isEmpty()) {
                             ce.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node),
-                                    undo));
+                                                                                    undo));
                         }
                     }
                 }
@@ -896,7 +886,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
     private class DeleteListener extends AbstractAction {
 
         public DeleteListener() {
-            super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getSmallIcon());
+            super(Localization.lang("Delete"), IconTheme.JabRefIcons.DELETE_ENTRY.getSmallIcon());
         }
 
         @Override
@@ -933,7 +923,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
 
         private final Boolean enable;
 
-
         public SelectionButton(boolean enable) {
             this.enable = enable;
         }
@@ -953,7 +942,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         public void listChanged(ListEvent<BibEntry> listEvent) {
             if (listEvent.getSourceList().size() == 1) {
                 preview.setEntry(listEvent.getSourceList().get(0));
-                contentPane.setDividerLocation(0.5f);
             }
         }
     }
@@ -983,8 +971,8 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                             return;
                         }
                         FileListEntry fl = tableModel.getEntry(0);
-                        (new ExternalFileMenuItem(frame, entry, "", fl.getLink(), null, panel.getBibDatabaseContext(),
-                                fl.getType())).actionPerformed(null);
+                        (new ExternalFileMenuItem(frame, "", fl.getLink(), null, panel.getBibDatabaseContext(),
+                                                  fl.getType())).actionPerformed(null);
                     }
                 } else { // Must be URL_COL
                     openExternalLink(FieldName.URL, e);
@@ -1041,8 +1029,8 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 if ((description == null) || (description.trim().isEmpty())) {
                     description = flEntry.getLink();
                 }
-                menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry.getLink(),
-                        flEntry.getType().get().getIcon(), panel.getBibDatabaseContext(), flEntry.getType()));
+                menu.add(new ExternalFileMenuItem(panel.frame(), description, flEntry.getLink(),
+                                                  flEntry.getType().get().getIcon().getSmallIcon(), panel.getBibDatabaseContext(), flEntry.getType()));
                 count++;
             }
             if (count == 0) {
@@ -1096,12 +1084,12 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             if ((col == DUPL_COL) && (glTable.getValueAt(row, col) != null)) {
                 BibEntry first = sortedList.get(row);
                 Optional<BibEntry> other = DuplicateCheck.containsDuplicate(panel.getDatabase(), first,
-                        panel.getBibDatabaseContext().getMode());
+                                                                            panel.getBibDatabaseContext().getMode());
                 if (other.isPresent()) {
                     // This will be true if the duplicate is in the existing
                     // database.
                     DuplicateResolverDialog diag = new DuplicateResolverDialog(ImportInspectionDialog.this, other.get(),
-                            first, DuplicateResolverDialog.DuplicateResolverType.INSPECTION);
+                                                                               first, DuplicateResolverDialog.DuplicateResolverType.INSPECTION);
                     diag.setLocationRelativeTo(ImportInspectionDialog.this);
                     diag.setVisible(true);
                     ImportInspectionDialog.this.toFront();
@@ -1162,7 +1150,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 other = internalDuplicate(entries, first);
                 if (other.isPresent()) {
                     DuplicateResolverDialog diag = new DuplicateResolverDialog(ImportInspectionDialog.this, first,
-                            other.get(), DuplicateResolverDialog.DuplicateResolverType.DUPLICATE_SEARCH);
+                                                                               other.get(), DuplicateResolverDialog.DuplicateResolverType.DUPLICATE_SEARCH);
                     diag.setLocationRelativeTo(ImportInspectionDialog.this);
                     diag.setVisible(true);
                     ImportInspectionDialog.this.toFront();
@@ -1199,15 +1187,16 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 return;
             }
             BibEntry entry = selectionModel.getSelected().get(0);
-            String result = JOptionPane.showInputDialog(ImportInspectionDialog.this, Localization.lang("Enter URL"),
-                    entry.getField(FieldName.URL).orElse(""));
+
+            Optional<String> result = frame.getDialogService().showInputDialogAndWait(Localization.lang("Enter URL"), Localization.lang("Enter URL"));
+
             entries.getReadWriteLock().writeLock().lock();
             try {
-                if (result != null) {
-                    if (result.isEmpty()) {
+                if (result.isPresent()) {
+                    if (result.get().isEmpty()) {
                         entry.clearField(FieldName.URL);
                     } else {
-                        entry.setField(FieldName.URL, result);
+                        entry.setField(FieldName.URL, result.get());
                     }
                 }
             } finally {
@@ -1221,7 +1210,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
 
         private BibEntry entry;
 
-
         public DownloadFile() {
             super(Localization.lang("Download file"));
             addActionListener(this);
@@ -1234,14 +1222,17 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             }
             entry = selectionModel.getSelected().get(0);
             if (!entry.getCiteKeyOptional().isPresent()) {
-                int answer = JOptionPane.showConfirmDialog(frame,
-                        Localization.lang("This entry has no BibTeX key. Generate key now?"),
-                        Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                if (answer == JOptionPane.OK_OPTION) {
+
+                boolean generateKeyPressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Download file"),
+                                                                                                    Localization.lang("This entry has no BibTeX key. Generate key now?"),
+                                                                                                    Localization.lang("Generate key"),
+                                                                                                    Localization.lang("Cancel"));
+
+                if (generateKeyPressed) {
                     generateKeyForEntry(entry);
                 }
             }
-            DownloadExternalFile def = new DownloadExternalFile(frame, bibDatabaseContext, entry);
+            DownloadExternalFile def = new DownloadExternalFile(frame.getDialogService(), bibDatabaseContext, entry);
             try {
                 def.download(this);
             } catch (IOException ex) {
@@ -1276,10 +1267,13 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             }
             final BibEntry entry = selectionModel.getSelected().get(0);
             if (!entry.hasCiteKey()) {
-                int answer = JOptionPane.showConfirmDialog(frame,
-                        Localization.lang("This entry has no BibTeX key. Generate key now?"),
-                        Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                if (answer == JOptionPane.OK_OPTION) {
+
+                boolean generateKeyPressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Download file"),
+                                                                                                    Localization.lang("This entry has no BibTeX key. Generate key now?"),
+                                                                                                    Localization.lang("Generate key"),
+                                                                                                    Localization.lang("Cancel"));
+
+                if (generateKeyPressed) {
                     generateKeyForEntry(entry);
                 } else {
                     return; // Can't go on without the bibtex key.
@@ -1291,18 +1285,18 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             // links:
             JDialog diag = new JDialog(ImportInspectionDialog.this, true);
             JabRefExecutorService.INSTANCE
-                    .execute(AutoSetLinks.autoSetLinks(entry, bibDatabaseContext, e -> {
-                        if (e.getID() > 0) {
+                                          .execute(AutoSetLinks.autoSetLinks(entry, bibDatabaseContext, e -> {
+                                              if (e.getID() > 0) {
 
-                            entries.getReadWriteLock().writeLock().lock();
-                            try {
-                                entry.setField(FieldName.FILE, localModel.getStringRepresentation());
-                            } finally {
-                                entries.getReadWriteLock().writeLock().unlock();
-                            }
-                            glTable.repaint();
-                        }
-                    } , diag));
+                                                  entries.getReadWriteLock().writeLock().lock();
+                                                  try {
+                                                      entry.setField(FieldName.FILE, localModel.getStringRepresentation());
+                                                  } finally {
+                                                      entries.getReadWriteLock().writeLock().unlock();
+                                                  }
+                                                  glTable.repaint();
+                                              }
+                                          }, diag));
 
         }
     }
@@ -1310,7 +1304,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
     private class LinkLocalFile extends JMenuItem implements ActionListener, DownloadExternalFile.DownloadCallback {
 
         private BibEntry entry;
-
 
         public LinkLocalFile() {
             super(Localization.lang("Link local file"));
@@ -1323,18 +1316,12 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 return;
             }
             entry = selectionModel.getSelected().get(0);
-            LinkedFile flEntry = new LinkedFile("", "", "");
-            FileListEntryEditor editor = new FileListEntryEditor(flEntry, false, true, bibDatabaseContext, true);
-            editor.setVisible(true, true);
-            if (editor.okPressed()) {
-                entries.getReadWriteLock().writeLock().lock();
-                try {
-                    entry.addFile(flEntry);
-                } finally {
-                    entries.getReadWriteLock().writeLock().unlock();
-                }
-                glTable.repaint();
-            }
+            LinkedFile linkedFile = new LinkedFile("", "", "");
+
+            LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(linkedFile);
+
+            Optional<LinkedFile> editedLinkedFile = DefaultTaskExecutor.runInJavaFXThread(() -> dialog.showAndWait());
+            editedLinkedFile.ifPresent(file -> entry.addFile(linkedFile));
         }
 
         @Override
@@ -1354,14 +1341,13 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
 
         private final GeneralRenderer renderer = new GeneralRenderer(Color.white);
 
-
         public EntryTable(TableModel model) {
             super(model);
             getTableHeader().setReorderingAllowed(false);
 
             setFont(GUIGlobals.currentFont);
             int maxOfIconsAndFontSize = Math.max(GUIGlobals.currentFont.getSize(), Globals.prefs.getInt(JabRefPreferences.ICON_SIZE_SMALL));
-            setRowHeight(Globals.prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING) + maxOfIconsAndFontSize);
+            setRowHeight(maxOfIconsAndFontSize);
             // Update Table header with new settings
             this.getTableHeader().resizeAndRepaint();
         }
@@ -1425,29 +1411,29 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 return entry.isSearchHit() ? Boolean.TRUE : Boolean.FALSE;
             } else if (i < PAD) {
                 switch (i) {
-                case DUPL_COL:
-                    return entry.isGroupHit() ? duplLabel : null;
-                case FILE_COL:
-                    if (entry.hasField(FieldName.FILE)) {
-                        FileListTableModel model = new FileListTableModel();
-                        entry.getField(FieldName.FILE).ifPresent(model::setContent);
-                        fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
-                        if ((model.getRowCount() > 0) && model.getEntry(0).getType().isPresent()) {
-                            fileLabel.setIcon(model.getEntry(0).getType().get().getIcon());
+                    case DUPL_COL:
+                        return entry.isGroupHit() ? duplLabel : null;
+                    case FILE_COL:
+                        if (entry.hasField(FieldName.FILE)) {
+                            FileListTableModel model = new FileListTableModel();
+                            entry.getField(FieldName.FILE).ifPresent(model::setContent);
+                            fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
+                            if ((model.getRowCount() > 0) && model.getEntry(0).getType().isPresent()) {
+                                fileLabel.setIcon(model.getEntry(0).getType().get().getIcon().getSmallIcon());
+                            }
+                            return fileLabel;
+                        } else {
+                            return null;
                         }
-                        return fileLabel;
-                    } else {
+                    case URL_COL:
+                        if (entry.hasField(FieldName.URL)) {
+                            urlLabel.setToolTipText(entry.getField(FieldName.URL).orElse(""));
+                            return urlLabel;
+                        } else {
+                            return null;
+                        }
+                    default:
                         return null;
-                    }
-                case URL_COL:
-                    if (entry.hasField(FieldName.URL)) {
-                        urlLabel.setToolTipText(entry.getField(FieldName.URL).orElse(""));
-                        return urlLabel;
-                    } else {
-                        return null;
-                    }
-                default:
-                    return null;
                 }
             } else {
                 String field = INSPECTION_FIELDS.get(i - PAD);

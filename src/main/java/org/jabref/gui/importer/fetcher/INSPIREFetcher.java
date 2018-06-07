@@ -30,12 +30,6 @@ import org.slf4j.LoggerFactory;
  * This class allows to access the Slac INSPIRE database. It is just a port of the original SPIRES Fetcher.
  *
  * It can either be a GeneralFetcher to pose requests to the database or fetch individual entries.
- *
- * @author Fedor Bezrukov
- * @author Sheer El-Showk
- *
- * @version $Id$
- *
  */
 public class INSPIREFetcher implements EntryFetcher {
 
@@ -60,7 +54,7 @@ public class INSPIREFetcher implements EntryFetcher {
             return "";
         }
         // At least 87 characters
-        StringBuilder sb = new StringBuilder(87).append("http://").append(INSPIREFetcher.INSPIRE_HOST)
+        StringBuilder sb = new StringBuilder(87).append("https://").append(INSPIREFetcher.INSPIRE_HOST)
                 .append("/search?ln=en&ln=en&p=find+").append(identifier)
                 .append("&action_search=Search&sf=&so=d&rm=&rg=1000&sc=0&of=hx");
         LOGGER.debug("Inspire URL: " + sb + "\n");
@@ -76,7 +70,7 @@ public class INSPIREFetcher implements EntryFetcher {
      *         public static String constructUrlFromSlaccitation(String slaccitation) { String cmd = "j"; String key =
      *         slaccitation.replaceAll("^%%CITATION = ", "").replaceAll( ";%%$", ""); if (key.matches("^\\w*-\\w*[ /].*"
      *         )) cmd = "eprint"; try { key = URLEncoder.encode(key, "UTF-8"); } catch (UnsupportedEncodingException e)
-     *         { } StringBuffer sb = new StringBuffer("http://").append(INSPIRE_HOST) .append("/");
+     *         { } StringBuffer sb = new StringBuffer("https://").append(INSPIRE_HOST) .append("/");
      *         sb.append("spires/find/hep/www").append("?"); sb.append("rawcmd=find+").append(cmd).append("+");
      *         sb.append(key); return sb.toString(); }
      *
@@ -87,7 +81,7 @@ public class INSPIREFetcher implements EntryFetcher {
      *
      *         public static String constructUrlFromEprint(String eprint) { String key = eprint.replaceAll(" [.*]$",
      *         ""); try { key = URLEncoder.encode(key, "UTF-8"); } catch (UnsupportedEncodingException e) { return ""; }
-     *         StringBuffer sb = new StringBuffer("http://").append(INSPIRE_HOST) .append("/");
+     *         StringBuffer sb = new StringBuffer("https://").append(INSPIRE_HOST) .append("/");
      *         sb.append("spires/find/hep/www").append("?"); sb.append("rawcmd=find+eprint+"); sb.append(key); return
      *         sb.toString(); }
      */

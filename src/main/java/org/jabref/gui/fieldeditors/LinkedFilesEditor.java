@@ -33,7 +33,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -43,6 +42,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.airhacks.afterburner.views.ViewLoader;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 
@@ -51,10 +51,14 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     @FXML private final LinkedFilesEditorViewModel viewModel;
     @FXML private ListView<LinkedFileViewModel> listView;
 
-    public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, JabRefPreferences preferences) {
+    public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, AutoCompleteSuggestionProvider<?> suggestionProvider,
+                             FieldCheckers fieldCheckers,
+                             JabRefPreferences preferences) {
         this.viewModel = new LinkedFilesEditorViewModel(fieldName, suggestionProvider, dialogService, databaseContext, taskExecutor, fieldCheckers, preferences);
 
-        ControlHelper.loadFXMLForControl(this);
+        ViewLoader.view(this)
+                  .root(this)
+                  .load();
 
         ViewModelListCellFactory<LinkedFileViewModel> cellFactory = new ViewModelListCellFactory<LinkedFileViewModel>()
                 .withTooltip(LinkedFileViewModel::getDescription)
@@ -149,7 +153,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     }
 
     private static Node createFileDisplay(LinkedFileViewModel linkedFile) {
-        Text icon = MaterialDesignIconFactory.get().createIcon(linkedFile.getTypeIcon());
+        Node icon = linkedFile.getTypeIcon().getGraphicNode();
         icon.setOnMouseClicked(event -> linkedFile.open());
         Text link = new Text();
         link.textProperty().bind(linkedFile.linkProperty());
@@ -159,6 +163,10 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         ProgressBar progressIndicator = new ProgressBar();
         progressIndicator.progressProperty().bind(linkedFile.downloadProgressProperty());
         progressIndicator.visibleProperty().bind(linkedFile.downloadOngoingProperty());
+
+        HBox info = new HBox(8);
+        info.setStyle("-fx-padding: 0.5em 0 0.5em 0;"); // To align with buttons below which also have 0.5em padding
+        info.getChildren().setAll(icon, link, desc, progressIndicator);
 
         Button acceptAutoLinkedFile = MaterialDesignIconFactory.get().createIconButton(MaterialDesignIcon.BRIEFCASE_CHECK);
         acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang("This file was found automatically. Do you want to link it to this entry?")));
@@ -175,11 +183,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         HBox container = new HBox(10);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
 
-        if (desc.getText().isEmpty()) {
-            container.getChildren().addAll(icon, link, progressIndicator, acceptAutoLinkedFile, writeXMPMetadata);
-        } else {
-            container.getChildren().addAll(icon, desc, link, progressIndicator, acceptAutoLinkedFile, writeXMPMetadata);
-        }
+        container.getChildren().addAll(info, acceptAutoLinkedFile, writeXMPMetadata);
 
         return container;
     }

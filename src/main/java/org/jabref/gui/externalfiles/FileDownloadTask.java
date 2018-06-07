@@ -11,7 +11,7 @@ import org.jabref.logic.net.URLDownload;
 
 import org.fxmisc.easybind.EasyBind;
 
-public class FileDownloadTask extends BackgroundTask<Void> {
+public class FileDownloadTask extends BackgroundTask<Path> {
 
     private final URL source;
     private final Path destination;
@@ -22,7 +22,7 @@ public class FileDownloadTask extends BackgroundTask<Void> {
     }
 
     @Override
-    protected Void call() throws Exception {
+    protected Path call() throws Exception {
         URLDownload download = new URLDownload(source);
         try (ProgressInputStream inputStream = download.asInputStream()) {
             EasyBind.subscribe(
@@ -35,6 +35,6 @@ public class FileDownloadTask extends BackgroundTask<Void> {
             Files.copy(inputStream, destination, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        return null;
+        return destination;
     }
 }

@@ -21,7 +21,7 @@ public class CopyDoiUrlAction extends AbstractAction {
     private String identifier;
 
     public CopyDoiUrlAction(String identifier) {
-        super(Localization.menuTitle("Copy DOI url"));
+        super(Localization.lang("Copy DOI url"));
         this.identifier = identifier;
     }
 

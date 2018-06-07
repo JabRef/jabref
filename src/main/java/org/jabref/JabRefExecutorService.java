@@ -140,7 +140,7 @@ public class JabRefExecutorService {
         this.lowPriorityExecutorService.shutdownNow();
         // kill the remote thread
         stopRemoteThread();
-        // timer doesn't need to be canceled as it is run in daemon mode, which ensures that it is stopped if the application is shut down
+        timer.cancel();
     }
 
     private class NamedRunnable implements Runnable {

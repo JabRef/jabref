@@ -11,8 +11,6 @@ import org.jabref.logic.layout.LayoutFormatter;
  * <p>If a fieldText is given, it must be a valid {@link DateTimeFormatter} pattern.
  * If none is given, the format pattern will be <code>yyyy-MM-dd hh:mm:ss z</code>.
  * This follows ISO-8601. Reason: <a href="https://xkcd.com/1179/">https://xkcd.com/1179/</a>.</p>
- *
- * @author andreas_sf at rudert-home dot de
  */
 public class CurrentDate implements LayoutFormatter {
 

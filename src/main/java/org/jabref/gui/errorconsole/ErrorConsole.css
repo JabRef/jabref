@@ -1,40 +1,26 @@
 .list-content {
-	-fx-padding: 10.0px;
-}
-
-.list-cell:default {
-	-fx-background-color: white;
+	-fx-padding: 10px;
 }
 
 .info-section {
-	-fx-padding: 10.0px;
+	-fx-padding: 10px;
+    -fx-background-color: -fx-background;
 }
 
-.info-section .icon {
-	-fx-font-size: 48.0;
+.info-section .glyph-icon {
+	-fx-font-size: 24.0;
 }
 
-.exception{
-    -fx-text-fill: -fx-negative;
+.exception .glyph-icon {
+    -fx-font-size: 18.0;
+    -fx-fill: -jr-error;
 }
 
-.exception .icon {
-	-fx-fill: -fx-negative;
-}
-
-.log {
-    -fx-text-fill: -fx-info;
-}
-
-.log .icon {
-	-fx-fill: -fx-info;
+.log .glyph-icon {
+    -fx-font-size: 18.0;
+    -fx-fill: -jr-info;
 }
 
 .custom-buttons {
-	-fx-padding: 5.0px;
-}
-
-.dialog-pane *.button-bar {
-	-fx-max-height: 0.0;
-	-fx-pref-height: 0.0;
+	-fx-padding: 5px;
 }

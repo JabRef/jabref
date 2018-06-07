@@ -8,7 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.icon.IconTheme;
 
 import org.controlsfx.control.decoration.Decoration;
 import org.controlsfx.control.decoration.GraphicDecoration;
@@ -32,11 +32,11 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
     }
 
     protected Node createErrorNode() {
-        return IconTheme.JabRefIcon.ERROR.getGraphicNode();
+        return IconTheme.JabRefIcons.ERROR.getGraphicNode();
     }
 
     protected Node createWarningNode() {
-        return IconTheme.JabRefIcon.WARNING.getGraphicNode();
+        return IconTheme.JabRefIcons.WARNING.getGraphicNode();
     }
 
     public Node createDecorationNode(ValidationMessage message) {

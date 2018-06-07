@@ -4,7 +4,6 @@ import java.net.Authenticator;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -47,8 +46,39 @@ public class JabRefMain extends Application {
 
     @Override
     public void start(Stage mainStage) throws Exception {
-        Platform.setImplicitExit(false);
-        SwingUtilities.invokeLater(() -> start(arguments));
+        // Fail on unsupported Java versions
+        ensureCorrectJavaVersion();
+        FallbackExceptionHandler.installExceptionHandler();
+
+        // Init preferences
+        final JabRefPreferences preferences = JabRefPreferences.getInstance();
+        Globals.prefs = preferences;
+        // Perform migrations
+        PreferencesMigrations.runMigrations();
+
+        configureProxy(preferences.getProxyPreferences());
+
+        Globals.startBackgroundTasks();
+
+        applyPreferences(preferences);
+
+        // Process arguments
+        ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START);
+
+        // Check for running JabRef
+        if (!handleMultipleAppInstances(arguments) || argumentProcessor.shouldShutDown()) {
+            shutdownCurrentInstance();
+            return;
+        }
+
+        // If not, start GUI
+        new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank());
+    }
+
+    @Override
+    public void stop() {
+        Platform.exit();
+        System.exit(0);
     }
 
     /**
@@ -73,11 +103,9 @@ public class JabRefMain extends Application {
 
         if (java9Fail || versionFail) {
             StringBuilder versionError = new StringBuilder(
-                    Localization.lang("Your current Java version (%0) is not supported. Please install version %1 or higher.",
-                            checker.getJavaVersion(),
-                            buildInfo.getMinRequiredJavaVersion()
-                    )
-            );
+                                                           Localization.lang("Your current Java version (%0) is not supported. Please install version %1 or higher.",
+                                                                             checker.getJavaVersion(),
+                                                                             buildInfo.getMinRequiredJavaVersion()));
 
             versionError.append("\n");
             versionError.append(Localization.lang("Your Java Runtime Environment is located at %0.", checker.getJavaInstallationDirectory()));
@@ -87,7 +115,7 @@ public class JabRefMain extends Application {
                 versionError.append(Localization.lang("Note that currently, JabRef does not run with Java 9."));
             }
             final JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame, versionError, Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, versionError, Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
             frame.dispose();
 
             // We exit on Java 9 error since this will definitely not work
@@ -97,61 +125,31 @@ public class JabRefMain extends Application {
         }
     }
 
-    private static void start(String[] args) {
-        // Fail on unsupported Java versions
-        ensureCorrectJavaVersion();
-        FallbackExceptionHandler.installExceptionHandler();
-
-        // Init preferences
-        final JabRefPreferences preferences = JabRefPreferences.getInstance();
-        Globals.prefs = preferences;
-        // Perform migrations
-        PreferencesMigrations.runMigrations();
-
-        configureProxy(preferences.getProxyPreferences());
-
-        Globals.startBackgroundTasks();
-
-        applyPreferences(preferences);
-
-        // Process arguments
-        ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);
-
-        // Check for running JabRef
-        if (!handleMultipleAppInstances(args) || argumentProcessor.shouldShutDown()) {
-            shutdownCurrentInstance();
-            return;
-        }
-
-        // If not, start GUI
-        SwingUtilities
-                .invokeLater(() -> new JabRefGUI(argumentProcessor.getParserResults(), argumentProcessor.isBlank()));
-    }
-
     private static boolean handleMultipleAppInstances(String[] args) {
         RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();
         if (remotePreferences.useRemoteServer()) {
-            Globals.REMOTE_LISTENER.open(new JabRefMessageHandler(), remotePreferences.getPort());
-
-            if (!Globals.REMOTE_LISTENER.isOpen()) {
-                // we are not alone, there is already a server out there, try to contact already running JabRef:
-                if (new RemoteClient(remotePreferences.getPort()).sendCommandLineArguments(args)) {
-                    // We have successfully sent our command line options through the socket to another JabRef instance.
+            // Try to contact already running JabRef
+            RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
+            if (remoteClient.ping()) {
+                // We are not alone, there is already a server out there, send command line arguments to other instance
+                if (remoteClient.sendCommandLineArguments(args)) {
                     // So we assume it's all taken care of, and quit.
                     LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
                     return false;
                 }
+            } else {
+                // We are alone, so we start the server
+                Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort());
             }
-            // we are alone, we start the server
-            Globals.REMOTE_LISTENER.start();
         }
         return true;
     }
 
     private static void shutdownCurrentInstance() {
+        Globals.stopBackgroundTasks();
         Globals.shutdownThreadPools();
-        // needed to tell JavaFx to stop
         Platform.exit();
+        System.exit(0);
     }
 
     private static void applyPreferences(JabRefPreferences preferences) {

@@ -5,7 +5,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
@@ -16,7 +17,7 @@ public class XmpPdfExporter extends Exporter {
     private final XmpPreferences xmpPreferences;
 
     public XmpPdfExporter(XmpPreferences xmpPreferences) {
-        super("pdf", FileType.PDF_XMP.getDescription(), FileType.PDF_XMP);
+        super("pdf", Localization.lang("XMP-annotated PDF"), StandardFileType.PDF);
         this.xmpPreferences = xmpPreferences;
     }
 

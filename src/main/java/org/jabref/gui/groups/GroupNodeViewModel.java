@@ -16,8 +16,10 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.DragAndDropDataFormats;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.InternalMaterialDesignIcon;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.TaskExecutor;
@@ -177,14 +179,25 @@ public class GroupNodeViewModel {
         return groupNode.hashCode();
     }
 
-    public MaterialDesignIcon getIcon() {
+    public JabRefIcon getIcon() {
         Optional<String> iconName = groupNode.getGroup().getIconName();
         return iconName.flatMap(this::parseIcon)
-                .orElse(IconTheme.JabRefIcon.DEFAULT_GROUP_ICON.getUnderlyingIcon());
+                       .orElseGet(this::createDefaultIcon);
     }
 
-    private Optional<MaterialDesignIcon> parseIcon(String iconCode) {
-        return Enums.getIfPresent(MaterialDesignIcon.class, iconCode.toUpperCase(Locale.ENGLISH)).toJavaUtil();
+    private JabRefIcon createDefaultIcon() {
+        Optional<Color> color = groupNode.getGroup().getColor();
+        if (color.isPresent()) {
+            return IconTheme.JabRefIcons.DEFAULT_GROUP_ICON_COLORED.withColor(color.get());
+        } else {
+            return IconTheme.JabRefIcons.DEFAULT_GROUP_ICON_COLORED.withColor(Color.web("#8a8a8a"));
+        }
+    }
+
+    private Optional<JabRefIcon> parseIcon(String iconCode) {
+        return Enums.getIfPresent(MaterialDesignIcon.class, iconCode.toUpperCase(Locale.ENGLISH))
+                    .toJavaUtil()
+                    .map(icon -> new InternalMaterialDesignIcon(getColor(), icon));
     }
 
     public ObservableList<GroupNodeViewModel> getChildren() {

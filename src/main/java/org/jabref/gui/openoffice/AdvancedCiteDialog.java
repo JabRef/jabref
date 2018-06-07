@@ -10,6 +10,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
@@ -34,7 +35,7 @@ class AdvancedCiteDialog {
 
 
     public AdvancedCiteDialog(JabRefFrame parent) {
-        diag = new JDialog(parent, Localization.lang("Cite special"), true);
+        diag = new JDialog((JFrame) null, Localization.lang("Cite special"), true);
         ButtonGroup bg = new ButtonGroup();
         JRadioButton inPar = new JRadioButton(Localization.lang("Cite selected entries between parenthesis"));
         JRadioButton inText = new JRadioButton(Localization.lang("Cite selected entries with in-text citation"));
@@ -88,7 +89,7 @@ class AdvancedCiteDialog {
         };
         cancel.addActionListener(cancelAction);
         builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+               .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         builder.getPanel().getActionMap().put("close", cancelAction);
 
     }

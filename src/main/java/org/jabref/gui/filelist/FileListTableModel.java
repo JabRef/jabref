@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
 
-import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
@@ -26,26 +25,6 @@ import org.jabref.model.entry.LinkedFile;
 public class FileListTableModel extends AbstractTableModel {
 
     private final List<FileListEntry> list = new ArrayList<>();
-
-    /**
-     * Convenience method for finding a label corresponding to the type of the
-     * first file link in the given field content. The difference between using
-     * this method and using setContent() on an instance of FileListTableModel
-     * is a slight optimization: with this method, parsing is discontinued after
-     * the first entry has been found.
-     *
-     * @param content The file field content, as fed to this class' setContent() method.
-     * @return A JLabel set up with no text and the icon of the first entry's file type, or null if no entry was found
-     * or the entry had no icon.
-     */
-    public static JLabel getFirstLabel(String content) {
-        FileListTableModel tm = new FileListTableModel();
-        FileListEntry entry = tm.setContent(content, true, true);
-        if ((entry == null) || (!entry.getType().isPresent())) {
-            return null;
-        }
-        return entry.getType().get().getIconLabel();
-    }
 
     @Override
     public int getRowCount() {

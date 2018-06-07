@@ -13,7 +13,6 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
-import org.jabref.gui.entryeditor.EntryEditorTabList;
 import org.jabref.gui.importer.actions.GUIPostOpenAction;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -169,7 +168,7 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
 
         message.add(formBuilder.build());
 
-        int answer = JOptionPane.showConfirmDialog(panel.frame(),
+        int answer = JOptionPane.showConfirmDialog(null,
                 message, Localization.lang("Upgrade file"), JOptionPane.YES_NO_OPTION);
         if (doNotShowDialog.isSelected()) {
             Globals.prefs.putBoolean(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING, false);
@@ -245,17 +244,13 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
     }
 
     private boolean showsFileInGenFields() {
-        boolean found = false;
-        EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
-        outer: for (int i = 0; i < tabList.getTabCount(); i++) {
-            List<String> fields = tabList.getTabFields(i);
+        for (List<String> fields : Globals.prefs.getEntryEditorTabList().values()) {
             for (String field : fields) {
                 if (field.equals(FieldName.FILE)) {
-                    found = true;
-                    break outer;
+                    return true;
                 }
             }
         }
-        return found;
+        return false;
     }
 }

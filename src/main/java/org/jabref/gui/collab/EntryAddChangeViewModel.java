@@ -5,7 +5,9 @@ import javax.swing.JComponent;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
+import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.undo.NamedCompound;
@@ -25,7 +27,7 @@ class EntryAddChangeViewModel extends ChangeViewModel {
         super(Localization.lang("Added entry"));
         this.diskEntry = diskEntry;
 
-        PreviewPanel previewPanel = new PreviewPanel(null, null);
+        PreviewPanel previewPanel = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), new FXDialogService());
         previewPanel.setEntry(diskEntry);
         container = CustomJFXPanel.wrap(new Scene(previewPanel));
     }
@@ -35,7 +37,7 @@ class EntryAddChangeViewModel extends ChangeViewModel {
         diskEntry.setId(IdGenerator.next());
         panel.getDatabase().insertEntry(diskEntry);
         secondary.insertEntry(diskEntry);
-        undoEdit.addEdit(new UndoableInsertEntry(panel.getDatabase(), diskEntry, panel));
+        undoEdit.addEdit(new UndoableInsertEntry(panel.getDatabase(), diskEntry));
         return true;
     }
 

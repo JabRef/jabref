@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.EnumSet;
 import java.util.Optional;
 import java.util.zip.ZipFile;
 
@@ -17,7 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JOptionPane;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -28,7 +27,6 @@ import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.help.HelpAction;
@@ -38,7 +36,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -62,7 +60,9 @@ public class ImportCustomizationDialog extends JabRefDialog {
     private final JTable customImporterTable;
 
     public ImportCustomizationDialog(final JabRefFrame frame) {
-        super(frame, Localization.lang("Manage custom imports"), false, ImportCustomizationDialog.class);
+        super((JFrame) null, Localization.lang("Manage custom imports"), false, ImportCustomizationDialog.class);
+
+        DialogService dialogService = frame.getDialogService();
 
         ImportTableModel tableModel = new ImportTableModel();
         customImporterTable = new JTable(tableModel);
@@ -83,13 +83,12 @@ public class ImportCustomizationDialog extends JabRefDialog {
         addFromFolderButton.addActionListener(e -> {
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileType.CLASS)
-                    .withDefaultExtension(FileType.JAR)
+                    .addExtensionFilter(StandardFileType.CLASS, StandardFileType.JAR)
+                    .withDefaultExtension(StandardFileType.JAR)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-            DialogService ds = new FXDialogService();
 
             Optional<Path> selectedFile = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
+                    .runInJavaFXThread(() -> dialogService.showFileOpenDialog(fileDialogConfiguration));
 
             if (selectedFile.isPresent() && (selectedFile.get().getParent() != null)) {
                 String chosenFileStr = selectedFile.get().toString();
@@ -103,10 +102,11 @@ public class ImportCustomizationDialog extends JabRefDialog {
                     customImporterTable.revalidate();
                     customImporterTable.repaint();
                 } catch (Exception exc) {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Could not instantiate %0", chosenFileStr));
+                    dialogService.showErrorDialogAndWait(Localization.lang("Could not instantiate %0", chosenFileStr), exc);
                 } catch (NoClassDefFoundError exc) {
-                    JOptionPane.showMessageDialog(frame, Localization.lang(
-                            "Could not instantiate %0. Have you chosen the correct package path?", chosenFileStr));
+                    dialogService.showErrorDialogAndWait(
+                            Localization.lang("Could not instantiate %0. Have you chosen the correct package path?", chosenFileStr),
+                            exc);
                 }
 
             }
@@ -118,13 +118,12 @@ public class ImportCustomizationDialog extends JabRefDialog {
         JButton addFromJarButton = new JButton(Localization.lang("Add from JAR"));
         addFromJarButton.addActionListener(e -> {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilters(EnumSet.of(FileType.ZIP, FileType.JAR))
-                    .withDefaultExtension(FileType.JAR)
+                    .addExtensionFilter(StandardFileType.JAR, StandardFileType.ZIP)
+                    .withDefaultExtension(StandardFileType.JAR)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-            DialogService ds = new FXDialogService();
 
             Optional<Path> jarZipFile = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
+                    .runInJavaFXThread(() -> dialogService.showFileOpenDialog(fileDialogConfiguration));
 
             if (jarZipFile.isPresent()) {
                 try (ZipFile zipFile = new ZipFile(jarZipFile.get().toFile(), ZipFile.OPEN_READ)) {
@@ -134,14 +133,16 @@ public class ImportCustomizationDialog extends JabRefDialog {
                     customImporterTable.repaint(10);
                 } catch (IOException exc) {
                     LOGGER.info("Could not open ZIP-archive.", exc);
-                    JOptionPane.showMessageDialog(frame,
+                    dialogService.showErrorDialogAndWait(
                             Localization.lang("Could not open %0", jarZipFile.get().toString()) + "\n"
-                                    + Localization.lang("Have you chosen the correct package path?"));
+                                    + Localization.lang("Have you chosen the correct package path?"),
+                            exc);
                 } catch (NoClassDefFoundError exc) {
                     LOGGER.info("Could not instantiate ZIP-archive reader.", exc);
-                    JOptionPane.showMessageDialog(frame,
+                    dialogService.showErrorDialogAndWait(
                             Localization.lang("Could not instantiate %0", jarZipFile.get().toString()) + "\n"
-                                    + Localization.lang("Have you chosen the correct package path?"));
+                                    + Localization.lang("Have you chosen the correct package path?"),
+                            exc);
                 }
             }
         });
@@ -153,10 +154,14 @@ public class ImportCustomizationDialog extends JabRefDialog {
         showDescButton.addActionListener(e -> {
             int row = customImporterTable.getSelectedRow();
             if (row == -1) {
-                JOptionPane.showMessageDialog(frame, Localization.lang("Please select an importer."));
+                dialogService.showWarningDialogAndWait(
+                        Localization.lang("Manage custom imports"),
+                        Localization.lang("Please select an importer."));
             } else {
                 CustomImporter importer = ((ImportTableModel) customImporterTable.getModel()).getImporter(row);
-                JOptionPane.showMessageDialog(frame, importer.getDescription());
+                dialogService.showWarningDialogAndWait(
+                        Localization.lang("Manage custom imports"),
+                        importer.getDescription());
             }
         });
 
@@ -164,7 +169,9 @@ public class ImportCustomizationDialog extends JabRefDialog {
         removeButton.addActionListener(e -> {
             int row = customImporterTable.getSelectedRow();
             if (row == -1) {
-                JOptionPane.showMessageDialog(frame, Localization.lang("Please select an importer."));
+                dialogService.showWarningDialogAndWait(
+                        Localization.lang("Manage custom imports"),
+                        Localization.lang("Please select an importer."));
             } else {
                 customImporterTable.removeRowSelectionInterval(row, row);
                 Globals.prefs.customImports
@@ -193,7 +200,7 @@ public class ImportCustomizationDialog extends JabRefDialog {
         JPanel mainPanel = new JPanel();
         ActionMap am = mainPanel.getActionMap();
         InputMap im = mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         am.put("close", closeAction);
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(sp, BorderLayout.CENTER);
@@ -214,7 +221,6 @@ public class ImportCustomizationDialog extends JabRefDialog {
         getContentPane().add(buttons, BorderLayout.SOUTH);
         this.setSize(getSize());
         pack();
-        this.setLocationRelativeTo(frame);
         customImporterTable.requestFocus();
     }
 

@@ -3,10 +3,11 @@ package org.jabref.gui.mergeentries;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
+import javax.swing.JFrame;
 import javax.swing.JSeparator;
 
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
@@ -22,11 +23,6 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
-/**
- * @author Oscar
- *
- *         Dialog for merging two Bibtex entries
- */
 public class MergeEntriesDialog extends JabRefDialog {
 
     private static final String MERGE_ENTRIES = Localization.lang("Merge entries");
@@ -34,10 +30,11 @@ public class MergeEntriesDialog extends JabRefDialog {
     private final BasePanel panel;
 
     private final CellConstraints cc = new CellConstraints();
+    private final DialogService dialogService;
 
-    public MergeEntriesDialog(BasePanel panel) {
-        super(panel.frame(), MERGE_ENTRIES, true, MergeEntriesDialog.class);
-
+    public MergeEntriesDialog(BasePanel panel, DialogService dialogService) {
+        super((JFrame) null, MERGE_ENTRIES, true, MergeEntriesDialog.class);
+        this.dialogService = dialogService;
         this.panel = panel;
 
         // Start setting up the dialog
@@ -53,9 +50,10 @@ public class MergeEntriesDialog extends JabRefDialog {
 
         // Check if there are two entries selected
         if (selected.size() != 2) { // None selected. Inform the user to select entries first.
-            JOptionPane.showMessageDialog(panel.frame(),
-                    Localization.lang("You have to choose exactly two entries to merge."),
-                    MERGE_ENTRIES, JOptionPane.INFORMATION_MESSAGE);
+
+            dialogService.showInformationDialogAndWait(Localization.lang("Merge entries"),
+                    Localization.lang("You have to choose exactly two entries to merge."));
+
             this.dispose();
             return;
         }
@@ -92,7 +90,7 @@ public class MergeEntriesDialog extends JabRefDialog {
             // Remove the other two entries and add them to the undo stack (which is not working...)
             BibEntry mergedEntry = mergeEntries.getMergeEntry();
             panel.insertEntry(mergedEntry);
-            ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), mergedEntry, panel));
+            ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), mergedEntry));
             ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), one, panel));
             panel.getDatabase().removeEntry(one);
             ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), two, panel));
