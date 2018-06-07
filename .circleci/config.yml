@@ -51,6 +51,7 @@ jobs:
           key: install4j
       - checkout
       - run: scripts/extract-install4j.sh
+      - run: install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY
       - run: ./gradlew -Pinstall4jDir="install4j7" release --stacktrace
       - store_artifacts:
           path: build/releases
