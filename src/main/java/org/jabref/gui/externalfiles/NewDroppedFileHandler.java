@@ -20,6 +20,8 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.OpenDatabase;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.PdfContentImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
@@ -28,6 +30,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,13 +45,15 @@ public class NewDroppedFileHandler {
     private final ImportFormatPreferences importFormatPreferences;
     private final MoveFilesCleanup moveFilesCleanup;
     private final DialogService dialogService;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
-    public NewDroppedFileHandler(DialogService dialogService, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes, FileDirectoryPreferences fileDirectoryPreferences, String fileDirPattern, ImportFormatPreferences importFormatPreferences) {
+    public NewDroppedFileHandler(DialogService dialogService, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes, FileDirectoryPreferences fileDirectoryPreferences, String fileDirPattern, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileupdateMonitor) {
         this.dialogService = dialogService;
         this.externalFileTypes = externalFileTypes;
         this.fileDirectoryPreferences = fileDirectoryPreferences;
         this.bibDatabaseContext = bibDatabaseContext;
         this.importFormatPreferences = importFormatPreferences;
+        this.fileUpdateMonitor = fileupdateMonitor;
         this.moveFilesCleanup = new MoveFilesCleanup(bibDatabaseContext, fileDirPattern, fileDirectoryPreferences);
     }
 
@@ -91,6 +96,11 @@ public class NewDroppedFileHandler {
                     LOGGER.warn("Problem reading XMP", e);
                 }
 
+            }
+
+            if (FileUtil.getFileExtension(file).filter(ext -> ext.equals("bib")).isPresent()) {
+                ParserResult pr = OpenDatabase.loadDatabase(file.toString(), importFormatPreferences, fileUpdateMonitor);
+                //TODO: import or open database
             }
         }
     }

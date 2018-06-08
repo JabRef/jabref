@@ -69,7 +69,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.database = Objects.requireNonNull(database);
         this.undoManager = panel.getUndoManager();
 
-        fileHandler = new NewDroppedFileHandler(frame.getDialogService(), database, externalFileTypes, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern(), Globals.prefs.getImportFormatPreferences());
+        fileHandler = new NewDroppedFileHandler(frame.getDialogService(), database, externalFileTypes,
+                                                Globals.prefs.getFileDirectoryPreferences(),
+                                                Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern(),
+                                                Globals.prefs.getImportFormatPreferences(),
+                                                Globals.getFileUpdateMonitor());
 
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
@@ -102,7 +106,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         pane.setFitToWidth(true);
 
         this.pane.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
-        
+
         // Store visual state
         new PersistenceVisualStateTable(this, Globals.prefs);
 
@@ -273,6 +277,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         if (event.getDragboard().hasContent(DataFormat.FILES)) {
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
+
+
+
             System.out.println(files);
 
             if (event.getTransferMode() == TransferMode.MOVE) {

@@ -74,8 +74,6 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     private Optional<Future<?>> citationStyleFuture = Optional.empty();
 
     private final NewDroppedFileHandler fileHandler;
-    private final ExternalFileTypes externalFileTypes;
-
     /**
      * @param panel           (may be null) Only set this if the preview is associated to the main window.
      * @param databaseContext (may be null) Used for resolving pdf directories for links.
@@ -86,9 +84,12 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         this.dialogService = dialogService;
         this.clipBoardManager = new ClipBoardManager();
         this.keyBindingRepository = keyBindingRepository;
-        this.externalFileTypes = externalFileTypes;
 
-        fileHandler = new NewDroppedFileHandler(dialogService, databaseContext, externalFileTypes, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern(), Globals.prefs.getImportFormatPreferences());
+        fileHandler = new NewDroppedFileHandler(dialogService, databaseContext, externalFileTypes,
+                                                Globals.prefs.getFileDirectoryPreferences(),
+                                                Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern(),
+                                                Globals.prefs.getImportFormatPreferences(),
+                                                Globals.getFileUpdateMonitor());
 
         // Set up scroll pane for preview pane
         setFitToHeight(true);
