@@ -112,14 +112,14 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
                 event.consume();
             });
         }
-        this.setOnDragOver(event -> {
+        this.previewView.setOnDragOver(event -> {
             System.out.println("drag over");
             if (event.getDragboard().hasFiles()) {
                 event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
             }
         });
 
-        this.setOnDragDropped(event -> {
+        this.previewView.setOnDragDropped(event -> {
             BibEntry entry = this.getEntry();
             boolean success = false;
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
