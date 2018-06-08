@@ -277,9 +277,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         if (event.getDragboard().hasContent(DataFormat.FILES)) {
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
-
-
-
             System.out.println(files);
 
             if (event.getTransferMode() == TransferMode.MOVE) {
