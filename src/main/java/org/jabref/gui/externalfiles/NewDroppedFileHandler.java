@@ -14,6 +14,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import org.jabref.JabRefGUI;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -99,7 +100,11 @@ public class NewDroppedFileHandler {
             }
 
             if (FileUtil.getFileExtension(file).filter(ext -> ext.equals("bib")).isPresent()) {
+
+                System.out.println("open db");
                 ParserResult pr = OpenDatabase.loadDatabase(file.toString(), importFormatPreferences, fileUpdateMonitor);
+                JabRefGUI.getMainFrame().addParserResult(pr, true);
+
                 //TODO: import or open database
             }
         }
