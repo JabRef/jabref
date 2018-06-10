@@ -5,6 +5,7 @@ import java.awt.Toolkit;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.jabref.gui.BasePanel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.GlobalFocusListener;
 import org.jabref.gui.StateManager;
@@ -19,6 +20,7 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -63,6 +65,9 @@ public class Globals {
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
     private static ThemeLoader themeLoader;
     private static TelemetryClient telemetryClient;
+
+    public static BibDatabaseContext bibDBContext;
+    public static BasePanel basePanel;
 
     private Globals() {
     }

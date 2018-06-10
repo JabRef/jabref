@@ -84,6 +84,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 availableModel.removeElement(object);
                 chosenModel.addElement(object);
             }
+            storeSettings();
         });
 
         btnLeft.addActionListener(event -> {
@@ -91,6 +92,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 availableModel.addElement(object);
                 chosenModel.removeElement(object);
             }
+            storeSettings();
         });
 
         btnUp.addActionListener(event -> {
@@ -102,6 +104,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 newSelectedIndices.add(newIndex);
             }
             chosen.setSelectedIndices(Ints.toArray(newSelectedIndices));
+            storeSettings();
         });
 
         btnDown.addActionListener(event -> {
@@ -115,6 +118,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 newSelectedIndices.add(newIndex);
             }
             chosen.setSelectedIndices(Ints.toArray(newSelectedIndices));
+            storeSettings();
         });
 
         btnDefault.addActionListener(event -> layout.setText(Globals.prefs.getPreviewPreferences()
@@ -126,8 +130,20 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 DefaultTaskExecutor.runInJavaFXThread(() -> {
 
                     PreviewPanel testPane = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService);
-                    testPane.setFixedLayout(layout.getText());
-                    testPane.setEntry(TestEntry.getTestEntry());
+                    if(chosen.isSelectionEmpty()){
+                        testPane.setFixedLayout(layout.getText());
+                        testPane.setEntry(TestEntry.getTestEntry());
+                    }
+                    else{
+                        int indexStyle = chosen.getSelectedIndex();
+                        PreviewPreferences p = Globals.prefs.getPreviewPreferences();
+                        p = new PreviewPreferences(p.getPreviewCycle(),indexStyle,p.getPreviewPanelDividerPosition(),p.isPreviewPanelEnabled(), p.getPreviewStyle(),p.getPreviewStyleDefault());
+
+                        testPane = new PreviewPanel(Globals.basePanel, Globals.bibDBContext, Globals.getKeyPrefs(), p, dialogService);
+                        testPane.setEntry(TestEntry.getTestEntry());
+                        testPane.updateLayout(p);
+                    }
+
 
                     DialogPane pane = new DialogPane();
                     pane.setContent(testPane);
