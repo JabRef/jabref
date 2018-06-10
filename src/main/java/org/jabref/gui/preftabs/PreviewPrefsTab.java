@@ -30,6 +30,7 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TestEntry;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.primitives.Ints;
@@ -130,20 +131,19 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 DefaultTaskExecutor.runInJavaFXThread(() -> {
 
                     PreviewPanel testPane = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService);
-                    if(chosen.isSelectionEmpty()){
+                    if (chosen.isSelectionEmpty()) {
                         testPane.setFixedLayout(layout.getText());
                         testPane.setEntry(TestEntry.getTestEntry());
                     }
-                    else{
+                    else {
                         int indexStyle = chosen.getSelectedIndex();
                         PreviewPreferences p = Globals.prefs.getPreviewPreferences();
                         p = new PreviewPreferences(p.getPreviewCycle(),indexStyle,p.getPreviewPanelDividerPosition(),p.isPreviewPanelEnabled(), p.getPreviewStyle(),p.getPreviewStyleDefault());
 
-                        testPane = new PreviewPanel(Globals.basePanel, Globals.bibDBContext, Globals.getKeyPrefs(), p, dialogService);
+                        testPane = new PreviewPanel(Globals.basePanel, new BibDatabaseContext(), Globals.getKeyPrefs(), p, dialogService);
                         testPane.setEntry(TestEntry.getTestEntry());
                         testPane.updateLayout(p);
                     }
-
 
                     DialogPane pane = new DialogPane();
                     pane.setContent(testPane);

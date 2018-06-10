@@ -18,7 +18,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.Globals;
 
 /**
  * Represents everything related to a BIB file. <p> The entries are stored in BibDatabase, the other data in MetaData
@@ -58,7 +57,6 @@ public class BibDatabaseContext {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
         this.location = DatabaseLocation.LOCAL;
-        Globals.bibDBContext = this;
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData) {

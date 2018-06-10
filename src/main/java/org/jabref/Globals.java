@@ -20,7 +20,6 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -40,6 +39,7 @@ public class Globals {
     // In the main program, this field is initialized in JabRef.java
     // Each test case initializes this field if required
     public static JabRefPreferences prefs;
+    public static BasePanel basePanel;
     /**
      * This field is initialized upon startup.
      * Only GUI code is allowed to access it, logic code should use dependency injection.
@@ -65,9 +65,6 @@ public class Globals {
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
     private static ThemeLoader themeLoader;
     private static TelemetryClient telemetryClient;
-
-    public static BibDatabaseContext bibDBContext;
-    public static BasePanel basePanel;
 
     private Globals() {
     }
