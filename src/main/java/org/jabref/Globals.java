@@ -5,7 +5,6 @@ import java.awt.Toolkit;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.GlobalFocusListener;
 import org.jabref.gui.StateManager;
@@ -39,7 +38,6 @@ public class Globals {
     // In the main program, this field is initialized in JabRef.java
     // Each test case initializes this field if required
     public static JabRefPreferences prefs;
-    public static BasePanel basePanel;
     /**
      * This field is initialized upon startup.
      * Only GUI code is allowed to access it, logic code should use dependency injection.

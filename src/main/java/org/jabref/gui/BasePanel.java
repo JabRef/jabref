@@ -232,7 +232,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         this.preview = new PreviewPanel(this, getBibDatabaseContext(), preferences.getKeyBindings(), preferences.getPreviewPreferences(), dialogService);
         frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview);
-        Globals.basePanel = this;
     }
 
     public static void runWorker(AbstractWorker worker) throws Exception {

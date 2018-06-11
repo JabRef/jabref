@@ -140,7 +140,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                         PreviewPreferences p = Globals.prefs.getPreviewPreferences();
                         p = new PreviewPreferences(p.getPreviewCycle(),indexStyle,p.getPreviewPanelDividerPosition(),p.isPreviewPanelEnabled(), p.getPreviewStyle(),p.getPreviewStyleDefault());
 
-                        testPane = new PreviewPanel(Globals.basePanel, new BibDatabaseContext(), Globals.getKeyPrefs(), p, dialogService);
+                        testPane = new PreviewPanel(JabRefGUI.getMainFrame().getCurrentBasePanel(), new BibDatabaseContext(), Globals.getKeyPrefs(), p, dialogService);
                         testPane.setEntry(TestEntry.getTestEntry());
                         testPane.updateLayout(p);
                     }
