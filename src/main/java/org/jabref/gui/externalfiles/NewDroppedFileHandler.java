@@ -14,7 +14,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import org.jabref.JabRefGUI;
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -25,6 +25,8 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.PdfContentImporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.UpdateField;
+import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.database.BibDatabaseContext;
@@ -32,6 +34,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,16 +47,26 @@ public class NewDroppedFileHandler {
     private final ExternalFileTypes externalFileTypes;
     private final FileDirectoryPreferences fileDirectoryPreferences;
     private final ImportFormatPreferences importFormatPreferences;
+    private final UpdateFieldPreferences updateFieldPreferences;
     private final MoveFilesCleanup moveFilesCleanup;
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
 
-    public NewDroppedFileHandler(DialogService dialogService, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes, FileDirectoryPreferences fileDirectoryPreferences, String fileDirPattern, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileupdateMonitor) {
+    public NewDroppedFileHandler(DialogService dialogService,
+                                 BibDatabaseContext bibDatabaseContext,
+                                 ExternalFileTypes externalFileTypes,
+                                 FileDirectoryPreferences fileDirectoryPreferences,
+                                 String fileDirPattern,
+                                 ImportFormatPreferences importFormatPreferences,
+                                 UpdateFieldPreferences updateFieldPreferences,
+                                 FileUpdateMonitor fileupdateMonitor) {
+
         this.dialogService = dialogService;
         this.externalFileTypes = externalFileTypes;
         this.fileDirectoryPreferences = fileDirectoryPreferences;
         this.bibDatabaseContext = bibDatabaseContext;
         this.importFormatPreferences = importFormatPreferences;
+        this.updateFieldPreferences = updateFieldPreferences;
         this.fileUpdateMonitor = fileupdateMonitor;
         this.moveFilesCleanup = new MoveFilesCleanup(bibDatabaseContext, fileDirPattern, fileDirectoryPreferences);
     }
@@ -98,16 +111,20 @@ public class NewDroppedFileHandler {
                 }
 
             }
-
-            if (FileUtil.getFileExtension(file).filter(ext -> ext.equals("bib")).isPresent()) {
-
-                System.out.println("open db");
-                ParserResult pr = OpenDatabase.loadDatabase(file.toString(), importFormatPreferences, fileUpdateMonitor);
-                JabRefGUI.getMainFrame().addParserResult(pr, true);
-
-                //TODO: import or open database
-            }
         }
+    }
+
+    public void importEntriesFromDroppedBibFiles(Path bibFile) {
+        System.out.println("importing db contens " + bibFile);
+        ParserResult parserResult = OpenDatabase.loadDatabase(bibFile.toString(), importFormatPreferences, fileUpdateMonitor);
+        List<BibEntry> entriesToImport = parserResult.getDatabaseContext().getEntries();
+        bibDatabaseContext.getDatabase().insertEntries(entriesToImport);
+
+        if (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)) {
+            // Set owner field to default value
+            UpdateField.setAutomaticFields(entriesToImport, true, true, updateFieldPreferences);
+        }
+
     }
 
     private void showImportOrLinkFileDialog(List<BibEntry> entriesToImport, Path fileName, BibEntry entryToLink) {

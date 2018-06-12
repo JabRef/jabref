@@ -234,8 +234,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         });
 
         tabbedPane.setOnDragDropped(event -> {
+            System.out.println("drag drop in tabbed pane");
             boolean success = false;
-            if (event.getDragboard().hasContent(DataFormat.FILES)) {
+
+            if (event.getDragboard().hasContent(DataFormat.FILES) ) {
                 List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
                 success = true;
 
