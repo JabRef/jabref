@@ -31,6 +31,7 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TestEntry;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.primitives.Ints;
@@ -85,6 +86,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 availableModel.removeElement(object);
                 chosenModel.addElement(object);
             }
+            storeSettings();
         });
 
         btnLeft.addActionListener(event -> {
@@ -92,6 +94,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 availableModel.addElement(object);
                 chosenModel.removeElement(object);
             }
+            storeSettings();
         });
 
         btnUp.addActionListener(event -> {
@@ -103,6 +106,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 newSelectedIndices.add(newIndex);
             }
             chosen.setSelectedIndices(Ints.toArray(newSelectedIndices));
+            storeSettings();
         });
 
         btnDown.addActionListener(event -> {
@@ -116,6 +120,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 newSelectedIndices.add(newIndex);
             }
             chosen.setSelectedIndices(Ints.toArray(newSelectedIndices));
+            storeSettings();
         });
 
         btnDefault.addActionListener(event -> layout.setText(Globals.prefs.getPreviewPreferences()
@@ -126,9 +131,20 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
             try {
                 DefaultTaskExecutor.runInJavaFXThread(() -> {
 
-                    PreviewPanel testPane = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService, ExternalFileTypes.getInstance());
-                    testPane.setFixedLayout(layout.getText());
-                    testPane.setEntry(TestEntry.getTestEntry());
+                    PreviewPanel testPane = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService);
+                    if (chosen.isSelectionEmpty()) {
+                        testPane.setFixedLayout(layout.getText());
+                        testPane.setEntry(TestEntry.getTestEntry());
+                    }
+                    else {
+                        int indexStyle = chosen.getSelectedIndex();
+                        PreviewPreferences preferences = Globals.prefs.getPreviewPreferences();
+                        preferences = new PreviewPreferences(preferences.getPreviewCycle(),indexStyle,preferences.getPreviewPanelDividerPosition(),preferences.isPreviewPanelEnabled(), preferences.getPreviewStyle(),preferences.getPreviewStyleDefault());
+
+                        testPane = new PreviewPanel(JabRefGUI.getMainFrame().getCurrentBasePanel(), new BibDatabaseContext(), Globals.getKeyPrefs(), preferences, dialogService);
+                        testPane.setEntry(TestEntry.getTestEntry());
+                        testPane.updateLayout(preferences);
+                    }
 
                     DialogPane pane = new DialogPane();
                     pane.setContent(testPane);
