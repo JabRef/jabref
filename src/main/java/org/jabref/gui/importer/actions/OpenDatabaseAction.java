@@ -92,13 +92,30 @@ public class OpenDatabaseAction extends SimpleCommand {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.BIBTEX_DB)
                 .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                .withInitialDirectory(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)))
+                .withInitialDirectory(getInitialDirectory())
                 .build();
 
         List<Path> chosenFiles = ds.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
         filesToOpen.addAll(chosenFiles);
 
         openFiles(filesToOpen, true);
+    }
+
+    /**
+     *
+     * @return Path of current panel database directory or the working directory
+     */
+    private Path getInitialDirectory() {
+        if (frame.getBasePanelCount() == 0) {
+            return getWorkingDirectoryPath();
+        } else {
+            Optional<Path> databasePath = frame.getCurrentBasePanel().getBibDatabaseContext().getDatabasePath();
+            return databasePath.map(p -> p.getParent()).orElse(getWorkingDirectoryPath());
+        }
+    }
+
+    private Path getWorkingDirectoryPath() {
+        return Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY));
     }
 
     /**
