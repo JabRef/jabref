@@ -25,7 +25,6 @@ public class EntryConverter {
         EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("archiveprefix", FieldName.EPRINTTYPE);
         EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put(FieldName.JOURNAL, FieldName.JOURNALTITLE);
         EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put(FieldName.KEY, "sortkey");
-        EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put(FieldName.PDF, FieldName.FILE);
         EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("primaryclass", FieldName.EPRINTCLASS);
         EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put(FieldName.SCHOOL, FieldName.INSTITUTION);
 

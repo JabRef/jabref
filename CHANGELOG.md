@@ -43,6 +43,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We reworked the "Edit file" dialog to make it resizeable and improved the workflow for adding and editing files https://github.com/JabRef/jabref/issues/2970
 - We fixed an issue where the month was not shown in the preview https://github.com/JabRef/jabref/issues/3239.
 - Rewritten logic to detect a second jabref instance. [#4023](https://github.com/JabRef/jabref/issues/4023)
+- We fixed an issue where the "Convert to BibTeX-Cleanup" moved the content of the `file` field to the `pdf` field [#4120](https://github.com/JabRef/jabref/issues/4120)
 - We fixed an issue where the preview pane in entry preview in preferences wasn't showing the citation style selected [#3849](https://github.com/JabRef/jabref/issues/3849)
 
 ### Removed
