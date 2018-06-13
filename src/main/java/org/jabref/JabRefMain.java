@@ -47,33 +47,37 @@ public class JabRefMain extends Application {
 
     @Override
     public void start(Stage mainStage) throws Exception {
-        // Fail on unsupported Java versions
-        ensureCorrectJavaVersion();
-        FallbackExceptionHandler.installExceptionHandler();
+        try {
+            // Fail on unsupported Java versions
+            ensureCorrectJavaVersion();
+            FallbackExceptionHandler.installExceptionHandler();
 
-        // Init preferences
-        final JabRefPreferences preferences = JabRefPreferences.getInstance();
-        Globals.prefs = preferences;
-        // Perform migrations
-        PreferencesMigrations.runMigrations();
+            // Init preferences
+            final JabRefPreferences preferences = JabRefPreferences.getInstance();
+            Globals.prefs = preferences;
+            // Perform migrations
+            PreferencesMigrations.runMigrations();
 
-        configureProxy(preferences.getProxyPreferences());
+            configureProxy(preferences.getProxyPreferences());
 
-        Globals.startBackgroundTasks();
+            Globals.startBackgroundTasks();
 
-        applyPreferences(preferences);
+            applyPreferences(preferences);
 
-        // Process arguments
-        ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START);
+            // Process arguments
+            ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START);
 
-        // Check for running JabRef
-        if (!handleMultipleAppInstances(arguments) || argumentProcessor.shouldShutDown()) {
-            shutdownCurrentInstance();
-            return;
+            // Check for running JabRef
+            if (!handleMultipleAppInstances(arguments) || argumentProcessor.shouldShutDown()) {
+                shutdownCurrentInstance();
+                return;
+            }
+
+            // If not, start GUI
+            new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank());
+        } catch (Exception ex) {
+            LOGGER.error("Unexpected exception", ex);
         }
-
-        // If not, start GUI
-        new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank());
     }
 
     /**
