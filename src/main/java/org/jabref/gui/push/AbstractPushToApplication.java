@@ -34,11 +34,10 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected boolean couldNotCall; // Set to true in case the command could not be executed, e.g., if the file is not found
     protected boolean couldNotConnect; // Set to true in case the tunnel to the program (if one is used) does not operate
     protected boolean notDefined; // Set to true if the corresponding path is not defined in the preferences
-    protected JPanel settings;
-    protected final JTextField path = new JTextField(30);
+
     protected String commandPath;
     protected String commandPathPreferenceKey;
-    protected FormBuilder builder;
+
     protected DialogService dialogService;
 
     public AbstractPushToApplication(DialogService dialogService) {
@@ -144,54 +143,11 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         return null;
     }
 
-    @Override
-    public JPanel getSettingsPanel() {
-        initParameters();
-        commandPath = Globals.prefs.get(commandPathPreferenceKey);
-        if (settings == null) {
-            initSettingsPanel();
-        }
-        path.setText(commandPath);
-        return settings;
-    }
-
     /**
      * Function to initialize parameters. Currently it is expected that commandPathPreferenceKey is set to the path of
      * the application.
      */
     protected abstract void initParameters();
-
-    /**
-     * Create a FormBuilder, fill it with a textbox for the path and store the JPanel in settings
-     */
-    protected void initSettingsPanel() {
-        builder = FormBuilder.create();
-        builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p"));
-        StringBuilder label = new StringBuilder(Localization.lang("Path to %0", getApplicationName()));
-        // In case the application name and the actual command is not the same, add the command in brackets
-        if (getCommandName() == null) {
-            label.append(':');
-        } else {
-            label.append(" (").append(getCommandName()).append("):");
-        }
-        builder.add(label.toString()).xy(1, 1);
-        builder.add(path).xy(3, 1);
-        JButton browse = new JButton(Localization.lang("Browse"));
-
-        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-
-        browse.addActionListener(
-                e -> DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showFileOpenDialog(fileDialogConfiguration))
-                        .ifPresent(f -> path.setText(f.toAbsolutePath().toString())));
-        builder.add(browse).xy(5, 1);
-        settings = builder.build();
-    }
-
-    @Override
-    public void storeSettings() {
-        Globals.prefs.put(commandPathPreferenceKey, path.getText());
-    }
 
     protected String getCiteCommand() {
         return Globals.prefs.get(JabRefPreferences.CITE_COMMAND);

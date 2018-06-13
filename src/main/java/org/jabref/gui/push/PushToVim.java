@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 public class PushToVim extends AbstractPushToApplication implements PushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToVim.class);
-    private final JTextField vimServer = new JTextField(30);
 
     public PushToVim(DialogService dialogService) {
         super(dialogService);
@@ -39,27 +38,6 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
     @Override
     public JabRefIcon getIcon() {
         return IconTheme.JabRefIcons.APPLICATION_VIM;
-    }
-
-    @Override
-    public JPanel getSettingsPanel() {
-        vimServer.setText(Globals.prefs.get(JabRefPreferences.VIM_SERVER));
-        return super.getSettingsPanel();
-    }
-
-    @Override
-    public void storeSettings() {
-        super.storeSettings();
-        Globals.prefs.put(JabRefPreferences.VIM_SERVER, vimServer.getText());
-    }
-
-    @Override
-    protected void initSettingsPanel() {
-        super.initSettingsPanel();
-        builder.appendRows("2dlu, p");
-        builder.add(Localization.lang("Vim server name") + ":").xy(1, 3);
-        builder.add(vimServer).xy(3, 3);
-        settings = builder.build();
     }
 
     @Override
