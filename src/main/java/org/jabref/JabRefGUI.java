@@ -37,7 +37,7 @@ public class JabRefGUI {
 
     private static final String NIMBUS_LOOK_AND_FEEL = "javax.swing.plaf.nimbus.NimbusLookAndFeel";
     private static final String WINDOWS_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-    private static final String OSX_AQUA_LOOk_AND_FEEL = "apple.laf.AquaLookAndFeel";
+    private static final String OSX_AQUA_LOOK_AND_FEEL = "apple.laf.AquaLookAndFeel";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
 
@@ -146,6 +146,11 @@ public class JabRefGUI {
         // do it here:
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
             mainStage.setMaximized(true);
+        } else {
+            mainStage.setX(Globals.prefs.getDouble(JabRefPreferences.POS_X));
+            mainStage.setY(Globals.prefs.getDouble(JabRefPreferences.POS_Y));
+            mainStage.setWidth(Globals.prefs.getDouble(JabRefPreferences.SIZE_X));
+            mainStage.setHeight(Globals.prefs.getDouble(JabRefPreferences.SIZE_Y));
         }
 
         Scene scene = new Scene(JabRefGUI.mainFrame, 800, 800);
@@ -156,6 +161,7 @@ public class JabRefGUI {
         mainStage.show();
 
         mainStage.setOnCloseRequest(event -> {
+            saveWindowState(mainStage);
             boolean reallyQuit = mainFrame.quit();
             if (!reallyQuit) {
                 event.consume();
@@ -192,6 +198,14 @@ public class JabRefGUI {
         }
 
         LOGGER.debug("Finished adding panels");
+    }
+
+    private void saveWindowState(Stage mainStage) {
+        Globals.prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, mainStage.isMaximized());
+        Globals.prefs.putDouble(JabRefPreferences.POS_X, mainStage.getX());
+        Globals.prefs.putDouble(JabRefPreferences.POS_Y, mainStage.getY());
+        Globals.prefs.putDouble(JabRefPreferences.SIZE_X, mainStage.getWidth());
+        Globals.prefs.putDouble(JabRefPreferences.SIZE_Y, mainStage.getHeight());
     }
 
     private void openLastEditedDatabases() {

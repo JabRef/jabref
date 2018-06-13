@@ -28,6 +28,8 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
@@ -146,7 +148,10 @@ public class GroupTreeView {
                     disclosureNode.getChildren().add(disclosureNodeArrow);
                     return disclosureNode;
                 })
-                .withOnMouseClickedEvent(group -> event -> group.toggleExpansion()));
+                .withOnMouseClickedEvent(group -> event -> {
+                    group.toggleExpansion();
+                    event.consume();
+                }));
 
         // Set pseudo-classes to indicate if row is root or sub-item ( > 1 deep)
         PseudoClass rootPseudoClass = PseudoClass.getPseudoClass("root");
@@ -176,6 +181,12 @@ public class GroupTreeView {
                     EasyBind.monadic(row.itemProperty())
                             .map(this::createContextMenuForGroup)
                             .orElse((ContextMenu) null));
+            row.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+                if (event.getButton() == MouseButton.SECONDARY) {
+                    // Prevent right-click to select group
+                    event.consume();
+                }
+            });
 
             // Drag and drop support
             row.setOnDragDetected(event -> {

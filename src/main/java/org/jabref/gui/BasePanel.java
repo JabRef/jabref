@@ -1243,36 +1243,12 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         mainTable.clearAndSelect(bibEntry);
     }
 
-    /**
-     * This method selects the entry on the given position, and scrolls it into view in the table.
-     * If an entryEditor is shown, it is given focus afterwards.
-     *
-     * @deprecated use select by entry not by row
-     */
-    @Deprecated
-    private void clearAndSelect(int pos) {
-        if ((pos >= 0) && (pos < mainTable.getItems().size())) {
-            mainTable.getSelectionModel().clearAndSelect(pos);
-        }
-    }
-
     public void selectPreviousEntry() {
-        mainTable.getSelectionModel().clearSelection();
-        mainTable.getSelectionModel().selectPrevious();
+        mainTable.getSelectionModel().clearAndSelect(mainTable.getSelectionModel().getSelectedIndex() - 1);
     }
 
     public void selectNextEntry() {
-        mainTable.getSelectionModel().clearSelection();
-        mainTable.getSelectionModel().selectNext();
-    }
-
-    public void selectFirstEntry() {
-        clearAndSelect(0);
-    }
-
-    public void selectLastEntry() {
-        mainTable.getSelectionModel().clearSelection();
-        mainTable.getSelectionModel().selectLast();
+        mainTable.getSelectionModel().clearAndSelect(mainTable.getSelectionModel().getSelectedIndex() + 1);
     }
 
     /**

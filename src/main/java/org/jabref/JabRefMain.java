@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
  * JabRef MainClass
  */
 public class JabRefMain extends Application {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefMain.class);
 
     private static String[] arguments;
@@ -46,41 +47,45 @@ public class JabRefMain extends Application {
 
     @Override
     public void start(Stage mainStage) throws Exception {
-        // Fail on unsupported Java versions
-        ensureCorrectJavaVersion();
-        FallbackExceptionHandler.installExceptionHandler();
+        try {
+            // Fail on unsupported Java versions
+            ensureCorrectJavaVersion();
+            FallbackExceptionHandler.installExceptionHandler();
 
-        // Init preferences
-        final JabRefPreferences preferences = JabRefPreferences.getInstance();
-        Globals.prefs = preferences;
-        // Perform migrations
-        PreferencesMigrations.runMigrations();
+            // Init preferences
+            final JabRefPreferences preferences = JabRefPreferences.getInstance();
+            Globals.prefs = preferences;
+            // Perform migrations
+            PreferencesMigrations.runMigrations();
 
-        configureProxy(preferences.getProxyPreferences());
+            configureProxy(preferences.getProxyPreferences());
 
-        Globals.startBackgroundTasks();
+            Globals.startBackgroundTasks();
 
-        applyPreferences(preferences);
+            applyPreferences(preferences);
 
-        // Process arguments
-        ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START);
+            // Process arguments
+            ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START);
 
-        // Check for running JabRef
-        if (!handleMultipleAppInstances(arguments) || argumentProcessor.shouldShutDown()) {
-            Platform.exit();
-            return;
+            // Check for running JabRef
+            if (!handleMultipleAppInstances(arguments) || argumentProcessor.shouldShutDown()) {
+                Platform.exit();
+                return;
+            }
+
+            // If not, start GUI
+            new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank());
+        } catch (Exception ex) {
+            LOGGER.error("Unexpected exception", ex);
         }
-
-        // If not, start GUI
-        new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank());
     }
-
+  
     @Override
     public void stop() {
         Globals.stopBackgroundTasks();
         Globals.shutdownThreadPools();
     }
-
+  
     /**
      * Tests if we are running an acceptable Java and terminates JabRef when we are sure the version is not supported.
      * This test uses the requirements for the Java version as specified in <code>gradle.build</code>. It is possible to
@@ -158,9 +163,9 @@ public class JabRefMain extends Application {
 
         /* Build list of Import and Export formats */
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
-                Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
+                                                        Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
         EntryTypes.loadCustomEntryTypes(preferences.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
-                preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
+                                        preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
         Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
 
         // Initialize protected terms loader
