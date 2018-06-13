@@ -8,7 +8,7 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 public class PreviewPreferences {
 
     private final List<String> previewCycle;
-    private final int previewCyclePosition;
+    private int previewCyclePosition;
     private final Number previewPanelDividerPosition;
     private final boolean previewPanelEnabled;
     private final String previewStyle;
