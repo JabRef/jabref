@@ -22,6 +22,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added icons to the group side panel to quickly switch between `union` and `intersection` group view mode https://github.com/JabRef/jabref/issues/3269.
 - We use `https` for [fetching from most online bibliographic database](https://help.jabref.org/en/#-using-online-bibliographic-database).
 - Opening a new file now prompts the directory of the currently selected file, instead of the directory of the last opened file.
+- Window state is saved on close and restored on start
 
 ### Fixed
 - We fixed an issue where custom exports could not be selected in the 'Export (selected) entries' dialog [#4013](https://github.com/JabRef/jabref/issues/4013)
