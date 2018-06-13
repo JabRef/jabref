@@ -8,6 +8,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -276,11 +277,13 @@ public class EntryTypeCustomizationDialog extends JabRefDialog implements ListSe
                 if (biblatexMode) {
                     Set<String> oldPrimaryOptionalFieldsLists = oldType.get().getPrimaryOptionalFields();
                     Set<String> oldSecondaryOptionalFieldsList = oldType.get().getSecondaryOptionalFields();
-                    if (oldRequiredFieldsList.equals(requiredFieldsList) && oldPrimaryOptionalFieldsLists.equals(optionalFieldsList) &&
-                            oldSecondaryOptionalFieldsList.equals(secondaryOptionalFieldsLists)) {
+                    if (Arrays.equals(oldRequiredFieldsList.toArray(), requiredFieldsList.toArray())
+                            && Arrays.equals(oldPrimaryOptionalFieldsLists.toArray(), optionalFieldsList.toArray())
+                            && Arrays.equals(oldSecondaryOptionalFieldsList.toArray(), secondaryOptionalFieldsLists.toArray())) {
                         changesMade = false;
                     }
-                } else if (oldRequiredFieldsList.equals(requiredFieldsList) && oldOptionalFieldsList.equals(optionalFieldsList)) {
+                } else if (Arrays.equals(oldRequiredFieldsList.toArray(), requiredFieldsList.toArray())
+                        && Arrays.equals(oldOptionalFieldsList.toArray(), optionalFieldsList.toArray())) {
                     changesMade = false;
                 }
             }
