@@ -9,7 +9,6 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.GlobalFocusListener;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
@@ -86,8 +85,8 @@ public class Globals {
         themeLoader = new ThemeLoader(fileUpdateMonitor);
 
         if (Globals.prefs.shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
-            BackgroundTask.wrap(Globals::startTelemetryClient)
-                          .executeWith(TASK_EXECUTOR);
+            //BackgroundTask.wrap(Globals::startTelemetryClient)
+            //              .executeWith(TASK_EXECUTOR);
         }
     }
 
