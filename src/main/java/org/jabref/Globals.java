@@ -95,7 +95,7 @@ public class Globals {
             client.trackSessionState(SessionState.End);
             client.flush();
 
-            // Workaround for bug https://github.com/Microsoft/ApplicationInsights-Java/issues/662
+            //FIXME: Workaround for bug https://github.com/Microsoft/ApplicationInsights-Java/issues/662
             SDKShutdownActivity.INSTANCE.stopAll();
         });
     }
