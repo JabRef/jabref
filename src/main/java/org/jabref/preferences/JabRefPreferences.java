@@ -214,12 +214,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String VALID_FIELD_BACKGROUND_COLOR = "validFieldBackgroundColor";
     public static final String ICON_ENABLED_COLOR = "iconEnabledColor";
     public static final String ICON_DISABLED_COLOR = "iconDisabledColor";
-    public static final String MENU_FONT_SIZE = "menuFontSize";
-    public static final String OVERRIDE_DEFAULT_FONTS = "overrideDefaultFonts";
     public static final String FONT_SIZE = "fontSize";
     public static final String FONT_STYLE = "fontStyle";
-    public static final String ICON_SIZE_LARGE = "iconSizeLarge";
-    public static final String ICON_SIZE_SMALL = "iconSizeSmall";
     public static final String RECENT_DATABASES = "recentDatabases";
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
@@ -405,8 +401,6 @@ public class JabRefPreferences implements PreferencesService {
 
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
-    // solves the issue java.lang.RuntimeException: Internal graphics not initialized yet
-    private final static Integer UNSET_MENU_FONT_SIZE = -123;
     // The only instance of this class:
     private static JabRefPreferences singleton;
     /**
@@ -501,7 +495,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(POS_Y, 0);
         defaults.put(SIZE_X, 1024);
         defaults.put(SIZE_Y, 768);
-        defaults.put(WINDOW_MAXIMISED, Boolean.FALSE);
+        defaults.put(WINDOW_MAXIMISED, Boolean.TRUE);
         defaults.put(AUTO_RESIZE_MODE, Boolean.TRUE);
         defaults.put(ENTRY_EDITOR_HEIGHT, 0.65);
         defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
@@ -601,10 +595,6 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(FONT_STYLE, Font.PLAIN);
         defaults.put(FONT_SIZE, 12);
-        defaults.put(OVERRIDE_DEFAULT_FONTS, Boolean.FALSE);
-        defaults.put(MENU_FONT_SIZE, UNSET_MENU_FONT_SIZE);
-        defaults.put(ICON_SIZE_LARGE, 24);
-        defaults.put(ICON_SIZE_SMALL, 16);
         // Main table color settings:
         defaults.put(VALID_FIELD_BACKGROUND_COLOR, "255:255:255");
         defaults.put(INVALID_FIELD_BACKGROUND_COLOR, "255:0:0");
@@ -926,11 +916,6 @@ public class JabRefPreferences implements PreferencesService {
         return preferredPositions;
     }
 
-    public int getFontSizeFX() {
-        // Decrease font size by 3 since JavaFX has default font size of 9, while Swing uses 12
-        return getInt(MENU_FONT_SIZE) - 3;
-    }
-
     public String getUser() {
         try {
             return get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
@@ -1018,16 +1003,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public int getIntDefault(String key) {
-        if (key.equals(JabRefPreferences.MENU_FONT_SIZE)) {
-            Integer menuFontSize = (Integer) defaults.get(key);
-            if (menuFontSize.equals(UNSET_MENU_FONT_SIZE)) {
-                menuFontSize = (int) javafx.scene.text.Font.getDefault().getSize();
-                defaults.put(key, menuFontSize);
-            }
-            return menuFontSize;
-        } else {
-            return (Integer) defaults.get(key);
-        }
+        return (Integer) defaults.get(key);
     }
 
     private double getDoubleDefault(String key) {

@@ -44,6 +44,8 @@ public class SidePaneManager {
         if (openOfficePreferences.getShowPanel()) {
             show(SidePaneType.OPEN_OFFICE);
         }
+
+        updateView();
     }
 
     public SidePane getPane() {
