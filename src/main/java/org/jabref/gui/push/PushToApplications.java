@@ -27,6 +27,14 @@ public class PushToApplications {
     }
 
     public static PushToApplicationSettings getSettings(PushToApplication application) {
-        return null;
+        if (application instanceof PushToEmacs) {
+            return new PushToEmacsSettings();
+        } else if (application instanceof PushToLyx) {
+            return new PushToLyxSettings();
+        } else if (application instanceof PushToVim) {
+            return new PushToVimSettings();
+        } else {
+            return new PushToApplicationSettings();
+        }
     }
 }
