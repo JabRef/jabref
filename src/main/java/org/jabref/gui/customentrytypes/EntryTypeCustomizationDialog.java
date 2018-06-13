@@ -49,7 +49,7 @@ import org.jabref.model.strings.StringUtil;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
-public class EntryCustomizationDialog extends JabRefDialog implements ListSelectionListener {
+public class EntryTypeCustomizationDialog extends JabRefDialog implements ListSelectionListener {
 
     protected GridBagLayout gbl = new GridBagLayout();
     protected GridBagConstraints con = new GridBagConstraints();
@@ -71,10 +71,10 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
     private BibDatabaseMode bibDatabaseMode;
 
     /**
-     * Creates a new instance of EntryCustomizationDialog
+     * Creates a new instance of EntryTypeCustomizationDialog
      */
-    public EntryCustomizationDialog(JabRefFrame frame) {
-        super((JFrame) null, Localization.lang("Customize entry types"), false, EntryCustomizationDialog.class);
+    public EntryTypeCustomizationDialog(JabRefFrame frame) {
+        super((JFrame) null, Localization.lang("Customize entry types"), false, EntryTypeCustomizationDialog.class);
 
         this.frame = frame;
         initGui();
