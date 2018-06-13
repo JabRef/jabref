@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
  * JabRef MainClass
  */
 public class JabRefMain extends Application {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefMain.class);
 
     private static String[] arguments;
@@ -77,12 +78,6 @@ public class JabRefMain extends Application {
         } catch (Exception ex) {
             LOGGER.error("Unexpected exception", ex);
         }
-    }
-
-    @Override
-    public void stop() {
-        Platform.exit();
-        System.exit(0);
     }
 
     /**
@@ -153,7 +148,6 @@ public class JabRefMain extends Application {
         Globals.stopBackgroundTasks();
         Globals.shutdownThreadPools();
         Platform.exit();
-        System.exit(0);
     }
 
     private static void applyPreferences(JabRefPreferences preferences) {
@@ -169,9 +163,9 @@ public class JabRefMain extends Application {
 
         /* Build list of Import and Export formats */
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
-                Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
+                                                        Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
         EntryTypes.loadCustomEntryTypes(preferences.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
-                preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
+                                        preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
         Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
 
         // Initialize protected terms loader
