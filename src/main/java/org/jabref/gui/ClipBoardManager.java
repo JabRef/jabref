@@ -29,8 +29,9 @@ import org.slf4j.LoggerFactory;
 
 public class ClipBoardManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClipBoardManager.class);
     public static final DataFormat XML = new DataFormat("application/xml");
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClipBoardManager.class);
 
     private final Clipboard clipboard;
 
