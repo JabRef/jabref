@@ -383,7 +383,7 @@ public class IconTheme {
         public FontBasedIcon(String code, Color iconColor) {
             this.iconCode = code;
             this.iconColor = iconColor;
-            this.size = JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_LARGE);
+            this.size = 24;
         }
 
         public FontBasedIcon(String code, Color iconColor, int size) {
@@ -426,7 +426,7 @@ public class IconTheme {
         }
 
         public FontBasedIcon createSmallIcon() {
-            return new FontBasedIcon(this.iconCode, this.iconColor, JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL));
+            return new FontBasedIcon(this.iconCode, this.iconColor, 16);
         }
 
         public FontBasedIcon createWithNewColor(Color newColor) {

@@ -69,7 +69,7 @@ public class JabRefMain extends Application {
 
             // Check for running JabRef
             if (!handleMultipleAppInstances(arguments) || argumentProcessor.shouldShutDown()) {
-                shutdownCurrentInstance();
+                Platform.exit();
                 return;
             }
 
@@ -79,7 +79,13 @@ public class JabRefMain extends Application {
             LOGGER.error("Unexpected exception", ex);
         }
     }
-
+  
+    @Override
+    public void stop() {
+        Globals.stopBackgroundTasks();
+        Globals.shutdownThreadPools();
+    }
+  
     /**
      * Tests if we are running an acceptable Java and terminates JabRef when we are sure the version is not supported.
      * This test uses the requirements for the Java version as specified in <code>gradle.build</code>. It is possible to
@@ -142,12 +148,6 @@ public class JabRefMain extends Application {
             }
         }
         return true;
-    }
-
-    private static void shutdownCurrentInstance() {
-        Globals.stopBackgroundTasks();
-        Globals.shutdownThreadPools();
-        Platform.exit();
     }
 
     private static void applyPreferences(JabRefPreferences preferences) {

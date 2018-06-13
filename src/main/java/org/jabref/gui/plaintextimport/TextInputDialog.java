@@ -59,7 +59,6 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import org.jabref.Globals;
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -521,7 +520,7 @@ public class TextInputDialog extends JabRefDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String data = new ClipBoardManager().getClipboardContents();
+            String data = Globals.clipboardManager.getContents();
             int selStart = textPane.getSelectionStart();
             int selEnd = textPane.getSelectionEnd();
             if ((selEnd - selStart) > 0) {
