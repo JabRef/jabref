@@ -2,8 +2,6 @@ package org.jabref.gui.push;
 
 import java.util.List;
 
-import javax.swing.JPanel;
-
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.database.BibDatabase;

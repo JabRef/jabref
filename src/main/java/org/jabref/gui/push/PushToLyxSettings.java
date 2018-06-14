@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 import org.jabref.logic.l10n.Localization;
 
 public class PushToLyxSettings extends PushToApplicationSettings {
+
     @Override
     protected void initSettingsPanel() {
         super.initSettingsPanel();

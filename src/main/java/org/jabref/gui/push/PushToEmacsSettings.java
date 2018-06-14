@@ -8,6 +8,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
 public class PushToEmacsSettings extends PushToApplicationSettings {
+
     private final JTextField additionalParams = new JTextField(30);
 
     @Override

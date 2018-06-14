@@ -1,32 +1,18 @@
 package org.jabref.gui.push;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-
 import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
 /**
@@ -38,7 +24,7 @@ public class PushToApplicationButton extends SimpleCommand implements ActionList
 
     private final JabRefFrame frame;
     private final List<PushToApplication> pushActions;
-    private PushToApplication toApp;
+    private final PushToApplication toApp;
     private final Map<PushToApplication, PushToApplicationAction> actions = new HashMap<>();
 
     public PushToApplicationButton(JabRefFrame frame, List<PushToApplication> pushActions) {

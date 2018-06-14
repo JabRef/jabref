@@ -8,6 +8,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
 public class PushToVimSettings extends PushToApplicationSettings {
+
     private final JTextField vimServer = new JTextField(30);
 
     @Override

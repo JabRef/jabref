@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;

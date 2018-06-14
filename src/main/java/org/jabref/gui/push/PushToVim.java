@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
@@ -57,9 +54,9 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
 
         try {
             String[] com = new String[] {commandPath, "--servername",
-                    Globals.prefs.get(JabRefPreferences.VIM_SERVER), "--remote-send",
-                    "<C-\\><C-N>a" + getCiteCommand() +
-                            "{" + keys + "}"};
+                                         Globals.prefs.get(JabRefPreferences.VIM_SERVER), "--remote-send",
+                                         "<C-\\><C-N>a" + getCiteCommand() +
+                                                                                                           "{" + keys + "}"};
 
             final Process p = Runtime.getRuntime().exec(com);
 
@@ -95,11 +92,11 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
         if (couldNotConnect) {
 
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
-                    Localization.lang("Could not connect to Vim server. Make sure that Vim is running with correct server name."));
+                                                 Localization.lang("Could not connect to Vim server. Make sure that Vim is running with correct server name."));
 
         } else if (couldNotCall) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
-                    Localization.lang("Could not run the 'vim' program."));
+                                                 Localization.lang("Could not run the 'vim' program."));
 
         } else {
             super.operationCompleted(panel);
