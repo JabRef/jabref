@@ -6,9 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
@@ -51,23 +48,15 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
     public void operationCompleted(BasePanel panel) {
         if (couldNotConnect) {
             panel.output(Localization.lang("Error") + ": " +
-                    Localization.lang("verify that LyX is running and that the lyxpipe is valid")
-                    + ". [" + commandPath + "]");
+                         Localization.lang("verify that LyX is running and that the lyxpipe is valid")
+                         + ". [" + commandPath + "]");
         } else if (couldNotCall) {
             panel.output(Localization.lang("Error") + ": " +
-                    Localization.lang("unable to write to") + " " + commandPath +
-                    ".in");
+                         Localization.lang("unable to write to") + " " + commandPath +
+                         ".in");
         } else {
             super.operationCompleted(panel);
         }
-    }
-
-    @Override
-    protected void initSettingsPanel() {
-        super.initSettingsPanel();
-        settings = new JPanel();
-        settings.add(new JLabel(Localization.lang("Path to LyX pipe") + ":"));
-        settings.add(path);
     }
 
     @Override

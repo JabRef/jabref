@@ -1,9 +1,6 @@
 package org.jabref.gui;
 
 import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -22,13 +19,9 @@ import java.util.stream.Collectors;
 
 import javax.swing.Action;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -39,8 +32,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
@@ -156,12 +151,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     private final SplitPane splitPane = new SplitPane();
     private final JabRefPreferences prefs = Globals.prefs;
     private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this);
-    private final JLabel statusLine = new JLabel("", SwingConstants.LEFT);
-    private final JLabel statusLabel = new JLabel(
-                                                  Localization.lang("Status")
-                                                  + ':',
-                                                  SwingConstants.LEFT);
-    private final JProgressBar progressBar = new JProgressBar();
+    private final Label statusLine = new Label("");
+    private final Label statusLabel = new Label(Localization.lang("Status") + ':');
+    private final ProgressBar progressBar = new ProgressBar();
     private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
 
     // Lists containing different subsets of actions for different purposes
@@ -447,11 +439,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
      * @param filenames the filenames of all currently opened files - used for storing them if prefs openLastEdited is set to true
      */
     private void tearDownJabRef(List<String> filenames) {
-        Globals.stopBackgroundTasks();
-        Globals.shutdownThreadPools();
-
-        //dispose();
-
         //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
 
         if (prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
@@ -571,8 +558,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         setCenter(splitPane);
 
-        UIManager.put("TabbedPane.contentBorderInsets", new Insets(0, 0, 0, 0));
-
+        /*
         GridBagLayout gbl = new GridBagLayout();
         GridBagConstraints con = new GridBagConstraints();
         con.fill = GridBagConstraints.BOTH;
@@ -596,6 +582,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         gbl.setConstraints(progressBar, con);
         status.add(progressBar);
         statusLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR.darker());
+        */
     }
 
     private void setDividerPosition() {
@@ -1036,10 +1023,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
      * displays the String on the Status Line visible on the bottom of the JabRef mainframe
      */
     public void output(final String s) {
-        SwingUtilities.invokeLater(() -> {
             statusLine.setText(s);
-            statusLine.repaint();
-        });
     }
 
     private void initActions() {
@@ -1266,31 +1250,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
     /**
      * Set the visibility of the progress bar in the right end of the
      * status line at the bottom of the frame.
-     * <p>
-     * If not called on the event dispatch thread, this method uses
-     * SwingUtilities.invokeLater() to do the actual operation on the EDT.
      */
     public void setProgressBarVisible(final boolean visible) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            progressBar.setVisible(visible);
-        } else {
-            SwingUtilities.invokeLater(() -> progressBar.setVisible(visible));
-        }
-    }
-
-    /**
-     * Sets the current value of the progress bar.
-     * <p>
-     * If not called on the event dispatch thread, this method uses
-     * SwingUtilities.invokeLater() to do the actual operation on the EDT.
-     */
-    public void setProgressBarValue(final int value) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            progressBar.setValue(value);
-        } else {
-            SwingUtilities.invokeLater(() -> progressBar.setValue(value));
-        }
-
+        progressBar.setVisible(visible);
     }
 
     /**
@@ -1300,29 +1262,14 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
      * SwingUtilities.invokeLater() to do the actual operation on the EDT.
      */
     public void setProgressBarIndeterminate(final boolean value) {
+        // TODO: Reimplement
+        /*
         if (SwingUtilities.isEventDispatchThread()) {
             progressBar.setIndeterminate(value);
         } else {
             SwingUtilities.invokeLater(() -> progressBar.setIndeterminate(value));
         }
-
-    }
-
-    /**
-     * Sets the maximum value of the progress bar. Always call this method
-     * before using the progress bar, to set a maximum value appropriate to
-     * the task at hand.
-     * <p>
-     * If not called on the event dispatch thread, this method uses
-     * SwingUtilities.invokeLater() to do the actual operation on the EDT.
-     */
-    public void setProgressBarMaximum(final int value) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            progressBar.setMaximum(value);
-        } else {
-            SwingUtilities.invokeLater(() -> progressBar.setMaximum(value));
-        }
-
+        */
     }
 
     /**

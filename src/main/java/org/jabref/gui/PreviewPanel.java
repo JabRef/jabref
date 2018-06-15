@@ -83,7 +83,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         this.databaseContext = Optional.ofNullable(databaseContext);
         this.basePanel = Optional.ofNullable(panel);
         this.dialogService = dialogService;
-        this.clipBoardManager = new ClipBoardManager();
+        this.clipBoardManager = Globals.clipboardManager;
         this.keyBindingRepository = keyBindingRepository;
 
         fileHandler = new NewDroppedFileHandler(dialogService, databaseContext, externalFileTypes,
@@ -348,6 +348,6 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
 
     private void copyPreviewToClipBoard() {
         String previewContent = (String) previewView.getEngine().executeScript("document.documentElement.outerHTML");
-        clipBoardManager.setClipboardContents(previewContent);
+        clipBoardManager.setContent(previewContent);
     }
 }

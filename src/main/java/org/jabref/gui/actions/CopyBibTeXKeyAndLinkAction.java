@@ -47,7 +47,7 @@ public class CopyBibTeXKeyAndLinkAction implements BaseAction {
                 sb.append(OS.NEWLINE);
             }
 
-            DefaultTaskExecutor.runInJavaFXThread(() -> clipboardManager.setClipboardHtmlContent(sb.toString()));
+            DefaultTaskExecutor.runInJavaFXThread(() -> clipboardManager.setHtmlContent(sb.toString()));
 
             int copied = entriesWithKey.size();
             int toCopy = entries.size();

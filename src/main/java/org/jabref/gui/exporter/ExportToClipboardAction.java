@@ -1,6 +1,5 @@
 package org.jabref.gui.exporter;
 
-import java.awt.Toolkit;
 import java.awt.datatransfer.ClipboardOwner;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,6 +12,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javafx.scene.input.ClipboardContent;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -99,10 +100,9 @@ public class ExportToClipboardAction extends AbstractWorker {
             ClipboardOwner owner = (clipboard, content) -> {
                 // Do nothing
             };
-            RtfTransferable rs = new RtfTransferable(sb.toString());
-            Toolkit.getDefaultToolkit()
-                   .getSystemClipboard()
-                   .setContents(rs, owner);
+            ClipboardContent clipboardContent = new ClipboardContent();
+            clipboardContent.putRtf(sb.toString());
+            Globals.clipboardManager.setContent(clipboardContent);
             message = Localization.lang("Entries exported to clipboard") + ": " + entries.size();
 
         } catch (Exception e) {

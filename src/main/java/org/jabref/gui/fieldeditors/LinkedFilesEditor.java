@@ -239,7 +239,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     private ContextMenu createContextMenuForFile(LinkedFileViewModel linkedFile) {
         ContextMenu menu = new ContextMenu();
-        menu.setStyle("-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
 
         MenuItem edit = new MenuItem(Localization.lang("Edit"));
         edit.setOnAction(event -> linkedFile.edit());

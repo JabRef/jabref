@@ -221,17 +221,15 @@ public class SearchResultFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!selectionModel.getSelected().isEmpty()) {
-                    List<BibEntry> selectedEntries = selectionModel.getSelected();
-                    // ! look at ClipBoardManager
-
+                    List<BibEntry> bes = selectionModel.getSelected();
                     try {
-                        Globals.clipboardManager.setClipboardContent(selectedEntries);
-                    } catch (IOException ex) {
-                        LOGGER.error("Error while copying selected entries to clipboard", ex);
+                        Globals.clipboardManager.setContent(bes);
+                    } catch (IOException e1) {
+                        LOGGER.error("Error while serializing entries for clipboard", e1);
                     }
-
-                    frame.output(Localization.lang("Copied") + ' ' + (selectedEntries.size() > 1 ? selectedEntries.size() + " "
-                                                                                                   + Localization.lang("entries") : "1 " + Localization.lang("entry") + '.'));
+                    frame.output(Localization.lang("Copied") + ' ' + (bes.size() > 1 ? bes.size() + " "
+                            + Localization.lang("entries")
+                            : "1 " + Localization.lang("entry") + '.'));
                 }
             }
         });
@@ -272,8 +270,8 @@ public class SearchResultFrame {
             @Override
             public void componentResized(ComponentEvent e) {
                 new SearchPreferences(Globals.prefs)
-                                                    .setSearchDialogWidth(searchResultFrame.getSize().width)
-                                                    .setSearchDialogHeight(searchResultFrame.getSize().height);
+                        .setSearchDialogWidth(searchResultFrame.getSize().width)
+                        .setSearchDialogHeight(searchResultFrame.getSize().height);
             }
 
             @Override
@@ -476,29 +474,28 @@ public class SearchResultFrame {
                 BibEntry entry = sortedEntries.get(row);
                 BasePanel p = entryHome.get(entry);
                 switch (col) {
-                    case FILE_COL:
-                        if (entry.hasField(FieldName.FILE)) {
-                            FileListTableModel tableModel = new FileListTableModel();
-                            entry.getField(FieldName.FILE).ifPresent(tableModel::setContent);
-                            if (tableModel.getRowCount() == 0) {
-                                return;
-                            }
-                            FileListEntry fl = tableModel.getEntry(0);
-                            (new ExternalFileMenuItem(frame, "", fl.getLink(), null,
-                                                      p.getBibDatabaseContext(), fl.getType())).actionPerformed(null);
+                case FILE_COL:
+                    if (entry.hasField(FieldName.FILE)) {
+                        FileListTableModel tableModel = new FileListTableModel();
+                        entry.getField(FieldName.FILE).ifPresent(tableModel::setContent);
+                        if (tableModel.getRowCount() == 0) {
+                            return;
                         }
-                        break;
-                    case URL_COL:
-                        entry.getField(FieldName.URL).ifPresent(link -> {
-                            try {
-                                JabRefDesktop.openExternalViewer(p.getBibDatabaseContext(), link, FieldName.URL);
-                            } catch (IOException ex) {
-                                LOGGER.warn("Could not open viewer", ex);
-                            }
-                        });
-                        break;
-                    default:
-                        break;
+                        FileListEntry fl = tableModel.getEntry(0);
+                            (new ExternalFileMenuItem(frame, "", fl.getLink(), null,
+                                p.getBibDatabaseContext(), fl.getType())).actionPerformed(null);
+                    }
+                    break;
+                case URL_COL:
+                    entry.getField(FieldName.URL).ifPresent(link -> { try {
+                        JabRefDesktop.openExternalViewer(p.getBibDatabaseContext(), link, FieldName.URL);
+                    } catch (IOException ex) {
+                            LOGGER.warn("Could not open viewer", ex);
+                        }
+                    });
+                    break;
+                default:
+                    break;
                 }
             }
         }
