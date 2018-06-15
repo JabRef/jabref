@@ -1,6 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -33,7 +32,11 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(TempDirectory.class)
-class LinkedFileViewModelTest {
+/**
+ * Must be public because otherwise @TestArchitectureTests fails!
+ *
+*/
+public class LinkedFileViewModelTest {
 
     private Path tempFile;
     private final JabRefPreferences preferences = mock(JabRefPreferences.class);
@@ -69,7 +72,7 @@ class LinkedFileViewModelTest {
     }
 
     @Test
-    void deleteWhenRemoveChosenReturnsTrueButDoesNotDeletesFile() throws IOException {
+    void deleteWhenRemoveChosenReturnsTrueButDoesNotDeletesFile() {
         linkedFile = new LinkedFile("", tempFile.toString(), "");
         when(dialogService.showCustomButtonDialogAndWait(
                 any(AlertType.class),
@@ -87,7 +90,7 @@ class LinkedFileViewModelTest {
     }
 
     @Test
-    void deleteWhenDeleteChosenReturnsTrueAndDeletesFile() throws IOException {
+    void deleteWhenDeleteChosenReturnsTrueAndDeletesFile() {
         linkedFile = new LinkedFile("", tempFile.toString(), "");
         when(dialogService.showCustomButtonDialogAndWait(
                 any(AlertType.class),
@@ -105,7 +108,7 @@ class LinkedFileViewModelTest {
     }
 
     @Test
-    void deleteWhenDeleteChosenAndFileMissingReturnsFalse() throws IOException {
+    void deleteWhenDeleteChosenAndFileMissingReturnsFalse() {
         linkedFile = new LinkedFile("", "!!nonexistent file!!", "");
         when(dialogService.showCustomButtonDialogAndWait(
                 any(AlertType.class),
@@ -123,7 +126,7 @@ class LinkedFileViewModelTest {
     }
 
     @Test
-    void deleteWhenDialogCancelledReturnsFalseAndDoesNotRemoveFile() throws IOException {
+    void deleteWhenDialogCancelledReturnsFalseAndDoesNotRemoveFile() {
         linkedFile = new LinkedFile("desc", tempFile.toString(), "pdf");
         when(dialogService.showCustomButtonDialogAndWait(
                 any(AlertType.class),
