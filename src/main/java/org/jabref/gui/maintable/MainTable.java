@@ -278,7 +278,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
             System.out.println("files in maintable " + files);
 
-            List<Path> bibFiles = files.stream().filter(file -> FileUtil.getFileExtension(file).filter(ext -> ext.equals("bib")).isPresent()).collect(Collectors.toList());
+            List<Path> bibFiles = files.stream().filter(file -> FileUtil.getFileExtension(file).filter(ext -> "bib".equals(ext)).isPresent()).collect(Collectors.toList());
 
             if (!bibFiles.isEmpty()) {
                 for (Path file : bibFiles) {

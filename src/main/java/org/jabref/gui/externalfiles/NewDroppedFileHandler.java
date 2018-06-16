@@ -93,7 +93,7 @@ public class NewDroppedFileHandler {
 
         for (Path file : files) {
 
-            if (FileUtil.getFileExtension(file).filter(ext -> ext.equals("pdf")).isPresent()) {
+            if (FileUtil.getFileExtension(file).filter(ext -> "pdf".equals(ext)).isPresent()) {
 
                 try {
 
@@ -116,7 +116,7 @@ public class NewDroppedFileHandler {
     }
 
     public void importEntriesFromDroppedBibFiles(Path bibFile) {
-        System.out.println("importing db contens " + bibFile);
+        System.out.println("importing db contents " + bibFile);
         ParserResult parserResult = OpenDatabase.loadDatabase(bibFile.toString(), importFormatPreferences, fileUpdateMonitor);
         List<BibEntry> entriesToImport = parserResult.getDatabaseContext().getEntries();
         bibDatabaseContext.getDatabase().insertEntries(entriesToImport);
