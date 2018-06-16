@@ -22,6 +22,7 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -240,7 +241,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
             event.setDropCompleted(success);
             event.consume();
-
         });
 
         //setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
