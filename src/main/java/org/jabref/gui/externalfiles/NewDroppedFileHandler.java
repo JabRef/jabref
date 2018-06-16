@@ -174,12 +174,12 @@ public class NewDroppedFileHandler {
                     filesCopiedToFileDirectory.add(targetFile);
                     System.out.println("copy to file dir " + filesCopiedToFileDirectory);
                 } else {
-                    dialogService.showErrorDialogAndWait(Localization.lang("Could not copy the file, the file %0 already exists", targetFile.toString()));
+                    dialogService.showErrorDialogAndWait(Localization.lang("Could not copy file"), Localization.lang("The file %0 already exists", targetFile.toString()));
+
                 }
+                addFilesToEntry(entry, filesCopiedToFileDirectory);
             }
-            addFilesToEntry(entry, filesCopiedToFileDirectory);
+
         }
-
     }
-
 }
