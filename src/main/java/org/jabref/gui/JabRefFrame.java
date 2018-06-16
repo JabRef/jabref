@@ -218,10 +218,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         initKeyBindings();
 
-
         tabbedPane.setOnDragOver(event -> {
             if (event.getDragboard().hasFiles() && (event.getSource() instanceof DndTabPane)) {
-                System.out.println("tab pane target gesture  files " + event.getGestureTarget() + "sourcee " + event.getSource());
                 event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
             }
         });
@@ -230,7 +228,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             System.out.println("drag drop in tabbed pane" + event.getGestureTarget());
             boolean success = false;
 
-            if (event.getDragboard().hasContent(DataFormat.FILES) ) {
+            if (event.getDragboard().hasContent(DataFormat.FILES)) {
                 List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
                 success = true;
 
@@ -1024,7 +1022,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
      * displays the String on the Status Line visible on the bottom of the JabRef mainframe
      */
     public void output(final String s) {
-            statusLine.setText(s);
+        statusLine.setText(s);
     }
 
     private void initActions() {
