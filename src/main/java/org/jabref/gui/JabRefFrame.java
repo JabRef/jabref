@@ -22,7 +22,6 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -219,14 +218,16 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         initKeyBindings();
 
+
         tabbedPane.setOnDragOver(event -> {
-            if (event.getDragboard().hasFiles()) {
+            if (event.getDragboard().hasFiles() && (event.getSource() instanceof DndTabPane)) {
+                System.out.println("tab pane target gesture  files " + event.getGestureTarget() + "sourcee " + event.getSource());
                 event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
             }
         });
 
         tabbedPane.setOnDragDropped(event -> {
-            System.out.println("drag drop in tabbed pane");
+            System.out.println("drag drop in tabbed pane" + event.getGestureTarget());
             boolean success = false;
 
             if (event.getDragboard().hasContent(DataFormat.FILES) ) {

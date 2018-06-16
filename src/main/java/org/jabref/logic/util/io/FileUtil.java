@@ -156,7 +156,7 @@ public class FileUtil {
             return false;
         }
         if (Files.exists(pathToDestinationFile) && !replaceExisting) {
-            LOGGER.error("Path to the destination file is not exists and the file shouldn't be replace.");
+            LOGGER.error("Path to the destination file exists but the file shouldn't be replaced.");
             return false;
         }
         try {

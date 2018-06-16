@@ -116,7 +116,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
             });
         }
         this.previewView.setOnDragOver(event -> {
-            System.out.println("drag over in preview");
+            System.out.println("drag over in preview" + event.getGestureTarget());
             if (event.getDragboard().hasFiles()) {
                 event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
             }
@@ -142,8 +142,9 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
 
                 }
                 if (event.getTransferMode() == TransferMode.COPY) {
-                    System.out.println("Mode Copy");
-
+                    System.out.println("Mode Copy"); //ctrl on win
+                    fileHandler.copyFileToFileDirAndAddToEntry(entry, files);
+                    success = true;
                 }
             }
 

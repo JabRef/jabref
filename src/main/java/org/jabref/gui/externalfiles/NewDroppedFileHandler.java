@@ -3,6 +3,7 @@ package org.jabref.gui.externalfiles;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -159,6 +160,25 @@ public class NewDroppedFileHandler {
     public void addToEntryAndMoveToFileDir(BibEntry entry, List<Path> files) {
         addFilesToEntry(entry, files);
         moveFilesCleanup.cleanup(entry);
+
+    }
+
+    public void copyFileToFileDirAndAddToEntry(BibEntry entry, List<Path> files) {
+        Optional<Path> firstExistingFileDir = bibDatabaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
+        if (firstExistingFileDir.isPresent()) {
+
+            List<Path> filesCopiedToFileDirectory = new ArrayList<>();
+            for (Path file : files) {
+                Path targetFile = firstExistingFileDir.get().resolve(file);
+                if (FileUtil.copyFile(file, firstExistingFileDir.get(), false)) {
+                    filesCopiedToFileDirectory.add(targetFile);
+                    System.out.println("copy to file dir " + filesCopiedToFileDirectory);
+                } else {
+                    dialogService.showErrorDialogAndWait(Localization.lang("Could not copy the file, the file %0 already exists", targetFile.toString()));
+                }
+            }
+            addFilesToEntry(entry, filesCopiedToFileDirectory);
+        }
 
     }
 

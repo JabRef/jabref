@@ -236,7 +236,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if ((event.getGestureSource() != originalItem) && LocalDragboard.INSTANCE.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
             event.acceptTransferModes(TransferMode.MOVE);
         }
-        if (event.getDragboard().hasFiles()) {
+        if (event.getDragboard().hasFiles() && (event.getSource() instanceof TableRow)) {
+            System.out.println("drag over in maintable" + event.getGestureTarget() + " sourece " + event.getSource());
             event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
         }
     }
@@ -305,8 +306,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
                 }
                 if (event.getTransferMode() == TransferMode.COPY) {
-                    System.out.println("Mode Copy");
-
+                    System.out.println("Mode Copy"); //ctrl on win
+                    fileHandler.copyFileToFileDirAndAddToEntry(entry, files);
+                    success = true;
                 }
             }
         }
