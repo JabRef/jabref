@@ -33,7 +33,7 @@ public class Layout {
         for (StringInt parsedEntry : parsedEntries) {
             switch (parsedEntry.i) {
             case LayoutHelper.IS_LAYOUT_TEXT:
-            case LayoutHelper.IS_SIMPLE_FIELD:
+                case LayoutHelper.IS_SIMPLE_COMMAND:
             case LayoutHelper.IS_OPTION_FIELD:
                 // Do nothing
                 break;

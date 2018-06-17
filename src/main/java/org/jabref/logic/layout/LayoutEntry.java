@@ -109,7 +109,7 @@ class LayoutEntry {
         case LayoutHelper.IS_LAYOUT_TEXT:
             text = si.s;
             break;
-        case LayoutHelper.IS_SIMPLE_FIELD:
+            case LayoutHelper.IS_SIMPLE_COMMAND:
             text = si.s.trim();
             break;
         case LayoutHelper.IS_OPTION_FIELD:
@@ -156,7 +156,7 @@ class LayoutEntry {
                 }
                 break;
             case LayoutHelper.IS_LAYOUT_TEXT:
-            case LayoutHelper.IS_SIMPLE_FIELD:
+                case LayoutHelper.IS_SIMPLE_COMMAND:
             case LayoutHelper.IS_OPTION_FIELD:
             default:
                 // Do nothing
@@ -185,7 +185,7 @@ class LayoutEntry {
         switch (type) {
         case LayoutHelper.IS_LAYOUT_TEXT:
             return text;
-        case LayoutHelper.IS_SIMPLE_FIELD:
+            case LayoutHelper.IS_SIMPLE_COMMAND:
             String value = bibtex.getResolvedFieldOrAlias(text, database).orElse("");
 
             // If a post formatter has been set, call it:
@@ -331,7 +331,7 @@ class LayoutEntry {
         case LayoutHelper.IS_LAYOUT_TEXT:
             return text;
 
-        case LayoutHelper.IS_SIMPLE_FIELD:
+            case LayoutHelper.IS_SIMPLE_COMMAND:
             throw new UnsupportedOperationException("bibtex entry fields not allowed in begin or end layout");
 
         case LayoutHelper.IS_FIELD_START:
