@@ -16,7 +16,7 @@ buildscript {
 
 plugins {
     id 'com.gradle.build-scan' version '1.14'
-    id 'com.install4j.gradle' version '7.0.4'
+    id 'com.install4j.gradle' version '7.0.6'
     id 'com.github.johnrengelman.shadow' version '2.0.4'
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
     id "com.simonharrer.modernizer" version '1.6.0-1'
@@ -166,7 +166,7 @@ dependencies {
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.6.0'
     testCompile 'org.xmlunit:xmlunit-matchers:2.6.0'
-    testCompile 'com.tngtech.archunit:archunit-junit:0.8.1'
+    testCompile 'com.tngtech.archunit:archunit-junit:0.8.2'
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
@@ -187,9 +187,14 @@ dependencyUpdates.revision = 'integration'
 // We have some dependencies which cannot be updated due to various reasons.
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
+        rules.all { ComponentSelection selection ->
+            if (selection.candidate.version ==~ /[0-9].*SNAPSHOT/) {
+                selection.reject("Ignore SNAPSHOT releases")
+            }
+        }
         rules.withModule("org.controlsfx:controlsfx") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /9.*/) { // Reject version 9 or higher
-                // selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
+                 selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
             }
         }
         rules.withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
