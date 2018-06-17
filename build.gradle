@@ -188,7 +188,7 @@ dependencyUpdates.revision = 'integration'
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /[0-9].*SNAPSHOT/) {
+            if ( selection.candidate.module != "junit-pioneer" && selection.candidate.version ==~ /[0-9].*SNAPSHOT/ ) {
                 selection.reject("Ignore SNAPSHOT releases")
             }
         }
