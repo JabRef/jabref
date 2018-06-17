@@ -15,14 +15,14 @@ buildscript {
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '1.11'
+    id 'com.gradle.build-scan' version '1.14'
     id 'com.install4j.gradle' version '7.0.4'
-    id 'com.github.johnrengelman.shadow' version '2.0.2'
+    id 'com.github.johnrengelman.shadow' version '2.0.4'
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
     id "com.simonharrer.modernizer" version '1.6.0-1'
-    id 'me.champeau.gradle.jmh' version '0.4.3'
-    id 'net.ltgt.errorprone' version '0.0.13'
-    id 'com.github.ben-manes.versions' version '0.17.0'
+    id 'me.champeau.gradle.jmh' version '0.4.6'
+    id 'net.ltgt.errorprone' version '0.0.14'
+    id 'com.github.ben-manes.versions' version '0.19.0'
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
@@ -45,7 +45,7 @@ apply from: 'xjc.gradle'
 
 group = "org.jabref"
 version = "4.4-dev"
-project.ext.threeDotVersion = "4.3.0.1"
+project.ext.threeDotVersion = "4.4.0.0"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j7' : 'install4j7')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -160,13 +160,13 @@ dependencies {
     testCompile 'org.junit-pioneer:junit-pioneer:0.1-SNAPSHOT'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
-    testCompile 'org.mockito:mockito-core:2.18.3'
-    testCompile 'com.github.tomakehurst:wiremock:2.17.0'
+    testCompile 'org.mockito:mockito-core:2.19.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.18.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.6.0'
     testCompile 'org.xmlunit:xmlunit-matchers:2.6.0'
-    testCompile 'com.tngtech.archunit:archunit-junit:0.8.0'
+    testCompile 'com.tngtech.archunit:archunit-junit:0.8.1'
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
@@ -181,32 +181,25 @@ dependencyUpdates {
     outputFormatter = "json"
 }
 
+//We have to use this as long as junit-pioneer has no official release
+dependencyUpdates.revision = 'integration'
+
 // We have some dependencies which cannot be updated due to various reasons.
 dependencyUpdates.resolutionStrategy = {
-    componentSelection {
-        withModule("org.controlsfx:controlsfx") { ComponentSelection selection ->
+    componentSelection { rules ->
+        rules.withModule("org.controlsfx:controlsfx") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /9.*/) { // Reject version 9 or higher
-                selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
+                // selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
             }
         }
-        withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
+        rules.withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /2.*/) {
                 selection.reject("Cannot be upgraded to version 2")
             }
         }
-        withModule("mysql:mysql-connector-java") { ComponentSelection selection ->
+        rules.withModule("mysql:mysql-connector-java") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /[6-9].*/) {
                 selection.reject("http://dev.mysql.com/downloads/connector/j/ lists the version 5.* as last stable version.")
-            }
-        }
-        withModule("org.jacoco:org.jacoco.agent") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /0.8.*/) {
-                selection.reject("As a native plugin we cannot control the actual version of jacoco. This dependency should be hidden.")
-            }
-        }
-        withModule("org.jacoco:org.jacoco.ant") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /0.8.*/) {
-                selection.reject("As a native plugin we cannot control the actual version of jacoco. This dependency should be hidden.")
             }
         }
     }
