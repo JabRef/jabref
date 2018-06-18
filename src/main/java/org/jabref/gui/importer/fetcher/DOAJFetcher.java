@@ -27,7 +27,7 @@ import org.json.JSONObject;
 /**
  * Fetches data from the Directory of Open Access Journals (DOAJ)
  *
- * @implNote
+ * @implNote <a href="https://doaj.org/api/v1/docs">API documentation</a>
  */
 public class DOAJFetcher implements SearchBasedParserFetcher {
 
