@@ -1,107 +1,45 @@
 package org.jabref.gui.importer.fetcher;
 
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
-import org.jabref.Globals;
-import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.ImportInspector;
-import org.jabref.logic.importer.OutputPrinter;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.Parser;
+import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.util.JSONEntryParser;
-import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.URLUtil;
+import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class DOAJFetcher implements EntryFetcher {
+/**
+ * Fetches data from the Directory of Open Access Journals (DOAJ)
+ *
+ * @implNote
+ */
+public class DOAJFetcher implements SearchBasedParserFetcher {
 
     private static final String SEARCH_URL = "https://doaj.org/api/v1/search/articles/";
-    private static final Logger LOGGER = LoggerFactory.getLogger(DOAJFetcher.class);
-    private static final int MAX_PER_PAGE = 100;
-    private boolean shouldContinue;
+    private final ImportFormatPreferences preferences;
 
-
-    private final JSONEntryParser jsonConverter = new JSONEntryParser();
-
-    @Override
-    public void stopFetching() {
-        shouldContinue = false;
+    public DOAJFetcher(ImportFormatPreferences preferences) {
+        this.preferences = Objects.requireNonNull(preferences);
     }
 
     @Override
-    public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
-        shouldContinue = true;
-        try {
-            status.setStatus(Localization.lang("Searching..."));
-            HttpResponse<JsonNode> jsonResponse;
-            jsonResponse = Unirest.get(SEARCH_URL + query + "?pageSize=1").header("accept", "application/json").asJson();
-            JSONObject jo = jsonResponse.getBody().getObject();
-            int numberToFetch = jo.getInt("total");
-            if (numberToFetch > 0) {
-                if (numberToFetch > MAX_PER_PAGE) {
-                    boolean numberEntered = false;
-                    do {
-                        String strCount = JOptionPane.showInputDialog(Localization.lang("%0 references found. Number of references to fetch?", String.valueOf(numberToFetch)));
-
-                        if (strCount == null) {
-                            status.setStatus(Localization.lang("%0 import canceled", getTitle()));
-                            return false;
-                        }
-
-                        try {
-                            numberToFetch = Integer.parseInt(strCount.trim());
-                            numberEntered = true;
-                        } catch (NumberFormatException ex) {
-                            status.showMessage(Localization.lang("Please enter a valid number"));
-                        }
-                    } while (!numberEntered);
-                }
-
-                int fetched = 0; // Keep track of number of items fetched for the progress bar
-                for (int page = 1; ((page - 1) * MAX_PER_PAGE) <= numberToFetch; page++) {
-                    if (!shouldContinue) {
-                        break;
-                    }
-
-                    int noToFetch = Math.min(MAX_PER_PAGE, numberToFetch - ((page - 1) * MAX_PER_PAGE));
-                    jsonResponse = Unirest.get(SEARCH_URL + query + "?page=" + page + "&pageSize=" + noToFetch)
-                            .header("accept", "application/json").asJson();
-                    jo = jsonResponse.getBody().getObject();
-                    if (jo.has("results")) {
-                        JSONArray results = jo.getJSONArray("results");
-                        for (int i = 0; i < results.length(); i++) {
-                            JSONObject bibJsonEntry = results.getJSONObject(i).getJSONObject("bibjson");
-                            BibEntry entry = jsonConverter.parseBibJSONtoBibtex(bibJsonEntry,
-                                    Globals.prefs.getKeywordDelimiter());
-                            inspector.addEntry(entry);
-                            fetched++;
-                            inspector.setProgress(fetched, numberToFetch);
-                        }
-                    }
-                }
-                return true;
-            } else {
-                status.showMessage(Localization.lang("No entries found for the search string '%0'", query),
-                        Localization.lang("Search %0", getTitle()), JOptionPane.INFORMATION_MESSAGE);
-                return false;
-            }
-        } catch (UnirestException e) {
-            LOGGER.error("Error while fetching from " + getTitle(), e);
-            ((ImportInspectionDialog)inspector).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
-            return false;
-        }
-    }
-
-    @Override
-    public String getTitle() {
+    public String getName() {
         return "DOAJ";
     }
 
@@ -111,9 +49,31 @@ public class DOAJFetcher implements EntryFetcher {
     }
 
     @Override
-    public JPanel getOptionsPanel() {
-        // No additional options available
-        return null;
+    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+        URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
+        URLUtil.addPath(uriBuilder, query);
+        uriBuilder.addParameter("pageSize", "20"); // Number of results
+        //uriBuilder.addParameter("page", "1"); // Page (not needed so far)
+        return uriBuilder.build().toURL();
     }
 
+    @Override
+    public Parser getParser() {
+        return inputStream -> {
+            JSONEntryParser jsonConverter = new JSONEntryParser();
+            String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
+            JSONObject jsonObject = new JSONObject(response);
+
+            List<BibEntry> entries = new ArrayList<>();
+            if (jsonObject.has("results")) {
+                JSONArray results = jsonObject.getJSONArray("results");
+                for (int i = 0; i < results.length(); i++) {
+                    JSONObject bibJsonEntry = results.getJSONObject(i).getJSONObject("bibjson");
+                    BibEntry entry = jsonConverter.parseBibJSONtoBibtex(bibJsonEntry, preferences.getKeywordSeparator());
+                    entries.add(entry);
+                }
+            }
+            return entries;
+        };
+    }
 }

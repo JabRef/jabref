@@ -31,7 +31,6 @@ public class SearchBasedEntryFetcher implements EntryFetcher {
 
     @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
-
         status.setStatus(Localization.lang("Processing %0", query));
         try {
             List<BibEntry> matches = fetcher.performSearch(query);

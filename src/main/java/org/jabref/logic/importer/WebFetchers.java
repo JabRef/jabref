@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.importer.fetcher.DOAJFetcher;
 import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ArXiv;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
@@ -82,6 +83,7 @@ public class WebFetchers {
         list.add(new GoogleScholar(importFormatPreferences));
         list.add(new DBLPFetcher(importFormatPreferences));
         list.add(new CrossRef());
+        list.add(new DOAJFetcher(importFormatPreferences));
         list.sort(Comparator.comparing(WebFetcher::getName));
         return list;
     }

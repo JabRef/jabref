@@ -71,7 +71,7 @@ public class JSONEntryParser {
             JSONObject journal = bibJsonEntry.getJSONObject("journal");
             // Journal title
             if (journal.has("title")) {
-                entry.setField(FieldName.JOURNAL, journal.getString("title"));
+                entry.setField(FieldName.JOURNAL, journal.getString("title").trim());
             } else {
                 LOGGER.info("No journal title found.");
             }
@@ -90,7 +90,7 @@ public class JSONEntryParser {
             JSONArray keywords = bibJsonEntry.getJSONArray("keywords");
             for (int i = 0; i < keywords.length(); i++) {
                 if (!keywords.isNull(i)) {
-                    entry.addKeyword(keywords.getString(i), keywordSeparator);
+                    entry.addKeyword(keywords.getString(i).trim(), keywordSeparator);
                 }
             }
         }
