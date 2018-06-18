@@ -30,7 +30,8 @@ public class FieldEditors {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldEditors.class);
 
-    private static final ImmutableSet<String> SINGLE_LINE_FIELDS = ImmutableSet.of("title", "author", "year");
+    private static final ImmutableSet<String> SINGLE_LINE_FIELDS = ImmutableSet.of(
+            "title", "author", "year", "institution");
 
     public static FieldEditorFX getForField(final String fieldName,
                                             final TaskExecutor taskExecutor,
