@@ -18,10 +18,14 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
 
     private EditorTextArea textArea;
 
-    public PersonsEditor(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, JabRefPreferences preferences, FieldCheckers fieldCheckers) {
+    public PersonsEditor(final String fieldName,
+                         final AutoCompleteSuggestionProvider<?> suggestionProvider,
+                         final JabRefPreferences preferences,
+                         final FieldCheckers fieldCheckers,
+                         final boolean hasSingleLine) {
         this.viewModel = new PersonsEditorViewModel(fieldName, suggestionProvider, preferences.getAutoCompletePreferences(), fieldCheckers);
 
-        textArea = new EditorTextArea();
+        textArea = new EditorTextArea(hasSingleLine);
         HBox.setHgrow(textArea, Priority.ALWAYS);
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
         textArea.addToContextMenu(EditorMenus.getNameMenu(textArea));

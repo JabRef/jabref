@@ -22,6 +22,7 @@ import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,12 +30,29 @@ public class FieldEditors {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldEditors.class);
 
-    public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, JabRefPreferences preferences, BibDatabaseContext databaseContext, String entryType, SuggestionProviders suggestionProviders, UndoManager undoManager) {
+    private static final ImmutableSet<String> SINGLE_LINE_FIELDS = ImmutableSet.of("title", "author", "year");
+
+    public static FieldEditorFX getForField(final String fieldName,
+                                            final TaskExecutor taskExecutor,
+                                            final DialogService dialogService,
+                                            final JournalAbbreviationLoader journalAbbreviationLoader,
+                                            final JournalAbbreviationPreferences journalAbbreviationPreferences,
+                                            final JabRefPreferences preferences,
+                                            final BibDatabaseContext databaseContext,
+                                            final String entryType,
+                                            final SuggestionProviders suggestionProviders,
+                                            final UndoManager undoManager) {
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 
-        AutoCompleteSuggestionProvider<?> suggestionProvider = getSuggestionProvider(fieldName, suggestionProviders, databaseContext.getMetaData());
+        final AutoCompleteSuggestionProvider<?> suggestionProvider = getSuggestionProvider(fieldName, suggestionProviders, databaseContext.getMetaData());
 
-        FieldCheckers fieldCheckers = new FieldCheckers(databaseContext, preferences.getFileDirectoryPreferences(), journalAbbreviationLoader.getRepository(journalAbbreviationPreferences), preferences.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
+        final FieldCheckers fieldCheckers = new FieldCheckers(
+                databaseContext,
+                preferences.getFileDirectoryPreferences(),
+                journalAbbreviationLoader.getRepository(journalAbbreviationPreferences),
+                preferences.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
+
+        final boolean hasSingleLine = SINGLE_LINE_FIELDS.contains(fieldName.toLowerCase());
 
         if (preferences.getTimestampPreferences().getTimestampField().equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
             if (fieldExtras.contains(FieldProperty.ISO_DATE)) {
@@ -71,7 +89,7 @@ public class FieldEditors {
         } else if (fieldExtras.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldExtras.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
             return new LinkedEntriesEditor(fieldName, databaseContext, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.PERSON_NAMES)) {
-            return new PersonsEditor(fieldName, suggestionProvider, preferences, fieldCheckers);
+            return new PersonsEditor(fieldName, suggestionProvider, preferences, fieldCheckers, hasSingleLine);
         } else if (FieldName.KEYWORDS.equals(fieldName)) {
             return new KeywordsEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
         } else if (fieldExtras.contains(FieldProperty.MULTILINE_TEXT)) {
@@ -81,7 +99,7 @@ public class FieldEditors {
         }
 
         // default
-        return new SimpleEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
+        return new SimpleEditor(fieldName, suggestionProvider, fieldCheckers, preferences, hasSingleLine);
     }
 
     @SuppressWarnings("unchecked")

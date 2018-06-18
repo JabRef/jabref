@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -16,10 +17,14 @@ import com.sun.javafx.scene.control.skin.TextAreaSkin;
 public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable {
 
     public EditorTextArea() {
-        this("");
+        this("", false);
     }
 
-    public EditorTextArea(String text) {
+    public EditorTextArea(final boolean hasSingleLine) {
+        this("", hasSingleLine);
+    }
+
+    public EditorTextArea(final String text, final boolean hasSingleLine) {
         super(text);
 
         setMinHeight(1);
@@ -46,6 +51,19 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
                 }
                 event.consume();
             }
+        });
+
+        if (hasSingleLine) {
+            setTextFormatter(createSingleLineTextFormatter());
+        }
+    }
+
+    private static <T> TextFormatter<T> createSingleLineTextFormatter() {
+        return new TextFormatter<>(change -> {
+            if (change.isAdded()) {
+                change.setText(change.getText().replaceAll("\\s+", " "));
+            }
+            return change;
         });
     }
 

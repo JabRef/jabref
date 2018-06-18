@@ -17,10 +17,14 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
 
     @FXML private final SimpleEditorViewModel viewModel;
 
-    public SimpleEditor(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, JabRefPreferences preferences) {
+    public SimpleEditor(final String fieldName,
+                        final AutoCompleteSuggestionProvider<?> suggestionProvider,
+                        final FieldCheckers fieldCheckers,
+                        final JabRefPreferences preferences,
+                        final boolean hasSingleLine) {
         this.viewModel = new SimpleEditorViewModel(fieldName, suggestionProvider, fieldCheckers);
 
-        EditorTextArea textArea = new EditorTextArea();
+        EditorTextArea textArea = new EditorTextArea(hasSingleLine);
         HBox.setHgrow(textArea, Priority.ALWAYS);
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
         textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));
@@ -33,6 +37,14 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         }
 
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+    }
+
+
+    public SimpleEditor(final String fieldName,
+                        final AutoCompleteSuggestionProvider<?> suggestionProvider,
+                        final FieldCheckers fieldCheckers,
+                        final JabRefPreferences preferences) {
+        this(fieldName, suggestionProvider, fieldCheckers, preferences, false);
     }
 
     @Override
