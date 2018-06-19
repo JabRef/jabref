@@ -52,7 +52,7 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
     public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
         URLUtil.addPath(uriBuilder, query);
-        uriBuilder.addParameter("pageSize", "20"); // Number of results
+        uriBuilder.addParameter("pageSize", "30"); // Number of results
         //uriBuilder.addParameter("page", "1"); // Page (not needed so far)
         return uriBuilder.build().toURL();
     }
