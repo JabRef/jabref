@@ -1,4 +1,4 @@
-package org.jabref.gui.importer.fetcher;
+package org.jabref.logic.importer.fetcher;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
