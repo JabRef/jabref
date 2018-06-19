@@ -7,6 +7,7 @@ This log lists the architectural decisions for JabRef.
 - [ADR-0000](0000-use-markdown-architectural-decision-records.md) - Use Markdown Architectural Decision Records
 - [ADR-0001](0001-use-crowdin-for-translations.md) - Use Crowdin for translations
 - [ADR-0002](0002-use-slf4j-for-logging.md) - Use slf4j together with log4j2 for logging
+- [ADR-0003](0003-use-gradle-as-build-tool.md) - Use Gradle as build tool
 
 <!-- adrlogstop -->
 
