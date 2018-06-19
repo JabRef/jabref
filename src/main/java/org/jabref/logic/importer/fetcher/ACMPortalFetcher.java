@@ -35,10 +35,15 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
         return HelpFile.FETCHER_ACM;
     }
 
+    private static String createQueryString(String query) {
+        // Query syntax to search for an entry that matches "one" and "two" in any field is: (+one +two)
+        return "(%252B" + query.trim().replaceAll("\\s+", "%20%252B") + ")";
+    }
+
     @Override
     public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
-        uriBuilder.addParameter("query", query); // Search all fields
+        uriBuilder.addParameter("query", createQueryString(query)); // Search all fields
         uriBuilder.addParameter("within", "owners.owner=GUIDE"); // Search within the ACM Guide to Computing Literature (encompasses the ACM Full-Text Collection)
         uriBuilder.addParameter("expformat", "bibtex"); // BibTeX format
         return uriBuilder.build().toURL();
