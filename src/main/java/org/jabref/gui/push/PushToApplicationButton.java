@@ -171,7 +171,7 @@ public class PushToApplicationButton extends SimpleCommand implements ActionList
 
             @Override
             public String getText() {
-                return Localization.menuTitle("Push entries to external application (%0)", application.getApplicationName());
+                return Localization.lang("Push entries to external application (%0)", application.getApplicationName());
             }
 
             @Override

@@ -127,10 +127,10 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         copyPreview.setOnAction(event -> copyPreviewToClipBoard());
         MenuItem printEntryPreview = new MenuItem(Localization.lang("Print entry preview"), IconTheme.JabRefIcons.PRINTED.getGraphicNode());
         printEntryPreview.setOnAction(event -> print());
-        MenuItem previousPreviewLayout = new MenuItem(Localization.menuTitle("Previous preview layout"));
+        MenuItem previousPreviewLayout = new MenuItem(Localization.lang("Previous preview layout"));
         previousPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.PREVIOUS_PREVIEW_LAYOUT));
         previousPreviewLayout.setOnAction(event -> basePanel.ifPresent(BasePanel::previousPreviewStyle));
-        MenuItem nextPreviewLayout = new MenuItem(Localization.menuTitle("Next preview layout"));
+        MenuItem nextPreviewLayout = new MenuItem(Localization.lang("Next preview layout"));
         nextPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.NEXT_PREVIEW_LAYOUT));
         nextPreviewLayout.setOnAction(event -> basePanel.ifPresent(BasePanel::nextPreviewStyle));
 

@@ -45,8 +45,8 @@ apply from: 'localization.gradle'
 apply from: 'xjc.gradle'
 
 group = "org.jabref"
-version = "4.3-dev"
-project.ext.threeDotVersion = "4.2.0.1"
+version = "4.4-dev"
+project.ext.threeDotVersion = "4.3.0.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j7' : 'install4j7')
 sourceCompatibility = 9
 targetCompatibility = 9
@@ -55,7 +55,7 @@ javaModule.name ="org.jabref"
 
 
 // These are the Java version requirements we will check on each start of JabRef
-ext.minRequiredJavaVersion = "1.8.0_144"
+ext.minRequiredJavaVersion = "1.8.0_172"
 ext.allowJava9 = true
 
 sourceSets {
@@ -125,7 +125,7 @@ dependencies {
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
-    compile 'com.google.guava:guava:25.0-jre'
+    compile 'com.google.guava:guava:25.1-jre'
 
     compile group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
 
@@ -186,7 +186,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.10'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.10.1'
 }
 
 jacoco {

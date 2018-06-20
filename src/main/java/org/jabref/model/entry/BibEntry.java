@@ -327,8 +327,9 @@ public class BibEntry implements Cloneable {
                     return parsedDate.get().getDay().map(Object::toString);
                 }
             } else {
-                LOGGER.warn("Could not parse date " + date.get());
-                return Optional.empty(); // Date field not in valid format
+                // Date field not in valid format
+                LOGGER.debug("Could not parse date " + date.get());
+                return Optional.empty();
             }
         }
         return Optional.empty();

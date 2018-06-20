@@ -47,7 +47,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
 
     @Override
     public String getName() {
-        return Localization.menuTitle("Push entries to external application (%0)", getApplicationName());
+        return Localization.lang("Push entries to external application (%0)", getApplicationName());
     }
 
     @Override
@@ -75,7 +75,19 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         try {
             if (OS.OS_X) {
                 String[] commands = getCommandLine(keyString);
-                ProcessBuilder processBuilder = new ProcessBuilder("open -a " + commands[0] + " -n --args " + commands[1] + " " + commands[2]);
+                if (commands.length < 3) {
+                    LOGGER.error("Commandline does not contain enough parameters to \"push to application\"");
+                    return;
+                }
+                ProcessBuilder processBuilder = new ProcessBuilder(
+                        "open",
+                        "-a",
+                        commands[0],
+                        "-n",
+                        "--args",
+                        commands[1],
+                        commands[2]
+                );
                 processBuilder.start();
             } else {
                 ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));

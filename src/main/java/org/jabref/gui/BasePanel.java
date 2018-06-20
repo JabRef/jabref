@@ -131,7 +131,6 @@ import org.jabref.preferences.PreviewPreferences;
 import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.lang3.NotImplementedException;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.Subscription;
 import org.slf4j.Logger;
@@ -1182,7 +1181,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 pane = entryEditor;
                 break;
             default:
-                throw new NotImplementedException("new mode not recognized: " + newMode.name());
+                throw new UnsupportedOperationException("new mode not recognized: " + newMode.name());
         }
         if (splitPane.getItems().size() == 2) {
             splitPane.getItems().set(1, pane);

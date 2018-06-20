@@ -26,7 +26,9 @@ public enum JabRefMaterialDesignIcon implements GlyphIcons {
     COPY("\ue909"),
     PASTE("\ue90a"),
     SET_CENTER("\ue90b"),
-    SET_ALL("\ue90c");
+    SET_ALL("\ue90c"),
+    VSCODE("\ue90d"),
+    CANCEL("\ue90e");
 
 
     private final String unicode;

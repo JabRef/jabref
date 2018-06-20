@@ -11,88 +11,68 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+
+### Fixed
+
+### Removed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## [4.3] - 2018-06-01
+
+### Changed
+- We changed the minimum required version of Java to 1.8.0_172, as 1.8.0_162 has introduced a CPU leak [3943](https://github.com/JabRef/jabref/issues/3943)
+- We added a validity check for dates in the `date` and `urldate` fields.
 - We added a text file export for 'Find Unlinked Files'. [#3341](https://github.com/JabRef/jabref/issues/3341)
 - We added a fetcher based on RFC-IDs. [#3971](https://github.com/JabRef/jabref/issues/3971)
 - We changed the implementation of the `[shorttitle]` key pattern. It now removes small words like `a`, `an`, `on`, `the` etc. Refer to the help page for a complete overview. [Feature request in the forum](http://discourse.jabref.org/t/jabref-differences-in-shorttitle-between-versions-3-8-1-and-4-not-discounting-the-a-an-of-in-titles/1147)
+- We added a formatter for adding braces around the `title` field. E.g., `title = {ExamPle}` becomes `title = {{ExamPle}}`, which prevents BibTeX to convert it to lower case. You can use it at the [cleanup entries](http://help.jabref.org/en/CleanupEntries) functionality.
+- We added a formatter to ensure correct en dashes in the `title` field. E.g., `title = {Example - illustrative}` becomes `title = {Example -- illustrative}`.
 - We streamlined the defaults for a [cleanup of entries](http://help.jabref.org/en/CleanupEntries) in the case of BibTeX.
+- The import inspection window now uses the same font size setting as the maintable [Feature request in the forum](http://discourse.jabref.org/t/inspection-window-and-others-line-height-of-table-too-small-for-fonts/1168)
 
 ### Fixed
-We fixed an issue where the export to clipboard functionality could not be invoked. [#3994](https://github.com/JabRef/jabref/issues/3994)
-We fixed an issue with the migration of invalid Look and Feels. [#3995, comment](https://github.com/JabRef/jabref/issues/3995#issuecomment-385649448)
-We fixed an issue where JabRef would no longer start, when the option "Override default font settings" was activated. [#3986](https://github.com/JabRef/jabref/issues/3986)
-We fixed an issue where JabRef removed whitespace from the Title-fetcher which resulting in no entries being found. [#4014](https://github.com/JabRef/jabref/issues/4014)
-We fixed an issue where fetched entries from the ACM fetcher could not be imported. [#4018](https://github.com/JabRef/jabref/issues/4018)
+- We fixed an issue where the export to clipboard functionality could not be invoked. [#3994](https://github.com/JabRef/jabref/issues/3994)
+- We fixed an issue with the migration of invalid Look and Feels. [#3995, comment](https://github.com/JabRef/jabref/issues/3995#issuecomment-385649448)
+- We fixed an issue where JabRef would no longer start, when the option "Override default font settings" was activated. [#3986](https://github.com/JabRef/jabref/issues/3986)
+- We fixed an issue where JabRef removed whitespace from the Title-fetcher which resulting in no entries being found. [#4014](https://github.com/JabRef/jabref/issues/4014)
+- We fixed an issue where fetched entries from the ACM fetcher could not be imported. [#4018](https://github.com/JabRef/jabref/issues/4018)
+- We fixed an issue to enable push to application on macOs again [#4041](https://github.com/JabRef/jabref/issues/4041)
 
 ### Removed
-We removed the GTK Look and Feel from the Options, as it leads to freezes in JabRef on MacOSX and Linux [#3995](https://github.com/JabRef/jabref/issues/3995)
+- We removed the GTK Look and Feel from the Options, as it leads to freezes in JabRef on MacOSX and Linux [#3995](https://github.com/JabRef/jabref/issues/3995).
 The GTK Look and Feel is now replaced with the "Nimbus" style as default.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ## [4.2] - 2018-04-26
@@ -429,7 +409,8 @@ The new default removes the linked file from the entry instead of deleting the f
 The changelog of versions 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of 2.11 and versions before is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v4.2...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v4.3...HEAD
+[4.3]: https://github.com/JabRef/jabref/compare/v4.2...v4.3
 [4.2]: https://github.com/JabRef/jabref/compare/v4.1...v4.2
 [4.1]: https://github.com/JabRef/jabref/compare/v4.0...v4.1
 [4.0]: https://github.com/JabRef/jabref/compare/v4.0-beta3...v4.0

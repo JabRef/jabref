@@ -706,14 +706,14 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
     private MenuBar createMenu() {
         ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
-        Menu file = new Menu(Localization.menuTitle("File"));
-        Menu edit = new Menu(Localization.menuTitle("Edit"));
+        Menu file = new Menu(Localization.lang("File"));
+        Menu edit = new Menu(Localization.lang("Edit"));
         Menu library = new Menu(Localization.lang("Library"));
-        Menu quality = new Menu(Localization.menuTitle("Quality"));
-        Menu view = new Menu(Localization.menuTitle("View"));
-        Menu tools = new Menu(Localization.menuTitle("Tools"));
-        Menu options = new Menu(Localization.menuTitle("Options"));
-        Menu help = new Menu(Localization.menuTitle("Help"));
+        Menu quality = new Menu(Localization.lang("Quality"));
+        Menu view = new Menu(Localization.lang("View"));
+        Menu tools = new Menu(Localization.lang("Tools"));
+        Menu options = new Menu(Localization.lang("Options"));
+        Menu help = new Menu(Localization.lang("Help"));
 
         file.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_LIBRARY_BIBTEX, new NewDatabaseAction(this, BibDatabaseMode.BIBTEX)),
