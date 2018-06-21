@@ -44,8 +44,8 @@ apply from: 'localization.gradle'
 apply from: 'xjc.gradle'
 
 group = "org.jabref"
-version = "4.4-dev"
-project.ext.threeDotVersion = "4.4.0.0"
+version = "5.0-dev"
+project.ext.threeDotVersion = "5.0.0.0"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j7' : 'install4j7')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -188,13 +188,18 @@ dependencyUpdates.revision = 'integration'
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /[0-9].*SNAPSHOT/) {
+            if ( selection.candidate.module != "junit-pioneer" && selection.candidate.module!="javax.inject"  && selection.candidate.version ==~ /[0-9].*SNAPSHOT/ ) {
                 selection.reject("Ignore SNAPSHOT releases")
             }
         }
         rules.withModule("org.controlsfx:controlsfx") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /9.*/) { // Reject version 9 or higher
                  selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
+            }
+        }
+		rules.withModule("com.github.tomtung:latex2unicode_2.12") { ComponentSelection selection ->
+            if (selection.candidate.version ==~ /0.2.2/) { // Reject version higher than 2.0.2
+                 selection.reject("Cannot be updated to 0.2.4 until JabRef is prepared for it")
             }
         }
         rules.withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
@@ -207,6 +212,7 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject("http://dev.mysql.com/downloads/connector/j/ lists the version 5.* as last stable version.")
             }
         }
+		
     }
 }
 
