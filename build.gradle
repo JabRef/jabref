@@ -22,7 +22,7 @@ plugins {
     id "com.simonharrer.modernizer" version '1.6.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.6'
     id 'net.ltgt.errorprone' version '0.0.14'
-    id 'com.github.ben-manes.versions' version '0.19.0'
+    id 'com.github.ben-manes.versions' version '0.20.0'
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
@@ -87,9 +87,9 @@ dependencies {
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
 
-    compile 'org.apache.pdfbox:pdfbox:2.0.9'
-    compile 'org.apache.pdfbox:fontbox:2.0.9'
-    compile 'org.apache.pdfbox:xmpbox:2.0.9'
+    compile 'org.apache.pdfbox:pdfbox:2.0.10'
+    compile 'org.apache.pdfbox:fontbox:2.0.10'
+    compile 'org.apache.pdfbox:xmpbox:2.0.10'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     compile 'org.bouncycastle:bcprov-jdk15on:1.59'
