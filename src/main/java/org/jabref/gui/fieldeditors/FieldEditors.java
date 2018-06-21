@@ -1,6 +1,9 @@
 package org.jabref.gui.fieldeditors;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -22,16 +25,21 @@ import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jabref.model.entry.FieldName.AUTHOR;
+import static org.jabref.model.entry.FieldName.INSTITUTION;
+import static org.jabref.model.entry.FieldName.TITLE;
+import static org.jabref.model.entry.FieldName.YEAR;
 
 public class FieldEditors {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldEditors.class);
 
-    private static final ImmutableSet<String> SINGLE_LINE_FIELDS = ImmutableSet.of(
-            "title", "author", "year", "institution");
+    private static final Set<String> SINGLE_LINE_FIELDS = Collections.unmodifiableSet(new HashSet<>(
+            Arrays.asList(TITLE, AUTHOR, YEAR, INSTITUTION)
+    ));
 
     public static FieldEditorFX getForField(final String fieldName,
                                             final TaskExecutor taskExecutor,

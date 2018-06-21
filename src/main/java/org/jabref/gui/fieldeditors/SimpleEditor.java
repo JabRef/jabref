@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
@@ -24,19 +25,21 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
                         final boolean hasSingleLine) {
         this.viewModel = new SimpleEditorViewModel(fieldName, suggestionProvider, fieldCheckers);
 
-        EditorTextArea textArea = new EditorTextArea(hasSingleLine);
-        HBox.setHgrow(textArea, Priority.ALWAYS);
-        textArea.textProperty().bindBidirectional(viewModel.textProperty());
-        textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));
-        this.getChildren().add(textArea);
+        TextInputControl textInput = hasSingleLine
+                ? new EditorTextField()
+                : new EditorTextArea();
+        HBox.setHgrow(textInput, Priority.ALWAYS);
+        textInput.textProperty().bindBidirectional(viewModel.textProperty());
+        ((ContextMenuAddable) textInput).addToContextMenu(EditorMenus.getDefaultMenu(textInput));
+        this.getChildren().add(textInput);
 
-        AutoCompletionTextInputBinding<?> autoCompleter = AutoCompletionTextInputBinding.autoComplete(textArea, viewModel::complete, viewModel.getAutoCompletionStrategy());
+        AutoCompletionTextInputBinding<?> autoCompleter = AutoCompletionTextInputBinding.autoComplete(textInput, viewModel::complete, viewModel.getAutoCompletionStrategy());
         if (suggestionProvider instanceof ContentSelectorSuggestionProvider) {
             // If content selector values are present, then we want to show the auto complete suggestions immediately on focus
             autoCompleter.setShowOnFocus(true);
         }
 
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textInput);
     }
 
 
