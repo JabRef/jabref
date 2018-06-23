@@ -16,8 +16,7 @@ import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
@@ -44,8 +43,7 @@ public class FieldEditors {
     public static FieldEditorFX getForField(final String fieldName,
                                             final TaskExecutor taskExecutor,
                                             final DialogService dialogService,
-                                            final JournalAbbreviationLoader journalAbbreviationLoader,
-                                            final JournalAbbreviationPreferences journalAbbreviationPreferences,
+                                            final JournalAbbreviationRepository journalAbbreviationRepository,
                                             final JabRefPreferences preferences,
                                             final BibDatabaseContext databaseContext,
                                             final String entryType,
@@ -58,7 +56,7 @@ public class FieldEditors {
         final FieldCheckers fieldCheckers = new FieldCheckers(
                 databaseContext,
                 preferences.getFileDirectoryPreferences(),
-                journalAbbreviationLoader.getRepository(journalAbbreviationPreferences),
+                journalAbbreviationRepository,
                 preferences.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
 
         final boolean hasSingleLine = SINGLE_LINE_FIELDS.contains(fieldName.toLowerCase());
@@ -72,7 +70,7 @@ public class FieldEditors {
         } else if (fieldExtras.contains(FieldProperty.EXTERNAL)) {
             return new UrlEditor(fieldName, dialogService, suggestionProvider, fieldCheckers, preferences);
         } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
-            return new JournalEditor(fieldName, journalAbbreviationLoader, preferences, suggestionProvider, fieldCheckers);
+            return new JournalEditor(fieldName, journalAbbreviationRepository, preferences, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.DOI) || fieldExtras.contains(FieldProperty.EPRINT) || fieldExtras.contains(FieldProperty.ISBN)) {
             return new IdentifierEditor(fieldName, taskExecutor, dialogService, suggestionProvider, fieldCheckers, preferences);
         } else if (fieldExtras.contains(FieldProperty.OWNER)) {
