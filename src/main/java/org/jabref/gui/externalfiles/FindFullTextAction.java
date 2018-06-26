@@ -9,12 +9,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.swing.SwingUtilities;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
@@ -27,14 +30,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
  */
-public class FindFullTextAction extends AbstractWorker {
+public class FindFullTextAction implements BaseAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FindFullTextAction.class);
     // The minimum number of selected entries to ask the user for confirmation
     private static final int WARNING_LIMIT = 5;
 
     private final BasePanel basePanel;
-    private final Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
     private final DialogService dialogService;
 
     public FindFullTextAction(DialogService dialogService, BasePanel basePanel) {
@@ -43,16 +45,19 @@ public class FindFullTextAction extends AbstractWorker {
     }
 
     @Override
-    public void init() throws Exception {
+    public void action() {
+        BackgroundTask.wrap(this::findFullTexts)
+                      .onSuccess(downloads -> SwingUtilities.invokeLater(() -> downloadFullTexts(downloads)))
+                      .executeWith(Globals.TASK_EXECUTOR);
+    }
+
+    private Map<Optional<URL>, BibEntry> findFullTexts() {
         if (!basePanel.getSelectedEntries().isEmpty()) {
             basePanel.output(Localization.lang("Looking for full text document..."));
         } else {
             LOGGER.debug("No entry selected for fulltext download.");
         }
-    }
 
-    @Override
-    public void run() {
         if (basePanel.getSelectedEntries().size() >= WARNING_LIMIT) {
             boolean confirmDownload = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Look up full text documents"),
@@ -67,18 +72,20 @@ public class FindFullTextAction extends AbstractWorker {
 
             if (!confirmDownload) {
                 basePanel.output(Localization.lang("Operation canceled."));
-                return;
+                return null;
             }
         }
 
+        Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
         for (BibEntry entry : basePanel.getSelectedEntries()) {
             FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
             downloads.put(fetchers.findFullTextPDF(entry), entry);
         }
+
+        return downloads;
     }
 
-    @Override
-    public void update() {
+    private void downloadFullTexts(Map<Optional<URL>, BibEntry> downloads) {
         List<Optional<URL>> finishedTasks = new ArrayList<>();
         for (Map.Entry<Optional<URL>, BibEntry> download : downloads.entrySet()) {
             BibEntry entry = download.getValue();

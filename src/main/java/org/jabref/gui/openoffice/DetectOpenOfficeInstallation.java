@@ -6,35 +6,42 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Tools for automatically detecting OpenOffice or LibreOffice installations.
  */
-public class DetectOpenOfficeInstallation extends AbstractWorker {
+public class DetectOpenOfficeInstallation {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DetectOpenOfficeInstallation.class);
 
     private final OpenOfficePreferences preferences;
     private final JDialog parent;
     private final DialogService dialogService;
 
-    private boolean foundPaths;
     private JDialog progressDialog;
 
     public DetectOpenOfficeInstallation(JDialog parent, OpenOfficePreferences preferences, DialogService dialogService) {
@@ -44,28 +51,27 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
     }
 
     public boolean isInstalled() {
-        foundPaths = false;
         if (this.checkAutoDetectedPaths(preferences)) {
             return true;
         }
         init();
-        getWorker().run();
-        update();
-        return foundPaths;
+        try {
+            Object result = BackgroundTask.wrap(this::autoDetectPaths)
+                                     .onSuccess(x -> SwingUtilities.invokeLater(progressDialog::dispose))
+                                     .executeWith(Globals.TASK_EXECUTOR)
+                                     .get();
+            return result == null ? false : (Boolean) result;
+        } catch (InterruptedException | ExecutionException e) {
+            LOGGER.error("OpenOffice detection failed.", e);
+        }
+        return false;
     }
 
-    @Override
-    public void run() {
-        foundPaths = autoDetectPaths();
-    }
-
-    @Override
     public void init() {
         progressDialog = showProgressDialog(parent, Localization.lang("Autodetecting paths..."),
                 Localization.lang("Please wait..."));
     }
 
-    @Override
     public void update() {
         progressDialog.dispose();
     }

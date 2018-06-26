@@ -3,14 +3,18 @@ package org.jabref.gui.actions;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.SwingUtilities;
+
+import javafx.application.Platform;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.cleanup.CleanupDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.CleanupWorker;
 import org.jabref.logic.l10n.Localization;
@@ -18,7 +22,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-public class CleanupAction extends AbstractWorker {
+public class CleanupAction implements BaseAction {
 
     private final BasePanel panel;
     private final DialogService dialogService;
@@ -39,6 +43,26 @@ public class CleanupAction extends AbstractWorker {
     }
 
     @Override
+    public void action() {
+        init();
+        Platform.runLater(() -> {
+            if (canceled) {
+                return;
+            }
+            CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), preferences.getCleanupPreset());
+
+            Optional<CleanupPreset> chosenPreset = cleanupDialog.showAndWait();
+            chosenPreset.ifPresent(cleanupPreset ->
+                    BackgroundTask
+                            .wrap(() -> {
+                                cleanup(cleanupPreset);
+                                return null;
+                            })
+                            .onSuccess(x -> SwingUtilities.invokeLater(this::showResults))
+                            .executeWith(Globals.TASK_EXECUTOR));
+        });
+    }
+
     public void init() {
         canceled = false;
         modifiedEntriesCount = 0;
@@ -51,20 +75,56 @@ public class CleanupAction extends AbstractWorker {
                 Integer.toString(panel.getSelectedEntries().size())));
     }
 
-    @Override
-    public void run() {
+    /**
+     * Runs the cleanup on the entry and records the change.
+     */
+    private void doCleanup(CleanupPreset preset, BibEntry entry, NamedCompound ce) {
+        // Create and run cleaner
+        CleanupWorker cleaner = new CleanupWorker(panel.getBibDatabaseContext(), preferences.getCleanupPreferences(
+                Globals.journalAbbreviationLoader));
+        List<FieldChange> changes = cleaner.cleanup(preset, entry);
 
+        unsuccessfulRenames = cleaner.getUnsuccessfulRenames();
+
+        if (changes.isEmpty()) {
+            return;
+        }
+
+        // Register undo action
+        for (FieldChange change : changes) {
+            ce.addEdit(new UndoableFieldChange(change));
+        }
+    }
+
+    private void showResults() {
         if (canceled) {
             return;
         }
-        CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), preferences.getCleanupPreset());
-
-        Optional<CleanupPreset> chosenPreset = cleanupDialog.showAndWait();
-        if (!chosenPreset.isPresent()) {
-            canceled = true;
-            return;
+        if (unsuccessfulRenames > 0) { //Rename failed for at least one entry
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Autogenerate PDF Names"),
+                    Localization.lang("File rename failed for %0 entries.", Integer.toString(unsuccessfulRenames)));
         }
-        CleanupPreset cleanupPreset = chosenPreset.get();
+        if (modifiedEntriesCount > 0) {
+            panel.updateEntryEditorIfShowing();
+            panel.markBaseChanged();
+        }
+        String message;
+        switch (modifiedEntriesCount) {
+            case 0:
+                message = Localization.lang("No entry needed a clean up");
+                break;
+            case 1:
+                message = Localization.lang("One entry needed a clean up");
+                break;
+            default:
+                message = Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
+                break;
+        }
+        panel.output(message);
+    }
+
+    private void cleanup(CleanupPreset cleanupPreset) {
         preferences.setCleanupPreset(cleanupPreset);
 
         if (cleanupPreset.isRenamePDF() && preferences.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
@@ -94,57 +154,5 @@ public class CleanupAction extends AbstractWorker {
                 panel.getUndoManager().addEdit(ce);
             }
         }
-
     }
-
-    @Override
-    public void update() {
-        if (canceled) {
-            return;
-        }
-        if (unsuccessfulRenames > 0) { //Rename failed for at least one entry
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("Autogenerate PDF Names"),
-                    Localization.lang("File rename failed for %0 entries.", Integer.toString(unsuccessfulRenames)));
-        }
-        if (modifiedEntriesCount > 0) {
-            panel.updateEntryEditorIfShowing();
-            panel.markBaseChanged();
-        }
-        String message;
-        switch (modifiedEntriesCount) {
-            case 0:
-                message = Localization.lang("No entry needed a clean up");
-                break;
-            case 1:
-                message = Localization.lang("One entry needed a clean up");
-                break;
-            default:
-                message = Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
-                break;
-        }
-        panel.output(message);
-    }
-
-    /**
-     * Runs the cleanup on the entry and records the change.
-     */
-    private void doCleanup(CleanupPreset preset, BibEntry entry, NamedCompound ce) {
-        // Create and run cleaner
-        CleanupWorker cleaner = new CleanupWorker(panel.getBibDatabaseContext(), preferences.getCleanupPreferences(
-                Globals.journalAbbreviationLoader));
-        List<FieldChange> changes = cleaner.cleanup(preset, entry);
-
-        unsuccessfulRenames = cleaner.getUnsuccessfulRenames();
-
-        if (changes.isEmpty()) {
-            return;
-        }
-
-        // Register undo action
-        for (FieldChange change : changes) {
-            ce.addEdit(new UndoableFieldChange(change));
-        }
-    }
-
 }

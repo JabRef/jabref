@@ -29,6 +29,9 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
+import javafx.application.Platform;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -40,10 +43,10 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.help.HelpFile;
@@ -76,7 +79,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Pane to manage the interaction between JabRef and OpenOffice.
  */
-public class OpenOfficePanel extends AbstractWorker {
+public class OpenOfficePanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficePanel.class);
     private final DialogService dialogService;
@@ -104,7 +107,6 @@ public class OpenOfficePanel extends AbstractWorker {
     private OOBibStyle style;
     private StyleSelectDialog styleDialog;
     private boolean dialogOkPressed;
-    private IOException connectException;
     private final OpenOfficePreferences preferences;
     private final StyleLoader loader;
 
@@ -363,7 +365,8 @@ public class OpenOfficePanel extends AbstractWorker {
             DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(diag, preferences, dialogService);
 
             if (!officeInstallation.isInstalled()) {
-                dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"));
+                Platform.runLater(() ->
+                        dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed")));
                 return;
             }
             diag.dispose();
@@ -383,27 +386,38 @@ public class OpenOfficePanel extends AbstractWorker {
             // Show progress dialog:
             progressDialog = new DetectOpenOfficeInstallation(diag, preferences, dialogService)
                     .showProgressDialog(diag, Localization.lang("Connecting"), Localization.lang("Please wait..."));
-            getWorker().run(); // Do the actual connection, using Spin to get off the EDT.
-            progressDialog.dispose();
+            JDialog finalProgressDialog = progressDialog;
+            BackgroundTask
+                    .wrap(this::createBibBase)
+                    .onSuccess(ooBase -> {
+                        this.ooBase = ooBase;
+                        SwingUtilities.invokeLater(() -> {
+                            finalProgressDialog.dispose();
+                            diag.dispose();
+                        });
+                        if (ooBase == null) {
+                            //throw connectException; // TODO
+                            return;
+                        }
+
+                        if (ooBase.isConnectedToDocument()) {
+                            frame.output(Localization.lang("Connected to document") + ": " + ooBase.getCurrentDocumentTitle().orElse(""));
+                        }
+
+                        // Enable actions that depend on Connect:
+                        selectDocument.setEnabled(true);
+                        pushEntries.setEnabled(true);
+                        pushEntriesInt.setEnabled(true);
+                        pushEntriesEmpty.setEnabled(true);
+                        pushEntriesAdvanced.setEnabled(true);
+                        update.setEnabled(true);
+                        merge.setEnabled(true);
+                        manageCitations.setEnabled(true);
+                        exportCitations.setEnabled(true);
+
+                    })
+                    .executeWith(Globals.TASK_EXECUTOR);
             diag.dispose();
-            if (ooBase == null) {
-                throw connectException;
-            }
-
-            if (ooBase.isConnectedToDocument()) {
-                frame.output(Localization.lang("Connected to document") + ": " + ooBase.getCurrentDocumentTitle().orElse(""));
-            }
-
-            // Enable actions that depend on Connect:
-            selectDocument.setEnabled(true);
-            pushEntries.setEnabled(true);
-            pushEntriesInt.setEnabled(true);
-            pushEntriesEmpty.setEnabled(true);
-            pushEntriesAdvanced.setEnabled(true);
-            update.setEnabled(true);
-            merge.setEnabled(true);
-            manageCitations.setEnabled(true);
-            exportCitations.setEnabled(true);
 
         } catch (UnsatisfiedLinkError e) {
             LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
@@ -442,7 +456,17 @@ public class OpenOfficePanel extends AbstractWorker {
         addURL(jarURLs);
     }
 
-    @Override
+    private OOBibBase createBibBase() {
+        try {
+            // Connect
+            return new OOBibBase(preferences.getExecutablePath(), true);
+        } catch (UnknownPropertyException |
+                CreationException | NoSuchElementException | WrappedTargetException | IOException |
+                NoDocumentException | BootstrapException | InvocationTargetException | IllegalAccessException e) {
+            return null;
+        }
+    }
+
     public void run() {
         try {
             // Connect
@@ -451,7 +475,6 @@ public class OpenOfficePanel extends AbstractWorker {
                 CreationException | NoSuchElementException | WrappedTargetException | IOException |
                 NoDocumentException | BootstrapException | InvocationTargetException | IllegalAccessException e) {
             ooBase = null;
-            connectException = new IOException(e.getMessage());
         }
     }
 
