@@ -51,7 +51,16 @@ project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jD
 sourceCompatibility = 9
 targetCompatibility = 9
 mainClassName = "org.jabref.JabRefMain"
-javaModule.name ="org.jabref"
+
+javaModule {
+    name = "org.jabref"
+    hacks {
+        opens "javafx.swing", "javafx.embed.swing", "org.jabref"
+        opens "java.desktop", "java.awt", "spin"
+        opens "javafx.controls", "javafx.scene.control", "org.jabref"
+        exports "javafx.base", "com.sun.javafx.runtime", "controlsfx"
+    }
+}
 
 
 // These are the Java version requirements we will check on each start of JabRef
