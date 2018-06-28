@@ -129,6 +129,14 @@ public class EntryEditor extends BorderPane {
                         tabbed.getSelectionModel().selectPrevious();
                         event.consume();
                         break;
+                    case ENTRY_EDITOR_NEXT_ENTRY:
+                        panel.selectNextEntry();
+                        event.consume();
+                        break;
+                    case ENTRY_EDITOR_PREVIOUS_ENTRY:
+                        panel.selectPreviousEntry();
+                        event.consume();
+                        break;
                     case HELP:
                         HelpAction.openHelpPage(HelpFile.ENTRY_EDITOR);
                         event.consume();
@@ -234,34 +242,33 @@ public class EntryEditor extends BorderPane {
     public void setEntry(BibEntry entry) {
         Objects.requireNonNull(entry);
 
-        // remove subscription for old entry if existing
+        // Remove subscription for old entry if existing
         if (typeSubscription != null) {
             typeSubscription.unsubscribe();
         }
+
         this.entry = entry;
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            recalculateVisibleTabs();
-            if (preferences.showSourceTabByDefault()) {
-                tabbed.getSelectionModel().select(sourceTab);
-            }
+        recalculateVisibleTabs();
+        if (preferences.showSourceTabByDefault()) {
+            tabbed.getSelectionModel().select(sourceTab);
+        }
 
-            // Notify current tab about new entry
-            EntryEditorTab selectedTab = (EntryEditorTab) tabbed.getSelectionModel().getSelectedItem();
-            selectedTab.notifyAboutFocus(entry);
+        // Notify current tab about new entry
+        getSelectedTab().notifyAboutFocus(entry);
 
-            setupToolBar();
-        });
+        setupToolBar();
 
-        // subscribe to type changes for rebuilding the currently visible tab
+        // Subscribe to type changes for rebuilding the currently visible tab
         typeSubscription = EasyBind.subscribe(this.entry.typeProperty(), type -> {
-            DefaultTaskExecutor.runInJavaFXThread(() -> {
-                typeLabel.setText(new TypedBibEntry(entry, databaseContext.getMode()).getTypeForDisplay());
-                recalculateVisibleTabs();
-                EntryEditorTab selectedTab = (EntryEditorTab) tabbed.getSelectionModel().getSelectedItem();
-                selectedTab.notifyAboutFocus(entry);
-            });
+            typeLabel.setText(new TypedBibEntry(entry, databaseContext.getMode()).getTypeForDisplay());
+            recalculateVisibleTabs();
+            getSelectedTab().notifyAboutFocus(entry);
         });
+    }
+
+    private EntryEditorTab getSelectedTab() {
+        return (EntryEditorTab) tabbed.getSelectionModel().getSelectedItem();
     }
 
     private void setupToolBar() {

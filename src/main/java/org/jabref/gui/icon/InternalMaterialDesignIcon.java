@@ -12,7 +12,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.util.ColorUtil;
-import org.jabref.preferences.JabRefPreferences;
 
 import de.jensd.fx.glyphs.GlyphIcons;
 
@@ -51,7 +50,7 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
 
     @Override
     public Icon getSmallIcon() {
-        return new IconTheme.FontBasedIcon(this.unicode, ColorUtil.toAWT(this.color.orElse(IconTheme.getDefaultColor())), JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL));
+        return new IconTheme.FontBasedIcon(this.unicode, ColorUtil.toAWT(this.color.orElse(IconTheme.getDefaultColor())));
     }
 
     @Override

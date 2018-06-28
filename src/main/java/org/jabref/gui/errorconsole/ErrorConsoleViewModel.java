@@ -75,7 +75,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
         if (messages.isEmpty()) {
             return;
         }
-        clipBoardManager.setClipboardContents(getLogMessagesAsString(messages));
+        clipBoardManager.setContent(getLogMessagesAsString(messages));
         dialogService.notify(Localization.lang("Log copied to clipboard."));
     }
 
@@ -100,7 +100,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
             // log messages
             String issueDetails = "<details>\n" + "<summary>" + "Detail information:" + "</summary>\n\n```\n"
                     + getLogMessagesAsString(allMessagesData) + "\n```\n\n</details>";
-            clipBoardManager.setClipboardContents(issueDetails);
+            clipBoardManager.setContent(issueDetails);
             // bug report body
             String issueBody = systemInfo + "\n\n" + howToReproduce + "\n\n" + "Paste your log details here.";
 
