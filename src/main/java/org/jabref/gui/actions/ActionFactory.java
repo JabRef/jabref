@@ -68,7 +68,9 @@ public class ActionFactory {
     }
 
     public ButtonBase configureIconButton(Action action, Command command, ButtonBase button) {
-        ActionUtils.configureButton(new JabRefAction(action, command, keyBindingRepository), button);
-        return button;
+        return ActionUtils.configureButton(
+                new JabRefAction(action, command, keyBindingRepository),
+                button,
+                ActionUtils.ActionTextBehavior.HIDE);
     }
 }
