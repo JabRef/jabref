@@ -7,6 +7,7 @@ import javax.swing.JComponent;
 import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
@@ -27,5 +28,15 @@ public class ControlHelper {
         node.setVisible(true);
 
         dialogPane.setContent(node);
+    }
+
+    public static boolean childIsFocused(Parent node) {
+        return node.isFocused() || node.getChildrenUnmodifiable().stream().anyMatch(child -> {
+            if (child instanceof Parent) {
+                return childIsFocused((Parent) child);
+            } else {
+                return child.isFocused();
+            }
+        });
     }
 }

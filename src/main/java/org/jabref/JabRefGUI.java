@@ -1,18 +1,10 @@
 package org.jabref;
 
-import java.awt.Font;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.plaf.FontUIResource;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -34,7 +26,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
@@ -46,7 +37,7 @@ public class JabRefGUI {
 
     private static final String NIMBUS_LOOK_AND_FEEL = "javax.swing.plaf.nimbus.NimbusLookAndFeel";
     private static final String WINDOWS_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-    private static final String OSX_AQUA_LOOk_AND_FEEL = "apple.laf.AquaLookAndFeel";
+    private static final String OSX_AQUA_LOOK_AND_FEEL = "apple.laf.AquaLookAndFeel";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
 
@@ -155,6 +146,11 @@ public class JabRefGUI {
         // do it here:
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
             mainStage.setMaximized(true);
+        } else {
+            mainStage.setX(Globals.prefs.getDouble(JabRefPreferences.POS_X));
+            mainStage.setY(Globals.prefs.getDouble(JabRefPreferences.POS_Y));
+            mainStage.setWidth(Globals.prefs.getDouble(JabRefPreferences.SIZE_X));
+            mainStage.setHeight(Globals.prefs.getDouble(JabRefPreferences.SIZE_Y));
         }
 
         Scene scene = new Scene(JabRefGUI.mainFrame, 800, 800);
@@ -165,6 +161,7 @@ public class JabRefGUI {
         mainStage.show();
 
         mainStage.setOnCloseRequest(event -> {
+            saveWindowState(mainStage);
             boolean reallyQuit = mainFrame.quit();
             if (!reallyQuit) {
                 event.consume();
@@ -201,6 +198,14 @@ public class JabRefGUI {
         }
 
         LOGGER.debug("Finished adding panels");
+    }
+
+    private void saveWindowState(Stage mainStage) {
+        Globals.prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, mainStage.isMaximized());
+        Globals.prefs.putDouble(JabRefPreferences.POS_X, mainStage.getX());
+        Globals.prefs.putDouble(JabRefPreferences.POS_Y, mainStage.getY());
+        Globals.prefs.putDouble(JabRefPreferences.SIZE_X, mainStage.getWidth());
+        Globals.prefs.putDouble(JabRefPreferences.SIZE_Y, mainStage.getHeight());
     }
 
     private void openLastEditedDatabases() {
@@ -242,46 +247,11 @@ public class JabRefGUI {
     }
 
     private void setLookAndFeel() {
-        try {
-
-            if (OS.WINDOWS) {
-                UIManager.setLookAndFeel(WINDOWS_LOOK_AND_FEEL);
-            }
-            if (OS.OS_X) {
-                UIManager.setLookAndFeel(OSX_AQUA_LOOk_AND_FEEL);
-            } else {
-                UIManager.setLookAndFeel(NIMBUS_LOOK_AND_FEEL);
-            }
-            // On Linux, Java FX fonts look blurry per default. This can be improved by using a non-default rendering
-            // setting. See https://github.com/woky/javafx-hates-linux
-            if (Globals.prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK)) {
-                System.setProperty("prism.text", "t2k");
-                System.setProperty("prism.lcdtext", "true");
-            }
-        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            try {
-                LOGGER.warn("Setting Look and Feel to Nimbus", e);
-
-                UIManager.setLookAndFeel(NIMBUS_LOOK_AND_FEEL);
-            } catch (Exception ex) {
-                LOGGER.warn("Look and feel could not be set", e);
-            }
-
-        }
-
-        // In JabRef v2.8, we did it only on NON-Mac. Now, we try on all platforms
-        boolean overrideDefaultFonts = Globals.prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS);
-        if (overrideDefaultFonts) {
-            int fontSize = Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
-            UIDefaults defaults = UIManager.getDefaults();
-            Enumeration<Object> keys = defaults.keys();
-            for (Object key : Collections.list(keys)) {
-                if ((key instanceof String) && ((String) key).endsWith(".font")) {
-                    Font font = (Font) UIManager.get(key);
-                    font = new FontUIResource(font.getName(), font.getStyle(), fontSize);
-                    defaults.put(key, font);
-                }
-            }
+        // On Linux, Java FX fonts look blurry per default. This can be improved by using a non-default rendering
+        // setting. See https://github.com/woky/javafx-hates-linux
+        if (Globals.prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK)) {
+            System.setProperty("prism.text", "t2k");
+            System.setProperty("prism.lcdtext", "true");
         }
     }
 

@@ -14,7 +14,6 @@ import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.desktop.os.DefaultDesktop;
 import org.jabref.gui.desktop.os.Linux;
 import org.jabref.gui.desktop.os.NativeDesktop;
@@ -198,7 +197,7 @@ public class JabRefDesktop {
         try {
             openBrowser(url);
         } catch (IOException exception) {
-            new ClipBoardManager().setClipboardContents(url);
+            Globals.clipboardManager.setContent(url);
             LOGGER.error("Could not open browser", exception);
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);

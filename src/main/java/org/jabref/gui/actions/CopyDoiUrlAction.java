@@ -7,8 +7,8 @@ import javax.swing.AbstractAction;
 
 import javafx.scene.control.TextArea;
 
+import org.jabref.Globals;
 import org.jabref.JabRefGUI;
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.identifier.DOI;
 
@@ -36,8 +36,7 @@ public class CopyDoiUrlAction extends AbstractAction {
 
         Optional<String> urlOptional = DOI.parse(identifier).map(DOI::getURIAsASCIIString);
         if (urlOptional.isPresent()) {
-            ClipBoardManager clipBoard = new ClipBoardManager();
-            clipBoard.setClipboardContents(urlOptional.get());
+            Globals.clipboardManager.setContent(urlOptional.get());
             JabRefGUI.getMainFrame().output(Localization.lang("The link has been copied to the clipboard."));
         } else {
             JabRefGUI.getMainFrame().output(Localization.lang("Invalid DOI: '%0'.", identifier));
