@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
@@ -30,8 +31,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-
-import javafx.application.Platform;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -364,10 +363,18 @@ public class OpenOfficePanel {
         if (autoDetect) {
             DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(diag, preferences, dialogService);
 
-            if (!officeInstallation.isInstalled()) {
-                Platform.runLater(() ->
-                        dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed")));
+            try {
+                Boolean installed = officeInstallation.isInstalled().get();
+                if (installed == null || !installed) {
+                    DefaultTaskExecutor.runInJavaFXThread(() ->
+                            dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed")));
+                }
+            } catch (InterruptedException e) {
                 return;
+            } catch (ExecutionException e) {
+                LOGGER.error("Failed to detect installation", e);
+                DefaultTaskExecutor.runInJavaFXThread(() ->
+                        dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), e));
             }
             diag.dispose();
         } else {
@@ -389,16 +396,12 @@ public class OpenOfficePanel {
             JDialog finalProgressDialog = progressDialog;
             BackgroundTask
                     .wrap(this::createBibBase)
+                    .onFinished(() -> SwingUtilities.invokeLater(() -> {
+                        finalProgressDialog.dispose();
+                        diag.dispose();
+                    }))
                     .onSuccess(ooBase -> {
                         this.ooBase = ooBase;
-                        SwingUtilities.invokeLater(() -> {
-                            finalProgressDialog.dispose();
-                            diag.dispose();
-                        });
-                        if (ooBase == null) {
-                            //throw connectException; // TODO
-                            return;
-                        }
 
                         if (ooBase.isConnectedToDocument()) {
                             frame.output(Localization.lang("Connected to document") + ": " + ooBase.getCurrentDocumentTitle().orElse(""));
@@ -416,24 +419,28 @@ public class OpenOfficePanel {
                         exportCitations.setEnabled(true);
 
                     })
+                    .onFailure(ex ->
+                            dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex))
                     .executeWith(Globals.TASK_EXECUTOR);
             diag.dispose();
 
         } catch (UnsatisfiedLinkError e) {
             LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
 
-            dialogService.showErrorDialogAndWait(Localization.lang("Unable to connect. One possible reason is that JabRef "
-                    + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
+            DefaultTaskExecutor.runInJavaFXThread(() ->
+                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to connect. One possible reason is that JabRef "
+                            + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode.")));
 
         } catch (IOException e) {
             LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
 
-            dialogService.showErrorDialogAndWait(Localization.lang("Could not connect to running OpenOffice/LibreOffice."),
-                    Localization.lang("Could not connect to running OpenOffice/LibreOffice.") + "\n"
-                            + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
-                            + Localization.lang("If connecting manually, please verify program and library paths.")
-                            + "\n" + "\n" + Localization.lang("Error message:"),
-                    e);
+            DefaultTaskExecutor.runInJavaFXThread(() ->
+                    dialogService.showErrorDialogAndWait(Localization.lang("Could not connect to running OpenOffice/LibreOffice."),
+                            Localization.lang("Could not connect to running OpenOffice/LibreOffice.") + "\n"
+                                    + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
+                                    + Localization.lang("If connecting manually, please verify program and library paths.")
+                                    + "\n" + "\n" + Localization.lang("Error message:"),
+                            e));
 
         } finally {
             if (progressDialog != null) {
@@ -456,26 +463,11 @@ public class OpenOfficePanel {
         addURL(jarURLs);
     }
 
-    private OOBibBase createBibBase() {
-        try {
-            // Connect
-            return new OOBibBase(preferences.getExecutablePath(), true);
-        } catch (UnknownPropertyException |
-                CreationException | NoSuchElementException | WrappedTargetException | IOException |
-                NoDocumentException | BootstrapException | InvocationTargetException | IllegalAccessException e) {
-            return null;
-        }
-    }
-
-    public void run() {
-        try {
-            // Connect
-            ooBase = new OOBibBase(preferences.getExecutablePath(), true);
-        } catch (UnknownPropertyException |
-                CreationException | NoSuchElementException | WrappedTargetException | IOException |
-                NoDocumentException | BootstrapException | InvocationTargetException | IllegalAccessException e) {
-            ooBase = null;
-        }
+    private OOBibBase createBibBase() throws IOException, InvocationTargetException, IllegalAccessException,
+            WrappedTargetException, BootstrapException, UnknownPropertyException, NoDocumentException,
+            NoSuchElementException, CreationException {
+        // Connect
+        return new OOBibBase(preferences.getExecutablePath(), true);
     }
 
     private static void addURL(List<URL> jarList) throws IOException {

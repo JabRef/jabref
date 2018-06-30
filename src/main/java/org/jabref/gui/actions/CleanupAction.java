@@ -3,10 +3,6 @@ package org.jabref.gui.actions;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.SwingUtilities;
-
-import javafx.application.Platform;
-
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
@@ -45,22 +41,16 @@ public class CleanupAction implements BaseAction {
     @Override
     public void action() {
         init();
-        Platform.runLater(() -> {
-            if (canceled) {
-                return;
-            }
-            CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), preferences.getCleanupPreset());
+        if (canceled) {
+            return;
+        }
+        CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), preferences.getCleanupPreset());
 
-            Optional<CleanupPreset> chosenPreset = cleanupDialog.showAndWait();
-            chosenPreset.ifPresent(cleanupPreset ->
-                    BackgroundTask
-                            .wrap(() -> {
-                                cleanup(cleanupPreset);
-                                return null;
-                            })
-                            .onSuccess(x -> SwingUtilities.invokeLater(this::showResults))
-                            .executeWith(Globals.TASK_EXECUTOR));
-        });
+        Optional<CleanupPreset> chosenPreset = cleanupDialog.showAndWait();
+        chosenPreset.ifPresent(cleanupPreset ->
+                BackgroundTask.wrap(() -> cleanup(cleanupPreset))
+                              .onSuccess(x -> showResults())
+                              .executeWith(Globals.TASK_EXECUTOR));
     }
 
     public void init() {

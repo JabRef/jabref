@@ -455,10 +455,7 @@ public class SaveDatabaseAction implements BaseAction {
     public void action() throws Exception {
         init();
         BackgroundTask
-                .wrap(() -> {
-                    doSave();
-                    return null;
-                })
+                .wrap(this::doSave)
                 .executeWith(Globals.TASK_EXECUTOR);
     }
 }

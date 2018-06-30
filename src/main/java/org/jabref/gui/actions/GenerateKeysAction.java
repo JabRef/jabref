@@ -90,11 +90,7 @@ public class GenerateKeysAction implements BaseAction {
     @Override
     public void action() {
         init();
-        BackgroundTask
-                .wrap(() -> {
-                    generateKeys();
-                    return null;
-                })
-                .executeWith(Globals.TASK_EXECUTOR);
+        BackgroundTask.wrap(this::generateKeys)
+                      .executeWith(Globals.TASK_EXECUTOR);
     }
 }

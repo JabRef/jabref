@@ -6,7 +6,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
@@ -28,15 +29,10 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Tools for automatically detecting OpenOffice or LibreOffice installations.
  */
 public class DetectOpenOfficeInstallation {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DetectOpenOfficeInstallation.class);
 
     private final OpenOfficePreferences preferences;
     private final JDialog parent;
@@ -50,21 +46,17 @@ public class DetectOpenOfficeInstallation {
         this.dialogService = dialogService;
     }
 
-    public boolean isInstalled() {
+    public Future<Boolean> isInstalled() {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
         if (this.checkAutoDetectedPaths(preferences)) {
-            return true;
+            future.complete(true);
+        } else {
+            init();
+            BackgroundTask.wrap(() -> future.complete(autoDetectPaths()))
+                          .onSuccess(x -> SwingUtilities.invokeLater(progressDialog::dispose))
+                          .executeWith(Globals.TASK_EXECUTOR);
         }
-        init();
-        try {
-            Object result = BackgroundTask.wrap(this::autoDetectPaths)
-                                     .onSuccess(x -> SwingUtilities.invokeLater(progressDialog::dispose))
-                                     .executeWith(Globals.TASK_EXECUTOR)
-                                     .get();
-            return result == null ? false : (Boolean) result;
-        } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error("OpenOffice detection failed.", e);
-        }
-        return false;
+        return future;
     }
 
     public void init() {
@@ -72,25 +64,20 @@ public class DetectOpenOfficeInstallation {
                 Localization.lang("Please wait..."));
     }
 
-    public void update() {
-        progressDialog.dispose();
-    }
-
     private Optional<Path> selectInstallationPath() {
 
         final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showInformationDialogAndWait(Localization.lang("Could not find OpenOffice/LibreOffice installation"),
-                Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually.")));
-        DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(nativeDesktop.getApplicationDirectory())
-                .build();
-        Optional<Path> path = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showDirectorySelectionDialog(dirDialogConfiguration));
+        Optional<Path> path = DefaultTaskExecutor.runInJavaFXThread(() -> {
+            dialogService.showInformationDialogAndWait(Localization.lang("Could not find OpenOffice/LibreOffice installation"),
+                    Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."));
+            DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                    .withInitialDirectory(nativeDesktop.getApplicationDirectory())
+                    .build();
+            return dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
+        });
 
-        if (path.isPresent()) {
-            return path;
-        }
-        return Optional.empty();
+        return path;
     }
 
     private boolean autoDetectPaths() {

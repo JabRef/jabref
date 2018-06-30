@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javafx.application.Platform;
 import javafx.scene.input.ClipboardContent;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -49,7 +49,7 @@ public class ExportToClipboardAction implements BaseAction {
                                                         .sorted(Comparator.comparing(Exporter::getName))
                                                         .collect(Collectors.toList());
 
-        Platform.runLater(() -> {
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
             Optional<Exporter> selectedExporter = panel.frame().getDialogService().showChoiceDialogAndWait(Localization.lang("Export"), Localization.lang("Select export format"),
                     Localization.lang("Export"), exporters);
 

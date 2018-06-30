@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import javafx.application.Platform;
 import javafx.stage.FileChooser;
 
 import org.jabref.Globals;
@@ -107,24 +106,17 @@ public class ExportCommand extends SimpleCommand {
                                  .getEncoding()
                                  .orElse(Globals.prefs.getDefaultEncoding()),
                             finEntries);
-                    return null;
+                    return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
                 .onSuccess(x -> frame.output(Localization.lang("%0 export successful", format.getName())))
-                .onFailure(exception -> Platform.runLater(() -> handleError(exception)))
+                .onFailure(this::handleError)
                 .executeWith(Globals.TASK_EXECUTOR);
     }
 
     private void handleError(Exception ex) {
         LOGGER.warn("Problem exporting", ex);
-        final String errorMessage;
-        if (ex.getMessage() == null) {
-            errorMessage = ex.toString();
-        } else {
-            errorMessage = ex.getMessage();
-        }
-
-        frame.output(Localization.lang("Could not save file.") + " - " + errorMessage);
+        frame.output(Localization.lang("Could not save file."));
         // Need to warn the user that saving failed!
-        frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file.") + "\n" + errorMessage);
+        frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
     }
 }

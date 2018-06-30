@@ -61,10 +61,8 @@ public class WriteXMPAction extends SimpleCommand {
     @Override
     public void execute() {
         init();
-        BackgroundTask.wrap(() -> {
-            writeXMP();
-            return null;
-        }).executeWith(Globals.TASK_EXECUTOR);
+        BackgroundTask.wrap(this::writeXMP)
+                      .executeWith(Globals.TASK_EXECUTOR);
     }
 
     public void init() {
