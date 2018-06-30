@@ -14,7 +14,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
@@ -141,8 +140,8 @@ public class OpenOfficePanel {
 
     private void initPanel() {
 
-        connect.addActionListener(e -> connect(true));
-        manualConnect.addActionListener(e -> connect(false));
+        connect.addActionListener(e -> connectAutomatically());
+        manualConnect.addActionListener(e -> connectManually());
 
         selectDocument.setToolTipText(Localization.lang("Select which open Writer document to work on"));
         selectDocument.addActionListener(e -> {
@@ -359,31 +358,33 @@ public class OpenOfficePanel {
         return databases;
     }
 
-    private void connect(boolean autoDetect) {
-        if (autoDetect) {
-            DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(diag, preferences, dialogService);
+    private void connectAutomatically() {
+        BackgroundTask
+                .wrap(() -> {
+                    DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(diag, preferences, dialogService);
 
-            try {
-                Boolean installed = officeInstallation.isInstalled().get();
-                if (installed == null || !installed) {
-                    DefaultTaskExecutor.runInJavaFXThread(() ->
-                            dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed")));
-                }
-            } catch (InterruptedException e) {
-                return;
-            } catch (ExecutionException e) {
-                LOGGER.error("Failed to detect installation", e);
-                DefaultTaskExecutor.runInJavaFXThread(() ->
-                        dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), e));
-            }
-            diag.dispose();
-        } else {
-            showManualConnectionDialog();
-            if (!dialogOkPressed) {
-                return;
-            }
+                    Boolean installed = officeInstallation.isInstalled().get();
+                    if (installed == null || !installed) {
+                        throw new IllegalStateException("OpenOffice Installation could not be detected.");
+                    }
+                    return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw exceptions
+                })
+                .onSuccess(x -> connect())
+                .onFailure(ex ->
+                        dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex))
+                .executeWith(Globals.TASK_EXECUTOR);
+    }
+
+    private void connectManually() {
+        showManualConnectionDialog();
+        if (!dialogOkPressed) {
+            return;
         }
 
+        connect();
+    }
+
+    private void connect() {
         JDialog progressDialog = null;
 
         try {
