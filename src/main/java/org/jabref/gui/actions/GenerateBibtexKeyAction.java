@@ -7,24 +7,23 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
-import org.jabref.gui.worker.AbstractWorker;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-public class GenerateBibtexKeyAction extends AbstractWorker {
+public class GenerateBibtexKeyAction implements BaseAction {
     private final DialogService dialogService;
     private BasePanel basePanel;
     private List<BibEntry> entries;
-    private boolean canceled;
+    private boolean isCanceled;
 
     public GenerateBibtexKeyAction(BasePanel basePanel, DialogService dialogService) {
         this.basePanel = basePanel;
         this.dialogService = dialogService;
     }
 
-    @Override
     public void init() {
         entries = basePanel.getSelectedEntries();
 
@@ -51,8 +50,7 @@ public class GenerateBibtexKeyAction extends AbstractWorker {
         }
     }
 
-    @Override
-    public void run() {
+    private void generateKeys() {
         // We don't want to generate keys for entries which already have one thus remove the entries
         if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
             entries.removeIf(BibEntry::hasCiteKey);
@@ -62,7 +60,7 @@ public class GenerateBibtexKeyAction extends AbstractWorker {
 
             // The user doesn't want to override cite keys
             if (!overwriteKeys) {
-                canceled = true;
+                isCanceled = true;
                 return;
             }
         }
@@ -80,11 +78,8 @@ public class GenerateBibtexKeyAction extends AbstractWorker {
         if (compound.hasEdits()) {
             basePanel.getUndoManager().addEdit(compound);
         }
-    }
 
-    @Override
-    public void update() {
-        if (canceled) {
+        if (isCanceled) {
             return;
         }
         basePanel.markBaseChanged();
@@ -94,5 +89,12 @@ public class GenerateBibtexKeyAction extends AbstractWorker {
     private String formatOutputMessage(String start, int count) {
         return String.format("%s %d %s.", start, count,
                 (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
+    }
+
+    @Override
+    public void action() {
+        init();
+        BackgroundTask.wrap(this::generateKeys)
+                      .executeWith(Globals.TASK_EXECUTOR);
     }
 }
