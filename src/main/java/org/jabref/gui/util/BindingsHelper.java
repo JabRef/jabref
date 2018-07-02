@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.ListProperty;
@@ -170,6 +171,15 @@ public class BindingsHelper {
             @Override
             protected boolean computeValue() {
                 return value;
+            }
+        };
+    }
+
+    public static ObservableValue<? extends String> emptyString() {
+        return new StringBinding() {
+            @Override
+            protected String computeValue() {
+                return "";
             }
         };
     }

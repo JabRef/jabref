@@ -41,7 +41,7 @@ import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.actions.CleanupAction;
 import org.jabref.gui.actions.CopyBibTeXKeyAndLinkAction;
-import org.jabref.gui.actions.GenerateKeysAction;
+import org.jabref.gui.actions.GenerateBibtexKeyAction;
 import org.jabref.gui.actions.WriteXMPAction;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteUpdater;
@@ -134,7 +134,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BasePanel extends StackPane implements ClipboardOwner {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(BasePanel.class);
 
     private final BibDatabaseContext bibDatabaseContext;
@@ -339,7 +338,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         });
 
         // The action for auto-generating keys.
-        actions.put(Actions.MAKE_KEY, new GenerateKeysAction(this, dialogService));
+        actions.put(Actions.MAKE_KEY, new GenerateBibtexKeyAction(this, frame.getDialogService()));
 
         // The action for cleaning up entry.
         actions.put(Actions.CLEANUP, cleanUpAction);

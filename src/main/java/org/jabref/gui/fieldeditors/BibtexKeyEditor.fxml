@@ -1,20 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import org.jabref.gui.fieldeditors.EditorTextArea?>
-<?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
          fx:controller="org.jabref.gui.fieldeditors.BibtexKeyEditor">
     <EditorTextArea fx:id="textArea" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
-    <Button onAction="#generateKey"
-            styleClass="flatButton">
-        <graphic>
-            <JabRefIconView glyph="MAKE_KEY"/>
-        </graphic>
-        <tooltip>
-            <Tooltip text="%Generate BibTeX key"/>
-        </tooltip>
-    </Button>
+    <Button fx:id="generateCiteKeyButton" styleClass="flatButton"/>
 </fx:root>
