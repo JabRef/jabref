@@ -10,6 +10,7 @@ import org.jabref.logic.importer.fetcher.ArXiv;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
+import org.jabref.logic.importer.fetcher.DOAJFetcher;
 import org.jabref.logic.importer.fetcher.DiVA;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.DoiResolution;
@@ -84,6 +85,7 @@ public class WebFetchers {
         list.add(new DBLPFetcher(importFormatPreferences));
         list.add(new SpringerFetcher());
         list.add(new CrossRef());
+        list.add(new DOAJFetcher(importFormatPreferences));
         list.sort(Comparator.comparing(WebFetcher::getName));
         return list;
     }
