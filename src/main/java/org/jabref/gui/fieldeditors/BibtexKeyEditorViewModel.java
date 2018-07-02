@@ -2,28 +2,30 @@ package org.jabref.gui.fieldeditors;
 
 import javax.swing.undo.UndoManager;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.GenerateBibtexKeySingleAction;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
-import org.jabref.gui.undo.UndoableKeyChange;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
 
-public class BibtexKeyEditorViewModel extends AbstractEditorViewModel {
-    private BibtexKeyPatternPreferences keyPatternPreferences;
-    private BibDatabaseContext bibDatabaseContext;
-    private UndoManager undoManager;
+import de.saxsys.mvvmfx.utils.commands.Command;
 
-    public BibtexKeyEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, BibtexKeyPatternPreferences keyPatternPreferences, BibDatabaseContext bibDatabaseContext, UndoManager undoManager) {
+public class BibtexKeyEditorViewModel extends AbstractEditorViewModel {
+    private final EntryEditorPreferences preferences;
+    private final BibDatabaseContext databaseContext;
+    private final UndoManager undoManager;
+    private final DialogService dialogService;
+
+    public BibtexKeyEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, EntryEditorPreferences preferences, BibDatabaseContext databaseContext, UndoManager undoManager, DialogService dialogService) {
         super(fieldName, suggestionProvider, fieldCheckers);
-        this.keyPatternPreferences = keyPatternPreferences;
-        this.bibDatabaseContext = bibDatabaseContext;
+        this.preferences = preferences;
+        this.databaseContext = databaseContext;
         this.undoManager = undoManager;
+        this.dialogService = dialogService;
     }
 
-    public void generateKey() {
-        new BibtexKeyGenerator(bibDatabaseContext, keyPatternPreferences)
-                .generateAndSetKey(entry)
-                .ifPresent(change -> undoManager.addEdit(new UndoableKeyChange(change)));
+    public Command getGenerateCiteKeyCommand() {
+        return new GenerateBibtexKeySingleAction(entry, databaseContext, dialogService, preferences, undoManager);
     }
 }

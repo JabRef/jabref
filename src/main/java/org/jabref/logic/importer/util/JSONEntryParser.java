@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.Month;
 
 import org.json.JSONArray;
@@ -71,7 +72,7 @@ public class JSONEntryParser {
             JSONObject journal = bibJsonEntry.getJSONObject("journal");
             // Journal title
             if (journal.has("title")) {
-                entry.setField(FieldName.JOURNAL, journal.getString("title"));
+                entry.setField(FieldName.JOURNAL, journal.getString("title").trim());
             } else {
                 LOGGER.info("No journal title found.");
             }
@@ -90,7 +91,7 @@ public class JSONEntryParser {
             JSONArray keywords = bibJsonEntry.getJSONArray("keywords");
             for (int i = 0; i < keywords.length(); i++) {
                 if (!keywords.isNull(i)) {
-                    entry.addKeyword(keywords.getString(i), keywordSeparator);
+                    entry.addKeyword(keywords.getString(i).trim(), keywordSeparator);
                 }
             }
         }
@@ -181,9 +182,9 @@ public class JSONEntryParser {
 
         // Page numbers
         if (springerJsonEntry.has("startingPage") && !(springerJsonEntry.getString("startingPage").isEmpty())) {
-            if (springerJsonEntry.has("endPage") && !(springerJsonEntry.getString("endPage").isEmpty())) {
+            if (springerJsonEntry.has("endingPage") && !(springerJsonEntry.getString("endingPage").isEmpty())) {
                 entry.setField(FieldName.PAGES,
-                        springerJsonEntry.getString("startingPage") + "--" + springerJsonEntry.getString("endPage"));
+                        springerJsonEntry.getString("startingPage") + "--" + springerJsonEntry.getString("endingPage"));
             } else {
                 entry.setField(FieldName.PAGES, springerJsonEntry.getString("startingPage"));
             }
@@ -194,13 +195,18 @@ public class JSONEntryParser {
             entry.setField(nametype, springerJsonEntry.getString("publicationName"));
         }
 
-        // URL
+        // Online file
         if (springerJsonEntry.has("url")) {
-            JSONArray urlarray = springerJsonEntry.optJSONArray("url");
-            if (urlarray == null) {
+            JSONArray urls = springerJsonEntry.optJSONArray("url");
+            if (urls == null) {
                 entry.setField(FieldName.URL, springerJsonEntry.optString("url"));
             } else {
-                entry.setField(FieldName.URL, urlarray.getJSONObject(0).optString("value"));
+                urls.forEach(data -> {
+                    JSONObject url = (JSONObject) data;
+                    if (url.optString("format").equalsIgnoreCase("pdf")) {
+                        entry.addFile(new LinkedFile("online", url.optString("value"), "PDF"));
+                    }
+                });
             }
         }
 

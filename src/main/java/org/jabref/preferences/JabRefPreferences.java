@@ -36,12 +36,14 @@ import java.util.stream.Collectors;
 
 import javax.swing.UIManager;
 
+import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.JabRefMain;
 import org.jabref.gui.SidePaneType;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabList;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -895,6 +897,18 @@ public class JabRefPreferences implements PreferencesService {
         storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().getAsStringList(OS.NEWLINE)));
     }
 
+    public EntryEditorPreferences getEntryEditorPreferences() {
+        return new EntryEditorPreferences(getEntryEditorTabList(),
+                getLatexFieldFormatterPreferences(),
+                getImportFormatPreferences(),
+                getCustomTabFieldNames(),
+                getBoolean(SHOW_RECOMMENDATIONS),
+                getBoolean(DEFAULT_SHOW_SOURCE),
+                getBibtexKeyPatternPreferences(),
+                Globals.getKeyPrefs(),
+                getBoolean(AVOID_OVERWRITING_KEY));
+    }
+
     public Map<SidePaneType, Integer> getSidePanePreferredPositions() {
         Map<SidePaneType, Integer> preferredPositions = new HashMap<>();
 
@@ -1444,9 +1458,14 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
-        return new BibtexKeyPatternPreferences(get(KEY_PATTERN_REGEX),
-                                               get(KEY_PATTERN_REPLACEMENT), getBoolean(KEY_GEN_ALWAYS_ADD_LETTER), getBoolean(KEY_GEN_FIRST_LETTER_A),
-                                               getBoolean(ENFORCE_LEGAL_BIBTEX_KEY), getKeyPattern(), getKeywordDelimiter());
+        return new BibtexKeyPatternPreferences(
+                get(KEY_PATTERN_REGEX),
+                get(KEY_PATTERN_REPLACEMENT),
+                getBoolean(KEY_GEN_ALWAYS_ADD_LETTER),
+                getBoolean(KEY_GEN_FIRST_LETTER_A),
+                getBoolean(ENFORCE_LEGAL_BIBTEX_KEY),
+                getKeyPattern(),
+                getKeywordDelimiter());
     }
 
     public TimestampPreferences getTimestampPreferences() {

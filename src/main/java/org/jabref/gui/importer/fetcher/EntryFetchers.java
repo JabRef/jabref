@@ -15,10 +15,6 @@ public class EntryFetchers {
     public EntryFetchers(JournalAbbreviationLoader abbreviationLoader) {
         entryFetchers.add(new CiteSeerXFetcher());
         entryFetchers.add(new IEEEXploreFetcher(abbreviationLoader));
-        entryFetchers.add(new INSPIREFetcher());
-        entryFetchers.add(new ACMPortalFetcher());
-        entryFetchers.add(new DOAJFetcher());
-        entryFetchers.add(new SpringerFetcher());
 
         WebFetchers.getSearchBasedFetchers(Globals.prefs.getImportFormatPreferences()).stream()
                 .map(SearchBasedEntryFetcher::new)

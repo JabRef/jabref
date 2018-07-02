@@ -5,17 +5,20 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ArXiv;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
+import org.jabref.logic.importer.fetcher.DOAJFetcher;
 import org.jabref.logic.importer.fetcher.DiVA;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
+import org.jabref.logic.importer.fetcher.INSPIREFetcher;
 import org.jabref.logic.importer.fetcher.IacrEprintFetcher;
 import org.jabref.logic.importer.fetcher.IsbnFetcher;
 import org.jabref.logic.importer.fetcher.LibraryOfCongress;
@@ -24,6 +27,7 @@ import org.jabref.logic.importer.fetcher.MedlineFetcher;
 import org.jabref.logic.importer.fetcher.OpenAccessDoi;
 import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
+import org.jabref.logic.importer.fetcher.SpringerFetcher;
 import org.jabref.logic.importer.fetcher.SpringerLink;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
 import org.jabref.logic.importer.fetcher.ZbMATH;
@@ -74,14 +78,18 @@ public class WebFetchers {
     public static List<SearchBasedFetcher> getSearchBasedFetchers(ImportFormatPreferences importFormatPreferences) {
         ArrayList<SearchBasedFetcher> list = new ArrayList<>();
         list.add(new ArXiv(importFormatPreferences));
+        list.add(new INSPIREFetcher(importFormatPreferences));
         list.add(new GvkFetcher());
         list.add(new MedlineFetcher());
         list.add(new AstrophysicsDataSystem(importFormatPreferences));
         list.add(new MathSciNet(importFormatPreferences));
         list.add(new ZbMATH(importFormatPreferences));
+        list.add(new ACMPortalFetcher(importFormatPreferences));
         list.add(new GoogleScholar(importFormatPreferences));
         list.add(new DBLPFetcher(importFormatPreferences));
+        list.add(new SpringerFetcher());
         list.add(new CrossRef());
+        list.add(new DOAJFetcher(importFormatPreferences));
         list.sort(Comparator.comparing(WebFetcher::getName));
         return list;
     }
