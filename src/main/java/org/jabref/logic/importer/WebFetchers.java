@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ArXiv;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
@@ -83,6 +84,7 @@ public class WebFetchers {
         list.add(new AstrophysicsDataSystem(importFormatPreferences));
         list.add(new MathSciNet(importFormatPreferences));
         list.add(new ZbMATH(importFormatPreferences));
+        list.add(new ACMPortalFetcher(importFormatPreferences));
         list.add(new GoogleScholar(importFormatPreferences));
         list.add(new DBLPFetcher(importFormatPreferences));
         list.add(new SpringerFetcher());

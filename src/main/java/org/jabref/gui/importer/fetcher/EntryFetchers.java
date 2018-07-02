@@ -16,7 +16,6 @@ public class EntryFetchers {
         entryFetchers.add(new CiteSeerXFetcher());
         entryFetchers.add(new IEEEXploreFetcher(abbreviationLoader));
         // entryFetchers.add(new OAI2Fetcher()); - new arXiv fetcher in place, see below
-        entryFetchers.add(new ACMPortalFetcher());
 
         WebFetchers.getSearchBasedFetchers(Globals.prefs.getImportFormatPreferences()).stream()
                 .map(SearchBasedEntryFetcher::new)
