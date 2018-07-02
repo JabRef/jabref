@@ -18,7 +18,6 @@ public class EntryFetchers {
         entryFetchers.add(new INSPIREFetcher());
         // entryFetchers.add(new OAI2Fetcher()); - new arXiv fetcher in place, see below
         entryFetchers.add(new ACMPortalFetcher());
-        entryFetchers.add(new SpringerFetcher());
 
         WebFetchers.getSearchBasedFetchers(Globals.prefs.getImportFormatPreferences()).stream()
                 .map(SearchBasedEntryFetcher::new)

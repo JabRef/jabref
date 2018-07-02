@@ -3,12 +3,10 @@ package org.jabref.gui.entryeditor;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.Globals;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.preferences.JabRefPreferences;
 
 public class EntryEditorPreferences {
 
@@ -20,8 +18,9 @@ public class EntryEditorPreferences {
     private final boolean shouldShowRecommendationsTab;
     private boolean showSourceTabByDefault;
     private final KeyBindingRepository keyBindings;
+    private boolean avoidOverwritingCiteKey;
 
-    public EntryEditorPreferences(Map<String, List<String>> entryEditorTabList, LatexFieldFormatterPreferences latexFieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, List<String> customTabFieldNames, boolean shouldShowRecommendationsTab, boolean showSourceTabByDefault, BibtexKeyPatternPreferences bibtexKeyPatternPreferences, KeyBindingRepository keyBindings) {
+    public EntryEditorPreferences(Map<String, List<String>> entryEditorTabList, LatexFieldFormatterPreferences latexFieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, List<String> customTabFieldNames, boolean shouldShowRecommendationsTab, boolean showSourceTabByDefault, BibtexKeyPatternPreferences bibtexKeyPatternPreferences, KeyBindingRepository keyBindings, boolean avoidOverwritingCiteKey) {
         this.entryEditorTabList = entryEditorTabList;
         this.latexFieldFormatterPreferences = latexFieldFormatterPreferences;
         this.importFormatPreferences = importFormatPreferences;
@@ -30,17 +29,7 @@ public class EntryEditorPreferences {
         this.showSourceTabByDefault = showSourceTabByDefault;
         this.bibtexKeyPatternPreferences = bibtexKeyPatternPreferences;
         this.keyBindings = keyBindings;
-    }
-
-    public static EntryEditorPreferences from(JabRefPreferences preferences) {
-        return new EntryEditorPreferences(preferences.getEntryEditorTabList(),
-                                          preferences.getLatexFieldFormatterPreferences(),
-                                          preferences.getImportFormatPreferences(),
-                                          preferences.getCustomTabFieldNames(),
-                                          preferences.getBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS),
-                                          preferences.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE),
-                                          preferences.getBibtexKeyPatternPreferences(),
-                                          Globals.getKeyPrefs());
+        this.avoidOverwritingCiteKey = avoidOverwritingCiteKey;
     }
 
     public Map<String, List<String>> getEntryEditorTabList() {
@@ -81,5 +70,9 @@ public class EntryEditorPreferences {
 
     public void setShowSourceTabByDefault(boolean showSourceTabByDefault) {
         this.showSourceTabByDefault = showSourceTabByDefault;
+    }
+
+    public boolean avoidOverwritingCiteKey() {
+        return avoidOverwritingCiteKey;
     }
 }
