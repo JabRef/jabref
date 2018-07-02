@@ -21,7 +21,7 @@ public class GenerateKeysAction implements BaseAction {
     private final DialogService dialogService;
     private List<BibEntry> entries;
     private int numSelected;
-    private boolean canceled;
+    private boolean isCanceled;
 
     public GenerateKeysAction(BasePanel panel, DialogService dialogService) {
         this.panel = panel;
@@ -59,27 +59,27 @@ public class GenerateKeysAction implements BaseAction {
 
                 // The user doesn't want to overide cite keys
                 if (!overwriteKeysPressed) {
-                    canceled = true;
+                    isCanceled = true;
                     return;
                 }
             }
         }
 
         // generate the new cite keys for each entry
-        final NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
+        final NamedCompound compoundEdit = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
         BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(panel.getBibDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences());
         for (BibEntry entry : entries) {
             Optional<FieldChange> change = keyGenerator.generateAndSetKey(entry);
-            change.ifPresent(fieldChange -> ce.addEdit(new UndoableKeyChange(fieldChange)));
+            change.ifPresent(fieldChange -> compoundEdit.addEdit(new UndoableKeyChange(fieldChange)));
         }
-        ce.end();
+        compoundEdit.end();
 
         // register the undo event only if new cite keys were generated
-        if (ce.hasEdits()) {
-            panel.getUndoManager().addEdit(ce);
+        if (compoundEdit.hasEdits()) {
+            panel.getUndoManager().addEdit(compoundEdit);
         }
 
-        if (canceled) {
+        if (isCanceled) {
             return;
         }
         panel.markBaseChanged();

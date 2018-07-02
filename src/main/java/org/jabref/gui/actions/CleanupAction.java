@@ -28,7 +28,7 @@ public class CleanupAction implements BaseAction {
      */
     private int unsuccessfulRenames;
 
-    private boolean canceled;
+    private boolean isCanceled;
     private int modifiedEntriesCount;
     private final JabRefPreferences preferences;
 
@@ -41,7 +41,7 @@ public class CleanupAction implements BaseAction {
     @Override
     public void action() {
         init();
-        if (canceled) {
+        if (isCanceled) {
             return;
         }
         CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), preferences.getCleanupPreset());
@@ -54,11 +54,11 @@ public class CleanupAction implements BaseAction {
     }
 
     public void init() {
-        canceled = false;
+        isCanceled = false;
         modifiedEntriesCount = 0;
         if (panel.getSelectedEntries().isEmpty()) { // None selected. Inform the user to select entries first.
             dialogService.showInformationDialogAndWait(Localization.lang("Cleanup entry"), Localization.lang("First select entries to clean up."));
-            canceled = true;
+            isCanceled = true;
             return;
         }
         panel.output(Localization.lang("Doing a cleanup for %0 entries...",
@@ -87,7 +87,7 @@ public class CleanupAction implements BaseAction {
     }
 
     private void showResults() {
-        if (canceled) {
+        if (isCanceled) {
             return;
         }
         if (unsuccessfulRenames > 0) { //Rename failed for at least one entry
@@ -127,7 +127,7 @@ public class CleanupAction implements BaseAction {
                     optOut -> Globals.prefs.putBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN, !optOut)));
 
             if (!confirmed) {
-                canceled = true;
+                isCanceled = true;
                 return;
             }
         }

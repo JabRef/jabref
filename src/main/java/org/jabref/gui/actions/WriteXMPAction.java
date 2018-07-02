@@ -40,13 +40,13 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 public class WriteXMPAction extends SimpleCommand {
 
     private final BasePanel basePanel;
-    private OptionsDialog optDiag;
+    private OptionsDialog optionsDialog;
 
     private Collection<BibEntry> entries;
 
     private BibDatabase database;
 
-    private boolean goOn = true;
+    private boolean shouldContinue = true;
 
     private int skipped;
     private int entriesChanged;
@@ -78,7 +78,7 @@ public class WriteXMPAction extends SimpleCommand {
                 dialogService.showErrorDialogAndWait(
                         Localization.lang("Write XMP-metadata"),
                         Localization.lang("This operation requires one or more entries to be selected."));
-                goOn = false;
+                shouldContinue = false;
                 return;
 
             } else {
@@ -86,7 +86,7 @@ public class WriteXMPAction extends SimpleCommand {
                         Localization.lang("Write XMP-metadata"),
                         Localization.lang("Write XMP-metadata for all PDFs in current library?"));
                 if (confirm) {
-                    goOn = false;
+                    shouldContinue = false;
                     return;
                 }
             }
@@ -94,16 +94,16 @@ public class WriteXMPAction extends SimpleCommand {
 
         errors = entriesChanged = skipped = 0;
 
-        if (optDiag == null) {
-            optDiag = new OptionsDialog(null);
+        if (optionsDialog == null) {
+            optionsDialog = new OptionsDialog(null);
         }
-        optDiag.open();
+        optionsDialog.open();
 
         basePanel.output(Localization.lang("Writing XMP-metadata..."));
     }
 
     private void writeXMP() {
-        if (!goOn) {
+        if (!shouldContinue) {
             return;
         }
 
@@ -117,55 +117,55 @@ public class WriteXMPAction extends SimpleCommand {
                                     .map(Optional::get)
                                     .collect(Collectors.toList());
 
-            SwingUtilities.invokeLater(() -> optDiag.getProgressArea()
-                                                    .append(entry.getCiteKeyOptional().orElse(Localization.lang("undefined")) + "\n"));
+            SwingUtilities.invokeLater(() -> optionsDialog.getProgressArea()
+                                                          .append(entry.getCiteKeyOptional().orElse(Localization.lang("undefined")) + "\n"));
 
             if (files.isEmpty()) {
                 skipped++;
-                SwingUtilities.invokeLater(() -> optDiag.getProgressArea()
-                                                        .append("  " + Localization.lang("Skipped - No PDF linked") + ".\n"));
+                SwingUtilities.invokeLater(() -> optionsDialog.getProgressArea()
+                                                              .append("  " + Localization.lang("Skipped - No PDF linked") + ".\n"));
             } else {
                 for (Path file : files) {
                     if (Files.exists(file)) {
                         try {
                             XmpUtilWriter.writeXmp(file, entry, database, Globals.prefs.getXMPPreferences());
                             SwingUtilities.invokeLater(
-                                    () -> optDiag.getProgressArea().append("  " + Localization.lang("OK") + ".\n"));
+                                    () -> optionsDialog.getProgressArea().append("  " + Localization.lang("OK") + ".\n"));
                             entriesChanged++;
                         } catch (Exception e) {
                             SwingUtilities.invokeLater(() -> {
-                                optDiag.getProgressArea().append("  " + Localization.lang("Error while writing") + " '"
+                                optionsDialog.getProgressArea().append("  " + Localization.lang("Error while writing") + " '"
                                         + file.toString() + "':\n");
-                                optDiag.getProgressArea().append("    " + e.getLocalizedMessage() + "\n");
+                                optionsDialog.getProgressArea().append("    " + e.getLocalizedMessage() + "\n");
                             });
                             errors++;
                         }
                     } else {
                         skipped++;
                         SwingUtilities.invokeLater(() -> {
-                            optDiag.getProgressArea()
-                                   .append("  " + Localization.lang("Skipped - PDF does not exist") + ":\n");
-                            optDiag.getProgressArea().append("    " + file.toString() + "\n");
+                            optionsDialog.getProgressArea()
+                                         .append("  " + Localization.lang("Skipped - PDF does not exist") + ":\n");
+                            optionsDialog.getProgressArea().append("    " + file.toString() + "\n");
                         });
                     }
                 }
             }
 
-            if (optDiag.isCanceled()) {
+            if (optionsDialog.isCanceled()) {
                 SwingUtilities.invokeLater(
-                        () -> optDiag.getProgressArea().append("\n" + Localization.lang("Operation canceled.") + "\n"));
+                        () -> optionsDialog.getProgressArea().append("\n" + Localization.lang("Operation canceled.") + "\n"));
                 break;
             }
         }
         SwingUtilities.invokeLater(() -> {
-            optDiag.getProgressArea()
-                   .append("\n"
+            optionsDialog.getProgressArea()
+                         .append("\n"
                            + Localization.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).", String
                            .valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
-            optDiag.done();
+            optionsDialog.done();
         });
 
-        if (!goOn) {
+        if (!shouldContinue) {
             return;
         }
 
@@ -178,7 +178,7 @@ public class WriteXMPAction extends SimpleCommand {
         private final JButton okButton = new JButton(Localization.lang("OK"));
         private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
 
-        private boolean canceled;
+        private boolean isCancelled;
 
         private final JTextArea progressArea;
 
@@ -192,7 +192,7 @@ public class WriteXMPAction extends SimpleCommand {
             AbstractAction cancel = new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    canceled = true;
+                    isCancelled = true;
                 }
             };
             cancelButton.addActionListener(cancel);
@@ -245,18 +245,18 @@ public class WriteXMPAction extends SimpleCommand {
 
         public void open() {
             progressArea.setText("");
-            canceled = false;
+            isCancelled = false;
 
             okButton.setEnabled(false);
             cancelButton.setEnabled(true);
 
             okButton.requestFocus();
 
-            optDiag.setVisible(true);
+            optionsDialog.setVisible(true);
         }
 
         public boolean isCanceled() {
-            return canceled;
+            return isCancelled;
         }
 
         public JTextArea getProgressArea() {

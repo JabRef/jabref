@@ -103,7 +103,7 @@ public class ExportToClipboardAction implements BaseAction {
             return Localization.lang("Entries exported to clipboard") + ": " + entries.size();
 
         } catch (Exception e) {
-            LOGGER.error("Error exporting to clipboard", e); //To change body of catch statement use File | Settings | File Templates.
+            LOGGER.error("Error exporting to clipboard", e);
             return Localization.lang("Error exporting to clipboard");
         } finally {
             // Clean up:

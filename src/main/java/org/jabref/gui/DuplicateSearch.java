@@ -32,11 +32,11 @@ import org.jabref.model.entry.BibEntry;
 public class DuplicateSearch extends SimpleCommand {
 
     private final JabRefFrame frame;
-    private BlockingQueue<List<BibEntry>> dups;
+    private final BlockingQueue<List<BibEntry>> duplicates = new LinkedBlockingQueue<>();
 
-    private AtomicBoolean libraryAnalyzed;
-    private AtomicBoolean autoRemoveExactDuplicates;
-    private AtomicInteger duplicateCount;
+    private final AtomicBoolean libraryAnalyzed = new AtomicBoolean();
+    private final AtomicBoolean autoRemoveExactDuplicates = new AtomicBoolean();
+    private final AtomicInteger duplicateCount = new AtomicInteger();
 
     public DuplicateSearch(JabRefFrame frame) {
         this.frame = frame;
@@ -48,10 +48,10 @@ public class DuplicateSearch extends SimpleCommand {
         panel.output(Localization.lang("Searching for duplicates..."));
 
         List<BibEntry> entries = panel.getDatabase().getEntries();
-        dups = new LinkedBlockingQueue<>();
-        libraryAnalyzed = new AtomicBoolean(false);
-        autoRemoveExactDuplicates = new AtomicBoolean(false);
-        duplicateCount = new AtomicInteger(0);
+        duplicates.clear();
+        libraryAnalyzed.set(false);
+        autoRemoveExactDuplicates.set(false);
+        duplicateCount.set(0);
 
         if (entries.size() < 2) {
             return;
@@ -76,7 +76,7 @@ public class DuplicateSearch extends SimpleCommand {
                 BibEntry second = entries.get(j);
 
                 if (DuplicateCheck.isDuplicate(first, second, databaseMode)) {
-                    dups.add(Arrays.asList(first, second));
+                    duplicates.add(Arrays.asList(first, second));
                     duplicateCount.getAndIncrement();
                 }
             }
@@ -87,20 +87,20 @@ public class DuplicateSearch extends SimpleCommand {
     private DuplicateSearchResult verifyDuplicates() {
         DuplicateSearchResult result = new DuplicateSearchResult();
 
-        while (!libraryAnalyzed.get() || !dups.isEmpty()) {
-            List<BibEntry> duplicates;
+        while (!libraryAnalyzed.get() || !duplicates.isEmpty()) {
+            List<BibEntry> dups;
             try {
                 // poll with timeout in case the library is not analyzed completely, but contains no more duplicates
-                duplicates = dups.poll(100, TimeUnit.MILLISECONDS);
-                if (duplicates == null) {
+                dups = this.duplicates.poll(100, TimeUnit.MILLISECONDS);
+                if (dups == null) {
                     continue;
                 }
             } catch (InterruptedException e) {
                 return null;
             }
 
-            BibEntry first = duplicates.get(0);
-            BibEntry second = duplicates.get(1);
+            BibEntry first = dups.get(0);
+            BibEntry second = dups.get(1);
 
             if (!result.isToRemove(first) && !result.isToRemove(second)) {
                 // Check if they are exact duplicates:
@@ -139,7 +139,7 @@ public class DuplicateSearch extends SimpleCommand {
             result.remove(first);
         } else if (resolverResult == DuplicateResolverResult.BREAK) {
             libraryAnalyzed.set(true);
-            dups.clear();
+            duplicates.clear();
         } else if (resolverResult == DuplicateResolverResult.KEEP_MERGE) {
             result.replace(first, second, dialog.getMergedEntry());
         }
@@ -152,12 +152,12 @@ public class DuplicateSearch extends SimpleCommand {
 
         SwingUtilities.invokeLater(() -> {
             BasePanel panel = frame.getCurrentBasePanel();
-            final NamedCompound ce = new NamedCompound(Localization.lang("duplicate removal"));
+            final NamedCompound compoundEdit = new NamedCompound(Localization.lang("duplicate removal"));
             // Now, do the actual removal:
             if (!result.getToRemove().isEmpty()) {
                 for (BibEntry entry : result.getToRemove()) {
                     panel.getDatabase().removeEntry(entry);
-                    ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
+                    compoundEdit.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
                 }
                 panel.markBaseChanged();
             }
@@ -165,15 +165,15 @@ public class DuplicateSearch extends SimpleCommand {
             if (!result.getToAdd().isEmpty()) {
                 for (BibEntry entry : result.getToAdd()) {
                     panel.getDatabase().insertEntry(entry);
-                    ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
+                    compoundEdit.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
                 }
                 panel.markBaseChanged();
             }
 
             panel.output(Localization.lang("Duplicates found") + ": " + duplicateCount.get() + ' '
                     + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
-            ce.end();
-            panel.getUndoManager().addEdit(ce);
+            compoundEdit.end();
+            panel.getUndoManager().addEdit(compoundEdit);
         });
     }
 
@@ -202,9 +202,9 @@ public class DuplicateSearch extends SimpleCommand {
             duplicates++;
         }
 
-        public synchronized void replace(BibEntry replace1, BibEntry replace2, BibEntry replacement) {
-            remove(replace1);
-            remove(replace2);
+        public synchronized void replace(BibEntry first, BibEntry second, BibEntry replacement) {
+            remove(first);
+            remove(second);
             toAdd.add(replacement);
             duplicates++;
         }
