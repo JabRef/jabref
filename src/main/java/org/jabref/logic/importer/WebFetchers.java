@@ -11,12 +11,14 @@ import org.jabref.logic.importer.fetcher.ArXiv;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
+import org.jabref.logic.importer.fetcher.DOAJFetcher;
 import org.jabref.logic.importer.fetcher.DiVA;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
+import org.jabref.logic.importer.fetcher.INSPIREFetcher;
 import org.jabref.logic.importer.fetcher.IacrEprintFetcher;
 import org.jabref.logic.importer.fetcher.IsbnFetcher;
 import org.jabref.logic.importer.fetcher.LibraryOfCongress;
@@ -76,6 +78,7 @@ public class WebFetchers {
     public static List<SearchBasedFetcher> getSearchBasedFetchers(ImportFormatPreferences importFormatPreferences) {
         ArrayList<SearchBasedFetcher> list = new ArrayList<>();
         list.add(new ArXiv(importFormatPreferences));
+        list.add(new INSPIREFetcher(importFormatPreferences));
         list.add(new GvkFetcher());
         list.add(new MedlineFetcher());
         list.add(new AstrophysicsDataSystem(importFormatPreferences));
@@ -86,6 +89,7 @@ public class WebFetchers {
         list.add(new DBLPFetcher(importFormatPreferences));
         list.add(new SpringerFetcher());
         list.add(new CrossRef());
+        list.add(new DOAJFetcher(importFormatPreferences));
         list.sort(Comparator.comparing(WebFetcher::getName));
         return list;
     }
