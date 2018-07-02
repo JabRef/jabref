@@ -15,7 +15,6 @@ public class EntryFetchers {
     public EntryFetchers(JournalAbbreviationLoader abbreviationLoader) {
         entryFetchers.add(new CiteSeerXFetcher());
         entryFetchers.add(new IEEEXploreFetcher(abbreviationLoader));
-        entryFetchers.add(new INSPIREFetcher());
         // entryFetchers.add(new OAI2Fetcher()); - new arXiv fetcher in place, see below
         entryFetchers.add(new ACMPortalFetcher());
 
