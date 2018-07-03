@@ -3,8 +3,10 @@ package org.jabref.logic.importer.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.Month;
@@ -226,6 +228,69 @@ public class JSONEntryParser {
                 entry.setField(FieldName.ABSTRACT, abstractContents.substring(8));
             }
         });
+
+        return entry;
+    }
+
+    /**
+     * @implNote <a href="https://developer.ieee.org/docs/read/Metadata_API_responses">documentation</a>
+     */
+    public static BibEntry parseIEEEJSONtoBibtex(JSONObject jsonEntry, Character keywordSeparator) {
+        BibEntry entry = new BibEntry();
+
+        switch (jsonEntry.optString("content_type")) {
+            case "Books":
+                entry.setType(BiblatexEntryTypes.BOOK);
+                break;
+            case "Conferences":
+                entry.setType(BiblatexEntryTypes.INPROCEEDINGS);
+                break;
+            case "Courses":
+                entry.setType(BiblatexEntryTypes.MISC);
+                break;
+            default:
+                entry.setType(BiblatexEntryTypes.ARTICLE);
+                break;
+        }
+
+        entry.setField(FieldName.ABSTRACT, jsonEntry.optString("abstract"));
+        //entry.setField(FieldName.IEEE_ID, jsonEntry.optString("article_number"));
+
+        final List<String> authors = new ArrayList<>();
+        JSONObject authorsContainer = jsonEntry.optJSONObject("authors");
+        authorsContainer.getJSONArray("authors").forEach(authorPure -> {
+                    JSONObject author = (JSONObject) authorPure;
+                    authors.add(author.optString("full_name"));
+                }
+        );
+        entry.setField(FieldName.AUTHOR, authors.stream().collect(Collectors.joining(" and ")));
+        entry.setField(FieldName.LOCATION, jsonEntry.optString("conference_location"));
+        entry.setField(FieldName.DOI, jsonEntry.optString("doi"));
+        entry.setField(FieldName.PAGES, jsonEntry.optString("start_page") + "--" + jsonEntry.optString("end_page"));
+
+        JSONObject keywordsContainer = jsonEntry.optJSONObject("index_terms");
+        if (keywordsContainer != null) {
+            keywordsContainer.getJSONObject("ieee_terms").getJSONArray("terms").forEach(data -> {
+                String keyword = (String) data;
+                entry.addKeyword(keyword, keywordSeparator);
+            });
+            keywordsContainer.getJSONObject("author_terms").getJSONArray("terms").forEach(data -> {
+                String keyword = (String) data;
+                entry.addKeyword(keyword, keywordSeparator);
+            });
+        }
+
+        entry.setField(FieldName.ISBN, jsonEntry.optString("isbn"));
+        entry.setField(FieldName.ISSN, jsonEntry.optString("issn"));
+        entry.setField(FieldName.ISSUE, jsonEntry.optString("issue"));
+        entry.addFile(new LinkedFile("", jsonEntry.optString("pdf_url"), "PDF"));
+        entry.setField(FieldName.JOURNALTITLE, jsonEntry.optString("publication_title"));
+        entry.setField(FieldName.DATE, jsonEntry.optString("publication_date"));
+        entry.setField(FieldName.EVENTTITLEADDON, jsonEntry.optString("conference_location"));
+        entry.setField(FieldName.EVENTDATE, jsonEntry.optString("conference_dates"));
+        entry.setField(FieldName.PUBLISHER, jsonEntry.optString("publisher"));
+        entry.setField(FieldName.TITLE, jsonEntry.optString("title"));
+        entry.setField(FieldName.VOLUME, jsonEntry.optString("volume"));
 
         return entry;
     }

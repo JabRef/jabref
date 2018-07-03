@@ -1,18 +1,35 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.Parser;
+import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.logic.importer.util.JSONEntryParser;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 
+import org.apache.http.client.utils.URIBuilder;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,8 +37,10 @@ import org.slf4j.LoggerFactory;
  * Class for finding PDF URLs for entries on IEEE
  * Will first look for URLs of the type https://ieeexplore.ieee.org/stamp/stamp.jsp?[tp=&]arnumber=...
  * If not found, will resolve the DOI, if it starts with 10.1109, and try to find a similar link on the HTML page
+ *
+ * @implNote <a href="https://developer.ieee.org/docs">API documentation</a>
  */
-public class IEEE implements FulltextFetcher {
+public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IEEE.class);
     private static final String STAMP_BASE_STRING_DOCUMENT = "/stamp/stamp.jsp?tp=&arnumber=";
@@ -31,6 +50,12 @@ public class IEEE implements FulltextFetcher {
     private static final Pattern PDF_PATTERN = Pattern.compile("\"(https://ieeexplore.ieee.org/ielx[0-9/]+\\.pdf[^\"]+)\"");
     private static final String IEEE_DOI = "10.1109";
     private static final String BASE_URL = "https://ieeexplore.ieee.org";
+
+    private final ImportFormatPreferences preferences;
+
+    public IEEE(ImportFormatPreferences preferences) {
+        this.preferences = Objects.requireNonNull(preferences);
+    }
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
@@ -102,4 +127,44 @@ public class IEEE implements FulltextFetcher {
         return TrustLevel.PUBLISHER;
     }
 
+    @Override
+    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+        URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
+        uriBuilder.addParameter("apikey", "86wnawtvtc986d3wtnqynm8c");
+        uriBuilder.addParameter("querytext", query);
+
+        URLDownload.bypassSSLVerification();
+
+        return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public Parser getParser() {
+        return inputStream -> {
+            String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
+            JSONObject jsonObject = new JSONObject(response);
+
+            List<BibEntry> entries = new ArrayList<>();
+            if (jsonObject.has("articles")) {
+                JSONArray results = jsonObject.getJSONArray("articles");
+                for (int i = 0; i < results.length(); i++) {
+                    JSONObject jsonEntry = results.getJSONObject(i);
+                    BibEntry entry = JSONEntryParser.parseIEEEJSONtoBibtex(jsonEntry, preferences.getKeywordSeparator());
+                    entries.add(entry);
+                }
+            }
+
+            return entries;
+        };
+    }
+
+    @Override
+    public String getName() {
+        return "IEEEXplore";
+    }
+
+    @Override
+    public HelpFile getHelpPage() {
+        return HelpFile.FETCHER_IEEEXPLORE;
+    }
 }
