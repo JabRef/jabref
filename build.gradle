@@ -58,17 +58,8 @@ mainClassName = "org.jabref.JabRefMain"
 ext.minRequiredJavaVersion = "1.8.0_171"
 ext.allowJava9 = false
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ["src/main/java", "src/main/gen"]
-        }
-
-        resources {
-            srcDirs = ["src/main/java", "src/main/resources"]
-        }
-    }
-}
+sourceSets.main.java.srcDirs += "src/main/gen"
+sourceSets.main.resources.srcDirs += "src/main/java"
 
 repositories {
     mavenLocal()
