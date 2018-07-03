@@ -1,6 +1,8 @@
 import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
 
+import static org.jabref.build.Dependencies.libraries
+
 // to update the gradle wrapper, execute
 // ./gradlew wrapper --gradle-version=4.4.1 --distribution-type=bin
 
@@ -84,93 +86,77 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     compile fileTree(dir: 'lib', includes: ['*.jar'])
 
-    compile 'com.jgoodies:jgoodies-common:1.8.1'
-    compile 'com.jgoodies:jgoodies-forms:1.9.0'
+    compile libraries.jGoodiesCommon
+    compile libraries.jGoodiesForms
 
-    compile 'org.apache.pdfbox:pdfbox:2.0.10'
-    compile 'org.apache.pdfbox:fontbox:2.0.10'
-    compile 'org.apache.pdfbox:xmpbox:2.0.10'
+    compile libraries.pdfbox
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    compile 'org.bouncycastle:bcprov-jdk15on:1.59'
+    compile libraries.bouncyCastle
 
-    compile 'commons-cli:commons-cli:1.4'
+    compile libraries.commonsCli
 
-    compile "org.libreoffice:juh:5.4.2"
-    compile "org.libreoffice:jurt:5.4.2"
-    compile "org.libreoffice:ridl:5.4.2"
-    compile "org.libreoffice:unoil:5.4.2"
+    compile libraries.libreOffice
 
-    compile 'io.github.java-diff-utils:java-diff-utils:2.2.0'
-    compile 'info.debatty:java-string-similarity:1.1.0'
+    compile libraries.diffUtils
+    compile libraries.stringSimilarity
 
-    antlr3 'org.antlr:antlr:3.5.2'
-    compile 'org.antlr:antlr-runtime:3.5.2'
+    antlr3 libraries.antlr3
+    compile libraries.antlr3runtime
 
-    antlr4 'org.antlr:antlr4:4.7.1'
-    compile 'org.antlr:antlr4-runtime:4.7.1'
+    antlr4 libraries.antlr4
+    compile libraries.antlr4runtime
 
     // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
-    compile 'mysql:mysql-connector-java:5.1.46'
+    compile libraries.mySqlConnector
 
-    compile 'org.postgresql:postgresql:42.2.2'
+    compile libraries.postgres
 
-    compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
+    compile libraries.glazedLists
 
-    compile 'com.google.guava:guava:25.1-jre'
+    compile libraries.guava
 
     // JavaFX stuff
-    compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
-    compile 'de.saxsys:mvvmfx-validation:1.7.0'
-    compile 'de.saxsys:mvvmfx:1.7.0'
-    compile 'org.fxmisc.easybind:easybind:1.0.3'
-    compile 'org.fxmisc.flowless:flowless:0.6.1'
-    compile 'org.fxmisc.richtext:richtextfx:0.9.0'
-    compile 'com.sibvisions.external.jvxfx:dndtabpane:0.1'
-    compile 'javax.inject:javax.inject:1'
+    compile libraries.fontawesome
+    compile libraries.mvvmfx
+    compile libraries.easybind
+    compile libraries.flowless
+    compile libraries.richtextfx
+    compile libraries.dndtabpane
+    compile libraries.javaInject
 
     // Cannot be updated to 9.*.* until Jabref works with Java 9
-    compile 'org.controlsfx:controlsfx:8.40.15-SNAPSHOT'
+    compile libraries.controlsFx
 
-    compile 'org.jsoup:jsoup:1.11.3'
-    compile 'com.mashape.unirest:unirest-java:1.4.9'
+    compile libraries.jsoup
+    compile libraries.unirest
 
     // >1.8.0-beta is required for java 9 compatibility
-    compile 'org.slf4j:slf4j-api:1.8.0-beta2'
-    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.0'
-    compile 'org.apache.logging.log4j:log4j-jcl:2.11.0'
-    compile 'org.apache.logging.log4j:log4j-api:2.11.0'
-    compile 'org.apache.logging.log4j:log4j-core:2.11.0'
+    compile libraries.loggingApi
+    compile libraries.logging
 
     // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
-    compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
-    compile 'org.citationstyles:locales:1.0.1-SNAPSHOT'
-    compile 'de.undercouch:citeproc-java:1.0.1'
+    compile libraries.citationStyles
+    compile libraries.citeproc
 
-    compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
+    compile libraries.latex2unicode
 
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.1.1'
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.1.1'
+    compile libraries.applicationInsights
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
-    testCompile 'org.junit.jupiter:junit-jupiter-params:5.2.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
-    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.2.0'
-    testCompile 'org.junit.platform:junit-platform-launcher:1.2.0'
-    testCompile 'org.junit-pioneer:junit-pioneer:0.1-SNAPSHOT'
-    testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
-    testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
-    testCompile 'org.mockito:mockito-core:2.19.0'
-    testCompile 'com.github.tomakehurst:wiremock:2.18.0'
-    testCompile 'org.assertj:assertj-swing-junit:3.8.0'
-    testCompile 'org.reflections:reflections:0.9.11'
-    testCompile 'org.xmlunit:xmlunit-core:2.6.0'
-    testCompile 'org.xmlunit:xmlunit-matchers:2.6.0'
-    testCompile 'com.tngtech.archunit:archunit-junit:0.8.2'
-    testCompile "org.testfx:testfx-core:4.0.+"
-    testCompile "org.testfx:testfx-junit5:4.0.+"
+    testCompile libraries.junit
+    testRuntimeOnly libraries.junitRuntime
+    testCompile libraries.junitPlatformLauncher
+    testCompile libraries.junitPioneer
+    testRuntime libraries.testLogging
+    testCompile libraries.mockito
+    testCompile libraries.wiremock
+    testCompile libraries.assertjSwing
+    testCompile libraries.reflections
+    testCompile libraries.xmlUnit
+    testCompile libraries.archUnit
+    testCompile libraries.xmlUnit
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.10.1'
+    checkstyle libraries.checkstyle
 }
 
 jacoco {
@@ -212,7 +198,6 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject("http://dev.mysql.com/downloads/connector/j/ lists the version 5.* as last stable version.")
             }
         }
-		
     }
 }
 
