@@ -348,3 +348,6 @@ gradle-app.setting
 
 # do not distribute Oracle's JDBC driver
 lib/ojdbc.jar
+
+# do not ignore the source of the build
+!/buildSrc/src/
