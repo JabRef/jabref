@@ -40,6 +40,7 @@ apply plugin: 'jacoco'
 apply plugin: 'install4j'
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'checkstyle'
+apply plugin: org.jabref.build.antlr.AntlrPlugin
 
 apply from: 'eclipse.gradle'
 apply from: 'localization.gradle'
@@ -75,11 +76,6 @@ repositories {
     maven {
         url 'https://oss.sonatype.org/content/groups/public'
     }
-}
-
-configurations {
-    antlr3
-    antlr4
 }
 
 dependencies {
@@ -239,45 +235,23 @@ task generateSource(dependsOn: ["generateBstGrammarSource", "generateSearchGramm
     description 'Generates all Java source files.'
 }
 
-task generateBstGrammarSource(type: JavaExec) {
-    group 'JabRef'
-    description 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr3.'
+task generateBstGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
+    group = "JabRef"
+    description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr3.'
 
-    File antlrSource = file('src/main/antlr3/org/jabref/bst/Bst.g')
-
-    inputs.file antlrSource
-    outputs.file file('src/main/gen/org/jabref/logic/bst/BstLexer.java')
-    outputs.file file('src/main/gen/org/jabref/logic/bst/BstParser.java')
-
-    main = 'org.antlr.Tool'
-    classpath = configurations.antlr3
-    args = ["-o", file('src/main/gen/org/jabref/logic/bst/'), antlrSource]
+    antlr = ANTLR3
+    inputFile = 'src/main/antlr3/org/jabref/bst/Bst.g'
+    outputDir = 'src/main/gen/org/jabref/logic/bst/'
 }
 
-task generateSearchGrammarSource(type: JavaExec) {
-    String grammarFile = "Search"
+task generateSearchGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
+    group = 'JabRef'
+    description = "Generates java files for Search.g antlr4."
 
-    group 'JabRef'
-    description "Generates java files for ${grammarFile}.g antlr4."
-
-    String packagePath = "org/jabref/search"
-    File antlrPath = file("src/main/antlr4")
-    File genPath = file("src/main/gen")
-
-    File antlrSource = file("$antlrPath/$packagePath/${grammarFile}.g4")
-    File destinationDir = file("$genPath/$packagePath")
-
-    inputs.file antlrSource
-    outputs.file file("$destinationDir/${grammarFile}Parser.java")
-    outputs.file file("$destinationDir/${grammarFile}Lexer.java")
-    outputs.file file("$destinationDir/${grammarFile}Visitor.java")
-    outputs.file file("$destinationDir/${grammarFile}BaseVisitor.java")
-    outputs.file file("$destinationDir/${grammarFile}.tokens")
-    outputs.file file("$destinationDir/${grammarFile}Lexer.tokens")
-
-    main = 'org.antlr.v4.Tool'
-    classpath = configurations.antlr4
-    args = ["-o", destinationDir, "-visitor", "-no-listener", "-package", "org.jabref.search", antlrSource]
+    antlr = ANTLR4
+    inputFile = "src/main/antlr4/org/jabref/search/Search.g4"
+    outputDir = "src/main/gen/org/jabref/search"
+    javaPackage = "org.jabref.search"
 }
 
 compileJava {
