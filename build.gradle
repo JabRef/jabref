@@ -141,7 +141,7 @@ dependencies {
     testCompile libraries.reflections
     testCompile libraries.xmlUnit
     testCompile libraries.archUnit
-    testCompile libraries.xmlUnit
+    testCompile libraries.testFx
 
     checkstyle libraries.checkstyle
 }
