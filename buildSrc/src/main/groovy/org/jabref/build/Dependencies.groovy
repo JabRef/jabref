@@ -61,7 +61,8 @@ class Dependencies {
             archUnit: "0.8.2",
             testFx: "4.0.+",
 
-            checkstyle: "8.10.1"
+            checkstyle: "8.10.1",
+            xjc: "2.2.4-1",
     ]
 
     static def libraries = [
@@ -171,6 +172,7 @@ class Dependencies {
             ],
 
             checkstyle: "com.puppycrawl.tools:checkstyle:${versions.checkstyle}",
+            xjc: "com.sun.xml.bind:jaxb-xjc:${versions.xjc}",
     ]
 
 }
