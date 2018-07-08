@@ -13,7 +13,6 @@ public class EntryFetchers {
     private final List<EntryFetcher> entryFetchers = new LinkedList<>();
 
     public EntryFetchers(JournalAbbreviationLoader abbreviationLoader) {
-        entryFetchers.add(new CiteSeerXFetcher());
         entryFetchers.add(new IEEEXploreFetcher(abbreviationLoader));
 
         WebFetchers.getSearchBasedFetchers(Globals.prefs.getImportFormatPreferences()).stream()

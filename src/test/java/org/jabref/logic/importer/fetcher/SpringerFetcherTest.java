@@ -5,12 +5,14 @@ import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@FetcherTest
 class SpringerFetcherTest {
 
     SpringerFetcher fetcher;
