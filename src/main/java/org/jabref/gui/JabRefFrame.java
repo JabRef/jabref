@@ -278,7 +278,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
 
         initShowTrackingNotification();
-
     }
 
     private void initKeyBindings() {
@@ -309,6 +308,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                     case DEFAULT_TABLE_FONT_SIZE:
                         setDefaultTableFontSize();
                         event.consume();
+                        break;
+                    case SEARCH:
+                        getGlobalSearchBar().focus();
                         break;
                     default:
                 }
