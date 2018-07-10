@@ -10,6 +10,7 @@ class Dependencies {
                     "org.libreoffice:unoil:5.4.2",
             ],
 
+            // >1.8.0-beta is required for java 9 compatibility
             loggingApi: "org.slf4j:slf4j-api:1.8.0-beta2",
 
             logging: [
@@ -37,10 +38,12 @@ class Dependencies {
                     "com.microsoft.azure:applicationinsights-logging-log4j2:2.1.1",
             ],
 
+            // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
             bouncyCastle: "org.bouncycastle:bcprov-jdk15on:1.59",
 
             latex2unicode: "com.github.tomtung:latex2unicode_2.12:0.2.2",
 
+            // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
             citationStyles: [
                     "org.citationstyles:styles:1.0.1-SNAPSHOT",
                     "org.citationstyles:locales:1.0.1-SNAPSHOT",
@@ -56,11 +59,13 @@ class Dependencies {
             diffUtils: "com.github.bkromhout:java-diff-utils:2.1.1",
             stringSimilarity: "info.debatty:java-string-similarity:1.1.0",
 
+            // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
             mySqlConnector: "mysql:mysql-connector-java:5.1.46",
             postgres: "org.postgresql:postgresql:42.2.2",
 
             glazedLists: "net.java.dev.glazedlists:glazedlists_java15:1.9.1",
 
+            // JavaFX stuff
             fontawesome: "de.jensd:fontawesomefx-materialdesignfont:1.7.22-4",
             mvvmfx     : [
                     "de.saxsys:mvvmfx-validation:1.7.0",
@@ -71,6 +76,8 @@ class Dependencies {
             richtextfx : "org.fxmisc.richtext:richtextfx:0.9.0",
             dndtabpane : "com.sibvisions.external.jvxfx:dndtabpane:0.1",
             javaInject : "javax.inject:javax.inject:1",
+
+            // Cannot be updated to 9.*.* until Jabref works with Java 9
             controlsFx: "org.controlsfx:controlsfx:8.40.15-SNAPSHOT",
 
             jsoup: "org.jsoup:jsoup:1.11.3",

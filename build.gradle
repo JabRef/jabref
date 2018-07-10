@@ -79,7 +79,6 @@ dependencies {
 
     compile libraries.pdfbox
 
-    // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     compile libraries.bouncyCastle
 
     compile libraries.commonsCli
@@ -95,7 +94,6 @@ dependencies {
     antlr4 libraries.antlr4
     compile libraries.antlr4runtime
 
-    // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
     compile libraries.mySqlConnector
 
     compile libraries.postgres
@@ -104,7 +102,6 @@ dependencies {
 
     compile libraries.guava
 
-    // JavaFX stuff
     compile libraries.fontawesome
     compile libraries.mvvmfx
     compile libraries.easybind
@@ -113,17 +110,14 @@ dependencies {
     compile libraries.dndtabpane
     compile libraries.javaInject
 
-    // Cannot be updated to 9.*.* until Jabref works with Java 9
     compile libraries.controlsFx
 
     compile libraries.jsoup
     compile libraries.unirest
 
-    // >1.8.0-beta is required for java 9 compatibility
     compile libraries.loggingApi
     compile libraries.logging
 
-    // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
     compile libraries.citationStyles
     compile libraries.citeproc
 
