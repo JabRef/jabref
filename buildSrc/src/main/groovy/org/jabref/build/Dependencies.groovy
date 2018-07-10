@@ -1,178 +1,115 @@
 package org.jabref.build
 
 class Dependencies {
-
-    static def versions = [
-            libreOffice: "5.4.2",
-
-            pdfbox: "2.0.10",
-
-            slf4j: "1.8.0-beta2",
-            log4j: "2.11.0",
-
-            antlr3: "3.5.2",
-            antlr4: "4.7.1",
-
-            guava: "25.1-jre",
-
-            applicationInsights: "2.1.1",
-
-            bouncyCastle: "1.59",
-
-            latex2unicode: "0.2.2",
-
-            citationStyles: "1.0.1-SNAPSHOT",
-            citeproc: "1.0.1",
-
-            commonsCli: "1.4",
-
-            jGoodiesCommon: "1.8.1",
-            jGoodiesForms: "1.9.0",
-
-            diffUtils: "2.1.1",
-            stringSimilarity: "1.1.0",
-
-            mySqlConnector: "5.1.46",
-            postgres: "42.2.2",
-
-            glazedLists: "1.9.1",
-
-            fontawesome: "1.7.22-4",
-            mvvmfx: "1.7.0",
-            easybind: "1.0.3",
-            flowless: "0.6.1",
-            richtextfx: "0.9.0",
-            dndtabpane: "0.1",
-            javaInject: "1",
-            controlsFx: "8.40.15-SNAPSHOT",
-
-            jsoup: "1.11.3",
-            unirest: "1.4.9",
-
-            junit: "5.2.0",
-            junitPlatformLauncher: "1.2.0",
-            junitPioneer: "0.1-SNAPSHOT",
-
-            mockito: "2.19.0",
-            wiremock: "2.18.0",
-            assertjSwing: "3.8.0",
-            reflections: "0.9.11",
-            xmlUnit: "2.6.0",
-            archUnit: "0.8.2",
-            testFx: "4.0.+",
-
-            checkstyle: "8.10.1",
-            xjc: "2.2.4-1",
-    ]
-
+    
     static def libraries = [
             libreOffice: [
-                    "org.libreoffice:juh:${versions.libreOffice}",
-                    "org.libreoffice:jurt:${versions.libreOffice}",
-                    "org.libreoffice:ridl:${versions.libreOffice}",
-                    "org.libreoffice:unoil:${versions.libreOffice}",
+                    "org.libreoffice:juh:5.4.2",
+                    "org.libreoffice:jurt:5.4.2",
+                    "org.libreoffice:ridl:5.4.2",
+                    "org.libreoffice:unoil:5.4.2",
             ],
 
-            loggingApi: "org.slf4j:slf4j-api:${versions.slf4j}",
+            loggingApi: "org.slf4j:slf4j-api:1.8.0-beta2",
 
             logging: [
-                    "org.apache.logging.log4j:log4j-slf4j-impl:${versions.log4j}",
-                    "org.apache.logging.log4j:log4j-jcl:${versions.log4j}",
-                    "org.apache.logging.log4j:log4j-api:${versions.log4j}",
-                    "org.apache.logging.log4j:log4j-core:${versions.log4j}",
+                    "org.apache.logging.log4j:log4j-slf4j-impl:2.11.0",
+                    "org.apache.logging.log4j:log4j-jcl:2.11.0",
+                    "org.apache.logging.log4j:log4j-api:2.11.0",
+                    "org.apache.logging.log4j:log4j-core:2.11.0",
             ],
 
             pdfbox: [
-                    "org.apache.pdfbox:pdfbox:${versions.pdfbox}",
-                    "org.apache.pdfbox:fontbox:${versions.pdfbox}",
-                    "org.apache.pdfbox:xmpbox:${versions.pdfbox}",
+                    "org.apache.pdfbox:pdfbox:2.0.10",
+                    "org.apache.pdfbox:fontbox:2.0.10",
+                    "org.apache.pdfbox:xmpbox:2.0.10",
             ],
 
-            antlr3: "org.antlr:antlr:${versions.antlr3}",
-            antlr3runtime: "org.antlr:antlr-runtime:${versions.antlr3}",
-            antlr4: "org.antlr:antlr4:${versions.antlr4}",
-            antlr4runtime: "org.antlr:antlr4-runtime:${versions.antlr4}",
+            antlr3: "org.antlr:antlr:3.5.2",
+            antlr3runtime: "org.antlr:antlr-runtime:3.5.2",
+            antlr4: "org.antlr:antlr4:4.7.1",
+            antlr4runtime: "org.antlr:antlr4-runtime:4.7.1",
 
-            guava: "com.google.guava:guava:${versions.guava}",
+            guava: "com.google.guava:guava:25.1-jre",
 
             applicationInsights: [
-                    "com.microsoft.azure:applicationinsights-core:${versions.applicationInsights}",
-                    "com.microsoft.azure:applicationinsights-logging-log4j2:${versions.applicationInsights}",
+                    "com.microsoft.azure:applicationinsights-core:2.1.1",
+                    "com.microsoft.azure:applicationinsights-logging-log4j2:2.1.1",
             ],
 
-            bouncyCastle: "org.bouncycastle:bcprov-jdk15on:${versions.bouncyCastle}",
+            bouncyCastle: "org.bouncycastle:bcprov-jdk15on:1.59",
 
-            latex2unicode: "com.github.tomtung:latex2unicode_2.12:${versions.latex2unicode}",
+            latex2unicode: "com.github.tomtung:latex2unicode_2.12:0.2.2",
 
             citationStyles: [
-                    "org.citationstyles:styles:${versions.citationStyles}",
-                    "org.citationstyles:locales:${versions.citationStyles}",
+                    "org.citationstyles:styles:1.0.1-SNAPSHOT",
+                    "org.citationstyles:locales:1.0.1-SNAPSHOT",
             ],
 
-            citeproc: "de.undercouch:citeproc-java:${versions.citeproc}",
+            citeproc: "de.undercouch:citeproc-java:1.0.1",
 
-            commonsCli: "commons-cli:commons-cli:${versions.commonsCli}",
+            commonsCli: "commons-cli:commons-cli:1.4",
 
-            jGoodiesCommon: "com.jgoodies:jgoodies-common:${versions.jGoodiesCommon}",
-            jGoodiesForms: "com.jgoodies:jgoodies-forms:${versions.jGoodiesForms}",
+            jGoodiesCommon: "com.jgoodies:jgoodies-common:1.8.1",
+            jGoodiesForms: "com.jgoodies:jgoodies-forms:1.9.0",
 
-            diffUtils: "com.github.bkromhout:java-diff-utils:${versions.diffUtils}",
-            stringSimilarity: "info.debatty:java-string-similarity:${versions.stringSimilarity}",
+            diffUtils: "com.github.bkromhout:java-diff-utils:2.1.1",
+            stringSimilarity: "info.debatty:java-string-similarity:1.1.0",
 
-            mySqlConnector: "mysql:mysql-connector-java:${versions.mySqlConnector}",
-            postgres: "org.postgresql:postgresql:${versions.postgres}",
+            mySqlConnector: "mysql:mysql-connector-java:5.1.46",
+            postgres: "org.postgresql:postgresql:42.2.2",
 
-            glazedLists: "net.java.dev.glazedlists:glazedlists_java15:${versions.glazedLists}",
+            glazedLists: "net.java.dev.glazedlists:glazedlists_java15:1.9.1",
 
-            fontawesome: "de.jensd:fontawesomefx-materialdesignfont:${versions.fontawesome}",
+            fontawesome: "de.jensd:fontawesomefx-materialdesignfont:1.7.22-4",
             mvvmfx     : [
-                    "de.saxsys:mvvmfx-validation:${versions.mvvmfx}",
-                    "de.saxsys:mvvmfx:${versions.mvvmfx}",
+                    "de.saxsys:mvvmfx-validation:1.7.0",
+                    "de.saxsys:mvvmfx:1.7.0",
             ],
-            easybind   : "org.fxmisc.easybind:easybind:${versions.easybind}",
-            flowless   : "org.fxmisc.flowless:flowless:${versions.flowless}",
-            richtextfx : "org.fxmisc.richtext:richtextfx:${versions.richtextfx}",
-            dndtabpane : "com.sibvisions.external.jvxfx:dndtabpane:${versions.dndtabpane}",
-            javaInject : "javax.inject:javax.inject:${versions.javaInject}",
-            controlsFx: "org.controlsfx:controlsfx:${versions.controlsFx}",
+            easybind   : "org.fxmisc.easybind:easybind:1.0.3",
+            flowless   : "org.fxmisc.flowless:flowless:0.6.1",
+            richtextfx : "org.fxmisc.richtext:richtextfx:0.9.0",
+            dndtabpane : "com.sibvisions.external.jvxfx:dndtabpane:0.1",
+            javaInject : "javax.inject:javax.inject:1",
+            controlsFx: "org.controlsfx:controlsfx:8.40.15-SNAPSHOT",
 
-            jsoup: "org.jsoup:jsoup:${versions.jsoup}",
-            unirest: "com.mashape.unirest:unirest-java:${versions.unirest}",
+            jsoup: "org.jsoup:jsoup:1.11.3",
+            unirest: "com.mashape.unirest:unirest-java:1.4.9",
 
             junit: [
-                    "org.junit.jupiter:junit-jupiter-api:${versions.junit}",
-                    "org.junit.jupiter:junit-jupiter-params:${versions.junit}",
+                    "org.junit.jupiter:junit-jupiter-api:5.2.0",
+                    "org.junit.jupiter:junit-jupiter-params:5.2.0",
             ],
 
             junitRuntime: [
-                    "org.junit.jupiter:junit-jupiter-engine:${versions.junit}",
-                    "org.junit.vintage:junit-vintage-engine:${versions.junit}",
+                    "org.junit.jupiter:junit-jupiter-engine:5.2.0",
+                    "org.junit.vintage:junit-vintage-engine:5.2.0",
             ],
 
-            junitPlatformLauncher: "org.junit.platform:junit-platform-launcher:${versions.junitPlatformLauncher}",
-            junitPioneer: "org.junit-pioneer:junit-pioneer:${versions.junitPioneer}",
+            junitPlatformLauncher: "org.junit.platform:junit-platform-launcher:1.2.0",
+            junitPioneer: "org.junit-pioneer:junit-pioneer:0.1-SNAPSHOT",
 
             testLogging: [
-                    "org.apache.logging.log4j:log4j-core:${versions.log4j}",
-                    "org.apache.logging.log4j:log4j-jul:${versions.log4j}",
+                    "org.apache.logging.log4j:log4j-core:2.11.0",
+                    "org.apache.logging.log4j:log4j-jul:2.11.0",
             ],
 
-            mockito: "org.mockito:mockito-core:${versions.mockito}",
-            wiremock: "com.github.tomakehurst:wiremock:${versions.wiremock}",
-            assertjSwing: "org.assertj:assertj-swing-junit:${versions.assertjSwing}",
-            reflections: "org.reflections:reflections:${versions.reflections}",
+            mockito: "org.mockito:mockito-core:2.19.0",
+            wiremock: "com.github.tomakehurst:wiremock:2.18.0",
+            assertjSwing: "org.assertj:assertj-swing-junit:3.8.0",
+            reflections: "org.reflections:reflections:0.9.11",
             xmlUnit: [
-                    "org.xmlunit:xmlunit-core:${versions.xmlUnit}",
-                    "org.xmlunit:xmlunit-matchers:${versions.xmlUnit}",
+                    "org.xmlunit:xmlunit-core:2.6.0",
+                    "org.xmlunit:xmlunit-matchers:2.6.0",
             ],
-            archUnit: "com.tngtech.archunit:archunit-junit:${versions.archUnit}",
+            archUnit: "com.tngtech.archunit:archunit-junit:0.8.2",
             testFx: [
-                    "org.testfx:testfx-core:${versions.testFx}",
-                    "org.testfx:testfx-junit5:${versions.testFx}",
+                    "org.testfx:testfx-core:4.0.+",
+                    "org.testfx:testfx-junit5:4.0.+",
             ],
 
-            checkstyle: "com.puppycrawl.tools:checkstyle:${versions.checkstyle}",
-            xjc: "com.sun.xml.bind:jaxb-xjc:${versions.xjc}",
+            checkstyle: "com.puppycrawl.tools:checkstyle:8.10.1",
+            xjc: "com.sun.xml.bind:jaxb-xjc:2.2.4-1",
     ]
 
 }
