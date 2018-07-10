@@ -1,7 +1,7 @@
 package org.jabref.build
 
 class Dependencies {
-    
+
     static def libraries = [
             libreOffice: [
                     "org.libreoffice:juh:5.4.2",
@@ -110,6 +110,7 @@ class Dependencies {
 
             checkstyle: "com.puppycrawl.tools:checkstyle:8.10.1",
             xjc: "com.sun.xml.bind:jaxb-xjc:2.2.4-1",
+            jython: "org.python:jython-standalone:2.7.1"
     ]
 
 }

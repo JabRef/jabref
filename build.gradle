@@ -43,9 +43,9 @@ apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'checkstyle'
 apply plugin: org.jabref.build.antlr.AntlrPlugin
 apply plugin: org.jabref.build.xjc.XjcPlugin
+apply plugin: org.jabref.build.localization.LocalizationPlugin
 
 apply from: 'eclipse.gradle'
-apply from: 'localization.gradle'
 
 group = "org.jabref"
 version = "5.0-dev"
@@ -146,6 +146,7 @@ dependencies {
 
     checkstyle libraries.checkstyle
     xjc libraries.xjc
+    jython 'org.python:jython-standalone:2.7.1'
 }
 
 jacoco {
@@ -307,6 +308,8 @@ javadoc {
         author = true
     }
 }
+
+localization.script = 'scripts/syncLang.py'
 
 // Test tasks
 test {
