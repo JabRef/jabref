@@ -32,6 +32,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 
 ### Fixed
+- We fixed an issue about improving check for page numbers.
+(https://github.com/JabRef/jabref/issues/4113)
 - We fixed an issue where custom exports could not be selected in the 'Export (selected) entries' dialog [#4013](https://github.com/JabRef/jabref/issues/4013)
 - Italic text is now rendered correctly. https://github.com/JabRef/jabref/issues/3356
 - The entry editor no longer gets corrupted after using the source tab. https://github.com/JabRef/jabref/issues/3532 https://github.com/JabRef/jabref/issues/3608 https://github.com/JabRef/jabref/issues/3616

@@ -11,24 +11,24 @@ import org.jabref.model.strings.StringUtil;
 public class PagesChecker implements ValueChecker {
 
     private static final String PAGES_EXP_BIBTEX = "" + "\\A" // begin String
-            + "\\d+" // number
+                                                   + "[A-Za-z]?\\d+" // number or letter  number
             + "(?:" // non-capture group
-            + "\\+|\\-{2}\\d+" // + or --number (range)
+                                                   + "\\+|\\-{1,2}[A-Za-z]?\\d+" // + or --number or -number(range)
             + ")?" // optional group
             + "(?:" // non-capture group
             + "," // comma
-            + "\\d+(?:\\+|\\-{2}\\d+)?" // repeat former pattern
+                                                   + "[A-Za-z]?\\d+(?:\\+|\\-{1,2}[A-Za-z]?\\d+)?" // repeat former pattern
             + ")*" // repeat group 0,*
             + "\\z"; // end String
 
     private static final String PAGES_EXP_BIBLATEX = "" + "\\A" // begin String
-            + "\\d+" // number
+                                                     + "[A-Za-z]?\\d+" // number
             + "(?:" // non-capture group
-            + "\\+|\\-{1,2}\\d+" // + or --number (range)
+                                                     + "\\+|\\-{1,2}[A-Za-z]?\\d+" // + or --number (range)
             + ")?" // optional group
             + "(?:" // non-capture group
             + "," // comma
-            + "\\d+(?:\\+|\\-{1,2}\\d+)?" // repeat former pattern
+                                                     + "[A-Za-z]?\\d+(?:\\+|\\-{1,2}[A-Za-z]?\\d+)?" // repeat former pattern
             + ")*" // repeat group 0,*
             + "\\z"; // end String
 
