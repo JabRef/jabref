@@ -7,7 +7,7 @@ import org.jabref.Globals;
 import org.jabref.gui.util.DefaultTaskExecutor;
 
 /**
- * Remove as soon as possible
+ * TODO: Remove as soon as possible
  */
 public class CustomJFXPanel {
 
