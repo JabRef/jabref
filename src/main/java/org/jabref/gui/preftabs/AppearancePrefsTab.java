@@ -71,21 +71,20 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public void storeSettings() {
-        boolean isRestartRequired;
-
         // Java FX font rendering tweak
         final boolean oldFxTweakValue = prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK);
         prefs.putBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK, fontTweaksLAF.isSelected());
-        isRestartRequired = oldFxTweakValue != fontTweaksLAF.isSelected();
 
         final boolean oldOverrideDefaultFontSize = prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONT_SIZE);
         final int oldFontSize = prefs.getInt(JabRefPreferences.MAIN_FONT_SIZE);
         prefs.putBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONT_SIZE, overrideFonts.isSelected());
         int newFontSize = Integer.parseInt(fontSize.getText());
         prefs.putInt(JabRefPreferences.MAIN_FONT_SIZE, newFontSize);
-        isRestartRequired |= oldOverrideDefaultFontSize != overrideFonts.isSelected();
-        isRestartRequired |= oldFontSize != newFontSize;
 
+        boolean isRestartRequired =
+                oldFxTweakValue != fontTweaksLAF.isSelected()
+                        || oldOverrideDefaultFontSize != overrideFonts.isSelected()
+                        || oldFontSize != newFontSize;
         if (isRestartRequired) {
             dialogService.showWarningDialogAndWait(Localization.lang("Settings"),
                     Localization.lang("Some appearance settings you changed require to restart JabRef to come into effect."));
