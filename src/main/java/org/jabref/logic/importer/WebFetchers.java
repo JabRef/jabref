@@ -92,6 +92,7 @@ public class WebFetchers {
         list.add(new CrossRef());
         list.add(new CiteSeer());
         list.add(new DOAJFetcher(importFormatPreferences));
+        list.add(new IEEE(importFormatPreferences));
         list.sort(Comparator.comparing(WebFetcher::getName));
         return list;
     }
@@ -141,7 +142,7 @@ public class WebFetchers {
         fetchers.add(new SpringerLink());
         fetchers.add(new ACS());
         fetchers.add(new ArXiv(importFormatPreferences));
-        fetchers.add(new IEEE());
+        fetchers.add(new IEEE(importFormatPreferences));
         // Meta search
         fetchers.add(new GoogleScholar(importFormatPreferences));
         fetchers.add(new OpenAccessDoi());

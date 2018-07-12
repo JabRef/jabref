@@ -12,8 +12,12 @@ public class EntryFetchers {
 
     private final List<EntryFetcher> entryFetchers = new LinkedList<>();
 
-    public EntryFetchers(JournalAbbreviationLoader abbreviationLoader) {
-        entryFetchers.add(new IEEEXploreFetcher(abbreviationLoader));
+   public EntryFetchers(JournalAbbreviationLoader abbreviationLoader) {
+
+
+
+
+
 
         WebFetchers.getSearchBasedFetchers(Globals.prefs.getImportFormatPreferences()).stream()
                 .map(SearchBasedEntryFetcher::new)

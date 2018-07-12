@@ -63,7 +63,7 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
             throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
             // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource
-            throw new FetcherException("An I/O exception occurred", e);
+            throw new FetcherException("A network error occurred", e);
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);
         }
