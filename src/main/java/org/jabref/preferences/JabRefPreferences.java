@@ -575,7 +575,7 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(MERGE_ENTRIES_DIFF_MODE, 2);
 
-        defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
+        defaults.put(SHOW_RECOMMENDATIONS, Boolean.FALSE);
         defaults.put(VALIDATE_IN_ENTRY_EDITOR, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);

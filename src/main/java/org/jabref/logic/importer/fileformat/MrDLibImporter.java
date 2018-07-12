@@ -29,13 +29,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-/**
- *
- *
- */
 public class MrDLibImporter extends Importer {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibImporter.class);
+
     public ParserResult parserResult;
 
     @Override
@@ -84,7 +80,7 @@ public class MrDLibImporter extends Importer {
 
     /**
      * The SaxParser needs this String. So I convert it here.
-     * @param Takes a BufferedReader with a reference to the XML document delivered by mdl server.
+     * @param input Takes a BufferedReader with a reference to the XML document delivered by mdl server.
      * @return Returns an String containing the XML file.
      * @throws IOException
      */
@@ -105,7 +101,6 @@ public class MrDLibImporter extends Importer {
      * Small pair-class to ensure the right order of the recommendations.
      */
     private class RankedBibEntry {
-
         public BibEntry entry;
         public Integer rank;
 
