@@ -25,8 +25,8 @@ public class CoinsParser implements Parser {
     private final Pattern DOI = Pattern.compile("%3Fdoi%3D([^&]+)");
     private final Pattern TITLE = Pattern.compile("&amp;rft.atitle=([^&]+)");
     private final Pattern JOURNAL = Pattern.compile("&amp;rft.jtitle=([^&]+)");
-    private final Pattern YEAR = Pattern.compile("&amp;rft.jtitle=([^&]+)");
-    private final Pattern VOLUME = Pattern.compile("&amp;rft.jtitle=([^&]+)");
+    private final Pattern YEAR = Pattern.compile("&amp;rft.date=([^&]+)");
+    private final Pattern VOLUME = Pattern.compile("&amp;rft.volume=([^&]+)");
     private final Pattern PAGES = Pattern.compile("&amp;rft.pages=([^&]+)");
     private final Pattern ISSUE = Pattern.compile("&amp;rft.issue=([^&]+)");
     private final Pattern TYPE = Pattern.compile("&amp;rft.genre=([^&]+)");

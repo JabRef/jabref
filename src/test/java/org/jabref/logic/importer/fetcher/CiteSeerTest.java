@@ -33,4 +33,18 @@ class CiteSeerTest {
         List<BibEntry> fetchedEntries = fetcher.performSearch("title:Ericksen-Leslie AND venue:q AND ncites:[10 TO 15000]");
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
+
+    @Test
+    void searchByQueryFindsEntry2() throws Exception {
+        BibEntry expected = new BibEntry();
+        expected.setType(BibtexEntryTypes.MISC);
+        expected.setField("author", "Lazarus Richard S.");
+        expected.setField("title", "Coping Theory and Research: Past Present and Future");
+        expected.setField("doi", "10.1.1.115.9665");
+        expected.setField("year", "1993");
+        expected.setField("journaltitle", "PSYCHOSOMATIC MEDICINE");
+
+        List<BibEntry> fetchedEntries = fetcher.performSearch("JabRef");
+        assertEquals(expected, fetchedEntries.get(4));
+    }
 }
