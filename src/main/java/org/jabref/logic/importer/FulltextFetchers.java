@@ -62,17 +62,16 @@ public class FulltextFetchers {
             findDoiForEntry(clonedEntry);
         }
 
-        List<Future<Optional<FetcherResult>>> result = new ArrayList<>();
-        result = JabRefExecutorService.INSTANCE.executeAll(getCallables(clonedEntry, finders), FETCHER_TIMEOUT, TimeUnit.SECONDS);
+        List<Future<Optional<FetcherResult>>> result = JabRefExecutorService.INSTANCE.executeAll(getCallables(clonedEntry, finders), FETCHER_TIMEOUT, TimeUnit.SECONDS);
 
         return result.stream()
-                .map(FulltextFetchers::getResults)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .filter(res -> Objects.nonNull(res.getSource()))
-                .sorted(Comparator.comparingInt((FetcherResult res) -> res.getTrust().getTrustScore()).reversed())
-                .map(res -> res.getSource())
-                .findFirst();
+                     .map(FulltextFetchers::getResults)
+                     .filter(Optional::isPresent)
+                     .map(Optional::get)
+                     .filter(res -> Objects.nonNull(res.getSource()))
+                     .sorted(Comparator.comparingInt((FetcherResult res) -> res.getTrust().getTrustScore()).reversed())
+                     .map(FetcherResult::getSource)
+                     .findFirst();
     }
 
     private void findDoiForEntry(BibEntry clonedEntry) {

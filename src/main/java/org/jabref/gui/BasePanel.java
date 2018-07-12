@@ -345,9 +345,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         actions.put(Actions.MERGE_ENTRIES, () -> new MergeEntriesDialog(BasePanel.this, dialogService));
 
-        actions.put(Actions.SEARCH, frame.getGlobalSearchBar()::focus);
-        actions.put(Actions.GLOBAL_SEARCH, frame.getGlobalSearchBar()::performGlobalSearch);
-
         // The action for copying the selected entry's key.
         actions.put(Actions.COPY_KEY, this::copyKey);
 
