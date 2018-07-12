@@ -28,6 +28,7 @@ import javax.swing.SwingWorker;
 import org.jabref.Globals;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.FetcherException;
@@ -331,13 +332,23 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
                     dispose();
                 } else if (searchID.trim().isEmpty()) {
-                    frame.getDialogService().showWarningDialogAndWait(Localization.lang("Empty search ID"),
-                            Localization.lang("The given search ID was empty."));
+                    DefaultTaskExecutor.runInJavaFXThread(() -> {
+                        frame.getDialogService().showWarningDialogAndWait(
+                                Localization.lang("Empty search ID"),
+                                Localization.lang("The given search ID was empty."));
+                    });
                 } else if (!fetcherException) {
-                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("No files found.",
-                            Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage));
+                    DefaultTaskExecutor.runInJavaFXThread(() -> {
+                        frame.getDialogService().showErrorDialogAndWait(
+                                Localization.lang("No files found."),
+                                Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage);
+                    });
                 } else {
-                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Error"), Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage);
+                    DefaultTaskExecutor.runInJavaFXThread(() -> {
+                        frame.getDialogService().showErrorDialogAndWait(
+                                Localization.lang("Error"),
+                                Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage);
+                    });
                 }
                 fetcherWorker = new FetcherWorker();
                 SwingUtilities.invokeLater(() -> {
