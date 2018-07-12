@@ -2,6 +2,7 @@ package org.jabref.logic.exporter;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
@@ -29,7 +30,6 @@ import org.slf4j.LoggerFactory;
  * If committing fails, the temporary file will not be deleted.
  */
 public class FileSaveSession extends SaveSession {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(FileSaveSession.class);
 
     // Filenames.
@@ -75,13 +75,18 @@ public class FileSaveSession extends SaveSession {
         try {
             // Always use a lock file
             try {
-                if (FileBasedLock.createLockFile(file)) {
-                    // Oops, the lock file already existed. Try to wait it out:
+                if (FileBasedLock.hasLockFile(file)) {
+                    // lock file exists, wait for lock
                     if (!FileBasedLock.waitForFileLock(file)) {
                         throw SaveException.FILE_LOCKED;
                     }
                 }
+
+                FileBasedLock.createLockFile(file);
+            } catch (FileSystemException ex) {
+                throw new SaveException("The network path was not found.");
             } catch (IOException ex) {
+                // TODO without a valid lock file, we should not continue?! we might accept this for save files but not for the main library file!
                 LOGGER.error("Error when creating lock file.", ex);
             }
 
