@@ -36,12 +36,14 @@ import java.util.stream.Collectors;
 
 import javax.swing.UIManager;
 
+import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.JabRefMain;
 import org.jabref.gui.SidePaneType;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabList;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -215,6 +217,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String ICON_ENABLED_COLOR = "iconEnabledColor";
     public static final String ICON_DISABLED_COLOR = "iconDisabledColor";
     public static final String FONT_SIZE = "fontSize";
+    public static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
+    public static final String MAIN_FONT_SIZE = "mainFontSize";
     public static final String FONT_STYLE = "fontStyle";
     public static final String RECENT_DATABASES = "recentDatabases";
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
@@ -686,6 +690,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(LAST_USED_EXPORT, "");
         defaults.put(SIDE_PANE_WIDTH, 0.15);
 
+        defaults.put(MAIN_FONT_SIZE, 9);
+        defaults.put(OVERRIDE_DEFAULT_FONT_SIZE, false);
+
         defaults.put(IMPORT_INSPECTION_DIALOG_WIDTH, 650);
         defaults.put(IMPORT_INSPECTION_DIALOG_HEIGHT, 650);
         defaults.put(SHOW_FILE_LINKS_UPGRADE_WARNING, Boolean.TRUE);
@@ -893,6 +900,18 @@ public class JabRefPreferences implements PreferencesService {
         storage.put(CLEANUP_CONVERT_TO_BIBTEX, preset.isConvertToBibtex());
         storage.put(CLEANUP_FIX_FILE_LINKS, preset.isFixFileLinks());
         storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().getAsStringList(OS.NEWLINE)));
+    }
+
+    public EntryEditorPreferences getEntryEditorPreferences() {
+        return new EntryEditorPreferences(getEntryEditorTabList(),
+                getLatexFieldFormatterPreferences(),
+                getImportFormatPreferences(),
+                getCustomTabFieldNames(),
+                getBoolean(SHOW_RECOMMENDATIONS),
+                getBoolean(DEFAULT_SHOW_SOURCE),
+                getBibtexKeyPatternPreferences(),
+                Globals.getKeyPrefs(),
+                getBoolean(AVOID_OVERWRITING_KEY));
     }
 
     public Map<SidePaneType, Integer> getSidePanePreferredPositions() {
@@ -1444,9 +1463,14 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
-        return new BibtexKeyPatternPreferences(get(KEY_PATTERN_REGEX),
-                                               get(KEY_PATTERN_REPLACEMENT), getBoolean(KEY_GEN_ALWAYS_ADD_LETTER), getBoolean(KEY_GEN_FIRST_LETTER_A),
-                                               getBoolean(ENFORCE_LEGAL_BIBTEX_KEY), getKeyPattern(), getKeywordDelimiter());
+        return new BibtexKeyPatternPreferences(
+                get(KEY_PATTERN_REGEX),
+                get(KEY_PATTERN_REPLACEMENT),
+                getBoolean(KEY_GEN_ALWAYS_ADD_LETTER),
+                getBoolean(KEY_GEN_FIRST_LETTER_A),
+                getBoolean(ENFORCE_LEGAL_BIBTEX_KEY),
+                getKeyPattern(),
+                getKeywordDelimiter());
     }
 
     public TimestampPreferences getTimestampPreferences() {
@@ -1891,4 +1915,11 @@ public class JabRefPreferences implements PreferencesService {
         return get(PREVIEW_STYLE);
     }
 
+    public Optional<Integer> getFontSize() {
+        if (getBoolean(OVERRIDE_DEFAULT_FONT_SIZE)) {
+            return Optional.of(getInt(MAIN_FONT_SIZE));
+        } else {
+            return Optional.empty();
+        }
+    }
 }

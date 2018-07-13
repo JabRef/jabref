@@ -33,7 +33,6 @@ import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.importer.FetcherPreviewDialog;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
@@ -178,52 +177,18 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             return;
         }
 
-        // We have two categories of fetchers. One category can show previews first and ask the
-        // user which ones to download:
-        if (activeFetcher instanceof PreviewEntryFetcher) {
-            frame.output(Localization.lang("Searching..."));
-            frame.setProgressBarIndeterminate(true);
-            frame.setProgressBarVisible(true);
-            final PreviewEntryFetcher pFetcher = (PreviewEntryFetcher) activeFetcher;
-            final FetcherPreviewDialog dialog = new FetcherPreviewDialog(frame,
-                    pFetcher.getWarningLimit(), pFetcher.getPreferredPreviewHeight());
-            JabRefExecutorService.INSTANCE.execute(() -> {
-                final boolean result = pFetcher.processQueryGetPreview(tf.getText().trim(), dialog, dialog);
-                SwingUtilities.invokeLater(() -> {
-                    frame.setProgressBarVisible(false);
-                    frame.output("");
-                    if (result) {
-                        dialog.setVisible(true);
-                        if (dialog.isOkPressed()) {
-                            final ImportInspectionDialog d2 = new ImportInspectionDialog(frame,
-                                    frame.getCurrentBasePanel(), activeFetcher.getTitle(), false);
-                            d2.addCallBack(activeFetcher);
-                            d2.setVisible(true);
-                            JabRefExecutorService.INSTANCE.execute(() -> {
-                                pFetcher.getEntries(dialog.getSelection(), d2);
-                                d2.entryListComplete();
-                            });
-                        }
-                    }
-                });
-            });
-        }
+        final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
+                activeFetcher.getTitle(), false);
+        dialog.addCallBack(activeFetcher);
+        dialog.setVisible(true);
 
-        // The other category downloads the entries first, then asks the user which ones to keep:
-        else {
-            final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
-                    activeFetcher.getTitle(), false);
-            dialog.addCallBack(activeFetcher);
-            dialog.setVisible(true);
-
-            JabRefExecutorService.INSTANCE.execute(() -> {
-                if (activeFetcher.processQuery(tf.getText().trim(), dialog, dialog)) {
-                    dialog.entryListComplete();
-                } else {
-                    dialog.dispose();
-                }
-            });
-        }
+        JabRefExecutorService.INSTANCE.execute(() -> {
+            if (activeFetcher.processQuery(tf.getText().trim(), dialog, dialog)) {
+                dialog.entryListComplete();
+            } else {
+                dialog.dispose();
+            }
+        });
     }
 
     @Override

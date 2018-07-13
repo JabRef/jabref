@@ -11,6 +11,7 @@ import java.util.Objects;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 
+import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -58,6 +59,8 @@ public class ThemeLoader {
                 addAndWatchForChanges(scene, cssUrl, 1);
             }
         }
+
+        Globals.prefs.getFontSize().ifPresent(size -> scene.getRoot().setStyle("-fx-font-size: " + size + "pt;"));
     }
 
     private void addAndWatchForChanges(Scene scene, String cssUrl, int index) {
