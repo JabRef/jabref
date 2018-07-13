@@ -327,7 +327,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                         if (Globals.prefs.getTimestampPreferences().includeCreatedTimestamp()) {
                             bibEntry.setField(Globals.prefs.getTimestampPreferences().getTimestampField(), Globals.prefs.getTimestampPreferences().now());
                         }
-                        frame.getCurrentBasePanel().insertEntry(bibEntry);
+                        DefaultTaskExecutor.runInJavaFXThread(() -> frame.getCurrentBasePanel().insertEntry(bibEntry));
                     }
 
                     dispose();

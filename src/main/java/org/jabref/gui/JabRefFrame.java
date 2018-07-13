@@ -1421,7 +1421,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         @Override
         public void execute() {
-            LOGGER.debug(Globals.getFocusListener().getFocused().toString());
             JComponent source = Globals.getFocusListener().getFocused();
             Action action = source.getActionMap().get(command);
             if (action != null) {
