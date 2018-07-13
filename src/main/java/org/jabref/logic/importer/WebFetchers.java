@@ -9,6 +9,7 @@ import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ArXiv;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
+import org.jabref.logic.importer.fetcher.CiteSeer;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.DOAJFetcher;
@@ -89,6 +90,7 @@ public class WebFetchers {
         list.add(new DBLPFetcher(importFormatPreferences));
         list.add(new SpringerFetcher());
         list.add(new CrossRef());
+        list.add(new CiteSeer());
         list.add(new DOAJFetcher(importFormatPreferences));
         list.add(new IEEE(importFormatPreferences));
         list.sort(Comparator.comparing(WebFetcher::getName));

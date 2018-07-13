@@ -9,13 +9,14 @@ import java.util.Optional;
 import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.importer.fileformat.GvkParser;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-
+@FetcherTest
 public class GvkParserTest {
 
     private void doTest(String xmlName, int expectedSize, List<String> resourceNames) throws Exception {
