@@ -9,7 +9,6 @@ import javax.swing.SwingUtilities;
 import org.jabref.Globals;
 import org.jabref.gui.EntryTypeDialog;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.model.entry.EntryType;
 
 import org.slf4j.Logger;
@@ -54,7 +53,7 @@ public class NewEntryAction extends SimpleCommand {
                 }
 
                 trackNewEntry(selectedType);
-                DefaultTaskExecutor.runInJavaFXThread(() -> jabRefFrame.getCurrentBasePanel().newEntry(selectedType));
+                jabRefFrame.getCurrentBasePanel().newEntry(selectedType);
             });
         }
     }
