@@ -245,8 +245,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     }
 
     @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_OAI2_ARXIV;
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_OAI2_ARXIV);
     }
 
     @Override
