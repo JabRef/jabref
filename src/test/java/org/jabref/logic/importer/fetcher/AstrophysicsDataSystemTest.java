@@ -136,7 +136,7 @@ public class AstrophysicsDataSystemTest {
 
     @Test
     public void testHelpPage() {
-        assertEquals("ADS", fetcher.getHelpPage().getPageName());
+        assertEquals("ADS", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test

@@ -538,10 +538,8 @@ public class ArgumentProcessor {
 
     /**
      * Run an entry fetcher from the command line.
-     * <p>
-     * Note that this only works headlessly if the EntryFetcher does not show any GUI.
      *
-     * @param fetchCommand A string containing both the fetcher to use (id of EntryFetcherExtension minus Fetcher) and
+     * @param fetchCommand A string containing both the name of the fetcher to use and
      *                     the search query, separated by a :
      * @return A parser result containing the entries fetched or null if an error occurred.
      */
@@ -569,14 +567,14 @@ public class ArgumentProcessor {
             return Optional.empty();
         } else {
             System.out.println(Localization.lang("Running query '%0' with fetcher '%1'.", query, engine));
-            System.out.println(Localization.lang("Please wait..."));
+            System.out.print(Localization.lang("Please wait..."));
             try {
                 List<BibEntry> matches = selectedFetcher.get().performSearch(query);
                 if (matches.isEmpty()) {
-                    System.out.println(Localization.lang("Query '%0' with fetcher '%1' did not return any results.", query, engine));
+                    System.out.println("\r" + Localization.lang("No results found."));
                     return Optional.empty();
                 } else {
-
+                    System.out.println("\r" + Localization.lang("Found %0 results.", String.valueOf(matches.size())));
                     return Optional.of(new ParserResult(matches));
                 }
             } catch (FetcherException e) {

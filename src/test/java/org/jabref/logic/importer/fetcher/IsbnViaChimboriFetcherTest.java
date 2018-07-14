@@ -44,7 +44,7 @@ public class IsbnViaChimboriFetcherTest extends AbstractIsbnFetcherTest {
     @Test
     @Override
     public void testHelpPage() {
-        assertEquals("ISBNtoBibTeX", fetcher.getHelpPage().getPageName());
+        assertEquals("ISBNtoBibTeX", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test
