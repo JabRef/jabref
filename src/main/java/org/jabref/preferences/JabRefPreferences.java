@@ -34,8 +34,6 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
-import javax.swing.UIManager;
-
 import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.JabRefMain;
@@ -115,7 +113,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String LYXPIPE = "lyxpipe";
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
     public static final String FONT_FAMILY = "fontFamily";
-    public static final String WIN_LOOK_AND_FEEL = "lookAndFeel";
     public static final String FX_FONT_RENDERING_TWEAK = "fxFontRenderingTweak";
     public static final String LANGUAGE = "language";
     public static final String NAMES_LAST_ONLY = "namesLastOnly";
@@ -461,15 +458,12 @@ public class JabRefPreferences implements PreferencesService {
 
         if (OS.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
-            defaults.put(WIN_LOOK_AND_FEEL, UIManager.getSystemLookAndFeelClassName());
             defaults.put(EMACS_PATH, "emacsclient");
         } else if (OS.WINDOWS) {
-            defaults.put(WIN_LOOK_AND_FEEL, "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
             defaults.put(EMACS_PATH, "emacsclient.exe");
         } else {
             // Linux
             defaults.put(FONT_FAMILY, "SansSerif");
-            defaults.put(WIN_LOOK_AND_FEEL, "javax.swing.plaf.nimbus.NimbusLookAndFeel");
             defaults.put(EMACS_PATH, "emacsclient");
         }
 
@@ -1897,14 +1891,6 @@ public class JabRefPreferences implements PreferencesService {
 
     public void setGroupViewMode(GroupViewMode mode) {
         put(GROUP_INTERSECT_UNION_VIEW_MODE, mode.name());
-    }
-
-    public String getLookAndFeel() {
-        return get(WIN_LOOK_AND_FEEL);
-    }
-
-    public void setLookAndFeel(String lookAndFeelClassName) {
-        put(WIN_LOOK_AND_FEEL, lookAndFeelClassName);
     }
 
     public void setPreviewStyle(String previewStyle) {
