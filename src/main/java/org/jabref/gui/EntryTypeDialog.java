@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -316,7 +317,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                         final BasePanel panel = frame.getCurrentBasePanel();
 
                         ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"), false);
-                        diag.addEntry(bibEntry);
+                        diag.addEntries(Collections.singletonList(bibEntry));
                         diag.entryListComplete();
                         diag.setVisible(true);
                         diag.toFront();
