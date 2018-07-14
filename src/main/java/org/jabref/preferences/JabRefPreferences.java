@@ -708,8 +708,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
         defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
         defaults.put(ALLOW_FILE_AUTO_OPEN_BROWSE, Boolean.TRUE);
-        defaults.put(WEB_SEARCH_VISIBLE, Boolean.FALSE);
-        defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.FALSE);
+        defaults.put(WEB_SEARCH_VISIBLE, Boolean.TRUE);
+        defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
         defaults.put(SELECTED_FETCHER_INDEX, 0);
         defaults.put(BIB_LOC_AS_PRIMARY_DIR, Boolean.FALSE);
         defaults.put(DB_CONNECT_SERVER_TYPE, "MySQL");
@@ -1039,6 +1039,10 @@ public class JabRefPreferences implements PreferencesService {
 
     public void putInt(String key, int value) {
         prefs.putInt(key, value);
+    }
+
+    public void putInt(String key, Number value) {
+        prefs.putInt(key, value.intValue());
     }
 
     public void putDouble(String key, double value) {
