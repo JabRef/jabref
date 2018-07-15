@@ -35,10 +35,6 @@ import org.slf4j.LoggerFactory;
 
 public class JabRefGUI {
 
-    private static final String NIMBUS_LOOK_AND_FEEL = "javax.swing.plaf.nimbus.NimbusLookAndFeel";
-    private static final String WINDOWS_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-    private static final String OSX_AQUA_LOOK_AND_FEEL = "apple.laf.AquaLookAndFeel";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
 
     private static JabRefFrame mainFrame;

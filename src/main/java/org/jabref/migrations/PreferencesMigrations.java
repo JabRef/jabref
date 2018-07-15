@@ -9,11 +9,9 @@ import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import java.util.stream.Stream;
 
 import org.jabref.Globals;
 import org.jabref.JabRefMain;
-import org.jabref.logic.util.OS;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
@@ -43,7 +41,6 @@ public class PreferencesMigrations {
         upgradeStoredCustomEntryTypes(Globals.prefs, mainPrefsNode);
         upgradeKeyBindingsToJavaFX(Globals.prefs);
         addCrossRefRelatedFieldsForAutoComplete(Globals.prefs);
-        upgradeObsoleteLookAndFeels(Globals.prefs);
         upgradePreviewStyleFromReviewToComment(Globals.prefs);
     }
 
@@ -283,28 +280,6 @@ public class PreferencesMigrations {
             keyPattern.addBibtexKeyPattern(key, oldPatternPrefs.get(key, null));
         }
         prefs.putKeyPattern(keyPattern);
-    }
-
-    private static void upgradeObsoleteLookAndFeels(JabRefPreferences prefs) {
-
-        String currentLandF = prefs.getLookAndFeel();
-
-        Stream.of("com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
-                  "com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel",
-                  "com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
-              .filter(style -> style.equals(currentLandF))
-              .findAny()
-              .ifPresent(loolAndFeel -> {
-                  if (OS.WINDOWS) {
-                      String windowsLandF = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-                      prefs.setLookAndFeel(windowsLandF);
-                      LOGGER.info("Switched from obsolete look and feel " + currentLandF + " to " + windowsLandF);
-                  } else {
-                      String nimbusLandF = "javax.swing.plaf.nimbus.NimbusLookAndFeel";
-                      prefs.setLookAndFeel(nimbusLandF);
-                      LOGGER.info("Switched from obsolete look and feel " + currentLandF + " to " + nimbusLandF);
-                  }
-              });
     }
 
     static void upgradePreviewStyleFromReviewToComment(JabRefPreferences prefs) {
