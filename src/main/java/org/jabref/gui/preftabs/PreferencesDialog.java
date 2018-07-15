@@ -188,7 +188,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         });
 
         showPreferences.addActionListener(
-                                          e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs), null).setVisible(true));
+                e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs)).setVisible(true));
         resetPreferences.addActionListener(e -> {
 
             boolean resetPreferencesClicked = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showConfirmationDialogAndWait(Localization.lang("Reset preferences"),
