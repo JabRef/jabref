@@ -15,12 +15,12 @@ buildscript {
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '1.14'
+    id 'com.gradle.build-scan' version '1.15.1'
     id 'com.install4j.gradle' version '7.0.6'
     id 'com.github.johnrengelman.shadow' version '2.0.4'
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
     id "com.simonharrer.modernizer" version '1.6.0-1'
-    id 'me.champeau.gradle.jmh' version '0.4.6'
+    id 'me.champeau.gradle.jmh' version '0.4.7'
     id 'net.ltgt.errorprone' version '0.0.14'
     id 'com.github.ben-manes.versions' version '0.20.0'
 }
