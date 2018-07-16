@@ -87,12 +87,12 @@ dependencies {
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
 
-    compile 'org.apache.pdfbox:pdfbox:2.0.10'
-    compile 'org.apache.pdfbox:fontbox:2.0.10'
-    compile 'org.apache.pdfbox:xmpbox:2.0.10'
+    compile 'org.apache.pdfbox:pdfbox:2.0.11'
+    compile 'org.apache.pdfbox:fontbox:2.0.11'
+    compile 'org.apache.pdfbox:xmpbox:2.0.11'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    compile 'org.bouncycastle:bcprov-jdk15on:1.59'
+    compile 'org.bouncycastle:bcprov-jdk15on:1.60'
 
     compile 'commons-cli:commons-cli:1.4'
 
@@ -113,7 +113,7 @@ dependencies {
     // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
     compile 'mysql:mysql-connector-java:5.1.46'
 
-    compile 'org.postgresql:postgresql:42.2.2'
+    compile 'org.postgresql:postgresql:42.2.4'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
@@ -157,10 +157,10 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.2.0'
     testCompile 'org.junit.platform:junit-platform-launcher:1.2.0'
-    testCompile 'org.junit-pioneer:junit-pioneer:0.1-SNAPSHOT'
+    testCompile 'org.junit-pioneer:junit-pioneer:0.1.2'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
-    testCompile 'org.mockito:mockito-core:2.19.0'
+    testCompile 'org.mockito:mockito-core:2.19.1'
     testCompile 'com.github.tomakehurst:wiremock:2.18.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
@@ -170,7 +170,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.10.1'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.11'
 }
 
 jacoco {
@@ -188,7 +188,7 @@ dependencyUpdates.revision = 'integration'
 dependencyUpdates.resolutionStrategy = {
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
-            if ( selection.candidate.module != "junit-pioneer" && selection.candidate.module!="javax.inject"  && selection.candidate.version ==~ /[0-9].*SNAPSHOT/ ) {
+            if ( selection.candidate.module!="javax.inject"  && selection.candidate.version ==~ /[0-9].*SNAPSHOT/ ) {
                 selection.reject("Ignore SNAPSHOT releases")
             }
         }
