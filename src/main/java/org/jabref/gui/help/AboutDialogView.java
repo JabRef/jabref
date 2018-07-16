@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 
 import org.jabref.gui.ClipBoardManager;
@@ -19,6 +20,7 @@ public class AboutDialogView extends BaseDialog<Void> {
 
     @FXML private ButtonType copyVersionButton;
     @FXML private TextArea textAreaVersions;
+    @FXML private Label devVersionLabel;
 
     @Inject private DialogService dialogService;
     @Inject private ClipBoardManager clipBoardManager;
