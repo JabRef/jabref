@@ -119,7 +119,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     }
 
     public LinkedFile getNewLinkedFile() {
-        return new LinkedFile(description.getValue(), link.getValue(), selectedExternalFileType.getValue().toString());
+        return new LinkedFile(description.getValue(), link.getValue(), selectedExternalFileType.getValue() == null ? null : selectedExternalFileType.getValue().toString());
 
     }
 

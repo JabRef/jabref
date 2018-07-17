@@ -1,5 +1,6 @@
 package org.jabref.gui.filelist;
 
+import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.Globals;
@@ -9,6 +10,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -32,11 +34,14 @@ public class AttachFileAction extends SimpleCommand {
         }
         BibEntry entry = panel.getSelectedEntries().get(0);
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
-                .build();
+                                                                                               .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                                                                                               .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
-            LinkedFile newLinkedFile = new LinkedFile("", newFile.toString(), "");
+
+            Path relativePath = FileUtil.shortenFileName(newFile, panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()));
+            LinkedFile newLinkedFile = new LinkedFile("", relativePath.toString(), "");
+
 
             LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(newLinkedFile);
 
