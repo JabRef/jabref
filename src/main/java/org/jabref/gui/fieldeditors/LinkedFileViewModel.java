@@ -281,6 +281,11 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
+    public void moveToDefaultDirectoryAndRename() {
+        moveToDefaultDirectory();
+        rename();
+    }
+
     public boolean delete(FileDirectoryPreferences prefs) {
         Optional<Path> file = linkedFile.findIn(databaseContext, prefs);
 
