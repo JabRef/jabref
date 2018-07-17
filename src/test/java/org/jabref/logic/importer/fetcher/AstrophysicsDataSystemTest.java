@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -176,8 +178,7 @@ public class AstrophysicsDataSystemTest {
 
     @Test
     public void testPerformSearchByIdInvalidDoi() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("this.doi.will.fail");
-        assertEquals(Optional.empty(), fetchedEntry);
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("this.doi.will.fail"));
     }
 
     @Test

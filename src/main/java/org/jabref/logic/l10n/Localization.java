@@ -51,8 +51,7 @@ public class Localization {
      */
     public static String lang(String key, String... params) {
         if (localizedMessages == null) {
-            // I'm logging this because it should never happen
-            LOGGER.error("Messages are not initialized before accessing key: " + key);
+            // This will happen when running junit tests
             setLanguage("en");
         }
         return lookup(localizedMessages, key, params);
