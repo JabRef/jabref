@@ -25,7 +25,6 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
@@ -75,7 +74,7 @@ public class EntryTypeCustomizationDialog extends JabRefDialog implements ListSe
      * Creates a new instance of EntryTypeCustomizationDialog
      */
     public EntryTypeCustomizationDialog(JabRefFrame frame) {
-        super((JFrame) null, Localization.lang("Customize entry types"), false, EntryTypeCustomizationDialog.class);
+        super(Localization.lang("Customize entry types"), false, EntryTypeCustomizationDialog.class);
 
         this.frame = frame;
         initGui();

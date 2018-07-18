@@ -455,7 +455,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         actions.put(Actions.PREVIOUS_PREVIEW_STYLE, this::previousPreviewStyle);
 
         actions.put(Actions.MANAGE_SELECTORS, () -> {
-            ContentSelectorDialog csd = new ContentSelectorDialog(null, frame, BasePanel.this, false, null);
+            ContentSelectorDialog csd = new ContentSelectorDialog(frame, BasePanel.this, false, null);
             csd.setVisible(true);
         });
 

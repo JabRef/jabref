@@ -66,7 +66,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
     public EntryTypeDialog(JabRefFrame frame) {
         // modal dialog
-        super(null, true, EntryTypeDialog.class);
+        super(true, EntryTypeDialog.class);
 
         this.frame = frame;
 
