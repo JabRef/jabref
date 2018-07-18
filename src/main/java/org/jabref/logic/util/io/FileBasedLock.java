@@ -11,13 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FileBasedLock {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileBasedLock.class);
-
     /**
-     * The age in ms of a lockfile before JabRef will offer to "steal" the locked file.
+     * The age in ms of a lock file before JabRef will offer to "steal" the locked file.
      */
     public static final long LOCKFILE_CRITICAL_AGE = 60000;
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileBasedLock.class);
     private static final String LOCKFILE_SUFFIX = ".lock";
 
     // default retry count for acquiring file lock
