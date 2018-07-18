@@ -17,11 +17,10 @@ import static org.mockito.Mockito.when;
 public class LibraryOfCongressTest {
 
     private LibraryOfCongress fetcher;
-    ImportFormatPreferences prefs;
 
     @BeforeEach
     public void setUp() {
-        prefs = mock(ImportFormatPreferences.class);
+        ImportFormatPreferences prefs = mock(ImportFormatPreferences.class);
         when(prefs.getKeywordSeparator()).thenReturn(',');
         fetcher = new LibraryOfCongress(prefs);
     }
