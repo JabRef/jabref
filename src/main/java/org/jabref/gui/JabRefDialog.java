@@ -45,7 +45,7 @@ public class JabRefDialog extends JDialog {
         super.setVisible(visible);
 
         if (visible) {
-            // Ugly hack to ensure that new dialogs are not hidden behind the main window
+            // FIXME: Ugly hack to ensure that new dialogs are not hidden behind the main window
             setAlwaysOnTop(true);
             requestFocus();
             setAlwaysOnTop(false);
