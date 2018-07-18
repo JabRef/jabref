@@ -44,7 +44,7 @@ public class DiVATest {
         entry.setField("institution", "Linköping University, The Institute of Technology");
         entry.setCiteKey("Gustafsson260746");
         entry.setField("journal",
-                "IEEE transactions on circuits and systems. 2, Analog and digital signal processing (Print)");
+                       "IEEE transactions on circuits and systems. 2, Analog and digital signal processing (Print)");
         entry.setField("number", "11");
         entry.setField("pages", "974--978");
         entry.setField("title", "Lower bounds for constant multiplication problems");
@@ -64,5 +64,10 @@ public class DiVATest {
     @Test
     public void testInvalidIdentifier() {
         assertFalse(fetcher.isValidId("banana"));
+    }
+
+    @Test
+    public void testEmptyId() throws Exception {
+        assertEquals(Optional.empty(), fetcher.performSearchById(""));
     }
 }

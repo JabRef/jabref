@@ -16,14 +16,15 @@ import static org.mockito.Mockito.when;
 @FetcherTest
 public class LibraryOfCongressTest {
 
-    ImportFormatPreferences prefs = mock(ImportFormatPreferences.class);
+    private LibraryOfCongress fetcher;
+    ImportFormatPreferences prefs;
 
     @BeforeEach
     public void setUp() {
+        prefs = mock(ImportFormatPreferences.class);
         when(prefs.getKeywordSeparator()).thenReturn(',');
+        fetcher = new LibraryOfCongress(prefs);
     }
-
-    private final LibraryOfCongress fetcher = new LibraryOfCongress(prefs);
 
     @Test
     public void performSearchById() throws Exception {
@@ -43,5 +44,15 @@ public class LibraryOfCongressTest {
         expected.setField("year", "2011");
 
         assertEquals(Optional.of(expected), fetcher.performSearchById("2010045158"));
+    }
+
+    @Test
+    public void performSearchByEmptyId() throws Exception {
+        assertEquals(Optional.empty(), fetcher.performSearchById(""));
+    }
+
+    @Test
+    public void performSearchByInvalidId() throws Exception {
+        assertEquals(Optional.empty(), fetcher.performSearchById("xxx"));
     }
 }

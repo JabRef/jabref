@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.Optional;
 
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
@@ -13,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
@@ -70,11 +68,11 @@ public class RfcFetcherTest {
 
     @Test
     public void performSearchByIdFindsNothingWithValidIdentifier() throws Exception {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("RFC9999"));
+        assertEquals(Optional.empty(), fetcher.performSearchById("RFC9999"));
     }
 
     @Test
     public void performSearchByIdFindsNothingWithInvalidIdentifier() throws Exception {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("banana"));
+        assertEquals(Optional.empty(), fetcher.performSearchById("banana"));
     }
 }

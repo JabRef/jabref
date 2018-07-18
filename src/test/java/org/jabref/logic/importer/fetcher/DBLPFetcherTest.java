@@ -64,4 +64,10 @@ public class DBLPFetcherTest {
         assertEquals(Collections.singletonList(entry), result);
     }
 
+    @Test
+    public void findNothing() throws Exception
+    {
+        assertEquals(Collections.emptyList(), dblpFetcher.performSearch(""));
+    }
+
 }

@@ -18,10 +18,11 @@ public class ProgressInputStream extends FilterInputStream {
 
     public ProgressInputStream(InputStream in, long maxNumBytes) {
         super(in);
-        this.maxNumBytes = maxNumBytes;
         this.totalNumBytesRead = new SimpleLongProperty(0);
         this.progress = new SimpleLongProperty(0);
-        this.progress.bind(totalNumBytesRead.divide(maxNumBytes));
+
+        this.maxNumBytes = maxNumBytes <=0 ? 1 : maxNumBytes;
+        this.progress.bind(totalNumBytesRead.divide(this.maxNumBytes));
     }
 
     public long getTotalNumBytesRead() {

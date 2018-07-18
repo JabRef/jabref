@@ -367,8 +367,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
          * Returns the arXiv identifier
          */
         public Optional<String> getIdString() {
-            // remove leading https://arxiv.org/abs/ from abstract url to get arXiv ID
-            String prefix = "https://arxiv.org/abs/";
+            // remove leading http://arxiv.org/abs/ from abstract url to get arXiv ID
+            String prefix = "http://arxiv.org/abs/";
             return urlAbstractPage.map(abstractUrl -> {
                 if (abstractUrl.startsWith(prefix)) {
                     return abstractUrl.substring(prefix.length());
