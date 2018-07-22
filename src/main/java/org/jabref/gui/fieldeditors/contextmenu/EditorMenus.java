@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.actions.CopyDoiUrlAction;
@@ -29,18 +30,18 @@ public class EditorMenus {
     /**
      * The default menu that contains functions for changing the case of text and doing several conversions.
      *
-     * @param textArea text-area that this menu will be connected to
+     * @param textInput text-input-control that this menu will be connected to
      * @return default context menu available for most text fields
      */
-    public static Supplier<List<MenuItem>> getDefaultMenu(TextArea textArea) {
+    public static Supplier<List<MenuItem>> getDefaultMenu(final TextInputControl textInput) {
         return () -> {
             List<MenuItem> menuItems = new ArrayList<>(6);
-            menuItems.add(new CaseChangeMenu(textArea.textProperty()));
-            menuItems.add(new ConversionMenu(textArea.textProperty()));
+            menuItems.add(new CaseChangeMenu(textInput.textProperty()));
+            menuItems.add(new ConversionMenu(textInput.textProperty()));
             menuItems.add(new SeparatorMenuItem());
-            menuItems.add(new ProtectedTermsMenu(textArea));
+            menuItems.add(new ProtectedTermsMenu(textInput));
             menuItems.add(new SeparatorMenuItem());
-            menuItems.add(new ClearField(textArea));
+            menuItems.add(new ClearField(textInput));
             return menuItems;
         };
     }
@@ -48,18 +49,18 @@ public class EditorMenus {
     /**
      * The default context menu with a specific menu for normalizing person names regarding to BibTex rules.
      *
-     * @param textArea text-area that this menu will be connected to
+     * @param textInput text-input-control that this menu will be connected to
      * @return menu containing items of the default menu and an item for normalizing person names
      */
-    public static Supplier<List<MenuItem>> getNameMenu(TextArea textArea) {
+    public static Supplier<List<MenuItem>> getNameMenu(final TextInputControl textInput) {
         return () -> {
             CustomMenuItem normalizeNames = new CustomMenuItem(new Label(Localization.lang("Normalize to BibTeX name format")));
-            normalizeNames.setOnAction(event -> textArea.setText(new NormalizeNamesFormatter().format(textArea.getText())));
+            normalizeNames.setOnAction(event -> textInput.setText(new NormalizeNamesFormatter().format(textInput.getText())));
             Tooltip toolTip = new Tooltip(Localization.lang("If possible, normalize this list of names to conform to standard BibTeX name formatting"));
             Tooltip.install(normalizeNames.getContent(), toolTip);
             List<MenuItem> menuItems = new ArrayList<>(6);
             menuItems.add(normalizeNames);
-            menuItems.addAll(getDefaultMenu(textArea).get());
+            menuItems.addAll(getDefaultMenu(textInput).get());
             return menuItems;
         };
     }
