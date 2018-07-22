@@ -7,12 +7,14 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.swing.JCheckBox;
+import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
-import org.jabref.gui.worker.AbstractWorker;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
@@ -22,57 +24,23 @@ import org.jabref.model.entry.BibEntry;
 /**
  * Function for resolving duplicate BibTeX keys.
  */
-public class SearchFixDuplicateLabels extends AbstractWorker {
+public class SearchFixDuplicateLabels implements BaseAction {
 
     private final BasePanel panel;
-    private Map<String, List<BibEntry>> dupes;
-
 
     public SearchFixDuplicateLabels(BasePanel panel) {
-
         this.panel = panel;
     }
 
     @Override
-    public void run() {
-        // Find all multiple occurrences of BibTeX keys.
-        dupes = new HashMap<>();
-
-        Map<String, BibEntry> foundKeys = new HashMap<>();
-        BibDatabase db = panel.getDatabase();
-        for (BibEntry entry : db.getEntries()) {
-            entry.getCiteKeyOptional().filter(key -> !key.isEmpty()).ifPresent(key -> {
-                // See whether this entry's key is already known:
-                if (foundKeys.containsKey(key)) {
-                    // Already known, so we have found a dupe. See if it was already found as a dupe:
-                    if (dupes.containsKey(key)) {
-                        // Already in the dupe map. Add this entry as well:
-                        dupes.get(key).add(entry);
-                    } else {
-                        // Construct a list of entries for this key:
-                        List<BibEntry> al = new ArrayList<>();
-                        // Add both the first one we found, and the one we found just now:
-                        al.add(foundKeys.get(key));
-                        al.add(entry);
-                        // Add the list to the dupe map:
-                        dupes.put(key, al);
-                    }
-                } else {
-                    // Not already known. Add key and entry to map:
-                    foundKeys.put(key, entry);
-                }
-            });
-        }
-    }
-
-    @Override
-    public void init() throws Exception {
+    public void action() throws Exception {
         panel.output(Localization.lang("Resolving duplicate BibTeX keys..."));
-
+        BackgroundTask.wrap(this::findDuplicates)
+                      .onSuccess(dupes -> SwingUtilities.invokeLater(() -> resolveDuplicates(dupes)))
+                      .executeWith(Globals.TASK_EXECUTOR);
     }
 
-    @Override
-    public void update() {
+    private void resolveDuplicates(Map<String, List<BibEntry>> dupes) {
         List<BibEntry> toGenerateFor = new ArrayList<>();
         for (Map.Entry<String, List<BibEntry>> dupeEntry : dupes.entrySet()) {
             ResolveDuplicateLabelDialog rdld = new ResolveDuplicateLabelDialog(panel, dupeEntry.getKey(), dupeEntry.getValue());
@@ -104,5 +72,37 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
         }
         panel.output(Localization.lang("Finished resolving duplicate BibTeX keys. %0 entries modified.",
                 String.valueOf(toGenerateFor.size())));
+    }
+
+    private Map<String, List<BibEntry>> findDuplicates() {
+        // Find all multiple occurrences of BibTeX keys.
+        Map<String, List<BibEntry>> dupes = new HashMap<>();
+
+        Map<String, BibEntry> foundKeys = new HashMap<>();
+        BibDatabase db = panel.getDatabase();
+        for (BibEntry entry : db.getEntries()) {
+            entry.getCiteKeyOptional().filter(key -> !key.isEmpty()).ifPresent(key -> {
+                // See whether this entry's key is already known:
+                if (foundKeys.containsKey(key)) {
+                    // Already known, so we have found a dupe. See if it was already found as a dupe:
+                    if (dupes.containsKey(key)) {
+                        // Already in the dupe map. Add this entry as well:
+                        dupes.get(key).add(entry);
+                    } else {
+                        // Construct a list of entries for this key:
+                        List<BibEntry> al = new ArrayList<>();
+                        // Add both the first one we found, and the one we found just now:
+                        al.add(foundKeys.get(key));
+                        al.add(entry);
+                        // Add the list to the dupe map:
+                        dupes.put(key, al);
+                    }
+                } else {
+                    // Not already known. Add key and entry to map:
+                    foundKeys.put(key, entry);
+                }
+            });
+        }
+        return dupes;
     }
 }

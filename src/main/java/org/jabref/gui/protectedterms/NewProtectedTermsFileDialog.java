@@ -12,7 +12,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
@@ -49,7 +48,7 @@ public class NewProtectedTermsFileDialog extends JabRefDialog {
     }
 
     public NewProtectedTermsFileDialog(DialogService dialogService, ProtectedTermsLoader loader) {
-        super((JFrame) null, Localization.lang("New protected terms file"), true, NewProtectedTermsFileDialog.class);
+        super(Localization.lang("New protected terms file"), true, NewProtectedTermsFileDialog.class);
         this.loader = loader;
         this.dialogService = dialogService;
         setupDialog();

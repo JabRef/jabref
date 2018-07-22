@@ -8,6 +8,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,7 +25,6 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
@@ -49,7 +49,7 @@ import org.jabref.model.strings.StringUtil;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
-public class EntryCustomizationDialog extends JabRefDialog implements ListSelectionListener {
+public class EntryTypeCustomizationDialog extends JabRefDialog implements ListSelectionListener {
 
     protected GridBagLayout gbl = new GridBagLayout();
     protected GridBagConstraints con = new GridBagConstraints();
@@ -71,10 +71,10 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
     private BibDatabaseMode bibDatabaseMode;
 
     /**
-     * Creates a new instance of EntryCustomizationDialog
+     * Creates a new instance of EntryTypeCustomizationDialog
      */
-    public EntryCustomizationDialog(JabRefFrame frame) {
-        super((JFrame) null, Localization.lang("Customize entry types"), false, EntryCustomizationDialog.class);
+    public EntryTypeCustomizationDialog(JabRefFrame frame) {
+        super(Localization.lang("Customize entry types"), false, EntryTypeCustomizationDialog.class);
 
         this.frame = frame;
         initGui();
@@ -276,11 +276,13 @@ public class EntryCustomizationDialog extends JabRefDialog implements ListSelect
                 if (biblatexMode) {
                     Set<String> oldPrimaryOptionalFieldsLists = oldType.get().getPrimaryOptionalFields();
                     Set<String> oldSecondaryOptionalFieldsList = oldType.get().getSecondaryOptionalFields();
-                    if (oldRequiredFieldsList.equals(requiredFieldsList) && oldPrimaryOptionalFieldsLists.equals(optionalFieldsList) &&
-                            oldSecondaryOptionalFieldsList.equals(secondaryOptionalFieldsLists)) {
+                    if (Arrays.equals(oldRequiredFieldsList.toArray(), requiredFieldsList.toArray())
+                            && Arrays.equals(oldPrimaryOptionalFieldsLists.toArray(), optionalFieldsList.toArray())
+                            && Arrays.equals(oldSecondaryOptionalFieldsList.toArray(), secondaryOptionalFieldsLists.toArray())) {
                         changesMade = false;
                     }
-                } else if (oldRequiredFieldsList.equals(requiredFieldsList) && oldOptionalFieldsList.equals(optionalFieldsList)) {
+                } else if (Arrays.equals(oldRequiredFieldsList.toArray(), requiredFieldsList.toArray())
+                        && Arrays.equals(oldOptionalFieldsList.toArray(), optionalFieldsList.toArray())) {
                     changesMade = false;
                 }
             }

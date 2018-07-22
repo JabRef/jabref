@@ -90,7 +90,7 @@ public class FieldEditors {
         } else if (fieldExtras.contains(FieldProperty.MULTILINE_TEXT)) {
             return new MultilineEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
         } else if (fieldExtras.contains(FieldProperty.KEY)) {
-            return new BibtexKeyEditor(fieldName, preferences, suggestionProvider, fieldCheckers, preferences.getBibtexKeyPatternPreferences(), databaseContext, undoManager);
+            return new BibtexKeyEditor(fieldName, preferences, suggestionProvider, fieldCheckers, databaseContext, undoManager, dialogService);
         }
 
         // default

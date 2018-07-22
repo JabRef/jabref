@@ -76,7 +76,6 @@ public class BibEntry implements Cloneable {
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
      */
-
     public BibEntry() {
         this(IdGenerator.next(), DEFAULT_TYPE);
     }
@@ -85,7 +84,9 @@ public class BibEntry implements Cloneable {
      * Constructs a new BibEntry with the given type
      *
      * @param type The type to set. May be null or empty. In that case, DEFAULT_TYPE is used.
+     * @deprecated use {{@link #BibEntry(EntryType)}} instead
      */
+    @Deprecated
     public BibEntry(String type) {
         this(IdGenerator.next(), type);
     }
@@ -102,6 +103,13 @@ public class BibEntry implements Cloneable {
         this.id = id;
         setType(type);
         this.sharedBibEntryData = new SharedBibEntryData();
+    }
+
+    /**
+     * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
+     */
+    public BibEntry(EntryType type) {
+        this(type.getName());
     }
 
     public Optional<FieldChange> setMonth(Month parsedMonth) {
@@ -848,6 +856,10 @@ public class BibEntry implements Cloneable {
 
     public ObjectBinding<String> getFieldBinding(String fieldName) {
         return Bindings.valueAt(fields, fieldName);
+    }
+
+    public ObjectBinding<String> getCiteKeyBinding() {
+        return getFieldBinding(KEY_FIELD);
     }
 
     public Optional<FieldChange> addFile(LinkedFile file) {

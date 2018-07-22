@@ -1,6 +1,7 @@
 package org.jabref.gui.util;
 
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 import javax.swing.JComponent;
 
@@ -11,6 +12,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.TextFormatter;
 
 public class ControlHelper {
 
@@ -38,5 +40,21 @@ public class ControlHelper {
                 return child.isFocused();
             }
         });
+    }
+
+    /**
+     * Returns a text formatter that restricts input to integers
+     */
+    public static TextFormatter<String> getIntegerTextFormatter() {
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+            String text = change.getText();
+
+            if (text.matches("[0-9]*")) {
+                return change;
+            }
+
+            return null;
+        };
+        return new TextFormatter<>(filter);
     }
 }

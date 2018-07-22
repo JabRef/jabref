@@ -12,14 +12,13 @@ import org.slf4j.LoggerFactory;
 
 public class FileBasedLock {
     /**
-     * The age in ms of a lockfile before JabRef will offer to "steal" the locked file.
+     * The age in ms of a lock file before JabRef will offer to "steal" the locked file.
      */
     public static final long LOCKFILE_CRITICAL_AGE = 60000;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(FileBasedLock.class);
     private static final String LOCKFILE_SUFFIX = ".lock";
 
-    // default retry count for aquiring file lock
+    // default retry count for acquiring file lock
     private static final int AQUIRE_LOCK_RETRY = 10;
 
     private FileBasedLock() {
@@ -30,7 +29,7 @@ public class FileBasedLock {
      * there is, it waits for 500 ms. This is repeated until the lock is gone
      * or we have waited the maximum number of times.
      *
-     * @param file The file to check the lock for.
+     * @param file         The file to check the lock for.
      * @param maxWaitCount The maximum number of times to wait.
      * @return true if the lock file is gone, false if it is still there.
      */
@@ -57,6 +56,7 @@ public class FileBasedLock {
 
     /**
      * Check whether a lock file exists for this file.
+     *
      * @param file The file to check.
      * @return true if a lock file exists, false otherwise.
      */
@@ -67,6 +67,7 @@ public class FileBasedLock {
 
     /**
      * Find the lock file's last modified time, if it has a lock file.
+     *
      * @param file The file to check.
      * @return the last modified time if lock file exists, empty optional otherwise.
      */

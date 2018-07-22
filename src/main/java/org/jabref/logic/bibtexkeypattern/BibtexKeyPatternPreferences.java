@@ -13,8 +13,8 @@ public class BibtexKeyPatternPreferences {
     private Character keywordDelimiter;
 
     public BibtexKeyPatternPreferences(String keyPatternRegex, String keyPatternReplacement, boolean alwaysAddLetter,
-            boolean firstLetterA, boolean enforceLegalKey, GlobalBibtexKeyPattern keyPattern,
-            Character keywordDelimiter) {
+                                       boolean firstLetterA, boolean enforceLegalKey, GlobalBibtexKeyPattern keyPattern,
+                                       Character keywordDelimiter) {
         this.keyPatternRegex = keyPatternRegex;
         this.keyPatternReplacement = keyPatternReplacement;
         this.alwaysAddLetter = alwaysAddLetter;

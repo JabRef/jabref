@@ -22,7 +22,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 /**
  * This class extends FieldSetComponent to provide some required functionality for the
- * list of entry types in EntryCustomizationDialog.
+ * list of entry types in EntryTypeCustomizationDialog.
  */
 public class EntryTypeList extends FieldSetComponent implements ListSelectionListener {
 
