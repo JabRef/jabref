@@ -395,32 +395,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         actions.put(Actions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(this, frame.getDialogService()));
 
-        actions.put(Actions.REPLACE_ALL, () -> {
-            final ReplaceStringDialog rsd = new ReplaceStringDialog(frame);
-            rsd.setVisible(true);
-            if (!rsd.okPressed()) {
-                return;
-            }
-            int counter = 0;
-            final NamedCompound ce = new NamedCompound(Localization.lang("Replace string"));
-            if (rsd.selOnly()) {
-                for (BibEntry be : mainTable.getSelectedEntries()) {
-                    counter += rsd.replace(be, ce);
-                }
-            } else {
-                for (BibEntry entry : bibDatabaseContext.getDatabase().getEntries()) {
-                    counter += rsd.replace(entry, ce);
-                }
-            }
-
-            output(Localization.lang("Replaced") + ' ' + counter + ' '
-                    + (counter == 1 ? Localization.lang("occurrence") : Localization.lang("occurrences")) + '.');
-            if (counter > 0) {
-                ce.end();
-                getUndoManager().addEdit(ce);
-                markBaseChanged();
-            }
-        });
+        actions.put(Actions.REPLACE_ALL, ()-> (new ReplaceStringAction(this)).execute());
 
         actions.put(new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getCommand(),
                     new SpecialFieldViewModel(SpecialField.RELEVANCE, undoManager).getSpecialFieldAction(SpecialField.RELEVANCE.getValues().get(0), frame));

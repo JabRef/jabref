@@ -75,6 +75,7 @@ import org.jabref.gui.actions.NewDatabaseAction;
 import org.jabref.gui.actions.NewEntryAction;
 import org.jabref.gui.actions.NewEntryFromPlainTextAction;
 import org.jabref.gui.actions.NewSubLibraryAction;
+import org.jabref.gui.actions.OldCommandWrapper;
 import org.jabref.gui.actions.OldDatabaseCommandWrapper;
 import org.jabref.gui.actions.OpenBrowserAction;
 import org.jabref.gui.actions.SearchForUpdateAction;
@@ -598,6 +599,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createIconButton(StandardActions.CUT, new OldDatabaseCommandWrapper(Actions.CUT, this, Globals.stateManager)),
                 factory.createIconButton(StandardActions.COPY, new OldDatabaseCommandWrapper(Actions.COPY, this, Globals.stateManager)),
                 factory.createIconButton(StandardActions.PASTE, new OldDatabaseCommandWrapper(Actions.PASTE, this, Globals.stateManager)),
+                factory.createIconButton(StandardActions.REPLACE_ALL, new ReplaceStringAction(this.getCurrentBasePanel())),
 
                 factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, Globals.stateManager)),
                 factory.createIconButton(pushToExternal.getMenuAction(), pushToExternal),
