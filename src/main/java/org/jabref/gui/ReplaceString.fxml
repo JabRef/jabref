@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -8,19 +7,19 @@
   <content>
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="376.0" prefWidth="552.0">
          <children>
-            <Button fx:id="CancelButton" cancelButton="true" layoutX="386.0" layoutY="273.0" mnemonicParsing="false" onAction="#ButtonCancel" prefHeight="28.0" prefWidth="74.0" text="Cancel" userData="CANCEL"/>
-            <Button fx:id="ReplaceButton" defaultButton="true" layoutX="260.0" layoutY="275.0" mnemonicParsing="false" onAction="#ButtonReplace" prefHeight="25.0" prefWidth="76.0" text="Replace" textFill="#e46161" userData="OK_DONE"/>
+            <Button fx:id="CancelButton" cancelButton="true" layoutX="386.0" layoutY="273.0" mnemonicParsing="false" onAction="#buttonCancel" prefHeight="28.0" prefWidth="74.0" text="Cancel" userData="CANCEL"/>
+            <Button fx:id="ReplaceButton" defaultButton="true" layoutX="260.0" layoutY="275.0" mnemonicParsing="false" onAction="#buttonReplace" prefHeight="25.0" prefWidth="76.0" text="Replace" textFill="#e46161" userData="OK_DONE"/>
             <TextField fx:id="FindField" layoutX="107.0" layoutY="21.0" prefHeight="23.0" prefWidth="347.0" />
             <TextField fx:id="ReplaceField" layoutX="107.0" layoutY="63.0" prefHeight="23.0" prefWidth="348.0" />
             <Label layoutX="14.0" layoutY="21.0" prefHeight="23.0" prefWidth="75.0" text="Find:" />
             <Label layoutX="11.0" layoutY="64.0" prefHeight="21.0" prefWidth="95.0" text="Replace with:" />
             <CheckBox fx:id="checkLimit" layoutX="20.0" layoutY="134.0" mnemonicParsing="false" onAction="#selectOnly" onMouseReleased="#selectOnly" prefHeight="22.0" prefWidth="211.0" text="Limit to Selected Entries" />
-            <RadioButton layoutX="20.0" layoutY="188.0" mnemonicParsing="false" onAction="#RadioAll" onMouseReleased="#RadioAll" prefHeight="16.0" prefWidth="125.0" selected="true" text="All Field Replace">
+            <RadioButton layoutX="20.0" layoutY="188.0" mnemonicParsing="false" onAction="#radioAll" onMouseReleased="#radioAll" prefHeight="16.0" prefWidth="125.0" selected="true" text="All Field Replace">
                <toggleGroup>
                   <ToggleGroup fx:id="RadioGroup" />
                </toggleGroup>
             </RadioButton>
-            <RadioButton layoutX="20.0" layoutY="217.0" mnemonicParsing="false" onAction="#RadioLimit" onMouseReleased="#RadioLimit" prefHeight="29.0" prefWidth="121.0" text="Limit to Fields:" toggleGroup="$RadioGroup" />
+            <RadioButton layoutX="20.0" layoutY="217.0" mnemonicParsing="false" onAction="#radioLimit" onMouseReleased="#radioLimit" prefHeight="29.0" prefWidth="121.0" text="Limit to Fields:" toggleGroup="$RadioGroup" />
             <TextField fx:id="LimitFieldInput" layoutX="157.0" layoutY="220.0" prefHeight="23.0" prefWidth="283.0" />
          </children></AnchorPane>
   </content>

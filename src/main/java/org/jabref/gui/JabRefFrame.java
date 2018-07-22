@@ -75,7 +75,6 @@ import org.jabref.gui.actions.NewDatabaseAction;
 import org.jabref.gui.actions.NewEntryAction;
 import org.jabref.gui.actions.NewEntryFromPlainTextAction;
 import org.jabref.gui.actions.NewSubLibraryAction;
-import org.jabref.gui.actions.OldCommandWrapper;
 import org.jabref.gui.actions.OldDatabaseCommandWrapper;
 import org.jabref.gui.actions.OpenBrowserAction;
 import org.jabref.gui.actions.SearchForUpdateAction;

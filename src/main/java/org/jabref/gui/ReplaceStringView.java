@@ -73,7 +73,7 @@ public class ReplaceStringView extends BaseDialog<Void>
      * FXML Message handler
     */
     @FXML
-    public void ButtonReplace() {
+    public void buttonReplace() {
         findString = FindField.getText();
         replaceString = ReplaceField.getText();
         fieldStrings = LimitFieldInput.getText().toLowerCase().split(";");
@@ -89,18 +89,18 @@ public class ReplaceStringView extends BaseDialog<Void>
     }
 
     @FXML
-    public void ButtonCancel() {
+    public void buttonCancel() {
         exitSignal = true;
         st.close();
     }
 
     @FXML
-    public void RadioAll() {
+    public void radioAll() {
         AllFieldReplace = true;
     }
 
     @FXML
-    public void RadioLimit() {
+    public void radioLimit() {
         AllFieldReplace = false;
     }
 
@@ -130,7 +130,7 @@ public class ReplaceStringView extends BaseDialog<Void>
             }
         }
         else {
-            for(BibEntry bibEntry: this.panel.getDatabase().getEntries())
+            for(BibEntry bibEntry: this.database.getEntries())
             {
                 counter += replaceItem(bibEntry, ce);
             }
