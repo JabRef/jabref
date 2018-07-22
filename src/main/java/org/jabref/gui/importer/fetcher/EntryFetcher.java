@@ -12,7 +12,7 @@ import org.jabref.logic.importer.OutputPrinter;
  * Use {@link SearchBasedEntryFetcher} instead <br>
  * Implement this interface to add another activeFetcher (something that grabs records
  * from the Web for JabRef). Have a look at the existing implemenations
- * OAI2Fetcher, IEEEXploreFetcher, JStorFetcher and
+ * IEEEXploreFetcher, JStorFetcher and
  * CiteSeerEntryFetcher.
  *
  * Note: You also need to implement the method stopFetching from

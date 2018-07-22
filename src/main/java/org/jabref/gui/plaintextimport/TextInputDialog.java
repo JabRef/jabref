@@ -134,7 +134,7 @@ public class TextInputDialog extends JabRefDialog {
 
 
     public TextInputDialog(JabRefFrame frame, BibEntry bibEntry) {
-        super(null, true, TextInputDialog.class);
+        super(true, TextInputDialog.class);
 
         this.frame = Objects.requireNonNull(frame);
 

@@ -3,7 +3,6 @@ package org.jabref.gui;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -158,8 +157,8 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
     private boolean checkBoxWhyIsThereNoGetSelectedStupidSwing;
 
-    public FindUnlinkedFilesDialog(Frame owner, JabRefFrame frame) {
-        super(owner, Localization.lang("Find unlinked files"), true, FindUnlinkedFilesDialog.class);
+    public FindUnlinkedFilesDialog(JabRefFrame frame) {
+        super(Localization.lang("Find unlinked files"), true, FindUnlinkedFilesDialog.class);
         this.frame = frame;
 
         restoreSizeOfDialog();

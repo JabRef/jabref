@@ -278,7 +278,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
 
         initShowTrackingNotification();
-
     }
 
     private void initKeyBindings() {
@@ -309,6 +308,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                     case DEFAULT_TABLE_FONT_SIZE:
                         setDefaultTableFontSize();
                         event.consume();
+                        break;
+                    case SEARCH:
+                        getGlobalSearchBar().focus();
                         break;
                     default:
                 }
@@ -841,7 +843,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createMenuItem(StandardActions.RESOLVE_DUPLICATE_KEYS, new OldDatabaseCommandWrapper(Actions.RESOLVE_DUPLICATE_KEYS, this, Globals.stateManager)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(this)),
                 factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, Globals.stateManager)),
-                factory.createMenuItem(StandardActions.GENERATE_CITE_KEY, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, Globals.stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -1419,7 +1421,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         @Override
         public void execute() {
-            LOGGER.debug(Globals.getFocusListener().getFocused().toString());
             JComponent source = Globals.getFocusListener().getFocused();
             Action action = source.getActionMap().get(command);
             if (action != null) {

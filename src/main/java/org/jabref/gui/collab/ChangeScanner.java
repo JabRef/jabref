@@ -81,7 +81,7 @@ public class ChangeScanner implements Runnable {
     public void displayResult(final DisplayResultCallback fup) {
         if (changes.getChildCount() > 0) {
             SwingUtilities.invokeLater(() -> {
-                ChangeDisplayDialog changeDialog = new ChangeDisplayDialog(null, panel, databaseInTemp.getDatabase(), changes);
+                ChangeDisplayDialog changeDialog = new ChangeDisplayDialog(panel, databaseInTemp.getDatabase(), changes);
                 changeDialog.setVisible(true);
                 fup.scanResultsResolved(changeDialog.isOkPressed());
                 if (changeDialog.isOkPressed()) {

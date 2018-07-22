@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.swing.JCheckBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -27,8 +26,8 @@ class PreferencesFilterDialog extends JabRefDialog {
     private final JCheckBox showOnlyDeviatingPreferenceOptions;
     private final JLabel count;
 
-    public PreferencesFilterDialog(JabRefPreferencesFilter preferencesFilter, JFrame frame) {
-        super(frame, true, PreferencesFilterDialog.class); // is modal
+    public PreferencesFilterDialog(JabRefPreferencesFilter preferencesFilter) {
+        super(true, PreferencesFilterDialog.class);
 
         this.preferencesFilter = Objects.requireNonNull(preferencesFilter);
 
