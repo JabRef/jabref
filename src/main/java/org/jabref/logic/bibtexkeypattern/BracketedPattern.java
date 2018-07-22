@@ -570,7 +570,7 @@ public class BracketedPattern {
         if (authorList.isEmpty()) {
             return "";
         }
-        if (authorList.getAuthor(0).getVon().toString().equals("Optional.empty")) {
+        if (!authorList.getAuthor(0).getVon().isPresent()) {
             Character.UnicodeBlock ub = Character.UnicodeBlock.of(authorList.getAuthor(0).getLast().orElse("").charAt(0));
             if ((ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS)
                 || (ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS)
