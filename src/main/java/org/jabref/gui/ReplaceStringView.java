@@ -77,7 +77,7 @@ public class ReplaceStringView extends BaseDialog<Void>
         findString = FindField.getText();
         replaceString = ReplaceField.getText();
         fieldStrings = LimitFieldInput.getText().toLowerCase().split(";");
-        if("".equals(findString))
+        if ("".equals(findString))
         {
             exitSignal = true;
             st.close();
@@ -121,16 +121,16 @@ public class ReplaceStringView extends BaseDialog<Void>
     public int replace() {
         final NamedCompound ce = new NamedCompound(Localization.lang("Replace string"));
         int counter = 0;
-        if(this.panel == null)
+        if (this.panel == null)
             return 0;
-        if(this.selOnly) {
-            for(BibEntry bibEntry: this.panel.getSelectedEntries())
+        if (this.selOnly) {
+            for (BibEntry bibEntry: this.panel.getSelectedEntries())
             {
                 counter += replaceItem(bibEntry, ce);
             }
         }
         else {
-            for(BibEntry bibEntry: this.database.getEntries())
+            for (BibEntry bibEntry: this.database.getEntries())
             {
                 counter += replaceItem(bibEntry, ce);
             }
