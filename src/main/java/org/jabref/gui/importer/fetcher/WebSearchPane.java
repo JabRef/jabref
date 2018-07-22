@@ -29,15 +29,13 @@ import org.fxmisc.easybind.EasyBind;
 
 public class WebSearchPane extends SidePaneComponent {
 
-    private final JabRefFrame frame;
     private final JabRefPreferences preferences;
     private final WebSearchPaneViewModel viewModel;
 
     public WebSearchPane(SidePaneManager sidePaneManager, JabRefPreferences preferences, JabRefFrame frame) {
         super(sidePaneManager, IconTheme.JabRefIcons.WWW, Localization.lang("Web search"));
-        this.frame = frame;
         this.preferences = preferences;
-        this.viewModel = new WebSearchPaneViewModel(preferences.getImportFormatPreferences(), frame);
+        this.viewModel = new WebSearchPaneViewModel(preferences.getImportFormatPreferences(), frame, preferences);
     }
 
     @Override
@@ -52,8 +50,8 @@ public class WebSearchPane extends SidePaneComponent {
         new ViewModelListCellFactory<SearchBasedFetcher>()
                 .withText(SearchBasedFetcher::getName)
                 .install(fetchers);
-        viewModel.selectedFetcherProperty().bind(fetchers.getSelectionModel().selectedItemProperty());
         fetchers.itemsProperty().bind(viewModel.fetchersProperty());
+        fetchers.valueProperty().bindBidirectional(viewModel.selectedFetcherProperty());
         fetchers.setMaxWidth(Double.POSITIVE_INFINITY);
 
         // Create help button for currently selected fetcher
@@ -78,17 +76,6 @@ public class WebSearchPane extends SidePaneComponent {
         // Create button that triggers search
         Button search = new Button(Localization.lang("Search"));
         search.setOnAction(event -> viewModel.search());
-
-        // Poor mans binding of default index
-        // (this logic should actually be in the view model but selected item property is readonly)
-        int defaultFetcher = preferences.getInt(JabRefPreferences.SELECTED_FETCHER_INDEX);
-        if (defaultFetcher <= 0 || defaultFetcher >= fetchers.getItems().size()) {
-            fetchers.getSelectionModel().selectFirst();
-        } else {
-            fetchers.getSelectionModel().select(defaultFetcher);
-        }
-        EasyBind.subscribe(fetchers.getSelectionModel().selectedIndexProperty(),
-                newIndex -> preferences.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, newIndex));
 
         // Put everything together
         VBox container = new VBox();

@@ -22,8 +22,10 @@ import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.lang3.StringUtils;
+import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,13 +38,25 @@ public class WebSearchPaneViewModel {
     private final StringProperty query = new SimpleStringProperty();
     private JabRefFrame frame;
 
-    public WebSearchPaneViewModel(ImportFormatPreferences importPreferences, JabRefFrame frame) {
-        // TODO: Rework so that we don't rely on JabRefFrame
+    public WebSearchPaneViewModel(ImportFormatPreferences importPreferences, JabRefFrame frame, JabRefPreferences preferences) {
+        // TODO: Rework so that we don't rely on JabRefFrame and not the complete preferences
         this.frame = frame;
 
         List<SearchBasedFetcher> allFetchers = WebFetchers.getSearchBasedFetchers(importPreferences);
         allFetchers.sort(Comparator.comparing(WebFetcher::getName));
         fetchers.setAll(allFetchers);
+
+        // Choose last-selected fetcher as default
+        int defaultFetcherIndex = preferences.getInt(JabRefPreferences.SELECTED_FETCHER_INDEX);
+        if (defaultFetcherIndex <= 0 || defaultFetcherIndex >= fetchers.size()) {
+            selectedFetcherProperty().setValue(fetchers.get(0));
+        } else {
+            selectedFetcherProperty().setValue(fetchers.get(defaultFetcherIndex));
+        }
+        EasyBind.subscribe(selectedFetcherProperty(), newFetcher -> {
+            int newIndex = fetchers.indexOf(newFetcher);
+            preferences.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, newIndex);
+        });
     }
 
     public ObservableList<SearchBasedFetcher> getFetchers() {
