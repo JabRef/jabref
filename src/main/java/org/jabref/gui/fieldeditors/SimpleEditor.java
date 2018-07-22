@@ -22,10 +22,10 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
                         final AutoCompleteSuggestionProvider<?> suggestionProvider,
                         final FieldCheckers fieldCheckers,
                         final JabRefPreferences preferences,
-                        final boolean hasSingleLine) {
+                        final boolean isSingleLine) {
         this.viewModel = new SimpleEditorViewModel(fieldName, suggestionProvider, fieldCheckers);
 
-        TextInputControl textInput = hasSingleLine
+        TextInputControl textInput = isSingleLine
                 ? new EditorTextField()
                 : new EditorTextArea();
         HBox.setHgrow(textInput, Priority.ALWAYS);

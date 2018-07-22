@@ -23,10 +23,10 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
                          final AutoCompleteSuggestionProvider<?> suggestionProvider,
                          final JabRefPreferences preferences,
                          final FieldCheckers fieldCheckers,
-                         final boolean hasSingleLine) {
+                         final boolean isSingleLine) {
         this.viewModel = new PersonsEditorViewModel(fieldName, suggestionProvider, preferences.getAutoCompletePreferences(), fieldCheckers);
 
-        textInput = hasSingleLine
+        textInput = isSingleLine
                 ? new EditorTextField()
                 : new EditorTextArea();
         HBox.setHgrow(textInput, Priority.ALWAYS);

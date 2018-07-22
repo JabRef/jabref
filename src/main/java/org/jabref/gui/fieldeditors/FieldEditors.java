@@ -1,9 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -27,18 +24,9 @@ import org.jabref.preferences.JabRefPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.model.entry.FieldName.AUTHOR;
-import static org.jabref.model.entry.FieldName.INSTITUTION;
-import static org.jabref.model.entry.FieldName.TITLE;
-import static org.jabref.model.entry.FieldName.YEAR;
-
 public class FieldEditors {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldEditors.class);
-
-    private static final Set<String> SINGLE_LINE_FIELDS = Collections.unmodifiableSet(new HashSet<>(
-            Arrays.asList(TITLE, AUTHOR, YEAR, INSTITUTION)
-    ));
 
     public static FieldEditorFX getForField(final String fieldName,
                                             final TaskExecutor taskExecutor,
@@ -59,7 +47,7 @@ public class FieldEditors {
                 journalAbbreviationRepository,
                 preferences.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
 
-        final boolean hasSingleLine = SINGLE_LINE_FIELDS.contains(fieldName.toLowerCase());
+        final boolean isSingleLine = InternalBibtexFields.isSingleLineField(fieldName);
 
         if (preferences.getTimestampPreferences().getTimestampField().equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
             if (fieldExtras.contains(FieldProperty.ISO_DATE)) {
@@ -96,7 +84,7 @@ public class FieldEditors {
         } else if (fieldExtras.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldExtras.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
             return new LinkedEntriesEditor(fieldName, databaseContext, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.PERSON_NAMES)) {
-            return new PersonsEditor(fieldName, suggestionProvider, preferences, fieldCheckers, hasSingleLine);
+            return new PersonsEditor(fieldName, suggestionProvider, preferences, fieldCheckers, isSingleLine);
         } else if (FieldName.KEYWORDS.equals(fieldName)) {
             return new KeywordsEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
         } else if (fieldExtras.contains(FieldProperty.MULTILINE_TEXT)) {
@@ -106,7 +94,7 @@ public class FieldEditors {
         }
 
         // default
-        return new SimpleEditor(fieldName, suggestionProvider, fieldCheckers, preferences, hasSingleLine);
+        return new SimpleEditor(fieldName, suggestionProvider, fieldCheckers, preferences, isSingleLine);
     }
 
     @SuppressWarnings("unchecked")
