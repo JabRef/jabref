@@ -255,6 +255,7 @@ public class Author {
      * @return first name of the author (may consist of several tokens)
      */
     public Optional<String> getFirst() {
+
         return Optional.ofNullable(firstPart);
     }
 
@@ -285,6 +286,7 @@ public class Author {
      * @return last name of the author (may consist of several tokens)
      */
     public Optional<String> getLast() {
+
         return Optional.ofNullable(lastPart);
     }
 

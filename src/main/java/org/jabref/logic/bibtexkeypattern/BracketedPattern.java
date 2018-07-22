@@ -570,6 +570,32 @@ public class BracketedPattern {
         if (authorList.isEmpty()) {
             return "";
         }
+        if (authorList.getAuthor(0).getVon().toString().equals("Optional.empty")) {
+            Character.UnicodeBlock ub = Character.UnicodeBlock.of(authorList.getAuthor(0).getLast().orElse("").charAt(0));
+            if ((ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS)
+                || (ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS)
+                || (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A)
+                || (ub == Character.UnicodeBlock.GENERAL_PUNCTUATION)
+                || (ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION)
+                || (ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS)) {
+                String authorLasttemp = authorList.getAuthor(0).getLast().orElse("");
+                if (!authorLasttemp.isEmpty()) {
+                    return authorLasttemp.substring(0, authorLasttemp.indexOf(" "));
+                }
+            }
+        } else {
+            Character.UnicodeBlock ub = Character.UnicodeBlock.of(authorList.getAuthor(0).getVon().orElse("").charAt(0));
+            if ((ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS)
+                || (ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS)
+                || (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A)
+                || (ub == Character.UnicodeBlock.GENERAL_PUNCTUATION)
+                || (ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION)
+                || (ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS)) {
+                return authorList.getAuthor(0).getVon().orElse("");
+            }
+        }
+        /**/
+
         return authorList.getAuthor(0).getLast().orElse("");
 
     }
@@ -590,6 +616,7 @@ public class BracketedPattern {
         if (authorList.isEmpty()) {
             return "";
         }
+
         return authorList.getAuthor(0).getFirstAbbr().map(s -> s.substring(0, 1)).orElse("");
     }
 
