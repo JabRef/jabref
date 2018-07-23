@@ -19,7 +19,7 @@ plugins {
     id 'com.install4j.gradle' version '7.0.6'
     id 'com.github.johnrengelman.shadow' version '2.0.4'
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
-    id "com.simonharrer.modernizer" version '1.6.0-1'
+//    id "com.simonharrer.modernizer" version '1.6.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.7'
     id 'com.zyxist.chainsaw' version '0.3.1'
     //id 'net.ltgt.errorprone' version '0.0.14'
@@ -38,20 +38,36 @@ apply plugin: 'project-report'
 apply plugin: 'jacoco'
 apply plugin: 'install4j'
 apply plugin: 'me.champeau.gradle.jmh'
-apply plugin: 'checkstyle'
+//apply plugin: 'checkstyle'
 apply plugin: org.jabref.build.antlr.AntlrPlugin
 
 apply from: 'eclipse.gradle'
 apply from: 'localization.gradle'
 apply from: 'xjc.gradle'
 
-group = "org.jabref"
-version = "5.0-dev"
-project.ext.threeDotVersion = "5.0.0.0"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j7' : 'install4j7')
-sourceCompatibility = 9
-targetCompatibility = 9
 mainClassName = "org.jabref.JabRefMain"
+
+allprojects {
+    group = "org.jabref"
+    version = "5.0-dev"
+    project.ext.threeDotVersion = "5.0.0.0"
+
+    sourceCompatibility = 9
+    targetCompatibility = 9
+
+    repositories {
+        mavenLocal()
+        jcenter()
+        maven {
+            url 'https://oss.sonatype.org/content/groups/public'
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+}
 
 javaModule {
     name = "org.jabref"
@@ -80,21 +96,18 @@ sourceSets {
     }
 }
 
-repositories {
-    mavenLocal()
-    jcenter()
-    maven {
-        url 'https://oss.sonatype.org/content/groups/public'
-    }
-}
-
 configurations {
     compile {
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
     }
 }
 
+// FIXME: bug in chainsaw does not build multi module projects in right order
+compileJava.dependsOn ":jabref-model:assemble"
+
 dependencies {
+    compile project(':jabref-model')
+
     // Include all jar-files in the 'lib' folder as dependencies
     compile fileTree(dir: 'lib', includes: ['*.jar'])
 
@@ -121,9 +134,6 @@ dependencies {
 
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
-
-    antlr4 'org.antlr:antlr4:4.7.1'
-    compile 'org.antlr:antlr4-runtime:4.7.1'
 
     // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
     compile 'mysql:mysql-connector-java:5.1.46'
@@ -194,7 +204,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.11'
+//    checkstyle 'com.puppycrawl.tools:checkstyle:8.11'
 }
 
 jacoco {
@@ -273,7 +283,7 @@ processResources {
 }
 
 
-task generateSource(dependsOn: ["generateBstGrammarSource", "generateSearchGrammarSource"]) {
+task generateSource(dependsOn: ["generateBstGrammarSource"]) {
     group = 'JabRef'
     description 'Generates all Java source files.'
 }
@@ -287,18 +297,7 @@ task generateBstGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
     outputDir = 'src/main/gen/org/jabref/logic/bst/'
 }
 
-task generateSearchGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
-    group = 'JabRef'
-    description = "Generates java files for Search.g antlr4."
-
-    antlr = ANTLR4
-    inputFile = "src/main/antlr4/org/jabref/search/Search.g4"
-    outputDir = "src/main/gen/org/jabref/search"
-    javaPackage = "org.jabref.search"
-}
-
 compileJava {
-    options.encoding = 'UTF-8'
     options.compilerArgs << "-Xlint:none"
 }
 compileJava.dependsOn "generateSource"
@@ -377,20 +376,20 @@ jacocoTestReport {
 }
 
 // Code quality tasks
-checkstyle {
-    // do not use other packages for checkstyle, excluding gen(erated) sources
-    checkstyleMain.source = "src/main/java"
-    toolVersion = '8.5'
-
-    // do not perform checkstyle checks by default
-    sourceSets = []
-}
-
-modernizer {
-    // We have more than 20 issues, which are not fixed yet. Nevertheless, we produce the modernizer output.
-    // See https://github.com/andrewgaul/modernizer-maven-plugin for more information on modernizer
-    failOnViolations = false
-}
+//checkstyle {
+//    // do not use other packages for checkstyle, excluding gen(erated) sources
+//    checkstyleMain.source = "src/main/java"
+//    toolVersion = '8.5'
+//
+//    // do not perform checkstyle checks by default
+//    sourceSets = []
+//}
+//
+//modernizer {
+//    // We have more than 20 issues, which are not fixed yet. Nevertheless, we produce the modernizer output.
+//    // See https://github.com/andrewgaul/modernizer-maven-plugin for more information on modernizer
+//    failOnViolations = false
+//}
 
 // Release tasks
 shadowJar {

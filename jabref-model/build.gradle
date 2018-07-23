@@ -1,0 +1,62 @@
+plugins {
+    id 'com.zyxist.chainsaw'
+}
+
+apply plugin: 'java'
+apply plugin: org.jabref.build.antlr.AntlrPlugin
+
+sourceSets.main.java.srcDirs += "src/main/gen"
+
+repositories {
+    mavenLocal()
+    jcenter()
+    maven {
+        url 'https://oss.sonatype.org/content/groups/public'
+    }
+}
+
+dependencies {
+    antlr4 'org.antlr:antlr4:4.7.1'
+    compile 'org.antlr:antlr4-runtime:4.7.1'
+
+    compile 'com.google.guava:guava:25.1-jre'
+
+    compile 'org.apache.pdfbox:pdfbox:2.0.11'
+    compile 'org.apache.pdfbox:fontbox:2.0.11'
+    compile 'org.apache.pdfbox:xmpbox:2.0.11'
+
+    // >1.8.0-beta is required for java 9 compatibility
+    compile 'org.slf4j:slf4j-api:1.8.0-beta2'
+
+    compile 'org.apache.commons:commons-lang3:3.7'
+
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
+    testCompile 'org.junit.jupiter:junit-jupiter-params:5.2.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.2.0'
+    testCompile 'org.junit.platform:junit-platform-launcher:1.2.0'
+    testCompile 'org.junit-pioneer:junit-pioneer:0.1.2'
+    testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
+    testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
+
+    testCompile 'org.mockito:mockito-core:2.19.1'
+}
+
+clean {
+    delete "src/main/gen"
+}
+
+compileJava.dependsOn "generateSearchGrammarSource"
+
+task generateSearchGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
+    group = 'JabRef'
+    description = "Generates java files for Search.g antlr4."
+
+    antlr = ANTLR4
+    inputFile = "src/main/antlr4/org/jabref/search/Search.g4"
+    outputDir = "src/main/gen/org/jabref/search"
+    javaPackage = "org.jabref.search"
+}
+

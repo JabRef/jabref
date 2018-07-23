@@ -6,8 +6,6 @@ open module org.jabref {
     exports org.jabref.gui.maintable;
     exports org.jabref.gui.specialfields;
 
-    exports org.jabref.model.database;
-
     exports org.jabref.logic;
     exports org.jabref.logic.citationstyle;
     exports org.jabref.logic.search;
@@ -15,6 +13,8 @@ open module org.jabref {
 //    opens org.jabref.gui to com.google.common;
 //    opens org.jabref.model.database to com.google.common;
 //    opens org.jabref.logic.citationstyle to com.google.common;
+
+    requires org.jabref.model;
 
     // Swing
 	requires java.desktop;
