@@ -31,7 +31,7 @@ class DOAJFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE);
         expected.setField("author", "Wei Wang and Yun He and Tong Li and Jiajun Zhu and Jinzhuo Liu");
         expected.setField("doi", "10.1155/2018/5913634");
         expected.setField("issn", "1875-919X");
@@ -65,10 +65,12 @@ class DOAJFetcherTest {
         assertEquals(Optional.of("VLSI Design"), bibEntry.getField("journal"));
         assertEquals(Optional.of("10.1155/2014/217495"), bibEntry.getField("doi"));
         assertEquals(Optional.of("Syed Asad Alam and Oscar Gustafsson"), bibEntry.getField("author"));
-        assertEquals(
-                Optional.of(
-                        "Design of Finite Word Length Linear-Phase FIR Filters in the Logarithmic Number System Domain"),
-                bibEntry.getField("title"));
+        assertEquals(Optional.of("Design of Finite Word Length Linear-Phase FIR Filters in the Logarithmic Number System Domain"), bibEntry.getField("title"));
         assertEquals(Optional.of("2014"), bibEntry.getField("year"));
+    }
+
+    @Test
+    public void searchByEmptyQuery() throws Exception {
+        assertEquals(Collections.emptyList(), fetcher.performSearch(""));
     }
 }
