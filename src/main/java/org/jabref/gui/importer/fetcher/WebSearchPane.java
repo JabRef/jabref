@@ -58,7 +58,7 @@ public class WebSearchPane extends SidePaneComponent {
         StackPane helpButtonContainer = new StackPane();
         ActionFactory factory = new ActionFactory(preferences.getKeyBindingRepository());
         EasyBind.subscribe(viewModel.selectedFetcherProperty(), fetcher -> {
-            if (fetcher != null && fetcher.getHelpPage().isPresent()) {
+            if ((fetcher != null) && fetcher.getHelpPage().isPresent()) {
                 HelpAction helpCommand = new HelpAction(fetcher.getHelpPage().get());
                 Button helpButton = factory.createIconButton(StandardActions.HELP, helpCommand.getCommand());
                 helpButtonContainer.getChildren().setAll(helpButton);
@@ -75,6 +75,7 @@ public class WebSearchPane extends SidePaneComponent {
 
         // Create button that triggers search
         Button search = new Button(Localization.lang("Search"));
+        search.setDefaultButton(true);
         search.setOnAction(event -> viewModel.search());
 
         // Put everything together
