@@ -40,7 +40,7 @@ import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.JabRefPreferencesFilter;
@@ -166,10 +166,9 @@ public class PreferencesDialog extends BaseDialog<Void> {
         importPreferences.addActionListener(e -> {
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                                   .addExtensionFilter(FileType.XML)
-                                                                                                   .withDefaultExtension(FileType.XML)
-                                                                                                   .withInitialDirectory(getPrefsExportPath())
-                                                                                                   .build();
+                    .addExtensionFilter(StandardFileType.XML)
+                    .withDefaultExtension(StandardFileType.XML)
+                    .withInitialDirectory(getPrefsExportPath()).build();
 
             Optional<Path> fileName = DefaultTaskExecutor
                                                          .runInJavaFXThread(() -> dialogService.showFileOpenDialog(fileDialogConfiguration));
@@ -277,11 +276,11 @@ public class PreferencesDialog extends BaseDialog<Void> {
         public void actionPerformed(ActionEvent e) {
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                                   .addExtensionFilter(FileType.XML)
-                                                                                                   .withDefaultExtension(FileType.XML)
-                                                                                                   .withInitialDirectory(prefs.get(JabRefPreferences.WORKING_DIRECTORY))
-                                                                                                   .build();
-            Optional<Path> path = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showFileSaveDialog(fileDialogConfiguration));
+                    .addExtensionFilter(StandardFileType.XML)
+                    .withDefaultExtension(StandardFileType.XML)
+                    .withInitialDirectory(prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+            Optional<Path> path = DefaultTaskExecutor
+                    .runInJavaFXThread(() -> dialogService.showFileSaveDialog(fileDialogConfiguration));
 
             path.ifPresent(exportFile -> {
                 try {

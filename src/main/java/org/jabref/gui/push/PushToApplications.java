@@ -10,9 +10,7 @@ public class PushToApplications {
     private final List<PushToApplication> applications;
 
     public PushToApplications(DialogService dialogService) {
-        /**
-         * Set up the current available hoices:
-         */
+        // Set up the current available choices:
 
         applications = new ArrayList<>();
 
@@ -26,5 +24,17 @@ public class PushToApplications {
 
     public List<PushToApplication> getApplications() {
         return applications;
+    }
+
+    public static PushToApplicationSettings getSettings(PushToApplication application) {
+        if (application instanceof PushToEmacs) {
+            return new PushToEmacsSettings();
+        } else if (application instanceof PushToLyx) {
+            return new PushToLyxSettings();
+        } else if (application instanceof PushToVim) {
+            return new PushToVimSettings();
+        } else {
+            return new PushToApplicationSettings();
+        }
     }
 }

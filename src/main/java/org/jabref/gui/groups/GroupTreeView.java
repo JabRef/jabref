@@ -28,11 +28,12 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
@@ -77,7 +78,6 @@ public class GroupTreeView {
         viewModel = new GroupTreeViewModel(stateManager, dialogService, taskExecutor);
 
         // Set-up groups tree
-        groupTree.setStyle("-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         // Set-up bindings
@@ -148,7 +148,10 @@ public class GroupTreeView {
                     disclosureNode.getChildren().add(disclosureNodeArrow);
                     return disclosureNode;
                 })
-                .withOnMouseClickedEvent(group -> event -> group.toggleExpansion()));
+                .withOnMouseClickedEvent(group -> event -> {
+                    group.toggleExpansion();
+                    event.consume();
+                }));
 
         // Set pseudo-classes to indicate if row is root or sub-item ( > 1 deep)
         PseudoClass rootPseudoClass = PseudoClass.getPseudoClass("root");
@@ -178,6 +181,12 @@ public class GroupTreeView {
                     EasyBind.monadic(row.itemProperty())
                             .map(this::createContextMenuForGroup)
                             .orElse((ContextMenu) null));
+            row.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+                if (event.getButton() == MouseButton.SECONDARY) {
+                    // Prevent right-click to select group
+                    event.consume();
+                }
+            });
 
             // Drag and drop support
             row.setOnDragDetected(event -> {

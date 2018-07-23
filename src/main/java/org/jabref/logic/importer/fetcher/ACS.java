@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 public class ACS implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(ACS.class);
 
-    private static final String SOURCE = "http://pubs.acs.org/doi/abs/%s";
+    private static final String SOURCE = "https://pubs.acs.org/doi/abs/%s";
 
     /**
      * Tries to find a fulltext URL for a given BibTex entry.

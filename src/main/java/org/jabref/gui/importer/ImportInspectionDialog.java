@@ -1344,6 +1344,12 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         public EntryTable(TableModel model) {
             super(model);
             getTableHeader().setReorderingAllowed(false);
+
+            setFont(GUIGlobals.currentFont);
+            int maxOfIconsAndFontSize = GUIGlobals.currentFont.getSize();
+            setRowHeight(maxOfIconsAndFontSize);
+            // Update Table header with new settings
+            this.getTableHeader().resizeAndRepaint();
         }
 
         @Override

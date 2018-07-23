@@ -51,4 +51,14 @@ public class ConvertToBibtexCleanupTest {
         assertEquals(Optional.empty(), entry.getField(FieldName.JOURNALTITLE));
         assertEquals(Optional.of("Best of JabRef"), entry.getField(FieldName.JOURNAL));
     }
+
+    @Test
+    public void cleanUpDoesntMoveFileField() {
+        String fileField = ":Ambriola2006 - On the Systematic Analysis of Natural Language Requirements with CIRCE.pdf:PDF";
+        BibEntry entry = new BibEntry().withField(FieldName.FILE, fileField);
+
+        worker.cleanup(entry);
+
+        assertEquals(Optional.of(fileField), entry.getField(FieldName.FILE));
+    }
 }

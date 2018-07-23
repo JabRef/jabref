@@ -13,7 +13,7 @@ import org.jabref.model.cleanup.Formatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HtmlToLatexFormatter implements LayoutFormatter, Formatter {
+public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HtmlToLatexFormatter.class);
 

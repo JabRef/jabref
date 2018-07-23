@@ -1,7 +1,7 @@
 ## Understanding the basics
 We welcome contributions to JabRef and encourage to create a fork, clone, **create a new branch** (such as `fix-for-issue-121`), **work on the new branch — not master**, and create a pull request.
 Be sure to create a **separate branch** for each improvement you implement.
-Take a look at GitHub's excellent [help documentation] for a detailed explanation and the explanation of [Feature Branch Workflow](https://de.atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
+Take a look at GitHub's excellent overview on the [GitHub flow](https://guides.github.com/introduction/flow/index.html) and their [pull request help documentation](https://help.github.com/articles/about-pull-requests/) for a detailed explanation and the explanation of [Feature Branch Workflow](https://de.atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
 
 We also have [code howtos](https://github.com/JabRef/jabref/wiki/Code-Howtos) and [guidelines for setting up a local workspace](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace).
 
@@ -118,5 +118,4 @@ You can add the prefix `[WIP]` to indicate that the pull request is not yet comp
 
 
 [commit guidelines section of Pro Git]: http://git-scm.com/book/en/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines
-[good commit message]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
-[help documentation]: https://help.github.com/articles/about-pull-requests/
+[good commit message]: https://github.com/joelparkerhenderson/git_commit_message

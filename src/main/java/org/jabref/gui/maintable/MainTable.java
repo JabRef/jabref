@@ -20,7 +20,6 @@ import javafx.scene.input.MouseEvent;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -85,7 +84,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         pane.setFitToWidth(true);
 
         this.pane.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
-        
+
         // Store visual state
         new PersistenceVisualStateTable(this, Globals.prefs);
 
@@ -115,7 +114,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         if (!selectedEntries.isEmpty()) {
             try {
-                Globals.clipboardManager.setClipboardContent(selectedEntries);
+                Globals.clipboardManager.setContent(selectedEntries);
                 panel.output(panel.formatOutputMessage(Localization.lang("Copied"), selectedEntries.size()));
             } catch (IOException e) {
                 LOGGER.error("Error while copying selected entries to clipboard", e);
@@ -182,7 +181,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public void paste() {
         // Find entries in clipboard
-        List<BibEntry> entriesToAdd = new ClipBoardManager().extractBibEntriesFromClipboard();
+        List<BibEntry> entriesToAdd = Globals.clipboardManager.extractEntries();
 
         if (!entriesToAdd.isEmpty()) {
             // Add new entries

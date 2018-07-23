@@ -59,7 +59,6 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import org.jabref.Globals;
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -74,8 +73,8 @@ import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.FreeCiteImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.entry.BibEntry;
@@ -521,7 +520,7 @@ public class TextInputDialog extends JabRefDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String data = new ClipBoardManager().getClipboardContents();
+            String data = Globals.clipboardManager.getContents();
             int selStart = textPane.getSelectionStart();
             int selEnd = textPane.getSelectionEnd();
             if ((selEnd - selStart) > 0) {
@@ -546,8 +545,8 @@ public class TextInputDialog extends JabRefDialog {
         public void actionPerformed(ActionEvent e) {
             try {
                 FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                        .addExtensionFilter(FileType.TXT)
-                        .withDefaultExtension(FileType.TXT)
+                        .addExtensionFilter(Localization.lang("Plain text"), StandardFileType.TXT)
+                        .withDefaultExtension(Localization.lang("Plain text"), StandardFileType.TXT)
                         .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
                 DialogService ds = frame.getDialogService();
 

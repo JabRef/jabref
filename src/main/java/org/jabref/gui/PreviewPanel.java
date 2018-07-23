@@ -74,7 +74,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         this.databaseContext = Optional.ofNullable(databaseContext);
         this.basePanel = Optional.ofNullable(panel);
         this.dialogService = dialogService;
-        this.clipBoardManager = new ClipBoardManager();
+        this.clipBoardManager = Globals.clipboardManager;
         this.keyBindingRepository = keyBindingRepository;
 
         // Set up scroll pane for preview pane
@@ -127,10 +127,10 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         copyPreview.setOnAction(event -> copyPreviewToClipBoard());
         MenuItem printEntryPreview = new MenuItem(Localization.lang("Print entry preview"), IconTheme.JabRefIcons.PRINTED.getGraphicNode());
         printEntryPreview.setOnAction(event -> print());
-        MenuItem previousPreviewLayout = new MenuItem(Localization.menuTitle("Previous preview layout"));
+        MenuItem previousPreviewLayout = new MenuItem(Localization.lang("Previous preview layout"));
         previousPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.PREVIOUS_PREVIEW_LAYOUT));
         previousPreviewLayout.setOnAction(event -> basePanel.ifPresent(BasePanel::previousPreviewStyle));
-        MenuItem nextPreviewLayout = new MenuItem(Localization.menuTitle("Next preview layout"));
+        MenuItem nextPreviewLayout = new MenuItem(Localization.lang("Next preview layout"));
         nextPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.NEXT_PREVIEW_LAYOUT));
         nextPreviewLayout.setOnAction(event -> basePanel.ifPresent(BasePanel::nextPreviewStyle));
 
@@ -293,6 +293,6 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
 
     private void copyPreviewToClipBoard() {
         String previewContent = (String) previewView.getEngine().executeScript("document.documentElement.outerHTML");
-        clipBoardManager.setClipboardContents(previewContent);
+        clipBoardManager.setContent(previewContent);
     }
 }

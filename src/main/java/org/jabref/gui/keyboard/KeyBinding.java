@@ -8,7 +8,7 @@ public enum KeyBinding {
     AUTOGENERATE_BIBTEX_KEYS("Autogenerate BibTeX keys", Localization.lang("Autogenerate BibTeX keys"), "ctrl+G", KeyBindingCategory.QUALITY),
     ACCEPT("Accept", Localization.lang("Accept"), "ctrl+ENTER", KeyBindingCategory.EDIT),
     AUTOMATICALLY_LINK_FILES("Automatically link files", Localization.lang("Automatically set file links"), "F7", KeyBindingCategory.QUALITY),
-    CHECK_INTEGRITY("Check integrity", Localization.menuTitle("Check integrity"), "ctrl+F8", KeyBindingCategory.QUALITY),
+    CHECK_INTEGRITY("Check integrity", Localization.lang("Check integrity"), "ctrl+F8", KeyBindingCategory.QUALITY),
     CLEANUP("Cleanup", Localization.lang("Cleanup entries"), "alt+F8", KeyBindingCategory.QUALITY),
     CLOSE_DATABASE("Close library", Localization.lang("Close library"), "ctrl+W", KeyBindingCategory.FILE),
     CLOSE("Close dialog", Localization.lang("Close dialog"), "Esc", KeyBindingCategory.VIEW),
@@ -27,10 +27,10 @@ public enum KeyBinding {
     DOWNLOAD_FULL_TEXT("Look up full text documents", Localization.lang("Look up full text documents"), "alt+F7", KeyBindingCategory.QUALITY),
     EDIT_ENTRY("Edit entry", Localization.lang("Edit entry"), "ctrl+E", KeyBindingCategory.BIBTEX),
     EDIT_STRINGS("Edit strings", Localization.lang("Edit strings"), "ctrl+T", KeyBindingCategory.BIBTEX),
-    ENTRY_EDITOR_NEXT_ENTRY("Entry editor, next entry", Localization.lang("Entry editor, next entry"), "ctrl+shift+DOWN", KeyBindingCategory.VIEW),
+    ENTRY_EDITOR_NEXT_ENTRY("Entry editor, next entry", Localization.lang("Entry editor, next entry"), "alt+DOWN", KeyBindingCategory.VIEW),
     ENTRY_EDITOR_NEXT_PANEL("Entry editor, next panel", Localization.lang("Entry editor, next panel"), "ctrl+TAB", KeyBindingCategory.VIEW),
     ENTRY_EDITOR_NEXT_PANEL_2("Entry editor, next panel 2", Localization.lang("Entry editor, next panel 2"), "ctrl+PLUS", KeyBindingCategory.VIEW),
-    ENTRY_EDITOR_PREVIOUS_ENTRY("Entry editor, previous entry", Localization.lang("Entry editor, previous entry"), "ctrl+shift+UP", KeyBindingCategory.VIEW),
+    ENTRY_EDITOR_PREVIOUS_ENTRY("Entry editor, previous entry", Localization.lang("Entry editor, previous entry"), "alt+UP", KeyBindingCategory.VIEW),
     ENTRY_EDITOR_PREVIOUS_PANEL("Entry editor, previous panel", Localization.lang("Entry editor, previous panel"), "ctrl+shift+TAB", KeyBindingCategory.VIEW),
     FILE_LIST_EDITOR_MOVE_ENTRY_DOWN("File list editor, move entry down", Localization.lang("File list editor, move entry down"), "ctrl+DOWN", KeyBindingCategory.VIEW),
     FILE_LIST_EDITOR_MOVE_ENTRY_UP("File list editor, move entry up", Localization.lang("File list editor, move entry up"), "ctrl+UP", KeyBindingCategory.VIEW),
@@ -102,7 +102,6 @@ public enum KeyBinding {
 
     /**
      * This method returns the enum constant value
-     * @return
      */
     public String getConstant() {
         return constant;

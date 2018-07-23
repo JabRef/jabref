@@ -57,10 +57,6 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         this.preferences = preferences;
     }
 
-    private JTextField getTextField() {
-        return tf;
-    }
-
     @Override
     public Action getToggleAction() {
         return StandardActions.TOGGLE_WEB_SEARCH;

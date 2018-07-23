@@ -29,10 +29,28 @@ public class PreferencesMigrations {
     }
 
     /**
+     * Perform checks and changes for users with a preference set from an older JabRef version.
+     */
+    public static void runMigrations() {
+
+        Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+
+        upgradePrefsToOrgJabRef(mainPrefsNode);
+        upgradeSortOrder(Globals.prefs);
+        upgradeFaultyEncodingStrings(Globals.prefs);
+        upgradeLabelPatternToBibtexKeyPattern(Globals.prefs);
+        upgradeImportFileAndDirePatterns(Globals.prefs, mainPrefsNode);
+        upgradeStoredCustomEntryTypes(Globals.prefs, mainPrefsNode);
+        upgradeKeyBindingsToJavaFX(Globals.prefs);
+        addCrossRefRelatedFieldsForAutoComplete(Globals.prefs);
+        upgradeObsoleteLookAndFeels(Globals.prefs);
+        upgradePreviewStyleFromReviewToComment(Globals.prefs);
+    }
+
+    /**
      * Migrate all preferences from net/sf/jabref to org/jabref
      */
-    public static void upgradePrefsToOrgJabRef() {
-        Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+    private static void upgradePrefsToOrgJabRef(Preferences mainPrefsNode) {
         try {
             if (mainPrefsNode.childrenNames().length != 0) {
                 // skip further processing as prefs already have been migrated
@@ -67,8 +85,7 @@ public class PreferencesMigrations {
     /**
      * Added from Jabref 2.11 beta 4 onwards to fix wrong encoding names
      */
-    public static void upgradeFaultyEncodingStrings() {
-        JabRefPreferences prefs = Globals.prefs;
+    private static void upgradeFaultyEncodingStrings(JabRefPreferences prefs) {
         String defaultEncoding = prefs.get(JabRefPreferences.DEFAULT_ENCODING);
         if (defaultEncoding == null) {
             return;
@@ -108,8 +125,7 @@ public class PreferencesMigrations {
      * these preferences, but it is only used when the new preference does not
      * exist
      */
-    public static void upgradeSortOrder() {
-        JabRefPreferences prefs = Globals.prefs;
+    private static void upgradeSortOrder(JabRefPreferences prefs) {
 
         if (prefs.get(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, null) == null) {
             if (prefs.getBoolean("exportInStandardOrder", false)) {
@@ -136,14 +152,11 @@ public class PreferencesMigrations {
     /**
      * Migrate all customized entry types from versions <=3.7
      */
-    public static void upgradeStoredCustomEntryTypes() {
-
-        JabRefPreferences prefs = Globals.prefs;
-        Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+    private static void upgradeStoredCustomEntryTypes(JabRefPreferences prefs, Preferences mainPrefsNode) {
 
         try {
             if (mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBTEX_TYPES) ||
-                    mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBLATEX_TYPES)) {
+                mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBLATEX_TYPES)) {
                 // skip further processing as prefs already have been migrated
             } else {
                 LOGGER.info("Migrating old custom entry types.");
@@ -157,9 +170,7 @@ public class PreferencesMigrations {
     /**
      * Migrate LabelPattern configuration from versions <=3.5 to new BibtexKeyPatterns
      */
-    public static void upgradeLabelPatternToBibtexKeyPattern() {
-
-        JabRefPreferences prefs = Globals.prefs;
+    private static void upgradeLabelPatternToBibtexKeyPattern(JabRefPreferences prefs) {
 
         try {
             Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
@@ -200,12 +211,12 @@ public class PreferencesMigrations {
         String preferenceFileNamePattern = mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null);
 
         if ((preferenceFileNamePattern != null) &&
-                oldStylePattern.equals(preferenceFileNamePattern)) {
+            oldStylePattern.equals(preferenceFileNamePattern)) {
             // Upgrade the old-style File Name pattern to new one:
             mainPrefsNode.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
             LOGGER.info("migrated old style " + JabRefPreferences.IMPORT_FILENAMEPATTERN +
-                    " value \"" + oldStylePattern + "\" to new value \"" +
-                    newStylePattern + "\" in the preference file");
+                        " value \"" + oldStylePattern + "\" to new value \"" +
+                        newStylePattern + "\" in the preference file");
 
             if (prefs.hasKey(JabRefPreferences.IMPORT_FILENAMEPATTERN)) {
                 // Update also the key in the current application settings, if necessary:
@@ -213,26 +224,23 @@ public class PreferencesMigrations {
                 if (oldStylePattern.equals(fileNamePattern)) {
                     prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
                     LOGGER.info("migrated old style " + JabRefPreferences.IMPORT_FILENAMEPATTERN +
-                            " value \"" + oldStylePattern + "\" to new value \"" +
-                            newStylePattern + "\" in the running application");
+                                " value \"" + oldStylePattern + "\" to new value \"" +
+                                newStylePattern + "\" in the running application");
                 }
             }
         }
     }
 
-    public static void upgradeImportFileAndDirePatterns() {
-        JabRefPreferences prefs = Globals.prefs;
-
-        Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+    static void upgradeImportFileAndDirePatterns(JabRefPreferences prefs, Preferences mainPrefsNode) {
 
         // Migrate Import patterns
         // Check for prefs node for Version <= 4.0
         if (mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null) != null) {
 
-            String[] oldStylePatterns = new String[]{"\\bibtexkey",
-                    "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
-            String[] newStylePatterns = new String[]{"[bibtexkey]",
-                    "[bibtexkey] - [fulltitle]"};
+            String[] oldStylePatterns = new String[] {"\\bibtexkey",
+                                                      "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
+            String[] newStylePatterns = new String[] {"[bibtexkey]",
+                                                      "[bibtexkey] - [fulltitle]"};
             for (int i = 0; i < oldStylePatterns.length; i++) {
                 migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
             }
@@ -241,7 +249,7 @@ public class PreferencesMigrations {
         // the user defined old-style patterns, and the default pattern is "".
     }
 
-    public static void upgradeKeyBindingsToJavaFX() {
+    private static void upgradeKeyBindingsToJavaFX(JabRefPreferences prefs) {
         UnaryOperator<String> replaceKeys = (str) -> {
             String result = str.replace("ctrl ", "ctrl+");
             result = result.replace("shift ", "shift+");
@@ -251,14 +259,12 @@ public class PreferencesMigrations {
             return result;
         };
 
-        JabRefPreferences prefs = Globals.prefs;
         List<String> keys = prefs.getStringList(JabRefPreferences.BINDINGS);
         keys.replaceAll(replaceKeys);
         prefs.putStringList(JabRefPreferences.BINDINGS, keys);
     }
 
-    public static void addCrossRefRelatedFieldsForAutoComplete() {
-        JabRefPreferences prefs = Globals.prefs;
+    private static void addCrossRefRelatedFieldsForAutoComplete(JabRefPreferences prefs) {
         //LinkedHashSet because we want to retain the order and add new fields to the end
         Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS));
         keys.add("crossref");
@@ -268,36 +274,42 @@ public class PreferencesMigrations {
     }
 
     private static void migrateTypedKeyPrefs(JabRefPreferences prefs, Preferences oldPatternPrefs)
-            throws BackingStoreException {
+        throws BackingStoreException {
         LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
 
         GlobalBibtexKeyPattern keyPattern = GlobalBibtexKeyPattern.fromPattern(
-                prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
+                                                                               prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         for (String key : oldPatternPrefs.keys()) {
             keyPattern.addBibtexKeyPattern(key, oldPatternPrefs.get(key, null));
         }
         prefs.putKeyPattern(keyPattern);
     }
 
-    public static void upgradeObsoleteLookAndFeels() {
-        JabRefPreferences prefs = Globals.prefs;
-        String currentLandF = prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
+    private static void upgradeObsoleteLookAndFeels(JabRefPreferences prefs) {
+
+        String currentLandF = prefs.getLookAndFeel();
 
         Stream.of("com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
-                "com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel",
-                "com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
-                .filter(style -> style.equals(currentLandF))
-                .findAny()
-                .ifPresent(loolAndFeel -> {
-                    if (OS.WINDOWS) {
-                        String windowsLandF = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-                        prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, windowsLandF);
-                        LOGGER.info("Switched from obsolete look and feel " + currentLandF + " to " + windowsLandF);
-                    } else {
-                        String nimbusLandF = "javax.swing.plaf.nimbus.NimbusLookAndFeel";
-                        prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, nimbusLandF);
-                        LOGGER.info("Switched from obsolete look and feel " + currentLandF + " to " + nimbusLandF);
-                    }
-                });
+                  "com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel",
+                  "com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
+              .filter(style -> style.equals(currentLandF))
+              .findAny()
+              .ifPresent(loolAndFeel -> {
+                  if (OS.WINDOWS) {
+                      String windowsLandF = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+                      prefs.setLookAndFeel(windowsLandF);
+                      LOGGER.info("Switched from obsolete look and feel " + currentLandF + " to " + windowsLandF);
+                  } else {
+                      String nimbusLandF = "javax.swing.plaf.nimbus.NimbusLookAndFeel";
+                      prefs.setLookAndFeel(nimbusLandF);
+                      LOGGER.info("Switched from obsolete look and feel " + currentLandF + " to " + nimbusLandF);
+                  }
+              });
+    }
+
+    static void upgradePreviewStyleFromReviewToComment(JabRefPreferences prefs) {
+        String currentPreviewStyle = prefs.getPreviewStyle();
+        String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}");
+        prefs.setPreviewStyle(migratedStyle);
     }
 }

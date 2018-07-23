@@ -35,7 +35,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.migrations.FileLinksUpgradeWarning;
 import org.jabref.model.database.BibDatabase;
@@ -90,15 +90,32 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         DialogService ds = frame.getDialogService();
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(FileType.BIBTEX_DB)
-                .withDefaultExtension(FileType.BIBTEX_DB)
-                .withInitialDirectory(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)))
+                .addExtensionFilter(StandardFileType.BIBTEX_DB)
+                .withDefaultExtension(StandardFileType.BIBTEX_DB)
+                .withInitialDirectory(getInitialDirectory())
                 .build();
 
         List<Path> chosenFiles = ds.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
         filesToOpen.addAll(chosenFiles);
 
         openFiles(filesToOpen, true);
+    }
+
+    /**
+     *
+     * @return Path of current panel database directory or the working directory
+     */
+    private Path getInitialDirectory() {
+        if (frame.getBasePanelCount() == 0) {
+            return getWorkingDirectoryPath();
+        } else {
+            Optional<Path> databasePath = frame.getCurrentBasePanel().getBibDatabaseContext().getDatabasePath();
+            return databasePath.map(p -> p.getParent()).orElse(getWorkingDirectoryPath());
+        }
+    }
+
+    private Path getWorkingDirectoryPath() {
+        return Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY));
     }
 
     /**

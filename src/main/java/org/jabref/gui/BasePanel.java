@@ -1,9 +1,7 @@
 package org.jabref.gui;
 
-import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.io.IOException;
@@ -100,7 +98,7 @@ import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
@@ -131,7 +129,6 @@ import org.jabref.preferences.PreviewPreferences;
 import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.lang3.NotImplementedException;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.Subscription;
 import org.slf4j.Logger;
@@ -649,8 +646,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 output(Localization.lang("None of the selected entries have titles."));
                 return;
             }
-            StringSelection ss = new StringSelection(String.join("\n", titles));
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
+            Globals.clipboardManager.setContent(String.join("\n", titles));
 
             if (titles.size() == selectedBibEntries.size()) {
                 // All entries had titles.
@@ -678,8 +674,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             String citeCommand = Optional.ofNullable(Globals.prefs.get(JabRefPreferences.CITE_COMMAND))
                                          .filter(cite -> cite.contains("\\")) // must contain \
                                          .orElse("\\cite");
-            StringSelection ss = new StringSelection(citeCommand + "{" + sb + '}');
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
+            Globals.clipboardManager.setContent(citeCommand + "{" + sb + '}');
 
             if (keys.size() == bes.size()) {
                 // All entries had keys.
@@ -703,8 +698,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 return;
             }
 
-            StringSelection ss = new StringSelection(String.join(",", keys));
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
+            Globals.clipboardManager.setContent(String.join(",", keys));
 
             if (keys.size() == bes.size()) {
                 // All entries had keys.
@@ -745,8 +739,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 return;
             }
 
-            final StringSelection ss = new StringSelection(sb.toString());
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
+            Globals.clipboardManager.setContent(sb.toString());
 
             if (copied == bes.size()) {
                 // All entries had keys.
@@ -1182,7 +1175,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 pane = entryEditor;
                 break;
             default:
-                throw new NotImplementedException("new mode not recognized: " + newMode.name());
+                throw new UnsupportedOperationException("new mode not recognized: " + newMode.name());
         }
         if (splitPane.getItems().size() == 2) {
             splitPane.getItems().set(1, pane);
@@ -1250,36 +1243,12 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         mainTable.clearAndSelect(bibEntry);
     }
 
-    /**
-     * This method selects the entry on the given position, and scrolls it into view in the table.
-     * If an entryEditor is shown, it is given focus afterwards.
-     *
-     * @deprecated use select by entry not by row
-     */
-    @Deprecated
-    private void clearAndSelect(int pos) {
-        if ((pos >= 0) && (pos < mainTable.getItems().size())) {
-            mainTable.getSelectionModel().clearAndSelect(pos);
-        }
-    }
-
     public void selectPreviousEntry() {
-        mainTable.getSelectionModel().clearSelection();
-        mainTable.getSelectionModel().selectPrevious();
+        mainTable.getSelectionModel().clearAndSelect(mainTable.getSelectionModel().getSelectedIndex() - 1);
     }
 
     public void selectNextEntry() {
-        mainTable.getSelectionModel().clearSelection();
-        mainTable.getSelectionModel().selectNext();
-    }
-
-    public void selectFirstEntry() {
-        clearAndSelect(0);
-    }
-
-    public void selectLastEntry() {
-        mainTable.getSelectionModel().clearSelection();
-        mainTable.getSelectionModel().selectLast();
+        mainTable.getSelectionModel().clearAndSelect(mainTable.getSelectionModel().getSelectedIndex() + 1);
     }
 
     /**
@@ -1821,8 +1790,8 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         @Override
         public void action() throws SaveException {
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .withDefaultExtension(FileType.BIBTEX_DB)
-                    .addExtensionFilter(FileType.BIBTEX_DB)
+                    .withDefaultExtension(StandardFileType.BIBTEX_DB)
+                    .addExtensionFilter(String.format("%1s %2s", "BibTex", Localization.lang("Library")), StandardFileType.BIBTEX_DB)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                     .build();
 

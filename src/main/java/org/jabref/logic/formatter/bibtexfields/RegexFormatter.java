@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
 
-public class RegexFormatter implements Formatter {
+public class RegexFormatter extends Formatter {
 
     public static final String KEY = "regex";
     private static final Pattern PATTERN_ESCAPED_OPENING_CURLY_BRACE = Pattern.compile("\\\\\\{");
@@ -26,7 +26,7 @@ public class RegexFormatter implements Formatter {
     private static final int LENGTH_OF_QUOTE_AND_OPENING_BRACE = QUOTE_AND_OPENING_BRACE.length();
     private static final String CLOSING_BRACE_AND_QUOTE = ")\"";
     private static final int LENGTH_OF_CLOSING_BRACE_AND_QUOTE = CLOSING_BRACE_AND_QUOTE.length();
-    private String regex;
+    private static String regex;
     private String replacement;
 
     /**

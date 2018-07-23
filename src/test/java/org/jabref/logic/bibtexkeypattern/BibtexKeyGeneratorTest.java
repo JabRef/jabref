@@ -301,6 +301,7 @@ public class BibtexKeyGeneratorTest {
         assertEquals("", BibtexKeyGenerator.firstAuthor(""));
     }
 
+    @Test
     public void testFirstAuthorNull() {
         assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.firstAuthor(null));
     }
@@ -424,6 +425,7 @@ public class BibtexKeyGeneratorTest {
         assertEquals("Newton", BibtexKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 7));
     }
 
+    @Test
     public void testAuthIniNNull() {
         assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.authIniN(null, 3));
     }
@@ -514,6 +516,7 @@ public class BibtexKeyGeneratorTest {
         assertEquals("", BibtexKeyGenerator.authNofMth("", 2, 4));
     }
 
+    @Test
     public void authNMThrowsNPE() {
         assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.authNofMth(null, 2, 4));
     }
@@ -709,6 +712,7 @@ public class BibtexKeyGeneratorTest {
         assertEquals("", BibtexKeyGenerator.pagePrefix("43+"));
     }
 
+    @Test
     public void testPagePrefixNull() {
         assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.pagePrefix(null));
     }
@@ -725,6 +729,7 @@ public class BibtexKeyGeneratorTest {
         assertEquals("43", BibtexKeyGenerator.lastPage("43+"));
     }
 
+    @Test
     public void testLastPageNull() {
         assertThrows(NullPointerException.class, () -> BibtexKeyGenerator.lastPage(null));
     }

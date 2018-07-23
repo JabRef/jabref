@@ -92,7 +92,7 @@
       </customScript>
       <infoPlist mode="3" file="">
         <content>&lt;key&gt;NSSupportsAutomaticGraphicsSwitching&lt;/key&gt;
-&lt;string&gt;YES&lt;/string&gt;</content>
+&lt;true/&gt;</content>
       </infoPlist>
       <iconImageFiles />
     </launcher>

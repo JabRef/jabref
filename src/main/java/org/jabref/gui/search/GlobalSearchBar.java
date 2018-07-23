@@ -7,8 +7,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.JLabel;
-
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -90,8 +88,6 @@ public class GlobalSearchBar extends HBox {
     private SearchResultFrame searchResultFrame;
 
     private SearchDisplayMode searchDisplayMode;
-
-    private final JLabel searchIcon = new JLabel(IconTheme.JabRefIcons.SEARCH.getIcon());
 
     /**
      * if this flag is set the searchbar won't be selected after the next search
