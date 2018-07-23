@@ -24,7 +24,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -102,7 +101,7 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
      * @param frame the JabRef Frame
      */
     public ConnectToSharedDatabaseDialog(JabRefFrame frame) {
-        super((JFrame) null, Localization.lang("Connect to shared database"), ConnectToSharedDatabaseDialog.class);
+        super(Localization.lang("Connect to shared database"), ConnectToSharedDatabaseDialog.class);
         this.frame = frame;
         initLayout();
         updateEnableState();

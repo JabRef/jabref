@@ -3,7 +3,6 @@ package org.jabref.gui.mergeentries;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JSeparator;
 
 import org.jabref.gui.BasePanel;
@@ -33,7 +32,7 @@ public class MergeEntriesDialog extends JabRefDialog {
     private final DialogService dialogService;
 
     public MergeEntriesDialog(BasePanel panel, DialogService dialogService) {
-        super((JFrame) null, MERGE_ENTRIES, true, MergeEntriesDialog.class);
+        super(MERGE_ENTRIES, true, MergeEntriesDialog.class);
         this.dialogService = dialogService;
         this.panel = panel;
 

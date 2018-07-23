@@ -13,7 +13,6 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -69,7 +68,7 @@ public class FromAuxDialog extends JabRefDialog {
     private final JabRefFrame parentFrame;
 
     public FromAuxDialog(JabRefFrame frame, String title, boolean modal, TabPane viewedDBs) {
-        super((JFrame) null, title, modal, FromAuxDialog.class);
+        super(title, modal, FromAuxDialog.class);
 
         parentTabbedPane = viewedDBs;
         parentFrame = frame;
