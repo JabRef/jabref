@@ -22,9 +22,9 @@ import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.lang3.StringUtils;
 import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class WebSearchPaneViewModel {
     private final ObjectProperty<SearchBasedFetcher> selectedFetcher = new SimpleObjectProperty<>();
     private final ListProperty<SearchBasedFetcher> fetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty query = new SimpleStringProperty();
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
 
     public WebSearchPaneViewModel(ImportFormatPreferences importPreferences, JabRefFrame frame, JabRefPreferences preferences) {
         // TODO: Rework so that we don't rely on JabRefFrame and not the complete preferences
@@ -48,7 +48,7 @@ public class WebSearchPaneViewModel {
 
         // Choose last-selected fetcher as default
         int defaultFetcherIndex = preferences.getInt(JabRefPreferences.SELECTED_FETCHER_INDEX);
-        if (defaultFetcherIndex <= 0 || defaultFetcherIndex >= fetchers.size()) {
+        if ((defaultFetcherIndex <= 0) || (defaultFetcherIndex >= fetchers.size())) {
             selectedFetcherProperty().setValue(fetchers.get(0));
         } else {
             selectedFetcherProperty().setValue(fetchers.get(defaultFetcherIndex));
@@ -84,7 +84,7 @@ public class WebSearchPaneViewModel {
     }
 
     public void search() {
-        if (StringUtils.isBlank(getQuery())) {
+        if (StringUtil.isBlank(getQuery())) {
             frame.output(Localization.lang("Please enter a search string"));
             return;
         }
