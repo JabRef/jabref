@@ -59,7 +59,6 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     private static final Logger LOGGER = LoggerFactory.getLogger(ArXiv.class);
 
     private static final String API_URL = "https://export.arxiv.org/api/query";
-    // remove leading http(s)://arxiv.org/abs/ from abstract url to get arXiv ID
     private static final String ARXIV_URL_PREFIX_FOR_ID = "(https?://arxiv.org/abs/)";
     private static final Pattern URL_PATTERN = Pattern.compile(ARXIV_URL_PREFIX_FOR_ID);
 
@@ -377,6 +376,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             return urlAbstractPage.map(abstractUrl -> {
                 Matcher matcher = URL_PATTERN.matcher(abstractUrl);
                 if (matcher.find()) {
+                    // remove leading http(s)://arxiv.org/abs/ from abstract url to get arXiv ID
                     return abstractUrl.substring(matcher.group(1).length());
                 } else {
                     return abstractUrl;
