@@ -20,11 +20,12 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.SidePaneType;
+import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.collab.ChangeScanner;
 import org.jabref.gui.dialogs.AutosaveUIManager;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -53,7 +54,7 @@ import org.slf4j.LoggerFactory;
  * The operations run synchronously, but offload the save operation from the event thread using Spin.
  * Callers can query whether the operation was canceled, or whether it was successful.
  */
-public class SaveDatabaseAction extends AbstractWorker {
+public class SaveDatabaseAction implements BaseAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);
 
@@ -80,7 +81,6 @@ public class SaveDatabaseAction extends AbstractWorker {
         this.filePath = Optional.ofNullable(filePath);
     }
 
-    @Override
     public void init() throws Exception {
         success = false;
         canceled = false;
@@ -101,30 +101,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         }
     }
 
-    @Override
-    public void update() {
-        if (success) {
-            DefaultTaskExecutor.runInJavaFXThread(() -> {
-                // Reset title of tab
-                frame.setTabTitle(panel, panel.getTabTitle(),
-                        panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
-                frame.output(Localization.lang("Saved library") + " '"
-                        + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
-                frame.setWindowTitle();
-                frame.updateAllTabTitles();
-            });
-        } else if (!canceled) {
-            if (fileLockedError) {
-                // TODO: user should have the option to override the lock file.
-                frame.output(Localization.lang("Could not save, file locked by another JabRef instance."));
-            } else {
-                frame.output(Localization.lang("Save failed"));
-            }
-        }
-    }
-
-    @Override
-    public void run() {
+    private void doSave() {
         if (canceled || !panel.getBibDatabaseContext().getDatabaseFile().isPresent()) {
             return;
         }
@@ -144,9 +121,9 @@ public class SaveDatabaseAction extends AbstractWorker {
                 // Save the database
                 success = saveDatabase(panel.getBibDatabaseContext().getDatabaseFile().get(), false,
                         panel.getBibDatabaseContext()
-                                .getMetaData()
-                                .getEncoding()
-                                .orElse(Globals.prefs.getDefaultEncoding()));
+                             .getMetaData()
+                             .getEncoding()
+                             .orElse(Globals.prefs.getDefaultEncoding()));
 
                 panel.updateTimeStamp();
             } else {
@@ -173,6 +150,25 @@ public class SaveDatabaseAction extends AbstractWorker {
                 return;
             }
             LOGGER.error("Problem saving file", ex);
+        }
+
+        if (success) {
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                // Reset title of tab
+                frame.setTabTitle(panel, panel.getTabTitle(),
+                        panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
+                frame.output(Localization.lang("Saved library") + " '"
+                        + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
+                frame.setWindowTitle();
+                frame.updateAllTabTitles();
+            });
+        } else if (!canceled) {
+            if (fileLockedError) {
+                // TODO: user should have the option to override the lock file.
+                frame.output(Localization.lang("Could not save, file locked by another JabRef instance."));
+            } else {
+                frame.output(Localization.lang("Save failed"));
+            }
         }
     }
 
@@ -279,7 +275,7 @@ public class SaveDatabaseAction extends AbstractWorker {
      * still runs synchronously using Spin (the method returns only after completing the operation).
      */
     public void runCommand() throws Exception {
-        BasePanel.runWorker(this);
+        action();
     }
 
     public void save() throws Exception {
@@ -453,5 +449,13 @@ public class SaveDatabaseAction extends AbstractWorker {
 
         // Return false as either no external database file modifications have been found or overwrite is requested any way
         return false;
+    }
+
+    @Override
+    public void action() throws Exception {
+        init();
+        BackgroundTask
+                .wrap(this::doSave)
+                .executeWith(Globals.TASK_EXECUTOR);
     }
 }

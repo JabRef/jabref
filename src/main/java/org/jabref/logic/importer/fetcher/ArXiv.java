@@ -23,7 +23,6 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
-import org.jabref.logic.importer.util.OAI2Handler;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.BibEntry;
@@ -297,7 +296,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
             // Title of the article
             // The result from the arXiv contains hard line breaks, try to remove them
-            title = XMLUtil.getNodeContent(item, "title").map(OAI2Handler::correctLineBreaks);
+            title = XMLUtil.getNodeContent(item, "title").map(ArXivEntry::correctLineBreaks);
 
             // The url leading to the abstract page
             urlAbstractPage = XMLUtil.getNodeContent(item, "id");
@@ -306,8 +305,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             publishedDate = XMLUtil.getNodeContent(item, "published");
 
             // Abstract of the article
-            abstractText = XMLUtil.getNodeContent(item, "summary").map(OAI2Handler::correctLineBreaks)
-                    .map(String::trim);
+            abstractText = XMLUtil.getNodeContent(item, "summary").map(ArXivEntry::correctLineBreaks)
+                                  .map(String::trim);
 
             // Authors of the article
             authorNames = new ArrayList<>();
@@ -349,6 +348,12 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             // Ex: <arxiv:primary_category xmlns:arxiv="https://arxiv.org/schemas/atom" term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
             primaryCategory = XMLUtil.getNode(item, "arxiv:primary_category")
                     .flatMap(node -> XMLUtil.getAttributeContent(node, "term"));
+        }
+
+        public static String correctLineBreaks(String s) {
+            String result = s.replaceAll("\\n(?!\\s*\\n)", " ");
+            result = result.replaceAll("\\s*\\n\\s*", "\n");
+            return result.replaceAll(" {2,}", " ").replaceAll("(^\\s*|\\s+$)", "");
         }
 
         /**

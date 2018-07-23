@@ -85,12 +85,10 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
     @Override
     public Parser getParser() {
-
         // MathSciNet returns the BibTeX result embedded in HTML
         // So we extract the BibTeX string from the <pre>bibtex</pre> tags and pass the content to the BibTeX parser
         return inputStream -> {
-            String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(
-                    Collectors.joining(OS.NEWLINE));
+            String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
 
             List<BibEntry> entries = new ArrayList<>();
             BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());

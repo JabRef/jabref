@@ -201,34 +201,19 @@ public class LinkedFileViewModel extends AbstractViewModel {
             // Cannot rename remote links
             return;
         }
-        Optional<Path> fileDir = databaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
-        if (!fileDir.isPresent()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Rename file"), Localization.lang("File directory is not set or does not exist!"));
-            return;
-        }
 
         Optional<Path> file = linkedFile.findIn(databaseContext, fileDirectoryPreferences);
         if ((file.isPresent()) && Files.exists(file.get())) {
             RenamePdfCleanup pdfCleanup = new RenamePdfCleanup(false, databaseContext, fileDirPattern, fileDirectoryPreferences, linkedFile);
-
-            String targetFileName = pdfCleanup.getTargetFileName(linkedFile, entry);
-
-            boolean confirm = dialogService.showConfirmationDialogAndWait(Localization.lang("Rename file"),
-                                                                          Localization.lang("Rename file to") + " " + targetFileName,
-                                                                          Localization.lang("Rename file"),
-                                                                          Localization.lang("Cancel"));
-
-            if (confirm) {
-                Optional<Path> fileConflictCheck = pdfCleanup.findExistingFile(linkedFile, entry);
-                performRenameWithConflictCheck(file, pdfCleanup, targetFileName, fileConflictCheck);
-            }
+            performRenameWithConflictCheck(file.get(), pdfCleanup);
         } else {
             dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
         }
     }
 
-    private void performRenameWithConflictCheck(Optional<Path> file, RenamePdfCleanup pdfCleanup, String targetFileName, Optional<Path> fileConflictCheck) {
+    private void performRenameWithConflictCheck(Path file, RenamePdfCleanup pdfCleanup) {
         boolean confirm;
+        Optional<Path> fileConflictCheck = pdfCleanup.findExistingFile(linkedFile, entry);
         if (!fileConflictCheck.isPresent()) {
             try {
                 pdfCleanup.cleanupWithException(entry);
@@ -236,6 +221,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 dialogService.showErrorDialogAndWait(Localization.lang("Rename failed"), Localization.lang("JabRef cannot access the file because it is being used by another process."));
             }
         } else {
+            String targetFileName = pdfCleanup.getTargetFileName(linkedFile, entry);
             confirm = dialogService.showConfirmationDialogAndWait(Localization.lang("File exists"),
                                                                   Localization.lang("'%0' exists. Overwrite file?", targetFileName),
                                                                   Localization.lang("Overwrite"),
@@ -243,7 +229,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
             if (confirm) {
                 try {
-                    FileUtil.renameFileWithException(fileConflictCheck.get(), file.get(), true);
+                    FileUtil.renameFileWithException(fileConflictCheck.get(), file, true);
                     pdfCleanup.cleanupWithException(entry);
                 } catch (IOException e) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Rename failed"),
@@ -268,17 +254,18 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         Optional<Path> file = linkedFile.findIn(databaseContext, fileDirectoryPreferences);
         if ((file.isPresent()) && Files.exists(file.get())) {
-            // Linked file exists, so move it
+            // Found the linked file, so move it
             MoveFilesCleanup moveFiles = new MoveFilesCleanup(databaseContext, fileDirPattern, fileDirectoryPreferences, linkedFile);
-
-            boolean confirm = dialogService.showConfirmationDialogAndWait(Localization.lang("Move file"), Localization.lang("Move file to file directory?") + " " + fileDir.get(), Localization.lang("Move file"), Localization.lang("Cancel"));
-            if (confirm) {
-                moveFiles.cleanup(entry);
-            }
+            moveFiles.cleanup(entry);
         } else {
             // File doesn't exist, so we can't move it.
             dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
         }
+    }
+
+    public void moveToDefaultDirectoryAndRename() {
+        moveToDefaultDirectory();
+        rename();
     }
 
     public boolean delete(FileDirectoryPreferences prefs) {

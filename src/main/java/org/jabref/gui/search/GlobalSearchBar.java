@@ -196,7 +196,7 @@ public class GlobalSearchBar extends HBox {
         this.setAlignment(Pos.CENTER_LEFT);
     }
 
-    public void performGlobalSearch() {
+    private void performGlobalSearch() {
         BasePanel currentBasePanel = frame.getCurrentBasePanel();
         if ((currentBasePanel == null) || validateSearchResultFrame(true)) {
             return;

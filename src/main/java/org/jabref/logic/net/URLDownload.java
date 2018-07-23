@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -88,7 +89,7 @@ public class URLDownload {
      * We will fix this issue by accepting all (!) certificates. This is ugly; but as JabRef does not rely on
      * security-relevant information this is kind of OK (no, actually it is not...).
      *
-     * Taken from http://stackoverflow.com/a/6055903/873661
+     * Taken from http://stackoverflow.com/a/6055903/873661 and https://stackoverflow.com/a/19542614/873661
      */
     public static void bypassSSLVerification() {
         LOGGER.warn("Fix SSL exceptions by accepting ALL certificates");
@@ -109,11 +110,15 @@ public class URLDownload {
             }
         }};
 
-        // Install the all-trusting trust manager
         try {
+            // Install all-trusting trust manager
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(null, trustAllCerts, new SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
+
+            // Install all-trusting host verifier
+            HostnameVerifier allHostsValid = (hostname, session) -> true;
+            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
         } catch (Exception e) {
             LOGGER.error("A problem occurred when bypassing SSL verification", e);
         }

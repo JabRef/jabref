@@ -3,7 +3,7 @@ package org.jabref.gui.actions;
 import javax.swing.JDialog;
 
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.customentrytypes.EntryCustomizationDialog;
+import org.jabref.gui.customentrytypes.EntryTypeCustomizationDialog;
 
 public class CustomizeEntryAction extends SimpleCommand {
 
@@ -12,10 +12,10 @@ public class CustomizeEntryAction extends SimpleCommand {
     public CustomizeEntryAction(JabRefFrame frame) {
         this.frame = frame;
     }
-    
+
     @Override
     public void execute() {
-        JDialog dialog = new EntryCustomizationDialog(frame);
+        JDialog dialog = new EntryTypeCustomizationDialog(frame);
         dialog.setVisible(true);
     }
 }

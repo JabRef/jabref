@@ -2,30 +2,41 @@ package org.jabref.gui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.SwingUtilities;
 
+import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import org.jabref.JabRefGUI;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverType;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
-import org.jabref.gui.worker.CallBack;
+import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-
-import spin.Spin;
 
 public class DuplicateSearch extends SimpleCommand {
 
     private final JabRefFrame frame;
-    private List<BibEntry> bes;
-    private final List<List<BibEntry>> duplicates = new ArrayList<>();
+    private final BlockingQueue<List<BibEntry>> duplicates = new LinkedBlockingQueue<>();
+
+    private final AtomicBoolean libraryAnalyzed = new AtomicBoolean();
+    private final AtomicBoolean autoRemoveExactDuplicates = new AtomicBoolean();
+    private final AtomicInteger duplicateCount = new AtomicInteger();
 
     public DuplicateSearch(JabRefFrame frame) {
         this.frame = frame;
@@ -33,194 +44,177 @@ public class DuplicateSearch extends SimpleCommand {
 
     @Override
     public void execute() {
-        JabRefExecutorService.INSTANCE.execute(() -> run());
-
-    }
-
-    public void run() {
         BasePanel panel = frame.getCurrentBasePanel();
-
         panel.output(Localization.lang("Searching for duplicates..."));
 
-        bes = panel.getDatabase().getEntries();
-        if (bes.size() < 2) {
+        List<BibEntry> entries = panel.getDatabase().getEntries();
+        duplicates.clear();
+        libraryAnalyzed.set(false);
+        autoRemoveExactDuplicates.set(false);
+        duplicateCount.set(0);
+
+        if (entries.size() < 2) {
             return;
         }
 
-        SearcherRunnable st = new SearcherRunnable();
-        JabRefExecutorService.INSTANCE.executeInterruptableTask(st, "DuplicateSearcher");
-        int current = 0;
-
-        final List<BibEntry> toRemove = new ArrayList<>();
-        final List<BibEntry> toAdd = new ArrayList<>();
-
-        int duplicateCounter = 0;
-        boolean autoRemoveExactDuplicates = false;
-
-        synchronized (duplicates) {
-            while (!st.finished() || (current < duplicates.size())) {
-
-                if (current >= duplicates.size()) {
-                    // wait until the search thread puts something into duplicates vector
-                    // or finish its work
-
-                    try {
-                        duplicates.wait();
-                    } catch (InterruptedException ignored) {
-                        // Ignore
-                    }
-
-                } else { // duplicates found
-                    List<BibEntry> be = duplicates.get(current);
-                    current++;
-                    if (!toRemove.contains(be.get(0)) && !toRemove.contains(be.get(1))) {
-                        // Check if they are exact duplicates:
-                        boolean askAboutExact = false;
-                        if (DuplicateCheck.compareEntriesStrictly(be.get(0), be.get(1)) > 1) {
-                            if (autoRemoveExactDuplicates) {
-                                toRemove.add(be.get(1));
-                                duplicateCounter++;
-                                continue;
-                            }
-                            askAboutExact = true;
-                        }
-
-                        DuplicateCallBack cb = new DuplicateCallBack(JabRefGUI.getMainFrame(), be.get(0), be.get(1),
-                                askAboutExact ? DuplicateResolverType.DUPLICATE_SEARCH_WITH_EXACT : DuplicateResolverType.DUPLICATE_SEARCH);
-                        ((CallBack) Spin.over(cb)).update();
-
-                        duplicateCounter++;
-                        DuplicateResolverResult answer = cb.getSelected();
-                        if ((answer == DuplicateResolverResult.KEEP_LEFT)
-                                || (answer == DuplicateResolverResult.AUTOREMOVE_EXACT)) {
-                            toRemove.add(be.get(1));
-                            if (answer == DuplicateResolverResult.AUTOREMOVE_EXACT) {
-                                autoRemoveExactDuplicates = true; // Remember choice
-                            }
-                        } else if (answer == DuplicateResolverResult.KEEP_RIGHT) {
-                            toRemove.add(be.get(0));
-                        } else if (answer == DuplicateResolverResult.BREAK) {
-                            st.setFinished(); // thread killing
-                            current = Integer.MAX_VALUE;
-                            duplicateCounter--; // correct counter
-                        } else if (answer == DuplicateResolverResult.KEEP_MERGE) {
-                            toRemove.addAll(be);
-                            toAdd.add(cb.getMergedEntry());
-                        }
-                    }
-                }
-            }
-        }
-
-        final NamedCompound ce = new NamedCompound(Localization.lang("duplicate removal"));
-
-        final int dupliC = duplicateCounter;
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                // Now, do the actual removal:
-                if (!toRemove.isEmpty()) {
-                    for (BibEntry entry : toRemove) {
-                        panel.getDatabase().removeEntry(entry);
-                        ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
-                    }
-                    panel.markBaseChanged();
-                }
-                // and adding merged entries:
-                if (!toAdd.isEmpty()) {
-                    for (BibEntry entry : toAdd) {
-                        panel.getDatabase().insertEntry(entry);
-                        ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
-                    }
-                    panel.markBaseChanged();
-                }
-
-                synchronized (duplicates) {
-                    panel.output(Localization.lang("Duplicates found") + ": " + duplicates.size() + ' '
-                            + Localization.lang("pairs processed") + ": " + dupliC);
-                }
-                ce.end();
-                panel.getUndoManager().addEdit(ce);
-
-            }
-
-        });
+        JabRefExecutorService.INSTANCE
+                .executeInterruptableTask(() -> searchPossibleDuplicates(entries, panel.getBibDatabaseContext().getMode()), "DuplicateSearcher");
+        BackgroundTask.wrap(this::verifyDuplicates)
+                      .onSuccess(this::handleDuplicates)
+                      .executeWith(Globals.TASK_EXECUTOR);
 
     }
 
-    class SearcherRunnable implements Runnable {
+    private void searchPossibleDuplicates(List<BibEntry> entries, BibDatabaseMode databaseMode) {
+        for (int i = 0; (i < (entries.size() - 1)); i++) {
+            for (int j = i + 1; (j < entries.size()); j++) {
+                if (Thread.interrupted()) {
+                    return;
+                }
 
-        private volatile boolean finished;
+                BibEntry first = entries.get(i);
+                BibEntry second = entries.get(j);
 
-        @Override
-        public void run() {
+                if (DuplicateCheck.isDuplicate(first, second, databaseMode)) {
+                    duplicates.add(Arrays.asList(first, second));
+                    duplicateCount.getAndIncrement();
+                }
+            }
+        }
+        libraryAnalyzed.set(true);
+    }
+
+    private DuplicateSearchResult verifyDuplicates() {
+        DuplicateSearchResult result = new DuplicateSearchResult();
+
+        while (!libraryAnalyzed.get() || !duplicates.isEmpty()) {
+            List<BibEntry> dups;
+            try {
+                // poll with timeout in case the library is not analyzed completely, but contains no more duplicates
+                dups = this.duplicates.poll(100, TimeUnit.MILLISECONDS);
+                if (dups == null) {
+                    continue;
+                }
+            } catch (InterruptedException e) {
+                return null;
+            }
+
+            BibEntry first = dups.get(0);
+            BibEntry second = dups.get(1);
+
+            if (!result.isToRemove(first) && !result.isToRemove(second)) {
+                // Check if they are exact duplicates:
+                boolean askAboutExact = false;
+                if (DuplicateCheck.compareEntriesStrictly(first, second) > 1) {
+                    if (autoRemoveExactDuplicates.get()) {
+                        result.remove(second);
+                        continue;
+                    }
+                    askAboutExact = true;
+                }
+
+                DuplicateResolverType resolverType = askAboutExact ? DuplicateResolverType.DUPLICATE_SEARCH_WITH_EXACT : DuplicateResolverType.DUPLICATE_SEARCH;
+
+                DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> askResolveStrategy(result, first, second, resolverType));
+            }
+        }
+
+        return result;
+    }
+
+    private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
+        DuplicateResolverDialog dialog = new DuplicateResolverDialog(frame, first, second, resolverType);
+        dialog.setVisible(true);
+        dialog.dispose();
+
+        DuplicateResolverResult resolverResult = dialog.getSelected();
+
+        if ((resolverResult == DuplicateResolverResult.KEEP_LEFT)
+                || (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT)) {
+            result.remove(second);
+            if (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT) {
+                autoRemoveExactDuplicates.set(true); // Remember choice
+            }
+        } else if (resolverResult == DuplicateResolverResult.KEEP_RIGHT) {
+            result.remove(first);
+        } else if (resolverResult == DuplicateResolverResult.BREAK) {
+            libraryAnalyzed.set(true);
+            duplicates.clear();
+        } else if (resolverResult == DuplicateResolverResult.KEEP_MERGE) {
+            result.replace(first, second, dialog.getMergedEntry());
+        }
+    }
+
+    private void handleDuplicates(DuplicateSearchResult result) {
+        if (result == null) {
+            return;
+        }
+
+        SwingUtilities.invokeLater(() -> {
             BasePanel panel = frame.getCurrentBasePanel();
-            for (int i = 0; (i < (bes.size() - 1)) && !finished; i++) {
-                for (int j = i + 1; (j < bes.size()) && !finished; j++) {
-                    BibEntry first = bes.get(i);
-                    BibEntry second = bes.get(j);
-                    boolean eq = DuplicateCheck.isDuplicate(first, second, panel.getBibDatabaseContext().getMode());
-
-                    // If (suspected) duplicates, add them to the duplicates vector.
-                    if (eq) {
-                        synchronized (duplicates) {
-                            duplicates.add(Arrays.asList(first, second));
-                            duplicates.notifyAll(); // send wake up all
-                        }
-                    }
+            final NamedCompound compoundEdit = new NamedCompound(Localization.lang("duplicate removal"));
+            // Now, do the actual removal:
+            if (!result.getToRemove().isEmpty()) {
+                for (BibEntry entry : result.getToRemove()) {
+                    panel.getDatabase().removeEntry(entry);
+                    compoundEdit.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
                 }
+                panel.markBaseChanged();
             }
-            finished = true;
-            // if no duplicates found, the graphical thread will never wake up
-            synchronized (duplicates) {
-                duplicates.notifyAll();
+            // and adding merged entries:
+            if (!result.getToAdd().isEmpty()) {
+                for (BibEntry entry : result.getToAdd()) {
+                    panel.getDatabase().insertEntry(entry);
+                    compoundEdit.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
+                }
+                panel.markBaseChanged();
             }
-        }
 
-        public boolean finished() {
-            return finished;
-        }
-
-        // Thread cancel option
-        // no synchronized used because no "really" critical situations expected
-        public void setFinished() {
-            finished = true;
-        }
+            panel.output(Localization.lang("Duplicates found") + ": " + duplicateCount.get() + ' '
+                    + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
+            compoundEdit.end();
+            panel.getUndoManager().addEdit(compoundEdit);
+        });
     }
 
-    static class DuplicateCallBack implements CallBack {
+    /**
+     * Result of a duplicate search.
+     * Uses {@link System#identityHashCode(Object)} for identifying objects for removal, as completely identical
+     * {@link BibEntry BibEntries} are equal to each other.
+     */
+    class DuplicateSearchResult {
 
-        private DuplicateResolverResult reply = DuplicateResolverResult.NOT_CHOSEN;
-        private final JabRefFrame frame;
-        private final BibEntry one;
-        private final BibEntry two;
-        private final DuplicateResolverType dialogType;
-        private BibEntry merged;
+        private final Map<Integer, BibEntry> toRemove = new HashMap<>();
+        private final List<BibEntry> toAdd = new ArrayList<>();
 
-        public DuplicateCallBack(JabRefFrame frame, BibEntry one, BibEntry two, DuplicateResolverType dialogType) {
-            this.frame = frame;
-            this.one = one;
-            this.two = two;
-            this.dialogType = dialogType;
+        private int duplicates = 0;
+
+        public synchronized Collection<BibEntry> getToRemove() {
+            return toRemove.values();
         }
 
-        public DuplicateResolverResult getSelected() {
-            return reply;
+        public synchronized List<BibEntry> getToAdd() {
+            return toAdd;
         }
 
-        public BibEntry getMergedEntry() {
-            return merged;
+        public synchronized void remove(BibEntry entry) {
+            toRemove.put(System.identityHashCode(entry), entry);
+            duplicates++;
         }
 
-        @Override
-        public void update() {
-            DuplicateResolverDialog diag = new DuplicateResolverDialog(frame, one, two, dialogType);
-            diag.setVisible(true);
-            diag.dispose();
-            reply = diag.getSelected();
-            merged = diag.getMergedEntry();
+        public synchronized void replace(BibEntry first, BibEntry second, BibEntry replacement) {
+            remove(first);
+            remove(second);
+            toAdd.add(replacement);
+            duplicates++;
+        }
+
+        public synchronized boolean isToRemove(BibEntry entry) {
+            return toRemove.containsKey(System.identityHashCode(entry));
+        }
+
+        public synchronized int getDuplicateCount() {
+            return duplicates;
         }
     }
-
 }

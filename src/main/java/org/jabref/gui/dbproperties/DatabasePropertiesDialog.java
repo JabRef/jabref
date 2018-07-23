@@ -16,7 +16,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
@@ -69,8 +68,8 @@ public class DatabasePropertiesDialog extends JabRefDialog {
 
     private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
 
-    public DatabasePropertiesDialog(JFrame parent, BasePanel panel) {
-        super(parent, Localization.lang("Library properties"), true, DatabasePropertiesDialog.class);
+    public DatabasePropertiesDialog(BasePanel panel) {
+        super(Localization.lang("Library properties"), true, DatabasePropertiesDialog.class);
         encoding = new JComboBox<>();
         encoding.setModel(new DefaultComboBoxModel<>(Encodings.ENCODINGS));
         ok = new JButton(Localization.lang("OK"));

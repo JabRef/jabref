@@ -6,19 +6,23 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -28,13 +32,12 @@ import org.jabref.logic.util.io.FileUtil;
 /**
  * Tools for automatically detecting OpenOffice or LibreOffice installations.
  */
-public class DetectOpenOfficeInstallation extends AbstractWorker {
+public class DetectOpenOfficeInstallation {
 
     private final OpenOfficePreferences preferences;
     private final JDialog parent;
     private final DialogService dialogService;
 
-    private boolean foundPaths;
     private JDialog progressDialog;
 
     public DetectOpenOfficeInstallation(JDialog parent, OpenOfficePreferences preferences, DialogService dialogService) {
@@ -43,48 +46,38 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
         this.dialogService = dialogService;
     }
 
-    public boolean isInstalled() {
-        foundPaths = false;
+    public Future<Boolean> isInstalled() {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
         if (this.checkAutoDetectedPaths(preferences)) {
-            return true;
+            future.complete(true);
+        } else {
+            init();
+            BackgroundTask.wrap(() -> future.complete(autoDetectPaths()))
+                          .onSuccess(x -> SwingUtilities.invokeLater(progressDialog::dispose))
+                          .executeWith(Globals.TASK_EXECUTOR);
         }
-        init();
-        getWorker().run();
-        update();
-        return foundPaths;
+        return future;
     }
 
-    @Override
-    public void run() {
-        foundPaths = autoDetectPaths();
-    }
-
-    @Override
     public void init() {
         progressDialog = showProgressDialog(parent, Localization.lang("Autodetecting paths..."),
                 Localization.lang("Please wait..."));
-    }
-
-    @Override
-    public void update() {
-        progressDialog.dispose();
     }
 
     private Optional<Path> selectInstallationPath() {
 
         final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showInformationDialogAndWait(Localization.lang("Could not find OpenOffice/LibreOffice installation"),
-                Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually.")));
-        DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(nativeDesktop.getApplicationDirectory())
-                .build();
-        Optional<Path> path = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showDirectorySelectionDialog(dirDialogConfiguration));
+        Optional<Path> path = DefaultTaskExecutor.runInJavaFXThread(() -> {
+            dialogService.showInformationDialogAndWait(Localization.lang("Could not find OpenOffice/LibreOffice installation"),
+                    Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."));
+            DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                    .withInitialDirectory(nativeDesktop.getApplicationDirectory())
+                    .build();
+            return dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
+        });
 
-        if (path.isPresent()) {
-            return path;
-        }
-        return Optional.empty();
+        return path;
     }
 
     private boolean autoDetectPaths() {
