@@ -72,8 +72,8 @@ public class ActionFactory {
     public ButtonBase configureIconButton(Action action, Command command, ButtonBase button) {
         ActionUtils.configureButton(
                 new JabRefAction(action, command, keyBindingRepository),
-                button,
-                ActionUtils.ActionTextBehavior.HIDE);
+                button/*,
+                ActionUtils.ActionTextBehavior.HIDE*/); // TODO: Java 9 why is this argument too much?
 
         button.getStyleClass().add("flatButton");
 

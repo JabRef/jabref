@@ -58,10 +58,10 @@ open module org.jabref {
 	requires jgoodies.forms;
 	requires commons.logging;
 	requires com.google.common;
-	requires spin;
     requires easybind;
     requires de.jensd.fx.glyphs.commons;
     requires controlsfx;
+    requires mvvmfx;
 
     // Libre Office
 	/*requires ridl;

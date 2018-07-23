@@ -97,7 +97,8 @@ public class Globals {
             client.flush();
 
             //FIXME: Workaround for bug https://github.com/Microsoft/ApplicationInsights-Java/issues/662
-            SDKShutdownActivity.INSTANCE.stopAll();
+            // TODO: Java 9, Application Insights
+//            SDKShutdownActivity.INSTANCE.stopAll();
         });
     }
 
