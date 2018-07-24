@@ -352,6 +352,18 @@
     -fx-background-color: rgba(0, 0, 0, 0.3);
 }
 
+.button:default {
+    -fx-background-color: -jr-accent;
+}
+
+.button:default:hover {
+    -fx-background-color: derive(-jr-accent, -10%);
+}
+
+.button:default:focused,
+.button:default:pressed {
+    -fx-background-color: derive(-jr-accent, -20%);
+}
 
 .menu-bar {
     -fx-background-color: -jr-menu-background;
