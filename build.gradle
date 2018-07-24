@@ -21,7 +21,7 @@ plugins {
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
     id "com.simonharrer.modernizer" version '1.6.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.7'
-    id 'net.ltgt.errorprone' version '0.0.14'
+    id 'net.ltgt.errorprone' version '0.0.15'
     id 'com.github.ben-manes.versions' version '0.20.0'
 }
 
@@ -160,13 +160,13 @@ dependencies {
     testCompile 'org.junit-pioneer:junit-pioneer:0.1.2'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
-    testCompile 'org.mockito:mockito-core:2.19.1'
+    testCompile 'org.mockito:mockito-core:2.20.0'
     testCompile 'com.github.tomakehurst:wiremock:2.18.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.6.0'
     testCompile 'org.xmlunit:xmlunit-matchers:2.6.0'
-    testCompile 'com.tngtech.archunit:archunit-junit:0.8.2'
+    testCompile 'com.tngtech.archunit:archunit-junit:0.8.3'
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
