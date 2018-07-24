@@ -4,8 +4,9 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import org.jabref.JabRefExecutorService;
+import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.ThemeLoader;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
 /**
@@ -18,11 +19,14 @@ public class StyleTesterMain extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         StyleTesterView view = new StyleTesterView();
 
+        DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
+        JabRefExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
+
         Scene scene = new Scene(view.getContent());
-        new ThemeLoader(new DummyFileUpdateMonitor()).installBaseCss(scene, JabRefPreferences.getInstance());
+        new ThemeLoader(fileUpdateMonitor).installBaseCss(scene, JabRefPreferences.getInstance());
         stage.setScene(scene);
         stage.show();
     }

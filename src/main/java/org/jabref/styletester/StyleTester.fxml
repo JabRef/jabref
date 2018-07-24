@@ -8,6 +8,7 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuButton?>
@@ -30,283 +31,303 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml"
-            xmlns="http://javafx.com/javafx"
-            fx:controller="org.jabref.styletester.StyleTesterView"
-            prefHeight="400.0" prefWidth="600.0">
-    <children>
-        <VBox layoutX="194.0" layoutY="14.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0"
-              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <children>
-                <MenuBar>
-                    <menus>
-                        <Menu mnemonicParsing="false" text="File">
-                            <items>
-                                <MenuItem mnemonicParsing="false" text="Load Stylesheet...">
-                                    <accelerator>
-                                        <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP"
-                                                            shortcut="UP"/>
-                                    </accelerator>
-                                </MenuItem>
-                                <MenuItem mnemonicParsing="false" text="Reload Stylesheet">
-                                    <accelerator>
-                                        <KeyCodeCombination alt="UP" code="R" control="DOWN" meta="UP" shift="UP"
-                                                            shortcut="UP"/>
-                                    </accelerator>
-                                </MenuItem>
-                            </items>
-                        </Menu>
-                    </menus>
-                </MenuBar>
-                <HBox prefHeight="652.0" prefWidth="1124.0" spacing="5.0">
-                    <children>
-                        <VBox prefHeight="385.0" prefWidth="236.0" spacing="10.0" HBox.hgrow="ALWAYS">
-                            <children>
-                                <ComboBox maxWidth="1.7976931348623157E308" prefWidth="150.0" promptText="Combo Box">
-                                    <items>
-                                        <FXCollections fx:factory="observableArrayList">
-                                            <String fx:value="Apple"/>
-                                            <String fx:value="Orange"/>
-                                            <String fx:value="Pear"/>
-                                        </FXCollections>
-                                    </items>
-                                </ComboBox>
-                                <ComboBox disable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0"
-                                          promptText="Combo Box (Disabled)">
-                                    <items>
-                                        <FXCollections fx:factory="observableArrayList">
-                                            <String fx:value="Apple"/>
-                                            <String fx:value="Orange"/>
-                                            <String fx:value="Pear"/>
-                                        </FXCollections>
-                                    </items>
-                                </ComboBox>
-                                <Separator prefWidth="200.0"/>
-                                <ComboBox editable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0"
-                                          promptText="Combo Box">
-                                    <items>
-                                        <FXCollections fx:factory="observableArrayList">
-                                            <String fx:value="Apple"/>
-                                            <String fx:value="Orange"/>
-                                            <String fx:value="Pear"/>
-                                        </FXCollections>
-                                    </items>
-                                </ComboBox>
-                                <ComboBox disable="true" editable="true" maxWidth="1.7976931348623157E308"
-                                          prefWidth="150.0" promptText="Combo Box (Disabled)">
-                                    <items>
-                                        <FXCollections fx:factory="observableArrayList">
-                                            <String fx:value="Apple"/>
-                                            <String fx:value="Orange"/>
-                                            <String fx:value="Pear"/>
-                                        </FXCollections>
-                                    </items>
-                                </ComboBox>
-                                <Separator prefWidth="200.0"/>
-                                <ChoiceBox maxWidth="1.7976931348623157E308" prefWidth="150.0">
-                                    <items>
-                                        <FXCollections fx:factory="observableArrayList">
-                                            <String fx:value="Apple"/>
-                                            <String fx:value="Orange"/>
-                                            <String fx:value="Pear"/>
-                                        </FXCollections>
-                                    </items>
-                                </ChoiceBox>
-                                <ChoiceBox disable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0">
-                                    <items>
-                                        <FXCollections fx:factory="observableArrayList">
-                                            <String fx:value="Apple"/>
-                                            <String fx:value="Orange"/>
-                                            <String fx:value="Pear"/>
-                                        </FXCollections>
-                                    </items>
-                                </ChoiceBox>
-                                <Separator prefWidth="200.0"/>
-                                <TextField promptText="Text Field"/>
-                                <TextField editable="false" text="Text Field (non-editable)"/>
-                                <TextField disable="true" text="Text Field (disabled)"/>
-                                <Separator prefWidth="200.0"/>
-                                <PasswordField promptText="Password"/>
-                                <PasswordField editable="false" promptText="Password (non-editable)"
-                                               text="Password (non-editable)"/>
-                                <PasswordField disable="true" text="Password (disabled)"/>
-                                <Separator prefWidth="200.0"/>
-                                <HBox prefHeight="100.0" prefWidth="200.0">
-                                    <children>
-                                        <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0"
-                                              HBox.hgrow="SOMETIMES">
-                                            <children>
-                                                <CheckBox allowIndeterminate="true" mnemonicParsing="false"
-                                                          text="CheckBox"/>
-                                                <CheckBox allowIndeterminate="true" mnemonicParsing="false"
-                                                          selected="true" text="CheckBox"/>
-                                                <CheckBox allowIndeterminate="true" disable="true"
-                                                          mnemonicParsing="false" text="CheckBox"/>
-                                                <CheckBox allowIndeterminate="true" disable="true"
-                                                          mnemonicParsing="false" selected="true" text="CheckBox"/>
-                                                <CheckBox allowIndeterminate="true" disable="true" indeterminate="true"
-                                                          mnemonicParsing="false" text="CheckBox"/>
-                                            </children>
-                                        </VBox>
-                                        <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0"
-                                              HBox.hgrow="SOMETIMES">
-                                            <children>
-                                                <RadioButton mnemonicParsing="false" text="RadioButton">
-                                                    <toggleGroup>
-                                                        <ToggleGroup fx:id="radios"/>
-                                                    </toggleGroup>
-                                                </RadioButton>
-                                                <RadioButton mnemonicParsing="false" selected="true" text="RadioButton"
-                                                             toggleGroup="$radios"/>
-                                                <RadioButton disable="true" mnemonicParsing="false" text="RadioButton"/>
-                                                <RadioButton disable="true" mnemonicParsing="false" selected="true"
-                                                             text="RadioButton"/>
-                                            </children>
-                                        </VBox>
-                                    </children>
-                                </HBox>
-                            </children>
-                        </VBox>
-                        <Separator orientation="VERTICAL" prefHeight="200.0"/>
-                        <VBox prefHeight="385.0" prefWidth="236.0" spacing="10.0" HBox.hgrow="ALWAYS">
-                            <children>
-                                <MenuButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="MenuButton">
-                                    <items>
-                                        <MenuItem mnemonicParsing="false" text="Action 1"/>
-                                        <MenuItem mnemonicParsing="false" text="Action 2"/>
-                                    </items>
-                                </MenuButton>
-                                <MenuButton disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                                            text="MenuButton (Disabled)">
-                                    <items>
-                                        <MenuItem mnemonicParsing="false" text="Action 1"/>
-                                        <MenuItem mnemonicParsing="false" text="Action 2"/>
-                                    </items>
-                                </MenuButton>
-                                <Separator prefWidth="200.0"/>
-                                <SplitMenuButton maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                                                 text="SplitMenuButton">
-                                    <items>
-                                        <MenuItem mnemonicParsing="false" text="Action 1"/>
-                                        <MenuItem mnemonicParsing="false" text="Action 2"/>
-                                    </items>
-                                </SplitMenuButton>
-                                <SplitMenuButton disable="true" maxWidth="1.7976931348623157E308"
-                                                 mnemonicParsing="false" text="SplitMenuButton (Disabled)">
-                                    <items>
-                                        <MenuItem mnemonicParsing="false" text="Action 1"/>
-                                        <MenuItem mnemonicParsing="false" text="Action 2"/>
-                                    </items>
-                                </SplitMenuButton>
-                                <Separator prefWidth="200.0"/>
-                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Button"/>
-                                <Button disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                                        text="Button (Disabled)"/>
-                                <Button defaultButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                                        text="Button (Default)"/>
-                                <Button cancelButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                                        text="Button (Cancel)"/>
-                                <Separator prefWidth="200.0"/>
-                                <Hyperlink maxWidth="1.7976931348623157E308" text="Hyperlink"/>
-                                <Hyperlink maxWidth="1.7976931348623157E308" text="Hyperlink (Visited)" visited="true"/>
-                                <Separator prefWidth="200.0"/>
-                            </children>
-                        </VBox>
-                        <Separator orientation="VERTICAL" prefHeight="200.0"/>
-                        <VBox prefHeight="385.0" prefWidth="236.0" spacing="10.0" HBox.hgrow="ALWAYS">
-                            <children>
-                                <Slider value="35.0"/>
-                                <Slider showTickMarks="true" snapToTicks="true" value="35.0"/>
-                                <Slider showTickLabels="true" showTickMarks="true" snapToTicks="true" value="35.0"/>
-                                <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" prefHeight="200.0"
-                                          prefWidth="200.0" vgap="10.0">
-                                    <children>
-                                        <Slider orientation="VERTICAL"/>
-                                        <Slider orientation="VERTICAL" showTickMarks="true"/>
-                                        <Slider orientation="VERTICAL" showTickLabels="true" showTickMarks="true"/>
-                                    </children>
-                                </FlowPane>
-                                <Separator prefWidth="200.0"/>
-                                <ProgressBar maxWidth="1.7976931348623157E308" prefWidth="200.0" progress="0.3"/>
-                                <ProgressBar maxWidth="1.7976931348623157E308" prefWidth="200.0"/>
-                                <ProgressIndicator progress="0.3"/>
-                                <ProgressIndicator/>
-                            </children>
-                        </VBox>
-                        <Separator orientation="VERTICAL" prefHeight="200.0"/>
-                        <VBox prefHeight="385.0" prefWidth="236.0" HBox.hgrow="ALWAYS">
-                            <children>
-                                <TextArea prefHeight="71.0" prefWidth="268.0" promptText="Text Area" wrapText="true"/>
-                            </children>
-                        </VBox>
-                    </children>
-                    <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-                    </padding>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="600.0"
+            xmlns="http://javafx.com/javafx/8.0.121" fx:controller="org.jabref.styletester.StyleTesterView">
+    <TabPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+             AnchorPane.topAnchor="0.0">
+        <Tab text="Buttons">
+            <FlowPane>
+                <Label>Normal buttons:</Label>
+                <HBox spacing="16">
+                    <Button text="Normal"/>
+                    <Button text="Hover" fx:id="normalButtonHover"/>
+                    <Button text="Pressed" fx:id="normalButtonPressed"/>
+                    <Button text="Focused" fx:id="normalButtonFocused"/>
+                    <Button disable="true" text="Disabled"/>
+                    <Button defaultButton="true" text="Default"/>
+                    <Button cancelButton="true" text="Cancel"/>
                 </HBox>
-                <SplitPane dividerPositions="0.45566502463054187" prefHeight="160.0" prefWidth="200.0"
-                           VBox.vgrow="ALWAYS">
-                    <items>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                            <children>
-                                <TabPane prefHeight="173.0" prefWidth="259.0" side="BOTTOM"
-                                         AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                                         AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                    <tabs>
-                                        <Tab text="Lorem">
-                                            <content>
-                                                <AnchorPane/>
-                                            </content>
-                                        </Tab>
-                                        <Tab text="Ipsum">
-                                            <content>
-                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0"
-                                                            prefWidth="200.0"/>
-                                            </content>
-                                        </Tab>
-                                        <Tab text="Dolor">
-                                            <content>
-                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0"
-                                                            prefWidth="200.0"/>
-                                            </content>
-                                        </Tab>
-                                    </tabs>
-                                </TabPane>
-                            </children>
-                        </AnchorPane>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                            <children>
-                                <TabPane prefHeight="173.0" prefWidth="294.0" side="LEFT" AnchorPane.bottomAnchor="0.0"
-                                         AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                                         AnchorPane.topAnchor="0.0">
-                                    <tabs>
-                                        <Tab text="Lorem">
-                                            <content>
-                                                <AnchorPane/>
-                                            </content>
-                                        </Tab>
-                                        <Tab text="Ipsum">
-                                            <content>
-                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0"
-                                                            prefWidth="200.0"/>
-                                            </content>
-                                        </Tab>
-                                        <Tab text="Dolor">
-                                            <content>
-                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0"
-                                                            prefWidth="200.0"/>
-                                            </content>
-                                        </Tab>
-                                    </tabs>
-                                </TabPane>
-                            </children>
-                        </AnchorPane>
-                    </items>
-                    <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-                    </padding>
-                </SplitPane>
-            </children>
-        </VBox>
-    </children>
+            </FlowPane>
+        </Tab>
+        <Tab>
+            <VBox layoutX="194.0" layoutY="14.0" prefHeight="200.0" prefWidth="100.0">
+                <children>
+                    <MenuBar>
+                        <menus>
+                            <Menu mnemonicParsing="false" text="File">
+                                <items>
+                                    <MenuItem mnemonicParsing="false" text="Load Stylesheet...">
+                                        <accelerator>
+                                            <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP"
+                                                                shortcut="UP"/>
+                                        </accelerator>
+                                    </MenuItem>
+                                    <MenuItem mnemonicParsing="false" text="Reload Stylesheet">
+                                        <accelerator>
+                                            <KeyCodeCombination alt="UP" code="R" control="DOWN" meta="UP" shift="UP"
+                                                                shortcut="UP"/>
+                                        </accelerator>
+                                    </MenuItem>
+                                </items>
+                            </Menu>
+                        </menus>
+                    </MenuBar>
+                    <HBox prefHeight="652.0" prefWidth="1124.0" spacing="5.0">
+                        <children>
+                            <VBox prefHeight="385.0" prefWidth="236.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <ComboBox maxWidth="1.7976931348623157E308" prefWidth="150.0"
+                                              promptText="Combo Box">
+                                        <items>
+                                            <FXCollections fx:factory="observableArrayList">
+                                                <String fx:value="Apple"/>
+                                                <String fx:value="Orange"/>
+                                                <String fx:value="Pear"/>
+                                            </FXCollections>
+                                        </items>
+                                    </ComboBox>
+                                    <ComboBox disable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0"
+                                              promptText="Combo Box (Disabled)">
+                                        <items>
+                                            <FXCollections fx:factory="observableArrayList">
+                                                <String fx:value="Apple"/>
+                                                <String fx:value="Orange"/>
+                                                <String fx:value="Pear"/>
+                                            </FXCollections>
+                                        </items>
+                                    </ComboBox>
+                                    <Separator prefWidth="200.0"/>
+                                    <ComboBox editable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0"
+                                              promptText="Combo Box">
+                                        <items>
+                                            <FXCollections fx:factory="observableArrayList">
+                                                <String fx:value="Apple"/>
+                                                <String fx:value="Orange"/>
+                                                <String fx:value="Pear"/>
+                                            </FXCollections>
+                                        </items>
+                                    </ComboBox>
+                                    <ComboBox disable="true" editable="true" maxWidth="1.7976931348623157E308"
+                                              prefWidth="150.0" promptText="Combo Box (Disabled)">
+                                        <items>
+                                            <FXCollections fx:factory="observableArrayList">
+                                                <String fx:value="Apple"/>
+                                                <String fx:value="Orange"/>
+                                                <String fx:value="Pear"/>
+                                            </FXCollections>
+                                        </items>
+                                    </ComboBox>
+                                    <Separator prefWidth="200.0"/>
+                                    <ChoiceBox maxWidth="1.7976931348623157E308" prefWidth="150.0">
+                                        <items>
+                                            <FXCollections fx:factory="observableArrayList">
+                                                <String fx:value="Apple"/>
+                                                <String fx:value="Orange"/>
+                                                <String fx:value="Pear"/>
+                                            </FXCollections>
+                                        </items>
+                                    </ChoiceBox>
+                                    <ChoiceBox disable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0">
+                                        <items>
+                                            <FXCollections fx:factory="observableArrayList">
+                                                <String fx:value="Apple"/>
+                                                <String fx:value="Orange"/>
+                                                <String fx:value="Pear"/>
+                                            </FXCollections>
+                                        </items>
+                                    </ChoiceBox>
+                                    <Separator prefWidth="200.0"/>
+                                    <TextField promptText="Text Field"/>
+                                    <TextField editable="false" text="Text Field (non-editable)"/>
+                                    <TextField disable="true" text="Text Field (disabled)"/>
+                                    <Separator prefWidth="200.0"/>
+                                    <PasswordField promptText="Password"/>
+                                    <PasswordField editable="false" promptText="Password (non-editable)"
+                                                   text="Password (non-editable)"/>
+                                    <PasswordField disable="true" text="Password (disabled)"/>
+                                    <Separator prefWidth="200.0"/>
+                                    <HBox prefHeight="100.0" prefWidth="200.0">
+                                        <children>
+                                            <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0"
+                                                  HBox.hgrow="SOMETIMES">
+                                                <children>
+                                                    <CheckBox allowIndeterminate="true" mnemonicParsing="false"
+                                                              text="CheckBox"/>
+                                                    <CheckBox allowIndeterminate="true" mnemonicParsing="false"
+                                                              selected="true" text="CheckBox"/>
+                                                    <CheckBox allowIndeterminate="true" disable="true"
+                                                              mnemonicParsing="false" text="CheckBox"/>
+                                                    <CheckBox allowIndeterminate="true" disable="true"
+                                                              mnemonicParsing="false" selected="true" text="CheckBox"/>
+                                                    <CheckBox allowIndeterminate="true" disable="true"
+                                                              indeterminate="true" mnemonicParsing="false"
+                                                              text="CheckBox"/>
+                                                </children>
+                                            </VBox>
+                                            <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0"
+                                                  HBox.hgrow="SOMETIMES">
+                                                <children>
+                                                    <RadioButton mnemonicParsing="false" text="RadioButton">
+                                                        <toggleGroup>
+                                                            <ToggleGroup fx:id="radios"/>
+                                                        </toggleGroup>
+                                                    </RadioButton>
+                                                    <RadioButton mnemonicParsing="false" selected="true"
+                                                                 text="RadioButton" toggleGroup="$radios"/>
+                                                    <RadioButton disable="true" mnemonicParsing="false"
+                                                                 text="RadioButton"/>
+                                                    <RadioButton disable="true" mnemonicParsing="false" selected="true"
+                                                                 text="RadioButton"/>
+                                                </children>
+                                            </VBox>
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </VBox>
+                            <Separator orientation="VERTICAL" prefHeight="200.0"/>
+                            <VBox prefHeight="385.0" prefWidth="236.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <MenuButton maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                                text="MenuButton">
+                                        <items>
+                                            <MenuItem mnemonicParsing="false" text="Action 1"/>
+                                            <MenuItem mnemonicParsing="false" text="Action 2"/>
+                                        </items>
+                                    </MenuButton>
+                                    <MenuButton disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                                text="MenuButton (Disabled)">
+                                        <items>
+                                            <MenuItem mnemonicParsing="false" text="Action 1"/>
+                                            <MenuItem mnemonicParsing="false" text="Action 2"/>
+                                        </items>
+                                    </MenuButton>
+                                    <Separator prefWidth="200.0"/>
+                                    <SplitMenuButton maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                                     text="SplitMenuButton">
+                                        <items>
+                                            <MenuItem mnemonicParsing="false" text="Action 1"/>
+                                            <MenuItem mnemonicParsing="false" text="Action 2"/>
+                                        </items>
+                                    </SplitMenuButton>
+                                    <SplitMenuButton disable="true" maxWidth="1.7976931348623157E308"
+                                                     mnemonicParsing="false" text="SplitMenuButton (Disabled)">
+                                        <items>
+                                            <MenuItem mnemonicParsing="false" text="Action 1"/>
+                                            <MenuItem mnemonicParsing="false" text="Action 2"/>
+                                        </items>
+                                    </SplitMenuButton>
+                                    <Separator prefWidth="200.0"/>
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Button"/>
+                                    <Button disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                            text="Button (Disabled)"/>
+                                    <Button defaultButton="true" maxWidth="1.7976931348623157E308"
+                                            mnemonicParsing="false" text="Button (Default)"/>
+                                    <Button cancelButton="true" maxWidth="1.7976931348623157E308"
+                                            mnemonicParsing="false" text="Button (Cancel)"/>
+                                    <Separator prefWidth="200.0"/>
+                                    <Hyperlink maxWidth="1.7976931348623157E308" text="Hyperlink"/>
+                                    <Hyperlink maxWidth="1.7976931348623157E308" text="Hyperlink (Visited)"
+                                               visited="true"/>
+                                    <Separator prefWidth="200.0"/>
+                                </children>
+                            </VBox>
+                            <Separator orientation="VERTICAL" prefHeight="200.0"/>
+                            <VBox prefHeight="385.0" prefWidth="236.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Slider value="35.0"/>
+                                    <Slider showTickMarks="true" snapToTicks="true" value="35.0"/>
+                                    <Slider showTickLabels="true" showTickMarks="true" snapToTicks="true" value="35.0"/>
+                                    <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0"
+                                              prefHeight="200.0" prefWidth="200.0" vgap="10.0">
+                                        <children>
+                                            <Slider orientation="VERTICAL"/>
+                                            <Slider orientation="VERTICAL" showTickMarks="true"/>
+                                            <Slider orientation="VERTICAL" showTickLabels="true" showTickMarks="true"/>
+                                        </children>
+                                    </FlowPane>
+                                    <Separator prefWidth="200.0"/>
+                                    <ProgressBar maxWidth="1.7976931348623157E308" prefWidth="200.0" progress="0.3"/>
+                                    <ProgressBar maxWidth="1.7976931348623157E308" prefWidth="200.0"/>
+                                    <ProgressIndicator progress="0.3"/>
+                                    <ProgressIndicator/>
+                                </children>
+                            </VBox>
+                            <Separator orientation="VERTICAL" prefHeight="200.0"/>
+                            <VBox prefHeight="385.0" prefWidth="236.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <TextArea prefHeight="71.0" prefWidth="268.0" promptText="Text Area"
+                                              wrapText="true"/>
+                                </children>
+                            </VBox>
+                        </children>
+                        <padding>
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                        </padding>
+                    </HBox>
+                    <SplitPane dividerPositions="0.45566502463054187" prefHeight="160.0" prefWidth="200.0"
+                               VBox.vgrow="ALWAYS">
+                        <items>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                <children>
+                                    <TabPane prefHeight="173.0" prefWidth="259.0" side="BOTTOM"
+                                             AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                             AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                        <tabs>
+                                            <Tab text="Lorem">
+                                                <content>
+                                                    <AnchorPane/>
+                                                </content>
+                                            </Tab>
+                                            <Tab text="Ipsum">
+                                                <content>
+                                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0"
+                                                                prefWidth="200.0"/>
+                                                </content>
+                                            </Tab>
+                                            <Tab text="Dolor">
+                                                <content>
+                                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0"
+                                                                prefWidth="200.0"/>
+                                                </content>
+                                            </Tab>
+                                        </tabs>
+                                    </TabPane>
+                                </children>
+                            </AnchorPane>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                <children>
+                                    <TabPane prefHeight="173.0" prefWidth="294.0" side="LEFT"
+                                             AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                             AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                        <tabs>
+                                            <Tab text="Lorem">
+                                                <content>
+                                                    <AnchorPane/>
+                                                </content>
+                                            </Tab>
+                                            <Tab text="Ipsum">
+                                                <content>
+                                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0"
+                                                                prefWidth="200.0"/>
+                                                </content>
+                                            </Tab>
+                                            <Tab text="Dolor">
+                                                <content>
+                                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0"
+                                                                prefWidth="200.0"/>
+                                                </content>
+                                            </Tab>
+                                        </tabs>
+                                    </TabPane>
+                                </children>
+                            </AnchorPane>
+                        </items>
+                        <padding>
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                        </padding>
+                    </SplitPane>
+                </children>
+            </VBox>
+        </Tab>
+    </TabPane>
 </AnchorPane>

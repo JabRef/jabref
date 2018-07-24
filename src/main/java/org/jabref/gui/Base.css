@@ -335,6 +335,24 @@
     -fx-text-fill: -fx-text-base-color;
 }
 
+.button {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(0, 0, 0, 0.23);
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-padding: 0.5em 1em 0.5em 1em;
+}
+
+.button:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.12);
+}
+
+.button:focused,
+.button:pressed {
+    -fx-background-color: rgba(0, 0, 0, 0.3);
+}
+
+
 .menu-bar {
     -fx-background-color: -jr-menu-background;
     -fx-background-insets: 0;
