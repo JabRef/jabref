@@ -353,16 +353,16 @@
 }
 
 .button:default {
-    -fx-background-color: -jr-accent;
+    -fx-background-color: -fx-default-button;
 }
 
 .button:default:hover {
-    -fx-background-color: derive(-jr-accent, -10%);
+    -fx-background-color: derive(-fx-default-button, -10%);
 }
 
 .button:default:focused,
 .button:default:pressed {
-    -fx-background-color: derive(-jr-accent, -20%);
+    -fx-background-color: derive(-fx-default-button, -20%);
 }
 
 .menu-bar {
