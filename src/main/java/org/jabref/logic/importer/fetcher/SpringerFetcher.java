@@ -147,8 +147,8 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_SPRINGER;
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_SPRINGER);
     }
 
     @Override
