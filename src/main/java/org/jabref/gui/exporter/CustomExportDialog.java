@@ -15,7 +15,6 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -57,7 +56,7 @@ class CustomExportDialog extends JabRefDialog {
     }
 
     public CustomExportDialog(final JabRefFrame parent) {
-        super((JFrame) null, Localization.lang("Edit custom export"), true, CustomExportDialog.class);
+        super(Localization.lang("Edit custom export"), true, CustomExportDialog.class);
         frame = parent;
         ActionListener okListener = e -> {
             Path layoutFileDir = Paths.get(layoutFile.getText()).getParent();

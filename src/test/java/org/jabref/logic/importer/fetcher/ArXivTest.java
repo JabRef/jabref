@@ -191,5 +191,8 @@ public class ArXivTest {
 
         assertEquals(ArXivIdentifier.parse("1405.2249v1"), finder.findIdentifier(sliceTheoremPaper));
     }
-
+    @Test
+    public void searchEmptyId() throws Exception {
+        assertEquals(Optional.empty(), finder.performSearchById(""));
+    }
 }

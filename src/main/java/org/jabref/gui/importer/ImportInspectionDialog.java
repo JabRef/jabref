@@ -193,7 +193,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
      * @param panel
      */
     public ImportInspectionDialog(JabRefFrame frame, BasePanel panel, String undoName, boolean newDatabase) {
-        super(null, ImportInspectionDialog.class);
+        super(ImportInspectionDialog.class);
         this.frame = frame;
         this.panel = panel;
         this.bibDatabaseContext = (panel == null) ? null : panel.getBibDatabaseContext();

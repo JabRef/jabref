@@ -85,9 +85,8 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         boolean isFirstField = true;
         for (String fieldName : fields) {
             FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.TASK_EXECUTOR, dialogService,
-                    Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs,
-                    databaseContext, entry.getType(),
-                    suggestionProviders, undoManager);
+                    Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
+                    Globals.prefs, databaseContext, entry.getType(), suggestionProviders, undoManager);
             fieldEditor.bindToEntry(entry);
 
             editors.put(fieldName, fieldEditor);
