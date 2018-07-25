@@ -48,7 +48,7 @@ public class IsbnFetcherTest {
 
     @Test
     public void testHelpPage() {
-        assertEquals("ISBNtoBibTeX", fetcher.getHelpPage().getPageName());
+        assertEquals("ISBNtoBibTeX", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test
