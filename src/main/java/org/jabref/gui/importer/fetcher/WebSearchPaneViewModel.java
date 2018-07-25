@@ -3,6 +3,8 @@ package org.jabref.gui.importer.fetcher;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.swing.SwingUtilities;
+
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -97,7 +99,8 @@ public class WebSearchPaneViewModel {
         SearchBasedFetcher activeFetcher = getSelectedFetcher();
         final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
                 activeFetcher.getName(), false);
-        dialog.setVisible(true);
+
+        SwingUtilities.invokeLater(() -> dialog.setVisible(true));
 
         JabRefExecutorService.INSTANCE.execute(() -> {
             dialog.setStatus(Localization.lang("Processing %0", getQuery()));
