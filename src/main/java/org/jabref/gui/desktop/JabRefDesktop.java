@@ -156,7 +156,9 @@ public class JabRefDesktop {
                 NATIVE_DESKTOP.openFileWithApplication(filePath, application);
             }
         } else {
-            NATIVE_DESKTOP.openFile(filePath, null);
+            //File type is not given and therefore no application specified
+            //Let the OS handle the opening of the file
+            NATIVE_DESKTOP.openFile(filePath, "");
         }
     }
 
