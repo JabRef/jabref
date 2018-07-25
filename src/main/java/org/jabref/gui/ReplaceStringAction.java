@@ -1,20 +1,18 @@
 package org.jabref.gui;
 
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.model.database.BibDatabase;
 
 public class ReplaceStringAction extends SimpleCommand
 {
     private BasePanel basePanel;
 
-    public ReplaceStringAction(BasePanel bPanel) {
-        this.basePanel = bPanel;
+    public ReplaceStringAction(BasePanel basePanel) {
+        this.basePanel = basePanel;
     }
 
     @Override
     public void execute() {
-        BibDatabase database = basePanel.getDatabase();
-        ReplaceStringView rsc = new ReplaceStringView(database, basePanel);
-        rsc.showAndWait().filter(response -> rsc.isExit());
+        ReplaceStringView dialog = new ReplaceStringView(basePanel);
+        dialog.showAndWait();
     }
 }

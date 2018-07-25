@@ -3,24 +3,56 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<DialogPane  maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="339.0" prefWidth="476.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="org.jabref.gui.ReplaceStringView" fx:id="pane">
-  <content>
-    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="376.0" prefWidth="552.0">
-         <children>
-            <Button fx:id="CancelButton" cancelButton="true" layoutX="386.0" layoutY="273.0" mnemonicParsing="false" onAction="#buttonCancel" prefHeight="28.0" prefWidth="74.0" text="Cancel" userData="CANCEL"/>
-            <Button fx:id="ReplaceButton" defaultButton="true" layoutX="260.0" layoutY="275.0" mnemonicParsing="false" onAction="#buttonReplace" prefHeight="25.0" prefWidth="76.0" text="Replace" textFill="#e46161" userData="OK_DONE"/>
-            <TextField fx:id="FindField" layoutX="107.0" layoutY="21.0" prefHeight="23.0" prefWidth="347.0" />
-            <TextField fx:id="ReplaceField" layoutX="107.0" layoutY="63.0" prefHeight="23.0" prefWidth="348.0" />
-            <Label layoutX="14.0" layoutY="21.0" prefHeight="23.0" prefWidth="75.0" text="Find:" />
-            <Label layoutX="11.0" layoutY="64.0" prefHeight="21.0" prefWidth="95.0" text="Replace with:" />
-            <CheckBox fx:id="checkLimit" layoutX="20.0" layoutY="134.0" mnemonicParsing="false" onAction="#selectOnly" onMouseReleased="#selectOnly" prefHeight="22.0" prefWidth="211.0" text="Limit to Selected Entries" />
-            <RadioButton layoutX="20.0" layoutY="188.0" mnemonicParsing="false" onAction="#radioAll" onMouseReleased="#radioAll" prefHeight="16.0" prefWidth="125.0" selected="true" text="All Field Replace">
-               <toggleGroup>
-                  <ToggleGroup fx:id="RadioGroup" />
-               </toggleGroup>
-            </RadioButton>
-            <RadioButton layoutX="20.0" layoutY="217.0" mnemonicParsing="false" onAction="#radioLimit" onMouseReleased="#radioLimit" prefHeight="29.0" prefWidth="121.0" text="Limit to Fields:" toggleGroup="$RadioGroup" />
-            <TextField fx:id="LimitFieldInput" layoutX="157.0" layoutY="220.0" prefHeight="23.0" prefWidth="283.0" />
-         </children></AnchorPane>
-  </content>
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8"
+            fx:controller="org.jabref.gui.ReplaceStringView" fx:id="pane">
+    <content>
+        <BorderPane>
+            <center>
+                <BorderPane BorderPane.alignment="CENTER">
+                    <center>
+                        <GridPane>
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                            </rowConstraints>
+                            <Label text="Find and Replace"/>
+                            <Label text="Find: " GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                            <TextField fx:id="findField" GridPane.columnIndex="1" GridPane.rowIndex="1"
+                                       GridPane.columnSpan="4"/>
+                            <Label text="Replace With:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                            <TextField fx:id="replaceField" GridPane.columnIndex="1" GridPane.rowIndex="2"
+                                       GridPane.columnSpan="4"/>
+                            <CheckBox GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2"
+                                      onAction="#selectOnly" text="Limit to Selected Entries"/>
+                            <RadioButton GridPane.columnIndex="0" GridPane.rowIndex="5" GridPane.columnSpan="2"
+                                         onAction="#radioAll" selected="true" text="All Field Replace">
+                                <toggleGroup>
+                                    <ToggleGroup fx:id="radioGroup"/>
+                                </toggleGroup>
+                            </RadioButton>
+                            <RadioButton GridPane.columnIndex="0" GridPane.rowIndex="6" GridPane.columnSpan="2"
+                                         onAction="#radioLimit" text="Limit to Fields:" toggleGroup="$radioGroup"/>
+                            <TextField fx:id="limitFieldInput" GridPane.columnIndex="2" GridPane.rowIndex="6"
+                                       GridPane.columnSpan="3"/>
+                        </GridPane>
+                    </center>
+                </BorderPane>
+            </center>
+        </BorderPane>
+    </content>
+    <ButtonType fx:id="replaceButton" text="Replace" buttonData="OK_DONE"/>
+    <ButtonType fx:constant="CANCEL"/>
 </DialogPane>
