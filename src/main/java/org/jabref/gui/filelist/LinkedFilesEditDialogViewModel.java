@@ -36,7 +36,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     private final StringProperty description = new SimpleStringProperty("");
     private final ListProperty<ExternalFileType> allExternalFileTypes = new SimpleListProperty<>(FXCollections.emptyObservableList());
     private final ObjectProperty<ExternalFileType> selectedExternalFileType = new SimpleObjectProperty<>();
-    private final MonadicObservableValue<ExternalFileType> monadiccSelectedExternalFileType;
+    private final MonadicObservableValue<ExternalFileType> monadicSelectedExternalFileType;
     private final BibDatabaseContext database;
     private final DialogService dialogService;
     private final PreferencesService preferences;
@@ -49,7 +49,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         this.externalFileTypes = externalFileTypes;
         allExternalFileTypes.set(FXCollections.observableArrayList(externalFileTypes.getExternalFileTypeSelection()));
 
-        monadiccSelectedExternalFileType = EasyBind.monadic(selectedExternalFileType);
+        monadicSelectedExternalFileType = EasyBind.monadic(selectedExternalFileType);
         setValues(linkedFile);
     }
 
@@ -125,7 +125,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     }
 
     public LinkedFile getNewLinkedFile() {
-        return new LinkedFile(description.getValue(), link.getValue(), monadiccSelectedExternalFileType.map(ExternalFileType::toString).getOrElse(""));
+        return new LinkedFile(description.getValue(), link.getValue(), monadicSelectedExternalFileType.map(ExternalFileType::toString).getOrElse(""));
     }
 
 }
