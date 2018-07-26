@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import org.jabref.Globals;
 import org.jabref.gui.collab.FileUpdatePanel;
 import org.jabref.gui.groups.GroupSidePane;
-import org.jabref.gui.importer.fetcher.GeneralFetcher;
+import org.jabref.gui.importer.fetcher.WebSearchPane;
 import org.jabref.gui.openoffice.OpenOfficeSidePanel;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.preferences.JabRefPreferences;
@@ -33,7 +33,7 @@ public class SidePaneManager {
         Stream.of(
                   new FileUpdatePanel(this),
                   new GroupSidePane(this, preferences, frame.getDialogService()),
-                  new GeneralFetcher(this, preferences, frame),
+                new WebSearchPane(this, preferences, frame),
                   new OpenOfficeSidePanel(this, openOfficePreferences, frame))
               .forEach(pane -> components.put(pane.getType(), pane));
 
@@ -43,6 +43,10 @@ public class SidePaneManager {
 
         if (openOfficePreferences.getShowPanel()) {
             show(SidePaneType.OPEN_OFFICE);
+        }
+
+        if (preferences.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
+            show(SidePaneType.WEB_SEARCH);
         }
 
         updateView();

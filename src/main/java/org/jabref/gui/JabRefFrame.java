@@ -282,7 +282,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
             // groupSidePane.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
             //previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
-            //generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GeneralFetcher.class));
+            //generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(WebSearchPane.class));
             //openOfficePanel.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
             // TODO: Can't notify focus listener since it is expecting a swing component
             //Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
@@ -306,7 +306,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
 
         initShowTrackingNotification();
-
     }
 
     private void initKeyBindings() {
@@ -337,6 +336,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                     case DEFAULT_TABLE_FONT_SIZE:
                         setDefaultTableFontSize();
                         event.consume();
+                        break;
+                    case SEARCH:
+                        getGlobalSearchBar().focus();
                         break;
                     default:
                 }
@@ -423,7 +425,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
      * The MacAdapter calls this method when "About" is selected from the application menu.
      */
     public void about() {
-        HelpAction.getCommand().execute();
+        HelpAction.getMainHelpPageCommand().execute();
     }
 
     public JabRefPreferences prefs() {
@@ -863,10 +865,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                                   new SeparatorMenuItem(),
 
-                                  factory.createMenuItem(StandardActions.RESOLVE_DUPLICATE_KEYS, new OldDatabaseCommandWrapper(Actions.RESOLVE_DUPLICATE_KEYS, this, Globals.stateManager)),
-                                  factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(this)),
-                                  factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, Globals.stateManager)),
-                                  factory.createMenuItem(StandardActions.GENERATE_CITE_KEY, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.RESOLVE_DUPLICATE_KEYS, new OldDatabaseCommandWrapper(Actions.RESOLVE_DUPLICATE_KEYS, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(this)),
+                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, Globals.stateManager)),
+                factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, Globals.stateManager)),
 
                                   new SeparatorMenuItem(),
 
@@ -947,8 +949,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         );
 
         help.getItems().addAll(
-                               factory.createMenuItem(StandardActions.HELP, HelpAction.getCommand()),
-                               factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction("http://discourse.jabref.org/")),
+                factory.createMenuItem(StandardActions.HELP, HelpAction.getMainHelpPageCommand()),
+                factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction("http://discourse.jabref.org/")),
 
                                new SeparatorMenuItem(),
 
@@ -1447,7 +1449,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         @Override
         public void execute() {
-            LOGGER.debug(Globals.getFocusListener().getFocused().toString());
             JComponent source = Globals.getFocusListener().getFocused();
             Action action = source.getActionMap().get(command);
             if (action != null) {

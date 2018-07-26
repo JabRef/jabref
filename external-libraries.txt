@@ -40,11 +40,6 @@ Project: AppleJavaExtensions
 URL:     https://developer.apple.com/legacy/library/samplecode/AppleJavaExtensions/Introduction/Intro.html
 License: Apple License
 
-Id:      com.github.bkromhout:java-diff-utils
-Project: java-diff-utils
-URL:     https://github.com/bkromhout/java-diff-utils
-License: Apache-2.0
-
 Id:      com.github.tomtung
 Project: latex2unicode
 URL:     https://github.com/tomtung/latex2unicode
@@ -119,6 +114,11 @@ Id:      info.debatty:java-string-similarity
 Project: Java String Similarity
 URL:     https://github.com/tdebatty/java-string-similarity
 License: MIT
+
+Id:      io.github.java-diff-utils:java-diff-utils
+Project: java-diff-utils
+URL:     https://github.com/java-diff-utils/java-diff-utils
+License: Apache-1.1
 
 Id:      mysql:mysql-connector-java
 Project: MySQL Connector/J

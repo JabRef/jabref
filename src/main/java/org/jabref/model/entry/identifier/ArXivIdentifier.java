@@ -22,8 +22,12 @@ public class ArXivIdentifier implements Identifier {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        }
 
         ArXivIdentifier that = (ArXivIdentifier) o;
 
@@ -43,6 +47,11 @@ public class ArXivIdentifier implements Identifier {
     @Override
     public String getNormalized() {
         return identifier;
+    }
+
+    @Override
+    public String toString() {
+        return "ArXivIdentifier [identifier=" + identifier + "]";
     }
 
     @Override
