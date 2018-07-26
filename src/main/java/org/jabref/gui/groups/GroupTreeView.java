@@ -38,10 +38,12 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.LocalDragboard;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AllEntriesGroup;
 
 import org.controlsfx.control.textfield.CustomTextField;
@@ -210,6 +212,9 @@ public class GroupTreeView {
                 if ((event.getGestureSource() != row) && row.getItem().acceptableDrop(dragboard)) {
                     event.acceptTransferModes(TransferMode.MOVE, TransferMode.LINK);
 
+                    //expand node and all children on drag over
+                    row.getTreeItem().setExpanded(true);
+
                     removePseudoClasses(row, dragOverBottom, dragOverCenter, dragOverTop);
                     switch (getDroppingMouseLocation(row, event)) {
                         case BOTTOM:
@@ -241,11 +246,10 @@ public class GroupTreeView {
                         success = true;
                     }
                 }
-                if (dragboard.hasContent(DragAndDropDataFormats.ENTRIES)) {
-                    TransferableEntrySelection entrySelection = (TransferableEntrySelection) dragboard
-                            .getContent(DragAndDropDataFormats.ENTRIES);
 
-                    row.getItem().addEntriesToGroup(entrySelection.getSelection());
+                if (LocalDragboard.INSTANCE.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
+                    List<BibEntry> entries = LocalDragboard.INSTANCE.getValue(DragAndDropDataFormats.BIBENTRY_LIST_CLASS);
+                    row.getItem().addEntriesToGroup(entries);
                     success = true;
                 }
                 event.setDropCompleted(success);
@@ -260,12 +264,12 @@ public class GroupTreeView {
     }
 
     private void updateSelection(List<TreeItem<GroupNodeViewModel>> newSelectedGroups) {
-        if (newSelectedGroups == null || newSelectedGroups.isEmpty()) {
+        if ((newSelectedGroups == null) || newSelectedGroups.isEmpty()) {
             viewModel.selectedGroupsProperty().clear();
         } else {
             List<GroupNodeViewModel> list = new ArrayList<>();
             for (TreeItem<GroupNodeViewModel> model : newSelectedGroups) {
-                if (model != null && model.getValue() != null && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)) {
+                if ((model != null) && (model.getValue() != null) && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)) {
                     list.add(model.getValue());
                 }
             }
