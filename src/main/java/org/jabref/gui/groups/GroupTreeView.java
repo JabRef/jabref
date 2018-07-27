@@ -209,7 +209,7 @@ public class GroupTreeView {
             });
             row.setOnDragOver(event -> {
                 Dragboard dragboard = event.getDragboard();
-                if ((event.getGestureSource() != row) && row.getItem().acceptableDrop(dragboard)) {
+                if ((event.getGestureSource() != row) && (row.getItem() != null) && row.getItem().acceptableDrop(dragboard)) {
                     event.acceptTransferModes(TransferMode.MOVE, TransferMode.LINK);
 
                     //expand node and all children on drag over
