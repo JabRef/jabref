@@ -2,6 +2,7 @@ package org.jabref.gui;
 
 import java.awt.Color;
 import java.awt.Font;
+
 import org.jabref.Globals;
 import org.jabref.gui.keyboard.EmacsKeyBindings;
 import org.jabref.gui.util.CustomLocalDragboard;
