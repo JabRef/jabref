@@ -36,9 +36,10 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.gui.util.LocalDragboard;
+import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
@@ -247,8 +248,8 @@ public class GroupTreeView {
                     }
                 }
 
-                if (LocalDragboard.INSTANCE.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
-                    List<BibEntry> entries = LocalDragboard.INSTANCE.getValue(DragAndDropDataFormats.BIBENTRY_LIST_CLASS);
+                if (GUIGlobals.localDragboard.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
+                    List<BibEntry> entries = GUIGlobals.localDragboard.getValue(DragAndDropDataFormats.BIBENTRY_LIST_CLASS);
                     row.getItem().addEntriesToGroup(entries);
                     success = true;
                 }

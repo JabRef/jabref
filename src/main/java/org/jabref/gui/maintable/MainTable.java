@@ -28,6 +28,7 @@ import javafx.scene.input.TransferMode;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiles.NewDroppedFileHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -35,7 +36,6 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
-import org.jabref.gui.util.LocalDragboard;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
@@ -233,7 +233,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void handleOnDragOver(BibEntryTableViewModel originalItem, DragEvent event) {
-        if ((event.getGestureSource() != originalItem) && LocalDragboard.INSTANCE.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
+        if ((event.getGestureSource() != originalItem) && GUIGlobals.localDragboard.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
             event.acceptTransferModes(TransferMode.MOVE);
         }
         if (event.getDragboard().hasFiles() && (event.getSource() instanceof TableRow)) {
@@ -263,7 +263,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
             content.put(DragAndDropDataFormats.ENTRIES, "");
             dragboard.setContent(content);
-            LocalDragboard.INSTANCE.putValue(DragAndDropDataFormats.BIBENTRY_LIST_CLASS, entries);
+            GUIGlobals.localDragboard.putValue(DragAndDropDataFormats.BIBENTRY_LIST_CLASS, entries);
         }
 
         event.consume();
