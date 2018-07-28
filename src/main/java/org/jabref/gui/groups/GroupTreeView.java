@@ -302,7 +302,6 @@ public class GroupTreeView {
         return Optional.empty();
     }
 
-
     private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {
         ContextMenu menu = new ContextMenu();
 
