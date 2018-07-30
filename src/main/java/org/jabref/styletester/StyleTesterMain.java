@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import org.jabref.JabRefExecutorService;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.ThemeLoader;
 import org.jabref.preferences.JabRefPreferences;
@@ -21,6 +22,8 @@ public class StyleTesterMain extends Application {
     @Override
     public void start(Stage stage) {
         StyleTesterView view = new StyleTesterView();
+
+        IconTheme.loadFonts();
 
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");

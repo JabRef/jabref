@@ -50,7 +50,7 @@ public class IconTheme {
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(
             IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
 
-    static {
+    public static void loadFonts() {
         try (InputStream stream = getMaterialDesignIconsStream()) {
             FONT = Font.createFont(Font.TRUETYPE_FONT, stream);
         } catch (FontFormatException | IOException e) {

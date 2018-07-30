@@ -365,6 +365,15 @@
     -fx-background-color: derive(-fx-default-button, -20%);
 }
 
+.text-button {
+    -fx-border-width: 0px;
+}
+
+.contained-button {
+    -fx-background-color: -jr-accent;
+    -fx-border-color: -jr-accent;
+}
+
 .menu-bar {
     -fx-background-color: -jr-menu-background;
     -fx-background-insets: 0;
