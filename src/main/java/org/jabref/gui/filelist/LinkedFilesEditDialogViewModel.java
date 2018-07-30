@@ -97,6 +97,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         description.set(linkedFile.getDescription());
         link.set(linkedFile.getLink());
 
+
         selectedExternalFileType.setValue(null);
 
         // See what is a reasonable selection for the type combobox:
@@ -126,6 +127,17 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
     public LinkedFile getNewLinkedFile() {
         return new LinkedFile(description.getValue(), link.getValue(), monadicSelectedExternalFileType.map(ExternalFileType::toString).getOrElse(""));
+    }
+
+    private void relativizeFile() {
+
+        Optional<Path> file = FileHelper.expandFilename(database, link.get(), preferences.getFileDirectoryPreferences());
+        Path workingDir = file.orElse(preferences.getWorkingDir());
+        Path filePath = Paths.get(link.get());
+        List<Path> fileDirectories = database.getFileDirectoriesAsPaths(preferences.getFileDirectoryPreferences());
+        filePath = FileUtil.shortenFileName(filePath, fileDirectories);
+        link.set(filePath.toString());
+
     }
 
 }
