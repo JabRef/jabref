@@ -63,7 +63,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 <<<<<<< HEAD
 - We fixed an issue where users were vulnerable to XXE attacks during parsing [#4229](https://github.com/JabRef/jabref/issues/4229)
 =======
-- We an issue where users were vulnerable to XXE attacks during parsing [#4229](https://github.com/JabRef/jabref/issues/4229)
+- We fixed an issue where users were vulnerable to XXE attacks during parsing [#4229](https://github.com/JabRef/jabref/issues/4229)
 - We fixed an issue where files added via the "Attach file" contextmenu of an entry were not made relative. [#4201](https://github.com/JabRef/jabref/issues/4201)
 >>>>>>> 72264836363b0cd55df49bd171ea15b4c6e774c9
 
