@@ -48,7 +48,7 @@ public class RfcFetcherTest {
 
     @Test
     public void getHelpPageReturnsEqualHelpPage() {
-        assertEquals("RFCtoBibTeX", fetcher.getHelpPage().getPageName());
+        assertEquals("RFCtoBibTeX", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test

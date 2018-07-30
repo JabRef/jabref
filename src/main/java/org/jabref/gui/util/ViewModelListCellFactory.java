@@ -3,6 +3,7 @@ package org.jabref.gui.util;
 import java.util.function.BiConsumer;
 
 import javafx.scene.Node;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -105,6 +106,11 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     public ViewModelListCellFactory<T> setOnDragOver(BiConsumer<T, ? super DragEvent> toOnDragOver) {
         this.toOnDragOver = toOnDragOver;
         return this;
+    }
+
+    public void install(ComboBox<T> comboBox) {
+        comboBox.setButtonCell(this.call(null));
+        comboBox.setCellFactory(this);
     }
 
     @Override

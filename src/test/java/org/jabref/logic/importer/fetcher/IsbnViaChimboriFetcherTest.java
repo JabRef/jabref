@@ -30,7 +30,7 @@ public class IsbnViaChimboriFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setField("author", "Joshua Bloch");
         bibEntry.setField("isbn", "978-0321356680");
         bibEntry.setField("url",
-                "https://www.amazon.com/Effective-Java-2nd-Joshua-Bloch/dp/0321356683?SubscriptionId=0JYN1NVW651KCA56C102&tag=techkie-20&linkCode=xm2&camp=2025&creative=165953&creativeASIN=0321356683");
+                          "https://www.amazon.com/Effective-Java-2nd-Joshua-Bloch/dp/0321356683?SubscriptionId=AKIAIOBINVZYXZQZ2U3A&tag=chimbori05-20&linkCode=xm2&camp=2025&creative=165953&creativeASIN=0321356683");
 
         fetcher = new IsbnViaChimboriFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
@@ -44,7 +44,7 @@ public class IsbnViaChimboriFetcherTest extends AbstractIsbnFetcherTest {
     @Test
     @Override
     public void testHelpPage() {
-        assertEquals("ISBNtoBibTeX", fetcher.getHelpPage().getPageName());
+        assertEquals("ISBNtoBibTeX", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test
@@ -77,7 +77,7 @@ public class IsbnViaChimboriFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setField("author", "Marlon Dumas and Marcello La Rosa and Jan Mendling and Hajo A. Reijers");
         bibEntry.setField("isbn", "3642434738");
         bibEntry.setField("url",
-                "https://www.amazon.com/Fundamentals-Business-Process-Management-Marlon/dp/3642434738?SubscriptionId=0JYN1NVW651KCA56C102&tag=techkie-20&linkCode=xm2&camp=2025&creative=165953&creativeASIN=3642434738");
+                          "https://www.amazon.com/Fundamentals-Business-Process-Management-Marlon/dp/3642434738?SubscriptionId=AKIAIOBINVZYXZQZ2U3A&tag=chimbori05-20&linkCode=xm2&camp=2025&creative=165953&creativeASIN=3642434738");
 
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3642434738");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
