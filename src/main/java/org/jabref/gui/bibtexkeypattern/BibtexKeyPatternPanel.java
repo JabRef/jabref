@@ -1,22 +1,9 @@
 package org.jabref.gui.bibtexkeypattern;
 
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.help.HelpAction;
@@ -31,6 +18,12 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.EntryType;
 import org.jabref.preferences.JabRefPreferences;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 public class BibtexKeyPatternPanel extends JPanel {
 
     // used by both BibtexKeyPatternPanel and TabLabelPAttern
@@ -39,12 +32,15 @@ public class BibtexKeyPatternPanel extends JPanel {
 
     // default pattern
     protected final JTextField defaultPat = new JTextField();
+    private final TextField textField = new TextField();
 
     private final HelpAction help;
 
     // one field for each type
     private final Map<String, JTextField> textFields = new HashMap<>();
+    private final TextField[] textFieldArray = new TextField[19];
     private final BasePanel panel;
+    private final GridPane gridPane = new GridPane();
 
 
     public BibtexKeyPatternPanel(BasePanel panel) {
@@ -60,8 +56,11 @@ public class BibtexKeyPatternPanel extends JPanel {
         sp.setBorder(BorderFactory.createEmptyBorder());
         pan.setLayout(gbl);
         setLayout(gbl);
+
         // The header - can be removed
         JLabel lblEntryType = new JLabel(Localization.lang("Entry type"));
+        Label label= new Label(Localization.lang("Entry type"));
+        gridPane.add(label,1,1);
         Font f = new Font("plain", Font.BOLD, 12);
         lblEntryType.setFont(f);
         con.gridx = 0;
@@ -75,6 +74,8 @@ public class BibtexKeyPatternPanel extends JPanel {
         pan.add(lblEntryType);
 
         JLabel lblKeyPattern = new JLabel(Localization.lang("Key pattern"));
+        Label label1 = new Label(Localization.lang("Key pattern"));
+        gridPane.add(label1,2,1);
         lblKeyPattern.setFont(f);
         con.gridx = 1;
         con.gridy = 0;
@@ -88,6 +89,9 @@ public class BibtexKeyPatternPanel extends JPanel {
         con.gridy = 1;
         con.gridx = 0;
         JLabel lab = new JLabel(Localization.lang("Default pattern"));
+        Label label2 = new Label(Localization.lang("Default pattern"));
+        gridPane.add(label2, 1,2);
+        gridPane.add(textField,2,2);
         gbl.setConstraints(lab, con);
         pan.add(lab);
         con.gridx = 1;
@@ -97,6 +101,10 @@ public class BibtexKeyPatternPanel extends JPanel {
         JButton btnDefault = new JButton(Localization.lang("Default"));
         btnDefault.addActionListener(
                 e -> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
+
+        Button button = new Button("Default");
+        button.setOnAction(e-> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
+        gridPane.add(button,3,2);
         con.gridx = 2;
         int y = 2;
         gbl.setConstraints(btnDefault, con);
@@ -110,6 +118,7 @@ public class BibtexKeyPatternPanel extends JPanel {
             // use preferences value if no DB is open
             mode = Globals.prefs.getDefaultBibDatabaseMode();
         }
+        addExtraText();
 
         for (EntryType type : EntryTypes.getAllValues(mode)) {
             textFields.put(type.getName().toLowerCase(Locale.ROOT), addEntryType(pan, type, y));
@@ -136,6 +145,11 @@ public class BibtexKeyPatternPanel extends JPanel {
         con.anchor = GridBagConstraints.SOUTHEAST;
         con.insets = new Insets(0, 5, 0, 5);
         JButton hlb = new JButton(IconTheme.JabRefIcons.HELP.getSmallIcon());
+
+        Button help1 = new Button("?");
+        help1.setOnAction(e->new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN).getHelpButton().doClick());
+        gridPane.add(help1,1,24);
+
         hlb.setToolTipText(Localization.lang("Help on key patterns"));
         gbl.setConstraints(hlb, con);
         add(hlb);
@@ -153,14 +167,58 @@ public class BibtexKeyPatternPanel extends JPanel {
         gbl.setConstraints(btnDefaultAll, con);
         btnDefaultAll.addActionListener(e -> {
             // reset all fields
-            for (JTextField field : textFields.values()) {
-                field.setText("");
+            for (TextField textField : textFieldArray) {
+                textField.setText("");
             }
 
             // also reset the default pattern
             defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         });
         add(btnDefaultAll);
+
+        Button btnDefaultAll1 = new Button(Localization.lang("Reset all"));
+        btnDefaultAll1.setOnAction(e-> {
+            // reset all fields
+            for (JTextField field : textFields.values()) {
+                field.setText("");
+            }
+            textField.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
+        });
+        gridPane.add(btnDefaultAll1,2,24);
+    }
+
+    private void addExtraText(){
+        Label []label = new Label[19];
+        Button []button = new Button[19];
+        for(int i=0; i<=18; i++){
+            textFieldArray[i] = new TextField();
+            button[i] = new Button("Default");
+            button[i].setOnAction(e-> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
+        }
+        label[0] = new Label("Article");
+        label[1] = new Label("Book");
+        label[2] = new Label("Booklet");
+        label[3] = new Label("Conference");
+        label[4] = new Label("Electronic");
+        label[5] = new Label("IEEEtranBSTCTI");
+        label[6] = new Label("InBook");
+        label[7] = new Label("InCollection");
+        label[8] = new Label("InProceedings");
+        label[9] = new Label("Manual");
+        label[10] = new Label("MasterThesis");
+        label[11] = new Label("Misc");
+        label[12] = new Label("Patent");
+        label[13] = new Label("Periodical");
+        label[14] = new Label("PhdThesis");
+        label[15] = new Label("Proceedings");
+        label[16] = new Label("Standard");
+        label[17] = new Label("TechReport");
+        label[18] = new Label("Unpublished");
+        for(int i=0 ;i<=18; i++){
+            gridPane.add(label[i],1,i+3);
+            gridPane.add(textFieldArray[i],2,i+3);
+            gridPane.add(button[i],3,i+3);
+        }
     }
 
     private JTextField addEntryType(Container c, EntryType type, int y) {
@@ -263,4 +321,7 @@ public class BibtexKeyPatternPanel extends JPanel {
         }
     }
 
+    public GridPane getPanel() {
+        return gridPane;
+    }
 }

@@ -88,6 +88,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         this.prefs = Objects.requireNonNull(prefs);
         setLayout(new BorderLayout());
 
+
+
         TableModel tableModel = new AbstractTableModel() {
 
             @Override

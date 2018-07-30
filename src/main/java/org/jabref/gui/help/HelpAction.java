@@ -17,6 +17,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 
+import com.sun.star.presentation.ClickAction;
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
 import org.jabref.Globals;
 import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.gui.actions.SimpleCommand;
@@ -110,11 +114,20 @@ public class HelpAction extends MnemonicAwareAction {
         openHelpPage(helpPage);
     }
 
-    public static SimpleCommand getCommand() {
+    public static SimpleCommand getMainHelpPageCommand() {
         return new SimpleCommand() {
             @Override
             public void execute() {
                 openHelpPage(HelpFile.CONTENTS);
+            }
+        };
+    }
+
+    public SimpleCommand getCommand() {
+        return new SimpleCommand() {
+            @Override
+            public void execute() {
+                openHelpPage(helpPage);
             }
         };
     }

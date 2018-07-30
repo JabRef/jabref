@@ -1,34 +1,31 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Insets;
-
-import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Paint;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import java.awt.*;
 
 public class NetworkTab extends JPanel implements PrefsTab {
 
-    private final JCheckBox useProxyCheckBox;
-    private final JTextField hostnameTextField;
-    private final JTextField portTextField;
-    private final JCheckBox useAuthenticationCheckBox;
-    private final JTextField usernameTextField;
-    private final JPasswordField passwordTextField;
+    private final CheckBox useProxyCheckBox;
+    private final TextField hostnameTextField;
+    private final TextField portTextField;
+    private final CheckBox useAuthenticationCheckBox;
+    private final TextField usernameTextField;
+    private final PasswordField passwordTextField;
     private final JabRefPreferences preferences;
     private ProxyPreferences oldProxyPreferences;
     private final DialogService dialogService;
@@ -39,62 +36,57 @@ public class NetworkTab extends JPanel implements PrefsTab {
 
         setLayout(new BorderLayout());
 
-        useProxyCheckBox = new JCheckBox(Localization.lang("Use custom proxy configuration"));
+        useProxyCheckBox = new CheckBox(Localization.lang("Use custom proxy configuration"));
 
-        hostnameTextField = new JTextField();
-        hostnameTextField.setEnabled(false);
-        portTextField = new JTextField();
-        portTextField.setEnabled(false);
+        hostnameTextField = new TextField();
+        hostnameTextField.setDisable(true);
+        portTextField = new TextField();
+        portTextField.setDisable(true);
 
-        useAuthenticationCheckBox = new JCheckBox(Localization.lang("Proxy requires authentication"));
-        useAuthenticationCheckBox.setEnabled(false);
+        useAuthenticationCheckBox = new CheckBox(Localization.lang("Proxy requires authentication"));
+        useAuthenticationCheckBox.setDisable(true);
 
-        usernameTextField = new JTextField();
-        usernameTextField.setEnabled(false);
-        passwordTextField = new JPasswordField();
-        passwordTextField.setEnabled(false);
-        JLabel passwordWarningLabel = new JLabel(Localization.lang("Attention: Password is stored in plain text!"));
-        passwordWarningLabel.setEnabled(false);
-        passwordWarningLabel.setForeground(Color.RED);
+        usernameTextField = new TextField();
+        usernameTextField.setDisable(true);
+        passwordTextField = new PasswordField();
+        passwordTextField.setDisable(true);
+        Label passwordWarningLabel = new Label(Localization.lang("Attention: Password is stored in plain text!"));
+        passwordWarningLabel.setDisable(true);
+        passwordWarningLabel.setTextFill(Paint.valueOf("Red"));
 
-        Insets margin = new Insets(0, 12, 3, 0);
-        useProxyCheckBox.setMargin(margin);
-        portTextField.setMargin(margin);
-        useAuthenticationCheckBox.setMargin(margin);
 
         // Listener on useProxyCheckBox to enable and disable the proxy related settings;
-        useProxyCheckBox.addChangeListener(event -> {
-            hostnameTextField.setEnabled(useProxyCheckBox.isSelected());
-            portTextField.setEnabled(useProxyCheckBox.isSelected());
-            useAuthenticationCheckBox.setEnabled(useProxyCheckBox.isSelected());
+        useProxyCheckBox.setOnAction(event -> {
+            hostnameTextField.setDisable(!useProxyCheckBox.isSelected());
+            portTextField.setDisable(!useProxyCheckBox.isSelected());
+            useAuthenticationCheckBox.setDisable(!useProxyCheckBox.isSelected());
         });
 
-        useAuthenticationCheckBox.addChangeListener(event -> {
-            usernameTextField.setEnabled(useProxyCheckBox.isSelected() && useAuthenticationCheckBox.isSelected());
-            passwordTextField.setEnabled(useProxyCheckBox.isSelected() && useAuthenticationCheckBox.isSelected());
-            passwordWarningLabel.setEnabled(useProxyCheckBox.isSelected() && useAuthenticationCheckBox.isSelected());
+        useAuthenticationCheckBox.setOnAction(event -> {
+            usernameTextField.setDisable(!useProxyCheckBox.isSelected() || !useAuthenticationCheckBox.isSelected());
+            passwordTextField.setDisable(!useProxyCheckBox.isSelected() || !useAuthenticationCheckBox.isSelected());
+            passwordWarningLabel.setDisable(!useProxyCheckBox.isSelected() || !useAuthenticationCheckBox.isSelected());
         });
 
-        FormLayout layout = new FormLayout("8dlu, left:pref, 4dlu, left:pref, 4dlu, fill:150dlu",
-                "p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p, p");
-        FormBuilder builder = FormBuilder.create().layout(layout);
+        GridPane builder = new GridPane();
 
-        builder.addSeparator(Localization.lang("Network")).xyw(1, 1, 6);
-        builder.add(useProxyCheckBox).xyw(2, 3, 5);
-        builder.add(Localization.lang("Hostname") + ':').xy(2, 5);
-        builder.add(hostnameTextField).xyw(4, 5, 3);
-        builder.add(Localization.lang("Port") + ':').xy(2, 7);
-        builder.add(portTextField).xyw(4, 7, 3);
-        builder.add(useAuthenticationCheckBox).xyw(4, 9, 3);
-        builder.add(Localization.lang("Username") + ':').xy(4, 11);
-        builder.add(usernameTextField).xy(6, 11);
-        builder.add(Localization.lang("Password") + ':').xy(4, 13);
-        builder.add(passwordTextField).xy(6, 13);
-        builder.add(passwordWarningLabel).xy(6, 14);
+        builder.add(new Label(Localization.lang("Network")),1,1);
+        builder.add(new Separator(),2,1);
+        builder.add(useProxyCheckBox,2,2);
+        builder.add(new Label(Localization.lang("    Hostname") + ':'),1,3);
+        builder.add(hostnameTextField,2,3);
+        builder.add(new Label(Localization.lang("    Port") + ':'),1,4);
+        builder.add(portTextField,2,4);
+        builder.add(useAuthenticationCheckBox,2,5);
+        builder.add(new Label(Localization.lang("Username") + ':'),2,6);
+        builder.add(usernameTextField,3,6);
+        builder.add(new Label(Localization.lang("Password") + ':'),2,7);
+        builder.add(passwordTextField,3,7);
+        builder.add(passwordWarningLabel,3,8);
 
-        JPanel pan = builder.getPanel();
-        pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        add(pan, BorderLayout.CENTER);
+        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
+        setLayout(new BorderLayout());
+        add(panel, BorderLayout.CENTER);
     }
 
     @Override
@@ -118,7 +110,7 @@ public class NetworkTab extends JPanel implements PrefsTab {
         String port = portTextField.getText().trim();
         Boolean useAuthentication = useAuthenticationCheckBox.isSelected();
         String username = usernameTextField.getText().trim();
-        String password = new String(passwordTextField.getPassword());
+        String password = passwordTextField.getText();
         ProxyPreferences proxyPreferences = new ProxyPreferences(useProxy, hostname, port, useAuthentication, username,
                 password);
         if (!proxyPreferences.equals(oldProxyPreferences)) {
@@ -147,9 +139,9 @@ public class NetworkTab extends JPanel implements PrefsTab {
             }
             if (useAuthenticationCheckBox.isSelected()) {
                 String userName = usernameTextField.getText();
-                char[] password = passwordTextField.getPassword();
+                char[] password = passwordTextField.getText().toCharArray();
                 // no empty proxy passwords currently supported (they make no sense in this case anyway)
-                if ((userName == null) || userName.trim().isEmpty() || (password == null) || (password.length == 0)) {
+                if ((userName == null) || userName.trim().isEmpty()  || (password.length == 0)) {
                     validAuthenticationSetting = false;
                     validSetting = false;
                 } else {

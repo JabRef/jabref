@@ -128,7 +128,7 @@ public class MedlineFetcherTest {
 
     @Test
     public void testGetHelpPage() {
-        assertEquals("Medline", fetcher.getHelpPage().getPageName());
+        assertEquals("Medline", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test

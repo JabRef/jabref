@@ -1,53 +1,50 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
-
+import javafx.collections.FXCollections;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import org.jabref.Globals;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import java.awt.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 class TablePrefsTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
 
-    private final JCheckBox autoResizeMode;
-    private final JCheckBox priDesc;
-    private final JCheckBox secDesc;
-    private final JCheckBox terDesc;
+    private final CheckBox autoResizeMode;
+    private final CheckBox priDesc;
+    private final CheckBox secDesc;
+    private final CheckBox terDesc;
 
-    private final JRadioButton namesAsIs;
-    private final JRadioButton namesFf;
-    private final JRadioButton namesFl;
-    private final JRadioButton namesNatbib;
-    private final JRadioButton abbrNames;
-    private final JRadioButton noAbbrNames;
-    private final JRadioButton lastNamesOnly;
+    private final RadioButton namesAsIs;
+    private final RadioButton namesFf;
+    private final RadioButton namesFl;
+    private final RadioButton namesNatbib;
+    private final RadioButton abbrNames;
+    private final RadioButton noAbbrNames;
+    private final RadioButton lastNamesOnly;
 
-    private final JTextField priField;
-    private final JTextField secField;
-    private final JTextField terField;
-    private final JTextField numericFields;
-    private final JComboBox<String> priSort;
-    private final JComboBox<String> secSort;
-    private final JComboBox<String> terSort;
+    private final TextField priField;
+    private final TextField secField;
+    private final TextField terField;
+    private final TextField numericFields;
+    private final ComboBox priSort;
+    private final ComboBox secSort;
+    private final ComboBox terSort;
 
 
     /**
@@ -71,131 +68,97 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         fieldNames.add(BibEntry.KEY_FIELD);
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
-        priSort = new JComboBox<>(allPlusKey);
-        secSort = new JComboBox<>(allPlusKey);
-        terSort = new JComboBox<>(allPlusKey);
+        priSort = new ComboBox<>(FXCollections.observableArrayList(allPlusKey));
+        secSort = new ComboBox<>(FXCollections.observableArrayList(allPlusKey));
+        terSort = new ComboBox<>(FXCollections.observableArrayList(allPlusKey));
 
-        autoResizeMode = new JCheckBox(Localization.lang("Fit table horizontally on screen"));
+        autoResizeMode = new CheckBox(Localization.lang("Fit table horizontally on screen"));
 
-        namesAsIs = new JRadioButton(Localization.lang("Show names unchanged"));
-        namesFf = new JRadioButton(Localization.lang("Show 'Firstname Lastname'"));
-        namesFl = new JRadioButton(Localization.lang("Show 'Lastname, Firstname'"));
-        namesNatbib = new JRadioButton(Localization.lang("Natbib style"));
-        noAbbrNames = new JRadioButton(Localization.lang("Do not abbreviate names"));
-        abbrNames = new JRadioButton(Localization.lang("Abbreviate names"));
-        lastNamesOnly = new JRadioButton(Localization.lang("Show last names only"));
+        namesAsIs = new RadioButton(Localization.lang("Show names unchanged"));
+        namesFf = new RadioButton(Localization.lang("Show 'Firstname Lastname'"));
+        namesFl = new RadioButton(Localization.lang("Show 'Lastname, Firstname'"));
+        namesNatbib = new RadioButton(Localization.lang("Natbib style"));
+        noAbbrNames = new RadioButton(Localization.lang("Do not abbreviate names"));
+        abbrNames = new RadioButton(Localization.lang("Abbreviate names"));
+        lastNamesOnly = new RadioButton(Localization.lang("Show last names only"));
 
-        priField = new JTextField(10);
-        secField = new JTextField(10);
-        terField = new JTextField(10);
+        priField = new TextField();
+        secField = new TextField();
+        terField = new TextField();
 
-        numericFields = new JTextField(30);
+        numericFields = new TextField();
 
-        priSort.insertItemAt(Localization.lang("<select>"), 0);
-        secSort.insertItemAt(Localization.lang("<select>"), 0);
-        terSort.insertItemAt(Localization.lang("<select>"), 0);
+        priSort.setValue("<select>");
+        secSort.setValue("<select>");
+        terSort.setValue("<select>");
 
-        priSort.addActionListener(e -> {
-            if (priSort.getSelectedIndex() > 0) {
-                priField.setText(priSort.getSelectedItem().toString());
-                priSort.setSelectedIndex(0);
+        priSort.setOnAction(e -> {
+            if (priSort.getBaselineOffset() > 0) {
+                priField.setText(priSort.getItems().toString());
             }
         });
-        secSort.addActionListener(e -> {
-            if (secSort.getSelectedIndex() > 0) {
-                secField.setText(secSort.getSelectedItem().toString());
-                secSort.setSelectedIndex(0);
+        secSort.setOnAction(e -> {
+            if (secSort.getBaselineOffset() > 0) {
+                secField.setText(secSort.getItems().toString());
             }
         });
-        terSort.addActionListener(e -> {
-            if (terSort.getSelectedIndex() > 0) {
-                terField.setText(terSort.getSelectedItem().toString());
-                terSort.setSelectedIndex(0);
+        terSort.setOnAction(e -> {
+            if (terSort.getBaselineOffset() > 0) {
+                terField.setText(terSort.getItems().toString());
             }
         });
 
-        ButtonGroup nameStyle = new ButtonGroup();
-        nameStyle.add(namesAsIs);
-        nameStyle.add(namesNatbib);
-        nameStyle.add(namesFf);
-        nameStyle.add(namesFl);
-        ButtonGroup nameAbbrev = new ButtonGroup();
-        nameAbbrev.add(lastNamesOnly);
-        nameAbbrev.add(abbrNames);
-        nameAbbrev.add(noAbbrNames);
-        priDesc = new JCheckBox(Localization.lang("Descending"));
-        secDesc = new JCheckBox(Localization.lang("Descending"));
-        terDesc = new JCheckBox(Localization.lang("Descending"));
+        priDesc = new CheckBox(Localization.lang("Descending"));
+        secDesc = new CheckBox(Localization.lang("Descending"));
+        terDesc = new CheckBox(Localization.lang("Descending"));
 
-        FormLayout layout = new FormLayout(
-                "1dlu, 8dlu, left:pref, 4dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, fill:pref", "");
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        JLabel lab;
-        JPanel pan = new JPanel();
+        GridPane builder = new GridPane();
+        builder.add(new Label(Localization.lang("Format of author and editor name:")),1,1);
+        builder.add(namesAsIs,1,2);
+        builder.add(noAbbrNames,2,2);
+        builder.add(namesFf,1,3);
+        builder.add(abbrNames,2,3);
+        builder.add(namesFl,1,4);
+        builder.add(lastNamesOnly,2,4);
 
-        builder.appendSeparator(Localization.lang("Format of author and editor names"));
-        DefaultFormBuilder nameBuilder = new DefaultFormBuilder(new FormLayout(
-                "left:pref, 8dlu, left:pref", ""));
+        builder.add(namesNatbib,1,5);
 
-        nameBuilder.append(namesAsIs);
-        nameBuilder.append(noAbbrNames);
-        nameBuilder.nextLine();
-        nameBuilder.append(namesFf);
-        nameBuilder.append(abbrNames);
-        nameBuilder.nextLine();
-        nameBuilder.append(namesFl);
-        nameBuilder.append(lastNamesOnly);
-        nameBuilder.nextLine();
-        nameBuilder.append(namesNatbib);
-        builder.append(pan);
-        builder.append(nameBuilder.getPanel());
-        builder.nextLine();
 
-        builder.appendSeparator(Localization.lang("Default sort criteria"));
+        builder.add(new Label(Localization.lang("Default sort criteria")),1,6);
         // Create a new panel with its own FormLayout for these items:
-        FormLayout layout2 = new FormLayout(
-                "left:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref", "");
-        DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
-        lab = new JLabel(Localization.lang("Primary sort criterion"));
-        builder2.append(lab);
-        builder2.append(priSort);
-        builder2.append(priField);
-        builder2.append(priDesc);
-        builder2.nextLine();
-        lab = new JLabel(Localization.lang("Secondary sort criterion"));
-        builder2.append(lab);
-        builder2.append(secSort);
-        builder2.append(secField);
-        builder2.append(secDesc);
-        builder2.nextLine();
-        lab = new JLabel(Localization.lang("Tertiary sort criterion"));
-        builder2.append(lab);
-        builder2.append(terSort);
-        builder2.append(terField);
-        builder2.append(terDesc);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(builder2.getPanel());
-        builder.nextLine();
-        builder.append(pan);
-        builder2 = new DefaultFormBuilder(new FormLayout("left:pref, 8dlu, fill:pref", ""));
-        builder2.append(Localization.lang("Sort the following fields as numeric fields") + ':');
-        builder2.append(numericFields);
-        builder.append(builder2.getPanel(), 5);
-        builder.nextLine();
-        builder.appendSeparator(Localization.lang("General"));
-        builder.append(pan);
-        builder.append(autoResizeMode);
-        builder.nextLine();
+        Label lab = new Label();
+        lab = new Label(Localization.lang("    Primary sort criterion"));
+        builder.add(lab,1,7);
+        builder.add(priSort,2,7);
+        builder.add(priField,3,7);
+        builder.add(priDesc,4,7);
 
-        pan = builder.getPanel();
-        pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        add(pan, BorderLayout.CENTER);
+        lab = new Label(Localization.lang("    Secondary sort criterion"));
+        builder.add(lab,1,8);
+        builder.add(secSort,2,8);
+        builder.add(secField,3,8);
+        builder.add(secDesc,4,8);
 
-        namesNatbib.addChangeListener(e -> {
-            abbrNames.setEnabled(!namesNatbib.isSelected());
-            lastNamesOnly.setEnabled(!namesNatbib.isSelected());
-            noAbbrNames.setEnabled(!namesNatbib.isSelected());
+        lab = new Label(Localization.lang("    Tertiary sort criterion"));
+        builder.add(lab,1,9);
+        builder.add(terSort,2,9);
+        builder.add(terField,3,9);
+        builder.add(terDesc,4,9);
+
+
+        builder.add(new Label(Localization.lang("    Sort the following fields as numeric fields") + ':'),1,10);
+        builder.add(numericFields,2,10);
+
+        builder.add(new Label(Localization.lang("General")),1,11);
+        builder.add(autoResizeMode,1,12);
+        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
+        setLayout(new BorderLayout());
+        add(panel, BorderLayout.CENTER);
+
+        namesNatbib.setOnAction(e -> {
+            abbrNames.setDisable(namesNatbib.isSelected());
+            lastNamesOnly.setDisable(namesNatbib.isSelected());
+            noAbbrNames.setDisable(namesNatbib.isSelected());
         });
     }
 
@@ -206,9 +169,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         priField.setText(prefs.get(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD));
         secField.setText(prefs.get(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD));
         terField.setText(prefs.get(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD));
-        priSort.setSelectedIndex(0);
-        secSort.setSelectedIndex(0);
-        terSort.setSelectedIndex(0);
+
 
         if (prefs.getBoolean(JabRefPreferences.NAMES_AS_IS)) {
             namesAsIs.setSelected(true);
@@ -230,9 +191,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         secDesc.setSelected(prefs.getBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING));
         terDesc.setSelected(prefs.getBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING));
 
-        abbrNames.setEnabled(!namesNatbib.isSelected());
-        lastNamesOnly.setEnabled(!namesNatbib.isSelected());
-        noAbbrNames.setEnabled(!namesNatbib.isSelected());
+        abbrNames.setDisable(namesNatbib.isSelected());
+        lastNamesOnly.setDisable(namesNatbib.isSelected());
+        noAbbrNames.setDisable(namesNatbib.isSelected());
 
         String numF = prefs.get(JabRefPreferences.NUMERIC_FIELDS);
         if (numF == null) {

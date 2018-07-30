@@ -254,7 +254,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
             // groupSidePane.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
             //previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
-            //generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GeneralFetcher.class));
+            //generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(WebSearchPane.class));
             //openOfficePanel.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
             // TODO: Can't notify focus listener since it is expecting a swing component
             //Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
@@ -278,7 +278,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         }
 
         initShowTrackingNotification();
-
     }
 
     private void initKeyBindings() {
@@ -309,6 +308,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                     case DEFAULT_TABLE_FONT_SIZE:
                         setDefaultTableFontSize();
                         event.consume();
+                        break;
+                    case SEARCH:
+                        getGlobalSearchBar().focus();
                         break;
                     default:
                 }
@@ -395,7 +397,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
      * The MacAdapter calls this method when "About" is selected from the application menu.
      */
     public void about() {
-        HelpAction.getCommand().execute();
+        HelpAction.getMainHelpPageCommand().execute();
     }
 
     public JabRefPreferences prefs() {
@@ -922,7 +924,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         );
 
         help.getItems().addAll(
-                factory.createMenuItem(StandardActions.HELP, HelpAction.getCommand()),
+                factory.createMenuItem(StandardActions.HELP, HelpAction.getMainHelpPageCommand()),
                 factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction("http://discourse.jabref.org/")),
 
                 new SeparatorMenuItem(),
@@ -1419,7 +1421,6 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
         @Override
         public void execute() {
-            LOGGER.debug(Globals.getFocusListener().getFocused().toString());
             JComponent source = Globals.getFocusListener().getFocused();
             Action action = source.getActionMap().get(command);
             if (action != null) {

@@ -1,107 +1,66 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
-
+import javafx.embed.swing.JFXPanel;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import java.awt.*;
 
 class GroupsPrefsTab extends JPanel implements PrefsTab {
 
-    private final JCheckBox hideNonHits = new JCheckBox(Localization.lang("Hide non-hits"));
-    private final JCheckBox grayOut = new JCheckBox(Localization.lang("Gray out non-hits"));
-    private final JCheckBox autoAssignGroup = new JCheckBox(Localization.lang("Automatically assign new entry to selected groups"));
-    private final JRadioButton multiSelectionModeIntersection = new JRadioButton(Localization.lang("Intersection"));
-    private final JRadioButton multiSelectionModeUnion = new JRadioButton(Localization.lang("Union"));
+    private final CheckBox hideNonHits = new CheckBox(Localization.lang("Hide non-hits"));
+    private final CheckBox grayOut = new CheckBox(Localization.lang("Gray out non-hits"));
+    private final CheckBox autoAssignGroup = new CheckBox(Localization.lang("Automatically assign new entry to selected groups"));
+    private final RadioButton multiSelectionModeIntersection = new RadioButton(Localization.lang("Intersection"));
+    private final RadioButton multiSelectionModeUnion = new RadioButton(Localization.lang("Union"));
 
-    private final JTextField groupingField = new JTextField(20);
-    private final JTextField keywordSeparator = new JTextField(2);
+    private final TextField groupingField = new TextField();
+    private final TextField keywordSeparator = new TextField();
 
     private final JabRefPreferences prefs;
 
     public GroupsPrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
 
-        keywordSeparator.addFocusListener(new FocusListener() {
-
+        keywordSeparator.setOnAction(new EventHandler<ActionEvent>() {
             @Override
-            public void focusGained(FocusEvent e) {
+            public void handle(ActionEvent event) {
                 keywordSeparator.selectAll();
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                // deselection is automatic
             }
         });
 
-        ButtonGroup hideMode = new ButtonGroup();
-        hideMode.add(grayOut);
-        hideMode.add(hideNonHits);
 
-        ButtonGroup multiSelectionMode = new ButtonGroup();
-        multiSelectionMode.add(multiSelectionModeIntersection);
-        multiSelectionMode.add(multiSelectionModeUnion);
-        multiSelectionModeIntersection.setToolTipText(Localization.lang("Display only entries belonging to all selected groups."));
-        multiSelectionModeUnion.setToolTipText(Localization.lang("Display all entries belonging to one or more of the selected groups."));
+        multiSelectionModeIntersection.setText(Localization.lang("Display only entries belonging to all selected groups."));
+        multiSelectionModeUnion.setText(Localization.lang("Display all entries belonging to one or more of the selected groups."));
 
-        FormLayout layout = new FormLayout("9dlu, pref", //500px",
-                                           "p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p");
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        builder.appendSeparator(Localization.lang("View"));
-        builder.nextLine();
-        builder.nextLine();
-        builder.nextColumn();
-        builder.append(hideNonHits);
-        builder.nextLine();
-        builder.nextLine();
-        builder.nextColumn();
-        builder.append(grayOut);
-        builder.nextLine();
-        builder.nextLine();
-        builder.nextColumn();
-        builder.append(multiSelectionModeIntersection);
-        builder.nextLine();
-        builder.nextLine();
-        builder.nextColumn();
-        builder.append(multiSelectionModeUnion);
-        builder.nextLine();
-        builder.nextLine();
-        builder.nextColumn();
-        builder.append(autoAssignGroup);
-        builder.nextLine();
-        builder.nextLine();
-        builder.appendSeparator(Localization.lang("Dynamic groups"));
-        builder.nextLine();
-        builder.nextLine();
-        builder.nextColumn();
-        // build subcomponent
-        FormLayout layout2 = new FormLayout("left:pref, 2dlu, left:pref", "p, 3dlu, p");
-        DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
-        builder2.append(new JLabel(Localization.lang("Default grouping field") + ":"));
-        builder2.append(groupingField);
-        builder2.nextLine();
-        builder2.nextLine();
-        builder2.append(new JLabel(Localization.lang("When adding/removing keywords, separate them by") + ":"));
-        builder2.append(keywordSeparator);
-        builder.append(builder2.getPanel());
+        GridPane builder = new GridPane();
 
+        builder.add(new Label(Localization.lang("View")),1,1);
+        builder.add(hideNonHits,2,2);
+        builder.add(grayOut,2,3);
+        builder.add(multiSelectionModeIntersection,2,4);
+        builder.add(multiSelectionModeUnion,2,5);
+        builder.add(autoAssignGroup,2,6);
+        builder.add(new Label(Localization.lang("Dynamic groups")),1,7);
+
+        builder.add(new Label(Localization.lang("    Default grouping field") + ":"),1,8);
+        builder.add(groupingField,2,8);
+        builder.add(new Label(Localization.lang("    When adding/removing keywords, separate them by") + ":"),1,9);
+        builder.add(keywordSeparator,2,9);
+
+        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
         setLayout(new BorderLayout());
-        JPanel panel = builder.getPanel();
-        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(panel, BorderLayout.CENTER);
     }
 

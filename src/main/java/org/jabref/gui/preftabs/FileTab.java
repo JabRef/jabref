@@ -1,23 +1,15 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ItemListener;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
-
+import javafx.collections.FXCollections;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -28,8 +20,11 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import java.awt.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Preferences tab for file options. These options were moved out from GeneralTab to
@@ -40,101 +35,90 @@ class FileTab extends JPanel implements PrefsTab {
     private final DialogService dialogService;
     private final JabRefPreferences prefs;
 
-    private final JCheckBox backup;
-    private final JCheckBox localAutoSave;
-    private final JCheckBox openLast;
-    private final JComboBox<String> newlineSeparator;
-    private final JCheckBox reformatFileOnSaveAndExport;
-    private final JRadioButton resolveStringsStandard;
-    private final JRadioButton resolveStringsAll;
-    private final JTextField nonWrappableFields;
-    private final JTextField doNotResolveStringsFor;
+    private final CheckBox backup;
+    private final CheckBox localAutoSave;
+    private final CheckBox openLast;
+    private final ComboBox newlineSeparator;
+    private final CheckBox reformatFileOnSaveAndExport;
+    private final RadioButton resolveStringsStandard;
+    private final RadioButton resolveStringsAll;
+    private final TextField nonWrappableFields;
+    private final TextField doNotResolveStringsFor;
 
-    private final JTextField fileDir;
-    private final JCheckBox bibLocAsPrimaryDir;
-    private final JCheckBox runAutoFileSearch;
-    private final JCheckBox allowFileAutoOpenBrowse;
-    private final JRadioButton useRegExpComboBox;
-    private final JRadioButton matchExactKeyOnly = new JRadioButton(
+    private final TextField fileDir;
+    private final CheckBox bibLocAsPrimaryDir;
+    private final CheckBox runAutoFileSearch;
+    private final CheckBox allowFileAutoOpenBrowse;
+    private final RadioButton useRegExpComboBox;
+    private final RadioButton matchExactKeyOnly = new RadioButton(
             Localization.lang("Autolink only files that match the BibTeX key"));
-    private final JRadioButton matchStartsWithKey = new JRadioButton(
+    private final RadioButton matchStartsWithKey = new RadioButton(
             Localization.lang("Autolink files with names starting with the BibTeX key"));
-    private final JTextField regExpTextField;
+    private final TextField regExpTextField;
 
     public FileTab(DialogService dialogService, JabRefPreferences prefs) {
         this.dialogService = dialogService;
         this.prefs = prefs;
 
-        fileDir = new JTextField(25);
-        bibLocAsPrimaryDir = new JCheckBox(Localization.lang("Use the BIB file location as primary file directory"));
-        bibLocAsPrimaryDir.setToolTipText(Localization.lang("When downloading files, or moving linked files to the "
+        fileDir = new TextField();
+        bibLocAsPrimaryDir = new CheckBox(Localization.lang("Use the BIB file location as primary file directory"));
+        bibLocAsPrimaryDir.setText(Localization.lang("When downloading files, or moving linked files to the "
                 + "file directory, prefer the BIB file location rather than the file directory set above"));
-        runAutoFileSearch = new JCheckBox(
+        runAutoFileSearch = new CheckBox(
                 Localization.lang("When opening file link, search for matching file if no link is defined"));
-        allowFileAutoOpenBrowse = new JCheckBox(
+        allowFileAutoOpenBrowse = new CheckBox(
                 Localization.lang("Automatically open browse dialog when creating new file link"));
-        regExpTextField = new JTextField(25);
-        useRegExpComboBox = new JRadioButton(Localization.lang("Use regular expression search"));
-        ItemListener regExpListener = e -> regExpTextField.setEditable(useRegExpComboBox.isSelected());
-        useRegExpComboBox.addItemListener(regExpListener);
-        ButtonGroup buttonGroup = new ButtonGroup();
-        buttonGroup.add(matchExactKeyOnly);
-        buttonGroup.add(matchStartsWithKey);
-        buttonGroup.add(useRegExpComboBox);
+        regExpTextField = new TextField();
+        useRegExpComboBox = new RadioButton(Localization.lang("Use regular expression search"));
+        useRegExpComboBox.setOnAction(e -> regExpTextField.setEditable(useRegExpComboBox.isSelected()));
 
-        openLast = new JCheckBox(Localization.lang("Open last edited libraries at startup"));
-        backup = new JCheckBox(Localization.lang("Backup old file when saving"));
-        localAutoSave = new JCheckBox(Localization.lang("Autosave local libraries"));
-        resolveStringsAll = new JRadioButton(Localization.lang("Resolve strings for all fields except") + ":");
-        resolveStringsStandard = new JRadioButton(Localization.lang("Resolve strings for standard BibTeX fields only"));
-        ButtonGroup bg = new ButtonGroup();
-        bg.add(resolveStringsAll);
-        bg.add(resolveStringsStandard);
+
+        openLast = new CheckBox(Localization.lang("Open last edited libraries at startup"));
+        backup = new CheckBox(Localization.lang("Backup old file when saving"));
+        localAutoSave = new CheckBox(Localization.lang("Autosave local libraries"));
+        resolveStringsAll = new RadioButton(Localization.lang("Resolve strings for all fields except") + ":");
+        resolveStringsStandard = new RadioButton(Localization.lang("Resolve strings for standard BibTeX fields only"));
 
         // This is sort of a quick hack
-        newlineSeparator = new JComboBox<>(new String[] {"CR", "CR/LF", "LF"});
+        newlineSeparator = new ComboBox<>(FXCollections.observableArrayList("CR", "CR/LF", "LF"));
 
-        reformatFileOnSaveAndExport = new JCheckBox(Localization.lang("Always reformat BIB file on save and export"));
+        reformatFileOnSaveAndExport = new CheckBox(Localization.lang("Always reformat BIB file on save and export"));
 
-        nonWrappableFields = new JTextField(25);
-        doNotResolveStringsFor = new JTextField(30);
+        nonWrappableFields = new TextField();
+        doNotResolveStringsFor = new TextField();
 
-        FormLayout layout = new FormLayout("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", ""); // left:pref, 4dlu, fill:pref
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+        GridPane builder = new GridPane();
 
-        builder.appendSeparator(Localization.lang("General"));
-        builder.nextLine();
-        builder.append(openLast, 3);
-        builder.nextLine();
-        builder.append(backup, 3);
-        builder.nextLine();
+        builder.add(new Label(Localization.lang("General")),1,1);
+        builder.add(openLast, 1,2);
+        builder.add(backup,1, 3);
 
-        JLabel label = new JLabel(Localization.lang("Do not wrap the following fields when saving") + ":");
-        builder.append(label);
-        builder.append(nonWrappableFields);
-        builder.nextLine();
-        builder.append(resolveStringsStandard, 3);
-        builder.nextLine();
-        builder.append(resolveStringsAll);
-        builder.append(doNotResolveStringsFor);
-        builder.nextLine();
 
-        JLabel lab = new JLabel(Localization.lang("Newline separator") + ":");
-        builder.append(lab);
-        builder.append(newlineSeparator);
-        builder.nextLine();
+        Label label = new Label(Localization.lang("Do not wrap the following fields when saving") + ":");
+        builder.add(label,1,4);
+        builder.add(nonWrappableFields,2,4);
 
-        builder.append(reformatFileOnSaveAndExport, 3);
-        builder.nextLine();
+        builder.add(resolveStringsStandard, 1,5);
+        builder.add(resolveStringsAll,1,6);
+        builder.add(doNotResolveStringsFor,2,6);
 
-        builder.appendSeparator(Localization.lang("External file links"));
-        builder.nextLine();
-        lab = new JLabel(Localization.lang("Main file directory") + ':');
-        builder.append(lab);
-        builder.append(fileDir);
 
-        JButton browse = new JButton(Localization.lang("Browse"));
-        browse.addActionListener(e -> {
+        Label lab = new Label(Localization.lang("Newline separator") + ":");
+        builder.add(lab,1,7);
+        builder.add(newlineSeparator,2,7);
+
+
+        builder.add(reformatFileOnSaveAndExport, 1,8);
+
+
+        builder.add(new Label(Localization.lang("External file links")),1,10);
+
+        lab = new Label(Localization.lang("Main file directory") + ':');
+        builder.add(lab,1,11);
+        builder.add(fileDir,2,11);
+
+        Button browse = new Button(Localization.lang("Browse"));
+        browse.setOnAction(e -> {
 
             DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                     .withInitialDirectory(Paths.get(fileDir.getText())).build();
@@ -143,41 +127,35 @@ class FileTab extends JPanel implements PrefsTab {
                     .ifPresent(f -> fileDir.setText(f.toString()));
 
         });
-        builder.append(browse);
+        builder.add(browse,3,11);
 
-        builder.nextLine();
-        builder.append(bibLocAsPrimaryDir, 3);
-        builder.nextLine();
-        builder.append(matchStartsWithKey, 3);
-        builder.nextLine();
-        builder.append(matchExactKeyOnly, 3);
-        builder.nextLine();
-        builder.append(useRegExpComboBox);
-        builder.append(regExpTextField);
 
-        builder.append(new HelpAction(Localization.lang("Help on regular expression search"),
-                HelpFile.REGEX_SEARCH)
-                        .getHelpButton());
-        builder.nextLine();
-        builder.append(runAutoFileSearch, 3);
-        builder.nextLine();
-        builder.append(allowFileAutoOpenBrowse);
-        builder.nextLine();
+        builder.add(bibLocAsPrimaryDir, 1,12);
+        builder.add(matchStartsWithKey, 1,13);
+        builder.add(matchExactKeyOnly, 1,14);
+        builder.add(useRegExpComboBox,1,15);
+        builder.add(regExpTextField,2,15);
 
-        builder.appendSeparator(Localization.lang("Autosave"));
-        builder.append(localAutoSave, 1);
-        JButton help = new HelpAction(HelpFile.AUTOSAVE).getHelpButton();
-        help.setPreferredSize(new Dimension(24, 24));
-        JPanel hPan = new JPanel();
-        hPan.setLayout(new BorderLayout());
-        hPan.add(help, BorderLayout.EAST);
-        builder.append(hPan);
-        builder.nextLine();
+        Button help = new Button("?");
+        help.setOnAction(event -> new HelpAction(Localization.lang("Help on regular expression search"),
+                HelpFile.REGEX_SEARCH).getHelpButton().doClick());
 
-        JPanel pan = builder.getPanel();
-        pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        builder.add(help,3,15);
+
+        builder.add(runAutoFileSearch, 1,16);
+        builder.add(allowFileAutoOpenBrowse,1,17);
+
+
+        builder.add(new Label(Localization.lang("Autosave")),1,18);
+        builder.add(localAutoSave, 1,19);
+        Button help1 = new Button("?");
+        help1.setOnAction(event -> new HelpAction(HelpFile.AUTOSAVE).getHelpButton().doClick());
+        builder.add(help1,2,19);
+
+
+        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
         setLayout(new BorderLayout());
-        add(pan, BorderLayout.CENTER);
+        add(panel, BorderLayout.CENTER);
     }
 
     @Override
@@ -200,12 +178,12 @@ class FileTab extends JPanel implements PrefsTab {
 
         String newline = prefs.get(JabRefPreferences.NEWLINE);
         if ("\r".equals(newline)) {
-            newlineSeparator.setSelectedIndex(0);
+            newlineSeparator.setValue("CR");
         } else if ("\n".equals(newline)) {
-            newlineSeparator.setSelectedIndex(2);
+            newlineSeparator.setValue("LF");
         } else {
             // fallback: windows standard
-            newlineSeparator.setSelectedIndex(1);
+            newlineSeparator.setValue("CR/LF");
         }
         reformatFileOnSaveAndExport.setSelected(prefs.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT));
 
@@ -230,11 +208,11 @@ class FileTab extends JPanel implements PrefsTab {
         }
 
         String newline;
-        switch (newlineSeparator.getSelectedIndex()) {
-            case 0:
+        switch (newlineSeparator.getPromptText()) {
+            case "CR":
                 newline = "\r";
                 break;
-            case 2:
+            case "LF":
                 newline = "\n";
                 break;
             default:

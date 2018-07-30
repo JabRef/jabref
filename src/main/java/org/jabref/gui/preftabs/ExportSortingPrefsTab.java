@@ -1,20 +1,21 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-
+import javafx.embed.swing.JFXPanel;
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.Separator;
+import javafx.scene.layout.GridPane;
+import javafx.scene.shape.Line;
 import org.jabref.gui.SaveOrderConfigDisplay;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import javax.swing.border.Border;
+import java.awt.*;
 
 /**
  * Preference tab for file sorting options.
@@ -23,59 +24,52 @@ class ExportSortingPrefsTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
 
-    private final JRadioButton exportInOriginalOrder;
-    private final JRadioButton exportInTableOrder;
-    private final JRadioButton exportInSpecifiedOrder;
+    private final RadioButton exportInOriginalOrder;
+    private final RadioButton exportInTableOrder;
+    private final RadioButton exportInSpecifiedOrder;
     private final SaveOrderConfigDisplay exportOrderPanel;
 
 
     public ExportSortingPrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
-        FormLayout layout = new FormLayout("4dlu, left:pref, 4dlu, fill:pref", "");
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        builder.leadingColumnOffset(1);
 
+        GridPane builder = new GridPane();
         // EXPORT SORT ORDER
         // create Components
-        exportInOriginalOrder = new JRadioButton(Localization.lang("Export entries in their original order"));
-        exportInTableOrder = new JRadioButton(Localization.lang("Export in current table sort order"));
-        exportInSpecifiedOrder = new JRadioButton(Localization.lang("Export entries ordered as specified"));
+        exportInOriginalOrder = new RadioButton(Localization.lang("Export entries in their original order"));
+        exportInTableOrder = new RadioButton(Localization.lang("Export in current table sort order"));
+        exportInSpecifiedOrder = new RadioButton(Localization.lang("Export entries ordered as specified"));
 
-        ButtonGroup buttonGroup = new ButtonGroup();
-        buttonGroup.add(exportInOriginalOrder);
-        buttonGroup.add(exportInTableOrder);
-        buttonGroup.add(exportInSpecifiedOrder);
 
-        ActionListener listener = new ActionListener() {
-
+        EventHandler<javafx.event.ActionEvent> listener =  new EventHandler<javafx.event.ActionEvent>() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean selected = e.getSource() == exportInSpecifiedOrder;
+            public void handle(javafx.event.ActionEvent event) {
+                boolean selected = event.getSource() == exportInSpecifiedOrder;
                 exportOrderPanel.setEnabled(selected);
             }
         };
-        exportInOriginalOrder.addActionListener(listener);
-        exportInTableOrder.addActionListener(listener);
-        exportInSpecifiedOrder.addActionListener(listener);
+        exportInOriginalOrder.setOnAction(listener);
+        exportInTableOrder.setOnAction(listener);
+        exportInSpecifiedOrder.setOnAction(listener);
 
         // create GUI
-        builder.appendSeparator(Localization.lang("Export sort order"));
-        builder.append(exportInOriginalOrder, 1);
-        builder.nextLine();
-        builder.append(exportInTableOrder, 1);
-        builder.nextLine();
-        builder.append(exportInSpecifiedOrder, 1);
-        builder.nextLine();
+        builder.add(new Label(Localization.lang("Export sort order")),1,1);
+        builder.add(new Separator(),2,1);
+        builder.add(exportInOriginalOrder, 1,2);
+        builder.add(new Line(),2,3);
+        builder.add(exportInTableOrder, 1,4);
+        builder.add(new Line(),2,5);
+        builder.add(exportInSpecifiedOrder, 1,6);
+        builder.add(new Line(),2,7);
 
         exportOrderPanel = new SaveOrderConfigDisplay();
-        builder.append(exportOrderPanel.getPanel());
-        builder.nextLine();
+        builder.add(exportOrderPanel.getJFXPanel(),2,8);
+        builder.add(new Line(),2,9);
 
         // COMBINE EVERYTHING
-        JPanel pan = builder.getPanel();
-        pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
         setLayout(new BorderLayout());
-        add(pan, BorderLayout.CENTER);
+        add(panel, BorderLayout.CENTER);
     }
 
     @Override

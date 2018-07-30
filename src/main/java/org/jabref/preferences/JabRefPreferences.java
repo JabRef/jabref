@@ -34,8 +34,6 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
-import javax.swing.UIManager;
-
 import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.JabRefMain;
@@ -115,7 +113,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String LYXPIPE = "lyxpipe";
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
     public static final String FONT_FAMILY = "fontFamily";
-    public static final String WIN_LOOK_AND_FEEL = "lookAndFeel";
     public static final String FX_FONT_RENDERING_TWEAK = "fxFontRenderingTweak";
     public static final String LANGUAGE = "language";
     public static final String NAMES_LAST_ONLY = "namesLastOnly";
@@ -217,6 +214,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String ICON_ENABLED_COLOR = "iconEnabledColor";
     public static final String ICON_DISABLED_COLOR = "iconDisabledColor";
     public static final String FONT_SIZE = "fontSize";
+    public static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
+    public static final String MAIN_FONT_SIZE = "mainFontSize";
     public static final String FONT_STYLE = "fontStyle";
     public static final String RECENT_DATABASES = "recentDatabases";
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
@@ -459,15 +458,12 @@ public class JabRefPreferences implements PreferencesService {
 
         if (OS.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
-            defaults.put(WIN_LOOK_AND_FEEL, UIManager.getSystemLookAndFeelClassName());
             defaults.put(EMACS_PATH, "emacsclient");
         } else if (OS.WINDOWS) {
-            defaults.put(WIN_LOOK_AND_FEEL, "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
             defaults.put(EMACS_PATH, "emacsclient.exe");
         } else {
             // Linux
             defaults.put(FONT_FAMILY, "SansSerif");
-            defaults.put(WIN_LOOK_AND_FEEL, "javax.swing.plaf.nimbus.NimbusLookAndFeel");
             defaults.put(EMACS_PATH, "emacsclient");
         }
 
@@ -688,6 +684,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(LAST_USED_EXPORT, "");
         defaults.put(SIDE_PANE_WIDTH, 0.15);
 
+        defaults.put(MAIN_FONT_SIZE, 9);
+        defaults.put(OVERRIDE_DEFAULT_FONT_SIZE, false);
+
         defaults.put(IMPORT_INSPECTION_DIALOG_WIDTH, 650);
         defaults.put(IMPORT_INSPECTION_DIALOG_HEIGHT, 650);
         defaults.put(SHOW_FILE_LINKS_UPGRADE_WARNING, Boolean.TRUE);
@@ -703,8 +702,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
         defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
         defaults.put(ALLOW_FILE_AUTO_OPEN_BROWSE, Boolean.TRUE);
-        defaults.put(WEB_SEARCH_VISIBLE, Boolean.FALSE);
-        defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.FALSE);
+        defaults.put(WEB_SEARCH_VISIBLE, Boolean.TRUE);
+        defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
         defaults.put(SELECTED_FETCHER_INDEX, 0);
         defaults.put(BIB_LOC_AS_PRIMARY_DIR, Boolean.FALSE);
         defaults.put(DB_CONNECT_SERVER_TYPE, "MySQL");
@@ -1034,6 +1033,10 @@ public class JabRefPreferences implements PreferencesService {
 
     public void putInt(String key, int value) {
         prefs.putInt(key, value);
+    }
+
+    public void putInt(String key, Number value) {
+        prefs.putInt(key, value.intValue());
     }
 
     public void putDouble(String key, double value) {
@@ -1894,14 +1897,6 @@ public class JabRefPreferences implements PreferencesService {
         put(GROUP_INTERSECT_UNION_VIEW_MODE, mode.name());
     }
 
-    public String getLookAndFeel() {
-        return get(WIN_LOOK_AND_FEEL);
-    }
-
-    public void setLookAndFeel(String lookAndFeelClassName) {
-        put(WIN_LOOK_AND_FEEL, lookAndFeelClassName);
-    }
-
     public void setPreviewStyle(String previewStyle) {
         put(PREVIEW_STYLE, previewStyle);
     }
@@ -1910,4 +1905,11 @@ public class JabRefPreferences implements PreferencesService {
         return get(PREVIEW_STYLE);
     }
 
+    public Optional<Integer> getFontSize() {
+        if (getBoolean(OVERRIDE_DEFAULT_FONT_SIZE)) {
+            return Optional.of(getInt(MAIN_FONT_SIZE));
+        } else {
+            return Optional.empty();
+        }
+    }
 }

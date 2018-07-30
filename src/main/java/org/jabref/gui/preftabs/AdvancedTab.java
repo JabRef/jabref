@@ -1,16 +1,18 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.util.Optional;
-
-import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.shape.Line;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -21,18 +23,18 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import java.awt.*;
+import java.util.Optional;
 
 class AdvancedTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences preferences;
-    private final JCheckBox useRemoteServer;
-    private final JCheckBox useIEEEAbrv;
-    private final JTextField remoteServerPort;
-
-    private final JCheckBox useCaseKeeperOnSearch;
-    private final JCheckBox useUnitFormatterOnSearch;
+    private final CheckBox useRemoteServer;
+    private final CheckBox useIEEEAbrv;
+    private final TextField remoteServerPort;
+    private final CheckBox useCaseKeeperOnSearch;
+    private final CheckBox useUnitFormatterOnSearch;
     private final RemotePreferences remotePreferences;
     private final DialogService dialogService;
 
@@ -41,55 +43,48 @@ class AdvancedTab extends JPanel implements PrefsTab {
         preferences = prefs;
         remotePreferences = prefs.getRemotePreferences();
 
-        useRemoteServer = new JCheckBox(Localization.lang("Listen for remote operation on port") + ':');
-        useIEEEAbrv = new JCheckBox(Localization.lang("Use IEEE LaTeX abbreviations"));
-        remoteServerPort = new JTextField();
-        useCaseKeeperOnSearch = new JCheckBox(Localization.lang("Add {} to specified title words on search to keep the correct case"));
-        useUnitFormatterOnSearch = new JCheckBox(Localization.lang("Format units by adding non-breaking separators and keeping the correct case on search"));
+        useRemoteServer = new CheckBox(Localization.lang("Listen for remote operation on port") + ':');
+        useIEEEAbrv = new CheckBox(Localization.lang("Use IEEE LaTeX abbreviations"));
+        remoteServerPort = new TextField();
+        useCaseKeeperOnSearch = new CheckBox(Localization.lang("Add {} to specified title words on search to keep the correct case"));
+        useUnitFormatterOnSearch = new CheckBox(Localization.lang("Format units by adding non-breaking separators and keeping the correct case on search"));
 
-        FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu", //, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
-                "");
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        JPanel pan = new JPanel();
+        GridPane builder = new GridPane();
+        builder.add(new Label(Localization.lang("Remote operation")),1,1);
+        builder.add(new Separator(),2,1);
+        builder.add(new Pane(),1,2);
+        builder.add(new Label(Localization.lang("This feature lets new files be opened or imported into an already running instance of JabRef instead of opening a new instance. For")),2,3);
+        builder.add(new Label(Localization.lang( "instance, this is useful when you open a file in JabRef from your web browser. ")),2,4);
+        builder.add(new Label(Localization.lang("Note that this will prevent you from running more than one instance of JabRef at a time.")),2,5);
+        builder.add(new Line(),2,6);
+        builder.add(new Pane(),2,7);
 
-        builder.appendSeparator(Localization.lang("Remote operation"));
-        builder.nextLine();
-        builder.append(new JPanel());
-        builder.append(new JLabel("<html>"
-                + Localization.lang("This feature lets new files be opened or imported into an "
-                        + "already running instance of JabRef<BR>instead of opening a new instance. For instance, this "
-                        + "is useful when you open a file in JabRef<br>from your web browser."
-                        + "<BR>Note that this will prevent you from running more than one instance of JabRef at a time.")
-                + "</html>"));
-        builder.nextLine();
-        builder.append(new JPanel());
+        HBox p = new HBox();
+        p.getChildren().add(useRemoteServer);
+        p.getChildren().add(remoteServerPort);
+        Button button = new Button("?");
+        button.setOnAction(event -> new HelpAction(HelpFile.REMOTE).getHelpButton().doClick());
+        p.getChildren().add(button);
 
-        JPanel p = new JPanel();
-        p.add(useRemoteServer);
-        p.add(remoteServerPort);
-        p.add(new HelpAction(HelpFile.REMOTE).getHelpButton());
-        builder.append(p);
+        builder.add(p,2,9);
 
-        // IEEE
-        builder.nextLine();
-        builder.appendSeparator(Localization.lang("Search %0", "IEEEXplore"));
-        builder.nextLine();
-        builder.append(new JPanel());
-        builder.append(useIEEEAbrv);
+        builder.add(new Line(),2,10);
+        builder.add(new Label((Localization.lang("Search %0", "IEEEXplore"))),1,11);
+        builder.add(new Separator(),2,11);
+        builder.add(new Pane(),2,12);
+        builder.add(useIEEEAbrv,2,13);
 
-        builder.nextLine();
-        builder.appendSeparator(Localization.lang("Import conversions"));
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(useCaseKeeperOnSearch);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(useUnitFormatterOnSearch);
+        builder.add(new Line(),2,16);
+        builder.add(new Label(Localization.lang("Import conversions")),1,17);
+        builder.add(new Separator(),2,17);
 
-        pan = builder.getPanel();
-        pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        builder.add(useCaseKeeperOnSearch,2,19);
+        builder.add(new Pane(),2,20);
+        builder.add(useUnitFormatterOnSearch,2,21);
+
+        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
         setLayout(new BorderLayout());
-        add(pan, BorderLayout.CENTER);
+        add(panel, BorderLayout.CENTER);
 
     }
 

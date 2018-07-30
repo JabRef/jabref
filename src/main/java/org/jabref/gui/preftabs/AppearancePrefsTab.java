@@ -1,20 +1,25 @@
 package org.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
-import java.awt.Font;
-import java.awt.GridBagLayout;
 
 import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
+import javafx.embed.swing.JFXPanel;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+
 import org.jabref.gui.DialogService;
-import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.customjfx.CustomJFXPanel;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +29,9 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
 
-    private final Font usedFont = GUIGlobals.currentFont;
-    private final JCheckBox fxFontTweaksLAF;
+    private final CheckBox fontTweaksLAF;
+    private final TextField fontSize;
+    private final CheckBox overrideFonts;
 
     private final DialogService dialogService;
 
@@ -39,53 +45,46 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         this.prefs = prefs;
         setLayout(new BorderLayout());
 
-        FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, fill:pref", "");
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+        overrideFonts = new CheckBox(Localization.lang("Override default font settings"));
+        fontSize = new TextField();
+        fontSize.setTextFormatter(ControlHelper.getIntegerTextFormatter());
+        Label fontSizeLabel = new Label(Localization.lang("Font size:"));
+        HBox fontSizeContainer = new HBox(fontSizeLabel, fontSize);
+        VBox.setMargin(fontSizeContainer, new Insets(0, 0, 0, 35));
+        fontSizeContainer.disableProperty().bind(overrideFonts.selectedProperty().not());
+        fontTweaksLAF = new CheckBox(Localization.lang("Tweak font rendering for entry editor on Linux"));
 
-        fxFontTweaksLAF = new JCheckBox(Localization.lang("Tweak font rendering for entry editor on Linux"));
-        // Only list L&F which are available
+        VBox container = new VBox();
+        container.getChildren().addAll(overrideFonts, fontSizeContainer, fontTweaksLAF);
 
-        // only the default L&F shows the OSX specific first drop-down menu
-
-        builder.append(fxFontTweaksLAF);
-        builder.nextLine();
-
-        builder.leadingColumnOffset(2);
-
-        JPanel upper = new JPanel();
-        JPanel sort = new JPanel();
-        JPanel namesp = new JPanel();
-        JPanel iconCol = new JPanel();
-        GridBagLayout gbl = new GridBagLayout();
-        upper.setLayout(gbl);
-        sort.setLayout(gbl);
-        namesp.setLayout(gbl);
-        iconCol.setLayout(gbl);
-
-        JPanel pan = builder.getPanel();
-        pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        add(pan, BorderLayout.CENTER);
+        JFXPanel panel = CustomJFXPanel.wrap(new Scene(container));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        add(panel, BorderLayout.CENTER);
     }
 
     @Override
     public void setValues() {
-        fxFontTweaksLAF.setSelected(prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK));
+        fontTweaksLAF.setSelected(prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK));
+        overrideFonts.setSelected(prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONT_SIZE));
+        fontSize.setText(String.valueOf(prefs.getInt(JabRefPreferences.MAIN_FONT_SIZE)));
     }
 
     @Override
     public void storeSettings() {
-        boolean isRestartRequired = false;
-
         // Java FX font rendering tweak
         final boolean oldFxTweakValue = prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK);
-        prefs.putBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK, fxFontTweaksLAF.isSelected());
-        isRestartRequired |= oldFxTweakValue != fxFontTweaksLAF.isSelected();
+        prefs.putBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK, fontTweaksLAF.isSelected());
 
-        prefs.put(JabRefPreferences.FONT_FAMILY, usedFont.getFamily());
-        prefs.putInt(JabRefPreferences.FONT_STYLE, usedFont.getStyle());
-        prefs.putInt(JabRefPreferences.FONT_SIZE, usedFont.getSize());
-        GUIGlobals.currentFont = usedFont;
+        final boolean oldOverrideDefaultFontSize = prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONT_SIZE);
+        final int oldFontSize = prefs.getInt(JabRefPreferences.MAIN_FONT_SIZE);
+        prefs.putBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONT_SIZE, overrideFonts.isSelected());
+        int newFontSize = Integer.parseInt(fontSize.getText());
+        prefs.putInt(JabRefPreferences.MAIN_FONT_SIZE, newFontSize);
 
+        boolean isRestartRequired =
+                oldFxTweakValue != fontTweaksLAF.isSelected()
+                        || oldOverrideDefaultFontSize != overrideFonts.isSelected()
+                        || oldFontSize != newFontSize;
         if (isRestartRequired) {
             dialogService.showWarningDialogAndWait(Localization.lang("Settings"),
                     Localization.lang("Some appearance settings you changed require to restart JabRef to come into effect."));
