@@ -21,16 +21,16 @@ import org.xml.sax.SAXParseException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 /**
  * Importer for the MS Office 2007 XML bibliography format
- * By S. M. Mahbub Murshed & Nicholas S. Weatherley
  *
  * ...
  */
 public class MsBibImporter extends Importer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MsBibImporter.class);
+    private static final String DISABLEDTD = "http://apache.org/xml/features/disallow-doctype-decl";
+    private static final String DISABLEEXTERNALDTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
 
     @Override
     public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
@@ -99,20 +99,20 @@ public class MsBibImporter extends Importer {
      * @return If supported, XXE safe DocumentBuilderFactory. Else, returns original builder given
      */
     private DocumentBuilderFactory makeSafeDocBuilderFactory(DocumentBuilderFactory dBuild) {
-        String FEATURE = null;
-        try {
-            FEATURE = "http://apache.org/xml/features/disallow-doctype-decl";
-            dBuild.setFeature(FEATURE, true);
+        String feature = null;
 
-            FEATURE = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-            dBuild.setFeature(FEATURE, false);
+        try {
+            feature = DISABLEDTD;
+            dBuild.setFeature(feature, true);
+
+            feature = DISABLEEXTERNALDTD;
+            dBuild.setFeature(feature, false);
 
             dBuild.setXIncludeAware(false);
             dBuild.setExpandEntityReferences(false);
 
         } catch (ParserConfigurationException e) {
-            LOGGER.warn("Builder not fully configured. ParserConfigurationException was thrown. Feature:'" +
-                        FEATURE + "' is probably not supported by current XML processor.");
+            LOGGER.warn("Builder not fully configured. Feature:'{}' is probably not supported by current XML processor. {}", feature, e);
         }
 
         return dBuild;
