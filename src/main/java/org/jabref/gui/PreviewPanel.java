@@ -142,7 +142,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
 
                 }
                 if (event.getTransferMode() == TransferMode.COPY) {
-                    System.out.println("Mode Copy"); //ctrl on win
+                    System.out.println("Mode Copy"); //ctrl on win, no modifier on Xubuntu
                     fileHandler.copyFileToFileDirAndAddToEntry(entry, files);
                     success = true;
                 }

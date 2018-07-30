@@ -112,6 +112,9 @@ public class NewDroppedFileHandler {
                 }
 
             }
+            else {
+                addToEntryAndMoveToFileDir(entry, files);
+            }
         }
     }
 
@@ -169,8 +172,8 @@ public class NewDroppedFileHandler {
 
             List<Path> filesCopiedToFileDirectory = new ArrayList<>();
             for (Path file : files) {
-                Path targetFile = firstExistingFileDir.get().resolve(file);
-                if (FileUtil.copyFile(file, firstExistingFileDir.get(), false)) {
+                Path targetFile = firstExistingFileDir.get().resolve(file.getFileName());
+                if (FileUtil.copyFile(file, targetFile, false)) {
                     filesCopiedToFileDirectory.add(targetFile);
                     System.out.println("copy to file dir " + filesCopiedToFileDirectory);
                 } else {
