@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.util.Optional;
+
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
@@ -19,8 +21,8 @@ public abstract class AbstractIsbnFetcher implements IdBasedParserFetcher {
     }
 
     @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_ISBN;
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_ISBN);
     }
 
     protected void ensureThatIsbnIsValid(String identifier) throws FetcherException {

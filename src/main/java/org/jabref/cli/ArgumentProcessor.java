@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -16,8 +15,6 @@ import java.util.prefs.BackingStoreException;
 import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.gui.externalfiles.AutoSetLinks;
-import org.jabref.gui.importer.fetcher.EntryFetcher;
-import org.jabref.gui.importer.fetcher.EntryFetchers;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -28,12 +25,15 @@ import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.SaveSession;
 import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -538,15 +538,12 @@ public class ArgumentProcessor {
 
     /**
      * Run an entry fetcher from the command line.
-     * <p>
-     * Note that this only works headlessly if the EntryFetcher does not show any GUI.
      *
-     * @param fetchCommand A string containing both the fetcher to use (id of EntryFetcherExtension minus Fetcher) and
+     * @param fetchCommand A string containing both the name of the fetcher to use and
      *                     the search query, separated by a :
      * @return A parser result containing the entries fetched or null if an error occurred.
      */
     private Optional<ParserResult> fetch(String fetchCommand) {
-
         if ((fetchCommand == null) || !fetchCommand.contains(":") || (fetchCommand.split(":").length != 2)) {
             System.out.println(Localization.lang("Expected syntax for --fetch='<name of fetcher>:<query>'"));
             System.out.println(Localization.lang("The following fetchers are available:"));
@@ -555,38 +552,36 @@ public class ArgumentProcessor {
 
         String[] split = fetchCommand.split(":");
         String engine = split[0];
-
-        EntryFetchers fetchers = new EntryFetchers(Globals.journalAbbreviationLoader);
-        EntryFetcher fetcher = null;
-        for (EntryFetcher e : fetchers.getEntryFetchers()) {
-            if (engine.equalsIgnoreCase(e.getClass().getSimpleName().replace("Fetcher", ""))) {
-                fetcher = e;
-            }
-        }
-
-        if (fetcher == null) {
-            System.out.println(Localization.lang("Could not find fetcher '%0'", engine));
-            System.out.println(Localization.lang("The following fetchers are available:"));
-
-            for (EntryFetcher e : fetchers.getEntryFetchers()) {
-                System.out.println(
-                        "  " + e.getClass().getSimpleName().replace("Fetcher", "").toLowerCase(Locale.ENGLISH));
-            }
-            return Optional.empty();
-        }
-
         String query = split[1];
-        System.out.println(Localization.lang("Running query '%0' with fetcher '%1'.", query, engine) + " "
-                + Localization.lang("Please wait..."));
-        Collection<BibEntry> result = new ImportInspectionCommandLine().query(query, fetcher);
 
-        if (result.isEmpty()) {
-            System.out.println(
-                    Localization.lang("Query '%0' with fetcher '%1' did not return any results.", query, engine));
+        List<SearchBasedFetcher> fetchers = WebFetchers.getSearchBasedFetchers(Globals.prefs.getImportFormatPreferences());
+        Optional<SearchBasedFetcher> selectedFetcher = fetchers.stream()
+                                                               .filter(fetcher -> fetcher.getName().equalsIgnoreCase(engine))
+                                                               .findFirst();
+        if (!selectedFetcher.isPresent()) {
+            System.out.println(Localization.lang("Could not find fetcher '%0'", engine));
+
+            System.out.println(Localization.lang("The following fetchers are available:"));
+            fetchers.forEach(fetcher -> System.out.println("  " + fetcher.getName()));
+
             return Optional.empty();
+        } else {
+            System.out.println(Localization.lang("Running query '%0' with fetcher '%1'.", query, engine));
+            System.out.print(Localization.lang("Please wait..."));
+            try {
+                List<BibEntry> matches = selectedFetcher.get().performSearch(query);
+                if (matches.isEmpty()) {
+                    System.out.println("\r" + Localization.lang("No results found."));
+                    return Optional.empty();
+                } else {
+                    System.out.println("\r" + Localization.lang("Found %0 results.", String.valueOf(matches.size())));
+                    return Optional.of(new ParserResult(matches));
+                }
+            } catch (FetcherException e) {
+                LOGGER.error("Error while fetching", e);
+                return Optional.empty();
+            }
         }
-
-        return Optional.of(new ParserResult(result));
     }
 
     public boolean isBlank() {
