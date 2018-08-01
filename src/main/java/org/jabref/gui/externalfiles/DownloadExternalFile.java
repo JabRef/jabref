@@ -13,7 +13,7 @@ import java.util.Optional;
 import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
+import org.jabref.logic.JabRefExecutorService;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;

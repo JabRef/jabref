@@ -1,6 +1,5 @@
 import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
-import org.jabref.build.xjc.XjcTask
 
 // to update the gradle wrapper, execute
 // ./gradlew wrapper --gradle-version=4.4.1 --distribution-type=bin
@@ -41,7 +40,6 @@ apply plugin: 'install4j'
 apply plugin: 'me.champeau.gradle.jmh'
 //apply plugin: 'checkstyle'
 apply plugin: org.jabref.build.antlr.AntlrPlugin
-apply plugin: org.jabref.build.xjc.XjcPlugin
 
 apply from: 'eclipse.gradle'
 apply from: 'localization.gradle'
@@ -87,10 +85,6 @@ ext.allowJava9 = true
 
 sourceSets {
     main {
-        java {
-            srcDirs = ["src/main/java", "src/main/gen"]
-        }
-
         resources {
             srcDirs = ["src/main/java", "src/main/resources"]
         }
@@ -105,12 +99,11 @@ configurations {
 
 // FIXME: bug in chainsaw does not build multi module projects in right order
 compileJava.dependsOn ":jabref-model:assemble"
+compileJava.dependsOn ":jabref-logic:assemble"
 
 dependencies {
     compile project(':jabref-model')
-
-    // Include all jar-files in the 'lib' folder as dependencies
-    compile fileTree(dir: 'lib', includes: ['*.jar'])
+    compile project(':jabref-logic')
 
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
@@ -130,17 +123,6 @@ dependencies {
     compile "org.libreoffice:ridl:5.4.2"
     compile "org.libreoffice:unoil:5.4.2"*/
 
-    compile 'io.github.java-diff-utils:java-diff-utils:2.2.0'
-    compile 'info.debatty:java-string-similarity:1.1.0'
-
-    antlr3 'org.antlr:antlr:3.5.2'
-    compile 'org.antlr:antlr-runtime:3.5.2'
-
-    // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
-    compile 'mysql:mysql-connector-java:5.1.46'
-
-    compile 'org.postgresql:postgresql:42.2.4'
-
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
     compile 'com.google.guava:guava:25.1-jre'
@@ -148,8 +130,6 @@ dependencies {
     compile group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
 
     // JavaFX stuff
-    compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
-    compile 'de.jensd:fontawesomefx-commons:9.1.2'
     compile 'de.saxsys:mvvmfx-validation:1.7.0'
     compile 'de.saxsys:mvvmfx:1.7.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
@@ -161,9 +141,6 @@ dependencies {
     // Cannot be updated to 9.*.* until Jabref works with Java 9
     compile 'org.controlsfx:controlsfx:9.0.0'
 
-    compile 'org.jsoup:jsoup:1.11.3'
-    compile 'com.mashape.unirest:unirest-java:1.4.9'
-
     // >1.8.0-beta is required for java 9 compatibility
     compile 'org.slf4j:slf4j-api:1.8.0-beta2'
     compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.0'
@@ -174,11 +151,6 @@ dependencies {
     // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
     compile 'org.citationstyles:locales:1.0.1-SNAPSHOT'
-    compile 'de.undercouch:citeproc-java:1.0.1'
-
-    // JAX-B is considered JavaEE API and is no longer part of JavaSE (JDK 9)
-    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
-    compile group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0'
 
 // TODO: recognized as 'latex2unicode.2.12', which is an invalid module name, temporarily removed
 //    compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
@@ -205,7 +177,6 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
-    xjc "com.sun.xml.bind:jaxb-xjc:2.2.4-1"
 //    checkstyle 'com.puppycrawl.tools:checkstyle:8.11'
 }
 
@@ -266,80 +237,9 @@ clean {
 processResources {
     filteringCharset = 'UTF-8'
 
-    filesMatching("build.properties") {
-        expand(version: project.version,
-                "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
-                "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
-                "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
-                "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'),
-                "minRequiredJavaVersion": minRequiredJavaVersion,
-                "allowJava9": allowJava9
-
-        )
-        filteringCharset = 'UTF-8'
-    }
-
     filesMatching("resource/**/meta.xml") {
         expand version: project.version
     }
-}
-
-
-task generateSource(dependsOn: ["generateBstGrammarSource",
-                                "generateMedlineSource",
-                                "generateBibtexmlSource",
-                                "generateEndnoteSource",
-                                "generateModsSource"]) {
-    group = 'JabRef'
-    description 'Generates all Java source files.'
-}
-
-task generateBstGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
-    group = "JabRef"
-    description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr3.'
-
-    antlr = ANTLR3
-    inputFile = 'src/main/antlr3/org/jabref/bst/Bst.g'
-    outputDir = 'src/main/gen/org/jabref/logic/bst/'
-}
-
-task generateMedlineSource(type: XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the medline importer."
-
-    schemaFile = "src/main/resources/xjc/medline/medline.xsd"
-    outputDirectory = "src/main/gen/"
-    javaPackage = "org.jabref.logic.importer.fileformat.medline"
-}
-
-task generateBibtexmlSource(type: XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the bibtexml importer."
-
-    schemaFile = "src/main/resources/xjc/bibtexml/bibtexml.xsd"
-    outputDirectory = "src/main/gen"
-    javaPackage = "org.jabref.logic.importer.fileformat.bibtexml"
-}
-
-task generateEndnoteSource(type: XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the endnote importer."
-
-    schemaFile = "src/main/resources/xjc/endnote/RSXML.dtd"
-    outputDirectory = "src/main/gen/"
-    javaPackage = "org.jabref.logic.importer.fileformat.endnote"
-    arguments = '-dtd'
-}
-
-task generateModsSource(type: XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the mods importer."
-
-    schemaFile = "src/main/resources/xjc/mods/mods-3-7.xsd"
-    bindingFile = "src/main/resources/xjc/mods/mods-binding.xjb"
-    outputDirectory = "src/main/gen/"
-    javaPackage = "org.jabref.logic.importer.fileformat.mods"
-    arguments = '-npa'
 }
 
 tasks.withType(JavaCompile) {
@@ -348,7 +248,6 @@ tasks.withType(JavaCompile) {
 
 compileJava {
     options.compilerArgs << "-Xlint:none"
-    dependsOn "generateSource"
 }
 
 javadoc {

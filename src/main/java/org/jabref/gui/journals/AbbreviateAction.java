@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
+import org.jabref.logic.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.undo.NamedCompound;

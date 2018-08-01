@@ -49,7 +49,7 @@ import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
+import org.jabref.logic.JabRefExecutorService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.AutoLinkFilesAction;

@@ -14,6 +14,7 @@ import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ThemeLoader;
+import org.jabref.logic.JabRefExecutorService;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -26,7 +27,6 @@ import org.jabref.preferences.JabRefPreferences;
 import com.google.common.base.StandardSystemProperty;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryConfiguration;
-import com.microsoft.applicationinsights.internal.shutdown.SDKShutdownActivity;
 import com.microsoft.applicationinsights.telemetry.SessionState;
 
 public class Globals {

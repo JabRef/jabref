@@ -1,3 +1,5 @@
 rootProject.name = "JabRef"
 include 'jabref-model'
+include 'jabref-logic'
+include 'jabref-testutils'
 

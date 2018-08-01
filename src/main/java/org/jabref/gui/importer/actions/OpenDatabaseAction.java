@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
+import org.jabref.logic.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelPreferences;
 import org.jabref.gui.DialogService;
@@ -37,7 +37,7 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileBasedLock;
-import org.jabref.migrations.FileLinksUpgradeWarning;
+import org.jabref.gui.migrations.FileLinksUpgradeWarning;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;

@@ -24,7 +24,7 @@ import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
-import org.jabref.JabRefExecutorService;
+import org.jabref.logic.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiles.DroppedFileHandler;

@@ -5,7 +5,7 @@ import java.util.List;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
-import org.jabref.JabRefExecutorService;
+import org.jabref.logic.JabRefExecutorService;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.externalfiles.AutoSetLinks;
 import org.jabref.gui.undo.NamedCompound;

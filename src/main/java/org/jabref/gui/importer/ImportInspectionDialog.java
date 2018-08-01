@@ -51,7 +51,7 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
+import org.jabref.logic.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelPreferences;
 import org.jabref.gui.DuplicateResolverDialog;

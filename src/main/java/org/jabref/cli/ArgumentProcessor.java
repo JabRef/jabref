@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
 import org.jabref.Globals;
-import org.jabref.JabRefException;
+import org.jabref.logic.JabRefException;
 import org.jabref.gui.externalfiles.AutoSetLinks;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.exporter.BibDatabaseWriter;

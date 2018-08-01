@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
+import org.jabref.logic.JabRefExecutorService;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverType;
 import org.jabref.gui.actions.SimpleCommand;

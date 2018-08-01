@@ -8,7 +8,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.SwingUtilities;
 
-import org.jabref.JabRefExecutorService;
+import org.jabref.logic.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;

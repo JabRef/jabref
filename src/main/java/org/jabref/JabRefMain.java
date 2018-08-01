@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.remote.JabRefMessageHandler;
+import org.jabref.logic.FallbackExceptionHandler;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
@@ -22,7 +23,7 @@ import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.JavaVersion;
 import org.jabref.logic.util.OS;
-import org.jabref.migrations.PreferencesMigrations;
+import org.jabref.gui.migrations.PreferencesMigrations;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.InternalBibtexFields;
@@ -79,13 +80,13 @@ public class JabRefMain extends Application {
             LOGGER.error("Unexpected exception", ex);
         }
     }
-  
+
     @Override
     public void stop() {
         Globals.stopBackgroundTasks();
         Globals.shutdownThreadPools();
     }
-  
+
     /**
      * Tests if we are running an acceptable Java and terminates JabRef when we are sure the version is not supported.
      * This test uses the requirements for the Java version as specified in <code>gradle.build</code>. It is possible to

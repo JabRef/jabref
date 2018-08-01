@@ -36,7 +36,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
+import org.jabref.logic.JabRefExecutorService;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.actions.CleanupAction;

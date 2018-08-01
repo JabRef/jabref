@@ -31,7 +31,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 import org.jabref.Globals;
-import org.jabref.JabRefException;
+import org.jabref.logic.JabRefException;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;

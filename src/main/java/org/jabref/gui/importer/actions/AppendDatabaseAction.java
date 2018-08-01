@@ -8,7 +8,7 @@ import java.util.List;
 import javax.swing.undo.CompoundEdit;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
+import org.jabref.logic.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;

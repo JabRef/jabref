@@ -35,7 +35,7 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 import org.jabref.Globals;
-import org.jabref.JabRefException;
+import org.jabref.logic.JabRefException;
 import org.jabref.JabRefMain;
 import org.jabref.gui.SidePaneType;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;

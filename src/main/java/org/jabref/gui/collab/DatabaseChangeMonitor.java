@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import javax.swing.SwingUtilities;
 
-import org.jabref.JabRefExecutorService;
+import org.jabref.logic.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.SidePaneManager;
 import org.jabref.gui.SidePaneType;

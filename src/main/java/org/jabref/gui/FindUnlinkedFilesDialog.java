@@ -66,7 +66,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
+import org.jabref.logic.JabRefExecutorService;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;

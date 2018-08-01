@@ -14,7 +14,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.JabRefExecutorService;
+import org.jabref.logic.JabRefExecutorService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.logic.importer.FetcherException;
