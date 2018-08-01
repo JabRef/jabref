@@ -362,14 +362,14 @@ public class IconTheme {
         public Button asButton() {
             Button button = new Button();
             button.setGraphic(getGraphicNode());
-            button.getStyleClass().add("flatButton");
+            button.getStyleClass().add("icon-button");
             return button;
         }
 
         public ToggleButton asToggleButton() {
             ToggleButton button = new ToggleButton();
             button.setGraphic(getGraphicNode());
-            button.getStyleClass().add("flatButton");
+            button.getStyleClass().add("icon-button");
             return button;
         }
     }
