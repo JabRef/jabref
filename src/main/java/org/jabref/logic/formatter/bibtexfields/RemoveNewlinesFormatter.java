@@ -10,7 +10,8 @@ import org.jabref.model.cleanup.Formatter;
  * Removes all line breaks in the string.
  */
 public class RemoveNewlinesFormatter extends Formatter {
-    private static final Pattern LINEBREAKS = Pattern.compile("(\r?\n|\r)");
+    private static final String newLine = String.format("%n");
+    private static final Pattern LINEBREAKS = Pattern.compile("(?<![.|:])(" + newLine + ")");
 
     @Override
     public String getName() {
@@ -32,7 +33,7 @@ public class RemoveNewlinesFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Removes all line breaks in the field content.");
+        return Localization.lang("Removes all line breaks which don't have preceded period or colon in the field content.");
     }
 
     @Override

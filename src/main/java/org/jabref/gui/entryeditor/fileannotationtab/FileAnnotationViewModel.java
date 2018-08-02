@@ -31,7 +31,11 @@ public class FileAnnotationViewModel {
             this.content.set(annotation.getLinkedFileAnnotation().getContent());
             String annotationContent = annotation.getContent();
             String illegibleTextMessage = Localization.lang("The marked area does not contain any legible text!");
-            this.marking.set(annotationContent.isEmpty() ? illegibleTextMessage : annotationContent);
+            String markingContent = (annotationContent.isEmpty() ? illegibleTextMessage : annotationContent);
+            // remove newlines && hyphens before linebreaks
+            markingContent = new RemoveHyphenatedNewlinesFormatter().format(markingContent);
+            markingContent = new RemoveNewlinesFormatter().format(markingContent);
+            this.marking.set(markingContent);
         } else {
             String content = annotation.getContent();
             // remove newlines && hyphens before linebreaks

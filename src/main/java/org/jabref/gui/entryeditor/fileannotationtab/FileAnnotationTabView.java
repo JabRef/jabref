@@ -94,12 +94,14 @@ public class FileAnnotationTabView {
         Label date = new Label(annotation.getDate());
         Label page = new Label(Localization.lang("Page") + ": " + annotation.getPage());
 
-        marking.setStyle("-fx-font-weight: bold");
+        marking.setStyle("-fx-font-size: 10px; -fx-font-weight: bold");
         marking.setMaxHeight(30);
 
         // add alignment for text in the list
         marking.setTextAlignment(TextAlignment.LEFT);
         marking.setAlignment(Pos.TOP_LEFT);
+        marking.setMaxWidth(500);
+        marking.setWrapText(true);
         author.setTextAlignment(TextAlignment.LEFT);
         author.setAlignment(Pos.TOP_LEFT);
         date.setTextAlignment(TextAlignment.RIGHT);

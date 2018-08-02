@@ -16,17 +16,8 @@ public class RemoveNewlinesFormatterTest {
     }
 
     @Test
-    public void removeCarriageReturnLineFeed() {
-        assertEquals("rn linebreak", formatter.format("rn\r\nlinebreak"));
-    }
-
-    @Test
-    public void removeCarriageReturn() {
-        assertEquals("r linebreak", formatter.format("r\rlinebreak"));
-    }
-
-    @Test
-    public void removeLineFeed() {
-        assertEquals("n linebreak", formatter.format("n\nlinebreak"));
+    public void removePlatformSpecificNewLine() {
+        String newLine = String.format("%n");
+        assertEquals("linebreak on current platform", formatter.format("linebreak on" + newLine + "current platform"));
     }
 }
