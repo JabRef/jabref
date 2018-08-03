@@ -11,6 +11,7 @@ import org.jabref.model.pdf.FileAnnotationType;
 
 public class FileAnnotationViewModel {
 
+    private static final String NEWLINE = String.format("%n");
     private final FileAnnotation annotation;
     private StringProperty author = new SimpleStringProperty();
     private StringProperty page = new SimpleStringProperty();
@@ -34,7 +35,8 @@ public class FileAnnotationViewModel {
             String markingContent = (annotationContent.isEmpty() ? illegibleTextMessage : annotationContent);
             // remove newlines && hyphens before linebreaks
             markingContent = new RemoveHyphenatedNewlinesFormatter().format(markingContent);
-            markingContent = new RemoveNewlinesFormatter().format(markingContent);
+            // remove new lines not preceded by '.' or ':'
+            markingContent = markingContent.replaceAll("(?<![.|:])(" + NEWLINE + ")", " ");
             this.marking.set(markingContent);
         } else {
             String content = annotation.getContent();
