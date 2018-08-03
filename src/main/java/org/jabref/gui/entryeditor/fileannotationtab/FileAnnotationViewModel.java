@@ -34,9 +34,10 @@ public class FileAnnotationViewModel {
             String illegibleTextMessage = Localization.lang("The marked area does not contain any legible text!");
             String markingContent = (annotationContent.isEmpty() ? illegibleTextMessage : annotationContent);
             // remove newlines && hyphens before linebreaks
-            markingContent = new RemoveHyphenatedNewlinesFormatter().format(markingContent);
+            markingContent = markingContent.replaceAll("-" + NEWLINE, "");
+            new RemoveHyphenatedNewlinesFormatter().format(markingContent);
             // remove new lines not preceded by '.' or ':'
-            markingContent = markingContent.replaceAll("(?<![.|:])(" + NEWLINE + ")", " ");
+            markingContent = markingContent.replaceAll("(?<![.|:])" + NEWLINE, " ");
             this.marking.set(markingContent);
         } else {
             String content = annotation.getContent();

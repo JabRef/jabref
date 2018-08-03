@@ -10,8 +10,7 @@ import org.jabref.model.cleanup.Formatter;
  * Removes all hyphenated line breaks in the string.
  */
 public class RemoveHyphenatedNewlinesFormatter extends Formatter {
-    private static final String NEWLINE = String.format("%n");
-    private static final Pattern HYPHENATED_WORDS = Pattern.compile("(-" + NEWLINE + ")");
+    private static final Pattern HYPHENATED_WORDS = Pattern.compile("-\\R");
 
     @Override
     public String getName() {
