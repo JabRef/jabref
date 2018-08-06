@@ -29,7 +29,6 @@ public class EntryTypesTest {
     private CustomEntryType newCustomType;
     private CustomEntryType overwrittenStandardType;
 
-
     private static Stream<Object> data4mode() {
         return Stream.of(BibDatabaseMode.BIBTEX, BibDatabaseMode.BIBLATEX);
     }
