@@ -174,5 +174,4 @@ public class EntryTypesTest {
         EntryTypes.addOrModifyCustomEntryType(overwrittenStandardType, mode);
         Assertions.assertFalse(EntryTypes.getAllValues(otherMode).contains(overwrittenStandardType));
     }
-
 }
