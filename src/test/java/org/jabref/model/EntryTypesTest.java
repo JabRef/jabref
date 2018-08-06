@@ -168,7 +168,6 @@ public class EntryTypesTest {
         Assertions.assertEquals(Optional.of(standardArticleType), EntryTypes.getType(standardArticleType.getName(), mode));
     }
 
-
     @ParameterizedTest
     @MethodSource("data4modeAndotherMode")
     void overwriteStandardTypeRequiredFieldsDoesNotAffectOtherMode(BibDatabaseMode mode, BibDatabaseMode otherMode) {
