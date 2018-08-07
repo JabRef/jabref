@@ -2,9 +2,9 @@ package org.jabref.gui;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogPane;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
@@ -17,67 +17,49 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 public class ReplaceStringView extends BaseDialog<Void>
 {
 
+    @FXML private RadioButton allReplace;
+    @FXML private CheckBox selectFieldOnly;
     @FXML private ButtonType replaceButton;
     @FXML private TextField limitFieldInput;
     @FXML private TextField findField;
     @FXML private TextField replaceField;
-    @FXML private DialogPane pane;
 
-    private boolean allFieldReplace;
-    private boolean selOnly;
-    private BasePanel panel;
-    private Stage stage;
+    private ReplaceStringViewModel viewModel;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public ReplaceStringView(BasePanel basePanel)  {
         this.setTitle(Localization.lang("Replace String"));
 
-        allFieldReplace = true;
-        selOnly = false;
-        panel = basePanel;
+        viewModel = new ReplaceStringViewModel(basePanel);
 
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
 
-        stage = (Stage) this.pane.getScene().getWindow();
         ControlHelper.setAction(replaceButton, getDialogPane(), event -> buttonReplace());
     }
 
     @FXML
     public void initialize() {
         visualizer.setDecoration(new IconValidationDecorator());
+
+        viewModel.getFindStringProperty().bind(findField.textProperty());
+        viewModel.getReplaceStringProperty().bind(replaceField.textProperty());
+        viewModel.getFieldStringProperty().bind(limitFieldInput.textProperty());
+        viewModel.selectOnlyProperty().bind(selectFieldOnly.selectedProperty());
+        viewModel.allFieldReplaceProperty().bind(allReplace.selectedProperty());
     }
 
     @FXML
-    public void buttonReplace() {
+    private void buttonReplace() {
         String findString = findField.getText();
-        String replaceString = replaceField.getText();
-        String[] fieldStrings = limitFieldInput.getText().toLowerCase().split(";");
         if ("".equals(findString))
         {
-            stage.close();
+            this.close();
             return;
         }
-        ReplaceStringViewModel viewModel = new ReplaceStringViewModel(panel, fieldStrings, findString, replaceString, selOnly, allFieldReplace);
         viewModel.replace();
-        stage.close();
+        this.close();
     }
-
-    @FXML
-    public void radioAll() {
-        allFieldReplace = true;
-    }
-
-    @FXML
-    public void radioLimit() {
-        allFieldReplace = false;
-    }
-
-    @FXML
-    public void selectOnly() {
-        selOnly = !selOnly;
-    }
-
 }

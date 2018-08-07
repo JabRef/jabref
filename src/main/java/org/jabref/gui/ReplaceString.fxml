@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8"
-            fx:controller="org.jabref.gui.ReplaceStringView" fx:id="pane">
+            fx:controller="org.jabref.gui.ReplaceStringView">
     <content>
         <BorderPane>
             <center>
@@ -35,16 +35,16 @@
                             <Label text="Replace With:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
                             <TextField fx:id="replaceField" GridPane.columnIndex="1" GridPane.rowIndex="2"
                                        GridPane.columnSpan="4"/>
-                            <CheckBox GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2"
-                                      onAction="#selectOnly" text="Limit to Selected Entries"/>
-                            <RadioButton GridPane.columnIndex="0" GridPane.rowIndex="5" GridPane.columnSpan="2"
-                                         onAction="#radioAll" selected="true" text="All Field Replace">
+                            <CheckBox fx:id="selectFieldOnly" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2"
+                                     text="Limit to Selected Entries"/>
+                            <RadioButton fx:id="allReplace" GridPane.columnIndex="0" GridPane.rowIndex="5" GridPane.columnSpan="2"
+                                         selected="true" text="All Field Replace">
                                 <toggleGroup>
                                     <ToggleGroup fx:id="radioGroup"/>
                                 </toggleGroup>
                             </RadioButton>
                             <RadioButton GridPane.columnIndex="0" GridPane.rowIndex="6" GridPane.columnSpan="2"
-                                         onAction="#radioLimit" text="Limit to Fields:" toggleGroup="$radioGroup"/>
+                                         text="Limit to Fields:" toggleGroup="$radioGroup"/>
                             <TextField fx:id="limitFieldInput" GridPane.columnIndex="2" GridPane.rowIndex="6"
                                        GridPane.columnSpan="3"/>
                         </GridPane>

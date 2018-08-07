@@ -1,5 +1,10 @@
 package org.jabref.gui;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
@@ -8,38 +13,41 @@ import org.jabref.model.entry.BibEntry;
 public class ReplaceStringViewModel extends AbstractViewModel
 {
     private boolean allFieldReplace;
-    private boolean selOnly;
     private String findString;
     private String replaceString;
     private String[] fieldStrings;
     private BasePanel panel;
 
-    public ReplaceStringViewModel(BasePanel basePanel, String[] fields, String find, String replace, Boolean selectedOnly, Boolean allFieldReplace)
+    private StringProperty findStringProperty = new SimpleStringProperty();
+    private StringProperty replaceStringProperty = new SimpleStringProperty();
+    private StringProperty fieldStringProperty = new SimpleStringProperty();
+    private BooleanProperty allFieldReplaceProperty = new SimpleBooleanProperty();
+    private BooleanProperty selectOnlyProperty = new SimpleBooleanProperty();
+
+
+    public ReplaceStringViewModel(BasePanel basePanel)
     {
         this.panel = basePanel;
-        this.fieldStrings = fields;
-        this.findString = find;
-        this.replaceString = replace;
-        this.selOnly = selectedOnly;
-        this.allFieldReplace = allFieldReplace;
     }
 
     public int replace() {
+        findString = findStringProperty.getValue();
+        replaceString = replaceStringProperty.getValue();
+        fieldStrings = fieldStringProperty.getValue().split(";");
+        boolean selOnly = selectOnlyProperty.getValue();
+        allFieldReplace = allFieldReplaceProperty.getValue();
+
         final NamedCompound compound = new NamedCompound(Localization.lang("Replace string"));
         int counter = 0;
         if (this.panel == null)
             return 0;
-        if (this.selOnly) {
+        if (selOnly) {
             for (BibEntry bibEntry: this.panel.getSelectedEntries())
-            {
                 counter += replaceItem(bibEntry, compound);
-            }
         }
         else {
             for (BibEntry bibEntry: this.panel.getDatabase().getEntries())
-            {
                 counter += replaceItem(bibEntry, compound);
-            }
         }
         return counter;
     }
@@ -87,4 +95,23 @@ public class ReplaceStringViewModel extends AbstractViewModel
         return counter;
     }
 
+    public BooleanProperty allFieldReplaceProperty() {
+        return allFieldReplaceProperty;
+    }
+
+    public BooleanProperty selectOnlyProperty() {
+        return selectOnlyProperty;
+    }
+
+    public StringProperty getFieldStringProperty() {
+        return fieldStringProperty;
+    }
+
+    public StringProperty getFindStringProperty() {
+        return findStringProperty;
+    }
+
+    public StringProperty getReplaceStringProperty() {
+        return replaceStringProperty;
+    }
 }
