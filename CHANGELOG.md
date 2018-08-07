@@ -27,7 +27,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Window state is saved on close and restored on start.
 - Files without a defined external file type are now directly opened with the default aplication of the operating system
 - We streamlined the process to rename and move files by removing the confirmation dialogs.
-- We removed the redundant new lines of markings and wrapped the summary in the File annotation tab. [#3823](https://github.com/JabRef/jabref/issues/3823)
 
 
 
