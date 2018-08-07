@@ -1,15 +1,22 @@
 package org.jabref.gui.preftabs;
 
+import java.awt.BorderLayout;
+import java.util.Optional;
+
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
+
+import javax.swing.JPanel;
+
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.customjfx.CustomJFXPanel;
@@ -23,9 +30,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.preferences.JabRefPreferences;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.Optional;
+
 
 class AdvancedTab extends JPanel implements PrefsTab {
 

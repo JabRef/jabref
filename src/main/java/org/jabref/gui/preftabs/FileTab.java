@@ -1,13 +1,23 @@
 package org.jabref.gui.preftabs;
 
+import java.awt.BorderLayout;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import javafx.collections.FXCollections;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+
+import javax.swing.JPanel;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.help.HelpAction;
@@ -19,12 +29,6 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.preferences.JabRefPreferences;
-
-import javax.swing.*;
-import java.awt.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Preferences tab for file options. These options were moved out from GeneralTab to

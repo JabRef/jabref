@@ -7,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternPanel;
@@ -15,7 +16,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.preferences.JabRefPreferences;
 
-import java.awt.*;
+import java.awt.BorderLayout;
 
 /**
  * The Preferences panel for key generation.

@@ -1,20 +1,29 @@
 package org.jabref.gui.preftabs;
 
+import java.util.ArrayList;
+import java.awt.BorderLayout;
+import java.util.List;
+import java.util.Objects;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.*;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.Scene;
+
+import javax.swing.JPanel;
+
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
@@ -22,22 +31,14 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.NameFormatter;
 import org.jabref.preferences.JabRefPreferences;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 public class NameFormatterTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;
-
     private final TableView table;
-
     private int rowCount = -1;
-
     private final List<TableRow> tableRows = new ArrayList<>(10);
+    private final ObservableList<TableRow> data = FXCollections.observableArrayList();
 
     public static class TableRow {
 
@@ -73,7 +74,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
             this.format.set(format);
         }
     }
-    private final ObservableList<TableRow> data = FXCollections.observableArrayList();
+
 
     /**
      * Tab to create custom Name Formatters
@@ -137,7 +138,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
             }
         });
         Button delete = new Button("Delete");
-        delete.setOnAction(e->{if (table.getFocusModel() != null && table.getFocusModel().getFocusedIndex()!= -1) {
+        delete.setOnAction(e-> {if (table.getFocusModel() != null && table.getFocusModel().getFocusedIndex()!= -1) {
             tableChanged = true;
             int row = table.getFocusModel().getFocusedIndex();
             TableRow tableRow = tableRows.get(row);

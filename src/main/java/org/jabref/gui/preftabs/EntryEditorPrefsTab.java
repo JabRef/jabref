@@ -1,11 +1,18 @@
 package org.jabref.gui.preftabs;
 
+import java.awt.BorderLayout;
+
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+
+import javax.swing.JPanel;
+
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.customjfx.CustomJFXPanel;
@@ -13,8 +20,6 @@ import org.jabref.gui.keyboard.EmacsKeyBindings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-import javax.swing.*;
-import java.awt.*;
 
 import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_ABBREVIATED;
 import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_FULL;

@@ -1,5 +1,7 @@
 package org.jabref.gui.preftabs;
 
+import java.awt.BorderLayout;
+
 import javafx.embed.swing.JFXPanel;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -8,14 +10,14 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.GridPane;
 import javafx.scene.shape.Line;
+
+import javax.swing.JPanel;
+
 import org.jabref.gui.SaveOrderConfigDisplay;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-import javax.swing.*;
-import javax.swing.border.Border;
-import java.awt.*;
 
 /**
  * Preference tab for file sorting options.

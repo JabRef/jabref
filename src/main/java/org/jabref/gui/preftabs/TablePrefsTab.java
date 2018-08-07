@@ -1,25 +1,29 @@
 package org.jabref.gui.preftabs;
 
+import java.awt.BorderLayout;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+
 import javafx.collections.FXCollections;
 import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.control.Label;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.Scene;
+
+import javax.swing.JPanel;
+
 import org.jabref.Globals;
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 
 class TablePrefsTab extends JPanel implements PrefsTab {
 

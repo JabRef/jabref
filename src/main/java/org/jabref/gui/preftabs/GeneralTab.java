@@ -1,15 +1,24 @@
 package org.jabref.gui.preftabs;
 
+import java.awt.BorderLayout;
+import java.nio.charset.Charset;
+import java.time.format.DateTimeFormatter;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.shape.Line;
+
+import javax.swing.JPanel;
+
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.customjfx.CustomJFXPanel;
@@ -22,10 +31,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
-import javax.swing.*;
-import java.awt.*;
-import java.nio.charset.Charset;
-import java.time.format.DateTimeFormatter;
+
 
 import static org.jabref.logic.l10n.Languages.LANGUAGES;
 
@@ -67,7 +73,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         updateTimeStamp = new CheckBox(Localization.lang("    Update timestamp on modification"));
         useTimeStamp = new CheckBox(Localization.lang("Mark new entries with addition date") + ". "
                 + Localization.lang("Date format") + ':');
-        if(!useTimeStamp.isSelected()){
+        if (!useTimeStamp.isSelected()){
             updateTimeStamp.setDisable(true);
         }
         useTimeStamp.setOnAction(e->updateTimeStamp.setDisable(!useTimeStamp.isSelected()));

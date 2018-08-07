@@ -1,26 +1,19 @@
 package org.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
 
 import javafx.embed.swing.JFXPanel;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+
+import javax.swing.JPanel;
+import javax.swing.JFileChooser;
+
 import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.customjfx.CustomJFXPanel;
@@ -32,9 +25,6 @@ import org.jabref.gui.push.PushToApplications;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
 
 class ExternalTab extends JPanel implements PrefsTab {
 
@@ -121,7 +111,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
         GridPane butpan = new GridPane();
         int index = 0;
-        for (PushToApplication pushToApplication : frame.getPushApplications().getApplications()){
+        for (PushToApplication pushToApplication : frame.getPushApplications().getApplications()) {
             addSettingsButton(pushToApplication, butpan, index);
             index++;
         }
@@ -154,7 +144,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         PushToApplicationSettings settings = PushToApplications.getSettings(application);
         Button button = new Button(Localization.lang("Settings for %0", application.getApplicationName()));
         button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(null, settings));
-        panel.add(button,index%2==0?1:2,index/2+1);
+        panel.add(button,index % 2==0?1:2,index/2+1);
     }
 
     @Override

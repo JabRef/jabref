@@ -1,25 +1,25 @@
 package org.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import javax.swing.Action;
 import javax.swing.JPanel;
 
 import javafx.embed.swing.JFXPanel;
-import javafx.geometry.Orientation;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.Border;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.Scene;
+
 import org.jabref.gui.customjfx.CustomJFXPanel;
-import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -33,8 +33,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
     private final JabRefPreferences prefs;
     private boolean tableChanged;
     private int rowCount;
-    private final Label label = new Label("    Field to filter");
-    private final ArrayList<TextField> textFields= new ArrayList<>(10);
+    private final ArrayList<TextField> textFields = new ArrayList<>(10);
     private final VBox vBox = new VBox();
     private final CheckBox privacyFilterCheckBox = new CheckBox(
             Localization.lang("Do not write the following fields to XMP Metadata:"));
@@ -81,9 +80,9 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
         add(panel, BorderLayout.CENTER);
     }
 
-    class DeleteRowAction{
-        public DeleteRowAction(){
-            textFields.remove(textFields.get(textFields.size()-1));
+    class DeleteRowAction {
+        public DeleteRowAction() {
+            textFields.remove(textFields.get(textFields.size() - 1));
             rowCount--;
             vBox.getChildren().clear();
             vBox.getChildren().add(new Label("field to filter"));
@@ -92,7 +91,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
         }
     }
 
-    class AddRowAction{
+    class AddRowAction {
 
         public AddRowAction() {
             rowCount++;
@@ -111,7 +110,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
         tableRows.clear();
         //List<String> names = JabRefPreferences.getInstance().getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS);
         List<String>names = new ArrayList<>();
-        for(TextField textField:textFields){
+        for (TextField textField : textFields){
            names.add(textField.getText());
         }
         tableRows.addAll(names);
