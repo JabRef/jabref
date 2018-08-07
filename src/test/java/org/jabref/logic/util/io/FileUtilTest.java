@@ -360,4 +360,5 @@ public class FileUtilTest {
         Files.write(testFile.toPath(), name.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
         return testFile.toPath();
     }
+
 }
