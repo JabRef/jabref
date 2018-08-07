@@ -146,7 +146,7 @@ public class BibtexKeyPatternPanel extends JPanel {
         con.insets = new Insets(0, 5, 0, 5);
         JButton hlb = new JButton(IconTheme.JabRefIcons.HELP.getSmallIcon());
 
-        Button help1 = new Button("?");
+        Button help1 = new Button("Help");
         help1.setOnAction(e->new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN).getHelpButton().doClick());
         gridPane.add(help1,1,24);
 

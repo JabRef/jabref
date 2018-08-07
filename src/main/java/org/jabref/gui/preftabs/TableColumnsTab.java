@@ -1,53 +1,41 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JToolBar;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.OSXCompatibleToolbar;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibtexSingleField;
 import org.jabref.preferences.JabRefPreferences;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.*;
+import java.util.List;
 
 class TableColumnsTab extends JPanel implements PrefsTab {
 
@@ -55,31 +43,31 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;
-    private final JTable colSetup;
+    private final TableView colSetup;
     private int rowCount = -1;
     private final List<TableRow> tableRows = new ArrayList<>(10);
     private final JabRefFrame frame;
 
-    private final JCheckBox urlColumn;
-    private final JCheckBox fileColumn;
-    private final JCheckBox arxivColumn;
+    private final CheckBox urlColumn;
+    private final CheckBox fileColumn;
+    private final CheckBox arxivColumn;
 
-    private final JCheckBox extraFileColumns;
-    private final JList<String> listOfFileColumns;
+    private final CheckBox extraFileColumns;
+    private final ListView listOfFileColumns;
 
-    private final JRadioButton preferUrl;
-    private final JRadioButton preferDoi;
-
+    private final RadioButton preferUrl;
+    private final RadioButton preferDoi;
+    private int lastIndex;
     /*** begin: special fields ***/
-    private final JCheckBox specialFieldsEnabled;
-    private final JCheckBox rankingColumn;
-    private final JCheckBox qualityColumn;
-    private final JCheckBox priorityColumn;
-    private final JCheckBox relevanceColumn;
-    private final JCheckBox printedColumn;
-    private final JCheckBox readStatusColumn;
-    private final JRadioButton syncKeywords;
-    private final JRadioButton writeSpecialFields;
+    private final CheckBox specialFieldsEnabled;
+    private final CheckBox rankingColumn;
+    private final CheckBox qualityColumn;
+    private final CheckBox priorityColumn;
+    private final CheckBox relevanceColumn;
+    private final CheckBox printedColumn;
+    private final CheckBox readStatusColumn;
+    private final RadioButton syncKeywords;
+    private final RadioButton writeSpecialFields;
     private boolean oldSpecialFieldsEnabled;
     private boolean oldRankingColumn;
     private boolean oldQualityColumn;
@@ -89,7 +77,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private boolean oldReadStatusColumn;
     private boolean oldSyncKeyWords;
     private boolean oldWriteSpecialFields;
-
+    private final VBox listOfFileColumnsVBox;
+    private final ObservableList<TableRow> data;
     /**
      * Customization of external program paths.
      *
@@ -98,126 +87,130 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     public TableColumnsTab(JabRefPreferences prefs, JabRefFrame frame) {
         this.prefs = prefs;
         this.frame = frame;
-        setLayout(new BorderLayout());
+        this.data = FXCollections.observableArrayList(
+                new TableRow("entrytype",75),
+                new TableRow("author/editor",300),
+                new TableRow("title",470),
+                new TableRow("year",60),
+                new TableRow("journal",130),
+                new TableRow("bibtexkey",100));
 
-        TableModel tm = new AbstractTableModel() {
+        colSetup = new TableView<>();
+        TableColumn<TableRow,String> field= new TableColumn<>("Field name");
+        TableColumn<TableRow,Double> column = new TableColumn<>("Column width");
+        field.setPrefWidth(400);
+        column.setPrefWidth(240);
+        field.setCellValueFactory(new PropertyValueFactory<>("name"));
+        field.setCellFactory(TextFieldTableCell.<TableRow>forTableColumn());
+        field.setOnEditCommit(
+                (TableColumn.CellEditEvent<TableRow, String> t) -> {
+                    ((TableRow) t.getTableView().getItems().get(
+                            t.getTablePosition().getRow())
+                    ).setName(t.getNewValue());
+                });
+        column.setCellValueFactory(new PropertyValueFactory<>("length"));
+        column.setOnEditCommit(
+                (TableColumn.CellEditEvent<TableRow, Double> t) -> {
+                    ((TableRow) t.getTableView().getItems().get(
+                            t.getTablePosition().getRow())
+                    ).setLength(t.getNewValue());
+                });
 
-            @Override
-            public int getRowCount() {
-                return rowCount;
-            }
+        colSetup.setItems(data);
+        colSetup.getColumns().addAll(field,column);
+        final TextField addName = new TextField();
+        addName.setPromptText("name");
+        addName.setMaxWidth(field.getPrefWidth());
+        final TextField addLast = new TextField();
+        addLast.setMaxWidth(column.getPrefWidth());
+        addLast.setPromptText("width");
+        GridPane builder = new GridPane();
+        BorderPane tabPanel = new BorderPane();
+        ScrollPane sp = new ScrollPane();
+        sp.setContent(colSetup);
+        tabPanel.setCenter(sp);
 
-            @Override
-            public int getColumnCount() {
-                return 2;
-            }
-
-            @Override
-            public Object getValueAt(int row, int column) {
-                int internalRow = row;
-                internalRow--;
-                if ((internalRow == -1) || (internalRow >= tableRows.size())) {
-                    return "";
-                }
-
-                TableRow rowContent = tableRows.get(internalRow);
-                if (rowContent == null) {
-                    return "";
-                }
-                // Only two columns
-                if (column == 0) {
-                    return rowContent.getName();
-                } else {
-                    return rowContent.getLength() > 0 ? Double.toString(rowContent.getLength()) : "";
-                }
-            }
-
-            @Override
-            public String getColumnName(int col) {
-                return col == 0 ? Localization.lang("Field name") : Localization.lang("Column width");
-            }
-
-            @Override
-            public Class<?> getColumnClass(int column) {
-                if (column == 0) {
-                    return String.class;
-                }
-                return Integer.class;
-            }
-
-            @Override
-            public boolean isCellEditable(int row, int col) {
-                return !((row == 0) && (col == 0));
-            }
-
-            @Override
-            public void setValueAt(Object value, int row, int col) {
+        HBox toolBar = new HBox();
+        Button addRow = new Button("Add");
+        addRow.setOnAction( e ->{
+            if (!addLast.getText().isEmpty()) {
+                TableRow tableRow = addLast.getText().matches("[1-9][0-9]+(.)?[0-9]+")? new TableRow(addName.getText(), Integer.valueOf(addLast.getText())):new TableRow(addName.getText());
+                addName.clear();
+                addLast.clear();
+                data.add(tableRow);
+                tableRows.clear();
+                tableRows.addAll(data);
+                rowCount++;
+                colSetup.setItems(data);
                 tableChanged = true;
-                // Make sure the vector is long enough.
-                while (row >= tableRows.size()) {
-                    tableRows.add(new TableRow("", -1));
-                }
-
-                TableRow rowContent = tableRows.get(row - 1);
-
-                if (col == 0) {
-                    rowContent.setName(value.toString());
-                    if ("".equals(getValueAt(row, 1))) {
-                        setValueAt(String.valueOf(BibtexSingleField.DEFAULT_FIELD_LENGTH), row, 1);
-                    }
-                } else {
-                    if (value == null) {
-                        rowContent.setLength(-1);
-                    } else {
-                        rowContent.setLength(Integer.parseInt(value.toString()));
-                    }
-                }
+                colSetup.refresh();
             }
-
-        };
-
-        colSetup = new JTable(tm);
-        TableColumnModel cm = colSetup.getColumnModel();
-        cm.getColumn(0).setPreferredWidth(140);
-        cm.getColumn(1).setPreferredWidth(80);
-
-        FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:pref", "");
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        JPanel pan = new JPanel();
-        JPanel tabPanel = new JPanel();
-        tabPanel.setLayout(new BorderLayout());
-        JScrollPane sp = new JScrollPane(colSetup, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        colSetup.setPreferredScrollableViewportSize(new Dimension(250, 200));
-        sp.setMinimumSize(new Dimension(250, 300));
-        tabPanel.add(sp, BorderLayout.CENTER);
-        JToolBar toolBar = new OSXCompatibleToolbar(SwingConstants.VERTICAL);
-        toolBar.setFloatable(false);
-        AddRowAction addRow = new AddRowAction();
-        DeleteRowAction deleteRow = new DeleteRowAction();
-        MoveRowUpAction moveUp = new MoveRowUpAction();
-        MoveRowDownAction moveDown = new MoveRowDownAction();
-        toolBar.setBorder(null);
-        toolBar.add(addRow);
-        toolBar.add(deleteRow);
-        toolBar.addSeparator();
-        toolBar.add(moveUp);
-        toolBar.add(moveDown);
-        tabPanel.add(toolBar, BorderLayout.EAST);
-
-        fileColumn = new JCheckBox(Localization.lang("Show file column"));
-        urlColumn = new JCheckBox(Localization.lang("Show URL/DOI column"));
-        preferUrl = new JRadioButton(Localization.lang("Show URL first"));
-        preferDoi = new JRadioButton(Localization.lang("Show DOI first"));
-        ButtonGroup preferUrlDoiGroup = new ButtonGroup();
-        preferUrlDoiGroup.add(preferUrl);
-        preferUrlDoiGroup.add(preferDoi);
-
-        urlColumn.addChangeListener(arg0 -> {
-            preferUrl.setEnabled(urlColumn.isSelected());
-            preferDoi.setEnabled(urlColumn.isSelected());
         });
-        arxivColumn = new JCheckBox(Localization.lang("Show ArXiv column"));
+
+        Button deleteRow = new Button("Delete");
+        deleteRow.setOnAction(e->{if (colSetup.getFocusModel() != null && colSetup.getFocusModel().getFocusedIndex()!= -1) {
+            tableChanged = true;
+            int row = colSetup.getFocusModel().getFocusedIndex();
+            TableRow tableRow = data.get(row);
+            data.remove(tableRow);
+            tableRows.clear();
+            tableRows.addAll(data);
+            colSetup.setItems(data);
+            rowCount--;
+            colSetup.refresh();
+        }});
+        Button up = new Button("Up");
+        up.setOnAction(e->{
+            if(colSetup.getFocusModel()!=null) {
+                int row = colSetup.getFocusModel().getFocusedIndex();
+                if (row > data.size() || row == 0) {
+                    return;
+                }
+                TableRow tableRow1 = data.get(row);
+                TableRow tableRow2 = data.get(row - 1);
+                data.set(row - 1, tableRow1);
+                data.set(row, tableRow2);
+                tableRows.clear();
+                tableRows.addAll(data);
+                colSetup.setItems(data);
+                colSetup.refresh();
+            }else {
+                return;
+            }
+        });
+        Button down = new Button("Down");
+        down.setOnAction(e->{
+            if(colSetup.getFocusModel()!=null) {
+                int row = colSetup.getFocusModel().getFocusedIndex();
+                if (row + 1 > data.size()) {
+                    return;
+                }
+                TableRow tableRow1 = data.get(row);
+                TableRow tableRow2 = data.get(row + 1);
+                data.set(row + 1, tableRow1);
+                data.set(row, tableRow2);
+                tableRows.clear();
+                tableRows.addAll(data);
+                lastIndex = row + 1;
+                colSetup.setItems(data);
+                colSetup.refresh();
+            }else {
+                return;
+            }
+        });
+        toolBar.getChildren().addAll(addName,addLast,addRow,deleteRow,up,down);
+        tabPanel.setBottom(toolBar);
+
+        fileColumn = new CheckBox(Localization.lang("Show file column"));
+        urlColumn = new CheckBox(Localization.lang("Show URL/DOI column"));
+        preferUrl = new RadioButton(Localization.lang("    Show URL first"));
+        preferDoi = new RadioButton(Localization.lang("    Show DOI first"));
+
+        urlColumn.setOnAction(arg0 -> {
+            preferUrl.setDisable(!urlColumn.isSelected());
+            preferDoi.setDisable(!urlColumn.isSelected());
+        });
+        arxivColumn = new CheckBox(Localization.lang("Show ArXiv column"));
 
         Collection<ExternalFileType> fileTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         String[] fileTypeNames = new String[fileTypes.size()];
@@ -225,97 +218,91 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         for (ExternalFileType fileType : fileTypes) {
             fileTypeNames[i++] = fileType.getName();
         }
-        listOfFileColumns = new JList<>(fileTypeNames);
-        JScrollPane listOfFileColumnsScrollPane = new JScrollPane(listOfFileColumns);
-        listOfFileColumns.setVisibleRowCount(3);
-        extraFileColumns = new JCheckBox(Localization.lang("Show extra columns"));
-        extraFileColumns.addChangeListener(arg0 -> listOfFileColumns.setEnabled(extraFileColumns.isSelected()));
+        listOfFileColumns = new ListView<>(FXCollections.observableArrayList(fileTypeNames));
+        listOfFileColumnsVBox = new VBox();
+        listOfFileColumnsVBox.getChildren().add(listOfFileColumns);
+        ScrollPane listOfFileColumnsScrollPane = new ScrollPane();
+        listOfFileColumnsScrollPane.setMaxHeight(80);
+        listOfFileColumnsScrollPane.setContent(listOfFileColumnsVBox);
+        extraFileColumns = new CheckBox(Localization.lang("Show extra columns"));
+        if(!extraFileColumns.isSelected()){
+            listOfFileColumnsVBox.setDisable(true);
+        }
+        extraFileColumns.setOnAction(arg0 -> listOfFileColumnsVBox.setDisable(!extraFileColumns.isSelected()));
 
         /*** begin: special table columns and special fields ***/
 
-        JButton helpButton = new HelpAction(Localization.lang("Help on special fields"),
-                HelpFile.SPECIAL_FIELDS).getHelpButton();
+        Button helpButton = new Button("Help");
+        helpButton.setOnAction(e->new HelpAction(Localization.lang("Help on special fields"),
+                HelpFile.SPECIAL_FIELDS).getHelpButton().doClick());
 
-        rankingColumn = new JCheckBox(Localization.lang("Show rank"));
-        qualityColumn = new JCheckBox(Localization.lang("Show quality"));
-        priorityColumn = new JCheckBox(Localization.lang("Show priority"));
-        relevanceColumn = new JCheckBox(Localization.lang("Show relevance"));
-        printedColumn = new JCheckBox(Localization.lang("Show printed status"));
-        readStatusColumn = new JCheckBox(Localization.lang("Show read status"));
+        rankingColumn = new CheckBox(Localization.lang("    Show rank"));
+        qualityColumn = new CheckBox(Localization.lang("    Show quality"));
+        priorityColumn = new CheckBox(Localization.lang("    Show priority"));
+        relevanceColumn = new CheckBox(Localization.lang("    Show relevance"));
+        printedColumn = new CheckBox(Localization.lang("    Show printed status"));
+        readStatusColumn = new CheckBox(Localization.lang("    Show read status"));
 
         // "sync keywords" and "write special" fields may be configured mutually exclusive only
         // The implementation supports all combinations (TRUE+TRUE and FALSE+FALSE, even if the latter does not make sense)
         // To avoid confusion, we opted to make the setting mutually exclusive
-        syncKeywords = new JRadioButton(Localization.lang("Synchronize with keywords"));
-        writeSpecialFields = new JRadioButton(Localization.lang("Write values of special fields as separate fields to BibTeX"));
-        ButtonGroup group = new ButtonGroup();
-        group.add(syncKeywords);
-        group.add(writeSpecialFields);
+        syncKeywords = new RadioButton(Localization.lang("    Synchronize with keywords"));
+        writeSpecialFields = new RadioButton(Localization.lang("    Write values of special fields as separate fields to BibTeX"));
 
-        specialFieldsEnabled = new JCheckBox(Localization.lang("Enable special fields"));
-        specialFieldsEnabled.addChangeListener(event -> {
+        specialFieldsEnabled = new CheckBox(Localization.lang("Enable special fields"));
+        specialFieldsEnabled.setOnAction(event -> {
             boolean isEnabled = specialFieldsEnabled.isSelected();
-            rankingColumn.setEnabled(isEnabled);
-            qualityColumn.setEnabled(isEnabled);
-            priorityColumn.setEnabled(isEnabled);
-            relevanceColumn.setEnabled(isEnabled);
-            printedColumn.setEnabled(isEnabled);
-            readStatusColumn.setEnabled(isEnabled);
-            syncKeywords.setEnabled(isEnabled);
-            writeSpecialFields.setEnabled(isEnabled);
+            rankingColumn.setDisable(!isEnabled);
+            qualityColumn.setDisable(!isEnabled);
+            priorityColumn.setDisable(!isEnabled);
+            relevanceColumn.setDisable(!isEnabled);
+            printedColumn.setDisable(!isEnabled);
+            readStatusColumn.setDisable(!isEnabled);
+            syncKeywords.setDisable(!isEnabled);
+            writeSpecialFields.setDisable(!isEnabled);
         });
 
-        builder.appendSeparator(Localization.lang("Special table columns"));
-        builder.nextLine();
-        builder.append(pan);
+        builder.add(new Label(Localization.lang("Special table columns")),1,1);
 
-        DefaultFormBuilder specialTableColumnsBuilder = new DefaultFormBuilder(new FormLayout(
-                "8dlu, 8dlu, 8cm, 8dlu, 8dlu, left:pref:grow", "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref"));
-        CellConstraints cc = new CellConstraints();
+        GridPane specialTableColumnsBuilder = new GridPane();
+        specialTableColumnsBuilder.add(specialFieldsEnabled,1,1);
+        specialTableColumnsBuilder.add(rankingColumn,1,2);
+        specialTableColumnsBuilder.add(relevanceColumn, 1,3);
+        specialTableColumnsBuilder.add(qualityColumn, 1,4);
+        specialTableColumnsBuilder.add(priorityColumn, 1,5);
+        specialTableColumnsBuilder.add(printedColumn, 1,6);
+        specialTableColumnsBuilder.add(readStatusColumn, 1,7);
+        specialTableColumnsBuilder.add(syncKeywords, 1,8);
+        specialTableColumnsBuilder.add(writeSpecialFields, 1,9);
+        specialTableColumnsBuilder.add(helpButton, 1,10);
 
-        specialTableColumnsBuilder.add(specialFieldsEnabled, cc.xyw(1, 1, 3));
-        specialTableColumnsBuilder.add(rankingColumn, cc.xyw(2, 2, 2));
-        specialTableColumnsBuilder.add(relevanceColumn, cc.xyw(2, 3, 2));
-        specialTableColumnsBuilder.add(qualityColumn, cc.xyw(2, 4, 2));
-        specialTableColumnsBuilder.add(priorityColumn, cc.xyw(2, 5, 2));
-        specialTableColumnsBuilder.add(printedColumn, cc.xyw(2, 6, 2));
-        specialTableColumnsBuilder.add(readStatusColumn, cc.xyw(2, 7, 2));
-        specialTableColumnsBuilder.add(syncKeywords, cc.xyw(2, 10, 2));
-        specialTableColumnsBuilder.add(writeSpecialFields, cc.xyw(2, 11, 2));
-        specialTableColumnsBuilder.add(helpButton, cc.xyw(1, 12, 2));
+        specialTableColumnsBuilder.add(fileColumn, 2,1);
+        specialTableColumnsBuilder.add(urlColumn, 2,2);
+        specialTableColumnsBuilder.add(preferUrl,2,3);
+        specialTableColumnsBuilder.add(preferDoi, 2,4);
+        specialTableColumnsBuilder.add(arxivColumn, 2,5);
 
-        specialTableColumnsBuilder.add(fileColumn, cc.xyw(5, 1, 2));
-        specialTableColumnsBuilder.add(urlColumn, cc.xyw(5, 2, 2));
-        specialTableColumnsBuilder.add(preferUrl, cc.xy(6, 3));
-        specialTableColumnsBuilder.add(preferDoi, cc.xy(6, 4));
-        specialTableColumnsBuilder.add(arxivColumn, cc.xyw(5, 5, 2));
+        specialTableColumnsBuilder.add(extraFileColumns,2,6);
+        specialTableColumnsBuilder.add(listOfFileColumnsScrollPane, 2,10);
 
-        specialTableColumnsBuilder.add(extraFileColumns, cc.xyw(5, 6, 2));
-        specialTableColumnsBuilder.add(listOfFileColumnsScrollPane, cc.xywh(5, 7, 2, 6));
+        builder.add(specialTableColumnsBuilder,1,2);
 
-        builder.append(specialTableColumnsBuilder.getPanel());
-        builder.nextLine();
 
         /*** end: special table columns and special fields ***/
 
-        builder.appendSeparator(Localization.lang("Entry table columns"));
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(tabPanel);
-        builder.nextLine();
-        builder.append(pan);
-        JButton buttonWidth = new JButton(new UpdateWidthsAction());
-        JButton buttonOrder = new JButton(new UpdateOrderAction());
-        builder.append(buttonWidth);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(buttonOrder);
-        builder.nextLine();
-        builder.append(pan);
-        builder.nextLine();
-        pan = builder.getPanel();
-        pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        add(pan, BorderLayout.CENTER);
+        builder.add(new Label(Localization.lang("Entry table columns")),1,3);
+        builder.add(tabPanel,1,4);
+
+        Button buttonWidth = new Button("Update to current column widths");
+        buttonWidth.setOnAction(e->new UpdateWidthsAction());
+        Button buttonOrder = new Button("Update to current column order");
+        buttonOrder.setOnAction(e->new UpdateOrderAction());
+        builder.add(buttonWidth,1,5);
+        builder.add(buttonOrder,1,6);
+
+        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
+        setLayout(new BorderLayout());
+        add(panel, BorderLayout.CENTER);
     }
 
     @Override
@@ -330,20 +317,23 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         extraFileColumns.setSelected(prefs.getBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS));
         if (extraFileColumns.isSelected()) {
             List<String> desiredColumns = prefs.getStringList(JabRefPreferences.LIST_OF_FILE_COLUMNS);
-            int listSize = listOfFileColumns.getModel().getSize();
+            int listSize = listOfFileColumns.getSelectionModel().getSelectedIndex();
             int[] indicesToSelect = new int[listSize];
             for (int i = 0; i < listSize; i++) {
                 indicesToSelect[i] = listSize + 1;
                 for (String desiredColumn : desiredColumns) {
-                    if (listOfFileColumns.getModel().getElementAt(i).equals(desiredColumn)) {
+                    if (listOfFileColumns.getAccessibleText().equals(desiredColumn)) {
                         indicesToSelect[i] = i;
                         break;
                     }
                 }
             }
-            listOfFileColumns.setSelectedIndices(indicesToSelect);
+            for(int i=0; i<listSize;i++)
+            {
+                listOfFileColumns.getSelectionModel().select(indicesToSelect[i]);
+            }
         } else {
-            listOfFileColumns.setSelectedIndices(new int[] {});
+            listOfFileColumns.getSelectionModel().select(new int[] {});
         }
 
         /*** begin: special fields ***/
@@ -384,7 +374,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         List<String> lengths = prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS);
         for (int i = 0; i < names.size(); i++) {
             if (i < lengths.size()) {
-                tableRows.add(new TableRow(names.get(i), Double.parseDouble(lengths.get(i))));
+                tableRows.add(new TableRow(names.get(i), Integer.parseInt(lengths.get(i))));
             } else {
                 tableRows.add(new TableRow(names.get(i)));
             }
@@ -394,189 +384,43 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
     /*** end: special fields ***/
 
-    static class TableRow {
+    public static class TableRow {
 
-        private String name;
-        private double length;
+        private SimpleStringProperty name;
+        private SimpleDoubleProperty length;
 
         public TableRow() {
-            name = "";
-            length = BibtexSingleField.DEFAULT_FIELD_LENGTH;
+            name = new SimpleStringProperty("");
+            length = new SimpleDoubleProperty(BibtexSingleField.DEFAULT_FIELD_LENGTH);
         }
 
         public TableRow(String name) {
-            this.name = name;
-            length = BibtexSingleField.DEFAULT_FIELD_LENGTH;
+            this.name = new SimpleStringProperty(name);
+            length = new SimpleDoubleProperty(BibtexSingleField.DEFAULT_FIELD_LENGTH);
         }
 
         public TableRow(String name, double length) {
-            this.name = name;
-            this.length = length;
+            this.name = new SimpleStringProperty(name);
+            this.length = new SimpleDoubleProperty(length);
         }
 
         public String getName() {
-            return name;
+            return name.get();
         }
 
         public void setName(String name) {
-            this.name = name;
+            this.name.set(name);
         }
 
         public double getLength() {
-            return length;
+            return length.get();
         }
 
-        public void setLength(int length) {
-            this.length = length;
-        }
-    }
-
-    class DeleteRowAction extends AbstractAction {
-
-        public DeleteRowAction() {
-            super("Delete row", IconTheme.JabRefIcons.REMOVE_NOBOX.getIcon());
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete rows"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int[] rows = colSetup.getSelectedRows();
-            if (rows.length == 0) {
-                return;
-            }
-            int offs = 0;
-            for (int i = rows.length - 1; i >= 0; i--) {
-                if ((rows[i] <= tableRows.size()) && (rows[i] != 0)) {
-                    tableRows.remove(rows[i] - 1);
-                    offs++;
-                }
-            }
-            rowCount -= offs;
-            if (rows.length > 1) {
-                colSetup.clearSelection();
-            }
-            colSetup.revalidate();
-            colSetup.repaint();
-            tableChanged = true;
+        public void setLength(double length) {
+            this.length.set(length);
         }
     }
 
-    class AddRowAction extends AbstractAction {
-
-        public AddRowAction() {
-            super("Add row", IconTheme.JabRefIcons.ADD_NOBOX.getIcon());
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Insert rows"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int[] rows = colSetup.getSelectedRows();
-            if (rows.length == 0) {
-                // No rows selected, so we just add one at the end.
-                rowCount++;
-                colSetup.revalidate();
-                colSetup.repaint();
-                return;
-            }
-            for (int i = 0; i < rows.length; i++) {
-                if (((rows[i] + i) - 1) < tableRows.size()) {
-                    tableRows.add(Math.max(0, (rows[i] + i) - 1), new TableRow());
-                }
-            }
-            rowCount += rows.length;
-            if (rows.length > 1) {
-                colSetup.clearSelection();
-            }
-            colSetup.revalidate();
-            colSetup.repaint();
-            tableChanged = true;
-        }
-    }
-
-    abstract class AbstractMoveRowAction extends AbstractAction {
-
-        public AbstractMoveRowAction(String string, Icon image) {
-            super(string, image);
-        }
-
-        public void swap(int i, int j) {
-            if ((i < 0) || (i >= tableRows.size())) {
-                return;
-            }
-            if ((j < 0) || (j >= tableRows.size())) {
-                return;
-            }
-            TableRow tmp = tableRows.get(i);
-            tableRows.set(i, tableRows.get(j));
-            tableRows.set(j, tmp);
-        }
-    }
-
-    class MoveRowUpAction extends AbstractMoveRowAction {
-
-        public MoveRowUpAction() {
-            super("Up", IconTheme.JabRefIcons.UP.getIcon());
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Move up"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int[] selected = colSetup.getSelectedRows();
-            Arrays.sort(selected);
-            // first element (#) not inside tableRows
-            // don't move if a selected element is at bounce
-            if ((selected.length > 0) && (selected[0] > 1)) {
-                boolean[] newSelected = new boolean[colSetup.getRowCount()];
-                for (int i : selected) {
-                    swap(i - 1, i - 2);
-                    newSelected[i - 1] = true;
-                }
-                // select all and remove unselected
-                colSetup.setRowSelectionInterval(0, colSetup.getRowCount() - 1);
-                for (int i = 0; i < colSetup.getRowCount(); i++) {
-                    if (!newSelected[i]) {
-                        colSetup.removeRowSelectionInterval(i, i);
-                    }
-                }
-                colSetup.revalidate();
-                colSetup.repaint();
-                tableChanged = true;
-            }
-        }
-    }
-
-    class MoveRowDownAction extends AbstractMoveRowAction {
-
-        public MoveRowDownAction() {
-            super("Down", IconTheme.JabRefIcons.DOWN.getIcon());
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Down"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int[] selected = colSetup.getSelectedRows();
-            Arrays.sort(selected);
-            final int last = selected.length - 1;
-            boolean[] newSelected = new boolean[colSetup.getRowCount()];
-            // don't move if a selected element is at bounce
-            if ((selected.length > 0) && (selected[last] < tableRows.size())) {
-                for (int i = last; i >= 0; i--) {
-                    swap(selected[i] - 1, selected[i]);
-                    newSelected[selected[i] + 1] = true;
-                }
-                // select all and remove unselected
-                colSetup.setRowSelectionInterval(0, colSetup.getRowCount() - 1);
-                for (int i = 0; i < colSetup.getRowCount(); i++) {
-                    if (!newSelected[i]) {
-                        colSetup.removeRowSelectionInterval(i, i);
-                    }
-                }
-                colSetup.revalidate();
-                colSetup.repaint();
-                tableChanged = true;
-            }
-        }
-    }
 
     class UpdateOrderAction extends AbstractAction {
 
@@ -612,8 +456,10 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 return n1.compareTo(n2);
             });
 
-            colSetup.revalidate();
-            colSetup.repaint();
+            data.clear();
+            data.addAll(tableRows);
+            colSetup.setItems(data);
+            colSetup.refresh();
             tableChanged = true;
         }
     }
@@ -671,11 +517,13 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.ARXIV_COLUMN, arxivColumn.isSelected());
 
         prefs.putBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS, extraFileColumns.isSelected());
-        if (extraFileColumns.isSelected() && !listOfFileColumns.isSelectionEmpty()) {
-            int numberSelected = listOfFileColumns.getSelectedIndices().length;
+        if (extraFileColumns.isSelected() && !listOfFileColumns.getSelectionModel().isEmpty()) {
+            int numberSelected = listOfFileColumns.getSelectionModel().getSelectedIndex();
             List<String> selections = new ArrayList<>(numberSelected);
             for (int i = 0; i < numberSelected; i++) {
-                selections.add(listOfFileColumns.getModel().getElementAt(listOfFileColumns.getSelectedIndices()[i]));
+                if(listOfFileColumnsVBox.getChildren().get(i).isFocused()){
+                    selections.add(listOfFileColumnsVBox.getChildren().get(i).getAccessibleText());
+                }
             }
             prefs.putStringList(JabRefPreferences.LIST_OF_FILE_COLUMNS, selections);
         } else {
@@ -728,11 +576,11 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         /*** end: special fields ***/
 
-        if (colSetup.isEditing()) {
-            int col = colSetup.getEditingColumn();
-            int row = colSetup.getEditingRow();
-            colSetup.getCellEditor(row, col).stopCellEditing();
-        }
+//        if (colSetup.isEditing()) {
+//            int col = colSetup.getEditingColumn();
+//            int row = colSetup.getEditingRow();
+//            colSetup.getCellEditor(row, col).stopCellEditing();
+//        }
 
         // Now we need to make sense of the contents the user has made to the
         // table setup table.

@@ -1,84 +1,79 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JToolBar;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-
-import org.jabref.gui.OSXCompatibleToolbar;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.NameFormatter;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class NameFormatterTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;
 
-    private final JTable table;
+    private final TableView table;
 
     private int rowCount = -1;
 
     private final List<TableRow> tableRows = new ArrayList<>(10);
 
-    static class TableRow {
+    public static class TableRow {
 
-        private String name;
+        private SimpleStringProperty name;
+        private SimpleStringProperty format;
 
-        private String format;
-
-
-        public TableRow() {
+        TableRow() {
             this("");
         }
 
-        public TableRow(String name) {
+        TableRow(String name) {
             this(name, NameFormatter.DEFAULT_FORMAT);
         }
 
-        public TableRow(String name, String format) {
-            this.name = name;
-            this.format = format;
+        TableRow(String name, String format) {
+            this.name = new SimpleStringProperty(name);
+            this.format = new SimpleStringProperty(format);
         }
 
         public String getName() {
-            return name;
+            return name.get();
         }
 
         public void setName(String name) {
-            this.name = name;
+            this.name.set(name);
         }
 
         public String getFormat() {
-            return format;
+            return format.get();
         }
 
         public void setFormat(String format) {
-            this.format = format;
+            this.format.set(format);
         }
     }
-
+    private final ObservableList<TableRow> data = FXCollections.observableArrayList();
 
     /**
      * Tab to create custom Name Formatters
@@ -88,112 +83,83 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         this.prefs = Objects.requireNonNull(prefs);
         setLayout(new BorderLayout());
 
+        TableColumn<TableRow,String> firstCol = new TableColumn<>("Formatter name");
+        TableColumn<TableRow,String> lastCol = new TableColumn<>("Format string");
+        table = new TableView();
+        table.setEditable(true);
+        firstCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        firstCol.setCellFactory(TextFieldTableCell.<TableRow>forTableColumn());
+        firstCol.setOnEditCommit(
+                (TableColumn.CellEditEvent<TableRow, String> t) -> {
+                    ((TableRow) t.getTableView().getItems().get(
+                            t.getTablePosition().getRow())
+                    ).setName(t.getNewValue());
+                });
+        lastCol.setCellValueFactory(new PropertyValueFactory<>("format"));
+        lastCol.setCellFactory(TextFieldTableCell.<TableRow>forTableColumn());
+        lastCol.setOnEditCommit(
+                (TableColumn.CellEditEvent<TableRow, String> t) -> {
+                    ((TableRow) t.getTableView().getItems().get(
+                            t.getTablePosition().getRow())
+                    ).setFormat(t.getNewValue());
+                });
+        firstCol.setPrefWidth(140);
+        lastCol.setPrefWidth(200);
+        table.setItems(data);
+        table.getColumns().addAll(firstCol,lastCol);
+        final TextField addName = new TextField();
+        addName.setPromptText("name");
+        addName.setMaxWidth(firstCol.getPrefWidth());
+        final TextField addLast = new TextField();
+        addLast.setMaxWidth(lastCol.getPrefWidth());
+        addLast.setPromptText("format");
 
+        GridPane builder = new GridPane();
+        BorderPane tabPanel = new BorderPane();
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setMaxHeight(400);
+        scrollPane.setMaxWidth(400);
+        scrollPane.setContent(table);
+        tabPanel.setCenter(scrollPane);
 
-        TableModel tableModel = new AbstractTableModel() {
-
-            @Override
-            public int getRowCount() {
-                return rowCount;
-            }
-
-            @Override
-            public int getColumnCount() {
-                return 2;
-            }
-
-            @Override
-            public Object getValueAt(int row, int column) {
-                if (row >= tableRows.size()) {
-                    return "";
-                }
-                TableRow tr = tableRows.get(row);
-                if (tr == null) {
-                    return "";
-                }
-                // Only two columns
-                if (column == 0) {
-                    return tr.getName();
-                } else {
-                    return tr.getFormat();
-                }
-            }
-
-            @Override
-            public String getColumnName(int col) {
-                return col == 0 ? Localization.lang("Formatter name") :
-                    Localization.lang("Format string");
-            }
-
-            @Override
-            public Class<String> getColumnClass(int column) {
-                return String.class;
-            }
-
-            @Override
-            public boolean isCellEditable(int row, int col) {
-                return true;
-            }
-
-            @Override
-            public void setValueAt(Object value, int row, int col) {
+        Button add = new Button("Add");
+        add.setOnAction(e-> {
+            if (!addName.getText().isEmpty() && !addLast.getText().isEmpty()) {
+                TableRow tableRow = new TableRow(addName.getText(), addLast.getText());
+                addName.clear();
+                addLast.clear();
+                data.add(tableRow);
+                tableRows.add(tableRow);
+                rowCount++;
+                table.setItems(data);
                 tableChanged = true;
-
-                // Make sure the vector is long enough.
-                while (row >= tableRows.size()) {
-                    tableRows.add(new TableRow());
-                }
-
-                TableRow rowContent = tableRows.get(row);
-
-                if (col == 0) {
-                    rowContent.setName(value.toString());
-                } else {
-                    rowContent.setFormat(value.toString());
-                }
+                table.refresh();
             }
-        };
+        });
+        Button delete = new Button("Delete");
+        delete.setOnAction(e->{if (table.getFocusModel() != null && table.getFocusModel().getFocusedIndex()!= -1) {
+            tableChanged = true;
+            int row = table.getFocusModel().getFocusedIndex();
+            TableRow tableRow = tableRows.get(row);
+            tableRows.remove(tableRow);
+            data.remove(tableRow);
+            table.setItems(data);
+            rowCount--;
+            table.refresh();
+        }});
+        Button help = new Button("Help");
+        help.setOnAction(e-> new HelpAction(Localization.lang("Help on Name Formatting"),
+                HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER).getHelpButton().doClick());
+        HBox toolbar = new HBox();
+        toolbar.getChildren().addAll(addName, addLast,add,delete,help);
+        tabPanel.setBottom(toolbar);
 
-        table = new JTable(tableModel);
+        builder.add(new Label(Localization.lang("Special name formatters")),1,1);
+        builder.add(tabPanel,1,2);
 
-        TableColumnModel columnModel = table.getColumnModel();
-        columnModel.getColumn(0).setPreferredWidth(140);
-        columnModel.getColumn(1).setPreferredWidth(400);
-
-        FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:pref", "");
-
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-
-        JPanel pan = new JPanel();
-
-        JPanel tabPanel = new JPanel();
-        tabPanel.setLayout(new BorderLayout());
-        JScrollPane scrollPane = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        table.setPreferredScrollableViewportSize(new Dimension(250, 200));
-        scrollPane.setMinimumSize(new Dimension(250, 300));
-        scrollPane.setPreferredSize(new Dimension(600, 300));
-        tabPanel.add(scrollPane, BorderLayout.CENTER);
-
-        JToolBar toolBar = new OSXCompatibleToolbar(SwingConstants.VERTICAL);
-        toolBar.setFloatable(false);
-        toolBar.setBorder(null);
-        toolBar.add(new AddRowAction());
-        toolBar.add(new DeleteRowAction());
-        toolBar.add(new HelpAction(Localization.lang("Help on Name Formatting"),
-                HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER).getHelpButton());
-
-        tabPanel.add(toolBar, BorderLayout.EAST);
-
-        builder.appendSeparator(Localization.lang("Special name formatters"));
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(tabPanel);
-        builder.nextLine();
-
-        pan = builder.getPanel();
-        pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        add(pan, BorderLayout.CENTER);
+        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
+        setLayout(new BorderLayout());
+        add(panel, BorderLayout.CENTER);
     }
 
     @Override
@@ -212,70 +178,6 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         rowCount = tableRows.size() + 5;
     }
 
-    class DeleteRowAction extends AbstractAction {
-
-        public DeleteRowAction() {
-            super("Delete row", IconTheme.JabRefIcons.REMOVE_NOBOX.getIcon());
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete rows"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            tableChanged = true;
-
-            int[] selectedRows = table.getSelectedRows();
-
-            int numberDeleted = 0;
-
-            for (int i = selectedRows.length - 1; i >= 0; i--) {
-                if (selectedRows[i] < tableRows.size()) {
-                    tableRows.remove(selectedRows[i]);
-                    numberDeleted++;
-                }
-            }
-
-            rowCount -= numberDeleted;
-
-            if (selectedRows.length > 1) {
-                table.clearSelection();
-            }
-
-            table.revalidate();
-            table.repaint();
-        }
-    }
-
-    class AddRowAction extends AbstractAction {
-
-        public AddRowAction() {
-            super("Add row", IconTheme.JabRefIcons.ADD_NOBOX.getIcon());
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Insert rows"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int[] rows = table.getSelectedRows();
-            if (rows.length == 0) {
-                // No rows selected, so we just add one at the end.
-                rowCount++;
-                table.revalidate();
-                table.repaint();
-                return;
-            }
-            for (int i = 0; i < rows.length; i++) {
-                if (((rows[i] + i) - 1) < tableRows.size()) {
-                    tableRows.add(Math.max(0, (rows[i] + i) - 1), new TableRow());
-                }
-            }
-            rowCount += rows.length;
-            if (rows.length > 1) {
-                table.clearSelection();
-            }
-            table.revalidate();
-            table.repaint();
-            tableChanged = true;
-        }
-    }
 
 
     /**
@@ -285,12 +187,6 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
      */
     @Override
     public void storeSettings() {
-
-        if (table.isEditing()) {
-            int col = table.getEditingColumn();
-            int row = table.getEditingRow();
-            table.getCellEditor(row, col).stopCellEditing();
-        }
 
         // Now we need to make sense of the contents the user has made to the
         // table setup table.

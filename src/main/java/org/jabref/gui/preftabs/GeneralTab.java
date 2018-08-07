@@ -64,9 +64,12 @@ class GeneralTab extends JPanel implements PrefsTab {
 
         memoryStick = new CheckBox(Localization.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
         useOwner = new CheckBox(Localization.lang("Mark new entries with owner name") + ':');
-        updateTimeStamp = new CheckBox(Localization.lang("Update timestamp on modification"));
+        updateTimeStamp = new CheckBox(Localization.lang("    Update timestamp on modification"));
         useTimeStamp = new CheckBox(Localization.lang("Mark new entries with addition date") + ". "
                 + Localization.lang("Date format") + ':');
+        if(!useTimeStamp.isSelected()){
+            updateTimeStamp.setDisable(true);
+        }
         useTimeStamp.setOnAction(e->updateTimeStamp.setDisable(!useTimeStamp.isSelected()));
         overwriteOwner = new CheckBox(Localization.lang("Overwrite"));
         overwriteTimeStamp = new CheckBox(Localization.lang("Overwrite"));
@@ -111,7 +114,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.add(new Label(Localization.lang("Field name") + ':'),6,13);
         builder.add(timeStampField,7,13);
 
-        Button help1 = new Button("?");
+        Button help1 = new Button("Help");
         help1.setOnAction(event -> new HelpAction(HelpFile.TIMESTAMP).getHelpButton().doClick());
         builder.add(help1,8,13);
 
@@ -205,9 +208,9 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.setDefaultEncoding((Charset) encodings.getItems());
         prefs.putBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE, biblatexMode.getItems().equals(BibDatabaseMode.BIBLATEX));
 
-        if (!LANGUAGES.get(language.getItems()).equals(prefs.get(JabRefPreferences.LANGUAGE))) {
-            prefs.put(JabRefPreferences.LANGUAGE, LANGUAGES.get(language.getItems()));
-            Localization.setLanguage(LANGUAGES.get(language.getItems()));
+        if (!LANGUAGES.get(language.getItems().toString()).equals(prefs.get(JabRefPreferences.LANGUAGE))) {
+            prefs.put(JabRefPreferences.LANGUAGE, LANGUAGES.get(language.getItems().toString()));
+            Localization.setLanguage(LANGUAGES.get(language.getItems().toString()));
             // Update any defaults that might be language dependent:
             Globals.prefs.setLanguageDependentDefaultValues();
             // Warn about restart needed:

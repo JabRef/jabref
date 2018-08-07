@@ -1,34 +1,27 @@
 package org.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JToolBar;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
 
-import org.jabref.gui.OSXCompatibleToolbar;
+import javafx.embed.swing.JFXPanel;
+import javafx.geometry.Orientation;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * Preference Tab for XMP.
@@ -39,12 +32,11 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;
-
     private int rowCount;
-
-    private final JTable table;
-
-    private final JCheckBox privacyFilterCheckBox = new JCheckBox(
+    private final Label label = new Label("    Field to filter");
+    private final ArrayList<TextField> textFields= new ArrayList<>(10);
+    private final VBox vBox = new VBox();
+    private final CheckBox privacyFilterCheckBox = new CheckBox(
             Localization.lang("Do not write the following fields to XMP Metadata:"));
 
     private final List<Object> tableRows = new ArrayList<>(10);
@@ -57,169 +49,71 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
         this.prefs = Objects.requireNonNull(prefs);
         setLayout(new BorderLayout());
 
-        TableModel tableModel = new AbstractTableModel() {
+        GridPane builder = new GridPane();
 
-            @Override
-            public int getRowCount() {
-                return rowCount;
-            }
+        BorderPane tablePanel = new BorderPane();
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setMaxHeight(400);
+        scrollPane.setMaxWidth(170);
+        textFields.add(new TextField("pdf"));
+        vBox.getChildren().add(new Label("field to filter"));
+        vBox.getChildren().addAll(textFields);
+        scrollPane.setContent(vBox);
+        tablePanel.setCenter(scrollPane);
 
-            @Override
-            public int getColumnCount() {
-                return 1;
-            }
+        Button add = new Button("+");
+        add.setOnAction(e->new AddRowAction());
+        Button delete = new Button("-");
+        delete.setOnAction(e->new DeleteRowAction());
+        VBox toolbar = new VBox(add,delete);
+        tablePanel.setRight(toolbar);
 
-            @Override
-            public Object getValueAt(int row, int column) {
-                if (row >= tableRows.size()) {
-                    return "";
-                }
-                Object rowContent = tableRows.get(row);
-                if (rowContent == null) {
-                    return "";
-                }
-                return rowContent;
-            }
-
-            @Override
-            public String getColumnName(int col) {
-                return Localization.lang("Field to filter");
-            }
-
-            @Override
-            public Class<?> getColumnClass(int column) {
-                return String.class;
-            }
-
-            @Override
-            public boolean isCellEditable(int row, int col) {
-                return true;
-            }
-
-            @Override
-            public void setValueAt(Object value, int row, int col) {
-                tableChanged = true;
-
-                if (tableRows.size() <= row) {
-                    ((ArrayList<Object>) tableRows).ensureCapacity(row + 1);
-                }
-
-                tableRows.set(row, value);
-            }
-
-        };
-
-        table = new JTable(tableModel);
-
-        TableColumnModel columnModel = table.getColumnModel();
-        columnModel.getColumn(0).setPreferredWidth(140);
-
-        FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:pref", "");
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        JPanel pan = new JPanel();
-
-        JPanel tablePanel = new JPanel();
-        tablePanel.setLayout(new BorderLayout());
-        JScrollPane scrollPane = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        table.setPreferredScrollableViewportSize(new Dimension(250, 200));
-        scrollPane.setMinimumSize(new Dimension(250, 300));
-        tablePanel.add(scrollPane, BorderLayout.CENTER);
-
-        JToolBar toolbar = new OSXCompatibleToolbar(SwingConstants.VERTICAL);
-        toolbar.setFloatable(false);
-        toolbar.setBorder(null);
-        toolbar.add(new AddRowAction());
-        toolbar.add(new DeleteRowAction());
-
-        tablePanel.add(toolbar, BorderLayout.EAST);
 
         // Build Prefs Tabs
-        builder.appendSeparator(Localization.lang("XMP export privacy settings"));
-        builder.nextLine();
+        builder.add(new Label(Localization.lang("XMP export privacy settings")),1,1);
 
-        builder.append(pan);
-        builder.append(privacyFilterCheckBox);
-        builder.nextLine();
+        builder.add(privacyFilterCheckBox,1,2);
 
-        builder.append(pan);
-        builder.append(tablePanel);
-        builder.nextLine();
+        builder.add(tablePanel,1,3);
 
-        pan = builder.getPanel();
-        pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        add(pan, BorderLayout.CENTER);
+        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
+        setLayout(new BorderLayout());
+        add(panel, BorderLayout.CENTER);
     }
 
-    class DeleteRowAction extends AbstractAction {
-
-        public DeleteRowAction() {
-            super("Delete row", IconTheme.JabRefIcons.REMOVE_NOBOX.getIcon());
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete rows"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int[] rows = table.getSelectedRows();
-            if (rows.length == 0) {
-                return;
-            }
-
-            for (int i = rows.length - 1; i >= 0; i--) {
-                if (rows[i] < tableRows.size()) {
-                    tableRows.remove(rows[i]);
-                }
-            }
-            rowCount -= rows.length;
-            if (rows.length > 1) {
-                table.clearSelection();
-            }
-            table.revalidate();
-            table.repaint();
+    class DeleteRowAction{
+        public DeleteRowAction(){
+            textFields.remove(textFields.get(textFields.size()-1));
+            rowCount--;
+            vBox.getChildren().clear();
+            vBox.getChildren().add(new Label("field to filter"));
+            vBox.getChildren().addAll(textFields);
             tableChanged = true;
         }
     }
 
-    class AddRowAction extends AbstractAction {
+    class AddRowAction{
 
         public AddRowAction() {
-            super("Add row", IconTheme.JabRefIcons.ADD_NOBOX.getIcon());
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Insert rows"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int[] rows = table.getSelectedRows();
-            if (rows.length == 0) {
-                // No rows selected, so we just add one at the end.
-                rowCount++;
-                table.revalidate();
-                table.repaint();
-                return;
-            }
-            for (int i = 0; i < rows.length; i++) {
-                if ((rows[i] + i) < tableRows.size()) {
-                    tableRows.add(rows[i] + i, "");
-                }
-            }
-            rowCount += rows.length;
-            if (rows.length > 1) {
-                table.clearSelection();
-            }
-            table.revalidate();
-            table.repaint();
+            rowCount++;
+            textFields.add(new TextField(""));
+            vBox.getChildren().clear();
+            vBox.getChildren().add(new Label("field to filter"));
+            vBox.getChildren().addAll(textFields);
             tableChanged = true;
         }
     }
-
-
     /**
      * Load settings from the preferences and initialize the table.
      */
     @Override
     public void setValues() {
         tableRows.clear();
-        List<String> names = JabRefPreferences.getInstance().getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS);
+        //List<String> names = JabRefPreferences.getInstance().getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS);
+        List<String>names = new ArrayList<>();
+        for(TextField textField:textFields){
+           names.add(textField.getText());
+        }
         tableRows.addAll(names);
         rowCount = tableRows.size() + 5;
 
@@ -234,13 +128,6 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
      */
     @Override
     public void storeSettings() {
-
-        if (table.isEditing()) {
-            int col = table.getEditingColumn();
-            int row = table.getEditingRow();
-            table.getCellEditor(row, col).stopCellEditing();
-        }
-
         // Now we need to make sense of the contents the user has made to the
         // table setup table. This needs to be done either if changes were made, or
         // if the checkbox is checked and no field values have been stored previously:
