@@ -110,7 +110,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
         tableRows.clear();
         //List<String> names = JabRefPreferences.getInstance().getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS);
         List<String>names = new ArrayList<>();
-        for (TextField textField : textFields){
+        for (TextField textField : textFields) {
            names.add(textField.getText());
         }
         tableRows.addAll(names);

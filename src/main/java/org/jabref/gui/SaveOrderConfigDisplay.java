@@ -24,7 +24,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.SaveOrderConfig;
 
-
 public class SaveOrderConfigDisplay {
 
     private GridPane panel;
