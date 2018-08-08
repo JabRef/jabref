@@ -17,6 +17,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 
+import com.sun.star.presentation.ClickAction;
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
 import org.jabref.Globals;
 import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.gui.actions.SimpleCommand;
