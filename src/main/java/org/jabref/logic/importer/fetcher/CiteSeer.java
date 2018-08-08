@@ -29,6 +29,9 @@ import org.apache.http.client.utils.URIBuilder;
 
 public class CiteSeer implements SearchBasedParserFetcher {
 
+    public CiteSeer() {
+    }
+
     @Override
     public String getName() {
         return "CiteSeerX";
