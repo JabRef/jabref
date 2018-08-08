@@ -226,7 +226,7 @@ public class BibtexKeyPatternPanel extends JPanel {
         label[16] = new Label("Standard");
         label[17] = new Label("TechReport");
         label[18] = new Label("Unpublished");
-        for (int i=0 ;i<=18; i++){
+        for (int i=0 ;i<=18; i++) {
             gridPane.add(label[i],1,i + 3);
             gridPane.add(textFieldArray[i],2,i + 3);
             gridPane.add(button[i],3,i + 3);

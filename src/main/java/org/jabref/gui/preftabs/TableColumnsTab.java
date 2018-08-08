@@ -144,7 +144,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         Button addRow = new Button("Add");
         addRow.setOnAction( e -> {
             if (!addLast.getText().isEmpty()) {
-                TableRow tableRow = addLast.getText().matches("[1-9][0-9]+")? new TableRow(addName.getText(), Integer.valueOf(addLast.getText())):new TableRow(addName.getText());
+                TableRow tableRow = addLast.getText().matches("[1-9][0-9]+") ? new TableRow(addName.getText(), Integer.valueOf(addLast.getText())):new TableRow(addName.getText());
                 addName.clear();
                 addLast.clear();
                 data.add(tableRow);
@@ -159,7 +159,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         Button deleteRow = new Button("Delete");
         deleteRow.setOnAction(e->  {
-            if (colSetup.getFocusModel() != null && colSetup.getFocusModel().getFocusedIndex()!= -1) {
+            if (colSetup.getFocusModel() != null && colSetup.getFocusModel().getFocusedIndex() != -1) {
             tableChanged = true;
             int row = colSetup.getFocusModel().getFocusedIndex();
             TableRow tableRow = data.get(row);
@@ -173,7 +173,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         });
         Button up = new Button("Up");
         up.setOnAction(e-> {
-            if (colSetup.getFocusModel()!=null) {
+            if (colSetup.getFocusModel() != null) {
                 int row = colSetup.getFocusModel().getFocusedIndex();
                 if (row > data.size() || row == 0) {
                     return;
@@ -236,7 +236,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         listOfFileColumnsScrollPane.setMaxHeight(80);
         listOfFileColumnsScrollPane.setContent(listOfFileColumnsVBox);
         extraFileColumns = new CheckBox(Localization.lang("Show extra columns"));
-        if (!extraFileColumns.isSelected()){
+        if (!extraFileColumns.isSelected()) {
             listOfFileColumnsVBox.setDisable(true);
         }
         extraFileColumns.setOnAction(arg0 -> listOfFileColumnsVBox.setDisable(!extraFileColumns.isSelected()));
@@ -339,7 +339,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                     }
                 }
             }
-            for (int i=0; i<listSize;i++)
+            for (int i=0; i<listSize; i++)
             {
                 listOfFileColumns.getSelectionModel().select(indicesToSelect[i]);
             }
