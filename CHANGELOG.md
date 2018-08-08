@@ -24,6 +24,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We changed the default keyboard shortcuts for moving between entries when the entry editor is active to ̀<kbd>alt</kbd> + <kbd>up/down</kbd>.
 - Opening a new file now prompts the directory of the currently selected file, instead of the directory of the last opened file.
 - Window state is saved on close and restored on start.
+- We added JavaFX Dialog to change Replace String dialog from swing to JavaFX, which is part of the issue[#3861](https://github.com/JabRef/jabref/issues/3861), with removing the old dialog logic.
 
 
 
@@ -78,6 +79,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
   - Set/clear/append/rename fields: available through Edit menu
   - Manage keywords: available through Edit menu
   - Copy linked files to folder: available through File menu
+- We removed the old logic of Replace String dialog (one file), instead, add JavaFX style dialog to cover the old function.
 
 
 
