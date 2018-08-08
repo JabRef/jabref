@@ -83,9 +83,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> {
             // Store the directory for next time:
             preferences.setWorkingDir(path);
-
-            link.set(path.toString());
-            relativizeFile();
+            link.set(relativize(path));
 
             setExternalFileTypeByExtension(link.getValueSafe());
         });
@@ -93,9 +91,9 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
     public void setValues(LinkedFile linkedFile) {
         description.set(linkedFile.getDescription());
-        link.set(linkedFile.getLink());
 
-        relativizeFile();
+        Path linkPath = Paths.get(linkedFile.getLink());
+        link.set(relativize(linkPath));
 
         selectedExternalFileType.setValue(null);
 
@@ -128,12 +126,9 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         return new LinkedFile(description.getValue(), link.getValue(), monadicSelectedExternalFileType.map(ExternalFileType::toString).getOrElse(""));
     }
 
-    private void relativizeFile() {
-        Path filePath = Paths.get(link.get());
+    private String relativize(Path filePath) {
         List<Path> fileDirectories = database.getFileDirectoriesAsPaths(preferences.getFileDirectoryPreferences());
-        filePath = FileUtil.shortenFileName(filePath, fileDirectories);
-        link.set(filePath.toString());
-
+        return FileUtil.shortenFileName(filePath, fileDirectories).toString();
     }
 
 }
