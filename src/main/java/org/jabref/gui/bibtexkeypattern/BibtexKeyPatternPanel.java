@@ -203,7 +203,7 @@ public class BibtexKeyPatternPanel extends JPanel {
     private void addExtraText() {
         Label []label = new Label[19];
         Button []button = new Button[19];
-        for (int i=0; i<=18; i++){
+        for (int i=0; i<=18; i++) {
             textFieldArray[i] = new TextField();
             button[i] = new Button("Default");
             button[i].setOnAction(e-> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));

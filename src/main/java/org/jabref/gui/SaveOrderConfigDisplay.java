@@ -1,12 +1,13 @@
 package org.jabref.gui;
 
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -14,9 +15,9 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 
-import javax.swing.JPanel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JPanel;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -34,13 +35,6 @@ public class SaveOrderConfigDisplay {
     private CheckBox savePriDesc;
     private CheckBox saveSecDesc;
     private CheckBox saveTerDesc;
-
-    private JComboBox<String> savePriSort1;
-    private JComboBox<String> saveSecSort1;
-    private JComboBox<String> saveTerSort1;
-    private JCheckBox savePriDesc1;
-    private JCheckBox saveSecDesc1;
-    private JCheckBox saveTerDesc1;
 
 
     public SaveOrderConfigDisplay() {
@@ -77,15 +71,15 @@ public class SaveOrderConfigDisplay {
         builder.add(saveTerDesc,3,3);
         panel = builder;
 
-        savePriSort1 = new JComboBox<>(allPlusKey);
+        JComboBox<String> savePriSort1 = new JComboBox<>(allPlusKey);
         savePriSort1.setEditable(true);
-        saveSecSort1 = new JComboBox<>(allPlusKey);
+        JComboBox<String> saveSecSort1 = new JComboBox<>(allPlusKey);
         saveSecSort1.setEditable(true);
-        saveTerSort1 = new JComboBox<>(allPlusKey);
+        JComboBox<String> saveTerSort1 = new JComboBox<>(allPlusKey);
         saveTerSort1.setEditable(true);
-        savePriDesc1 = new JCheckBox(Localization.lang("Descending"));
-        saveSecDesc1 = new JCheckBox(Localization.lang("Descending"));
-        saveTerDesc1 = new JCheckBox(Localization.lang("Descending"));
+        JCheckBox savePriDesc1 = new JCheckBox(Localization.lang("Descending"));
+        JCheckBox saveSecDesc1 = new JCheckBox(Localization.lang("Descending"));
+        JCheckBox saveTerDesc1 = new JCheckBox(Localization.lang("Descending"));
         FormLayout layout = new FormLayout("right:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref",
                 "pref, 2dlu, pref, 2dlu, pref");
         FormBuilder builder1 = FormBuilder.create().layout(layout);
