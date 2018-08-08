@@ -13,12 +13,16 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+
+import javax.swing.JPanel;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.SaveOrderConfig;
 
-import javax.swing.*;
 
 public class SaveOrderConfigDisplay {
 
