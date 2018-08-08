@@ -36,7 +36,6 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.EntryType;
 import org.jabref.preferences.JabRefPreferences;
 
-
 public class BibtexKeyPatternPanel extends JPanel {
 
     // used by both BibtexKeyPatternPanel and TabLabelPAttern
