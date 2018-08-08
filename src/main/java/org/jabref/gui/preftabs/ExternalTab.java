@@ -143,10 +143,10 @@ class ExternalTab extends JPanel implements PrefsTab {
         Button button = new Button(Localization.lang("Settings for %0", application.getApplicationName()));
         button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(null, settings));
         if (index % 2 == 0) {
-            panel.add(button,1,index / 2+1);
+            panel.add(button,1,index / 2 + 1);
         }
         else {
-            panel.add(button,2,index / 2+1);
+            panel.add(button,2,index / 2 + 1);
         }
     }
 

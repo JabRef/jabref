@@ -144,7 +144,12 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         Button addRow = new Button("Add");
         addRow.setOnAction( e -> {
             if (!addLast.getText().isEmpty()) {
-                TableRow tableRow = addLast.getText().matches("[1-9][0-9]+") ? new TableRow(addName.getText(), Integer.valueOf(addLast.getText())):new TableRow(addName.getText());
+                TableRow tableRow;
+                if (addLast.getText().matches("[1-9][0-9]+")){
+                    tableRow = new TableRow(addName.getText(), Integer.valueOf(addLast.getText()));
+                } else {
+                    tableRow = new TableRow(addName.getText());
+                }
                 addName.clear();
                 addLast.clear();
                 data.add(tableRow);
@@ -192,7 +197,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         });
         Button down = new Button("Down");
         down.setOnAction(e-> {
-            if (colSetup.getFocusModel()!=null) {
+            if (colSetup.getFocusModel() != null) {
                 int row = colSetup.getFocusModel().getFocusedIndex();
                 if (row + 1 > data.size()) {
                     return;
@@ -339,8 +344,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                     }
                 }
             }
-            for (int i=0; i<listSize; i++)
-            {
+            for (int i=0; i < listSize; i++) {
                 listOfFileColumns.getSelectionModel().select(indicesToSelect[i]);
             }
         } else {
