@@ -84,6 +84,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
             // Store the directory for next time:
             preferences.setWorkingDir(path);
 
+            link.set(path.toString());
             relativizeFile();
 
             setExternalFileTypeByExtension(link.getValueSafe());
