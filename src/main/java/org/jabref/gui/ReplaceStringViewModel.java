@@ -104,15 +104,15 @@ public class ReplaceStringViewModel extends AbstractViewModel
         return selectOnlyProperty;
     }
 
-    public StringProperty FieldStringProperty() {
+    public StringProperty fieldStringProperty() {
         return fieldStringProperty;
     }
 
-    public StringProperty FindStringProperty() {
+    public StringProperty findStringProperty() {
         return findStringProperty;
     }
 
-    public StringProperty ReplaceStringProperty() {
+    public StringProperty replaceStringProperty() {
         return replaceStringProperty;
     }
 }
