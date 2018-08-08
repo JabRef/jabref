@@ -84,11 +84,8 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
             // Store the directory for next time:
             preferences.setWorkingDir(path);
 
-            // If the file is below the file directory, make the path relative:
-            List<Path> fileDirectories = database.getFileDirectoriesAsPaths(preferences.getFileDirectoryPreferences());
-            path = FileUtil.shortenFileName(path, fileDirectories);
+            relativizeFile();
 
-            link.set(path.toString());
             setExternalFileTypeByExtension(link.getValueSafe());
         });
     }
@@ -97,6 +94,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         description.set(linkedFile.getDescription());
         link.set(linkedFile.getLink());
 
+        relativizeFile();
 
         selectedExternalFileType.setValue(null);
 
@@ -130,9 +128,6 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     }
 
     private void relativizeFile() {
-
-        Optional<Path> file = FileHelper.expandFilename(database, link.get(), preferences.getFileDirectoryPreferences());
-        Path workingDir = file.orElse(preferences.getWorkingDir());
         Path filePath = Paths.get(link.get());
         List<Path> fileDirectories = database.getFileDirectoriesAsPaths(preferences.getFileDirectoryPreferences());
         filePath = FileUtil.shortenFileName(filePath, fileDirectories);
