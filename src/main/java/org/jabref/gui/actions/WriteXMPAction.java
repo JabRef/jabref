@@ -61,7 +61,7 @@ public class WriteXMPAction extends SimpleCommand {
     public void execute() {
         init();
         BackgroundTask.wrap(this::writeXMP)
-                      .executeWith(Globals.TASK_EXECUTOR);
+                .executeWith(Globals.TASK_EXECUTOR);
     }
 
     public void init() {
@@ -110,19 +110,19 @@ public class WriteXMPAction extends SimpleCommand {
 
             // Make a list of all PDFs linked from this entry:
             List<Path> files = entry.getFiles().stream()
-                                    .filter(file -> file.getFileType().equalsIgnoreCase("pdf"))
-                                    .map(file -> file.findIn(basePanel.getBibDatabaseContext(), Globals.prefs.getFileDirectoryPreferences()))
-                                    .filter(Optional::isPresent)
-                                    .map(Optional::get)
-                                    .collect(Collectors.toList());
+                    .filter(file -> file.getFileType().equalsIgnoreCase("pdf"))
+                    .map(file -> file.findIn(basePanel.getBibDatabaseContext(), Globals.prefs.getFileDirectoryPreferences()))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
 
             SwingUtilities.invokeLater(() -> optionsDialog.getProgressArea()
-                                                          .append(entry.getCiteKeyOptional().orElse(Localization.lang("undefined")) + "\n"));
+                    .append(entry.getCiteKeyOptional().orElse(Localization.lang("undefined")) + "\n"));
 
             if (files.isEmpty()) {
                 skipped++;
                 SwingUtilities.invokeLater(() -> optionsDialog.getProgressArea()
-                                                              .append("  " + Localization.lang("Skipped - No PDF linked") + ".\n"));
+                        .append("  " + Localization.lang("Skipped - No PDF linked") + ".\n"));
             } else {
                 for (Path file : files) {
                     if (Files.exists(file)) {
@@ -143,7 +143,7 @@ public class WriteXMPAction extends SimpleCommand {
                         skipped++;
                         SwingUtilities.invokeLater(() -> {
                             optionsDialog.getProgressArea()
-                                         .append("  " + Localization.lang("Skipped - PDF does not exist") + ":\n");
+                                    .append("  " + Localization.lang("Skipped - PDF does not exist") + ":\n");
                             optionsDialog.getProgressArea().append("    " + file.toString() + "\n");
                         });
                     }
@@ -158,9 +158,9 @@ public class WriteXMPAction extends SimpleCommand {
         }
         SwingUtilities.invokeLater(() -> {
             optionsDialog.getProgressArea()
-                         .append("\n"
-                           + Localization.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).", String
-                           .valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
+                    .append("\n"
+                            + Localization.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).", String
+                            .valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
             optionsDialog.done();
         });
 

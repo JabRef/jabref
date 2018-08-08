@@ -174,7 +174,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
     private final PreviewPanel preview;
     private final Map<BibEntry, Set<GroupTreeNode>> groupAdditions = new HashMap<>();
     private final JCheckBox autoGenerate = new JCheckBox(Localization.lang("Generate keys"),
-                                                         Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION));
+            Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION));
     private final JLabel duplLabel = new JLabel(IconTheme.JabRefIcons.DUPLICATE.getSmallIcon());
     private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcons.FILE.getSmallIcon());
     private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcons.WWW.getSmallIcon());
@@ -204,7 +204,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
 
         sortedList = new SortedList<>(entries);
         DefaultEventTableModel<BibEntry> tableModelGl = (DefaultEventTableModel<BibEntry>) GlazedListsSwing
-                                                                                                           .eventTableModelWithThreadProxyList(sortedList, new EntryTableFormat());
+                .eventTableModelWithThreadProxyList(sortedList, new EntryTableFormat());
         glTable = new EntryTable(tableModelGl);
         GeneralRenderer renderer = new GeneralRenderer(Color.white);
         glTable.setDefaultRenderer(JLabel.class, renderer);
@@ -214,11 +214,11 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
         glTable.getActionMap().put("delete", deleteListener);
 
         selectionModel = (DefaultEventSelectionModel<BibEntry>) GlazedListsSwing
-                                                                                .eventSelectionModelWithThreadProxyList(sortedList);
+                .eventSelectionModelWithThreadProxyList(sortedList);
         glTable.setSelectionModel(selectionModel);
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
         comparatorChooser = TableComparatorChooser.install(glTable, sortedList,
-                                                           AbstractTableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
+                AbstractTableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
         setupComparatorChooser();
         glTable.addMouseListener(new TableClickListener());
 
@@ -312,7 +312,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
 
         // Remember and default to last size:
         setSize(new Dimension(Globals.prefs.getInt(JabRefPreferences.IMPORT_INSPECTION_DIALOG_WIDTH),
-                              Globals.prefs.getInt(JabRefPreferences.IMPORT_INSPECTION_DIALOG_HEIGHT)));
+                Globals.prefs.getInt(JabRefPreferences.IMPORT_INSPECTION_DIALOG_HEIGHT)));
         addWindowListener(new WindowAdapter() {
 
             @Override
@@ -353,8 +353,8 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
             // database (if
             // applicable) and against entries already in the table.
             if ((panel != null) && (DuplicateCheck
-                                                  .containsDuplicate(panel.getDatabase(), entry, panel.getBibDatabaseContext().getMode()).isPresent()
-                                    || (internalDuplicate(this.entries, entry).isPresent()))) {
+                    .containsDuplicate(panel.getDatabase(), entry, panel.getBibDatabaseContext().getMode()).isPresent()
+                    || (internalDuplicate(this.entries, entry).isPresent()))) {
                 entry.setGroupHit(true);
                 SwingUtilities.invokeLater(() -> deselectAllDuplicates.setEnabled(true));
             }
@@ -430,7 +430,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
 
             // Generate a unique key:
             new BibtexKeyGenerator(localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
-                                   database, Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(entry);
+                    database, Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(entry);
             // Remove the entry from the database again, since we only added it in
             // order to
             // make sure the key was unique:
@@ -472,7 +472,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                 database.insertEntry(entry);
 
                 new BibtexKeyGenerator(localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
-                                       database, Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(entry);
+                        database, Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(entry);
                 // Add the generated key to our list:   -- TODO: Why??
                 keys.add(entry.getCiteKeyOptional());
             }
@@ -614,9 +614,9 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
      */
     public void showErrorMessage(String fetcherTitle, String localizedException) {
         showMessage(Localization.lang("Error while fetching from %0", fetcherTitle) + "\n" +
-                    Localization.lang("Please try again later and/or check your network connection.") + "\n" +
-                    localizedException,
-                    Localization.lang("Search %0", fetcherTitle), JOptionPane.ERROR_MESSAGE);
+                        Localization.lang("Please try again later and/or check your network connection.") + "\n" +
+                        localizedException,
+                Localization.lang("Search %0", fetcherTitle), JOptionPane.ERROR_MESSAGE);
     }
 
     public JabRefFrame getFrame() {
@@ -698,10 +698,10 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                         boolean continuePressed =
                                 DefaultTaskExecutor.runInJavaFXThread(() ->
                                         frame.getDialogService().showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
-                                                                                                                   Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
-                                                                                                                   Localization.lang("Continue"),
-                                                                                                                   Localization.lang("Cancel"),
-                                                                                                                   Localization.lang("Disable this confirmation dialog"),
+                                                Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
+                                                Localization.lang("Continue"),
+                                                Localization.lang("Cancel"),
+                                                Localization.lang("Disable this confirmation dialog"),
                                                 optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, !optOut)));
 
                         if (!continuePressed) {
@@ -801,9 +801,9 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                 // immediately.
 
                 boolean generateKeysPressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Add to group"),
-                                                                                                     Localization.lang("Cannot add entries to group without generating keys. Generate keys now?"),
-                                                                                                     Localization.lang("Generate keys"),
-                                                                                                     Localization.lang("Cancel"));
+                        Localization.lang("Cannot add entries to group without generating keys. Generate keys now?"),
+                        Localization.lang("Generate keys"),
+                        Localization.lang("Cancel"));
 
                 if (generateKeysPressed) {
                     generateKeys();
@@ -821,7 +821,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                         List<FieldChange> undo = entryChanger.add(Collections.singletonList(entry));
                         if (!undo.isEmpty()) {
                             ce.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node),
-                                                                                    undo));
+                                    undo));
                         }
                     }
                 }
@@ -937,7 +937,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                         }
                         FileListEntry fl = tableModel.getEntry(0);
                         (new ExternalFileMenuItem(frame, "", fl.getLink(), null, panel.getBibDatabaseContext(),
-                                                  fl.getType())).actionPerformed(null);
+                                fl.getType())).actionPerformed(null);
                     }
                 } else { // Must be URL_COL
                     openExternalLink(FieldName.URL, e);
@@ -995,7 +995,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                     description = flEntry.getLink();
                 }
                 menu.add(new ExternalFileMenuItem(panel.frame(), description, flEntry.getLink(),
-                                                  flEntry.getType().get().getIcon().getSmallIcon(), panel.getBibDatabaseContext(), flEntry.getType()));
+                        flEntry.getType().get().getIcon().getSmallIcon(), panel.getBibDatabaseContext(), flEntry.getType()));
                 count++;
             }
             if (count == 0) {
@@ -1049,12 +1049,12 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
             if ((col == DUPL_COL) && (glTable.getValueAt(row, col) != null)) {
                 BibEntry first = sortedList.get(row);
                 Optional<BibEntry> other = DuplicateCheck.containsDuplicate(panel.getDatabase(), first,
-                                                                            panel.getBibDatabaseContext().getMode());
+                        panel.getBibDatabaseContext().getMode());
                 if (other.isPresent()) {
                     // This will be true if the duplicate is in the existing
                     // database.
                     DuplicateResolverDialog diag = new DuplicateResolverDialog(ImportInspectionDialog.this, other.get(),
-                                                                               first, DuplicateResolverDialog.DuplicateResolverType.INSPECTION);
+                            first, DuplicateResolverDialog.DuplicateResolverType.INSPECTION);
                     diag.setLocationRelativeTo(ImportInspectionDialog.this);
                     diag.setVisible(true);
                     ImportInspectionDialog.this.toFront();
@@ -1115,7 +1115,7 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
                 other = internalDuplicate(entries, first);
                 if (other.isPresent()) {
                     DuplicateResolverDialog diag = new DuplicateResolverDialog(ImportInspectionDialog.this, first,
-                                                                               other.get(), DuplicateResolverDialog.DuplicateResolverType.DUPLICATE_SEARCH);
+                            other.get(), DuplicateResolverDialog.DuplicateResolverType.DUPLICATE_SEARCH);
                     diag.setLocationRelativeTo(ImportInspectionDialog.this);
                     diag.setVisible(true);
                     ImportInspectionDialog.this.toFront();
@@ -1189,9 +1189,9 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
             if (!entry.getCiteKeyOptional().isPresent()) {
 
                 boolean generateKeyPressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Download file"),
-                                                                                                    Localization.lang("This entry has no BibTeX key. Generate key now?"),
-                                                                                                    Localization.lang("Generate key"),
-                                                                                                    Localization.lang("Cancel"));
+                        Localization.lang("This entry has no BibTeX key. Generate key now?"),
+                        Localization.lang("Generate key"),
+                        Localization.lang("Cancel"));
 
                 if (generateKeyPressed) {
                     generateKeyForEntry(entry);
@@ -1234,9 +1234,9 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
             if (!entry.hasCiteKey()) {
 
                 boolean generateKeyPressed = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Download file"),
-                                                                                                    Localization.lang("This entry has no BibTeX key. Generate key now?"),
-                                                                                                    Localization.lang("Generate key"),
-                                                                                                    Localization.lang("Cancel"));
+                        Localization.lang("This entry has no BibTeX key. Generate key now?"),
+                        Localization.lang("Generate key"),
+                        Localization.lang("Cancel"));
 
                 if (generateKeyPressed) {
                     generateKeyForEntry(entry);
@@ -1250,18 +1250,18 @@ public class ImportInspectionDialog extends JabRefDialog implements OutputPrinte
             // links:
             JDialog diag = new JDialog(ImportInspectionDialog.this, true);
             JabRefExecutorService.INSTANCE
-                                          .execute(AutoSetLinks.autoSetLinks(entry, bibDatabaseContext, e -> {
-                                              if (e.getID() > 0) {
+                    .execute(AutoSetLinks.autoSetLinks(entry, bibDatabaseContext, e -> {
+                        if (e.getID() > 0) {
 
-                                                  entries.getReadWriteLock().writeLock().lock();
-                                                  try {
-                                                      entry.setField(FieldName.FILE, localModel.getStringRepresentation());
-                                                  } finally {
-                                                      entries.getReadWriteLock().writeLock().unlock();
-                                                  }
-                                                  glTable.repaint();
-                                              }
-                                          }, diag));
+                            entries.getReadWriteLock().writeLock().lock();
+                            try {
+                                entry.setField(FieldName.FILE, localModel.getStringRepresentation());
+                            } finally {
+                                entries.getReadWriteLock().writeLock().unlock();
+                            }
+                            glTable.repaint();
+                        }
+                    }, diag));
 
         }
     }

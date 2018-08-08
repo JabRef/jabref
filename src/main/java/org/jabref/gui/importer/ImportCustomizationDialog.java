@@ -224,9 +224,9 @@ public class ImportCustomizationDialog extends JabRefDialog {
     }
 
     /*
-    *  (non-Javadoc)
-    * @see java.awt.Component#getSize()
-    */
+     *  (non-Javadoc)
+     * @see java.awt.Component#getSize()
+     */
     @Override
     public Dimension getSize() {
         int width = COL_0_WIDTH + COL_1_WIDTH + COL_2_WIDTH + COL_3_WIDTH;

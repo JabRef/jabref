@@ -607,7 +607,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                 factory.createIconButton(StandardActions.FORK_ME, new OpenBrowserAction("https://github.com/JabRef/jabref")),
                 factory.createIconButton(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
                 factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org"))
-                );
+        );
 
         HBox.setHgrow(globalSearchBar, Priority.ALWAYS);
 
@@ -618,7 +618,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                 rightSpacer,
                 rightSide
-                );
+        );
         toolBar.getStyleClass().add("mainToolbar");
 
         return toolBar;
@@ -999,7 +999,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
      * displays the String on the Status Line visible on the bottom of the JabRef mainframe
      */
     public void output(final String s) {
-            statusLine.setText(s);
+        statusLine.setText(s);
     }
 
     private void initActions() {
@@ -1297,10 +1297,10 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
      */
     private boolean confirmClose(BasePanel panel) {
         String filename = panel.getBibDatabaseContext()
-                               .getDatabasePath()
-                               .map(Path::toAbsolutePath)
-                               .map(Path::toString)
-                               .orElse(GUIGlobals.UNTITLED_TITLE);
+                .getDatabasePath()
+                .map(Path::toAbsolutePath)
+                .map(Path::toString)
+                .orElse(GUIGlobals.UNTITLED_TITLE);
 
         ButtonType saveChanges = new ButtonType(Localization.lang("Save changes"), ButtonBar.ButtonData.YES);
         ButtonType discardChanges = new ButtonType(Localization.lang("Discard changes"), ButtonBar.ButtonData.NO);

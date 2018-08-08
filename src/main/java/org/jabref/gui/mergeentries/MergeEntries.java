@@ -322,7 +322,7 @@ public class MergeEntries {
     }
 
     private void synchronizeColumnWidths(FormLayout mainLayout, FormLayout mergeLayout,
-            int maxLabelWidth) {
+                                         int maxLabelWidth) {
         // Synchronize column widths
         String[] rbAlign = {"right", "center", "left"};
         mainLayout.setColumnSpec(1, ColumnSpec.decode(Integer.toString(maxLabelWidth) + "px"));
@@ -366,26 +366,26 @@ public class MergeEntries {
             String leftString = leftEntry.getField(field).orElse("");
             String rightString = rightEntry.getField(field).orElse("");
             switch (diffMode.getSelectedIndex()) {
-            case 0: // Plain text
-                break;
-            case 1: // Latexdiff style - word
-                rightString = DiffHighlighting.generateDiffHighlighting(leftString, rightString, " ");
-                break;
-            case 2: // Latexdiff style - character
-                rightString = DiffHighlighting.generateDiffHighlighting(leftString, rightString, "");
-                break;
-            case 3: // Symmetric style - word
-                String tmpLeftString = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, " ");
-                rightString = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, " ");
-                leftString = tmpLeftString;
-                break;
-            case 4: // Symmetric style - character
-                tmpLeftString = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, "");
-                rightString = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, "");
-                leftString = tmpLeftString;
-                break;
-            default: // Shouldn't happen
-                break;
+                case 0: // Plain text
+                    break;
+                case 1: // Latexdiff style - word
+                    rightString = DiffHighlighting.generateDiffHighlighting(leftString, rightString, " ");
+                    break;
+                case 2: // Latexdiff style - character
+                    rightString = DiffHighlighting.generateDiffHighlighting(leftString, rightString, "");
+                    break;
+                case 3: // Symmetric style - word
+                    String tmpLeftString = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, " ");
+                    rightString = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, " ");
+                    leftString = tmpLeftString;
+                    break;
+                case 4: // Symmetric style - character
+                    tmpLeftString = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, "");
+                    rightString = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, "");
+                    leftString = tmpLeftString;
+                    break;
+                default: // Shouldn't happen
+                    break;
             }
             if ((leftString != null) && leftTextPanes.containsKey(field)) {
                 leftTextPanes.get(field).setText(DiffHighlighting.HTML_START + leftString + DiffHighlighting.HTML_END);

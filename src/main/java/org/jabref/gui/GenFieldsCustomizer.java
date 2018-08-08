@@ -116,7 +116,7 @@ public class GenFieldsCustomizer extends JabRefDialog {
                 // Report error and exit.
                 String field = Localization.lang("field");
                 JOptionPane.showMessageDialog(this, Localization.lang("Each line must be on the following form") + " '" +
-                        Localization.lang("Tabname") + ':' + field + "1;" + field + "2;...;" + field + "N'",
+                                Localization.lang("Tabname") + ':' + field + "1;" + field + "2;...;" + field + "N'",
                         Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }

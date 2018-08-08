@@ -163,12 +163,12 @@ public class ExportCustomizationDialog extends JabRefDialog {
         @Override
         public String getColumnName(int col) {
             switch (col) {
-            case 0:
-                return Localization.lang("Export name");
-            case 1:
-                return Localization.lang("Main layout file");
-            default:
-                return Localization.lang("Extension");
+                case 0:
+                    return Localization.lang("Export name");
+                case 1:
+                    return Localization.lang("Main layout file");
+                default:
+                    return Localization.lang("Extension");
             }
         }
     }

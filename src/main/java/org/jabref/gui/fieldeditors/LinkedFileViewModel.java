@@ -223,9 +223,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
         } else {
             String targetFileName = pdfCleanup.getTargetFileName(linkedFile, entry);
             confirm = dialogService.showConfirmationDialogAndWait(Localization.lang("File exists"),
-                                                                  Localization.lang("'%0' exists. Overwrite file?", targetFileName),
-                                                                  Localization.lang("Overwrite"),
-                                                                  Localization.lang("Cancel"));
+                    Localization.lang("'%0' exists. Overwrite file?", targetFileName),
+                    Localization.lang("Overwrite"),
+                    Localization.lang("Cancel"));
 
             if (confirm) {
                 try {
@@ -233,7 +233,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     pdfCleanup.cleanupWithException(entry);
                 } catch (IOException e) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Rename failed"),
-                                                         Localization.lang("JabRef cannot access the file because it is being used by another process."));
+                            Localization.lang("JabRef cannot access the file because it is being used by another process."));
                 }
             }
         }
@@ -279,9 +279,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
         ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"), ButtonData.YES);
         ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
         Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
-                                                                                      Localization.lang("Delete '%0'", file.get().toString()),
-                                                                                      Localization.lang("Delete the selected file permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk."),
-                                                                                      removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
+                Localization.lang("Delete '%0'", file.get().toString()),
+                Localization.lang("Delete the selected file permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk."),
+                removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
 
         if (buttonType.isPresent()) {
             if (buttonType.get().equals(removeFromEntry)) {

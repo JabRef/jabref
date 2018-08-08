@@ -52,7 +52,7 @@ public class JabRefDesktop {
      */
     public static void openExternalViewer(BibDatabaseContext databaseContext, String initialLink,
                                           String initialFieldName)
-        throws IOException {
+            throws IOException {
         String link = initialLink;
         String fieldName = initialFieldName;
         if (FieldName.PS.equals(fieldName) || FieldName.PDF.equals(fieldName)) {
@@ -73,7 +73,7 @@ public class JabRefDesktop {
                 if ("pdf".equalsIgnoreCase(split[split.length - 1])) {
                     fieldName = FieldName.PDF;
                 } else if ("ps".equalsIgnoreCase(split[split.length - 1])
-                           || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
+                        || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
                     fieldName = FieldName.PS;
                 }
             }
@@ -121,7 +121,7 @@ public class JabRefDesktop {
      */
     public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext, String link,
                                                     final Optional<ExternalFileType> type)
-        throws IOException {
+            throws IOException {
 
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
             openExternalFilePlatformIndependent(type, link);
@@ -146,7 +146,7 @@ public class JabRefDesktop {
     }
 
     private static void openExternalFilePlatformIndependent(Optional<ExternalFileType> fileType, String filePath)
-        throws IOException {
+            throws IOException {
         if (fileType.isPresent()) {
             String application = fileType.get().getOpenWithApplication();
 
@@ -203,10 +203,10 @@ public class JabRefDesktop {
             String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
             JabRefGUI.getMainFrame().output(couldNotOpenBrowser);
             JOptionPane.showMessageDialog(null,
-                                          couldNotOpenBrowser + "\n" + openManually + "\n" +
-                                                copiedToClipboard,
-                                          couldNotOpenBrowser,
-                                          JOptionPane.ERROR_MESSAGE);
+                    couldNotOpenBrowser + "\n" + openManually + "\n" +
+                            copiedToClipboard,
+                    couldNotOpenBrowser,
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -248,9 +248,9 @@ public class JabRefDesktop {
                     LOGGER.error("Open console", exception);
 
                     JOptionPane.showMessageDialog(null,
-                                                  Localization.lang("Error occured while executing the command \"%0\".", commandLoggingText),
-                                                  Localization.lang("Open console") + " - " + Localization.lang("Error"),
-                                                  JOptionPane.ERROR_MESSAGE);
+                            Localization.lang("Error occured while executing the command \"%0\".", commandLoggingText),
+                            Localization.lang("Open console") + " - " + Localization.lang("Error"),
+                            JOptionPane.ERROR_MESSAGE);
                     JabRefGUI.getMainFrame().output(null);
                 }
             }

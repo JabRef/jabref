@@ -307,7 +307,7 @@ class StringDialog extends JabRefDialog {
         @Override
         public String getColumnName(int col) {
             return col == 0 ? Localization.lang("Label") :
-                Localization.lang("Content");
+                    Localization.lang("Content");
         }
 
         @Override

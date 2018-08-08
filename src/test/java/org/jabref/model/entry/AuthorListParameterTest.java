@@ -25,17 +25,17 @@ public class AuthorListParameterTest {
     public static Collection<Object[]> data() {
 
         return Arrays.asList(new Object[][] {
-            {"王, 军", authorList(new Author("军", "军.", null, "王", null))},
-            { "Doe, John", authorList(new Author("John", "J.", null, "Doe", null)) },
-            { "von Berlichingen zu Hornberg, Johann Gottfried",
-                    authorList(new Author("Johann Gottfried", "J. G.", "von", "Berlichingen zu Hornberg", null)) },
-            //{ "Robert and Sons, Inc.", authorList(new Author(null, null, null, "Robert and Sons, Inc.", null)) },
+                {"王, 军", authorList(new Author("军", "军.", null, "王", null))},
+                { "Doe, John", authorList(new Author("John", "J.", null, "Doe", null)) },
+                { "von Berlichingen zu Hornberg, Johann Gottfried",
+                        authorList(new Author("Johann Gottfried", "J. G.", "von", "Berlichingen zu Hornberg", null)) },
+                //{ "Robert and Sons, Inc.", authorList(new Author(null, null, null, "Robert and Sons, Inc.", null)) },
                 //{ "al-Ṣāliḥ, Abdallāh", authorList(new Author("Abdallāh", "A.", null, "al-Ṣāliḥ", null)) },
                 {"de la Vallée Poussin, Jean Charles Gabriel",
                         authorList(new Author("Jean Charles Gabriel", "J. C. G.", "de la", "Vallée Poussin", null))},
                 {"de la Vallée Poussin, J. C. G.",
                         authorList(new Author("J. C. G.", "J. C. G.", "de la", "Vallée Poussin", null))},
-            { "{K}ent-{B}oswell, E. S.", authorList(new Author("E. S.", "E. S.", null, "{K}ent-{B}oswell", null)) },
+                { "{K}ent-{B}oswell, E. S.", authorList(new Author("E. S.", "E. S.", null, "{K}ent-{B}oswell", null)) },
         });
     }
 

@@ -189,7 +189,7 @@ class ReplaceStringDialog extends JabRefDialog {
             }
         } else {
             for (String fld : fieldStrings) {
-                    counter += replaceField(be, fld, ce);
+                counter += replaceField(be, fld, ce);
             }
         }
         return counter;

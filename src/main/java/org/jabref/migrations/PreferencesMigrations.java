@@ -153,7 +153,7 @@ public class PreferencesMigrations {
 
         try {
             if (mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBTEX_TYPES) ||
-                mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBLATEX_TYPES)) {
+                    mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBLATEX_TYPES)) {
                 // skip further processing as prefs already have been migrated
             } else {
                 LOGGER.info("Migrating old custom entry types.");
@@ -208,12 +208,12 @@ public class PreferencesMigrations {
         String preferenceFileNamePattern = mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null);
 
         if ((preferenceFileNamePattern != null) &&
-            oldStylePattern.equals(preferenceFileNamePattern)) {
+                oldStylePattern.equals(preferenceFileNamePattern)) {
             // Upgrade the old-style File Name pattern to new one:
             mainPrefsNode.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
             LOGGER.info("migrated old style " + JabRefPreferences.IMPORT_FILENAMEPATTERN +
-                        " value \"" + oldStylePattern + "\" to new value \"" +
-                        newStylePattern + "\" in the preference file");
+                    " value \"" + oldStylePattern + "\" to new value \"" +
+                    newStylePattern + "\" in the preference file");
 
             if (prefs.hasKey(JabRefPreferences.IMPORT_FILENAMEPATTERN)) {
                 // Update also the key in the current application settings, if necessary:
@@ -221,8 +221,8 @@ public class PreferencesMigrations {
                 if (oldStylePattern.equals(fileNamePattern)) {
                     prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
                     LOGGER.info("migrated old style " + JabRefPreferences.IMPORT_FILENAMEPATTERN +
-                                " value \"" + oldStylePattern + "\" to new value \"" +
-                                newStylePattern + "\" in the running application");
+                            " value \"" + oldStylePattern + "\" to new value \"" +
+                            newStylePattern + "\" in the running application");
                 }
             }
         }
@@ -235,9 +235,9 @@ public class PreferencesMigrations {
         if (mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null) != null) {
 
             String[] oldStylePatterns = new String[] {"\\bibtexkey",
-                                                      "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
+                    "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
             String[] newStylePatterns = new String[] {"[bibtexkey]",
-                                                      "[bibtexkey] - [fulltitle]"};
+                    "[bibtexkey] - [fulltitle]"};
             for (int i = 0; i < oldStylePatterns.length; i++) {
                 migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
             }
@@ -271,11 +271,11 @@ public class PreferencesMigrations {
     }
 
     private static void migrateTypedKeyPrefs(JabRefPreferences prefs, Preferences oldPatternPrefs)
-        throws BackingStoreException {
+            throws BackingStoreException {
         LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
 
         GlobalBibtexKeyPattern keyPattern = GlobalBibtexKeyPattern.fromPattern(
-                                                                               prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
+                prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         for (String key : oldPatternPrefs.keys()) {
             keyPattern.addBibtexKeyPattern(key, oldPatternPrefs.get(key, null));
         }

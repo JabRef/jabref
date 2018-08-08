@@ -112,10 +112,10 @@ public class FromAuxDialog extends JabRefDialog {
         this.setTitle(Localization.lang("AUX file import"));
         JLabel desc = new JLabel("<html><h3>" + Localization.lang("AUX file import") + "</h3><p>"
                 + Localization.lang("This feature generates a new library based on which entries "
-                        + "are needed in an existing LaTeX document.")
+                + "are needed in an existing LaTeX document.")
                 + "</p>" + "<p>"
                 + Localization.lang("You need to select one of your open libraries from which to choose "
-                        + "entries, as well as the AUX file produced by LaTeX when compiling your document.")
+                + "entries, as well as the AUX file produced by LaTeX when compiling your document.")
                 + "</p></html>");
         desc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         panel1.add(desc, BorderLayout.NORTH);

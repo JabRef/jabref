@@ -47,7 +47,7 @@ class CustomExportDialog extends JabRefDialog {
     private boolean okPressed;
 
     public CustomExportDialog(final JabRefFrame parent, final String exporterName, final String layoutFileName,
-            final String extensionName) {
+                              final String extensionName) {
         this(parent);
         frame = parent;
         name.setText(exporterName);
@@ -98,7 +98,7 @@ class CustomExportDialog extends JabRefDialog {
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY)).build();
         browse.addActionListener(
                 e -> DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showFileOpenDialog(fileDialogConfiguration))
-                                        .ifPresent(f -> layoutFile.setText(f.toAbsolutePath().toString())));
+                        .ifPresent(f -> layoutFile.setText(f.toAbsolutePath().toString())));
 
         AbstractAction cancelAction = new AbstractAction() {
 

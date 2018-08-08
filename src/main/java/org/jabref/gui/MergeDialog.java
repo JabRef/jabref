@@ -53,8 +53,8 @@ public class MergeDialog extends JabRefDialog {
         panel1.setLayout(borderLayout1);
         ok.setText(Localization.lang("OK"));
         ok.addActionListener(e -> {
-                okPressed = true;
-                dispose();
+            okPressed = true;
+            dispose();
         });
         cancel.setText(Localization.lang("Cancel"));
         cancel.addActionListener(e -> dispose());
@@ -113,5 +113,4 @@ public class MergeDialog extends JabRefDialog {
         return selector.isSelected();
     }
 }
-
 

@@ -21,7 +21,7 @@ plugins {
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
     id "com.simonharrer.modernizer" version '1.6.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.7'
-    id 'net.ltgt.errorprone' version '0.0.15'
+    id 'net.ltgt.errorprone' version '0.0.16'
     id 'com.github.ben-manes.versions' version '0.20.0'
 }
 
@@ -117,7 +117,7 @@ dependencies {
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
-    compile 'com.google.guava:guava:25.1-jre'
+    compile 'com.google.guava:guava:26.0-jre'
 
     // JavaFX stuff
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
@@ -137,10 +137,10 @@ dependencies {
 
     // >1.8.0-beta is required for java 9 compatibility
     compile 'org.slf4j:slf4j-api:1.8.0-beta2'
-    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.0'
-    compile 'org.apache.logging.log4j:log4j-jcl:2.11.0'
-    compile 'org.apache.logging.log4j:log4j-api:2.11.0'
-    compile 'org.apache.logging.log4j:log4j-core:2.11.0'
+    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.1'
+    compile 'org.apache.logging.log4j:log4j-jcl:2.11.1'
+    compile 'org.apache.logging.log4j:log4j-api:2.11.1'
+    compile 'org.apache.logging.log4j:log4j-core:2.11.1'
 
     // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
@@ -149,8 +149,8 @@ dependencies {
 
     compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
 
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.1.1'
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.1.1'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.1.2'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.1.2'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
     testCompile 'org.junit.jupiter:junit-jupiter-params:5.2.0'
@@ -160,7 +160,7 @@ dependencies {
     testCompile 'org.junit-pioneer:junit-pioneer:0.1.2'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
-    testCompile 'org.mockito:mockito-core:2.20.0'
+    testCompile 'org.mockito:mockito-core:2.21.0'
     testCompile 'com.github.tomakehurst:wiremock:2.18.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
@@ -194,12 +194,12 @@ dependencyUpdates.resolutionStrategy = {
         }
         rules.withModule("org.controlsfx:controlsfx") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /9.*/) { // Reject version 9 or higher
-                 selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
+                selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
             }
         }
-		rules.withModule("com.github.tomtung:latex2unicode_2.12") { ComponentSelection selection ->
+        rules.withModule("com.github.tomtung:latex2unicode_2.12") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /0.2.2/) { // Reject version higher than 2.0.2
-                 selection.reject("Cannot be updated to 0.2.4 until JabRef is prepared for it")
+                selection.reject("Cannot be updated to 0.2.4 until JabRef is prepared for it")
             }
         }
         rules.withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
@@ -212,7 +212,7 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject("http://dev.mysql.com/downloads/connector/j/ lists the version 5.* as last stable version.")
             }
         }
-		
+
     }
 }
 
@@ -494,16 +494,16 @@ jmh {
 
 // Source: https://stackoverflow.com/a/44168582/873282
 task downloadDependencies {
-  description "Pre-downloads *most* dependencies"
-  doLast {
-    configurations.getAsMap().each { name, config ->
-      println "Retrieving dependencies for $name"
-      try {
-        config.files
-      } catch (e) {
-        // some cannot be resolved, just log them
-        project.logger.info e.message
-      }
+    description "Pre-downloads *most* dependencies"
+    doLast {
+        configurations.getAsMap().each { name, config ->
+            println "Retrieving dependencies for $name"
+            try {
+                config.files
+            } catch (e) {
+                // some cannot be resolved, just log them
+                project.logger.info e.message
+            }
+        }
     }
-  }
 }

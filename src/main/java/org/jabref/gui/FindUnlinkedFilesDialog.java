@@ -956,8 +956,8 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
      *            Insets of the component. Can be <code>null</code>.
      */
     private static void addComponent(GridBagLayout layout, Container container, Component component, Integer fill,
-            Integer anchor, Insets insets, int gridX, int gridY, int width, int height, double weightX, double weightY,
-            int ipadX, int ipadY) {
+                                     Integer anchor, Insets insets, int gridX, int gridY, int width, int height, double weightX, double weightY,
+                                     int ipadX, int ipadY) {
         container.setLayout(layout);
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = gridX;
@@ -1058,7 +1058,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
              */
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
-                    boolean cellHasFocus) {
+                                                          boolean cellHasFocus) {
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected,
                         cellHasFocus);
                 if (value instanceof EntryFromFileCreator) {
@@ -1156,7 +1156,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
         @Override
         public Component getTreeCellRendererComponent(final JTree tree, Object value, boolean sel, boolean expanded,
-                boolean leaf, int row, boolean hasFocus) {
+                                                      boolean leaf, int row, boolean hasFocus) {
 
             Component nodeComponent = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row,
                     hasFocus);

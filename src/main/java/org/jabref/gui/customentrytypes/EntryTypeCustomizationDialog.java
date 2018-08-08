@@ -326,9 +326,9 @@ public class EntryTypeCustomizationDialog extends JabRefDialog implements ListSe
             if (!EntryTypes.getStandardType(name, bibDatabaseMode).isPresent()) {
 
                 boolean deleteCustomClicked = frame.getDialogService().showConfirmationDialogAndWait(Localization.lang("Delete custom format") +
-                        " '" + StringUtil.capitalizeFirst(name) + '\'',  Localization.lang("All entries of this "
-                        + "type will be declared "
-                        + "typeless. Continue?"),
+                                " '" + StringUtil.capitalizeFirst(name) + '\'',  Localization.lang("All entries of this "
+                                + "type will be declared "
+                                + "typeless. Continue?"),
                         Localization.lang("Delete custom format"), Localization.lang("Cancel"));
 
                 if (!deleteCustomClicked) {

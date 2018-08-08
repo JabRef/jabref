@@ -219,10 +219,10 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         Optional<String> selectedFieldName = editors.entrySet()
-                                                    .stream()
-                                                    .filter(editor -> editor.getValue().childIsFocused())
-                                                    .map(Map.Entry::getKey)
-                                                    .findFirst();
+                .stream()
+                .filter(editor -> editor.getValue().childIsFocused())
+                .map(Map.Entry::getKey)
+                .findFirst();
 
         Region panel = setupPanel(entry, isCompressed, suggestionProviders, undoManager);
         setContent(panel);
