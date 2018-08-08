@@ -3,7 +3,6 @@ package org.jabref.gui.push;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import javafx.scene.layout.GridPane;
 import org.jabref.Globals;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
@@ -16,12 +15,6 @@ public class PushToEmacsSettings extends PushToApplicationSettings {
     public JPanel getSettingsPanel() {
         additionalParams.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
         return super.getSettingsPanel();
-    }
-
-    @Override
-    public GridPane getJFXSettingPane(){
-        additionalParams.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
-        return super.getJFXSettingPane();
     }
 
     @Override
