@@ -11,7 +11,6 @@ import org.jabref.model.pdf.FileAnnotationType;
 
 public class FileAnnotationViewModel {
 
-    private static final String NEWLINE = String.format("%n");
     private final FileAnnotation annotation;
     private StringProperty author = new SimpleStringProperty();
     private StringProperty page = new SimpleStringProperty();
@@ -32,13 +31,7 @@ public class FileAnnotationViewModel {
             this.content.set(annotation.getLinkedFileAnnotation().getContent());
             String annotationContent = annotation.getContent();
             String illegibleTextMessage = Localization.lang("The marked area does not contain any legible text!");
-            String markingContent = (annotationContent.isEmpty() ? illegibleTextMessage : annotationContent);
-            // remove newlines && hyphens before linebreaks
-            markingContent = markingContent.replaceAll("-" + NEWLINE, "");
-            new RemoveHyphenatedNewlinesFormatter().format(markingContent);
-            // remove new lines not preceded by '.' or ':'
-            markingContent = markingContent.replaceAll("(?<![.|:])" + NEWLINE, " ");
-            this.marking.set(markingContent);
+            this.marking.set(annotationContent.isEmpty() ? illegibleTextMessage : annotationContent);
         } else {
             String content = annotation.getContent();
             // remove newlines && hyphens before linebreaks
