@@ -31,11 +31,11 @@ public class SidePaneManager {
 
         OpenOfficePreferences openOfficePreferences = preferences.getOpenOfficePreferences();
         Stream.of(
-                new FileUpdatePanel(this),
-                new GroupSidePane(this, preferences, frame.getDialogService()),
+                  new FileUpdatePanel(this),
+                  new GroupSidePane(this, preferences, frame.getDialogService()),
                 new WebSearchPane(this, preferences, frame),
-                new OpenOfficeSidePanel(this, openOfficePreferences, frame))
-                .forEach(pane -> components.put(pane.getType(), pane));
+                  new OpenOfficeSidePanel(this, openOfficePreferences, frame))
+              .forEach(pane -> components.put(pane.getType(), pane));
 
         if (preferences.getBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE)) {
             show(SidePaneType.GROUPS);

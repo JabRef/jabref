@@ -115,52 +115,52 @@ public class AuthorListParser {
         while (continueLoop) {
             int token = getToken();
             switch (token) {
-                case TOKEN_EOF:
-                case TOKEN_AND:
-                    continueLoop = false;
+            case TOKEN_EOF:
+            case TOKEN_AND:
+                continueLoop = false;
+                break;
+            case TOKEN_COMMA:
+                if (commaFirst < 0) {
+                    commaFirst = tokens.size();
+                } else if (commaSecond < 0) {
+                    commaSecond = tokens.size();
+                }
+                break;
+            case TOKEN_WORD:
+                tokens.add(original.substring(tokenStart, tokenEnd));
+                tokens.add(original.substring(tokenStart, tokenAbbrEnd));
+                tokens.add(tokenTerm);
+                tokens.add(tokenCase);
+                if (commaFirst >= 0) {
                     break;
-                case TOKEN_COMMA:
-                    if (commaFirst < 0) {
-                        commaFirst = tokens.size();
-                    } else if (commaSecond < 0) {
-                        commaSecond = tokens.size();
-                    }
+                }
+                if (lastStart >= 0) {
                     break;
-                case TOKEN_WORD:
-                    tokens.add(original.substring(tokenStart, tokenEnd));
-                    tokens.add(original.substring(tokenStart, tokenAbbrEnd));
-                    tokens.add(tokenTerm);
-                    tokens.add(tokenCase);
-                    if (commaFirst >= 0) {
-                        break;
-                    }
-                    if (lastStart >= 0) {
-                        break;
-                    }
-                    if (vonStart < 0) {
-                        if (!tokenCase) {
-                            int previousTermToken = (tokens.size() - TOKEN_GROUP_LENGTH - TOKEN_GROUP_LENGTH) + OFFSET_TOKEN_TERM;
-                            if ((previousTermToken >= 0) && tokens.get(previousTermToken).equals('-')) {
-                                // We are in a first name which contained a hyphen
-                                break;
-                            }
-
-                            int thisTermToken = previousTermToken + TOKEN_GROUP_LENGTH;
-                            if ((thisTermToken >= 0) && tokens.get(thisTermToken).equals('-')) {
-                                // We are in a name which contained a hyphen
-                                break;
-                            }
-
-                            vonStart = tokens.size() - TOKEN_GROUP_LENGTH;
+                }
+                if (vonStart < 0) {
+                    if (!tokenCase) {
+                        int previousTermToken = (tokens.size() - TOKEN_GROUP_LENGTH - TOKEN_GROUP_LENGTH) + OFFSET_TOKEN_TERM;
+                        if ((previousTermToken >= 0) && tokens.get(previousTermToken).equals('-')) {
+                            // We are in a first name which contained a hyphen
                             break;
                         }
-                    } else if ((lastStart < 0) && tokenCase) {
-                        lastStart = tokens.size() - TOKEN_GROUP_LENGTH;
+
+                        int thisTermToken = previousTermToken + TOKEN_GROUP_LENGTH;
+                        if ((thisTermToken >= 0) && tokens.get(thisTermToken).equals('-')) {
+                            // We are in a name which contained a hyphen
+                            break;
+                        }
+
+                        vonStart = tokens.size() - TOKEN_GROUP_LENGTH;
                         break;
                     }
+                } else if ((lastStart < 0) && tokenCase) {
+                    lastStart = tokens.size() - TOKEN_GROUP_LENGTH;
                     break;
-                default:
-                    break;
+                }
+                break;
+            default:
+                break;
             }
         }
 
@@ -264,8 +264,7 @@ public class AuthorListParser {
                 false);
         String jrPart = jrPartStart < 0 ? null : concatTokens(tokens, jrPartStart, jrPartEnd, OFFSET_TOKEN, false);
 
-        if ((firstPart != null) && (lastPart != null) && lastPart.equals(lastPart.toUpperCase(Locale.ROOT)) && (lastPart.length() < 5)
-                && (Character.UnicodeScript.of(lastPart.charAt(0)) != Character.UnicodeScript.HAN)) {
+        if ((firstPart != null) && (lastPart != null) && lastPart.equals(lastPart.toUpperCase(Locale.ROOT)) && (lastPart.length() < 5)) {
             // The last part is a small string in complete upper case, so interpret it as initial of the first name
             // This is the case for example in "Smith SH" which we think of as lastname=Smith and firstname=SH
             // The length < 5 constraint should allow for "Smith S.H." as input
@@ -379,7 +378,7 @@ public class AuthorListParser {
             }
             if (!firstLetterIsFound && (currentBackslash < 0) && Character.isLetter(c)) {
                 if (bracesLevel == 0) {
-                    tokenCase = Character.isUpperCase(c) || (Character.UnicodeScript.of(c) == Character.UnicodeScript.HAN);
+                    tokenCase = Character.isUpperCase(c);
                 } else {
                     // If this is a particle in braces, always treat it as if it starts with
                     // an upper case letter. Otherwise a name such as "{van den Bergen}, Hans"

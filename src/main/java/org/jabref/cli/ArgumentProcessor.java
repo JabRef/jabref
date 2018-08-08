@@ -556,8 +556,8 @@ public class ArgumentProcessor {
 
         List<SearchBasedFetcher> fetchers = WebFetchers.getSearchBasedFetchers(Globals.prefs.getImportFormatPreferences());
         Optional<SearchBasedFetcher> selectedFetcher = fetchers.stream()
-                .filter(fetcher -> fetcher.getName().equalsIgnoreCase(engine))
-                .findFirst();
+                                                               .filter(fetcher -> fetcher.getName().equalsIgnoreCase(engine))
+                                                               .findFirst();
         if (!selectedFetcher.isPresent()) {
             System.out.println(Localization.lang("Could not find fetcher '%0'", engine));
 
