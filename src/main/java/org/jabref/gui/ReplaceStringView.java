@@ -44,9 +44,9 @@ public class ReplaceStringView extends BaseDialog<Void>
     public void initialize() {
         visualizer.setDecoration(new IconValidationDecorator());
 
-        viewModel.getFindStringProperty().bind(findField.textProperty());
-        viewModel.getReplaceStringProperty().bind(replaceField.textProperty());
-        viewModel.getFieldStringProperty().bind(limitFieldInput.textProperty());
+        viewModel.FindStringProperty().bind(findField.textProperty());
+        viewModel.ReplaceStringProperty().bind(replaceField.textProperty());
+        viewModel.FieldStringProperty().bind(limitFieldInput.textProperty());
         viewModel.selectOnlyProperty().bind(selectFieldOnly.selectedProperty());
         viewModel.allFieldReplaceProperty().bind(allReplace.selectedProperty());
     }

@@ -1,5 +1,7 @@
 package org.jabref.gui;
 
+import java.util.Objects;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -27,6 +29,7 @@ public class ReplaceStringViewModel extends AbstractViewModel
 
     public ReplaceStringViewModel(BasePanel basePanel)
     {
+        Objects.requireNonNull(basePanel);
         this.panel = basePanel;
     }
 
@@ -39,8 +42,6 @@ public class ReplaceStringViewModel extends AbstractViewModel
 
         final NamedCompound compound = new NamedCompound(Localization.lang("Replace string"));
         int counter = 0;
-        if (this.panel == null)
-            return 0;
         if (selOnly) {
             for (BibEntry bibEntry: this.panel.getSelectedEntries())
                 counter += replaceItem(bibEntry, compound);
@@ -72,11 +73,11 @@ public class ReplaceStringViewModel extends AbstractViewModel
         return counter;
     }
 
-    private int replaceField(BibEntry entry, String fieldname, NamedCompound compound) {
-        if (!entry.hasField(fieldname)) {
+    private int replaceField(BibEntry entry, String fieldName, NamedCompound compound) {
+        if (!entry.hasField(fieldName)) {
             return 0;
         }
-        String txt = entry.getField(fieldname).get();
+        String txt = entry.getField(fieldName).get();
         StringBuilder stringBuilder = new StringBuilder();
         int ind;
         int piv = 0;
@@ -90,8 +91,8 @@ public class ReplaceStringViewModel extends AbstractViewModel
         }
         stringBuilder.append(txt.substring(piv));
         String newStr = stringBuilder.toString();
-        entry.setField(fieldname, newStr);
-        compound.addEdit(new UndoableFieldChange(entry, fieldname, txt, newStr));
+        entry.setField(fieldName, newStr);
+        compound.addEdit(new UndoableFieldChange(entry, fieldName, txt, newStr));
         return counter;
     }
 
@@ -103,15 +104,15 @@ public class ReplaceStringViewModel extends AbstractViewModel
         return selectOnlyProperty;
     }
 
-    public StringProperty getFieldStringProperty() {
+    public StringProperty FieldStringProperty() {
         return fieldStringProperty;
     }
 
-    public StringProperty getFindStringProperty() {
+    public StringProperty FindStringProperty() {
         return findStringProperty;
     }
 
-    public StringProperty getReplaceStringProperty() {
+    public StringProperty ReplaceStringProperty() {
         return replaceStringProperty;
     }
 }
