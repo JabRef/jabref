@@ -11,8 +11,8 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
-import javax.swing.JPanel;
 import javax.swing.JFileChooser;
+import javax.swing.JPanel;
 
 import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
@@ -43,8 +43,6 @@ class ExternalTab extends JPanel implements PrefsTab {
     private final RadioButton sumatraReader;
     private final TextField adobeAcrobatReaderPath;
     private final TextField sumatraReaderPath;
-    private final Button browseAdobeAcrobatReader;
-    private final Button browseSumatraReader;
 
     public ExternalTab(JabRefFrame frame, PreferencesDialog prefsDiag, JabRefPreferences prefs) {
         this.prefs = prefs;
@@ -62,11 +60,11 @@ class ExternalTab extends JPanel implements PrefsTab {
 
         adobeAcrobatReader = new RadioButton(Localization.lang("Adobe Acrobat Reader"));
         adobeAcrobatReaderPath = new TextField();
-        browseAdobeAcrobatReader = new Button(Localization.lang("Browse"));
+        Button browseAdobeAcrobatReader = new Button(Localization.lang("Browse"));
 
         sumatraReader = new RadioButton(Localization.lang("Sumatra Reader"));
         sumatraReaderPath = new TextField();
-        browseSumatraReader = new Button(Localization.lang("Browse"));
+        Button browseSumatraReader = new Button(Localization.lang("Browse"));
 
         Label commandDescription = new Label(Localization.lang("Note: Use the placeholder %0 for the location of the opened library file.", "%DIR"));
 

@@ -1,9 +1,27 @@
 package org.jabref.gui.bibtexkeypattern;
 
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.help.HelpAction;
@@ -18,21 +36,6 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.EntryType;
 import org.jabref.preferences.JabRefPreferences;
 
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JScrollPane;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 
 public class BibtexKeyPatternPanel extends JPanel {
 
@@ -69,7 +72,7 @@ public class BibtexKeyPatternPanel extends JPanel {
 
         // The header - can be removed
         JLabel lblEntryType = new JLabel(Localization.lang("Entry type"));
-        Label label= new Label(Localization.lang("Entry type"));
+        Label label = new Label(Localization.lang("Entry type"));
         gridPane.add(label,1,1);
         Font f = new Font("plain", Font.BOLD, 12);
         lblEntryType.setFont(f);
@@ -197,10 +200,10 @@ public class BibtexKeyPatternPanel extends JPanel {
         gridPane.add(btnDefaultAll1,2,24);
     }
 
-    private void addExtraText(){
+    private void addExtraText() {
         Label []label = new Label[19];
         Button []button = new Button[19];
-        for(int i=0; i<=18; i++){
+        for (int i=0; i<=18; i++){
             textFieldArray[i] = new TextField();
             button[i] = new Button("Default");
             button[i].setOnAction(e-> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
@@ -225,9 +228,9 @@ public class BibtexKeyPatternPanel extends JPanel {
         label[17] = new Label("TechReport");
         label[18] = new Label("Unpublished");
         for(int i=0 ;i<=18; i++){
-            gridPane.add(label[i],1,i+3);
-            gridPane.add(textFieldArray[i],2,i+3);
-            gridPane.add(button[i],3,i+3);
+            gridPane.add(label[i],1,i + 3);
+            gridPane.add(textFieldArray[i],2,i + 3);
+            gridPane.add(button[i],3,i + 3);
         }
     }
 

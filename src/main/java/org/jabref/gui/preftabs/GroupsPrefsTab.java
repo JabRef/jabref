@@ -1,5 +1,7 @@
 package org.jabref.gui.preftabs;
 
+import java.awt.BorderLayout;
+
 import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -9,17 +11,18 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+
+import javax.swing.JPanel;
+
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-import javax.swing.*;
-import java.awt.*;
+
 
 class GroupsPrefsTab extends JPanel implements PrefsTab {
 
-    private final CheckBox hideNonHits = new CheckBox(Localization.lang("Hide non-hits"));
     private final CheckBox grayOut = new CheckBox(Localization.lang("Gray out non-hits"));
     private final CheckBox autoAssignGroup = new CheckBox(Localization.lang("Automatically assign new entry to selected groups"));
     private final RadioButton multiSelectionModeIntersection = new RadioButton(Localization.lang("Intersection"));
@@ -47,6 +50,7 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         GridPane builder = new GridPane();
 
         builder.add(new Label(Localization.lang("View")),1,1);
+        CheckBox hideNonHits = new CheckBox(Localization.lang("Hide non-hits"));
         builder.add(hideNonHits,2,2);
         builder.add(grayOut,2,3);
         builder.add(multiSelectionModeIntersection,2,4);
