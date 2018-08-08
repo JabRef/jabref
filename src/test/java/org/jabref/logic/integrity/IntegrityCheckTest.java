@@ -1,7 +1,8 @@
 package org.jabref.logic.integrity;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -22,15 +23,18 @@ import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
 
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.TemporaryFolder;
+import org.junitpioneer.jupiter.TempDirectory;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
+@ExtendWith(TempDirectory.class)
 public class IntegrityCheckTest {
 
     @Rule
@@ -221,12 +225,14 @@ public class IntegrityCheckTest {
     }
 
     @Test
-    public void fileCheckFindsFilesRelativeToBibFile() throws IOException {
-        File bibFile = testFolder.newFile("lit.bib");
-        testFolder.newFile("file.pdf");
+    public void fileCheckFindsFilesRelativeToBibFile(@TempDirectory.TempDir Path testFolder) throws IOException {
+        Path bibFile = testFolder.resolve("lit.bib");
+        Files.createFile(bibFile);
+        Path pdfFile = testFolder.resolve("file.pdf");
+        Files.createFile(pdfFile);
 
         BibDatabaseContext databaseContext = createContext("file", ":file.pdf:PDF");
-        databaseContext.setDatabaseFile(bibFile);
+        databaseContext.setDatabaseFile(bibFile.toFile());
 
         assertCorrect(databaseContext);
     }
@@ -381,7 +387,7 @@ public class IntegrityCheckTest {
                 createBibtexKeyPatternPreferences(),
                 new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true)
                 .checkBibtexDatabase();
-        assertFalse(messages.toString(), messages.isEmpty());
+        assertFalse(messages.isEmpty(), messages.toString());
     }
 
     private void assertCorrect(BibDatabaseContext context) {
