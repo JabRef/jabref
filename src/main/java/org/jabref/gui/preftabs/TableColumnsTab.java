@@ -144,7 +144,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         Button addRow = new Button("Add");
         addRow.setOnAction( e -> {
             if (!addLast.getText().isEmpty()) {
-                TableRow tableRow = addLast.getText().matches("[1-9][0-9]+(.)?[0-9]+")? new TableRow(addName.getText(), Integer.valueOf(addLast.getText())):new TableRow(addName.getText());
+                TableRow tableRow = addLast.getText().matches("[1-9][0-9]+")? new TableRow(addName.getText(), Integer.valueOf(addLast.getText())):new TableRow(addName.getText());
                 addName.clear();
                 addLast.clear();
                 data.add(tableRow);
@@ -158,7 +158,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         });
 
         Button deleteRow = new Button("Delete");
-        deleteRow.setOnAction(e-> {if (colSetup.getFocusModel() != null && colSetup.getFocusModel().getFocusedIndex()!= -1) {
+        deleteRow.setOnAction(e->  {
+            if (colSetup.getFocusModel() != null && colSetup.getFocusModel().getFocusedIndex()!= -1) {
             tableChanged = true;
             int row = colSetup.getFocusModel().getFocusedIndex();
             TableRow tableRow = data.get(row);
