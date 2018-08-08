@@ -1,13 +1,25 @@
 configurations {
     xjc
 }
-
-dependencies {
-    // Cannot be updated.
-    xjc 'com.sun.xml.bind:jaxb-xjc:2.2.4-1'
+repositories {
+        mavenLocal()
+        jcenter()
+        maven {
+            url 'https://oss.sonatype.org/content/groups/public'
+        }
+          maven {
+            url 'https://maven.java.net/content/groups/promoted/'
+        }
 }
 
+dependencies {
+    xjc "javax.xml.bind:jaxb-api:2.4.0-b180725.0427"
+    xjc "org.glassfish.jaxb:jaxb-runtime:2.4.0-b180725.0644"
+    xjc "org.glassfish.jaxb:jaxb-xjc:2.4.0-b180725.0644"
+}
 task xjc {
+    System.setProperty('javax.xml.accessExternalSchema', 'all') //does not yet work
+
     inputs.dir "src/main/resources/xjc/medline/"
     inputs.dir "src/main/resources/xjc/bibtexml/"
     inputs.dir "src/main/resources/xjc/endnote/"
@@ -18,7 +30,6 @@ task xjc {
     outputs.dir "src/main/gen/org/jabref/logic/importer/fileformat/mods"
 
     ant.taskdef(name: 'xjc', classname: 'com.sun.tools.xjc.XJCTask', classpath: configurations.xjc.asPath)
-
     doLast {
         ant.xjc(destdir: 'src/main/gen/', package: 'org.jabref.logic.importer.fileformat.medline') {
             schema(dir: 'src/main/resources/xjc/medline', includes: 'medline.xsd')
@@ -28,6 +39,8 @@ task xjc {
         }
         ant.xjc(destdir: 'src/main/gen/', package: 'org.jabref.logic.importer.fileformat.endnote') {
             arg(value: '-dtd')
+            arg(value:"-disableXmlSecurity")
+            property('env.)
             schema(dir: 'src/main/resources/xjc/endnote', includes: 'RSXML.dtd')
         }
         ant.xjc(destdir: 'src/main/gen/', package: 'org.jabref.logic.importer.fileformat.mods') {
