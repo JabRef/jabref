@@ -21,7 +21,7 @@ plugins {
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
     id "com.simonharrer.modernizer" version '1.6.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.7'
-    id 'net.ltgt.errorprone' version '0.0.15'
+    id 'net.ltgt.errorprone' version '0.0.16'
     id 'com.github.ben-manes.versions' version '0.20.0'
 }
 
@@ -117,7 +117,7 @@ dependencies {
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
-    compile 'com.google.guava:guava:25.1-jre'
+    compile 'com.google.guava:guava:26.0-jre'
 
     // JavaFX stuff
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
@@ -137,10 +137,10 @@ dependencies {
 
     // >1.8.0-beta is required for java 9 compatibility
     compile 'org.slf4j:slf4j-api:1.8.0-beta2'
-    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.0'
-    compile 'org.apache.logging.log4j:log4j-jcl:2.11.0'
-    compile 'org.apache.logging.log4j:log4j-api:2.11.0'
-    compile 'org.apache.logging.log4j:log4j-core:2.11.0'
+    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.1'
+    compile 'org.apache.logging.log4j:log4j-jcl:2.11.1'
+    compile 'org.apache.logging.log4j:log4j-api:2.11.1'
+    compile 'org.apache.logging.log4j:log4j-core:2.11.1'
 
     // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
@@ -149,8 +149,8 @@ dependencies {
 
     compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
 
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.1.1'
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.1.1'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.1.2'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.1.2'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
     testCompile 'org.junit.jupiter:junit-jupiter-params:5.2.0'
@@ -160,7 +160,7 @@ dependencies {
     testCompile 'org.junit-pioneer:junit-pioneer:0.1.2'
     testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
     testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
-    testCompile 'org.mockito:mockito-core:2.20.0'
+    testCompile 'org.mockito:mockito-core:2.21.0'
     testCompile 'com.github.tomakehurst:wiremock:2.18.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
