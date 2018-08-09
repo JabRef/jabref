@@ -1,5 +1,7 @@
 package org.jabref.gui.preftabs;
 
+import java.awt.BorderLayout;
+
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
@@ -15,8 +17,6 @@ import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.preferences.JabRefPreferences;
-
-import java.awt.BorderLayout;
 
 /**
  * The Preferences panel for key generation.

@@ -11,8 +11,8 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
-import javax.swing.JPanel;
 import javax.swing.JFileChooser;
+import javax.swing.JPanel;
 
 import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
@@ -43,8 +43,6 @@ class ExternalTab extends JPanel implements PrefsTab {
     private final RadioButton sumatraReader;
     private final TextField adobeAcrobatReaderPath;
     private final TextField sumatraReaderPath;
-    private final Button browseAdobeAcrobatReader;
-    private final Button browseSumatraReader;
 
     public ExternalTab(JabRefFrame frame, PreferencesDialog prefsDiag, JabRefPreferences prefs) {
         this.prefs = prefs;
@@ -62,11 +60,11 @@ class ExternalTab extends JPanel implements PrefsTab {
 
         adobeAcrobatReader = new RadioButton(Localization.lang("Adobe Acrobat Reader"));
         adobeAcrobatReaderPath = new TextField();
-        browseAdobeAcrobatReader = new Button(Localization.lang("Browse"));
+        Button browseAdobeAcrobatReader = new Button(Localization.lang("Browse"));
 
         sumatraReader = new RadioButton(Localization.lang("Sumatra Reader"));
         sumatraReaderPath = new TextField();
-        browseSumatraReader = new Button(Localization.lang("Browse"));
+        Button browseSumatraReader = new Button(Localization.lang("Browse"));
 
         Label commandDescription = new Label(Localization.lang("Note: Use the placeholder %0 for the location of the opened library file.", "%DIR"));
 
@@ -144,7 +142,11 @@ class ExternalTab extends JPanel implements PrefsTab {
         PushToApplicationSettings settings = PushToApplications.getSettings(application);
         Button button = new Button(Localization.lang("Settings for %0", application.getApplicationName()));
         button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(null, settings));
-        panel.add(button,index % 2==0?1:2,index/2+1);
+        if (index % 2 == 0) {
+            panel.add(button,1, index / 2 + 1);
+        } else {
+            panel.add(button,2, index / 2 + 1);
+        }
     }
 
     @Override

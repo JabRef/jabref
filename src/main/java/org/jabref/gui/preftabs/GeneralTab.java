@@ -73,7 +73,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         updateTimeStamp = new CheckBox(Localization.lang("    Update timestamp on modification"));
         useTimeStamp = new CheckBox(Localization.lang("Mark new entries with addition date") + ". "
                 + Localization.lang("Date format") + ':');
-        if (!useTimeStamp.isSelected()){
+        if (!useTimeStamp.isSelected()) {
             updateTimeStamp.setDisable(true);
         }
         useTimeStamp.setOnAction(e->updateTimeStamp.setDisable(!useTimeStamp.isSelected()));

@@ -143,7 +143,8 @@ import org.slf4j.LoggerFactory;
  * receiving this call).
  */
 
-public class ImportInspectionDialog extends JabRefDialog implements OutputPrinter {
+public class ImportInspectionDialog extends JabRefDialog
+        implements OutputPrinter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportInspectionDialog.class);
     private static final List<String> INSPECTION_FIELDS = Arrays.asList(FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, BibEntry.KEY_FIELD);

@@ -1,28 +1,28 @@
 package org.jabref.gui.preftabs;
 
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.List;
+import java.util.Locale;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -30,7 +30,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.Scene;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
@@ -145,7 +144,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         Button addRow = new Button("Add");
         addRow.setOnAction( e -> {
             if (!addLast.getText().isEmpty()) {
-                TableRow tableRow = addLast.getText().matches("[1-9][0-9]+(.) ?[0-9]+")? new TableRow(addName.getText(), Integer.valueOf(addLast.getText())):new TableRow(addName.getText());
+                TableRow tableRow = addLast.getText().matches("[1-9][0-9]") ? new TableRow(addName.getText(), Integer.valueOf(addLast.getText())) : new TableRow(addName.getText());
                 addName.clear();
                 addLast.clear();
                 data.add(tableRow);
@@ -159,7 +158,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         });
 
         Button deleteRow = new Button("Delete");
-        deleteRow.setOnAction(e -> {if (colSetup.getFocusModel() != null && colSetup.getFocusModel().getFocusedIndex()!= -1) {
+        deleteRow.setOnAction(e -> {if (colSetup.getFocusModel() != null && colSetup.getFocusModel().getFocusedIndex() != -1) {
             tableChanged = true;
             int row = colSetup.getFocusModel().getFocusedIndex();
             TableRow tableRow = data.get(row);
@@ -172,7 +171,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         }});
         Button up = new Button("Up");
         up.setOnAction(e-> {
-            if (colSetup.getFocusModel()!=null) {
+            if (colSetup.getFocusModel() != null) {
                 int row = colSetup.getFocusModel().getFocusedIndex();
                 if (row > data.size() || row == 0) {
                     return;
@@ -235,7 +234,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         listOfFileColumnsScrollPane.setMaxHeight(80);
         listOfFileColumnsScrollPane.setContent(listOfFileColumnsVBox);
         extraFileColumns = new CheckBox(Localization.lang("Show extra columns"));
-        if (!extraFileColumns.isSelected()){
+        if (!extraFileColumns.isSelected()) {
             listOfFileColumnsVBox.setDisable(true);
         }
         extraFileColumns.setOnAction(arg0 -> listOfFileColumnsVBox.setDisable(!extraFileColumns.isSelected()));
@@ -338,8 +337,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                     }
                 }
             }
-            for (int i=0; i<listSize;i++)
-            {
+            for (int i = 0; i < listSize; i++) {
                 listOfFileColumns.getSelectionModel().select(indicesToSelect[i]);
             }
         } else {

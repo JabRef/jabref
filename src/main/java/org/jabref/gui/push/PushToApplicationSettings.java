@@ -45,10 +45,10 @@ public class PushToApplicationSettings {
         return settings;
     }
 
-    public GridPane getJFXSettingPane(){
+    public GridPane getJFXSettingPane() {
         application.initParameters();
         String commandPath = Globals.prefs.get(application.commandPathPreferenceKey);
-        if(jfxSettings == null){
+        if (jfxSettings == null) {
             initJFXSettingsPanel();
         }
         path1.setText(commandPath);

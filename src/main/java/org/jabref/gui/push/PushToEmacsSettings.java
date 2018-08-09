@@ -19,7 +19,7 @@ public class PushToEmacsSettings extends PushToApplicationSettings {
     }
 
     @Override
-    public GridPane getJFXSettingPane(){
+    public GridPane getJFXSettingPane() {
         additionalParams.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
         return super.getJFXSettingPane();
     }
