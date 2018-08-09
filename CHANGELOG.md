@@ -24,10 +24,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We changed the default keyboard shortcuts for moving between entries when the entry editor is active to ̀<kbd>alt</kbd> + <kbd>up/down</kbd>.
 - Opening a new file now prompts the directory of the currently selected file, instead of the directory of the last opened file.
 - Window state is saved on close and restored on start.
-<<<<<<< HEAD
 
-=======
->>>>>>> 6dad44fcec7b1ac42b7efaa33c7235285cf9c5ca
 
 
 
@@ -82,10 +79,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
   - Set/clear/append/rename fields: available through Edit menu
   - Manage keywords: available through Edit menu
   - Copy linked files to folder: available through File menu
-<<<<<<< HEAD
 
-=======
->>>>>>> 6dad44fcec7b1ac42b7efaa33c7235285cf9c5ca
 
 
 
