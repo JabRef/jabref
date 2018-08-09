@@ -15,6 +15,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.help.HelpAction;
@@ -28,13 +35,6 @@ import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.EntryType;
 import org.jabref.preferences.JabRefPreferences;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 
 public class BibtexKeyPatternPanel extends JPanel {
 
@@ -226,7 +226,7 @@ public class BibtexKeyPatternPanel extends JPanel {
         label[16] = new Label("Standard");
         label[17] = new Label("TechReport");
         label[18] = new Label("Unpublished");
-        for (int i=0; i <= 18; i++) {
+        for (int i = 0; i <= 18; i++) {
             gridPane.add(label[i],1,i + 3);
             gridPane.add(textFieldArray[i],2,i + 3);
             gridPane.add(button[i],3,i + 3);

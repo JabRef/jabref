@@ -138,7 +138,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
             }
         });
         Button delete = new Button("Delete");
-        delete.setOnAction(e-> {if (table.getFocusModel() != null && table.getFocusModel().getFocusedIndex() != -1) {
+        delete.setOnAction(e-> {
+            if (table.getFocusModel() != null && table.getFocusModel().getFocusedIndex() != -1) {
             tableChanged = true;
             int row = table.getFocusModel().getFocusedIndex();
             TableRow tableRow = tableRows.get(row);

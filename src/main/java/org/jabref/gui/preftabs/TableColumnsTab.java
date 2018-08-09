@@ -158,7 +158,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         });
 
         Button deleteRow = new Button("Delete");
-        deleteRow.setOnAction(e -> {if (colSetup.getFocusModel() != null && colSetup.getFocusModel().getFocusedIndex() != -1) {
+        deleteRow.setOnAction(e -> {
+            if (colSetup.getFocusModel() != null && colSetup.getFocusModel().getFocusedIndex() != -1) {
             tableChanged = true;
             int row = colSetup.getFocusModel().getFocusedIndex();
             TableRow tableRow = data.get(row);
@@ -190,7 +191,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         });
         Button down = new Button("Down");
         down.setOnAction(e-> {
-            if (colSetup.getFocusModel()!=null) {
+            if (colSetup.getFocusModel() != null) {
                 int row = colSetup.getFocusModel().getFocusedIndex();
                 if (row + 1 > data.size()) {
                     return;
