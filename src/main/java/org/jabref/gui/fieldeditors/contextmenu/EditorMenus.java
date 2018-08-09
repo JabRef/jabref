@@ -95,13 +95,10 @@ public class EditorMenus {
     public static Supplier<List<MenuItem>> getCleanupURLMenu(TextArea textArea) {
         return () -> {
             CustomMenuItem cleanupURL = new CustomMenuItem(new Label(Localization.lang("Cleanup URL Link")));
-            //cleanupURL.setDisable(true);
             cleanupURL.setOnAction(event -> textArea.setText(new CleanupURLFormatter().format(textArea.getText())));
 
             List<MenuItem> menuItems = new ArrayList<>();
             menuItems.add(cleanupURL);
-            menuItems.add(new SeparatorMenuItem());
-            menuItems.addAll(getDefaultMenu(textArea).get());
             return menuItems;
         };
     }
