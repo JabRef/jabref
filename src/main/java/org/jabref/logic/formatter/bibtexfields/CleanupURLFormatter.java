@@ -6,10 +6,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Cleanup URL link
@@ -36,13 +37,13 @@ public class CleanupURLFormatter extends Formatter {
         String toDecode = value;
 
         Matcher matcher = PATTERN_URL.matcher(value);
-        if(matcher.find()) {
+        if (matcher.find()) {
           toDecode = matcher.group(1);
         }
         try {
             decodedLink = URLDecoder.decode(toDecode, StandardCharsets.UTF_8.name());
         }
-        catch (UnsupportedEncodingException e){
+        catch (UnsupportedEncodingException e) {
             LOGGER.warn("Used unsupported character encoding", e);
         }
         return decodedLink;
