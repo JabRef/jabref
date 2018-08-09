@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -54,6 +55,7 @@ public class PushToApplicationSettings {
         path1.setText(commandPath);
         return jfxSettings;
     }
+
     /**
      * Create a FormBuilder, fill it with a textbox for the path and store the JPanel in settings
      */
@@ -102,6 +104,7 @@ public class PushToApplicationSettings {
                         .ifPresent(f -> path.setText(f.toAbsolutePath().toString())));
         jfxSettings.add(browse,3, 1);
     }
+
     /**
      * This method is called to indicate that the settings panel returned from the getSettingsPanel() method has been
      * shown to the user and that the user has indicated that the settings should be stored. This method must store the

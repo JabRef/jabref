@@ -2,6 +2,8 @@ package org.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 
+import javax.swing.JPanel;
+
 import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -11,8 +13,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-
-import javax.swing.JPanel;
 
 import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.groups.GroupViewMode;

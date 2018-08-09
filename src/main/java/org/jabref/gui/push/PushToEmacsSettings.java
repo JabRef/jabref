@@ -4,6 +4,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import javafx.scene.layout.GridPane;
+
 import org.jabref.Globals;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;

@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import javax.swing.AbstractAction;
+import javax.swing.JPanel;
+
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -31,9 +34,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import javax.swing.AbstractAction;
-import javax.swing.JPanel;
-
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.customjfx.CustomJFXPanel;
@@ -45,6 +45,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibtexSingleField;
 import org.jabref.preferences.JabRefPreferences;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -429,7 +430,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             this.length.set(length);
         }
     }
-
 
     class UpdateOrderAction extends AbstractAction {
 

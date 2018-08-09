@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.nio.charset.Charset;
 import java.time.format.DateTimeFormatter;
 
+import javax.swing.JPanel;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.JFXPanel;
@@ -16,8 +18,6 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.shape.Line;
-
-import javax.swing.JPanel;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;

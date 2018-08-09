@@ -2,6 +2,9 @@ package org.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -10,9 +13,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
 
 import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;

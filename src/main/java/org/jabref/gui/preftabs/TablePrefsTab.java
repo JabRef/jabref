@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import javax.swing.JPanel;
+
 import javafx.collections.FXCollections;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
@@ -15,8 +17,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-
-import javax.swing.JPanel;
 
 import org.jabref.Globals;
 import org.jabref.gui.customjfx.CustomJFXPanel;
@@ -173,7 +173,6 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         priField.setText(prefs.get(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD));
         secField.setText(prefs.get(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD));
         terField.setText(prefs.get(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD));
-
 
         if (prefs.getBoolean(JabRefPreferences.NAMES_AS_IS)) {
             namesAsIs.setSelected(true);

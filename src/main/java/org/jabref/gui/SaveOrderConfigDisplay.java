@@ -5,16 +5,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
-
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;

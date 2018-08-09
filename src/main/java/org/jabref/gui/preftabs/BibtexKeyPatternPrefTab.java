@@ -81,8 +81,6 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
     }
 
     private void appendKeyGeneratorSettings() {
-
-
         // Build a panel for checkbox settings:
 
         builder.add(new Label(Localization.lang("Key generator settings")),1,10);

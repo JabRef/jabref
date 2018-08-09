@@ -102,6 +102,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
             tableChanged = true;
         }
     }
+
     /**
      * Load settings from the preferences and initialize the table.
      */
