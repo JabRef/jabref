@@ -23,7 +23,7 @@ public class CleanupURLFormatter extends Formatter {
 
     @Override
     public String getName() {
-        return Localization.lang("Cleanup URL Link");
+        return Localization.lang("Cleanup URL link");
     }
 
     @Override
@@ -51,7 +51,7 @@ public class CleanupURLFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Cleanup URL Link by removing special symbols and extracting simple link");
+        return Localization.lang("Cleanup URL link by removing special symbols and extracting simple link");
     }
 
     @Override
