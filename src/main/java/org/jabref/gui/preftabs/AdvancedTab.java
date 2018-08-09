@@ -56,16 +56,23 @@ class AdvancedTab extends JPanel implements PrefsTab {
         builder.add(new Label(Localization.lang("Remote operation")),1,1);
         builder.add(new Separator(),2,1);
         builder.add(new Pane(),1,2);
-        builder.add(new Label(Localization.lang("This feature lets new files be opened or imported into an already running instance of JabRef instead of opening a new instance. For")),2,3);
-        builder.add(new Label(Localization.lang( "instance, this is useful when you open a file in JabRef from your web browser. ")),2,4);
-        builder.add(new Label(Localization.lang("Note that this will prevent you from running more than one instance of JabRef at a time.")),2,5);
+        Label label = new Label(Localization.lang("This feature lets new files be opened or imported into an "
+
+                + "already running instance of JabRef<BR>instead of opening a new instance. For instance, this "
+
+                + "is useful when you open a file in JabRef<br>from your web browser."
+
+                + "<BR>Note that this will prevent you from running more than one instance of JabRef at a time."));
+        builder.add(new Label("This feature lets new files be opened or imported into an already running instance of JabRef instead of opening a new instance. For"),2,3);
+        builder.add(new Label("instance, this is useful when you open a file in JabRef from your web browser. "),2,4);
+        builder.add(new Label("Note that this will prevent you from running more than one instance of JabRef at a time."),2,5);
         builder.add(new Line(),2,6);
         builder.add(new Pane(),2,7);
 
         HBox p = new HBox();
         p.getChildren().add(useRemoteServer);
         p.getChildren().add(remoteServerPort);
-        Button button = new Button("?");
+        Button button = new Button("Help");
         button.setOnAction(event -> new HelpAction(HelpFile.REMOTE).getHelpButton().doClick());
         p.getChildren().add(button);
 
@@ -158,7 +165,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
             }
         } catch (NumberFormatException ex) {
 
-           DefaultTaskExecutor.runInJavaFXThread(()-> dialogService.showErrorDialogAndWait(Localization.lang("Remote server port"),
+            DefaultTaskExecutor.runInJavaFXThread(()-> dialogService.showErrorDialogAndWait(Localization.lang("Remote server port"),
                     Localization.lang("You must enter an integer value in the interval 1025-65535 in the text field for")
                             + " '" + Localization.lang("Remote server port") + '\''));
 
@@ -170,5 +177,4 @@ class AdvancedTab extends JPanel implements PrefsTab {
     public String getTabName() {
         return Localization.lang("Advanced");
     }
-
 }

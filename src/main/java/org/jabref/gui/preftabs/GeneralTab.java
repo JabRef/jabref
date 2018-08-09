@@ -70,7 +70,7 @@ class GeneralTab extends JPanel implements PrefsTab {
 
         memoryStick = new CheckBox(Localization.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
         useOwner = new CheckBox(Localization.lang("Mark new entries with owner name") + ':');
-        updateTimeStamp = new CheckBox(Localization.lang("    Update timestamp on modification"));
+        updateTimeStamp = new CheckBox(Localization.lang("Update timestamp on modification"));
         useTimeStamp = new CheckBox(Localization.lang("Mark new entries with addition date") + ". "
                 + Localization.lang("Date format") + ':');
         if (!useTimeStamp.isSelected()) {
@@ -78,7 +78,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         }
         useTimeStamp.setOnAction(e->updateTimeStamp.setDisable(!useTimeStamp.isSelected()));
         overwriteOwner = new CheckBox(Localization.lang("Overwrite"));
-        overwriteTimeStamp = new CheckBox(Localization.lang("Overwrite"));
+        overwriteTimeStamp = new CheckBox(Localization.lang("If a pasted or imported entry already has the field set, overwrite."));
         enforceLegalKeys = new CheckBox(Localization.lang("Enforce legal characters in BibTeX keys"));
         confirmDelete = new CheckBox(Localization.lang("Show confirmation dialog when deleting entries"));
 

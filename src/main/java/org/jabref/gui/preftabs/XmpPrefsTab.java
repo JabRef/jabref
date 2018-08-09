@@ -55,7 +55,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
         scrollPane.setMaxHeight(400);
         scrollPane.setMaxWidth(170);
         textFields.add(new TextField("pdf"));
-        vBox.getChildren().add(new Label("field to filter"));
+        vBox.getChildren().add(new Label("Field to filter"));
         vBox.getChildren().addAll(textFields);
         scrollPane.setContent(vBox);
         tablePanel.setCenter(scrollPane);
@@ -85,7 +85,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
             textFields.remove(textFields.get(textFields.size() - 1));
             rowCount--;
             vBox.getChildren().clear();
-            vBox.getChildren().add(new Label("field to filter"));
+            vBox.getChildren().add(new Label(Localization.lang("Field to filter")));
             vBox.getChildren().addAll(textFields);
             tableChanged = true;
         }
@@ -112,7 +112,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
         //List<String> names = JabRefPreferences.getInstance().getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS);
         List<String>names = new ArrayList<>();
         for (TextField textField : textFields) {
-           names.add(textField.getText());
+            names.add(textField.getText());
         }
         tableRows.addAll(names);
         rowCount = tableRows.size() + 5;

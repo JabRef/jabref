@@ -56,9 +56,9 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         builder.add(autoAssignGroup,2,6);
         builder.add(new Label(Localization.lang("Dynamic groups")),1,7);
 
-        builder.add(new Label(Localization.lang("    Default grouping field") + ":"),1,8);
+        builder.add(new Label(Localization.lang("Default grouping field") + ":"),1,8);
         builder.add(groupingField,2,8);
-        builder.add(new Label(Localization.lang("    When adding/removing keywords, separate them by") + ":"),1,9);
+        builder.add(new Label(Localization.lang("When adding/removing keywords, separate them by") + ":"),1,9);
         builder.add(keywordSeparator,2,9);
 
         JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));

@@ -60,7 +60,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         fileDirPattern = new TextField();
         selectFileNamePattern = new ComboBox<>();
         selectFileNamePattern.getItems().addAll(FXCollections.observableArrayList(DEFAULT_FILENAMEPATTERNS_DISPLAY));
-        selectFileNamePattern.setValue("Choose pattern");
+        selectFileNamePattern.setValue(Localization.lang("Choose pattern"));
         selectFileNamePattern.setOnAction(e -> {
             fileNamePattern.setText(selectFileNamePattern.getValue());
         });
@@ -75,12 +75,12 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         builder.add(new Label(Localization.lang("Default PDF file link action")),1,7);
 
 
-        Label lab = new Label(Localization.lang("    Filename format pattern").concat(":"));
+        Label lab = new Label(Localization.lang("Filename format pattern").concat(":"));
         builder.add(lab,1,8);
         builder.add(fileNamePattern,2,8);
         builder.add(selectFileNamePattern,3,8);
 
-        Label lbfileDirPattern = new Label(Localization.lang("    File directory pattern").concat(":"));
+        Label lbfileDirPattern = new Label(Localization.lang("File directory pattern").concat(":"));
         builder.add(lbfileDirPattern,1,9);
         builder.add(fileDirPattern,2,9);
 
@@ -95,22 +95,22 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         useDefaultPDFImportStyle.setSelected(prefs.getBoolean(JabRefPreferences.IMPORT_ALWAYSUSE));
         int style = prefs.getInt(JabRefPreferences.IMPORT_DEFAULT_PDF_IMPORT_STYLE);
         switch (style) {
-        case ImportDialog.NOMETA:
-            radioButtonNoMeta.setSelected(true);
-            break;
-        case ImportDialog.XMP:
-            radioButtonXmp.setSelected(true);
-            break;
-        case ImportDialog.CONTENT:
-            radioButtonPDFcontent.setSelected(true);
-            break;
-        case ImportDialog.ONLYATTACH:
-            radioButtononlyAttachPDF.setSelected(true);
-            break;
-        default:
-            // fallback
-            radioButtonPDFcontent.setSelected(true);
-            break;
+            case ImportDialog.NOMETA:
+                radioButtonNoMeta.setSelected(true);
+                break;
+            case ImportDialog.XMP:
+                radioButtonXmp.setSelected(true);
+                break;
+            case ImportDialog.CONTENT:
+                radioButtonPDFcontent.setSelected(true);
+                break;
+            case ImportDialog.ONLYATTACH:
+                radioButtononlyAttachPDF.setSelected(true);
+                break;
+            default:
+                // fallback
+                radioButtonPDFcontent.setSelected(true);
+                break;
         }
         fileNamePattern.setText(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
         fileDirPattern.setText(prefs.get(JabRefPreferences.IMPORT_FILEDIRPATTERN));

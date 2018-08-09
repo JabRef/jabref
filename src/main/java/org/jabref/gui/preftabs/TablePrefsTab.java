@@ -92,9 +92,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
         numericFields = new TextField();
 
-        priSort.setValue("<select>");
-        secSort.setValue("<select>");
-        terSort.setValue("<select>");
+        priSort.setValue(Localization.lang("<select>"));
+        secSort.setValue(Localization.lang("<select>"));
+        terSort.setValue(Localization.lang("<select>"));
 
         priSort.setOnAction(e -> {
             if (priSort.getBaselineOffset() > 0) {
@@ -117,7 +117,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         terDesc = new CheckBox(Localization.lang("Descending"));
 
         GridPane builder = new GridPane();
-        builder.add(new Label(Localization.lang("Format of author and editor name:")),1,1);
+        builder.add(new Label(Localization.lang("Format of author and editor names")),1,1);
         builder.add(namesAsIs,1,2);
         builder.add(noAbbrNames,2,2);
         builder.add(namesFf,1,3);
@@ -131,26 +131,26 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         builder.add(new Label(Localization.lang("Default sort criteria")),1,6);
         // Create a new panel with its own FormLayout for these items:
         Label lab = new Label();
-        lab = new Label(Localization.lang("    Primary sort criterion"));
+        lab = new Label(Localization.lang("Primary sort criterion"));
         builder.add(lab,1,7);
         builder.add(priSort,2,7);
         builder.add(priField,3,7);
         builder.add(priDesc,4,7);
 
-        lab = new Label(Localization.lang("    Secondary sort criterion"));
+        lab = new Label(Localization.lang("Secondary sort criterion"));
         builder.add(lab,1,8);
         builder.add(secSort,2,8);
         builder.add(secField,3,8);
         builder.add(secDesc,4,8);
 
-        lab = new Label(Localization.lang("    Tertiary sort criterion"));
+        lab = new Label(Localization.lang("Tertiary sort criterion"));
         builder.add(lab,1,9);
         builder.add(terSort,2,9);
         builder.add(terField,3,9);
         builder.add(terDesc,4,9);
 
 
-        builder.add(new Label(Localization.lang("    Sort the following fields as numeric fields") + ':'),1,10);
+        builder.add(new Label(Localization.lang("Sort the following fields as numeric fields") + ':'),1,10);
         builder.add(numericFields,2,10);
 
         builder.add(new Label(Localization.lang("General")),1,11);

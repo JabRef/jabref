@@ -84,8 +84,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         this.prefs = Objects.requireNonNull(prefs);
         setLayout(new BorderLayout());
 
-        TableColumn<TableRow,String> firstCol = new TableColumn<>("Formatter name");
-        TableColumn<TableRow,String> lastCol = new TableColumn<>("Format string");
+        TableColumn<TableRow,String> firstCol = new TableColumn<>(Localization.lang("Formatter name"));
+        TableColumn<TableRow,String> lastCol = new TableColumn<>(Localization.lang("Format string"));
         table = new TableView();
         table.setEditable(true);
         firstCol.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -123,7 +123,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         scrollPane.setContent(table);
         tabPanel.setCenter(scrollPane);
 
-        Button add = new Button("Add");
+        Button add = new Button(Localization.lang("Insert rows"));
         add.setOnAction(e-> {
             if (!addName.getText().isEmpty() && !addLast.getText().isEmpty()) {
                 TableRow tableRow = new TableRow(addName.getText(), addLast.getText());
@@ -137,18 +137,18 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
                 table.refresh();
             }
         });
-        Button delete = new Button("Delete");
+        Button delete = new Button(Localization.lang("Delete rows"));
         delete.setOnAction(e-> {
             if (table.getFocusModel() != null && table.getFocusModel().getFocusedIndex() != -1) {
-            tableChanged = true;
-            int row = table.getFocusModel().getFocusedIndex();
-            TableRow tableRow = tableRows.get(row);
-            tableRows.remove(tableRow);
-            data.remove(tableRow);
-            table.setItems(data);
-            rowCount--;
-            table.refresh();
-        }});
+                tableChanged = true;
+                int row = table.getFocusModel().getFocusedIndex();
+                TableRow tableRow = tableRows.get(row);
+                tableRows.remove(tableRow);
+                data.remove(tableRow);
+                table.setItems(data);
+                rowCount--;
+                table.refresh();
+            }});
         Button help = new Button("Help");
         help.setOnAction(e-> new HelpAction(Localization.lang("Help on Name Formatting"),
                 HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER).getHelpButton().doClick());

@@ -57,15 +57,15 @@ public class SaveOrderConfigDisplay {
         saveTerDesc = new CheckBox(Localization.lang("Descending"));
 
         GridPane builder = new GridPane();
-        builder.add(new Label(Localization.lang("    Primary sort criterion ")),1,1);
+        builder.add(new Label(Localization.lang("Primary sort criterion")),1,1);
         builder.add(savePriSort,2,1);
         builder.add(savePriDesc,3,1);
 
-        builder.add(new Label(Localization.lang("Secondary sort criterion ")),1,2);
+        builder.add(new Label(Localization.lang("Secondary sort criterion")),1,2);
         builder.add(saveSecSort,2,2);
         builder.add(saveSecDesc,3,2);
 
-        builder.add(new Label(Localization.lang("    Tertiary sort criterion ")),1, 3);
+        builder.add(new Label(Localization.lang("Tertiary sort criterion")),1, 3);
         builder.add(saveTerSort,2,3);
         builder.add(saveTerDesc,3,3);
         panel = builder;

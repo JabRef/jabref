@@ -96,7 +96,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         GridPane builder = new GridPane();
 
         builder.add(new Label(Localization.lang("Sending of emails")),1,1);
-        Label lab = new Label(Localization.lang("    Subject for sending an email with references").concat(":"));
+        Label lab = new Label(Localization.lang("Subject for sending an email with references").concat(":"));
         builder.add(lab,1,2);
         emailSubject = new TextField();
         builder.add(emailSubject,2,2);

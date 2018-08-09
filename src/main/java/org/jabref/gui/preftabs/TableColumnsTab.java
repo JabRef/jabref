@@ -107,8 +107,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 new TableRow("bibtexkey",100));
 
         colSetup = new TableView<>();
-        TableColumn<TableRow,String> field = new TableColumn<>("Field name");
-        TableColumn<TableRow,Double> column = new TableColumn<>("Column width");
+        TableColumn<TableRow,String> field = new TableColumn<>(Localization.lang("Field name"));
+        TableColumn<TableRow,Double> column = new TableColumn<>(Localization.lang("Column width"));
         field.setPrefWidth(400);
         column.setPrefWidth(240);
         field.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -214,8 +214,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         fileColumn = new CheckBox(Localization.lang("Show file column"));
         urlColumn = new CheckBox(Localization.lang("Show URL/DOI column"));
-        preferUrl = new RadioButton(Localization.lang("    Show URL first"));
-        preferDoi = new RadioButton(Localization.lang("    Show DOI first"));
+        preferUrl = new RadioButton(Localization.lang("Show URL first"));
+        preferDoi = new RadioButton(Localization.lang("Show DOI first"));
 
         urlColumn.setOnAction(arg0 -> {
             preferUrl.setDisable(!urlColumn.isSelected());
@@ -247,18 +247,18 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         helpButton.setOnAction(e->new HelpAction(Localization.lang("Help on special fields"),
                 HelpFile.SPECIAL_FIELDS).getHelpButton().doClick());
 
-        rankingColumn = new CheckBox(Localization.lang("    Show rank"));
-        qualityColumn = new CheckBox(Localization.lang("    Show quality"));
-        priorityColumn = new CheckBox(Localization.lang("    Show priority"));
-        relevanceColumn = new CheckBox(Localization.lang("    Show relevance"));
-        printedColumn = new CheckBox(Localization.lang("    Show printed status"));
-        readStatusColumn = new CheckBox(Localization.lang("    Show read status"));
+        rankingColumn = new CheckBox(Localization.lang("Show rank"));
+        qualityColumn = new CheckBox(Localization.lang("Show quality"));
+        priorityColumn = new CheckBox(Localization.lang("Show priority"));
+        relevanceColumn = new CheckBox(Localization.lang("Show relevance"));
+        printedColumn = new CheckBox(Localization.lang("Show printed status"));
+        readStatusColumn = new CheckBox(Localization.lang("Show read status"));
 
         // "sync keywords" and "write special" fields may be configured mutually exclusive only
         // The implementation supports all combinations (TRUE+TRUE and FALSE+FALSE, even if the latter does not make sense)
         // To avoid confusion, we opted to make the setting mutually exclusive
-        syncKeywords = new RadioButton(Localization.lang("    Synchronize with keywords"));
-        writeSpecialFields = new RadioButton(Localization.lang("    Write values of special fields as separate fields to BibTeX"));
+        syncKeywords = new RadioButton(Localization.lang("Synchronize with keywords"));
+        writeSpecialFields = new RadioButton(Localization.lang("Write values of special fields as separate fields to BibTeX"));
 
         specialFieldsEnabled = new CheckBox(Localization.lang("Enable special fields"));
         specialFieldsEnabled.setOnAction(event -> {
