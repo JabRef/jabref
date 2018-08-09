@@ -18,9 +18,10 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
 
     /**
      *  Variable that contains user-defined behavior for paste action.
-     *  Set empty paste behavior by default
      */
-    private PasteActionHandler pasteActionHandler = new EmptyPasteHandler();
+    private PasteActionHandler pasteActionHandler = () -> {
+        // Set empty paste behavior by default
+    };
 
     public EditorTextArea() {
         this("");
@@ -98,16 +99,5 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
     public interface PasteActionHandler {
 
         void handle();
-    }
-  
-    /**
-     * Empty interface implementation to do nothing external on paste method
-     */
-    private static class EmptyPasteHandler implements PasteActionHandler {
-  
-        @Override
-        public void handle() {
-            //empty implementation
-        }
     }
 }
