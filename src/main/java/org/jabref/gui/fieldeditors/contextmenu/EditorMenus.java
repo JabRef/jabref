@@ -94,7 +94,7 @@ public class EditorMenus {
      */
     public static Supplier<List<MenuItem>> getCleanupURLMenu(TextArea textArea) {
         return () -> {
-            CustomMenuItem cleanupURL = new CustomMenuItem(new Label(Localization.lang("Cleanup URL lnk")));
+            CustomMenuItem cleanupURL = new CustomMenuItem(new Label(Localization.lang("Cleanup URL link")));
             cleanupURL.setDisable(textArea.textProperty().isEmpty().get());
             cleanupURL.setOnAction(event -> textArea.setText(new CleanupURLFormatter().format(textArea.getText())));
 
