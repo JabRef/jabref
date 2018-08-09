@@ -63,6 +63,8 @@ class AdvancedTab extends JPanel implements PrefsTab {
                 + "is useful when you open a file in JabRef<br>from your web browser."
 
                 + "<BR>Note that this will prevent you from running more than one instance of JabRef at a time."));
+        label.setVisible(false);
+        builder.add(label,2,22);
         builder.add(new Label("This feature lets new files be opened or imported into an already running instance of JabRef instead of opening a new instance. For"),2,3);
         builder.add(new Label("instance, this is useful when you open a file in JabRef from your web browser. "),2,4);
         builder.add(new Label("Note that this will prevent you from running more than one instance of JabRef at a time."),2,5);
