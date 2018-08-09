@@ -416,7 +416,7 @@ public class ModsImporter extends Importer implements Parser {
 
     private void putIfListIsNotEmpty(Map<String, String> fields, List<String> list, String key, String separator) {
         if (!list.isEmpty()) {
-            fields.put(key, Joiner.on(separator).join(list));
+            fields.put(key, list.stream().collect(Collectors.joining(separator)));
         }
     }
 

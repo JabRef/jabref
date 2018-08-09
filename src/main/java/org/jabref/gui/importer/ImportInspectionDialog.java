@@ -84,7 +84,6 @@ import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.ImportInspector;
 import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
@@ -144,7 +143,7 @@ import org.slf4j.LoggerFactory;
  * receiving this call).
  */
 
-public class ImportInspectionDialog extends JabRefDialog implements ImportInspector, OutputPrinter {
+public class ImportInspectionDialog extends JabRefDialog implements OutputPrinter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportInspectionDialog.class);
     private static final List<String> INSPECTION_FIELDS = Arrays.asList(FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, BibEntry.KEY_FIELD);
@@ -168,7 +167,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
      */
     private final List<BibEntry> entriesToDelete = new ArrayList<>();
     private final String undoName;
-    private final List<CallBack> callBacks = new ArrayList<>();
     private final boolean newDatabase;
     private final JPopupMenu popup = new JPopupMenu();
     private final JButton deselectAllDuplicates = new JButton(Localization.lang("Deselect all duplicates"));
@@ -193,7 +191,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
      * @param panel
      */
     public ImportInspectionDialog(JabRefFrame frame, BasePanel panel, String undoName, boolean newDatabase) {
-        super(null, ImportInspectionDialog.class);
+        super(ImportInspectionDialog.class);
         this.frame = frame;
         this.panel = panel;
         this.bibDatabaseContext = (panel == null) ? null : panel.getBibDatabaseContext();
@@ -286,7 +284,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         generate.setEnabled(false);
         ok.addActionListener(new OkListener());
         cancel.addActionListener(e -> {
-            signalStopFetching();
             dispose();
             frame.output(Localization.lang("Import canceled by user"));
         });
@@ -297,7 +294,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             generateKeys(); // Generate the keys.
         });
         stop.addActionListener(e -> {
-            signalStopFetching();
             entryListComplete();
         });
         selectAll.addActionListener(new SelectionButton(true));
@@ -343,29 +339,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         am.put("close", closeAction);
 
-    }
-
-    /* (non-Javadoc)
-     * @see package org.jabref.logic.importer.ImportInspector#setProgress(int, int)
-     */
-    @Override
-    public void setProgress(int current, int max) {
-        SwingUtilities.invokeLater(() -> {
-            progressBar.setIndeterminate(false);
-            progressBar.setMinimum(0);
-            progressBar.setMaximum(max);
-            progressBar.setValue(current);
-        });
-    }
-
-    /* (non-Javadoc)
-     * @see package org.jabref.logic.importer.ImportInspector#addEntry(org.jabref.model.entry.BibEntry)
-     */
-    @Override
-    public void addEntry(BibEntry entry) {
-        List<BibEntry> list = new ArrayList<>();
-        list.add(entry);
-        addEntries(list);
     }
 
     public void addEntries(Collection<BibEntry> entriesToAdd) {
@@ -557,14 +530,6 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         AbstractAction action = new AddToGroupAction(node);
         action.setEnabled(node.getGroup() instanceof GroupEntryChanger);
         return action;
-    }
-
-    public void addCallBack(CallBack cb) {
-        callBacks.add(cb);
-    }
-
-    private void signalStopFetching() {
-        callBacks.forEach(CallBack::stopFetching);
     }
 
     private void setWidths() {

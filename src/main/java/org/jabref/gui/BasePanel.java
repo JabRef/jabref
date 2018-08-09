@@ -62,6 +62,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.groups.GroupAddRemoveDialog;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.journals.UnabbreviateAction;
@@ -455,7 +456,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         actions.put(Actions.PREVIOUS_PREVIEW_STYLE, this::previousPreviewStyle);
 
         actions.put(Actions.MANAGE_SELECTORS, () -> {
-            ContentSelectorDialog csd = new ContentSelectorDialog(null, frame, BasePanel.this, false, null);
+            ContentSelectorDialog csd = new ContentSelectorDialog(frame, BasePanel.this, false, null);
             csd.setVisible(true);
         });
 
@@ -674,7 +675,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                 return;
             }
             FileListEntry flEntry = fileListTableModel.getEntry(0);
-            ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), "", flEntry.getLink(), flEntry.getType().get().getIcon().getSmallIcon(), bibDatabaseContext, flEntry.getType());
+            ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), "", flEntry.getLink(), flEntry.getType().map(ExternalFileType::getIcon).map(JabRefIcon::getSmallIcon).orElse(null), bibDatabaseContext, flEntry.getType());
             item.doClick();
         });
     }

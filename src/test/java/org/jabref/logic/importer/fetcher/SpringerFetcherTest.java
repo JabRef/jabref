@@ -2,15 +2,19 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.testutils.category.FetcherTest;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@FetcherTest
 class SpringerFetcherTest {
 
     SpringerFetcher fetcher;
@@ -22,7 +26,7 @@ class SpringerFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE);
         expected.setField("author", "Steinmacher, Igor and Gerosa, Marco and Conte, Tayana U. and Redmiles, David F.");
         expected.setField("date", "2018-06-14");
         expected.setField("doi", "10.1007/s10606-018-9335-z");
@@ -38,5 +42,33 @@ class SpringerFetcherTest {
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("JabRef Social Barriers Steinmacher");
         assertEquals(Collections.singletonList(expected), fetchedEntries);
+    }
+
+    @Test
+    void testSpringerJSONToBibtex() {
+        String jsonString = "{\r\n" + "            \"identifier\":\"doi:10.1007/BF01201962\",\r\n"
+                + "            \"title\":\"Book reviews\",\r\n"
+                + "            \"publicationName\":\"World Journal of Microbiology & Biotechnology\",\r\n"
+                + "            \"issn\":\"1573-0972\",\r\n" + "            \"isbn\":\"\",\r\n"
+                + "            \"doi\":\"10.1007/BF01201962\",\r\n" + "            \"publisher\":\"Springer\",\r\n"
+                + "            \"publicationDate\":\"1992-09-01\",\r\n" + "            \"volume\":\"8\",\r\n"
+                + "            \"number\":\"5\",\r\n" + "            \"startingPage\":\"550\",\r\n"
+                + "            \"url\":\"http://dx.doi.org/10.1007/BF01201962\",\"copyright\":\"©1992 Rapid Communications of Oxford Ltd.\"\r\n"
+                + "        }";
+
+        JSONObject jsonObject = new JSONObject(jsonString);
+        BibEntry bibEntry = SpringerFetcher.parseSpringerJSONtoBibtex(jsonObject);
+        assertEquals(Optional.of("1992"), bibEntry.getField("year"));
+        assertEquals(Optional.of("5"), bibEntry.getField("number"));
+        assertEquals(Optional.of("#sep#"), bibEntry.getField("month"));
+        assertEquals(Optional.of("10.1007/BF01201962"), bibEntry.getField("doi"));
+        assertEquals(Optional.of("8"), bibEntry.getField("volume"));
+        assertEquals(Optional.of("Springer"), bibEntry.getField("publisher"));
+        assertEquals(Optional.of("1992-09-01"), bibEntry.getField("date"));
+    }
+
+    @Test
+    void searchByEmptyQueryFindsNothing() throws Exception {
+        assertEquals(Collections.emptyList(), fetcher.performSearch(""));
     }
 }

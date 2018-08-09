@@ -13,7 +13,7 @@ public class FindUnlinkedFilesAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        FindUnlinkedFilesDialog dlg = new FindUnlinkedFilesDialog(null, jabRefFrame);
+        FindUnlinkedFilesDialog dlg = new FindUnlinkedFilesDialog(jabRefFrame);
         dlg.setVisible(true);
     }
 

@@ -1,9 +1,11 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -115,7 +117,7 @@ public class CrossRefTest {
 
     @Test
     public void performSearchByIdFindsPaperWithoutTitle() throws Exception {
-        BibEntry entry = new BibEntry("article");
+        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE);
         entry.setField("author", "Dominik Wujastyk");
         entry.setField("doi", "10.1023/a:1003473214310");
         entry.setField("issn", "0019-7246");
@@ -124,5 +126,15 @@ public class CrossRefTest {
         entry.setField("year", "1999");
 
         assertEquals(Optional.of(entry), fetcher.performSearchById("10.1023/a:1003473214310"));
+    }
+
+    @Test
+    public void performSearchByEmptyId() throws Exception {
+        assertEquals(Optional.empty(), fetcher.performSearchById(""));
+    }
+
+    @Test
+    public void performSearchByEmptyQuery() throws Exception {
+        assertEquals(Collections.emptyList(), fetcher.performSearch(""));
     }
 }

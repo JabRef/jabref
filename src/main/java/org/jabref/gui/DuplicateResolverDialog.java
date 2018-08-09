@@ -6,7 +6,6 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.jabref.gui.help.HelpAction;
@@ -46,7 +45,7 @@ public class DuplicateResolverDialog extends JabRefDialog {
     private MergeEntries me;
 
     public DuplicateResolverDialog(JabRefFrame frame, BibEntry one, BibEntry two, DuplicateResolverType type) {
-        super((JFrame) null, Localization.lang("Possible duplicate entries"), true, DuplicateResolverDialog.class);
+        super(Localization.lang("Possible duplicate entries"), true, DuplicateResolverDialog.class);
         this.frame = frame;
         init(one, two, type);
     }
