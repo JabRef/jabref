@@ -3,9 +3,10 @@ package org.jabref.logic.net;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import org.junit.Rule;
-import org.junit.Test;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.any;
@@ -13,15 +14,25 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.head;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MimeTypeDetectorTest {
+class MimeTypeDetectorTest {
 
-    @Rule public WireMockRule wireMockRule = new WireMockRule();
+    private WireMockServer wireMockServer = new WireMockServer();
+
+    @BeforeEach
+    void before() {
+        wireMockServer.start();
+    }
+
+    @AfterEach
+    void after() {
+        wireMockServer.stop();
+    }
 
     @Test
-    public void handlePermanentRedirections() throws IOException {
+    void handlePermanentRedirections() throws IOException {
         String redirectedUrl = "http://localhost:8080/redirection";
 
         stubFor(any(urlEqualTo("/redirection"))
@@ -36,25 +47,25 @@ public class MimeTypeDetectorTest {
     }
 
     @Test
-    public void beFalseForUnreachableUrl() throws IOException {
+    void beFalseForUnreachableUrl() throws IOException {
         String invalidUrl = "http://idontknowthisurlforsure.de";
         assertFalse(new URLDownload(invalidUrl).isMimeType("application/pdf"));
     }
 
     @Test
-    public void beTrueForPdfMimeType() throws IOException {
+    void beTrueForPdfMimeType() throws IOException {
         String pdfUrl = "http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf";
         assertTrue(new URLDownload(pdfUrl).isMimeType("application/pdf"));
     }
 
     @Test
-    public void beTrueForLocalPdfUri() throws URISyntaxException, IOException {
+    void beTrueForLocalPdfUri() throws URISyntaxException, IOException {
         String localPath = MimeTypeDetectorTest.class.getResource("empty.pdf").toURI().toASCIIString();
         assertTrue(new URLDownload(localPath).isMimeType("application/pdf"));
     }
 
     @Test
-    public void beTrueForPDFMimeTypeVariations() throws IOException {
+    void beTrueForPDFMimeTypeVariations() throws IOException {
         String mimeTypeVariation = "http://localhost:8080/mimevariation";
 
         stubFor(any(urlEqualTo("/mimevariation"))
@@ -67,7 +78,7 @@ public class MimeTypeDetectorTest {
     }
 
     @Test
-    public void beAbleToUseHeadRequest() throws IOException {
+    void beAbleToUseHeadRequest() throws IOException {
         String mimeTypeVariation = "http://localhost:8080/mimevariation";
 
         stubFor(head(urlEqualTo("/mimevariation"))
@@ -80,7 +91,7 @@ public class MimeTypeDetectorTest {
     }
 
     @Test
-    public void beAbleToUseGetRequest() throws IOException {
+    void beAbleToUseGetRequest() throws IOException {
         String mimeTypeVariation = "http://localhost:8080/mimevariation";
 
         stubFor(head(urlEqualTo("/mimevariation"))
