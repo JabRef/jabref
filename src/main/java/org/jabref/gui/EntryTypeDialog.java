@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -28,6 +29,7 @@ import javax.swing.SwingWorker;
 import org.jabref.Globals;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.FetcherException;
@@ -65,7 +67,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
     public EntryTypeDialog(JabRefFrame frame) {
         // modal dialog
-        super(null, true, EntryTypeDialog.class);
+        super(true, EntryTypeDialog.class);
 
         this.frame = frame;
 
@@ -315,7 +317,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                         final BasePanel panel = frame.getCurrentBasePanel();
 
                         ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"), false);
-                        diag.addEntry(bibEntry);
+                        diag.addEntries(Collections.singletonList(bibEntry));
                         diag.entryListComplete();
                         diag.setVisible(true);
                         diag.toFront();
@@ -326,18 +328,28 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                         if (Globals.prefs.getTimestampPreferences().includeCreatedTimestamp()) {
                             bibEntry.setField(Globals.prefs.getTimestampPreferences().getTimestampField(), Globals.prefs.getTimestampPreferences().now());
                         }
-                        frame.getCurrentBasePanel().insertEntry(bibEntry);
+                        DefaultTaskExecutor.runInJavaFXThread(() -> frame.getCurrentBasePanel().insertEntry(bibEntry));
                     }
 
                     dispose();
                 } else if (searchID.trim().isEmpty()) {
-                    frame.getDialogService().showWarningDialogAndWait(Localization.lang("Empty search ID"),
-                            Localization.lang("The given search ID was empty."));
+                    DefaultTaskExecutor.runInJavaFXThread(() -> {
+                        frame.getDialogService().showWarningDialogAndWait(
+                                Localization.lang("Empty search ID"),
+                                Localization.lang("The given search ID was empty."));
+                    });
                 } else if (!fetcherException) {
-                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("No files found.",
-                            Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage));
+                    DefaultTaskExecutor.runInJavaFXThread(() -> {
+                        frame.getDialogService().showErrorDialogAndWait(
+                                Localization.lang("No files found."),
+                                Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage);
+                    });
                 } else {
-                    frame.getDialogService().showErrorDialogAndWait(Localization.lang("Error"), Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage);
+                    DefaultTaskExecutor.runInJavaFXThread(() -> {
+                        frame.getDialogService().showErrorDialogAndWait(
+                                Localization.lang("Error"),
+                                Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage);
+                    });
                 }
                 fetcherWorker = new FetcherWorker();
                 SwingUtilities.invokeLater(() -> {

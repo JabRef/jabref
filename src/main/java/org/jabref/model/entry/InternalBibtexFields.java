@@ -93,6 +93,10 @@ public class InternalBibtexFields {
             SpecialField.RELEVANCE.getFieldName()
     );
 
+    private static final Set<String> SINGLE_LINE_FIELDS = Collections.unmodifiableSet(new HashSet<>(
+            Arrays.asList(FieldName.TITLE, FieldName.AUTHOR, FieldName.YEAR, FieldName.INSTITUTION)
+    ));
+
     // singleton instance
     private static InternalBibtexFields RUNTIME = new InternalBibtexFields();
 
@@ -474,5 +478,9 @@ public class InternalBibtexFields {
      */
     private void add(BibtexSingleField field) {
         fieldSet.put(field.getName(), field);
+    }
+
+    public static boolean isSingleLineField(final String fieldName) {
+        return SINGLE_LINE_FIELDS.contains(fieldName.toLowerCase());
     }
 }

@@ -129,20 +129,15 @@ public class JabRefDesktop {
         }
 
         Optional<Path> file = FileHelper.expandFilename(databaseContext, link, Globals.prefs.getFileDirectoryPreferences());
-        if (file.isPresent() && Files.exists(file.get()) && (type.isPresent())) {
+        if (file.isPresent() && Files.exists(file.get())) {
             // Open the file:
             String filePath = file.get().toString();
             openExternalFilePlatformIndependent(type, filePath);
             return true;
         } else {
             // No file matched the name, try to open it directly using the given app
-            if (type.isPresent()) {
-                openExternalFilePlatformIndependent(type, link);
-                return true;
-            }
-
-            // Run out of ideas what to do...
-            return false;
+            openExternalFilePlatformIndependent(type, link);
+            return true;
         }
     }
 
@@ -160,6 +155,10 @@ public class JabRefDesktop {
             } else {
                 NATIVE_DESKTOP.openFileWithApplication(filePath, application);
             }
+        } else {
+            //File type is not given and therefore no application specified
+            //Let the OS handle the opening of the file
+            NATIVE_DESKTOP.openFile(filePath, "");
         }
     }
 

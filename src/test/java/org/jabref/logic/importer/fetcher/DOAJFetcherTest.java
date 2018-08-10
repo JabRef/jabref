@@ -2,12 +2,14 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +31,7 @@ class DOAJFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        BibEntry expected = new BibEntry(BibtexEntryTypes.ARTICLE);
         expected.setField("author", "Wei Wang and Yun He and Tong Li and Jiajun Zhu and Jinzhuo Liu");
         expected.setField("doi", "10.1155/2018/5913634");
         expected.setField("issn", "1875-919X");
@@ -43,5 +45,32 @@ class DOAJFetcherTest {
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("JabRef impact");
         assertEquals(Collections.singletonList(expected), fetchedEntries);
+    }
+
+    @Test
+    void testBibJSONConverter() {
+        String jsonString = "{\n\"title\": \"Design of Finite Word Length Linear-Phase FIR Filters in the Logarithmic Number System Domain\",\n"
+                + "\"journal\": {\n\"publisher\": \"Hindawi Publishing Corporation\",\n\"language\": ["
+                + "\"English\"],\n\"title\": \"VLSI Design\",\"country\": \"US\",\"volume\": \"2014\""
+                + "},\"author\":[{\"name\": \"Syed Asad Alam\"},{\"name\": \"Oscar Gustafsson\""
+                + "}\n],\n\"link\":[{\"url\": \"http://dx.doi.org/10.1155/2014/217495\","
+                + "\"type\": \"fulltext\"}],\"year\":\"2014\",\"identifier\":[{"
+                + "\"type\": \"pissn\",\"id\": \"1065-514X\"},\n{\"type\": \"eissn\","
+                + "\"id\": \"1563-5171\"},{\"type\": \"doi\",\"id\": \"10.1155/2014/217495\""
+                + "}],\"created_date\":\"2014-05-09T19:38:31Z\"}\"";
+        JSONObject jsonObject = new JSONObject(jsonString);
+        BibEntry bibEntry = DOAJFetcher.parseBibJSONtoBibtex(jsonObject, ',');
+
+        assertEquals("article", bibEntry.getType());
+        assertEquals(Optional.of("VLSI Design"), bibEntry.getField("journal"));
+        assertEquals(Optional.of("10.1155/2014/217495"), bibEntry.getField("doi"));
+        assertEquals(Optional.of("Syed Asad Alam and Oscar Gustafsson"), bibEntry.getField("author"));
+        assertEquals(Optional.of("Design of Finite Word Length Linear-Phase FIR Filters in the Logarithmic Number System Domain"), bibEntry.getField("title"));
+        assertEquals(Optional.of("2014"), bibEntry.getField("year"));
+    }
+
+    @Test
+    public void searchByEmptyQuery() throws Exception {
+        assertEquals(Collections.emptyList(), fetcher.performSearch(""));
     }
 }

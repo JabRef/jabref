@@ -1,5 +1,7 @@
 package org.jabref.gui.actions;
 
+import javax.swing.SwingUtilities;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelPreferences;
@@ -23,16 +25,18 @@ public class NewSubLibraryAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        FromAuxDialog dialog = new FromAuxDialog(jabRefFrame, "", true, jabRefFrame.getTabbedPane());
+        SwingUtilities.invokeLater(() -> {
+            FromAuxDialog dialog = new FromAuxDialog(jabRefFrame, "", true, jabRefFrame.getTabbedPane());
 
-        dialog.setVisible(true);
+            dialog.setVisible(true);
 
-        if (dialog.generatePressed()) {
-            Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
-            BasePanel bp = new BasePanel(jabRefFrame, BasePanelPreferences.from(Globals.prefs), new BibDatabaseContext(dialog.getGenerateDB(), defaults), ExternalFileTypes.getInstance());
-            jabRefFrame.addTab(bp, true);
-            jabRefFrame.output(Localization.lang("New library created."));
-        }
+            if (dialog.generatePressed()) {
+                Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
+                BasePanel bp = new BasePanel(jabRefFrame, BasePanelPreferences.from(Globals.prefs), new BibDatabaseContext(dialog.getGenerateDB(), defaults), ExternalFileTypes.getInstance());
+                jabRefFrame.addTab(bp, true);
+                jabRefFrame.output(Localization.lang("New library created."));
+            }
+        });
     }
 
 }

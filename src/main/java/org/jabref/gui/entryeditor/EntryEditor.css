@@ -31,15 +31,15 @@
     -fx-background-color: -jr-icon-background-active;
 }
 
-.flatButton.narrow {
+.icon-button.narrow {
     -fx-padding: 0.1em;
 }
 
-.flatButtonNoSpaceBottom.narrow {
+.icon-buttonNoSpaceBottom.narrow {
     -fx-padding: 0.1em 0.1em -0.2em 0.1em;
 }
 
-.flatButtonNoSpaceTop.narrow {
+.icon-buttonNoSpaceTop.narrow {
     -fx-padding: -0.2em 0.1em 0.1em 0.1em;
 }
 

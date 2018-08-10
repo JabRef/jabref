@@ -110,11 +110,20 @@ public class HelpAction extends MnemonicAwareAction {
         openHelpPage(helpPage);
     }
 
-    public static SimpleCommand getCommand() {
+    public static SimpleCommand getMainHelpPageCommand() {
         return new SimpleCommand() {
             @Override
             public void execute() {
                 openHelpPage(HelpFile.CONTENTS);
+            }
+        };
+    }
+
+    public SimpleCommand getCommand() {
+        return new SimpleCommand() {
+            @Override
+            public void execute() {
+                openHelpPage(helpPage);
             }
         };
     }

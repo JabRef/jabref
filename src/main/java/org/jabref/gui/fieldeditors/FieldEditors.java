@@ -13,8 +13,7 @@ import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
@@ -29,12 +28,26 @@ public class FieldEditors {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldEditors.class);
 
-    public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, JabRefPreferences preferences, BibDatabaseContext databaseContext, String entryType, SuggestionProviders suggestionProviders, UndoManager undoManager) {
+    public static FieldEditorFX getForField(final String fieldName,
+                                            final TaskExecutor taskExecutor,
+                                            final DialogService dialogService,
+                                            final JournalAbbreviationRepository journalAbbreviationRepository,
+                                            final JabRefPreferences preferences,
+                                            final BibDatabaseContext databaseContext,
+                                            final String entryType,
+                                            final SuggestionProviders suggestionProviders,
+                                            final UndoManager undoManager) {
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 
-        AutoCompleteSuggestionProvider<?> suggestionProvider = getSuggestionProvider(fieldName, suggestionProviders, databaseContext.getMetaData());
+        final AutoCompleteSuggestionProvider<?> suggestionProvider = getSuggestionProvider(fieldName, suggestionProviders, databaseContext.getMetaData());
 
-        FieldCheckers fieldCheckers = new FieldCheckers(databaseContext, preferences.getFileDirectoryPreferences(), journalAbbreviationLoader.getRepository(journalAbbreviationPreferences), preferences.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
+        final FieldCheckers fieldCheckers = new FieldCheckers(
+                databaseContext,
+                preferences.getFileDirectoryPreferences(),
+                journalAbbreviationRepository,
+                preferences.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
+
+        final boolean isSingleLine = InternalBibtexFields.isSingleLineField(fieldName);
 
         if (preferences.getTimestampPreferences().getTimestampField().equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
             if (fieldExtras.contains(FieldProperty.ISO_DATE)) {
@@ -45,7 +58,7 @@ public class FieldEditors {
         } else if (fieldExtras.contains(FieldProperty.EXTERNAL)) {
             return new UrlEditor(fieldName, dialogService, suggestionProvider, fieldCheckers, preferences);
         } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
-            return new JournalEditor(fieldName, journalAbbreviationLoader, preferences, suggestionProvider, fieldCheckers);
+            return new JournalEditor(fieldName, journalAbbreviationRepository, preferences, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.DOI) || fieldExtras.contains(FieldProperty.EPRINT) || fieldExtras.contains(FieldProperty.ISBN)) {
             return new IdentifierEditor(fieldName, taskExecutor, dialogService, suggestionProvider, fieldCheckers, preferences);
         } else if (fieldExtras.contains(FieldProperty.OWNER)) {
@@ -71,7 +84,7 @@ public class FieldEditors {
         } else if (fieldExtras.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldExtras.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
             return new LinkedEntriesEditor(fieldName, databaseContext, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.PERSON_NAMES)) {
-            return new PersonsEditor(fieldName, suggestionProvider, preferences, fieldCheckers);
+            return new PersonsEditor(fieldName, suggestionProvider, preferences, fieldCheckers, isSingleLine);
         } else if (FieldName.KEYWORDS.equals(fieldName)) {
             return new KeywordsEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
         } else if (fieldExtras.contains(FieldProperty.MULTILINE_TEXT)) {
@@ -81,7 +94,7 @@ public class FieldEditors {
         }
 
         // default
-        return new SimpleEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
+        return new SimpleEditor(fieldName, suggestionProvider, fieldCheckers, preferences, isSingleLine);
     }
 
     @SuppressWarnings("unchecked")

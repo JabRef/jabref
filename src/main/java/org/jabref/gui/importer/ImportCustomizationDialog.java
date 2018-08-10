@@ -16,7 +16,6 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -60,7 +59,7 @@ public class ImportCustomizationDialog extends JabRefDialog {
     private final JTable customImporterTable;
 
     public ImportCustomizationDialog(final JabRefFrame frame) {
-        super((JFrame) null, Localization.lang("Manage custom imports"), false, ImportCustomizationDialog.class);
+        super(Localization.lang("Manage custom imports"), false, ImportCustomizationDialog.class);
 
         DialogService dialogService = frame.getDialogService();
 

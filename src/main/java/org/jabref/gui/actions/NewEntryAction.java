@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.swing.SwingUtilities;
+
 import org.jabref.Globals;
 import org.jabref.gui.EntryTypeDialog;
 import org.jabref.gui.JabRefFrame;
@@ -42,15 +44,17 @@ public class NewEntryAction extends SimpleCommand {
         if (type.isPresent()) {
             jabRefFrame.getCurrentBasePanel().newEntry(type.get());
         } else {
-            EntryTypeDialog typeChoiceDialog = new EntryTypeDialog(jabRefFrame);
-            typeChoiceDialog.setVisible(true);
-            EntryType selectedType = typeChoiceDialog.getChoice();
-            if (selectedType == null) {
-                return;
-            }
+            SwingUtilities.invokeLater(() -> {
+                EntryTypeDialog typeChoiceDialog = new EntryTypeDialog(jabRefFrame);
+                typeChoiceDialog.setVisible(true);
+                EntryType selectedType = typeChoiceDialog.getChoice();
+                if (selectedType == null) {
+                    return;
+                }
 
-            trackNewEntry(selectedType);
-            jabRefFrame.getCurrentBasePanel().newEntry(selectedType);
+                trackNewEntry(selectedType);
+                jabRefFrame.getCurrentBasePanel().newEntry(selectedType);
+            });
         }
     }
 
