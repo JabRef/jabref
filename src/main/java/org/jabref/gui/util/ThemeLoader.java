@@ -11,10 +11,10 @@ import java.util.Objects;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 
-import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +49,7 @@ public class ThemeLoader {
      * Installs the base css file as a stylesheet in the given scene.
      * Changes in the css file lead to a redraw of the scene using the new css file.
      */
-    public void installBaseCss(Scene scene) {
+    public void installBaseCss(Scene scene, JabRefPreferences preferences) {
         addAndWatchForChanges(scene, DEFAULT_PATH_MAIN_CSS, 0);
 
         if (StringUtil.isNotBlank(CSS_SYSTEM_PROPERTY)) {
@@ -60,7 +60,7 @@ public class ThemeLoader {
             }
         }
 
-        Globals.prefs.getFontSize().ifPresent(size -> scene.getRoot().setStyle("-fx-font-size: " + size + "pt;"));
+        preferences.getFontSize().ifPresent(size -> scene.getRoot().setStyle("-fx-font-size: " + size + "pt;"));
     }
 
     private void addAndWatchForChanges(Scene scene, String cssUrl, int index) {
@@ -77,7 +77,7 @@ public class ThemeLoader {
 
                     DefaultTaskExecutor.runInJavaFXThread(() -> {
                                 scene.getStylesheets().remove(cssUrl);
-                        scene.getStylesheets().add(index, cssUrl);
+                                scene.getStylesheets().add(index, cssUrl);
                             }
                     );
                 });

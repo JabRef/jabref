@@ -76,26 +76,24 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         String fileName = Paths.get(fileText).getFileName().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                               .withInitialDirectory(workingDir)
-                                                                                               .withInitialFileName(fileName)
-                                                                                               .build();
+                .withInitialDirectory(workingDir)
+                .withInitialFileName(fileName)
+                .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> {
             // Store the directory for next time:
             preferences.setWorkingDir(path);
+            link.set(relativize(path));
 
-            // If the file is below the file directory, make the path relative:
-            List<Path> fileDirectories = database.getFileDirectoriesAsPaths(preferences.getFileDirectoryPreferences());
-            path = FileUtil.shortenFileName(path, fileDirectories);
-
-            link.set(path.toString());
             setExternalFileTypeByExtension(link.getValueSafe());
         });
     }
 
     public void setValues(LinkedFile linkedFile) {
         description.set(linkedFile.getDescription());
-        link.set(linkedFile.getLink());
+
+        Path linkPath = Paths.get(linkedFile.getLink());
+        link.set(relativize(linkPath));
 
         selectedExternalFileType.setValue(null);
 
@@ -126,6 +124,11 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
     public LinkedFile getNewLinkedFile() {
         return new LinkedFile(description.getValue(), link.getValue(), monadicSelectedExternalFileType.map(ExternalFileType::toString).getOrElse(""));
+    }
+
+    private String relativize(Path filePath) {
+        List<Path> fileDirectories = database.getFileDirectoriesAsPaths(preferences.getFileDirectoryPreferences());
+        return FileUtil.shortenFileName(filePath, fileDirectories).toString();
     }
 
 }
