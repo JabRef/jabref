@@ -1,13 +1,8 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
 import java.util.Objects;
 
-import javax.swing.JPanel;
-
 import javafx.collections.FXCollections;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -15,13 +10,14 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.text.Font;
 
-import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.pdfimport.ImportDialog;
 import org.jabref.preferences.JabRefPreferences;
 
-public class ImportSettingsTab extends JPanel implements PrefsTab {
+public class ImportSettingsTab extends Pane implements PrefsTab {
 
     public static final String[] DEFAULT_FILENAMEPATTERNS = new String[] {"[bibtexkey]",
             "[bibtexkey] - [title]"};
@@ -35,7 +31,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
     private final RadioButton radioButtonNoMeta;
     private final RadioButton radioButtononlyAttachPDF;
     private final CheckBox useDefaultPDFImportStyle;
-
+    private final GridPane builder = new GridPane();
     private final TextField fileNamePattern;
     private final ComboBox<String> selectFileNamePattern;
 
@@ -45,16 +41,21 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
     public ImportSettingsTab(JabRefPreferences prefs) {
         this.prefs = Objects.requireNonNull(prefs);
 
-        setLayout(new BorderLayout());
+        Font font = new Font(10);
+        Font font1 = new Font(14);
 
         radioButtonNoMeta = new RadioButton(Localization.lang("Create blank entry linking the PDF"));
+        radioButtonNoMeta.setFont(font);
         radioButtonXmp = new RadioButton(Localization.lang("Create entry based on XMP-metadata"));
+        radioButtonXmp.setFont(font);
         radioButtonPDFcontent = new RadioButton(Localization.lang("Create entry based on content"));
+        radioButtonPDFcontent.setFont(font);
         radioButtononlyAttachPDF = new RadioButton(Localization.lang("Only attach PDF"));
-
+        radioButtononlyAttachPDF.setFont(font);
 
         useDefaultPDFImportStyle = new CheckBox(
                 Localization.lang("Always use this PDF import style (and do not ask for each import)"));
+        useDefaultPDFImportStyle.setFont(font);
 
         fileNamePattern = new TextField();
         fileDirPattern = new TextField();
@@ -64,29 +65,35 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         selectFileNamePattern.setOnAction(e -> {
             fileNamePattern.setText(selectFileNamePattern.getValue());
         });
-        GridPane builder = new GridPane();
-        builder.add(new Label(Localization.lang("Default import style for drag and drop of PDFs")),1,1);
+
+        Label label = new Label(Localization.lang("Default import style for drag and drop of PDFs"));
+        label.setFont(font1);
+        builder.add(label,1,1);
         builder.add(new Separator(),2,1);
         builder.add(radioButtonNoMeta,2,2);
         builder.add(radioButtonXmp,2,3);
         builder.add(radioButtonPDFcontent,2,4);
         builder.add(radioButtononlyAttachPDF,2,5);
         builder.add(useDefaultPDFImportStyle,2,6);
-        builder.add(new Label(Localization.lang("Default PDF file link action")),1,7);
+        builder.add(new Label(""),1,7);
 
-
+        Label label1 = new Label(Localization.lang("Default PDF file link action") + "  ------------------------");
+        label1.setFont(font1);
+        builder.add(label1,1,8);
         Label lab = new Label(Localization.lang("Filename format pattern").concat(":"));
-        builder.add(lab,1,8);
-        builder.add(fileNamePattern,2,8);
-        builder.add(selectFileNamePattern,3,8);
+        lab.setFont(font);
+        builder.add(lab,1,9);
+        builder.add(fileNamePattern,2,9);
+        builder.add(selectFileNamePattern,3,9);
 
         Label lbfileDirPattern = new Label(Localization.lang("File directory pattern").concat(":"));
-        builder.add(lbfileDirPattern,1,9);
-        builder.add(fileDirPattern,2,9);
+        lbfileDirPattern.setFont(font);
+        builder.add(lbfileDirPattern,1,10);
+        builder.add(fileDirPattern,2,10);
+    }
 
-        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
-        setLayout(new BorderLayout());
-        add(panel, BorderLayout.CENTER);
+    public GridPane getBuilder() {
+        return builder;
     }
 
     @Override

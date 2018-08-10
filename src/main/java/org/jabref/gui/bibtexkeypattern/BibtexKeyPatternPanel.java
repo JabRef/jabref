@@ -68,10 +68,11 @@ public class BibtexKeyPatternPanel extends JPanel {
         sp.setBorder(BorderFactory.createEmptyBorder());
         pan.setLayout(gbl);
         setLayout(gbl);
-
+        javafx.scene.text.Font font1 = new javafx.scene.text.Font(10);
         // The header - can be removed
         JLabel lblEntryType = new JLabel(Localization.lang("Entry type"));
         Label label = new Label(Localization.lang("Entry type"));
+        label.setFont(font1);
         gridPane.add(label,1,1);
         Font f = new Font("plain", Font.BOLD, 12);
         lblEntryType.setFont(f);
@@ -87,7 +88,8 @@ public class BibtexKeyPatternPanel extends JPanel {
 
         JLabel lblKeyPattern = new JLabel(Localization.lang("Key pattern"));
         Label label1 = new Label(Localization.lang("Key pattern"));
-        gridPane.add(label1,2,1);
+        label1.setFont(font1);
+        gridPane.add(label1,3,1);
         lblKeyPattern.setFont(f);
         con.gridx = 1;
         con.gridy = 0;
@@ -102,8 +104,9 @@ public class BibtexKeyPatternPanel extends JPanel {
         con.gridx = 0;
         JLabel lab = new JLabel(Localization.lang("Default pattern"));
         Label label2 = new Label(Localization.lang("Default pattern"));
+        label2.setFont(font1);
         gridPane.add(label2, 1,2);
-        gridPane.add(textField,2,2);
+        gridPane.add(textField,3,2);
         gbl.setConstraints(lab, con);
         pan.add(lab);
         con.gridx = 1;
@@ -115,8 +118,9 @@ public class BibtexKeyPatternPanel extends JPanel {
                 e -> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
 
         Button button = new Button("Default");
+        button.setFont(font1);
         button.setOnAction(e-> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
-        gridPane.add(button,3,2);
+        gridPane.add(button,4,2);
         con.gridx = 2;
         int y = 2;
         gbl.setConstraints(btnDefault, con);
@@ -158,7 +162,7 @@ public class BibtexKeyPatternPanel extends JPanel {
         con.insets = new Insets(0, 5, 0, 5);
         JButton hlb = new JButton(IconTheme.JabRefIcons.HELP.getSmallIcon());
 
-        Button help1 = new Button("Help");
+        Button help1 = new Button("?");
         help1.setOnAction(e->new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN).getHelpButton().doClick());
         gridPane.add(help1,1,24);
 
@@ -189,6 +193,7 @@ public class BibtexKeyPatternPanel extends JPanel {
         add(btnDefaultAll);
 
         Button btnDefaultAll1 = new Button(Localization.lang("Reset all"));
+        btnDefaultAll1.setFont(font1);
         btnDefaultAll1.setOnAction(e-> {
             // reset all fields
             for (JTextField field : textFields.values()) {
@@ -196,7 +201,7 @@ public class BibtexKeyPatternPanel extends JPanel {
             }
             textField.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         });
-        gridPane.add(btnDefaultAll1,2,24);
+        gridPane.add(btnDefaultAll1,3,24);
     }
 
     private void addExtraText() {
@@ -205,6 +210,7 @@ public class BibtexKeyPatternPanel extends JPanel {
         for (int i = 0; i <= 18; i++) {
             textFieldArray[i] = new TextField();
             button[i] = new Button("Default");
+            button[i].setFont(new javafx.scene.text.Font(10));
             button[i].setOnAction(e-> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
         }
         label[0] = new Label("Article");
@@ -227,9 +233,10 @@ public class BibtexKeyPatternPanel extends JPanel {
         label[17] = new Label("TechReport");
         label[18] = new Label("Unpublished");
         for (int i = 0; i <= 18; i++) {
+            label[i].setFont(new javafx.scene.text.Font(10));
             gridPane.add(label[i],1,i + 3);
-            gridPane.add(textFieldArray[i],2,i + 3);
-            gridPane.add(button[i],3,i + 3);
+            gridPane.add(textFieldArray[i],3,i + 3);
+            gridPane.add(button[i],4,i + 3);
         }
     }
 

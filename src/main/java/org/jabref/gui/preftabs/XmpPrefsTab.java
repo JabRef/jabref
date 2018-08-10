@@ -1,25 +1,28 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import javax.swing.JPanel;
-
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.text.Font;
 
-import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -28,17 +31,16 @@ import org.jabref.preferences.JabRefPreferences;
  *
  * Allows the user to enable and configure the XMP privacy filter.
  */
-class XmpPrefsTab extends JPanel implements PrefsTab {
+class XmpPrefsTab extends Pane implements PrefsTab {
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;
     private int rowCount;
-    private final ArrayList<TextField> textFields = new ArrayList<>(10);
-    private final VBox vBox = new VBox();
+    private final GridPane builder = new GridPane();
+    private final ObservableList<TableRow> data = FXCollections.observableArrayList();
     private final CheckBox privacyFilterCheckBox = new CheckBox(
             Localization.lang("Do not write the following fields to XMP Metadata:"));
-
-    private final List<Object> tableRows = new ArrayList<>(10);
+    private final List<TableRow> tableRows = new ArrayList<>(10);
 
 
     /**
@@ -46,60 +48,89 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
      */
     public XmpPrefsTab(JabRefPreferences prefs) {
         this.prefs = Objects.requireNonNull(prefs);
-        setLayout(new BorderLayout());
-
-        GridPane builder = new GridPane();
-
+        TableView tableView = new TableView();
+        TableColumn<TableRow,String> column = new TableColumn<>(Localization.lang("Field to filter"));
+        column.setCellValueFactory(new PropertyValueFactory<>("name"));
+        column.setCellFactory(TextFieldTableCell.<TableRow>forTableColumn());
+        column.setOnEditCommit(
+                (TableColumn.CellEditEvent<TableRow, String> t) -> {
+                    ((TableRow) t.getTableView().getItems().get(
+                            t.getTablePosition().getRow())
+                    ).setName(t.getNewValue());
+                });
+        column.setPrefWidth(350);
+        tableView.setItems(data);
+        tableView.getColumns().add(column);
+        final TextField addName = new TextField();
+        addName.setPromptText("name");
+        addName.setMaxWidth(column.getPrefWidth());
         BorderPane tablePanel = new BorderPane();
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setMaxHeight(400);
-        scrollPane.setMaxWidth(170);
-        textFields.add(new TextField("pdf"));
-        vBox.getChildren().add(new Label("Field to filter"));
-        vBox.getChildren().addAll(textFields);
-        scrollPane.setContent(vBox);
+        scrollPane.setMaxWidth(400);
+        scrollPane.setContent(tableView);
         tablePanel.setCenter(scrollPane);
 
-        Button add = new Button("+");
-        add.setOnAction(e->new AddRowAction());
-        Button delete = new Button("-");
-        delete.setOnAction(e->new DeleteRowAction());
-        VBox toolbar = new VBox(add,delete);
-        tablePanel.setRight(toolbar);
+        Button add = new Button("Add");
+        add.setOnAction(e-> {
+            if (!addName.getText().isEmpty()) {
+                TableRow tableRow = new TableRow(addName.getText());
+                addName.clear();
+                data.add(tableRow);
+                tableRows.clear();
+                tableRows.addAll(data);
+                rowCount++;
+                tableView.setItems(data);
+                tableChanged = true;
+                tableView.refresh();
+            }
+        });
+        Button delete = new Button("Delete");
+        delete.setOnAction(e-> {
+            if (tableView.getFocusModel() != null && tableView.getFocusModel().getFocusedIndex() != -1) {
+                tableChanged = true;
+                int row = tableView.getFocusModel().getFocusedIndex();
+                TableRow tableRow = data.get(row);
+                data.remove(tableRow);
+                tableRows.clear();
+                tableRows.addAll(data);
+                tableView.setItems(data);
+                rowCount--;
+                tableView.refresh();
+            }
+        });
+        HBox toolbar = new HBox(addName,add,delete);
+        tablePanel.setBottom(toolbar);
 
 
         // Build Prefs Tabs
-        builder.add(new Label(Localization.lang("XMP export privacy settings")),1,1);
-
+        Label label = new Label(Localization.lang("XMP export privacy settings") + "  -------------------------");
+        label.setFont(new Font(14));
+        builder.add(label,1,1);
+        privacyFilterCheckBox.setFont(new Font(10));
         builder.add(privacyFilterCheckBox,1,2);
 
         builder.add(tablePanel,1,3);
 
-        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
-        setLayout(new BorderLayout());
-        add(panel, BorderLayout.CENTER);
     }
 
-    class DeleteRowAction {
-        public DeleteRowAction() {
-            textFields.remove(textFields.get(textFields.size() - 1));
-            rowCount--;
-            vBox.getChildren().clear();
-            vBox.getChildren().add(new Label(Localization.lang("Field to filter")));
-            vBox.getChildren().addAll(textFields);
-            tableChanged = true;
+    public GridPane getBuilder() {
+        return builder;
+    }
+
+    public static class TableRow {
+        private SimpleStringProperty name;
+
+        TableRow(String name) {
+            this.name = new SimpleStringProperty(name);
         }
-    }
 
-    class AddRowAction {
+        public void setName(String name) {
+            this.name.set(name);
+        }
 
-        public AddRowAction() {
-            rowCount++;
-            textFields.add(new TextField(""));
-            vBox.getChildren().clear();
-            vBox.getChildren().add(new Label("field to filter"));
-            vBox.getChildren().addAll(textFields);
-            tableChanged = true;
+        public String getName() {
+            return name.get();
         }
     }
 
@@ -110,11 +141,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
     public void setValues() {
         tableRows.clear();
         //List<String> names = JabRefPreferences.getInstance().getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS);
-        List<String>names = new ArrayList<>();
-        for (TextField textField : textFields) {
-            names.add(textField.getText());
-        }
-        tableRows.addAll(names);
+        tableRows.addAll(data);
         rowCount = tableRows.size() + 5;
 
         privacyFilterCheckBox.setSelected(JabRefPreferences.getInstance().getBoolean(

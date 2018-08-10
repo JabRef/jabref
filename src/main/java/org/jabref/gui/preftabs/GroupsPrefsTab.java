@@ -1,25 +1,20 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JPanel;
-
-import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.text.Font;
 
-import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-class GroupsPrefsTab extends JPanel implements PrefsTab {
+class GroupsPrefsTab extends Pane implements PrefsTab {
 
     private final CheckBox hideNonHits = new CheckBox(Localization.lang("Hide non-hits"));
     private final CheckBox grayOut = new CheckBox(Localization.lang("Gray out non-hits"));
@@ -29,7 +24,7 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
 
     private final TextField groupingField = new TextField();
     private final TextField keywordSeparator = new TextField();
-
+    private final GridPane builder = new GridPane();
     private final JabRefPreferences prefs;
 
     public GroupsPrefsTab(JabRefPreferences prefs) {
@@ -42,28 +37,40 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
             }
         });
 
+        Font font = new Font(10);
+        Font font1 = new Font(14);
 
         multiSelectionModeIntersection.setText(Localization.lang("Display only entries belonging to all selected groups."));
+        multiSelectionModeIntersection.setFont(font);
         multiSelectionModeUnion.setText(Localization.lang("Display all entries belonging to one or more of the selected groups."));
+        multiSelectionModeUnion.setFont(font);
 
-        GridPane builder = new GridPane();
-
-        builder.add(new Label(Localization.lang("View")),1,1);
+        Label label = new Label(Localization.lang("View") + "  ---------------------------------------");
+        label.setFont(font1);
+        builder.add(label,1,1);
         builder.add(hideNonHits,2,2);
         builder.add(grayOut,2,3);
         builder.add(multiSelectionModeIntersection,2,4);
         builder.add(multiSelectionModeUnion,2,5);
         builder.add(autoAssignGroup,2,6);
-        builder.add(new Label(Localization.lang("Dynamic groups")),1,7);
+        builder.add(new Label(""),1,7);
 
-        builder.add(new Label(Localization.lang("Default grouping field") + ":"),1,8);
-        builder.add(groupingField,2,8);
-        builder.add(new Label(Localization.lang("When adding/removing keywords, separate them by") + ":"),1,9);
-        builder.add(keywordSeparator,2,9);
+        Label label1 = new Label(Localization.lang("Dynamic groups") + "  --------------------------");
+        label1.setFont(font1);
+        builder.add(label1,1,8);
 
-        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
-        setLayout(new BorderLayout());
-        add(panel, BorderLayout.CENTER);
+        Label label2 = new Label(Localization.lang("Default grouping field") + ":");
+        label2.setFont(font);
+        builder.add(label2,1,9);
+        builder.add(groupingField,2,9);
+        Label label3 = new Label(Localization.lang("When adding/removing keywords, separate them by") + ":");
+        label3.setFont(font);
+        builder.add(label3,1,10);
+        builder.add(keywordSeparator,2,10);
+    }
+
+    public GridPane getBuilder() {
+        return builder;
     }
 
     @Override

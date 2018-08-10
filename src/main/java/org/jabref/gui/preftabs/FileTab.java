@@ -1,15 +1,10 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import javax.swing.JPanel;
-
 import javafx.collections.FXCollections;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -17,9 +12,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.text.Font;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -34,7 +30,7 @@ import org.jabref.preferences.JabRefPreferences;
  * Preferences tab for file options. These options were moved out from GeneralTab to
  * resolve the space issue.
  */
-class FileTab extends JPanel implements PrefsTab {
+class FileTab extends Pane implements PrefsTab {
 
     private final DialogService dialogService;
     private final JabRefPreferences prefs;
@@ -48,6 +44,7 @@ class FileTab extends JPanel implements PrefsTab {
     private final RadioButton resolveStringsAll;
     private final TextField nonWrappableFields;
     private final TextField doNotResolveStringsFor;
+    private final GridPane builder = new GridPane();
 
     private final TextField fileDir;
     private final CheckBox bibLocAsPrimaryDir;
@@ -63,43 +60,59 @@ class FileTab extends JPanel implements PrefsTab {
     public FileTab(DialogService dialogService, JabRefPreferences prefs) {
         this.dialogService = dialogService;
         this.prefs = prefs;
+        Font font = new Font(10);
+        Font font1 = new Font(14);
 
         fileDir = new TextField();
         bibLocAsPrimaryDir = new CheckBox(Localization.lang("Use the BIB file location as primary file directory"));
-        bibLocAsPrimaryDir.setText(Localization.lang("When downloading files, or moving linked files to the "
+        bibLocAsPrimaryDir.setFont(font);
+        bibLocAsPrimaryDir.setAccessibleText(Localization.lang("When downloading files, or moving linked files to the "
                 + "file directory, prefer the BIB file location rather than the file directory set above"));
         runAutoFileSearch = new CheckBox(
                 Localization.lang("When opening file link, search for matching file if no link is defined"));
+        runAutoFileSearch.setFont(font);
         allowFileAutoOpenBrowse = new CheckBox(
                 Localization.lang("Automatically open browse dialog when creating new file link"));
+        allowFileAutoOpenBrowse.setFont(font);
         regExpTextField = new TextField();
         useRegExpComboBox = new RadioButton(Localization.lang("Use regular expression search"));
+        useRegExpComboBox.setFont(font);
         useRegExpComboBox.setOnAction(e -> regExpTextField.setEditable(useRegExpComboBox.isSelected()));
 
 
         openLast = new CheckBox(Localization.lang("Open last edited libraries at startup"));
+        openLast.setFont(font);
         backup = new CheckBox(Localization.lang("Backup old file when saving"));
+        backup.setFont(font);
         localAutoSave = new CheckBox(Localization.lang("Autosave local libraries"));
+        localAutoSave.setFont(font);
         resolveStringsAll = new RadioButton(Localization.lang("Resolve strings for all fields except") + ":");
+        resolveStringsAll.setFont(font);
         resolveStringsStandard = new RadioButton(Localization.lang("Resolve strings for standard BibTeX fields only"));
+        resolveStringsStandard.setFont(font);
 
         // This is sort of a quick hack
         newlineSeparator = new ComboBox<>(FXCollections.observableArrayList("CR", "CR/LF", "LF"));
 
         reformatFileOnSaveAndExport = new CheckBox(Localization.lang("Always reformat BIB file on save and export"));
+        reformatFileOnSaveAndExport.setFont(font);
 
         nonWrappableFields = new TextField();
         doNotResolveStringsFor = new TextField();
+        nonWrappableFields.setPrefSize(80,25);
+        doNotResolveStringsFor.setPrefSize(80,25);
 
-        GridPane builder = new GridPane();
-
-        builder.add(new Label(Localization.lang("General")),1,1);
+        builder.setPrefSize(800,600);
+        Label label = new Label(Localization.lang("General") + "  ----------------------------------------------");
+        label.setFont(font1);
+        builder.add(label,1,1);
         builder.add(openLast, 1,2);
         builder.add(backup,1, 3);
 
 
-        Label label = new Label(Localization.lang("Do not wrap the following fields when saving") + ":");
-        builder.add(label,1,4);
+        Label label1 = new Label(Localization.lang("Do not wrap the following fields when saving") + ":");
+        label1.setFont(font);
+        builder.add(label1,1,4);
         builder.add(nonWrappableFields,2,4);
 
         builder.add(resolveStringsStandard, 1,5);
@@ -108,58 +121,61 @@ class FileTab extends JPanel implements PrefsTab {
 
 
         Label lab = new Label(Localization.lang("Newline separator") + ":");
+        lab.setFont(font);
         builder.add(lab,1,7);
         builder.add(newlineSeparator,2,7);
 
-
         builder.add(reformatFileOnSaveAndExport, 1,8);
 
+        Label invisible = new Label("");
+        builder.add(invisible,1,9);
 
-        builder.add(new Label(Localization.lang("External file links")),1,10);
+        Label label2 = new Label(Localization.lang("External file links") + "  ------------------------------------");
+        label2.setFont(font1);
+        builder.add(label2,1,11);
 
         lab = new Label(Localization.lang("Main file directory") + ':');
-        builder.add(lab,1,11);
-        builder.add(fileDir,2,11);
+        lab.setFont(font);
+        builder.add(lab,1,12);
+        builder.add(fileDir,2,12);
 
         Button browse = new Button(Localization.lang("Browse"));
+        browse.setFont(font);
         browse.setOnAction(e -> {
-
             DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                     .withInitialDirectory(Paths.get(fileDir.getText())).build();
-
             DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showDirectorySelectionDialog(dirDialogConfiguration))
                     .ifPresent(f -> fileDir.setText(f.toString()));
-
         });
-        builder.add(browse,3,11);
+        builder.add(browse,3,12);
 
 
-        builder.add(bibLocAsPrimaryDir, 1,12);
-        builder.add(matchStartsWithKey, 1,13);
-        builder.add(matchExactKeyOnly, 1,14);
-        builder.add(useRegExpComboBox,1,15);
-        builder.add(regExpTextField,2,15);
+        builder.add(bibLocAsPrimaryDir, 1,13);
+        builder.add(matchStartsWithKey, 1,14);
+        builder.add(matchExactKeyOnly, 1,15);
+        builder.add(useRegExpComboBox,1,16);
+        builder.add(regExpTextField,2,16);
 
         Button help = new Button("?");
         help.setOnAction(event -> new HelpAction(Localization.lang("Help on regular expression search"),
                 HelpFile.REGEX_SEARCH).getHelpButton().doClick());
 
-        builder.add(help,3,15);
+        builder.add(help,3,16);
 
-        builder.add(runAutoFileSearch, 1,16);
-        builder.add(allowFileAutoOpenBrowse,1,17);
+        builder.add(runAutoFileSearch, 1,17);
+        builder.add(allowFileAutoOpenBrowse,1,18);
 
+        Label invisible1 = new Label("");
+        builder.add(invisible1,1,19);
 
-        builder.add(new Label(Localization.lang("Autosave")),1,18);
-        builder.add(localAutoSave, 1,19);
+        Label label3 = new Label(Localization.lang("Autosave") + "  ---------------------------------------------");
+        label3.setFont(font1);
+        builder.add(label3,1,20);
+        builder.add(localAutoSave, 1,21);
         Button help1 = new Button("?");
         help1.setOnAction(event -> new HelpAction(HelpFile.AUTOSAVE).getHelpButton().doClick());
-        builder.add(help1,2,19);
+        builder.add(help1,2,21);
 
-
-        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
-        setLayout(new BorderLayout());
-        add(panel, BorderLayout.CENTER);
     }
 
     @Override
@@ -197,6 +213,10 @@ class FileTab extends JPanel implements PrefsTab {
         nonWrappableFields.setText(prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS));
 
         localAutoSave.setSelected(prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE));
+    }
+
+    public GridPane getBuilder() {
+        return builder;
     }
 
     @Override

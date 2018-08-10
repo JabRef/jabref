@@ -16,6 +16,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 
+import javafx.scene.text.Font;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
@@ -56,16 +57,23 @@ public class SaveOrderConfigDisplay {
         saveSecDesc = new CheckBox(Localization.lang("Descending"));
         saveTerDesc = new CheckBox(Localization.lang("Descending"));
 
+        Font font = new Font(10);
         GridPane builder = new GridPane();
-        builder.add(new Label(Localization.lang("Primary sort criterion")),1,1);
+        Label label = new Label(Localization.lang("Primary sort criterion"));
+        label.setFont(font);
+        builder.add(label,1,1);
         builder.add(savePriSort,2,1);
         builder.add(savePriDesc,3,1);
 
-        builder.add(new Label(Localization.lang("Secondary sort criterion")),1,2);
+        Label label1 = new Label(Localization.lang("Secondary sort criterion"));
+        label1.setFont(font);
+        builder.add(label1,1,2);
         builder.add(saveSecSort,2,2);
         builder.add(saveSecDesc,3,2);
 
-        builder.add(new Label(Localization.lang("Tertiary sort criterion")),1, 3);
+        Label label2 = new Label(Localization.lang("Tertiary sort criterion"));
+        label2.setFont(font);
+        builder.add(label2,1, 3);
         builder.add(saveTerSort,2,3);
         builder.add(saveTerDesc,3,3);
         panel = builder;

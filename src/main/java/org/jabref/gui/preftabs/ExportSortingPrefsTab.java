@@ -1,20 +1,15 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JPanel;
-
-import javafx.embed.swing.JFXPanel;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
 
 import org.jabref.gui.SaveOrderConfigDisplay;
-import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -22,7 +17,7 @@ import org.jabref.preferences.JabRefPreferences;
 /**
  * Preference tab for file sorting options.
  */
-class ExportSortingPrefsTab extends JPanel implements PrefsTab {
+class ExportSortingPrefsTab extends Pane implements PrefsTab {
 
     private final JabRefPreferences prefs;
 
@@ -30,17 +25,20 @@ class ExportSortingPrefsTab extends JPanel implements PrefsTab {
     private final RadioButton exportInTableOrder;
     private final RadioButton exportInSpecifiedOrder;
     private final SaveOrderConfigDisplay exportOrderPanel;
-
+    private final  GridPane builder = new GridPane();
 
     public ExportSortingPrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
 
-        GridPane builder = new GridPane();
+         Font font = new Font(10);
         // EXPORT SORT ORDER
         // create Components
         exportInOriginalOrder = new RadioButton(Localization.lang("Export entries in their original order"));
+        exportInOriginalOrder.setFont(font);
         exportInTableOrder = new RadioButton(Localization.lang("Export in current table sort order"));
+        exportInTableOrder.setFont(font);
         exportInSpecifiedOrder = new RadioButton(Localization.lang("Export entries ordered as specified"));
+        exportInSpecifiedOrder.setFont(font);
 
 
         EventHandler<javafx.event.ActionEvent> listener =  new EventHandler<javafx.event.ActionEvent>() {
@@ -54,8 +52,10 @@ class ExportSortingPrefsTab extends JPanel implements PrefsTab {
         exportInTableOrder.setOnAction(listener);
         exportInSpecifiedOrder.setOnAction(listener);
 
+        Label label = new Label(Localization.lang("Export sort order") + "  ------------------------");
+        label.setFont(new Font(14));
         // create GUI
-        builder.add(new Label(Localization.lang("Export sort order")),1,1);
+        builder.add(label,1,1);
         builder.add(new Separator(),2,1);
         builder.add(exportInOriginalOrder, 1,2);
         builder.add(new Line(),2,3);
@@ -65,13 +65,13 @@ class ExportSortingPrefsTab extends JPanel implements PrefsTab {
         builder.add(new Line(),2,7);
 
         exportOrderPanel = new SaveOrderConfigDisplay();
-        builder.add(exportOrderPanel.getJFXPanel(),2,8);
+        builder.add(exportOrderPanel.getJFXPanel(),1,8);
         builder.add(new Line(),2,9);
 
-        // COMBINE EVERYTHING
-        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
-        setLayout(new BorderLayout());
-        add(panel, BorderLayout.CENTER);
+    }
+
+    public GridPane getBuilder() {
+        return builder;
     }
 
     @Override

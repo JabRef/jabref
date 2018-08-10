@@ -1,19 +1,15 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternPanel;
-import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.preferences.JabRefPreferences;
@@ -41,9 +37,11 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
     public BibtexKeyPatternPrefTab(JabRefPreferences prefs, BasePanel panel) {
         super(panel);
         builder.add(super.getPanel(),1,1);
+        builder.add(new Label(""),1,2);
         this.prefs = prefs;
         appendKeyGeneratorSettings();
     }
+
 
     /**
      * Store changes to table preferences. This method is called when the user clicks Ok.
@@ -83,7 +81,20 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
     private void appendKeyGeneratorSettings() {
         // Build a panel for checkbox settings:
 
-        builder.add(new Label(Localization.lang("Key generator settings")),1,10);
+        Font font = new Font(10);
+        Font font1 = new Font(14);
+
+        autoGenerateOnImport.setFont(font);
+        letterStartA.setFont(font);
+        warnBeforeOverwriting.setFont(font);
+        letterStartB.setFont(font);
+        dontOverwrite.setFont(font);
+        alwaysAddLetter.setFont(font);
+        generateOnSave.setFont(font);
+
+        Label label = new Label(Localization.lang("Key generator settings") + "  --------------------------");
+        label.setFont(font1);
+        builder.add(label,1,10);
         builder.add(autoGenerateOnImport,1,11);
         builder.add(letterStartA,2,11);
         builder.add(warnBeforeOverwriting,1,12);
@@ -98,13 +109,13 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
         builder.add(keyPatternRegex,1,16);
         builder.add(keyPatternReplacement,2,16);
 
-        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
-        setLayout(new BorderLayout());
-        add(panel, BorderLayout.CENTER);
-
         dontOverwrite.setOnAction(e ->
         // Warning before overwriting is only relevant if overwriting can happen:
         warnBeforeOverwriting.setDisable(dontOverwrite.isSelected()));
+    }
+
+    public GridPane getBuilder() {
+        return builder;
     }
 
     @Override

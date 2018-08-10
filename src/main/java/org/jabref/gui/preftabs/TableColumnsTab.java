@@ -1,6 +1,5 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,14 +9,11 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.swing.AbstractAction;
-import javax.swing.JPanel;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -32,11 +28,12 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.HelpAction;
@@ -49,7 +46,7 @@ import org.jabref.preferences.JabRefPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class TableColumnsTab extends JPanel implements PrefsTab {
+class TableColumnsTab extends Pane implements PrefsTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TableColumnsTab.class);
 
@@ -90,6 +87,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private boolean oldWriteSpecialFields;
     private final VBox listOfFileColumnsVBox;
     private final ObservableList<TableRow> data;
+    private final GridPane builder = new GridPane();
     /**
      * Customization of external program paths.
      *
@@ -105,6 +103,9 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 new TableRow("year",60),
                 new TableRow("journal",130),
                 new TableRow("bibtexkey",100));
+
+        Font font = new Font(10);
+        Font font1 = new Font(14);
 
         colSetup = new TableView<>();
         TableColumn<TableRow,String> field = new TableColumn<>(Localization.lang("Field name"));
@@ -135,7 +136,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         final TextField addLast = new TextField();
         addLast.setMaxWidth(column.getPrefWidth());
         addLast.setPromptText("width");
-        GridPane builder = new GridPane();
         BorderPane tabPanel = new BorderPane();
         ScrollPane sp = new ScrollPane();
         sp.setContent(colSetup);
@@ -213,15 +213,20 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         tabPanel.setBottom(toolBar);
 
         fileColumn = new CheckBox(Localization.lang("Show file column"));
+        fileColumn.setFont(font);
         urlColumn = new CheckBox(Localization.lang("Show URL/DOI column"));
+        urlColumn.setFont(font);
         preferUrl = new RadioButton(Localization.lang("Show URL first"));
+        preferUrl.setFont(font);
         preferDoi = new RadioButton(Localization.lang("Show DOI first"));
+        preferDoi.setFont(font);
 
         urlColumn.setOnAction(arg0 -> {
             preferUrl.setDisable(!urlColumn.isSelected());
             preferDoi.setDisable(!urlColumn.isSelected());
         });
         arxivColumn = new CheckBox(Localization.lang("Show ArXiv column"));
+        arxivColumn.setFont(font);
 
         Collection<ExternalFileType> fileTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         String[] fileTypeNames = new String[fileTypes.size()];
@@ -236,6 +241,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         listOfFileColumnsScrollPane.setMaxHeight(80);
         listOfFileColumnsScrollPane.setContent(listOfFileColumnsVBox);
         extraFileColumns = new CheckBox(Localization.lang("Show extra columns"));
+        extraFileColumns.setFont(font);
         if (!extraFileColumns.isSelected()) {
             listOfFileColumnsVBox.setDisable(true);
         }
@@ -243,24 +249,33 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         /*** begin: special table columns and special fields ***/
 
-        Button helpButton = new Button("Help");
+        Button helpButton = new Button("?");
         helpButton.setOnAction(e->new HelpAction(Localization.lang("Help on special fields"),
                 HelpFile.SPECIAL_FIELDS).getHelpButton().doClick());
 
         rankingColumn = new CheckBox(Localization.lang("Show rank"));
+        rankingColumn.setFont(font);
         qualityColumn = new CheckBox(Localization.lang("Show quality"));
+        qualityColumn.setFont(font);
         priorityColumn = new CheckBox(Localization.lang("Show priority"));
+        priorityColumn.setFont(font);
         relevanceColumn = new CheckBox(Localization.lang("Show relevance"));
+        relevanceColumn.setFont(font);
         printedColumn = new CheckBox(Localization.lang("Show printed status"));
+        priorityColumn.setFont(font);
         readStatusColumn = new CheckBox(Localization.lang("Show read status"));
+        readStatusColumn.setFont(font);
 
         // "sync keywords" and "write special" fields may be configured mutually exclusive only
         // The implementation supports all combinations (TRUE+TRUE and FALSE+FALSE, even if the latter does not make sense)
         // To avoid confusion, we opted to make the setting mutually exclusive
         syncKeywords = new RadioButton(Localization.lang("Synchronize with keywords"));
+        syncKeywords.setFont(font);
         writeSpecialFields = new RadioButton(Localization.lang("Write values of special fields as separate fields to BibTeX"));
+        writeSpecialFields.setFont(font);
 
         specialFieldsEnabled = new CheckBox(Localization.lang("Enable special fields"));
+        specialFieldsEnabled.setFont(font);
         specialFieldsEnabled.setOnAction(event -> {
             boolean isEnabled = specialFieldsEnabled.isSelected();
             rankingColumn.setDisable(!isEnabled);
@@ -273,7 +288,9 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             writeSpecialFields.setDisable(!isEnabled);
         });
 
-        builder.add(new Label(Localization.lang("Special table columns")),1,1);
+        Label label = new Label(Localization.lang("Special table columns") + "  ------------------------------------");
+        label.setFont(font1);
+        builder.add(label,1,1);
 
         GridPane specialTableColumnsBuilder = new GridPane();
         specialTableColumnsBuilder.add(specialFieldsEnabled,1,1);
@@ -301,19 +318,25 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         /*** end: special table columns and special fields ***/
 
-        builder.add(new Label(Localization.lang("Entry table columns")),1,3);
-        builder.add(tabPanel,1,4);
+        builder.add(new Label(""),1,3);
+
+        Label label1 = new Label(Localization.lang("Entry table columns") + "  --------------------------------------");
+        label1.setFont(font1);
+        builder.add(label1,1,4);
+        builder.add(tabPanel,1,5);
 
         Button buttonWidth = new Button("Update to current column widths");
+        buttonWidth.setFont(font);
         buttonWidth.setOnAction(e->new UpdateWidthsAction());
         Button buttonOrder = new Button("Update to current column order");
+        buttonOrder.setFont(font);
         buttonOrder.setOnAction(e->new UpdateOrderAction());
-        builder.add(buttonWidth,1,5);
-        builder.add(buttonOrder,1,6);
+        builder.add(buttonWidth,1,6);
+        builder.add(buttonOrder,1,7);
+    }
 
-        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
-        setLayout(new BorderLayout());
-        add(panel, BorderLayout.CENTER);
+    public GridPane getBuilder() {
+        return builder;
     }
 
     @Override

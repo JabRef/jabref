@@ -1,29 +1,23 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Component;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
 
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 
 import org.jabref.Globals;
 import org.jabref.JabRefException;
@@ -61,23 +55,38 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesDialog.class);
 
-    private final JPanel main;
+    private final BorderPane main;
 
     private final DialogService dialogService;
     private final JabRefFrame frame;
     private final JabRefPreferences prefs;
+    private final AdvancedTab advancedTab;
+    private final AppearancePrefsTab appearancePrefsTab;
+    private final BibtexKeyPatternPrefTab bibtexKeyPatternPrefTab;
+    private final EntryEditorPrefsTab entryEditorPrefsTab;
+    private final ExportSortingPrefsTab exportSortingPrefsTab;
+    private final ExternalTab externalTab;
+    private final FileTab fileTab;
+    private final GeneralTab generalTab;
+    private final GroupsPrefsTab groupsPrefsTab;
+    private final ImportSettingsTab importSettingsTab;
+    private final NameFormatterTab nameFormatterTab;
+    private final NetworkTab networkTab;
+    private final PreviewPrefsTab previewPrefsTab;
+    private final TableColumnsTab tableColumnsTab;
+    private final TablePrefsTab tablePrefsTab;
+    private final XmpPrefsTab xmpPrefsTab;
+    private ArrayList<PrefsTab> arrayList = new ArrayList<>();
 
     public PreferencesDialog(JabRefFrame parent) {
         setTitle(Localization.lang("JabRef preferences"));
-        getDialogPane().setPrefSize(1000, 800);
+        getDialogPane().setPrefSize(1200, 800);
         getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         setResizable(true);
-
         ButtonType save = new ButtonType(Localization.lang("Save"), ButtonData.OK_DONE);
-
         getDialogPane().getButtonTypes().addAll(save, ButtonType.CANCEL);
         ControlHelper.setAction(save, getDialogPane(), event -> {
-            storeAllSettings();
+           storeAllSettings();
             close();
         });
 
@@ -85,85 +94,186 @@ public class PreferencesDialog extends BaseDialog<Void> {
         frame = parent;
         dialogService = frame.getDialogService();
 
-        main = new JPanel();
+        advancedTab = new AdvancedTab(dialogService,prefs);
+        appearancePrefsTab = new AppearancePrefsTab(dialogService,prefs);
+        bibtexKeyPatternPrefTab = new BibtexKeyPatternPrefTab(prefs,frame.getCurrentBasePanel());
+        entryEditorPrefsTab = new EntryEditorPrefsTab(prefs);
+        exportSortingPrefsTab = new ExportSortingPrefsTab(prefs);
+        externalTab = new ExternalTab(frame,this,prefs);
+        fileTab = new FileTab(dialogService,prefs);
+        generalTab = new GeneralTab(dialogService,prefs);
+        groupsPrefsTab = new GroupsPrefsTab(prefs);
+        importSettingsTab = new ImportSettingsTab(prefs);
+        nameFormatterTab = new NameFormatterTab(prefs);
+        networkTab = new NetworkTab(dialogService,prefs);
+        previewPrefsTab = new PreviewPrefsTab(dialogService);
+        tableColumnsTab = new TableColumnsTab(prefs,frame);
+        tablePrefsTab = new TablePrefsTab(prefs);
+        xmpPrefsTab = new XmpPrefsTab(prefs);
 
-        ControlHelper.setSwingContent(getDialogPane(), constructSwingContent());
+        if (arrayList.isEmpty()) {
+            arrayList.add(advancedTab);
+            arrayList.add(appearancePrefsTab);
+            arrayList.add(bibtexKeyPatternPrefTab);
+            arrayList.add(entryEditorPrefsTab);
+            arrayList.add(exportSortingPrefsTab);
+            arrayList.add(externalTab);
+            arrayList.add(fileTab);
+            arrayList.add(generalTab);
+            arrayList.add(groupsPrefsTab);
+            arrayList.add(importSettingsTab);
+            arrayList.add(nameFormatterTab);
+            arrayList.add(networkTab);
+            arrayList.add(previewPrefsTab);
+            arrayList.add(tableColumnsTab);
+            arrayList.add(tablePrefsTab);
+            arrayList.add(xmpPrefsTab);
+        }
+
+
+        main = new BorderPane();
+        main.setCenter(generalTab.getBuilder());
+        getDialogPane().setContent(main);
+        constructSwingContent();
     }
 
-    private JComponent constructSwingContent() {
-        JPanel mainPanel = new JPanel();
-        final CardLayout cardLayout = new CardLayout();
-        main.setLayout(cardLayout);
+    private void constructSwingContent() {
+        BorderPane mainPanel = new BorderPane();
 
-        List<PrefsTab> tabs = new ArrayList<>();
-        tabs.add(new GeneralTab(dialogService, prefs));
-        tabs.add(new FileTab(dialogService, prefs));
-        tabs.add(new TablePrefsTab(prefs));
-        tabs.add(new TableColumnsTab(prefs, frame));
-        tabs.add(new PreviewPrefsTab(dialogService));
-        tabs.add(new ExternalTab(frame, this, prefs));
-        tabs.add(new GroupsPrefsTab(prefs));
-        tabs.add(new EntryEditorPrefsTab(prefs));
-        tabs.add(new BibtexKeyPatternPrefTab(prefs, frame.getCurrentBasePanel()));
-        tabs.add(new ImportSettingsTab(prefs));
-        tabs.add(new ExportSortingPrefsTab(prefs));
-        tabs.add(new NameFormatterTab(prefs));
-        tabs.add(new XmpPrefsTab(prefs));
-        tabs.add(new NetworkTab(dialogService, prefs));
-        tabs.add(new AdvancedTab(dialogService, prefs));
-        tabs.add(new AppearancePrefsTab(dialogService, prefs));
+        VBox vBox = new VBox();
+        Font font = new Font(10);
 
-        // add all tabs
-        tabs.forEach(tab -> main.add((Component) tab, tab.getTabName()));
+        Button general = new Button(Localization.lang("General"));
+        general.setFont(font);
+        general.setAlignment(Pos.BASELINE_LEFT);
+        general.setOnAction( e -> main.setCenter(generalTab.getBuilder()));
+        general.setPrefSize(120,20);
 
-        mainPanel.setBorder(BorderFactory.createEtchedBorder());
+        Button file = new Button(Localization.lang("File"));
+        file.setFont(font);
+        file.setAlignment(Pos.BASELINE_LEFT);
+        file.setPrefSize(120,20);
+        file.setOnAction( e-> main.setCenter(fileTab.getBuilder()));
 
-        String[] tabNames = tabs.stream().map(PrefsTab::getTabName).toArray(String[]::new);
-        JList<String> chooser = new JList<>(tabNames);
-        chooser.setBorder(BorderFactory.createEtchedBorder());
-        // Set a prototype value to control the width of the list:
-        chooser.setPrototypeCellValue("This should be wide enough");
-        chooser.setSelectedIndex(0);
-        chooser.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        Button entryTable = new Button(Localization.lang("Entry table"));
+        entryTable.setFont(font);
+        entryTable.setAlignment(Pos.BASELINE_LEFT);
+        entryTable.setPrefSize(120,20);
+        entryTable.setOnAction(e -> main.setCenter(tablePrefsTab.getBuilder()));
 
-        // Add the selection listener that will show the correct panel when
-        // selection changes:
-        chooser.addListSelectionListener(e -> {
-            if (e.getValueIsAdjusting()) {
-                return;
-            }
-            String o = chooser.getSelectedValue();
-            cardLayout.show(main, o);
-        });
+        Button tableColumn = new Button(Localization.lang("Entry table columns"));
+        tableColumn.setFont(font);
+        tableColumn.setAlignment(Pos.BASELINE_LEFT);
+        tableColumn.setPrefSize(120,20);
+        tableColumn.setOnAction( e -> main.setCenter(tableColumnsTab.getBuilder()));
 
-        JPanel buttons = new JPanel();
-        buttons.setLayout(new GridLayout(4, 1));
-        JButton importPreferences = new JButton(Localization.lang("Import preferences"));
-        buttons.add(importPreferences, 0);
-        JButton exportPreferences = new JButton(Localization.lang("Export preferences"));
-        buttons.add(exportPreferences, 1);
-        JButton showPreferences = new JButton(Localization.lang("Show preferences"));
-        buttons.add(showPreferences, 2);
-        JButton resetPreferences = new JButton(Localization.lang("Reset preferences"));
-        buttons.add(resetPreferences, 3);
+        Button entryPreview = new Button(Localization.lang("Entry preview"));
+        entryPreview.setFont(font);
+        entryPreview.setAlignment(Pos.BASELINE_LEFT);
+        entryPreview.setPrefSize(120,20);
+        entryPreview.setOnAction( e -> main.setCenter(previewPrefsTab.getGridPane()));
 
-        JPanel westPanel = new JPanel();
-        westPanel.setLayout(new BorderLayout());
-        westPanel.add(chooser, BorderLayout.CENTER);
-        westPanel.add(buttons, BorderLayout.SOUTH);
-        mainPanel.setLayout(new BorderLayout());
-        mainPanel.add(putPanelInScrollPane(main), BorderLayout.CENTER);
-        mainPanel.add(putPanelInScrollPane(westPanel), BorderLayout.WEST);
+        Button externalPrograms = new Button(Localization.lang("External programs"));
+        externalPrograms.setFont(font);
+        externalPrograms.setAlignment(Pos.BASELINE_LEFT);
+        externalPrograms.setPrefSize(120,20);
+        externalPrograms.setOnAction(e -> main.setCenter(externalTab.getBuilder()));
+
+        Button groups = new Button(Localization.lang("Groups"));
+        groups.setFont(font);
+        groups.setAlignment(Pos.BASELINE_LEFT);
+        groups.setPrefSize(120,20);
+        groups.setOnAction( e -> main.setCenter(groupsPrefsTab.getBuilder()));
+
+        Button entryEditor = new Button(Localization.lang("Entry editor"));
+        entryEditor.setFont(font);
+        entryEditor.setAlignment(Pos.BASELINE_LEFT);
+        entryEditor.setPrefSize(120,20);
+        entryEditor.setOnAction( e -> main.setCenter(entryEditorPrefsTab.getBuilder()));
+
+        Button bibkeyGenerator = new Button(Localization.lang("BibTeX key generator"));
+        bibkeyGenerator.setPrefSize(120,20);
+        bibkeyGenerator.setFont(font);
+        bibkeyGenerator.setAlignment(Pos.BASELINE_LEFT);
+        bibkeyGenerator.setOnAction( e -> main.setCenter(bibtexKeyPatternPrefTab.getBuilder()));
+
+        Button imports = new Button(Localization.lang("Import"));
+        imports.setFont(font);
+        imports.setAlignment(Pos.BASELINE_LEFT);
+        imports.setPrefSize(120,20);
+        imports.setOnAction( e -> main.setCenter(importSettingsTab.getBuilder()));
+
+        Button export = new Button(Localization.lang("Export sorting"));
+        export.setFont(font);
+        export.setAlignment(Pos.BASELINE_LEFT);
+        export.setPrefSize(120,20);
+        export.setOnAction( e -> main.setCenter(exportSortingPrefsTab.getBuilder()));
+
+        Button nameFormatter = new Button(Localization.lang("Name formatter"));
+        nameFormatter.setFont(font);
+        nameFormatter.setAlignment(Pos.BASELINE_LEFT);
+        nameFormatter.setPrefSize(120,20);
+        nameFormatter.setOnAction( e -> main.setCenter(nameFormatterTab.getBuilder()));
+
+        Button xmp = new Button(Localization.lang("XMP-metadata"));
+        xmp.setFont(font);
+        xmp.setAlignment(Pos.BASELINE_LEFT);
+        xmp.setPrefSize(120,20);
+        xmp.setOnAction( e -> main.setCenter(xmpPrefsTab.getBuilder()));
+
+        Button network = new Button(Localization.lang("Network"));
+        network.setFont(font);
+        network.setAlignment(Pos.BASELINE_LEFT);
+        network.setPrefSize(120,20);
+        network.setOnAction(e -> main.setCenter(networkTab.getBuilder()));
+
+        Button advanced = new Button(Localization.lang("Advanced"));
+        advanced.setFont(font);
+        advanced.setAlignment(Pos.BASELINE_LEFT);
+        advanced.setPrefSize(120,20);
+        advanced.setOnAction( e -> main.setCenter(advancedTab.getBuilder()));
+
+        Button appearance = new Button(Localization.lang("Appearance"));
+        appearance.setFont(font);
+        appearance.setAlignment(Pos.BASELINE_LEFT);
+        appearance.setPrefSize(120,20);
+        appearance.setOnAction( e -> main.setCenter(appearancePrefsTab.getContainer()));
+
+        vBox.getChildren().addAll(general, file, entryTable, tableColumn, entryPreview, externalPrograms, groups,
+                entryEditor, bibkeyGenerator, imports, export, nameFormatter, xmp, network, advanced, appearance);
+
+        for (int i = 0; i < 18; i++) {
+            vBox.getChildren().add(new Label(""));
+        }
+        Button importPreferences = new Button(Localization.lang("Import preferences"));
+        importPreferences.setAlignment(Pos.BASELINE_LEFT);
+        importPreferences.setFont(font);
+        importPreferences.setPrefSize(120,20);
+        Button exportPreferences = new Button(Localization.lang("Export preferences"));
+        exportPreferences.setFont(font);
+        exportPreferences.setPrefSize(120,20);
+        exportPreferences.setAlignment(Pos.BASELINE_LEFT);
+        Button showPreferences = new Button(Localization.lang("Show preferences"));
+        showPreferences.setFont(font);
+        showPreferences.setAlignment(Pos.BASELINE_LEFT);
+        showPreferences.setPrefSize(120,20);
+        Button resetPreferences = new Button(Localization.lang("Reset preferences"));
+        resetPreferences.setFont(font);
+        resetPreferences.setPrefSize(120,20);
+        resetPreferences.setAlignment(Pos.BASELINE_LEFT);
+
+        vBox.getChildren().addAll(importPreferences, exportPreferences, showPreferences, resetPreferences);
+        main.setLeft(vBox);
 
         // TODO: Key bindings:
         // KeyBinder.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
 
         // Import and export actions:
-        exportPreferences.setToolTipText(Localization.lang("Export preferences to file"));
-        exportPreferences.addActionListener(new ExportAction());
+        exportPreferences.setAccessibleText(Localization.lang("Export preferences to file"));
+        exportPreferences.setOnAction( e -> new ExportAction());
 
-        importPreferences.setToolTipText(Localization.lang("Import preferences from file"));
-        importPreferences.addActionListener(e -> {
+        importPreferences.setAccessibleText(Localization.lang("Import preferences from file"));
+        importPreferences.setOnAction(e -> {
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .addExtensionFilter(StandardFileType.XML)
@@ -187,9 +297,9 @@ public class PreferencesDialog extends BaseDialog<Void> {
             }
         });
 
-        showPreferences.addActionListener(
+        showPreferences.setOnAction(
                 e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs)).setVisible(true));
-        resetPreferences.addActionListener(e -> {
+        resetPreferences.setOnAction(e -> {
 
             boolean resetPreferencesClicked = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showConfirmationDialogAndWait(Localization.lang("Reset preferences"),
                                                                                                                                       Localization.lang("Are you sure you want to reset all settings to default values?"),
@@ -212,15 +322,6 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
         setValues();
 
-        return mainPanel;
-    }
-
-    private JScrollPane putPanelInScrollPane(JPanel panel) {
-        JScrollPane scrollPane = new JScrollPane(panel);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setBorder(null);
-        return scrollPane;
     }
 
     private String getPrefsExportPath() {
@@ -229,7 +330,6 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
     private void updateAfterPreferenceChanges() {
         setValues();
-
         Map<String, TemplateExporter> customExporters = prefs.customExports.getCustomExportFormats(prefs, Globals.journalAbbreviationLoader);
         LayoutFormatterPreferences layoutPreferences = prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
         SavePreferences savePreferences = prefs.loadForExportFromPreferences();
@@ -240,15 +340,14 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
     private void storeAllSettings() {
         // First check that all tabs are ready to close:
-        Component[] preferenceTabs = main.getComponents();
-        for (Component tab : preferenceTabs) {
-            if (!((PrefsTab) tab).validateSettings()) {
+        for (PrefsTab tab : arrayList) {
+            if (!tab.validateSettings()) {
                 return; // If not, break off.
             }
         }
         // Then store settings and close:
-        for (Component tab : preferenceTabs) {
-            ((PrefsTab) tab).storeSettings();
+        for (PrefsTab tab : arrayList) {
+            tab.storeSettings();
         }
         prefs.flush();
 
@@ -259,10 +358,8 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
     public void setValues() {
         // Update all field values in the tabs:
-        int count = main.getComponentCount();
-        Component[] comps = main.getComponents();
-        for (int i = 0; i < count; i++) {
-            ((PrefsTab) comps[i]).setValues();
+        for (PrefsTab prefsTab : arrayList) {
+            prefsTab.setValues();
         }
     }
 

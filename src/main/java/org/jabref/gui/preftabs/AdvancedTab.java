@@ -1,12 +1,7 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
 import java.util.Optional;
 
-import javax.swing.JPanel;
-
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -16,10 +11,10 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -30,7 +25,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.preferences.JabRefPreferences;
 
-class AdvancedTab extends JPanel implements PrefsTab {
+class AdvancedTab extends Pane implements PrefsTab {
 
     private final JabRefPreferences preferences;
     private final CheckBox useRemoteServer;
@@ -38,6 +33,8 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final TextField remoteServerPort;
     private final CheckBox useCaseKeeperOnSearch;
     private final CheckBox useUnitFormatterOnSearch;
+    private final GridPane builder = new GridPane();
+
     private final RemotePreferences remotePreferences;
     private final DialogService dialogService;
 
@@ -46,58 +43,78 @@ class AdvancedTab extends JPanel implements PrefsTab {
         preferences = prefs;
         remotePreferences = prefs.getRemotePreferences();
 
+        Font font = new Font(10);
+        Font font1 = new Font(14);
+
         useRemoteServer = new CheckBox(Localization.lang("Listen for remote operation on port") + ':');
+        useRemoteServer.setFont(font);
         useIEEEAbrv = new CheckBox(Localization.lang("Use IEEE LaTeX abbreviations"));
+        useIEEEAbrv.setFont(font);
         remoteServerPort = new TextField();
         useCaseKeeperOnSearch = new CheckBox(Localization.lang("Add {} to specified title words on search to keep the correct case"));
+        useCaseKeeperOnSearch.setFont(font);
         useUnitFormatterOnSearch = new CheckBox(Localization.lang("Format units by adding non-breaking separators and keeping the correct case on search"));
+        useUnitFormatterOnSearch.setFont(font);
 
-        GridPane builder = new GridPane();
-        builder.add(new Label(Localization.lang("Remote operation")),1,1);
+        Label label = new Label(Localization.lang("Remote operation") + "  -----------------------------");
+        label.setFont(font1);
+        builder.add(label,2,1);
         builder.add(new Separator(),2,1);
         builder.add(new Pane(),1,2);
-        Label label = new Label(Localization.lang("This feature lets new files be opened or imported into an "
+        Label label1 = new Label(Localization.lang("This feature lets new files be opened or imported into an "
 
                 + "already running instance of JabRef<BR>instead of opening a new instance. For instance, this "
 
                 + "is useful when you open a file in JabRef<br>from your web browser."
 
                 + "<BR>Note that this will prevent you from running more than one instance of JabRef at a time."));
-        label.setVisible(false);
-        builder.add(label,2,22);
-        builder.add(new Label("This feature lets new files be opened or imported into an already running instance of JabRef instead of opening a new instance. For"),2,3);
-        builder.add(new Label("instance, this is useful when you open a file in JabRef from your web browser. "),2,4);
-        builder.add(new Label("Note that this will prevent you from running more than one instance of JabRef at a time."),2,5);
+        label1.setVisible(false);
+        builder.add(label1,2,22);
+
+        Label label2 = new Label("    This feature lets new files be opened or imported into an already running instance of JabRef instead of opening a new instance. For");
+        label2.setFont(font);
+        builder.add(label2,2,3);
+        Label label3 = new Label("instance, this is useful when you open a file in JabRef from your web browser. ");
+        label3.setFont(font);
+        builder.add(label3,2,4);
+        Label label4 = new Label("    Note that this will prevent you from running more than one instance of JabRef at a time.");
+        label4.setFont(font);
+        builder.add(label4,2,5);
         builder.add(new Line(),2,6);
         builder.add(new Pane(),2,7);
 
         HBox p = new HBox();
         p.getChildren().add(useRemoteServer);
         p.getChildren().add(remoteServerPort);
-        Button button = new Button("Help");
+        Button button = new Button("?");
         button.setOnAction(event -> new HelpAction(HelpFile.REMOTE).getHelpButton().doClick());
         p.getChildren().add(button);
 
         builder.add(p,2,9);
+        builder.add(new Label(""),1,10);
 
-        builder.add(new Line(),2,10);
-        builder.add(new Label((Localization.lang("Search %0", "IEEEXplore"))),1,11);
+        Label label5 = new Label(Localization.lang("Search %0", "IEEEXplore") + "  -----------------------------");
+        label5.setFont(font1);
+        builder.add(label5,2,11);
         builder.add(new Separator(),2,11);
         builder.add(new Pane(),2,12);
         builder.add(useIEEEAbrv,2,13);
 
         builder.add(new Line(),2,16);
-        builder.add(new Label(Localization.lang("Import conversions")),1,17);
-        builder.add(new Separator(),2,17);
+        builder.add(new Label(""),1,17);
+
+        Label label6 = new Label(Localization.lang("Import conversions") + "  ----------------------------");
+        label6.setFont(font1);
+        builder.add(label6,2,18);
 
         builder.add(useCaseKeeperOnSearch,2,19);
         builder.add(new Pane(),2,20);
         builder.add(useUnitFormatterOnSearch,2,21);
 
-        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
-        setLayout(new BorderLayout());
-        add(panel, BorderLayout.CENTER);
+    }
 
+    public GridPane getBuilder() {
+        return builder;
     }
 
     @Override

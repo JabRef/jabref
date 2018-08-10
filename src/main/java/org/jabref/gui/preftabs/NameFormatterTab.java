@@ -1,17 +1,12 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.swing.JPanel;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -23,19 +18,21 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.text.Font;
 
-import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.NameFormatter;
 import org.jabref.preferences.JabRefPreferences;
 
-public class NameFormatterTab extends JPanel implements PrefsTab {
+public class NameFormatterTab extends Pane implements PrefsTab {
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;
     private final TableView table;
+    private final GridPane builder = new GridPane();
     private int rowCount = -1;
     private final List<TableRow> tableRows = new ArrayList<>(10);
     private final ObservableList<TableRow> data = FXCollections.observableArrayList();
@@ -75,14 +72,12 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         }
     }
 
-
     /**
      * Tab to create custom Name Formatters
      *
      */
     public NameFormatterTab(JabRefPreferences prefs) {
         this.prefs = Objects.requireNonNull(prefs);
-        setLayout(new BorderLayout());
 
         TableColumn<TableRow,String> firstCol = new TableColumn<>(Localization.lang("Formatter name"));
         TableColumn<TableRow,String> lastCol = new TableColumn<>(Localization.lang("Format string"));
@@ -115,7 +110,6 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         addLast.setMaxWidth(lastCol.getPrefWidth());
         addLast.setPromptText("format");
 
-        GridPane builder = new GridPane();
         BorderPane tabPanel = new BorderPane();
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setMaxHeight(400);
@@ -149,19 +143,22 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
                 rowCount--;
                 table.refresh();
             }});
-        Button help = new Button("Help");
+        Button help = new Button("?");
         help.setOnAction(e-> new HelpAction(Localization.lang("Help on Name Formatting"),
                 HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER).getHelpButton().doClick());
         HBox toolbar = new HBox();
         toolbar.getChildren().addAll(addName, addLast,add,delete,help);
         tabPanel.setBottom(toolbar);
 
-        builder.add(new Label(Localization.lang("Special name formatters")),1,1);
+        Label label = new Label(Localization.lang("Special name formatters") + "  ------------------------------------");
+        label.setFont(new Font(14));
+        builder.add(label,1,1);
         builder.add(tabPanel,1,2);
 
-        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
-        setLayout(new BorderLayout());
-        add(panel, BorderLayout.CENTER);
+    }
+
+    public GridPane getBuilder() {
+        return builder;
     }
 
     @Override

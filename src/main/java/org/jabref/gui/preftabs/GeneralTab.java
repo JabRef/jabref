@@ -1,27 +1,22 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
 import java.nio.charset.Charset;
 import java.time.format.DateTimeFormatter;
 
-import javax.swing.JPanel;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.help.HelpFile;
@@ -35,7 +30,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 import static org.jabref.logic.l10n.Languages.LANGUAGES;
 
-class GeneralTab extends JPanel implements PrefsTab {
+class GeneralTab extends Pane implements PrefsTab {
 
 
     private final CheckBox useOwner;
@@ -49,6 +44,7 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final CheckBox updateTimeStamp;
     private final CheckBox overwriteTimeStamp;
     private final TextField defOwnerField;
+    private final GridPane builder = new GridPane();
 
     private final TextField timeStampFormat;
     private final TextField timeStampField;
@@ -63,90 +59,102 @@ class GeneralTab extends JPanel implements PrefsTab {
     public GeneralTab(DialogService dialogService, JabRefPreferences prefs) {
         this.prefs = prefs;
         this.dialogService = dialogService;
-        setLayout(new BorderLayout());
-
+        Font font = new Font("News Time Roman", 10);
         biblatexMode = new ComboBox<>(FXCollections.observableArrayList(BibDatabaseMode.values()));
 
-
         memoryStick = new CheckBox(Localization.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
+        memoryStick.setFont(font);
         useOwner = new CheckBox(Localization.lang("Mark new entries with owner name") + ':');
+        useOwner.setFont(font);
         updateTimeStamp = new CheckBox(Localization.lang("Update timestamp on modification"));
+        updateTimeStamp.setFont(font);
         useTimeStamp = new CheckBox(Localization.lang("Mark new entries with addition date") + ". "
                 + Localization.lang("Date format") + ':');
+        useTimeStamp.setFont(font);
         if (!useTimeStamp.isSelected()) {
             updateTimeStamp.setDisable(true);
         }
         useTimeStamp.setOnAction(e->updateTimeStamp.setDisable(!useTimeStamp.isSelected()));
         overwriteOwner = new CheckBox(Localization.lang("Overwrite"));
+        overwriteOwner.setFont(font);
         overwriteTimeStamp = new CheckBox(Localization.lang("If a pasted or imported entry already has the field set, overwrite."));
+        overwriteTimeStamp.setFont(font);
         enforceLegalKeys = new CheckBox(Localization.lang("Enforce legal characters in BibTeX keys"));
+        enforceLegalKeys.setFont(font);
         confirmDelete = new CheckBox(Localization.lang("Show confirmation dialog when deleting entries"));
-
+        confirmDelete.setFont(font);
         defOwnerField = new TextField();
+        defOwnerField.setPrefSize(80,20);
         timeStampFormat = new TextField();
+        timeStampFormat.setPrefSize(80,20);
         timeStampField = new TextField();
+        timeStampField.setPrefSize(80,20);
         inspectionWarnDupli = new CheckBox(Localization.lang("Warn about unresolved duplicates when closing inspection window"));
-
+        inspectionWarnDupli.setFont(font);
         shouldCollectTelemetry = new CheckBox(Localization.lang("Collect and share telemetry data to help improve JabRef."));
-
+        shouldCollectTelemetry.setFont(font);
         encodings = new ComboBox<>(FXCollections.observableArrayList(Encodings.ENCODINGS));
 
-
-        GridPane builder = new GridPane();
-        builder.add(new Label(Localization.lang("General")),1,1);
-        builder.add(new Separator(),2,1);
-        builder.add(new Line(),2,2);
-        builder.add(inspectionWarnDupli, 2,3);
-        builder.add(new Line(),2,4);
-        builder.add(confirmDelete, 2,5);
-        builder.add(new Line(),2,6);
-        builder.add(enforceLegalKeys, 2,7);
-        builder.add(new Line(),2,8);
-        builder.add(memoryStick, 2,9);
+        Label label1 = new Label(Localization.lang("General") + "  -----------------------------------------------");
+        Font font1 = new Font(14);
+        label1.setFont(font1);
+        builder.add(label1,1,1);
+        builder.add(new Line(),1,2);
+        builder.add(inspectionWarnDupli, 1,3);
+        builder.add(new Line(),1,4);
+        builder.add(confirmDelete, 1,5);
+        builder.add(new Line(),1,6);
+        builder.add(enforceLegalKeys, 1,7);
+        builder.add(new Line(),1,8);
+        builder.add(memoryStick, 1,9);
 
         // Create a new panel with its own FormLayout for the last items:
-        builder.add(useOwner, 2,10);
-        builder.add(defOwnerField,3,10);
-        builder.add(overwriteOwner,4,10);
+        builder.add(useOwner, 1,10);
+        builder.add(defOwnerField,2,10);
+        builder.add(overwriteOwner,3,10);
 
-        Button help = new Button("Help");
+        Button help = new Button("?");
         help.setOnAction(event -> new HelpAction(HelpFile.OWNER).getHelpButton().doClick());
-        builder.add(help,5,10);
+        builder.add(help,4,10);
 
+        builder.add(useTimeStamp, 1,13);
+        builder.add(timeStampFormat,2,13);
+        builder.add(overwriteTimeStamp,3,13);
+        Label label = new Label(Localization.lang("Field name") + ':');
+        label.setFont(font);
+        builder.add(label,4,13);
+        builder.add(timeStampField,5,13);
 
-        builder.add(useTimeStamp, 2,13);
-        builder.add(timeStampFormat,3,13);
-        builder.add(overwriteTimeStamp,4,13);
-        builder.add(new Label(Localization.lang("Field name") + ':'),6,13);
-        builder.add(timeStampField,7,13);
-
-        Button help1 = new Button("Help");
+        Button help1 = new Button("?");
         help1.setOnAction(event -> new HelpAction(HelpFile.TIMESTAMP).getHelpButton().doClick());
-        builder.add(help1,8,13);
+        builder.add(help1,6,13);
 
 
-        builder.add(updateTimeStamp, 2,14);
-        builder.add(new Line(),2,15);
+        builder.add(updateTimeStamp, 1,14);
+        builder.add(new Line(),1,15);
 
-        builder.add(shouldCollectTelemetry,2,15);
-        builder.add(new Line(),2,16);
+        builder.add(shouldCollectTelemetry,1,15);
+        builder.add(new Line(),1,16);
         Label lab;
         lab = new Label(Localization.lang("Language") + ':');
+        lab.setFont(font);
         builder.add(lab, 1,17);
         builder.add(language,2,17);
         builder.add(new Line(),2,18);
         lab = new Label(Localization.lang("Default encoding") + ':');
+        lab.setFont(font);
         builder.add(lab, 1,19);
         builder.add(encodings,2,19);
+        Label label2 = new Label(Localization.lang("Default bibliography mode"));
+        label2.setFont(font);
+        builder.add(label2,1,20);
+        builder.add(biblatexMode,2,20);
 
-        builder.add(new Label(Localization.lang("Default bibliography mode")),1,20);
 
-        builder.add(biblatexMode,2,21);
+    }
 
-        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
-        setLayout(new BorderLayout());
-        add(panel, BorderLayout.CENTER);
-
+    public GridPane getBuilder() {
+        return builder;
     }
 
     @Override

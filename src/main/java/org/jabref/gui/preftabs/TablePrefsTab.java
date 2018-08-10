@@ -1,31 +1,27 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import javax.swing.JPanel;
-
 import javafx.collections.FXCollections;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.text.Font;
 
 import org.jabref.Globals;
-import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
-class TablePrefsTab extends JPanel implements PrefsTab {
+class TablePrefsTab extends Pane implements PrefsTab {
 
     private final JabRefPreferences prefs;
 
@@ -49,7 +45,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     private final ComboBox priSort;
     private final ComboBox secSort;
     private final ComboBox terSort;
-
+    private final GridPane builder = new GridPane();
 
     /**
      * Customization of external program paths.
@@ -59,7 +55,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
      */
     public TablePrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
-        setLayout(new BorderLayout());
+        Font font = new Font(10);
+        Font font1 = new Font(14);
 
         /**
          * Added Bibtexkey to combobox.
@@ -77,14 +74,21 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         terSort = new ComboBox<>(FXCollections.observableArrayList(allPlusKey));
 
         autoResizeMode = new CheckBox(Localization.lang("Fit table horizontally on screen"));
-
+        autoResizeMode.setFont(font);
         namesAsIs = new RadioButton(Localization.lang("Show names unchanged"));
+        namesAsIs.setFont(font);
         namesFf = new RadioButton(Localization.lang("Show 'Firstname Lastname'"));
+        namesFf.setFont(font);
         namesFl = new RadioButton(Localization.lang("Show 'Lastname, Firstname'"));
+        namesFl.setFont(font);
         namesNatbib = new RadioButton(Localization.lang("Natbib style"));
+        namesNatbib.setFont(font);
         noAbbrNames = new RadioButton(Localization.lang("Do not abbreviate names"));
+        noAbbrNames.setFont(font);
         abbrNames = new RadioButton(Localization.lang("Abbreviate names"));
+        abbrNames.setFont(font);
         lastNamesOnly = new RadioButton(Localization.lang("Show last names only"));
+        lastNamesOnly.setFont(font);
 
         priField = new TextField();
         secField = new TextField();
@@ -113,57 +117,70 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         });
 
         priDesc = new CheckBox(Localization.lang("Descending"));
+        priDesc.setFont(font);
         secDesc = new CheckBox(Localization.lang("Descending"));
+        secDesc.setFont(font);
         terDesc = new CheckBox(Localization.lang("Descending"));
+        terDesc.setFont(font);
 
-        GridPane builder = new GridPane();
-        builder.add(new Label(Localization.lang("Format of author and editor names")),1,1);
+        Label label = new Label(Localization.lang("Format of author and editor names") + "  ----------------------");
+        label.setFont(font1);
+        builder.add(label,1,1);
         builder.add(namesAsIs,1,2);
         builder.add(noAbbrNames,2,2);
         builder.add(namesFf,1,3);
         builder.add(abbrNames,2,3);
         builder.add(namesFl,1,4);
         builder.add(lastNamesOnly,2,4);
-
         builder.add(namesNatbib,1,5);
 
+        Label label1 = new Label("");
+        builder.add(label1,1,6);
 
-        builder.add(new Label(Localization.lang("Default sort criteria")),1,6);
+        Label label2 = new Label(Localization.lang("Default sort criteria") + "  ----------------------------------------");
+        label2.setFont(font1);
+        builder.add(label2,1,7);
         // Create a new panel with its own FormLayout for these items:
-        Label lab = new Label();
-        lab = new Label(Localization.lang("Primary sort criterion"));
-        builder.add(lab,1,7);
-        builder.add(priSort,2,7);
-        builder.add(priField,3,7);
-        builder.add(priDesc,4,7);
+        Label lab = new Label(Localization.lang("Primary sort criterion"));
+        lab.setFont(font);
+        builder.add(lab,1,8);
+        builder.add(priSort,2,8);
+        builder.add(priField,3,8);
+        builder.add(priDesc,4,8);
 
         lab = new Label(Localization.lang("Secondary sort criterion"));
-        builder.add(lab,1,8);
-        builder.add(secSort,2,8);
-        builder.add(secField,3,8);
-        builder.add(secDesc,4,8);
+        lab.setFont(font);
+        builder.add(lab,1,9);
+        builder.add(secSort,2,9);
+        builder.add(secField,3,9);
+        builder.add(secDesc,4,9);
 
         lab = new Label(Localization.lang("Tertiary sort criterion"));
-        builder.add(lab,1,9);
-        builder.add(terSort,2,9);
-        builder.add(terField,3,9);
-        builder.add(terDesc,4,9);
+        builder.add(lab,1,10);
+        builder.add(terSort,2,10);
+        builder.add(terField,3,10);
+        builder.add(terDesc,4,10);
 
 
-        builder.add(new Label(Localization.lang("Sort the following fields as numeric fields") + ':'),1,10);
-        builder.add(numericFields,2,10);
+        builder.add(new Label(Localization.lang("Sort the following fields as numeric fields") + ':'),1,11);
+        builder.add(numericFields,2,11);
 
-        builder.add(new Label(Localization.lang("General")),1,11);
-        builder.add(autoResizeMode,1,12);
-        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
-        setLayout(new BorderLayout());
-        add(panel, BorderLayout.CENTER);
+        Label label3 = new Label("");
+        builder.add(label3,1,12);
 
+        Label label4 = new Label(Localization.lang("General") + " ------------------------------------------------------");
+        label4.setFont(font1);
+        builder.add(label4,1,13);
+        builder.add(autoResizeMode,1,14);
         namesNatbib.setOnAction(e -> {
             abbrNames.setDisable(namesNatbib.isSelected());
             lastNamesOnly.setDisable(namesNatbib.isSelected());
             noAbbrNames.setDisable(namesNatbib.isSelected());
         });
+    }
+
+    public GridPane getBuilder() {
+        return builder;
     }
 
     @Override

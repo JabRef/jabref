@@ -17,7 +17,7 @@ public class ShowPreferencesAction extends SimpleCommand {
         if (prefsDialog == null) {
             prefsDialog = new PreferencesDialog(jabRefFrame);
         } else {
-            prefsDialog.setValues();
+//            prefsDialog.setValues();
         }
 
         prefsDialog.showAndWait();
