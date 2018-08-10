@@ -7,8 +7,6 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
-import java.nio.file.Path;
-import java.nio.file.Files;
 
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
@@ -32,35 +30,31 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(TempDirectory.class)
 public class CleanupWorkerTest {
+
+    @Rule public TemporaryFolder bibFolder = new TemporaryFolder();
 
     private final CleanupPreset emptyPreset = new CleanupPreset(EnumSet.noneOf(CleanupPreset.CleanupStep.class));
     private CleanupWorker worker;
     private File pdfFolder;
 
-    @BeforeEach
-    public void setUp(@TempDirectory.TempDir Path bibFolder) throws IOException {
-
-        Path path = bibFolder.resolve("ARandomlyNamedFolder");
-        Files.createDirectory(path);
-        pdfFolder = path.toFile();
+    @Before
+    public void setUp() throws IOException {
+        pdfFolder = bibFolder.newFolder();
 
         MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
-        Files.createFile(path.resolve("test.bib"));
-        context.setDatabaseFile(path.resolve("test.bib").toFile());
+        context.setDatabaseFile(bibFolder.newFile("test.bib"));
 
         FileDirectoryPreferences fileDirPrefs = mock(FileDirectoryPreferences.class);
         //Biblocation as Primary overwrites all other dirs
@@ -75,18 +69,18 @@ public class CleanupWorkerTest {
 
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void cleanupWithNullPresetThrowsException() {
         worker.cleanup(null, new BibEntry());
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void cleanupNullEntryThrowsException() {
         worker.cleanup(emptyPreset, null);
     }
 
     @Test
-    public void cleanupDoesNothingByDefault(@TempDirectory.TempDir Path bibFolder) throws IOException {
+    public void cleanupDoesNothingByDefault() throws IOException {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("Toot");
         entry.setField("pdf", "aPdfFile");
@@ -101,14 +95,12 @@ public class CleanupWorkerTest {
         entry.setField("journal", "test");
         entry.setField("title", "<b>hallo</b> units 1 A case AlGaAs and latex $\\alpha$$\\beta$");
         entry.setField("abstract", "Réflexions");
-        Path path = bibFolder.resolve("ARandomlyNamedFolder");
-        Files.createDirectory(path);
-        File tempFile = Files.createFile(path.resolve("")).toFile();
+        File tempFile = bibFolder.newFile();
         LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
         List<FieldChange> changes = worker.cleanup(emptyPreset, entry);
-        assertEquals(Collections.emptyList(), changes);
+        Assert.assertEquals(Collections.emptyList(), changes);
     }
 
     @Test
@@ -118,8 +110,8 @@ public class CleanupWorkerTest {
         entry.setField("pdf", "aPdfFile");
 
         worker.cleanup(preset, entry);
-        assertEquals(Optional.empty(), entry.getField("pdf"));
-        assertEquals(Optional.of("aPdfFile:aPdfFile:PDF"), entry.getField("file"));
+        Assert.assertEquals(Optional.empty(), entry.getField("pdf"));
+        Assert.assertEquals(Optional.of("aPdfFile:aPdfFile:PDF"), entry.getField("file"));
     }
 
     @Test
@@ -129,8 +121,8 @@ public class CleanupWorkerTest {
         entry.setField("ps", "aPsFile");
 
         worker.cleanup(preset, entry);
-        assertEquals(Optional.empty(), entry.getField("pdf"));
-        assertEquals(Optional.of("aPsFile:aPsFile:PostScript"), entry.getField("file"));
+        Assert.assertEquals(Optional.empty(), entry.getField("pdf"));
+        Assert.assertEquals(Optional.of("aPsFile:aPsFile:PostScript"), entry.getField("file"));
     }
 
     @Test
@@ -140,7 +132,7 @@ public class CleanupWorkerTest {
         entry.setField("doi", "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
 
         worker.cleanup(preset, entry);
-        assertEquals(Optional.of("10.1016/0001-8708(80)90035-3"), entry.getField("doi"));
+        Assert.assertEquals(Optional.of("10.1016/0001-8708(80)90035-3"), entry.getField("doi"));
     }
 
     @Test
@@ -153,7 +145,7 @@ public class CleanupWorkerTest {
 
         FieldChange expectedChange = new FieldChange(entry, "doi", "http://dx.doi.org/10.1016/0001-8708(80)90035-3",
                 "10.1016/0001-8708(80)90035-3");
-        assertEquals(Collections.singletonList(expectedChange), changes);
+        Assert.assertEquals(Collections.singletonList(expectedChange), changes);
     }
 
     @Test
@@ -163,8 +155,8 @@ public class CleanupWorkerTest {
         entry.setField("url", "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
 
         worker.cleanup(preset, entry);
-        assertEquals(Optional.of("10.1016/0001-8708(80)90035-3"), entry.getField("doi"));
-        assertEquals(Optional.empty(), entry.getField("url"));
+        Assert.assertEquals(Optional.of("10.1016/0001-8708(80)90035-3"), entry.getField("doi"));
+        Assert.assertEquals(Optional.empty(), entry.getField("url"));
     }
 
     @Test
@@ -177,7 +169,7 @@ public class CleanupWorkerTest {
         List<FieldChange> changeList = new ArrayList<>();
         changeList.add(new FieldChange(entry, "doi", null, "10.1016/0001-8708(80)90035-3"));
         changeList.add(new FieldChange(entry, "url", "http://dx.doi.org/10.1016/0001-8708(80)90035-3", null));
-        assertEquals(changeList, changes);
+        Assert.assertEquals(changeList, changes);
     }
 
     @Test
@@ -188,7 +180,7 @@ public class CleanupWorkerTest {
         entry.setField("month", "01");
 
         worker.cleanup(preset, entry);
-        assertEquals(Optional.of("#jan#"), entry.getField("month"));
+        Assert.assertEquals(Optional.of("#jan#"), entry.getField("month"));
     }
 
     @Test
@@ -199,7 +191,7 @@ public class CleanupWorkerTest {
         entry.setField("pages", "1-2");
 
         worker.cleanup(preset, entry);
-        assertEquals(Optional.of("1--2"), entry.getField("pages"));
+        Assert.assertEquals(Optional.of("1--2"), entry.getField("pages"));
     }
 
     @Test
@@ -210,7 +202,7 @@ public class CleanupWorkerTest {
         entry.setField("date", "01/1999");
 
         worker.cleanup(preset, entry);
-        assertEquals(Optional.of("1999-01"), entry.getField("date"));
+        Assert.assertEquals(Optional.of("1999-01"), entry.getField("date"));
     }
 
     @Test
@@ -220,16 +212,14 @@ public class CleanupWorkerTest {
         entry.setField("file", "link::");
 
         worker.cleanup(preset, entry);
-        assertEquals(Optional.of(":link:"), entry.getField("file"));
+        Assert.assertEquals(Optional.of(":link:"), entry.getField("file"));
     }
 
     @Test
-    public void cleanupMoveFilesMovesFileFromSubfolder(@TempDirectory.TempDir Path bibFolder) throws IOException {
+    public void cleanupMoveFilesMovesFileFromSubfolder() throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.MOVE_PDF);
 
-        Path path = bibFolder.resolve("AnotherRandomlyNamedFolder");
-        Files.createDirectory(path);
-        File subfolder = path.toFile();
+        File subfolder = bibFolder.newFolder();
         File tempFile = new File(subfolder, "test.pdf");
         tempFile.createNewFile();
         BibEntry entry = new BibEntry();
@@ -238,32 +228,28 @@ public class CleanupWorkerTest {
 
         worker.cleanup(preset, entry);
         LinkedFile newFileField = new LinkedFile("", tempFile.getName(), "");
-        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
+        Assert.assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
     @Test
-    public void cleanupRelativePathsConvertAbsoluteToRelativePath(@TempDirectory.TempDir Path bibFolder) throws IOException {
+    public void cleanupRelativePathsConvertAbsoluteToRelativePath() throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.MAKE_PATHS_RELATIVE);
 
-        Path path = bibFolder.resolve("AnotherRandomlyNamedFolder");
-        Files.createDirectory(path);
-        File tempFile = path.toFile();
+        File tempFile = bibFolder.newFile();
         BibEntry entry = new BibEntry();
         LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
         worker.cleanup(preset, entry);
         LinkedFile newFileField = new LinkedFile("", tempFile.getName(), "");
-        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
+        Assert.assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
     @Test
-    public void cleanupRenamePdfRenamesRelativeFile(@TempDirectory.TempDir Path bibFolder) throws IOException {
+    public void cleanupRenamePdfRenamesRelativeFile() throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.RENAME_PDF);
 
-        Path path = bibFolder.resolve("AnotherRandomlyNamedFolder");
-        Files.createDirectory(path);
-        File tempFile = path.toFile();
+        File tempFile = bibFolder.newFile();
         BibEntry entry = new BibEntry();
         entry.setCiteKey("Toot");
         LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
@@ -271,7 +257,7 @@ public class CleanupWorkerTest {
 
         worker.cleanup(preset, entry);
         LinkedFile newFileField = new LinkedFile("", "Toot.tmp", "");
-        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
+        Assert.assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
     @Test
@@ -282,7 +268,7 @@ public class CleanupWorkerTest {
         entry.setField("title", "&Epsilon;");
 
         worker.cleanup(preset, entry);
-        assertEquals(Optional.of("{{$\\Epsilon$}}"), entry.getField("title"));
+        Assert.assertEquals(Optional.of("{{$\\Epsilon$}}"), entry.getField("title"));
     }
 
     @Test
@@ -293,7 +279,7 @@ public class CleanupWorkerTest {
         entry.setField("title", "1 A");
 
         worker.cleanup(preset, entry);
-        assertEquals(Optional.of("1~{A}"), entry.getField("title"));
+        Assert.assertEquals(Optional.of("1~{A}"), entry.getField("title"));
     }
 
     @Test
@@ -301,14 +287,14 @@ public class CleanupWorkerTest {
         ProtectedTermsLoader protectedTermsLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
                         Collections.emptyList(), Collections.emptyList()));
-        assertNotEquals(Collections.emptyList(), protectedTermsLoader.getProtectedTerms());
+        Assert.assertNotEquals(Collections.emptyList(), protectedTermsLoader.getProtectedTerms());
         CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true, Collections
                 .singletonList(new FieldFormatterCleanup("title", new ProtectTermsFormatter(protectedTermsLoader)))));
         BibEntry entry = new BibEntry();
         entry.setField("title", "AlGaAs");
 
         worker.cleanup(preset, entry);
-        assertEquals(Optional.of("{AlGaAs}"), entry.getField("title"));
+        Assert.assertEquals(Optional.of("{AlGaAs}"), entry.getField("title"));
     }
 
     @Test
@@ -319,7 +305,7 @@ public class CleanupWorkerTest {
         entry.setField("title", "$\\alpha$$\\beta$");
 
         worker.cleanup(preset, entry);
-        assertEquals(Optional.of("$\\alpha\\beta$"), entry.getField("title"));
+        Assert.assertEquals(Optional.of("$\\alpha\\beta$"), entry.getField("title"));
     }
 
     @Test
@@ -329,8 +315,8 @@ public class CleanupWorkerTest {
         entry.setField("address", "test");
 
         worker.cleanup(preset, entry);
-        assertEquals(Optional.empty(), entry.getField("address"));
-        assertEquals(Optional.of("test"), entry.getField("location"));
+        Assert.assertEquals(Optional.empty(), entry.getField("address"));
+        Assert.assertEquals(Optional.of("test"), entry.getField("location"));
     }
 
     @Test
@@ -340,8 +326,8 @@ public class CleanupWorkerTest {
         entry.setField("journal", "test");
 
         worker.cleanup(preset, entry);
-        assertEquals(Optional.empty(), entry.getField("journal"));
-        assertEquals(Optional.of("test"), entry.getField("journaltitle"));
+        Assert.assertEquals(Optional.empty(), entry.getField("journal"));
+        Assert.assertEquals(Optional.of("test"), entry.getField("journaltitle"));
     }
 
     @Test
@@ -352,7 +338,7 @@ public class CleanupWorkerTest {
         entry.setField("month", "01");
 
         worker.cleanup(preset, entry);
-        assertEquals(Optional.of("01"), entry.getField("month"));
+        Assert.assertEquals(Optional.of("01"), entry.getField("month"));
     }
 
 }
