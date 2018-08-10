@@ -11,7 +11,7 @@
          fx:controller="org.jabref.gui.fieldeditors.LinkedFilesEditor">
     <ListView fx:id="listView" prefHeight="0" HBox.hgrow="ALWAYS" maxHeight="100"/>
     <Button onAction="#addNewFile"
-            styleClass="flatButton">
+            styleClass="icon-button">
         <graphic>
             <JabRefIconView glyph="NEW_FILE"/>
         </graphic>
@@ -19,7 +19,7 @@
             <Tooltip text="%Open"/>
         </tooltip>
     </Button>
-    <Button onAction="#fetchFulltext" styleClass="flatButton">
+    <Button onAction="#fetchFulltext" styleClass="icon-button">
         <graphic>
             <StackPane>
                 <JabRefIconView glyph="FETCH_FULLTEXT"
@@ -34,7 +34,7 @@
     </Button>
     <Button
             onAction="#addFromURL"
-            styleClass="flatButton">
+            styleClass="icon-button">
         <graphic>
             <JabRefIconView glyph="DOWNLOAD"/>
         </graphic>

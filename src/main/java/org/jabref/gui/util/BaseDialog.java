@@ -21,7 +21,7 @@ public class BaseDialog<T> extends Dialog<T> {
 
         setDialogIcon(IconTheme.getJabRefImageFX());
 
-        Globals.getThemeLoader().installBaseCss(getDialogPane().getScene());
+        Globals.getThemeLoader().installBaseCss(getDialogPane().getScene(), Globals.prefs);
     }
 
     private void setDialogIcon(Image image) {
