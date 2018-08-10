@@ -148,7 +148,6 @@ class FileTab extends Pane implements PrefsTab {
                     .ifPresent(f -> fileDir.setText(f.toString()));
         });
         builder.add(browse,3,12);
-        
         builder.add(bibLocAsPrimaryDir, 1,13);
         builder.add(matchStartsWithKey, 1,14);
         builder.add(matchExactKeyOnly, 1,15);
