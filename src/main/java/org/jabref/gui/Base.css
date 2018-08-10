@@ -282,44 +282,6 @@
     -fx-font-family: monospace;
 }
 
-.flatButtonNoSpaceBottom,
-.flatButtonNoSpaceTop,
-.flatButton {
-    -fx-shadow-highlight-color: black;
-    -fx-outer-border: red;
-    -fx-inner-border: purple;
-    -fx-faint-focus-color: transparent;
-    -fx-background-color: -jr-icon-background;
-    -fx-text-background-color: blue;
-    -fx-padding: 0.5em;
-}
-
-.flatButtonNoSpaceBottom:hover,
-.flatButtonNoSpaceTop:hover,
-.flatButton:hover {
-    -fx-background-color: -jr-icon-background-active;
-}
-
-.flatButtonNoSpaceBottom:armed,
-.flatButtonNoSpaceTop:armed,
-.flatButton:armed {
-    -fx-background-color: -jr-icon-background-armed;
-}
-
-.flatButton:selected {
-    -fx-background-color: -jr-icon-background-active;
-    -fx-text-fill: white;
-    -fx-fill: white;
-}
-
-.flatButtonNoSpaceBottom {
-    -fx-padding: 0.5em 0.5em -0.1em 0.5em;
-}
-
-.flatButtonNoSpaceTop {
-    -fx-padding: -0.1em 0.5em 0.5em 0.5em;
-}
-
 .button,
 .toggle-button,
 .radio-button > .radio,
@@ -333,6 +295,79 @@
     -fx-background-insets: 0;
     -fx-background-radius: 0;
     -fx-text-fill: -fx-text-base-color;
+}
+
+.button {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(0, 0, 0, 0.23);
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-padding: 0.5em 1em 0.5em 1em;
+}
+
+.button:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.12);
+}
+
+.button:focused,
+.button:pressed {
+    -fx-background-color: rgba(0, 0, 0, 0.3);
+}
+
+.button:default {
+    -fx-background-color: -fx-default-button;
+}
+
+.button:default:hover {
+    -fx-background-color: derive(-fx-default-button, -10%);
+}
+
+.button:default:focused,
+.button:default:pressed {
+    -fx-background-color: derive(-fx-default-button, -20%);
+}
+
+.text-button {
+    -fx-border-width: 0px;
+}
+
+.contained-button {
+    -fx-background-color: -jr-accent;
+    -fx-border-color: -jr-accent;
+}
+
+.icon-buttonNoSpaceBottom,
+.icon-buttonNoSpaceTop,
+.icon-button {
+    -fx-border-width: 0px;
+    -fx-background-color: -jr-icon-background;
+    -fx-padding: 0.5em;
+}
+
+.icon-buttonNoSpaceBottom:hover,
+.icon-buttonNoSpaceTop:hover,
+.icon-button:hover {
+    -fx-background-color: -jr-icon-background-active;
+}
+
+.icon-buttonNoSpaceBottom:armed,
+.icon-buttonNoSpaceTop:armed,
+.icon-button:armed {
+    -fx-background-color: -jr-icon-background-armed;
+}
+
+.icon-button:selected {
+    -fx-background-color: -jr-icon-background-active;
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+.icon-buttonNoSpaceBottom {
+    -fx-padding: 0.5em 0.5em -0.1em 0.5em;
+}
+
+.icon-buttonNoSpaceTop {
+    -fx-padding: -0.1em 0.5em 0.5em 0.5em;
 }
 
 .menu-bar {
