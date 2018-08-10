@@ -7,7 +7,8 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
-import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.Files;
 
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
@@ -34,9 +35,7 @@ import org.jabref.model.metadata.MetaData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.TempDirectory;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
@@ -53,10 +52,11 @@ public class CleanupWorkerTest {
     @BeforeEach
     public void setUp(@TempDirectory.TempDir Path bibFolder) throws IOException {
 
-        MetaData metaData = new MetaData();
         Path path = bibFolder.resolve("ARandomlyNamedFolder");
         Files.createDirectory(path);
         pdfFolder = path.toFile();
+
+        MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
         Files.createFile(path.resolve("test.bib"));
@@ -75,20 +75,17 @@ public class CleanupWorkerTest {
 
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupWithNullPresetThrowsException() {
         worker.cleanup(null, new BibEntry());
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupNullEntryThrowsException() {
         worker.cleanup(emptyPreset, null);
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupDoesNothingByDefault(@TempDirectory.TempDir Path bibFolder) throws IOException {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("Toot");
@@ -114,8 +111,7 @@ public class CleanupWorkerTest {
         assertEquals(Collections.emptyList(), changes);
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void upgradeExternalLinksMoveFromPdfToFile() {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
         BibEntry entry = new BibEntry();
@@ -126,8 +122,7 @@ public class CleanupWorkerTest {
         assertEquals(Optional.of("aPdfFile:aPdfFile:PDF"), entry.getField("file"));
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void upgradeExternalLinksMoveFromPsToFile() {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
         BibEntry entry = new BibEntry();
@@ -138,8 +133,7 @@ public class CleanupWorkerTest {
         assertEquals(Optional.of("aPsFile:aPsFile:PostScript"), entry.getField("file"));
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupDoiRemovesLeadingHttp() {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
         BibEntry entry = new BibEntry();
@@ -149,8 +143,7 @@ public class CleanupWorkerTest {
         assertEquals(Optional.of("10.1016/0001-8708(80)90035-3"), entry.getField("doi"));
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupDoiReturnsChanges() {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
         BibEntry entry = new BibEntry();
@@ -163,8 +156,7 @@ public class CleanupWorkerTest {
         assertEquals(Collections.singletonList(expectedChange), changes);
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupDoiFindsDoiInURLFieldAndMoveItToDOIField() {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
         BibEntry entry = new BibEntry();
@@ -175,8 +167,7 @@ public class CleanupWorkerTest {
         assertEquals(Optional.empty(), entry.getField("url"));
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupDoiReturnsChangeWhenDoiInURLField() {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
         BibEntry entry = new BibEntry();
@@ -189,8 +180,7 @@ public class CleanupWorkerTest {
         assertEquals(changeList, changes);
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupMonthChangesNumberToBibtex() {
         CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true,
                 Collections.singletonList(new FieldFormatterCleanup("month", new NormalizeMonthFormatter()))));
@@ -201,8 +191,7 @@ public class CleanupWorkerTest {
         assertEquals(Optional.of("#jan#"), entry.getField("month"));
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupPageNumbersConvertsSingleDashToDouble() {
         CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true,
                 Collections.singletonList(new FieldFormatterCleanup("pages", new NormalizePagesFormatter()))));
@@ -213,8 +202,7 @@ public class CleanupWorkerTest {
         assertEquals(Optional.of("1--2"), entry.getField("pages"));
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupDatesConvertsToCorrectFormat() {
         CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true,
                 Collections.singletonList(new FieldFormatterCleanup("date", new NormalizeDateFormatter()))));
@@ -225,8 +213,7 @@ public class CleanupWorkerTest {
         assertEquals(Optional.of("1999-01"), entry.getField("date"));
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupFixFileLinksMovesSingleDescriptionToLink() {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.FIX_FILE_LINKS);
         BibEntry entry = new BibEntry();
@@ -236,8 +223,7 @@ public class CleanupWorkerTest {
         assertEquals(Optional.of(":link:"), entry.getField("file"));
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupMoveFilesMovesFileFromSubfolder(@TempDirectory.TempDir Path bibFolder) throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.MOVE_PDF);
 
@@ -255,8 +241,7 @@ public class CleanupWorkerTest {
         assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupRelativePathsConvertAbsoluteToRelativePath(@TempDirectory.TempDir Path bibFolder) throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.MAKE_PATHS_RELATIVE);
 
@@ -272,8 +257,7 @@ public class CleanupWorkerTest {
         assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupRenamePdfRenamesRelativeFile(@TempDirectory.TempDir Path bibFolder) throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.RENAME_PDF);
 
@@ -290,8 +274,7 @@ public class CleanupWorkerTest {
         assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupHtmlToLatexConvertsEpsilonToLatex() {
         CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true,
                 Collections.singletonList(new FieldFormatterCleanup("title", new HtmlToLatexFormatter()))));
@@ -302,8 +285,7 @@ public class CleanupWorkerTest {
         assertEquals(Optional.of("{{$\\Epsilon$}}"), entry.getField("title"));
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupUnitsConvertsOneAmpereToLatex() {
         CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true,
                 Collections.singletonList(new FieldFormatterCleanup("title", new UnitsToLatexFormatter()))));
@@ -314,8 +296,7 @@ public class CleanupWorkerTest {
         assertEquals(Optional.of("1~{A}"), entry.getField("title"));
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupCasesAddsBracketAroundAluminiumGalliumArsenid() {
         ProtectedTermsLoader protectedTermsLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
@@ -330,8 +311,7 @@ public class CleanupWorkerTest {
         assertEquals(Optional.of("{AlGaAs}"), entry.getField("title"));
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupLatexMergesTwoLatexMathEnvironments() {
         CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true,
                 Collections.singletonList(new FieldFormatterCleanup("title", new LatexCleanupFormatter()))));
@@ -342,8 +322,7 @@ public class CleanupWorkerTest {
         assertEquals(Optional.of("$\\alpha\\beta$"), entry.getField("title"));
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void convertToBiblatexMovesAddressToLocation() {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
         BibEntry entry = new BibEntry();
@@ -354,8 +333,7 @@ public class CleanupWorkerTest {
         assertEquals(Optional.of("test"), entry.getField("location"));
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void convertToBiblatexMovesJournalToJournalTitle() {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
         BibEntry entry = new BibEntry();
@@ -366,8 +344,7 @@ public class CleanupWorkerTest {
         assertEquals(Optional.of("test"), entry.getField("journaltitle"));
     }
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
+    @Test
     public void cleanupWithDisabledFieldFormatterChangesNothing() {
         CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(false,
                 Collections.singletonList(new FieldFormatterCleanup("month", new NormalizeMonthFormatter()))));
