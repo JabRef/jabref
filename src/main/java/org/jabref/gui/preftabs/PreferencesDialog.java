@@ -14,8 +14,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.effect.Effect;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -192,7 +190,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         for (int i = 0; i < 12; i++) {
             vBox.getChildren().add(new Label(""));
         }
-        
+
         vBox.getChildren().addAll(button[16], button[17], button[18], button[19]);
         main.setLeft(vBox);
 
@@ -203,55 +201,55 @@ public class PreferencesDialog extends BaseDialog<Void> {
         button[17].setOnAction( e -> new ExportAction());
 
         button[16].setAccessibleText(Localization.lang("Import preferences from file"));
-        button[16].setOnAction(e -> {
-
-            FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(StandardFileType.XML)
-                    .withDefaultExtension(StandardFileType.XML)
-                    .withInitialDirectory(getPrefsExportPath()).build();
-
-            Optional<Path> fileName = DefaultTaskExecutor
-                                                         .runInJavaFXThread(() -> dialogService.showFileOpenDialog(fileDialogConfiguration));
-
-            if (fileName.isPresent()) {
-                try {
-                    prefs.importPreferences(fileName.get().toString());
-                    updateAfterPreferenceChanges();
-
-                    DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showWarningDialogAndWait(Localization.lang("Import preferences"),
-                                                                                                       Localization.lang("You must restart JabRef for this to come into effect.")));
-                } catch (JabRefException ex) {
-                    LOGGER.warn(ex.getMessage(), ex);
-                    DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Import preferences"), ex));
-                }
-            }
-        });
+        button[16].setOnAction(e -> importPreferences());
 
         button[18].setOnAction(
                 e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs)).setVisible(true));
-        button[19].setOnAction(e -> {
-
-            boolean resetPreferencesClicked = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showConfirmationDialogAndWait(Localization.lang("Reset preferences"),
-                                                                                                                                      Localization.lang("Are you sure you want to reset all settings to default values?"),
-                                                                                                                                      Localization.lang("Reset preferences"), Localization.lang("Cancel")));
-
-            if (resetPreferencesClicked) {
-                try {
-                    prefs.clear();
-                    new SharedDatabasePreferences().clear();
-
-                    DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showWarningDialogAndWait(Localization.lang("Reset preferences"),
-                                                                                                       Localization.lang("You must restart JabRef for this to come into effect.")));
-                } catch (BackingStoreException ex) {
-                    LOGGER.warn(ex.getMessage(), ex);
-                    DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Reset preferences"), ex));
-                }
-                updateAfterPreferenceChanges();
-            }
-        });
+        button[19].setOnAction(e -> resetPreferences());
 
         setValues();
 
+    }
+
+    private void resetPreferences(){
+        boolean resetPreferencesClicked = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showConfirmationDialogAndWait(Localization.lang("Reset preferences"),
+                Localization.lang("Are you sure you want to reset all settings to default values?"),
+                Localization.lang("Reset preferences"), Localization.lang("Cancel")));
+        if (resetPreferencesClicked) {
+            try {
+                prefs.clear();
+                new SharedDatabasePreferences().clear();
+
+                DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showWarningDialogAndWait(Localization.lang("Reset preferences"),
+                        Localization.lang("You must restart JabRef for this to come into effect.")));
+            } catch (BackingStoreException ex) {
+                LOGGER.warn(ex.getMessage(), ex);
+                DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Reset preferences"), ex));
+            }
+            updateAfterPreferenceChanges();
+        }
+    }
+    private void importPreferences(){
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(StandardFileType.XML)
+                .withDefaultExtension(StandardFileType.XML)
+                .withInitialDirectory(getPrefsExportPath()).build();
+
+        Optional<Path> fileName = DefaultTaskExecutor
+                .runInJavaFXThread(() -> dialogService.showFileOpenDialog(fileDialogConfiguration));
+
+        if (fileName.isPresent()) {
+            try {
+                prefs.importPreferences(fileName.get().toString());
+                updateAfterPreferenceChanges();
+
+                DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showWarningDialogAndWait(Localization.lang("Import preferences"),
+                        Localization.lang("You must restart JabRef for this to come into effect.")));
+            } catch (JabRefException ex) {
+                LOGGER.warn(ex.getMessage(), ex);
+                DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(Localization.lang("Import preferences"), ex));
+            }
+        }
     }
 
     private String getPrefsExportPath() {
