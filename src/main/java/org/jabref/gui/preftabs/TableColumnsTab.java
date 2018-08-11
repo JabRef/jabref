@@ -412,7 +412,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         List<String> lengths = prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS);
         for (int i = 0; i < names.size(); i++) {
             if (i < lengths.size()) {
-                tableRows.add(new TableRow(names.get(i), Integer.parseInt(lengths.get(i))));
+                tableRows.add(new TableRow(names.get(i), Double.parseDouble(lengths.get(i))));
             } else {
                 tableRows.add(new TableRow(names.get(i)));
             }
