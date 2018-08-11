@@ -57,7 +57,6 @@ public class NetworkTab extends Pane implements PrefsTab {
         passwordWarningLabel.setDisable(true);
         passwordWarningLabel.setTextFill(Paint.valueOf("Red"));
 
-
         // Listener on useProxyCheckBox to enable and disable the proxy related settings;
         useProxyCheckBox.setOnAction(event -> {
             hostnameTextField.setDisable(!useProxyCheckBox.isSelected());
