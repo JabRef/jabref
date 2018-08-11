@@ -10,6 +10,7 @@
     -jr-theme: #50618F;
     -jr-accent: #a3b7e6;
     -jr-selected: -jr-accent;
+    -jr-checked: -jr-theme;
     -jr-hover: #0002;
 
     /* The base gray. Most gray-tones in the application are derived from this color. */
@@ -368,6 +369,30 @@
 
 .icon-buttonNoSpaceTop {
     -fx-padding: -0.1em 0.5em 0.5em 0.5em;
+}
+
+.check-box {
+    -fx-label-padding: 0.0em 0.0em 0.0em 0.75em;
+    -fx-text-fill: -fx-text-background-color;
+}
+
+.check-box > .box {
+    -fx-border-color: rgba(0, 0, 0, 0.54);
+    -fx-border-width: 2px;
+    -fx-border-radius: 1px;
+    -fx-padding: 0.166667em 0.166667em 0.25em 0.25em;
+}
+
+.check-box:selected > .box {
+    -fx-background-insets: 2px;
+    -fx-border-color: -jr-checked;
+    -fx-background-color: -jr-checked;
+}
+
+.check-box > .box > .mark {
+    -fx-background-color: white;
+    -fx-padding: 0.166667em 0.166667em 0.166667em 0.166667 m;
+    -fx-shape: "M6.61 11.89L3.5 8.78 2.44 9.84 6.61 14l8.95-8.95L14.5 4z";
 }
 
 .menu-bar {

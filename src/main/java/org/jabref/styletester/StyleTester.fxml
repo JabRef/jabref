@@ -33,7 +33,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="700.0"
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="900.0"
             xmlns="http://javafx.com/javafx/8.0.121" fx:controller="org.jabref.styletester.StyleTesterView">
     <TabPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
              AnchorPane.topAnchor="0.0">
@@ -160,6 +160,17 @@
                     </graphic>
                 </Button>
             </GridPane>
+        </Tab>
+        <Tab text="Switches">
+            <VBox style="-fx-padding: 1em" spacing="10">
+                <Label text="Checkboxes"/>
+                <VBox style="-fx-padding: 0em 0em 0em 1em" spacing="15">
+                    <CheckBox text="Unchecked"/>
+                    <CheckBox text="Checked" selected="true"/>
+                    <CheckBox text="Unchecked disabled" disable="true"/>
+                    <CheckBox text="Checked disabled" disable="true" selected="true"/>
+                </VBox>
+            </VBox>
         </Tab>
         <Tab>
             <VBox layoutX="194.0" layoutY="14.0" prefHeight="200.0" prefWidth="100.0">
