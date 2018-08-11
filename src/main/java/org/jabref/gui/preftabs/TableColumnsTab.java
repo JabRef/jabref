@@ -132,9 +132,11 @@ class TableColumnsTab extends Pane implements PrefsTab {
         final TextField addName = new TextField();
         addName.setPromptText("name");
         addName.setMaxWidth(field.getPrefWidth());
+        addName.setPrefHeight(30);
         final TextField addLast = new TextField();
         addLast.setMaxWidth(column.getPrefWidth());
         addLast.setPromptText("width");
+        addLast.setPrefHeight(30);
         BorderPane tabPanel = new BorderPane();
         ScrollPane sp = new ScrollPane();
         sp.setContent(colSetup);
@@ -142,6 +144,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         HBox toolBar = new HBox();
         Button addRow = new Button("Add");
+        addRow.setPrefSize(80,20);
         addRow.setOnAction( e -> {
             if (!addLast.getText().isEmpty()) {
                 TableRow tableRow = addLast.getText().matches("[1-9][0-9]") ? new TableRow(addName.getText(), Integer.valueOf(addLast.getText())) : new TableRow(addName.getText());
@@ -157,6 +160,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         });
 
         Button deleteRow = new Button("Delete");
+        deleteRow.setPrefSize(80,20);
         deleteRow.setOnAction(e -> {
             if (colSetup.getFocusModel() != null && colSetup.getFocusModel().getFocusedIndex() != -1) {
             tableChanged = true;
@@ -169,6 +173,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
             colSetup.refresh();
         }});
         Button up = new Button("Up");
+        up.setPrefSize(80,20);
         up.setOnAction(e-> {
             if (colSetup.getFocusModel() != null) {
                 int row = colSetup.getFocusModel().getFocusedIndex();
@@ -188,6 +193,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
             }
         });
         Button down = new Button("Down");
+        down.setPrefSize(80,20);
         down.setOnAction(e-> {
             if (colSetup.getFocusModel() != null) {
                 int row = colSetup.getFocusModel().getFocusedIndex();
@@ -247,6 +253,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         /** begin: special table columns and special fields ***/
 
         Button helpButton = new Button("?");
+        helpButton.setPrefSize(20,20);
         helpButton.setOnAction(e->new HelpAction(Localization.lang("Help on special fields"),
                 HelpFile.SPECIAL_FIELDS).getHelpButton().doClick());
 
@@ -316,16 +323,17 @@ class TableColumnsTab extends Pane implements PrefsTab {
         /*** end: special table columns and special fields ***/
 
         builder.add(new Label(""),1,3);
-
         Label label1 = new Label(Localization.lang("Entry table columns") + "  --------------------------------------");
         label1.setFont(font1);
         builder.add(label1,1,4);
         builder.add(tabPanel,1,5);
 
         Button buttonWidth = new Button("Update to current column widths");
+        buttonWidth.setPrefSize(200,30);
         buttonWidth.setFont(font);
         buttonWidth.setOnAction(e->new UpdateWidthsAction());
         Button buttonOrder = new Button("Update to current column order");
+        buttonOrder.setPrefSize(200,30);
         buttonOrder.setFont(font);
         buttonOrder.setOnAction(e->new UpdateOrderAction());
         builder.add(buttonWidth,1,6);

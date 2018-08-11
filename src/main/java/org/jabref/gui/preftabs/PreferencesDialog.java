@@ -14,6 +14,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.effect.Effect;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -80,7 +82,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
     public PreferencesDialog(JabRefFrame parent) {
         setTitle(Localization.lang("JabRef preferences"));
-        getDialogPane().setPrefSize(1200, 800);
+        getDialogPane().setPrefSize(1250, 800);
         getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         setResizable(true);
         ButtonType save = new ButtonType(Localization.lang("Save"), ButtonData.OK_DONE);
@@ -93,7 +95,6 @@ public class PreferencesDialog extends BaseDialog<Void> {
         prefs = JabRefPreferences.getInstance();
         frame = parent;
         dialogService = frame.getDialogService();
-
         advancedTab = new AdvancedTab(dialogService,prefs);
         appearancePrefsTab = new AppearancePrefsTab(dialogService,prefs);
         bibtexKeyPatternPrefTab = new BibtexKeyPatternPrefTab(prefs,frame.getCurrentBasePanel());
@@ -138,138 +139,71 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
     private void construct() {
         VBox vBox = new VBox();
-        Font font = new Font(10);
-        Button general = new Button(Localization.lang("General"));
-        general.setFont(font);
-        general.setAlignment(Pos.BASELINE_LEFT);
-        general.setOnAction( e -> main.setCenter(generalTab.getBuilder()));
-        general.setPrefSize(120,20);
+        vBox.setPrefSize(150,800);
+        Font font = new Font(9);
+        Button []button = new Button[20];
 
-        Button file = new Button(Localization.lang("File"));
-        file.setFont(font);
-        file.setAlignment(Pos.BASELINE_LEFT);
-        file.setPrefSize(120,20);
-        file.setOnAction( e-> main.setCenter(fileTab.getBuilder()));
+        button[0] = new Button(Localization.lang("General"));
+        button[0].setOnAction( e -> main.setCenter(generalTab.getBuilder()));
+        button[1] = new Button(Localization.lang("File"));
+        button[1].setOnAction( e-> main.setCenter(fileTab.getBuilder()));
+        button[2] = new Button(Localization.lang("Entry table"));
+        button[2].setOnAction(e -> main.setCenter(tablePrefsTab.getBuilder()));
+        button[3] = new Button(Localization.lang("Entry table columns"));
+        button[3].setOnAction( e -> main.setCenter(tableColumnsTab.getBuilder()));
+        button[4] = new Button(Localization.lang("Entry preview"));
+        button[4].setOnAction( e -> main.setCenter(previewPrefsTab.getGridPane()));
+        button[5] = new Button(Localization.lang("External programs"));
+        button[5].setOnAction(e -> main.setCenter(externalTab.getBuilder()));
+        button[6] = new Button(Localization.lang("Groups"));
+        button[6].setOnAction( e -> main.setCenter(groupsPrefsTab.getBuilder()));
+        button[7] = new Button(Localization.lang("Entry editor"));
+        button[7].setOnAction( e -> main.setCenter(entryEditorPrefsTab.getBuilder()));
+        button[8] = new Button(Localization.lang("BibTeX key generator"));
+        button[8].setOnAction( e -> main.setCenter(bibtexKeyPatternPrefTab.getBuilder()));
+        button[9] = new Button(Localization.lang("Import"));
+        button[9].setOnAction( e -> main.setCenter(importSettingsTab.getBuilder()));
+        button[10] = new Button(Localization.lang("Export sorting"));
+        button[10].setOnAction( e -> main.setCenter(exportSortingPrefsTab.getBuilder()));
+        button[11] = new Button(Localization.lang("Name formatter"));
+        button[11].setOnAction( e -> main.setCenter(nameFormatterTab.getBuilder()));
+        button[12] = new Button(Localization.lang("XMP-metadata"));
+        button[12].setOnAction( e -> main.setCenter(xmpPrefsTab.getBuilder()));
+        button[13] = new Button(Localization.lang("Network"));
+        button[13].setOnAction(e -> main.setCenter(networkTab.getBuilder()));
+        button[14] = new Button(Localization.lang("Advanced"));
+        button[14].setOnAction( e -> main.setCenter(advancedTab.getBuilder()));
+        button[15] = new Button(Localization.lang("Appearance"));
+        button[15].setOnAction( e -> main.setCenter(appearancePrefsTab.getContainer()));
+        button[16] = new Button(Localization.lang("Import preferences"));
+        button[17] = new Button(Localization.lang("Export preferences"));
+        button[18] = new Button(Localization.lang("Show preferences"));
+        button[19] = new Button(Localization.lang("Reset preferences"));
+        for (int i = 0; i < button.length; i++) {
+            button[i].setFont(font);
+            button[i].setEffect(null);
+            button[i].setAlignment(Pos.BASELINE_LEFT);
+            button[i].setPrefSize(120,20);
+        }
 
-        Button entryTable = new Button(Localization.lang("Entry table"));
-        entryTable.setFont(font);
-        entryTable.setAlignment(Pos.BASELINE_LEFT);
-        entryTable.setPrefSize(120,20);
-        entryTable.setOnAction(e -> main.setCenter(tablePrefsTab.getBuilder()));
-
-        Button tableColumn = new Button(Localization.lang("Entry table columns"));
-        tableColumn.setFont(font);
-        tableColumn.setAlignment(Pos.BASELINE_LEFT);
-        tableColumn.setPrefSize(120,20);
-        tableColumn.setOnAction( e -> main.setCenter(tableColumnsTab.getBuilder()));
-
-        Button entryPreview = new Button(Localization.lang("Entry preview"));
-        entryPreview.setFont(font);
-        entryPreview.setAlignment(Pos.BASELINE_LEFT);
-        entryPreview.setPrefSize(120,20);
-        entryPreview.setOnAction( e -> main.setCenter(previewPrefsTab.getGridPane()));
-
-        Button externalPrograms = new Button(Localization.lang("External programs"));
-        externalPrograms.setFont(font);
-        externalPrograms.setAlignment(Pos.BASELINE_LEFT);
-        externalPrograms.setPrefSize(120,20);
-        externalPrograms.setOnAction(e -> main.setCenter(externalTab.getBuilder()));
-
-        Button groups = new Button(Localization.lang("Groups"));
-        groups.setFont(font);
-        groups.setAlignment(Pos.BASELINE_LEFT);
-        groups.setPrefSize(120,20);
-        groups.setOnAction( e -> main.setCenter(groupsPrefsTab.getBuilder()));
-
-        Button entryEditor = new Button(Localization.lang("Entry editor"));
-        entryEditor.setFont(font);
-        entryEditor.setAlignment(Pos.BASELINE_LEFT);
-        entryEditor.setPrefSize(120,20);
-        entryEditor.setOnAction( e -> main.setCenter(entryEditorPrefsTab.getBuilder()));
-
-        Button bibkeyGenerator = new Button(Localization.lang("BibTeX key generator"));
-        bibkeyGenerator.setPrefSize(120,20);
-        bibkeyGenerator.setFont(font);
-        bibkeyGenerator.setAlignment(Pos.BASELINE_LEFT);
-        bibkeyGenerator.setOnAction( e -> main.setCenter(bibtexKeyPatternPrefTab.getBuilder()));
-
-        Button imports = new Button(Localization.lang("Import"));
-        imports.setFont(font);
-        imports.setAlignment(Pos.BASELINE_LEFT);
-        imports.setPrefSize(120,20);
-        imports.setOnAction( e -> main.setCenter(importSettingsTab.getBuilder()));
-
-        Button export = new Button(Localization.lang("Export sorting"));
-        export.setFont(font);
-        export.setAlignment(Pos.BASELINE_LEFT);
-        export.setPrefSize(120,20);
-        export.setOnAction( e -> main.setCenter(exportSortingPrefsTab.getBuilder()));
-
-        Button nameFormatter = new Button(Localization.lang("Name formatter"));
-        nameFormatter.setFont(font);
-        nameFormatter.setAlignment(Pos.BASELINE_LEFT);
-        nameFormatter.setPrefSize(120,20);
-        nameFormatter.setOnAction( e -> main.setCenter(nameFormatterTab.getBuilder()));
-
-        Button xmp = new Button(Localization.lang("XMP-metadata"));
-        xmp.setFont(font);
-        xmp.setAlignment(Pos.BASELINE_LEFT);
-        xmp.setPrefSize(120,20);
-        xmp.setOnAction( e -> main.setCenter(xmpPrefsTab.getBuilder()));
-
-        Button network = new Button(Localization.lang("Network"));
-        network.setFont(font);
-        network.setAlignment(Pos.BASELINE_LEFT);
-        network.setPrefSize(120,20);
-        network.setOnAction(e -> main.setCenter(networkTab.getBuilder()));
-
-        Button advanced = new Button(Localization.lang("Advanced"));
-        advanced.setFont(font);
-        advanced.setAlignment(Pos.BASELINE_LEFT);
-        advanced.setPrefSize(120,20);
-        advanced.setOnAction( e -> main.setCenter(advancedTab.getBuilder()));
-
-        Button appearance = new Button(Localization.lang("Appearance"));
-        appearance.setFont(font);
-        appearance.setAlignment(Pos.BASELINE_LEFT);
-        appearance.setPrefSize(120,20);
-        appearance.setOnAction( e -> main.setCenter(appearancePrefsTab.getContainer()));
-
-        vBox.getChildren().addAll(general, file, entryTable, tableColumn, entryPreview, externalPrograms, groups,
-                entryEditor, bibkeyGenerator, imports, export, nameFormatter, xmp, network, advanced, appearance);
-
-        for (int i = 0; i < 18; i++) {
+        for (int i = 0; i < 16; i++) {
+            vBox.getChildren().add(button[i]);
+        }
+        for (int i = 0; i < 12; i++) {
             vBox.getChildren().add(new Label(""));
         }
-        Button importPreferences = new Button(Localization.lang("Import preferences"));
-        importPreferences.setAlignment(Pos.BASELINE_LEFT);
-        importPreferences.setFont(font);
-        importPreferences.setPrefSize(120,20);
-        Button exportPreferences = new Button(Localization.lang("Export preferences"));
-        exportPreferences.setFont(font);
-        exportPreferences.setPrefSize(120,20);
-        exportPreferences.setAlignment(Pos.BASELINE_LEFT);
-        Button showPreferences = new Button(Localization.lang("Show preferences"));
-        showPreferences.setFont(font);
-        showPreferences.setAlignment(Pos.BASELINE_LEFT);
-        showPreferences.setPrefSize(120,20);
-        Button resetPreferences = new Button(Localization.lang("Reset preferences"));
-        resetPreferences.setFont(font);
-        resetPreferences.setPrefSize(120,20);
-        resetPreferences.setAlignment(Pos.BASELINE_LEFT);
-
-        vBox.getChildren().addAll(importPreferences, exportPreferences, showPreferences, resetPreferences);
+        
+        vBox.getChildren().addAll(button[16], button[17], button[18], button[19]);
         main.setLeft(vBox);
 
         // TODO: Key bindings:
         // KeyBinder.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
-
         // Import and export actions:
-        exportPreferences.setAccessibleText(Localization.lang("Export preferences to file"));
-        exportPreferences.setOnAction( e -> new ExportAction());
+        button[17].setAccessibleText(Localization.lang("Export preferences to file"));
+        button[17].setOnAction( e -> new ExportAction());
 
-        importPreferences.setAccessibleText(Localization.lang("Import preferences from file"));
-        importPreferences.setOnAction(e -> {
+        button[16].setAccessibleText(Localization.lang("Import preferences from file"));
+        button[16].setOnAction(e -> {
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .addExtensionFilter(StandardFileType.XML)
@@ -293,9 +227,9 @@ public class PreferencesDialog extends BaseDialog<Void> {
             }
         });
 
-        showPreferences.setOnAction(
+        button[18].setOnAction(
                 e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs)).setVisible(true));
-        resetPreferences.setOnAction(e -> {
+        button[19].setOnAction(e -> {
 
             boolean resetPreferencesClicked = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showConfirmationDialogAndWait(Localization.lang("Reset preferences"),
                                                                                                                                       Localization.lang("Are you sure you want to reset all settings to default values?"),

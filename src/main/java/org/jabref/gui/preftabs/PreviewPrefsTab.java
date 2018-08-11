@@ -161,6 +161,10 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     private void setupGui() {
         VBox vBox = new VBox();
+        btnRight.setPrefSize(80,20);
+        btnLeft.setPrefSize(80,20);
+        btnUp.setPrefSize(80,20);
+        btnDown.setPrefSize(80,20);
         vBox.getChildren().addAll(new Label(""), new Label(""),new Label(""),new Label(""), new Label(""),new Label(""),new Label(""), btnRight,btnLeft, new Label(""), new Label(""),new Label(""),btnUp,btnDown);
         Label label = new Label(Localization.lang("Current Preview") + "  ------------------------------------------");
         label.setFont(new Font(14));

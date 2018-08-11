@@ -160,6 +160,8 @@ class ExternalTab extends JPanel implements PrefsTab {
     private void addSettingsButton(final PushToApplication application, GridPane panel, int index) {
         PushToApplicationSettings settings = PushToApplications.getSettings(application);
         Button button = new Button(Localization.lang("Settings for %0", application.getApplicationName()));
+        button.setFont(new Font(10));
+        button.setPrefSize(150,20);
         button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(null, settings));
         if (index % 2 == 0) {
             panel.add(button,1, index / 2 + 1);

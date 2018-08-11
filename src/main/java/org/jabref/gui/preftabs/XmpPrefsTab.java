@@ -60,7 +60,7 @@ class XmpPrefsTab extends Pane implements PrefsTab {
         tableView.getColumns().add(column);
         final TextField addName = new TextField();
         addName.setPromptText("name");
-        addName.setMaxWidth(column.getPrefWidth());
+        addName.setPrefSize(200,30);
         BorderPane tablePanel = new BorderPane();
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setMaxHeight(400);
@@ -69,6 +69,7 @@ class XmpPrefsTab extends Pane implements PrefsTab {
         tablePanel.setCenter(scrollPane);
 
         Button add = new Button("Add");
+        add.setPrefSize(80,20);
         add.setOnAction(e-> {
             if (!addName.getText().isEmpty()) {
                 TableRow tableRow = new TableRow(addName.getText());
@@ -82,6 +83,7 @@ class XmpPrefsTab extends Pane implements PrefsTab {
             }
         });
         Button delete = new Button("Delete");
+        delete.setPrefSize(80,20);
         delete.setOnAction(e-> {
             if (tableView.getFocusModel() != null && tableView.getFocusModel().getFocusedIndex() != -1) {
                 tableChanged = true;

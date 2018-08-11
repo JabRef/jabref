@@ -103,19 +103,22 @@ public class NameFormatterTab extends Pane implements PrefsTab {
         table.getColumns().addAll(firstCol,lastCol);
         final TextField addName = new TextField();
         addName.setPromptText("name");
-        addName.setMaxWidth(firstCol.getPrefWidth());
+        addName.setMaxWidth(100);
         final TextField addLast = new TextField();
-        addLast.setMaxWidth(lastCol.getPrefWidth());
+        addLast.setMaxWidth(100);
         addLast.setPromptText("format");
 
         BorderPane tabPanel = new BorderPane();
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setMaxHeight(400);
-        scrollPane.setMaxWidth(400);
+        scrollPane.setMaxWidth(360);
         scrollPane.setContent(table);
         tabPanel.setCenter(scrollPane);
 
-        Button add = new Button(Localization.lang("Insert rows"));
+        Label label1 = new Label(Localization.lang("Insert rows"));
+        label1.setVisible(false);
+        Button add = new Button("Insert");
+        add.setFont(new Font(10));
         add.setOnAction(e-> {
             if (!addName.getText().isEmpty() && !addLast.getText().isEmpty()) {
                 TableRow tableRow = new TableRow(addName.getText(), addLast.getText());
@@ -128,7 +131,10 @@ public class NameFormatterTab extends Pane implements PrefsTab {
                 table.refresh();
             }
         });
-        Button delete = new Button(Localization.lang("Delete rows"));
+        Label label2 = new Label(Localization.lang("Delete rows"));
+        label2.setVisible(false);
+        Button delete = new Button("Delete");
+        delete.setFont(new Font(10));
         delete.setOnAction(e-> {
             if (table.getFocusModel() != null && table.getFocusModel().getFocusedIndex() != -1) {
                 tableChanged = true;
@@ -140,6 +146,7 @@ public class NameFormatterTab extends Pane implements PrefsTab {
                 table.refresh();
             }});
         Button help = new Button("?");
+        help.setFont(new Font(10));
         help.setOnAction(e-> new HelpAction(Localization.lang("Help on Name Formatting"),
                 HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER).getHelpButton().doClick());
         HBox toolbar = new HBox();

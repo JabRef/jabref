@@ -114,6 +114,8 @@ class GeneralTab extends Pane implements PrefsTab {
         builder.add(overwriteOwner,3,10);
 
         Button help = new Button("?");
+        help.setFont(font);
+        help.setPrefSize(10,10);
         help.setOnAction(event -> new HelpAction(HelpFile.OWNER).getHelpButton().doClick());
         builder.add(help,4,10);
 
@@ -126,6 +128,7 @@ class GeneralTab extends Pane implements PrefsTab {
         builder.add(timeStampField,5,13);
 
         Button help1 = new Button("?");
+        help1.setFont(font);
         help1.setOnAction(event -> new HelpAction(HelpFile.TIMESTAMP).getHelpButton().doClick());
         builder.add(help1,6,13);
 
@@ -149,8 +152,6 @@ class GeneralTab extends Pane implements PrefsTab {
         label2.setFont(font);
         builder.add(label2,1,20);
         builder.add(biblatexMode,2,20);
-
-
     }
 
     public GridPane getBuilder() {

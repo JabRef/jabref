@@ -87,6 +87,7 @@ class AdvancedTab extends Pane implements PrefsTab {
         p.getChildren().add(useRemoteServer);
         p.getChildren().add(remoteServerPort);
         Button button = new Button("?");
+        button.setFont(font);
         button.setOnAction(event -> new HelpAction(HelpFile.REMOTE).getHelpButton().doClick());
         p.getChildren().add(button);
 

@@ -140,6 +140,7 @@ class FileTab extends Pane implements PrefsTab {
         builder.add(fileDir,2,12);
 
         Button browse = new Button(Localization.lang("Browse"));
+        browse.setPrefSize(80,20);
         browse.setFont(font);
         browse.setOnAction(e -> {
             DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
@@ -155,6 +156,7 @@ class FileTab extends Pane implements PrefsTab {
         builder.add(regExpTextField,2,16);
 
         Button help = new Button("?");
+        help.setFont(font);
         help.setOnAction(event -> new HelpAction(Localization.lang("Help on regular expression search"),
                 HelpFile.REGEX_SEARCH).getHelpButton().doClick());
 
@@ -171,6 +173,7 @@ class FileTab extends Pane implements PrefsTab {
         builder.add(label3,1,20);
         builder.add(localAutoSave, 1,21);
         Button help1 = new Button("?");
+        help1.setFont(font);
         help1.setOnAction(event -> new HelpAction(HelpFile.AUTOSAVE).getHelpButton().doClick());
         builder.add(help1,2,21);
 
