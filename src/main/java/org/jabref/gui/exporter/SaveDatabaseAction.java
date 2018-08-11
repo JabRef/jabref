@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
  * Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for
  * save operations when closing a database or quitting the applications.
  *
- * The operations run synchronously, but offload the save operation from the event thread using Spin.
+ * The save operation is loaded off of the GUI thread using {@link BackgroundTask}.
  * Callers can query whether the operation was canceled, or whether it was successful.
  */
 public class SaveDatabaseAction implements BaseAction {
@@ -271,8 +271,7 @@ public class SaveDatabaseAction implements BaseAction {
     }
 
     /**
-     * Run the "Save" operation. This method offloads the actual save operation to a background thread, but
-     * still runs synchronously using Spin (the method returns only after completing the operation).
+     * Run the "Save" operation. This method offloads the actual save operation to a background thread.
      */
     public void runCommand() throws Exception {
         action();
@@ -301,8 +300,7 @@ public class SaveDatabaseAction implements BaseAction {
     }
 
     /**
-     * Run the "Save as" operation. This method offloads the actual save operation to a background thread, but
-     * still runs synchronously using Spin (the method returns only after completing the operation).
+     * Run the "Save as" operation. This method offloads the actual save operation to a background thread.
      */
     public void saveAs(File file) throws Exception {
         BibDatabaseContext context = panel.getBibDatabaseContext();

@@ -235,10 +235,4 @@ Project: XMLUnit
 URL:     http://www.xmlunit.org/
 License: Apache-2.0
 
-Id:      spin
-Path:    lib/spin.jar
-Project: Spin
-URL:     http://spin.sourceforge.net/
-License: LGPL-2.1+
-
 The last entry has to end with an empty line. Otherwise the entry is not present in About.html.
