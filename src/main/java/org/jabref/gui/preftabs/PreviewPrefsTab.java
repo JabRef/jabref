@@ -46,8 +46,6 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     private final ObservableList<Object> availableModel = FXCollections.observableArrayList();
     private final ObservableList<Object> chosenModel = FXCollections.observableArrayList();
 
-    private List<String> list = new ArrayList<>();
-
     private final ListView<Object> available = new ListView<>(availableModel);
     private final ListView<Object> chosen = new ListView<>(chosenModel);
 

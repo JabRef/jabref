@@ -32,16 +32,13 @@ import org.jabref.preferences.JabRefPreferences;
  * Allows the user to enable and configure the XMP privacy filter.
  */
 class XmpPrefsTab extends Pane implements PrefsTab {
-
     private final JabRefPreferences prefs;
     private boolean tableChanged;
-    private int rowCount;
     private final GridPane builder = new GridPane();
     private final ObservableList<TableRow> data = FXCollections.observableArrayList();
     private final CheckBox privacyFilterCheckBox = new CheckBox(
             Localization.lang("Do not write the following fields to XMP Metadata:"));
     private final List<TableRow> tableRows = new ArrayList<>(10);
-
 
     /**
      * Customization of external program paths.
@@ -79,7 +76,6 @@ class XmpPrefsTab extends Pane implements PrefsTab {
                 data.add(tableRow);
                 tableRows.clear();
                 tableRows.addAll(data);
-                rowCount++;
                 tableView.setItems(data);
                 tableChanged = true;
                 tableView.refresh();
@@ -95,13 +91,11 @@ class XmpPrefsTab extends Pane implements PrefsTab {
                 tableRows.clear();
                 tableRows.addAll(data);
                 tableView.setItems(data);
-                rowCount--;
                 tableView.refresh();
             }
         });
         HBox toolbar = new HBox(addName,add,delete);
         tablePanel.setBottom(toolbar);
-
 
         // Build Prefs Tabs
         Label label = new Label(Localization.lang("XMP export privacy settings") + "  -------------------------");
@@ -140,10 +134,7 @@ class XmpPrefsTab extends Pane implements PrefsTab {
     @Override
     public void setValues() {
         tableRows.clear();
-        //List<String> names = JabRefPreferences.getInstance().getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS);
         tableRows.addAll(data);
-        rowCount = tableRows.size() + 5;
-
         privacyFilterCheckBox.setSelected(JabRefPreferences.getInstance().getBoolean(
                 JabRefPreferences.USE_XMP_PRIVACY_FILTER));
     }

@@ -53,7 +53,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
     private final JabRefPreferences prefs;
     private boolean tableChanged;
     private final TableView colSetup;
-    private int rowCount = -1;
     private final List<TableRow> tableRows = new ArrayList<>(10);
     private final JabRefFrame frame;
 
@@ -151,7 +150,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 data.add(tableRow);
                 tableRows.clear();
                 tableRows.addAll(data);
-                rowCount++;
                 colSetup.setItems(data);
                 tableChanged = true;
                 colSetup.refresh();
@@ -168,7 +166,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
             tableRows.clear();
             tableRows.addAll(data);
             colSetup.setItems(data);
-            rowCount--;
             colSetup.refresh();
         }});
         Button up = new Button("Up");
@@ -247,7 +244,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         }
         extraFileColumns.setOnAction(arg0 -> listOfFileColumnsVBox.setDisable(!extraFileColumns.isSelected()));
 
-        /*** begin: special table columns and special fields ***/
+        /** begin: special table columns and special fields ***/
 
         Button helpButton = new Button("?");
         helpButton.setOnAction(e->new HelpAction(Localization.lang("Help on special fields"),
@@ -412,7 +409,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 tableRows.add(new TableRow(names.get(i)));
             }
         }
-        rowCount = tableRows.size() + 5;
     }
 
     /*** end: special fields ***/

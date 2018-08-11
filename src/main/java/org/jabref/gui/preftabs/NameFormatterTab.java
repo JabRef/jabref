@@ -33,12 +33,10 @@ public class NameFormatterTab extends Pane implements PrefsTab {
     private boolean tableChanged;
     private final TableView table;
     private final GridPane builder = new GridPane();
-    private int rowCount = -1;
     private final List<TableRow> tableRows = new ArrayList<>(10);
     private final ObservableList<TableRow> data = FXCollections.observableArrayList();
 
     public static class TableRow {
-
         private SimpleStringProperty name;
         private SimpleStringProperty format;
 
@@ -125,7 +123,6 @@ public class NameFormatterTab extends Pane implements PrefsTab {
                 addLast.clear();
                 data.add(tableRow);
                 tableRows.add(tableRow);
-                rowCount++;
                 table.setItems(data);
                 tableChanged = true;
                 table.refresh();
@@ -140,7 +137,6 @@ public class NameFormatterTab extends Pane implements PrefsTab {
                 tableRows.remove(tableRow);
                 data.remove(tableRow);
                 table.setItems(data);
-                rowCount--;
                 table.refresh();
             }});
         Button help = new Button("?");
@@ -174,10 +170,7 @@ public class NameFormatterTab extends Pane implements PrefsTab {
                 tableRows.add(new TableRow(names.get(i)));
             }
         }
-        rowCount = tableRows.size() + 5;
     }
-
-
 
     /**
      * Store changes to table preferences. This method is called when the user

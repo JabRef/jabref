@@ -13,15 +13,9 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 class AppearancePrefsTab extends Pane implements PrefsTab {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AppearancePrefsTab.class);
-
     private final JabRefPreferences prefs;
-
     private final CheckBox fontTweaksLAF;
     private final TextField fontSize;
     private final CheckBox overrideFonts;

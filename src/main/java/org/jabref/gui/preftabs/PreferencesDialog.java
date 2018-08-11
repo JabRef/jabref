@@ -130,19 +130,15 @@ public class PreferencesDialog extends BaseDialog<Void> {
             arrayList.add(xmpPrefsTab);
         }
 
-
         main = new BorderPane();
         main.setCenter(generalTab.getBuilder());
         getDialogPane().setContent(main);
-        constructSwingContent();
+        construct();
     }
 
-    private void constructSwingContent() {
-        BorderPane mainPanel = new BorderPane();
-
+    private void construct() {
         VBox vBox = new VBox();
         Font font = new Font(10);
-
         Button general = new Button(Localization.lang("General"));
         general.setFont(font);
         general.setAlignment(Pos.BASELINE_LEFT);
