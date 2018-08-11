@@ -1,0 +1,15 @@
+apply plugin: 'java'
+
+repositories {
+    mavenLocal()
+    jcenter()
+    maven {
+        url 'https://oss.sonatype.org/content/groups/public'
+    }
+}
+
+dependencies {
+    compile project(':jabref-model')
+
+    compile 'org.junit.jupiter:junit-jupiter-api:5.2.0'
+}
