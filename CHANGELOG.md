@@ -36,6 +36,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 
 
+
 ### Fixed
 - We fixed an issue where custom exports could not be selected in the 'Export (selected) entries' dialog [#4013](https://github.com/JabRef/jabref/issues/4013)
 - Italic text is now rendered correctly. https://github.com/JabRef/jabref/issues/3356
@@ -84,6 +85,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
   - Set/clear/append/rename fields: available through Edit menu
   - Manage keywords: available through Edit menu
   - Copy linked files to folder: available through File menu
+
 
 
 
