@@ -211,7 +211,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
     }
 
-    private void resetPreferences(){
+    private void resetPreferences() {
         boolean resetPreferencesClicked = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showConfirmationDialogAndWait(Localization.lang("Reset preferences"),
                 Localization.lang("Are you sure you want to reset all settings to default values?"),
                 Localization.lang("Reset preferences"), Localization.lang("Cancel")));
@@ -229,7 +229,8 @@ public class PreferencesDialog extends BaseDialog<Void> {
             updateAfterPreferenceChanges();
         }
     }
-    private void importPreferences(){
+    
+    private void importPreferences() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.XML)
                 .withDefaultExtension(StandardFileType.XML)
