@@ -229,7 +229,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
             updateAfterPreferenceChanges();
         }
     }
-    
+
     private void importPreferences() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.XML)
