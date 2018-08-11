@@ -266,7 +266,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         relevanceColumn = new CheckBox(Localization.lang("Show relevance"));
         relevanceColumn.setFont(font);
         printedColumn = new CheckBox(Localization.lang("Show printed status"));
-        priorityColumn.setFont(font);
+        printedColumn.setFont(font);
         readStatusColumn = new CheckBox(Localization.lang("Show read status"));
         readStatusColumn.setFont(font);
 

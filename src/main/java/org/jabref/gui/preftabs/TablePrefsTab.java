@@ -156,17 +156,17 @@ class TablePrefsTab extends Pane implements PrefsTab {
         builder.add(secDesc,4,9);
 
         lab = new Label(Localization.lang("Tertiary sort criterion"));
+        lab.setFont(font);
         builder.add(lab,1,10);
         builder.add(terSort,2,10);
         builder.add(terField,3,10);
         builder.add(terDesc,4,10);
 
-
-        builder.add(new Label(Localization.lang("Sort the following fields as numeric fields") + ':'),1,11);
+        Label label3 = new Label(Localization.lang("Sort the following fields as numeric fields") + ':');
+        builder.add(label3,1,11);
         builder.add(numericFields,2,11);
 
-        Label label3 = new Label("");
-        builder.add(label3,1,12);
+        builder.add(new Label(""),1,12);
 
         Label label4 = new Label(Localization.lang("General") + " ------------------------------------------------------");
         label4.setFont(font1);
