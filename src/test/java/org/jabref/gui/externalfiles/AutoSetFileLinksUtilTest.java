@@ -11,9 +11,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertEquals;
@@ -30,7 +30,7 @@ public class AutoSetFileLinksUtilTest {
     private final BibEntry entry = new BibEntry("article");
     @Rule public TemporaryFolder folder = new TemporaryFolder();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         entry.setCiteKey("CiteKey");
         folder.newFile("CiteKey.pdf");

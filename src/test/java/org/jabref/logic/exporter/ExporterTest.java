@@ -18,12 +18,13 @@ import org.jabref.model.entry.BibEntry;
 
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 @RunWith(Parameterized.class)
@@ -74,15 +75,19 @@ public class ExporterTest {
         assertEquals(Collections.emptyList(), Files.readAllLines(tmpFile));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testExportingNullDatabaseThrowsNPE() throws Exception {
-        Path tmpFile = testFolder.newFile().toPath();
-        exportFormat.export(null, tmpFile, charset, entries);
+    	assertThrows(NullPointerException.class, () -> {
+    		Path tmpFile = testFolder.newFile().toPath();
+    		exportFormat.export(null, tmpFile, charset, entries);
+    		});
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testExportingNullEntriesThrowsNPE() throws Exception {
-        Path tmpFile = testFolder.newFile().toPath();
-        exportFormat.export(databaseContext, tmpFile, charset, null);
+    	assertThrows(NullPointerException.class, () -> {
+    		Path tmpFile = testFolder.newFile().toPath();
+    		exportFormat.export(databaseContext, tmpFile, charset, null);
+        });
     }
 }

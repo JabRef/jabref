@@ -19,7 +19,7 @@ import org.jabref.model.util.FileHelper;
 
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Answers;
 
@@ -27,6 +27,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 public class FileUtilTest {
@@ -267,20 +268,20 @@ public class FileUtilTest {
         FileUtil.copyFile(existingTestFile, temp, false);
         assertNotEquals(Files.readAllLines(existingTestFile, StandardCharsets.UTF_8),Files.readAllLines(temp, StandardCharsets.UTF_8));
     }
-
-    @Test (expected = NullPointerException.class)
+    
+    @Test
     public void testRenameFileWithFromFileIsNullAndToFileIsNull() {
-        FileUtil.renameFile(null, null);
+    	assertThrows(NullPointerException.class, () -> FileUtil.renameFile(null, null));
     }
 
-    @Test (expected = NullPointerException.class)
+    @Test
     public void testRenameFileWithFromFileExistAndToFileIsNull() {
-        FileUtil.renameFile(existingTestFile, null);
+    	assertThrows(NullPointerException.class, () -> FileUtil.renameFile(existingTestFile, null));
     }
 
-    @Test (expected = NullPointerException.class)
+    @Test
     public void testRenameFileWithFromFileIsNullAndToFileExist() {
-        FileUtil.renameFile(null, existingTestFile);
+    	assertThrows(NullPointerException.class, () -> FileUtil.renameFile(null, existingTestFile));
     }
 
     @Test

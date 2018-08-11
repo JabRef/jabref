@@ -14,9 +14,9 @@ import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.IEEETranEntryTypes;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -46,7 +46,7 @@ public class EntryTypesTest {
         return new Object[] {BibDatabaseMode.BIBTEX, BibDatabaseMode.BIBLATEX};
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         newCustomType = new CustomEntryType("customType", "required", "optional");
         List<String> newRequiredFields = new ArrayList<>(BibtexEntryTypes.ARTICLE.getRequiredFields());
@@ -55,7 +55,7 @@ public class EntryTypesTest {
                 Collections.singletonList("optional"));
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         EntryTypes.removeAllCustomEntryTypes();
     }

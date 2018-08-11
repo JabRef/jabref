@@ -3,7 +3,7 @@ package org.jabref.model.entry;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -25,7 +25,6 @@ public class AuthorListParameterTest {
     public static Collection<Object[]> data() {
 
         return Arrays.asList(new Object[][] {
-            {"王, 军", authorList(new Author("军", "军.", null, "王", null))},
             { "Doe, John", authorList(new Author("John", "J.", null, "Doe", null)) },
             { "von Berlichingen zu Hornberg, Johann Gottfried",
                     authorList(new Author("Johann Gottfried", "J. G.", "von", "Berlichingen zu Hornberg", null)) },

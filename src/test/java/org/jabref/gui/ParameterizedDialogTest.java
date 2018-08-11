@@ -10,15 +10,15 @@ import org.jabref.testutils.category.GUITest;
 
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import static org.assertj.swing.finder.WindowFinder.findDialog;
 
 @RunWith(Parameterized.class)
-@Category(GUITest.class)
+@Tag("GUITest")
 public class ParameterizedDialogTest extends AbstractUITest {
 
     private final boolean createDatabase;

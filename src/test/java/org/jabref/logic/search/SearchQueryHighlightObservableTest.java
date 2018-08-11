@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;

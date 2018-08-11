@@ -33,9 +33,10 @@ import org.jabref.model.metadata.MetaData;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.TemporaryFolder;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -70,14 +71,14 @@ public class CleanupWorkerTest {
 
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void cleanupWithNullPresetThrowsException() {
-        worker.cleanup(null, new BibEntry());
+    	assertThrows(NullPointerException.class, () -> worker.cleanup(null, new BibEntry()));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void cleanupNullEntryThrowsException() {
-        worker.cleanup(emptyPreset, null);
+    	assertThrows(NullPointerException.class, () -> worker.cleanup(emptyPreset, null));
     }
 
     @Test
