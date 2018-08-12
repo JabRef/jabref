@@ -48,20 +48,19 @@ class CleanupWorkerTest {
 
     private final CleanupPreset emptyPreset = new CleanupPreset(EnumSet.noneOf(CleanupPreset.CleanupStep.class));
     private CleanupWorker worker;
-    private File pdfFolder;
 
     @BeforeEach
     void setUp(@TempDirectory.TempDir Path bibFolder) throws IOException {
 
         Path path = bibFolder.resolve("ARandomlyNamedFolder");
         Files.createDirectory(path);
-        pdfFolder = path.toFile();
+        File pdfFolder = path.toFile();
 
         MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
-        Files.createFile(path.resolve("test.bib"));
-        context.setDatabaseFile(path.resolve("test.bib").toFile());
+        Files.createFile(bibFolder.resolve("test.bib"));
+        context.setDatabaseFile(bibFolder.resolve("test.bib").toFile());
 
         FileDirectoryPreferences fileDirPrefs = mock(FileDirectoryPreferences.class);
         //Biblocation as Primary overwrites all other dirs
