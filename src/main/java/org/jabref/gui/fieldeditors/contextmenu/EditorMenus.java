@@ -16,6 +16,7 @@ import javafx.scene.control.TextInputControl;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.actions.CopyDoiUrlAction;
+import org.jabref.logic.formatter.bibtexfields.CleanupURLFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.l10n.Localization;
 
@@ -81,6 +82,24 @@ public class EditorMenus {
             menuItems.add(copyDoiUrlMenuItem);
             menuItems.add(new SeparatorMenuItem());
             menuItems.addAll(getDefaultMenu(textArea).get());
+            return menuItems;
+        };
+    }
+
+    /**
+     * The default context menu with a specific menu item to cleanup  URL.
+     *
+     * @param textArea text-area that this menu will be connected to
+     * @return menu containing items of the default menu and an item to cleanup a URL
+     */
+    public static Supplier<List<MenuItem>> getCleanupURLMenu(TextArea textArea) {
+        return () -> {
+            CustomMenuItem cleanupURL = new CustomMenuItem(new Label(Localization.lang("Cleanup URL link")));
+            cleanupURL.setDisable(textArea.textProperty().isEmpty().get());
+            cleanupURL.setOnAction(event -> textArea.setText(new CleanupURLFormatter().format(textArea.getText())));
+
+            List<MenuItem> menuItems = new ArrayList<>();
+            menuItems.add(cleanupURL);
             return menuItems;
         };
     }

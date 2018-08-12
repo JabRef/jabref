@@ -60,7 +60,7 @@ public class ActionFactory {
     public Button createIconButton(Action action, Command command) {
         Button button = ActionUtils.createButton(new JabRefAction(action, command, keyBindingRepository), ActionUtils.ActionTextBehavior.HIDE);
 
-        button.getStyleClass().setAll("flatButton");
+        button.getStyleClass().setAll("icon-button");
 
         // For some reason the graphic is not set correctly, so let's fix this
         button.graphicProperty().unbind();
@@ -75,7 +75,7 @@ public class ActionFactory {
                 button,
                 ActionUtils.ActionTextBehavior.HIDE);
 
-        button.getStyleClass().add("flatButton");
+        button.getStyleClass().add("icon-button");
 
         // For some reason the graphic is not set correctly, so let's fix this
         button.graphicProperty().unbind();

@@ -11,7 +11,7 @@
          fx:controller="org.jabref.gui.fieldeditors.IdentifierEditor">
     <EditorTextArea fx:id="textArea" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
     <Button disable="${controller.viewModel.validIdentifierIsNotPresent}" onAction="#openExternalLink"
-            styleClass="flatButton">
+            styleClass="icon-button">
         <graphic>
             <JabRefIconView glyph="OPEN_LINK"/>
         </graphic>
@@ -19,7 +19,7 @@
             <Tooltip text="%Open" />
         </tooltip>
     </Button>
-    <Button fx:id="lookupIdentifierButton" onAction="#lookupIdentifier" styleClass="flatButton"
+    <Button fx:id="lookupIdentifierButton" onAction="#lookupIdentifier" styleClass="icon-button"
             visible="${controller.viewModel.idFetcherAvailable}" managed="${controller.viewModel.idFetcherAvailable}">
         <graphic>
             <StackPane>
@@ -32,7 +32,7 @@
     </Button>
     <Button fx:id="fetchInformationByIdentifierButton" disable="${controller.viewModel.validIdentifierIsNotPresent}"
             onAction="#fetchInformationByIdentifier"
-            styleClass="flatButton">
+            styleClass="icon-button">
         <graphic>
             <JabRefIconView glyph="FETCH_BY_IDENTIFIER"/>
         </graphic>
