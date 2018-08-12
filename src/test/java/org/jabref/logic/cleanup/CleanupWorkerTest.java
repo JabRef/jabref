@@ -268,7 +268,6 @@ class CleanupWorkerTest {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("Toot");
         LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
-        System.out.println(tempFile.getAbsolutePath());
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
         worker.cleanup(preset, entry);
