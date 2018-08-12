@@ -26,12 +26,9 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
-
-
 import static org.jabref.logic.l10n.Languages.LANGUAGES;
 
 class GeneralTab extends Pane implements PrefsTab {
-
 
     private final CheckBox useOwner;
     private final CheckBox overwriteOwner;
@@ -50,8 +47,8 @@ class GeneralTab extends Pane implements PrefsTab {
     private final TextField timeStampField;
     private final JabRefPreferences prefs;
 
-    private ObservableList<String> options = FXCollections.observableArrayList(LANGUAGES.keySet().toArray(new String[LANGUAGES.keySet().size()]));
-    private final ComboBox<? extends String> language = new ComboBox<>(options);
+    private final ObservableList<String> options = FXCollections.observableArrayList(LANGUAGES.keySet().toArray(new String[LANGUAGES.keySet().size()]));
+    private final ComboBox<String> language = new ComboBox<>(options);
     private final ComboBox<Charset> encodings;
     private final ComboBox<BibDatabaseMode> biblatexMode;
     private final DialogService dialogService;
@@ -220,12 +217,12 @@ class GeneralTab extends Pane implements PrefsTab {
         prefs.put(JabRefPreferences.TIME_STAMP_FIELD, timeStampField.getText().trim());
         // Update name of the time stamp field based on preferences
         InternalBibtexFields.updateTimeStampField(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD));
-        prefs.setDefaultEncoding((Charset) encodings.getItems());
-        prefs.putBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE, biblatexMode.getItems().equals(BibDatabaseMode.BIBLATEX));
+        prefs.setDefaultEncoding(encodings.getValue());
+        prefs.putBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE, biblatexMode.getValue().equals(BibDatabaseMode.BIBLATEX));
 
-        if (!LANGUAGES.get(language.getItems().toString()).equals(prefs.get(JabRefPreferences.LANGUAGE))) {
-            prefs.put(JabRefPreferences.LANGUAGE, LANGUAGES.get(language.getItems().toString()));
-            Localization.setLanguage(LANGUAGES.get(language.getItems().toString()));
+        if (!LANGUAGES.get(language.getValue()).equals(prefs.get(JabRefPreferences.LANGUAGE))) {
+            prefs.put(JabRefPreferences.LANGUAGE, LANGUAGES.get(language.getValue()));
+            Localization.setLanguage(LANGUAGES.get(language.getValue()));
             // Update any defaults that might be language dependent:
             Globals.prefs.setLanguageDependentDefaultValues();
             // Warn about restart needed:

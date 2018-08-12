@@ -217,6 +217,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
             discoverCitationStyleWorker.cancel(true);
         }
 
+
         discoverCitationStyleWorker = new SwingWorker<List<CitationStyle>, Void>() {
 
             @Override
