@@ -60,7 +60,6 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     private final ScrollPane scrollPane = new ScrollPane(layout);
     private final DialogService dialogService;
 
-
     public PreviewPrefsTab(DialogService dialogService) {
         this.dialogService = dialogService;
         setupLogic();
@@ -217,9 +216,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
             discoverCitationStyleWorker.cancel(true);
         }
 
-
         discoverCitationStyleWorker = new SwingWorker<List<CitationStyle>, Void>() {
-
             @Override
             protected List<CitationStyle> doInBackground() throws Exception {
                 return CitationStyle.discoverCitationStyles();
