@@ -26,28 +26,28 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class EntryTypesTest {
+class EntryTypesTest {
 
     private CustomEntryType newCustomType;
     private CustomEntryType overwrittenStandardType;
 
-    private static Stream<Object> data4mode() {
+    private static Stream<Object> mode() {
         return Stream.of(BibDatabaseMode.BIBTEX, BibDatabaseMode.BIBLATEX);
     }
 
-    private static Stream<Arguments> data4defaultTypeAndmode() {
+    private static Stream<Arguments> defaultTypeAndMode() {
         return Stream.of(
                 Arguments.of(BiblatexEntryTypes.MISC, BibDatabaseMode.BIBLATEX),
                 Arguments.of(BibtexEntryTypes.MISC, BibDatabaseMode.BIBTEX));
     }
 
-    private static Stream<Arguments> data4modeAndotherMode() {
+    private static Stream<Arguments> modeAndOtherMode() {
         return Stream.of(
                 Arguments.of(BibDatabaseMode.BIBTEX, BibDatabaseMode.BIBLATEX),
                 Arguments.of(BibDatabaseMode.BIBLATEX, BibDatabaseMode.BIBTEX));
     }
 
-    private static Stream<Arguments> data4standardArticleTypeandmode() {
+    private static Stream<Arguments> standardArticleTypeAndMode() {
         return Stream.of(
                 Arguments.of(BiblatexEntryTypes.ARTICLE, BibDatabaseMode.BIBLATEX),
                 Arguments.of(BibtexEntryTypes.ARTICLE, BibDatabaseMode.BIBTEX));
@@ -91,41 +91,41 @@ public class EntryTypesTest {
     }
 
     @ParameterizedTest
-    @MethodSource("data4mode")
+    @MethodSource("mode")
     void unknownTypeIsNotFound(BibDatabaseMode mode) {
         assertEquals(Optional.empty(), EntryTypes.getType("aaaaarticle", mode));
         assertEquals(Optional.empty(), EntryTypes.getStandardType("aaaaarticle", mode));
     }
 
     @ParameterizedTest
-    @MethodSource("data4defaultTypeAndmode")
+    @MethodSource("defaultTypeAndMode")
     void unknownTypeIsConvertedToMiscByGetTypeOrDefault(EntryType defaultType, BibDatabaseMode mode) {
         assertEquals(defaultType, EntryTypes.getTypeOrDefault("unknowntype", mode));
     }
 
     @ParameterizedTest
-    @MethodSource("data4mode")
+    @MethodSource("mode")
     void registerCustomEntryType(BibDatabaseMode mode) {
         EntryTypes.addOrModifyCustomEntryType(newCustomType, mode);
         assertEquals(Optional.of(newCustomType), EntryTypes.getType("customType", mode));
     }
 
     @ParameterizedTest
-    @MethodSource("data4mode")
+    @MethodSource("mode")
     void registeredCustomEntryTypeIsContainedInListOfCustomizedEntryTypes(BibDatabaseMode mode) {
         EntryTypes.addOrModifyCustomEntryType(newCustomType, mode);
         assertEquals(Arrays.asList(newCustomType), EntryTypes.getAllCustomTypes(mode));
     }
 
     @ParameterizedTest
-    @MethodSource("data4modeAndotherMode")
+    @MethodSource("modeAndOtherMode")
     void registerCustomEntryTypeDoesNotAffectOtherMode(BibDatabaseMode mode, BibDatabaseMode otherMode) {
         EntryTypes.addOrModifyCustomEntryType(newCustomType, mode);
         assertFalse(EntryTypes.getAllValues(otherMode).contains(newCustomType));
     }
 
     @ParameterizedTest
-    @MethodSource("data4mode")
+    @MethodSource("mode")
     void overwriteCustomEntryTypeFields(BibDatabaseMode mode) {
         EntryTypes.addOrModifyCustomEntryType(newCustomType, mode);
         CustomEntryType newCustomEntryTypeAuthorRequired = new CustomEntryType("customType", FieldName.AUTHOR, "optional");
@@ -134,14 +134,14 @@ public class EntryTypesTest {
     }
 
     @ParameterizedTest
-    @MethodSource("data4mode")
+    @MethodSource("mode")
     void overwriteStandardTypeRequiredFields(BibDatabaseMode mode) {
         EntryTypes.addOrModifyCustomEntryType(overwrittenStandardType, mode);
         assertEquals(Optional.of(overwrittenStandardType), EntryTypes.getType(overwrittenStandardType.getName(), mode));
     }
 
     @ParameterizedTest
-    @MethodSource("data4mode")
+    @MethodSource("mode")
     void registeredCustomizedStandardEntryTypeIsContainedInListOfCustomizedEntryTypes(BibDatabaseMode mode) {
         EntryTypes.addOrModifyCustomEntryType(overwrittenStandardType, mode);
         assertEquals(Arrays.asList(overwrittenStandardType), EntryTypes.getAllModifiedStandardTypes(mode));
@@ -149,14 +149,14 @@ public class EntryTypesTest {
 
 
     @ParameterizedTest
-    @MethodSource("data4standardArticleTypeandmode")
+    @MethodSource("standardArticleTypeAndMode")
     void standardTypeIsStillAcessibleIfOverwritten(EntryType standardArticleType, BibDatabaseMode mode) {
         EntryTypes.addOrModifyCustomEntryType(overwrittenStandardType, mode);
         assertEquals(Optional.of(standardArticleType), EntryTypes.getStandardType(overwrittenStandardType.getName(), mode));
     }
 
     @ParameterizedTest
-    @MethodSource("data4standardArticleTypeandmode")
+    @MethodSource("standardArticleTypeAndMode")
     void standardTypeIsRestoredAfterDeletionOfOverwrittenType(EntryType standardArticleType, BibDatabaseMode mode) {
         EntryTypes.addOrModifyCustomEntryType(overwrittenStandardType, mode);
         EntryTypes.removeType(overwrittenStandardType.getName(), mode);
@@ -164,14 +164,14 @@ public class EntryTypesTest {
     }
 
     @ParameterizedTest
-    @MethodSource("data4standardArticleTypeandmode")
+    @MethodSource("standardArticleTypeAndMode")
     void standardTypeCannotBeRemoved(EntryType standardArticleType, BibDatabaseMode mode) {
         EntryTypes.removeType(standardArticleType.getName(), mode);
         assertEquals(Optional.of(standardArticleType), EntryTypes.getType(standardArticleType.getName(), mode));
     }
 
     @ParameterizedTest
-    @MethodSource("data4modeAndotherMode")
+    @MethodSource("modeAndOtherMode")
     void overwriteStandardTypeRequiredFieldsDoesNotAffectOtherMode(BibDatabaseMode mode, BibDatabaseMode otherMode) {
         EntryTypes.addOrModifyCustomEntryType(overwrittenStandardType, mode);
         assertFalse(EntryTypes.getAllValues(otherMode).contains(overwrittenStandardType));
