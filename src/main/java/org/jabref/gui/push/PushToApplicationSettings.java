@@ -39,18 +39,19 @@ public class PushToApplicationSettings {
     public JPanel getSettingsPanel(int n) {
         switch (n) {
             case 0: application = new PushToEmacs(dialogService);
-            break;
+                    break;
             case 1: application = new PushToLyx(dialogService);
-            break;
+                    break;
             case 2: application = new PushToTexmaker(dialogService);
-            break;
+                    break;
             case 3: application = new PushToTeXstudio(dialogService);
-            break;
+                     break;
             case 4: application = new PushToVim(dialogService);
-            break;
+                    break;
             case 5: application = new PushToWinEdt(dialogService);
-            break;
+                    break;
             default: application = null;
+                    break;
         }
         application.initParameters();
         String commandPath = Globals.prefs.get(application.commandPathPreferenceKey);
@@ -126,6 +127,7 @@ public class PushToApplicationSettings {
      * state of the widgets in the settings panel to Globals.prefs.
      */
     public void storeSettings() {
+        System.out.println(application.commandPathPreferenceKey);
         Globals.prefs.put(application.commandPathPreferenceKey, path.getText());
     }
 }
