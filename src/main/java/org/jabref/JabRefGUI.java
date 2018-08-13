@@ -150,7 +150,7 @@ public class JabRefGUI {
         }
 
         Scene scene = new Scene(JabRefGUI.mainFrame, 800, 800);
-        Globals.getThemeLoader().installBaseCss(scene);
+        Globals.getThemeLoader().installBaseCss(scene, Globals.prefs);
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
         mainStage.setScene(scene);

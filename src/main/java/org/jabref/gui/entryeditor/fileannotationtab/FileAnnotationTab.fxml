@@ -35,7 +35,7 @@
                 <HBox>
                     <Label fx:id="author" />
                     <Pane HBox.hgrow="ALWAYS" />
-                    <Button onAction="#copy" styleClass="flatButton">
+                    <Button onAction="#copy" styleClass="icon-button">
                         <graphic>
                             <JabRefIconView glyph="COPY"/>
                         </graphic>

@@ -28,8 +28,7 @@ public interface GUIPostOpenAction {
      *
      * Note: if several such methods need to be called sequentially, it is
      *       important that all implementations of this method do not return
-     *       until the operation is finished. If work needs to be off-loaded
-     *       into a worker thread, use Spin to do this synchronously.
+     *       until the operation is finished.
      *
      * @param panel The BasePanel where the database is shown.
      * @param pr The result of the BIB parse operation.

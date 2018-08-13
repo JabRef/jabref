@@ -28,12 +28,17 @@ public class AboutDialogView extends BaseDialog<Void> {
 
     public AboutDialogView() {
         this.setTitle(Localization.lang("About JabRef"));
+        this.setResizable(true);
 
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
 
         ControlHelper.setAction(copyVersionButton, getDialogPane(), event -> copyVersionToClipboard());
+    }
+
+    public AboutDialogViewModel getViewModel() {
+        return viewModel;
     }
 
     @FXML

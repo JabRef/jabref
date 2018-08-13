@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 
 import org.jabref.Globals;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.EmacsKeyBindings;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.l10n.Localization;
@@ -59,6 +60,7 @@ public class GUIGlobals {
         // Set up entry editor colors, first time:
         GUIGlobals.updateEntryEditorColors();
 
+        IconTheme.loadFonts();
         GUIGlobals.currentFont = new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY),
                                           Globals.prefs.getInt(JabRefPreferences.FONT_STYLE), Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
     }
