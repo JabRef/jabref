@@ -37,6 +37,7 @@ public class PushToApplicationSettings {
      * @return a JPanel containing options, or null if options are not needed.
      */
     public JPanel getSettingsPanel(int n) {
+        
         switch (n) {
             case 0: application = new PushToEmacs(dialogService);
                     break;
