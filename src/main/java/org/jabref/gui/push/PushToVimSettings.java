@@ -24,8 +24,8 @@ public class PushToVimSettings extends PushToApplicationSettings {
     }
 
     @Override
-    protected void initSettingsPanel(String s, String command) {
-        super.initSettingsPanel(s,Globals.prefs.get(JabRefPreferences.VIM_SERVER));
+    protected void initSettingsPanel() {
+        super.initSettingsPanel();
         builder.appendRows("2dlu, p");
         builder.add(Localization.lang("Vim server name") + ":").xy(1, 3);
         builder.add(vimServer).xy(3, 3);

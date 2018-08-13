@@ -32,8 +32,8 @@ public class PushToEmacsSettings extends PushToApplicationSettings {
     }
 
     @Override
-    protected void initSettingsPanel(String s, String command) {
-        super.initSettingsPanel(s,Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
+    protected void initSettingsPanel() {
+        super.initSettingsPanel();
         builder.appendRows("2dlu, p, 2dlu, p");
         builder.add(Localization.lang("Additional parameters") + ":").xy(1, 3);
         builder.add(additionalParams).xy(3, 3);
