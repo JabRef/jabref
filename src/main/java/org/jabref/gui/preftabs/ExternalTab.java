@@ -30,7 +30,6 @@ import org.jabref.preferences.JabRefPreferences;
 class ExternalTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
-
     private final TextField emailSubject;
     private final TextField citeCommand;
     private final CheckBox openFoldersOfAttachedFiles;
