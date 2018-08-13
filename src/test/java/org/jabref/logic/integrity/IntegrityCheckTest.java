@@ -22,10 +22,8 @@ import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.rules.TemporaryFolder;
 import org.junitpioneer.jupiter.TempDirectory;
 import org.mockito.Mockito;
 
@@ -36,9 +34,6 @@ import static org.mockito.Mockito.mock;
 
 @ExtendWith(TempDirectory.class)
 public class IntegrityCheckTest {
-
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @Test
     public void testEntryTypeChecks() {
