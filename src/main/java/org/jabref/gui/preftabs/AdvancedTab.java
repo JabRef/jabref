@@ -1,6 +1,5 @@
 package org.jabref.gui.preftabs;
 
-import java.io.FileOutputStream;
 import java.util.Optional;
 
 import javafx.scene.control.Button;
