@@ -14,9 +14,13 @@ public class PushToEmacsSettings extends PushToApplicationSettings {
     private final JTextField additionalParams = new JTextField(30);
 
     @Override
-    public JPanel getSettingsPanel() {
+    public JPanel getSettingsPanel(int n) {
         additionalParams.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
-        return super.getSettingsPanel();
+        if (super.settings == null) {
+            super.initSettingsPanel("Emacs",Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
+        }
+        super.path.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
+        return super.settings;
     }
 
     @Override
@@ -32,8 +36,8 @@ public class PushToEmacsSettings extends PushToApplicationSettings {
     }
 
     @Override
-    protected void initSettingsPanel() {
-        super.initSettingsPanel();
+    protected void initSettingsPanel(String s, String command) {
+        super.initSettingsPanel(s,Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
         builder.appendRows("2dlu, p, 2dlu, p");
         builder.add(Localization.lang("Additional parameters") + ":").xy(1, 3);
         builder.add(additionalParams).xy(3, 3);

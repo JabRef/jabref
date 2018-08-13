@@ -8,8 +8,8 @@ import org.jabref.logic.l10n.Localization;
 public class PushToLyxSettings extends PushToApplicationSettings {
 
     @Override
-    protected void initSettingsPanel() {
-        super.initSettingsPanel();
+    protected void initSettingsPanel(String s, String command) {
+        super.initSettingsPanel(s, command);
         settings = new JPanel();
         settings.add(new JLabel(Localization.lang("Path to LyX pipe") + ":"));
         settings.add(path);

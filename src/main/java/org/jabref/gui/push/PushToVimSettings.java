@@ -12,9 +12,9 @@ public class PushToVimSettings extends PushToApplicationSettings {
     private final JTextField vimServer = new JTextField(30);
 
     @Override
-    public JPanel getSettingsPanel() {
+    public JPanel getSettingsPanel(int n) {
         vimServer.setText(Globals.prefs.get(JabRefPreferences.VIM_SERVER));
-        return super.getSettingsPanel();
+        return super.getSettingsPanel(n);
     }
 
     @Override
@@ -24,8 +24,8 @@ public class PushToVimSettings extends PushToApplicationSettings {
     }
 
     @Override
-    protected void initSettingsPanel() {
-        super.initSettingsPanel();
+    protected void initSettingsPanel(String s, String command) {
+        super.initSettingsPanel(s,Globals.prefs.get(JabRefPreferences.VIM_SERVER));
         builder.appendRows("2dlu, p");
         builder.add(Localization.lang("Vim server name") + ":").xy(1, 3);
         builder.add(vimServer).xy(3, 3);

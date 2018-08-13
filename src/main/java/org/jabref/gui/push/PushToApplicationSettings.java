@@ -36,11 +36,26 @@ public class PushToApplicationSettings {
      *
      * @return a JPanel containing options, or null if options are not needed.
      */
-    public JPanel getSettingsPanel() {
+    public JPanel getSettingsPanel(int n) {
+        switch (n) {
+            case 0: application = new PushToEmacs(dialogService);
+            break;
+            case 1: application = new PushToLyx(dialogService);
+            break;
+            case 2: application = new PushToTexmaker(dialogService);
+            break;
+            case 3: application = new PushToTeXstudio(dialogService);
+            break;
+            case 4: application = new PushToVim(dialogService);
+            break;
+            case 5: application = new PushToWinEdt(dialogService);
+            break;
+            default: application = null;
+        }
         application.initParameters();
         String commandPath = Globals.prefs.get(application.commandPathPreferenceKey);
         if (settings == null) {
-            initSettingsPanel();
+            initSettingsPanel(" ",null);
         }
         path.setText(commandPath);
         return settings;
@@ -59,15 +74,15 @@ public class PushToApplicationSettings {
     /**
      * Create a FormBuilder, fill it with a textbox for the path and store the JPanel in settings
      */
-    protected void initSettingsPanel() {
+    protected void initSettingsPanel(String s, String command) {
         builder = FormBuilder.create();
         builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p"));
-        StringBuilder label = new StringBuilder(Localization.lang("Path to %0", application.getApplicationName()));
+        StringBuilder label = new StringBuilder(Localization.lang("Path to %0", s));
         // In case the application name and the actual command is not the same, add the command in brackets
-        if (application.getCommandName() == null) {
+        if (command == null) {
             label.append(':');
         } else {
-            label.append(" (").append(application.getCommandName()).append("):");
+            label.append(" (").append(command).append("):");
         }
         builder.add(label.toString()).xy(1, 1);
         builder.add(path).xy(3, 1);
