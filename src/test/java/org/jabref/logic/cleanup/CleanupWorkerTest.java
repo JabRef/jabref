@@ -261,7 +261,7 @@ class CleanupWorkerTest {
     void cleanupRenamePdfRenamesRelativeFile(@TempDirectory.TempDir Path bibFolder) throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.RENAME_PDF);
 
-        Path path = bibFolder.resolve("AnotherRandomlyNamedFile");
+        Path path = bibFolder.resolve("AnotherRandomlyNamedFile.tmp");
         Files.createFile(path);
         File tempFile = path.toFile();
         BibEntry entry = new BibEntry();
