@@ -1,5 +1,6 @@
 package org.jabref.gui.preftabs;
 
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -38,14 +39,13 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
         exportInSpecifiedOrder = new RadioButton(Localization.lang("Export entries ordered as specified"));
         exportInSpecifiedOrder.setFont(FontSize.smallFont);
 
+        exportOrderPanel = new SaveOrderConfigDisplay();
 
-        EventHandler<javafx.event.ActionEvent> listener =  new EventHandler<javafx.event.ActionEvent>() {
-            @Override
-            public void handle(javafx.event.ActionEvent event) {
+        EventHandler<ActionEvent> listener =  (event) -> {
                 boolean selected = event.getSource() == exportInSpecifiedOrder;
                 exportOrderPanel.setEnabled(selected);
-            }
         };
+
         exportInOriginalOrder.setOnAction(listener);
         exportInTableOrder.setOnAction(listener);
         exportInSpecifiedOrder.setOnAction(listener);
@@ -62,7 +62,6 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
         builder.add(exportInSpecifiedOrder, 1, 6);
         builder.add(new Line(), 2, 7);
 
-        exportOrderPanel = new SaveOrderConfigDisplay();
         builder.add(exportOrderPanel.getJFXPanel(), 1, 8);
         builder.add(new Line(), 2, 9);
 
