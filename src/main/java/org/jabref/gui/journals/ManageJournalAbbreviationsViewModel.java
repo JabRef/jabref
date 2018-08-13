@@ -99,7 +99,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
                 }
             }
         });
-        isLoading.bind(isLoadingBuiltIn.and(isLoadingBuiltIn));
+        isLoading.bind(isLoadingBuiltIn.or(isLoadingIeee));
     }
 
     public SimpleBooleanProperty isLoadingProperty() {
@@ -121,6 +121,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
                 .onSuccess(result -> {
                     isLoadingBuiltIn.setValue(false);
                     addList(Localization.lang("JabRef built in list"), result);
+                    selectLastJournalFile();
                 })
                 .onFailure(dialogService::showErrorDialogAndWait)
                 .executeWith(taskExecutor);
