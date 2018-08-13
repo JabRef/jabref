@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.swing.finder.WindowFinder.findDialog;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("GUITest")
 public class UndoTest extends AbstractUITest {
@@ -21,7 +21,7 @@ public class UndoTest extends AbstractUITest {
 
         JTableFixture entryTable = mainFrame.table();
 
-        assertTrue("The database must have at least 2 entries for the test to begin!", entryTable.rowCount() >= 2);
+        assertTrue(entryTable.rowCount() >= 2, "The database must have at least 2 entries for the test to begin!");
         entryTable.selectRows(0, 1);
         entryTable.requireSelectedRows(0, 1);
 
