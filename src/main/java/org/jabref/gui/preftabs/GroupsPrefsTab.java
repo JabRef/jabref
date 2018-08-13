@@ -8,7 +8,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.text.Font;
 
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.logic.l10n.Localization;
@@ -37,36 +36,33 @@ class GroupsPrefsTab extends Pane implements PrefsTab {
             }
         });
 
-        Font font = new Font(10);
-        Font font1 = new Font(14);
-
         multiSelectionModeIntersection.setText(Localization.lang("Display only entries belonging to all selected groups."));
-        multiSelectionModeIntersection.setFont(font);
+        multiSelectionModeIntersection.setFont(FontSize.smallFont);
         multiSelectionModeUnion.setText(Localization.lang("Display all entries belonging to one or more of the selected groups."));
-        multiSelectionModeUnion.setFont(font);
+        multiSelectionModeUnion.setFont(FontSize.smallFont);
 
-        Label label = new Label(Localization.lang("View") + "  ---------------------------------------");
-        label.setFont(font1);
-        builder.add(label,1,1);
-        builder.add(hideNonHits,2,2);
-        builder.add(grayOut,2,3);
-        builder.add(multiSelectionModeIntersection,2,4);
-        builder.add(multiSelectionModeUnion,2,5);
-        builder.add(autoAssignGroup,2,6);
-        builder.add(new Label(""),1,7);
+        Label view = new Label(Localization.lang("View") + "  ---------------------------------------");
+        view.setFont(FontSize.bigFont);
+        builder.add(view, 1, 1);
+        builder.add(hideNonHits, 2, 2);
+        builder.add(grayOut, 2, 3);
+        builder.add(multiSelectionModeIntersection, 2, 4);
+        builder.add(multiSelectionModeUnion, 2, 5);
+        builder.add(autoAssignGroup, 2, 6);
+        builder.add(new Label(""), 1, 7);
 
-        Label label1 = new Label(Localization.lang("Dynamic groups") + "  --------------------------");
-        label1.setFont(font1);
-        builder.add(label1,1,8);
+        Label dynamicGroups = new Label(Localization.lang("Dynamic groups") + "  --------------------------");
+        dynamicGroups.setFont(FontSize.bigFont);
+        builder.add(dynamicGroups, 1, 8);
 
-        Label label2 = new Label(Localization.lang("Default grouping field") + ":");
-        label2.setFont(font);
-        builder.add(label2,1,9);
-        builder.add(groupingField,2,9);
-        Label label3 = new Label(Localization.lang("When adding/removing keywords, separate them by") + ":");
-        label3.setFont(font);
-        builder.add(label3,1,10);
-        builder.add(keywordSeparator,2,10);
+        Label defaultGrouping = new Label(Localization.lang("Default grouping field") + ":");
+        defaultGrouping.setFont(FontSize.smallFont);
+        builder.add(defaultGrouping, 1, 9);
+        builder.add(groupingField, 2, 9);
+        Label label = new Label(Localization.lang("When adding/removing keywords, separate them by") + ":");
+        label.setFont(FontSize.smallFont);
+        builder.add(label, 1, 10);
+        builder.add(keywordSeparator, 2, 10);
     }
 
     public GridPane getBuilder() {

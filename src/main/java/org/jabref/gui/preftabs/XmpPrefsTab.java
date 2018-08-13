@@ -21,7 +21,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.text.Font;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
@@ -60,7 +59,7 @@ class XmpPrefsTab extends Pane implements PrefsTab {
         tableView.getColumns().add(column);
         final TextField addName = new TextField();
         addName.setPromptText("name");
-        addName.setPrefSize(200,30);
+        addName.setPrefSize(200, 30);
         BorderPane tablePanel = new BorderPane();
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setMaxHeight(400);
@@ -69,7 +68,7 @@ class XmpPrefsTab extends Pane implements PrefsTab {
         tablePanel.setCenter(scrollPane);
 
         Button add = new Button("Add");
-        add.setPrefSize(80,20);
+        add.setPrefSize(80, 20);
         add.setOnAction(e-> {
             if (!addName.getText().isEmpty()) {
                 TableRow tableRow = new TableRow(addName.getText());
@@ -83,7 +82,7 @@ class XmpPrefsTab extends Pane implements PrefsTab {
             }
         });
         Button delete = new Button("Delete");
-        delete.setPrefSize(80,20);
+        delete.setPrefSize(80, 20);
         delete.setOnAction(e-> {
             if (tableView.getFocusModel() != null && tableView.getFocusModel().getFocusedIndex() != -1) {
                 tableChanged = true;
@@ -100,13 +99,12 @@ class XmpPrefsTab extends Pane implements PrefsTab {
         tablePanel.setBottom(toolbar);
 
         // Build Prefs Tabs
-        Label label = new Label(Localization.lang("XMP export privacy settings") + "  -------------------------");
-        label.setFont(new Font(14));
-        builder.add(label,1,1);
-        privacyFilterCheckBox.setFont(new Font(10));
-        builder.add(privacyFilterCheckBox,1,2);
-
-        builder.add(tablePanel,1,3);
+        Label xmpExportPrivacySettings = new Label(Localization.lang("XMP export privacy settings") + "  -------------------------");
+        xmpExportPrivacySettings.setFont(FontSize.bigFont);
+        builder.add(xmpExportPrivacySettings, 1, 1);
+        privacyFilterCheckBox.setFont(FontSize.smallFont);
+        builder.add(privacyFilterCheckBox, 1, 2);
+        builder.add(tablePanel, 1, 3);
 
     }
 

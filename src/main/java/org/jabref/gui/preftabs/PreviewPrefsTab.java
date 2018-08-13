@@ -20,7 +20,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
@@ -160,21 +159,23 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     private void setupGui() {
         VBox vBox = new VBox();
-        btnRight.setPrefSize(80,20);
-        btnLeft.setPrefSize(80,20);
-        btnUp.setPrefSize(80,20);
-        btnDown.setPrefSize(80,20);
-        vBox.getChildren().addAll(new Label(""), new Label(""),new Label(""),new Label(""), new Label(""),new Label(""),new Label(""), btnRight,btnLeft, new Label(""), new Label(""),new Label(""),btnUp,btnDown);
-        Label label = new Label(Localization.lang("Current Preview") + "  ------------------------------------------");
-        label.setFont(new Font(14));
-        gridPane.add(label,1,1);
-        gridPane.add(available,1,2);
-        gridPane.add(vBox,2,2);
-        gridPane.add(chosen,3,2);
-        gridPane.add(btnTest,2,6);
-        gridPane.add(btnDefault,3,6);
-        layout.setPrefSize(600,300);
-        gridPane.add(scrollPane,1,9);
+        btnRight.setPrefSize(80, 20);
+        btnLeft.setPrefSize(80, 20);
+        btnUp.setPrefSize(80, 20);
+        btnDown.setPrefSize(80, 20);
+        vBox.getChildren().addAll(new Label(""),  new Label(""), new Label(""), new Label(""), new Label(""),
+                new Label(""), new Label(""), btnRight, btnLeft, new Label(""), new Label(""), new Label(""),
+                btnUp, btnDown);
+        Label currentPreview = new Label(Localization.lang("Current Preview") + "  ------------------------------------------");
+        currentPreview.setFont(FontSize.bigFont);
+        gridPane.add(currentPreview, 1, 1);
+        gridPane.add(available, 1, 2);
+        gridPane.add(vBox, 2, 2);
+        gridPane.add(chosen, 3, 2);
+        gridPane.add(btnTest, 2, 6);
+        gridPane.add(btnDefault, 3, 6);
+        layout.setPrefSize(600, 300);
+        gridPane.add(scrollPane, 1, 9);
     }
 
     public GridPane getGridPane() {

@@ -11,7 +11,6 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.text.Font;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.pdfimport.ImportDialog;
@@ -40,22 +39,18 @@ public class ImportSettingsTab extends Pane implements PrefsTab {
 
     public ImportSettingsTab(JabRefPreferences prefs) {
         this.prefs = Objects.requireNonNull(prefs);
-
-        Font font = new Font(10);
-        Font font1 = new Font(14);
-
         radioButtonNoMeta = new RadioButton(Localization.lang("Create blank entry linking the PDF"));
-        radioButtonNoMeta.setFont(font);
+        radioButtonNoMeta.setFont(FontSize.smallFont);
         radioButtonXmp = new RadioButton(Localization.lang("Create entry based on XMP-metadata"));
-        radioButtonXmp.setFont(font);
+        radioButtonXmp.setFont(FontSize.smallFont);
         radioButtonPDFcontent = new RadioButton(Localization.lang("Create entry based on content"));
-        radioButtonPDFcontent.setFont(font);
+        radioButtonPDFcontent.setFont(FontSize.smallFont);
         radioButtononlyAttachPDF = new RadioButton(Localization.lang("Only attach PDF"));
-        radioButtononlyAttachPDF.setFont(font);
+        radioButtononlyAttachPDF.setFont(FontSize.smallFont);
 
         useDefaultPDFImportStyle = new CheckBox(
                 Localization.lang("Always use this PDF import style (and do not ask for each import)"));
-        useDefaultPDFImportStyle.setFont(font);
+        useDefaultPDFImportStyle.setFont(FontSize.smallFont);
 
         fileNamePattern = new TextField();
         fileDirPattern = new TextField();
@@ -66,30 +61,30 @@ public class ImportSettingsTab extends Pane implements PrefsTab {
             fileNamePattern.setText(selectFileNamePattern.getValue());
         });
 
-        Label label = new Label(Localization.lang("Default import style for drag and drop of PDFs"));
-        label.setFont(font1);
-        builder.add(label,1,1);
-        builder.add(new Separator(),2,1);
-        builder.add(radioButtonNoMeta,2,2);
-        builder.add(radioButtonXmp,2,3);
-        builder.add(radioButtonPDFcontent,2,4);
-        builder.add(radioButtononlyAttachPDF,2,5);
-        builder.add(useDefaultPDFImportStyle,2,6);
-        builder.add(new Label(""),1,7);
+        Label defaultImportStyle = new Label(Localization.lang("Default import style for drag and drop of PDFs"));
+        defaultImportStyle.setFont(FontSize.bigFont);
+        builder.add(defaultImportStyle, 1, 1);
+        builder.add(new Separator(), 2, 1);
+        builder.add(radioButtonNoMeta, 2, 2);
+        builder.add(radioButtonXmp, 2, 3);
+        builder.add(radioButtonPDFcontent, 2, 4);
+        builder.add(radioButtononlyAttachPDF, 2, 5);
+        builder.add(useDefaultPDFImportStyle, 2, 6);
+        builder.add(new Label(""), 1, 7);
 
-        Label label1 = new Label(Localization.lang("Default PDF file link action") + "  ------------------------");
-        label1.setFont(font1);
-        builder.add(label1,1,8);
-        Label lab = new Label(Localization.lang("Filename format pattern").concat(":"));
-        lab.setFont(font);
-        builder.add(lab,1,9);
-        builder.add(fileNamePattern,2,9);
-        builder.add(selectFileNamePattern,3,9);
+        Label defaultPdfFileLinkAction = new Label(Localization.lang("Default PDF file link action") + "  ------------------------");
+        defaultPdfFileLinkAction.setFont(FontSize.bigFont);
+        builder.add(defaultPdfFileLinkAction, 1, 8);
+        Label filenameFormatPattern = new Label(Localization.lang("Filename format pattern").concat(":"));
+        filenameFormatPattern.setFont(FontSize.smallFont);
+        builder.add(filenameFormatPattern, 1, 9);
+        builder.add(fileNamePattern, 2, 9);
+        builder.add(selectFileNamePattern, 3, 9);
 
         Label lbfileDirPattern = new Label(Localization.lang("File directory pattern").concat(":"));
-        lbfileDirPattern.setFont(font);
-        builder.add(lbfileDirPattern,1,10);
-        builder.add(fileDirPattern,2,10);
+        lbfileDirPattern.setFont(FontSize.smallFont);
+        builder.add(lbfileDirPattern, 1, 10);
+        builder.add(fileDirPattern, 2, 10);
     }
 
     public GridPane getBuilder() {

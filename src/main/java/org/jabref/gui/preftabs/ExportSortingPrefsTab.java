@@ -7,7 +7,6 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
-import javafx.scene.text.Font;
 
 import org.jabref.gui.SaveOrderConfigDisplay;
 import org.jabref.logic.l10n.Localization;
@@ -29,16 +28,14 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
 
     public ExportSortingPrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
-
-         Font font = new Font(10);
         // EXPORT SORT ORDER
         // create Components
         exportInOriginalOrder = new RadioButton(Localization.lang("Export entries in their original order"));
-        exportInOriginalOrder.setFont(font);
+        exportInOriginalOrder.setFont(FontSize.smallFont);
         exportInTableOrder = new RadioButton(Localization.lang("Export in current table sort order"));
-        exportInTableOrder.setFont(font);
+        exportInTableOrder.setFont(FontSize.smallFont);
         exportInSpecifiedOrder = new RadioButton(Localization.lang("Export entries ordered as specified"));
-        exportInSpecifiedOrder.setFont(font);
+        exportInSpecifiedOrder.setFont(FontSize.smallFont);
 
 
         EventHandler<javafx.event.ActionEvent> listener =  new EventHandler<javafx.event.ActionEvent>() {
@@ -52,21 +49,21 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
         exportInTableOrder.setOnAction(listener);
         exportInSpecifiedOrder.setOnAction(listener);
 
-        Label label = new Label(Localization.lang("Export sort order") + "  ------------------------");
-        label.setFont(new Font(14));
+        Label exportSortOrder = new Label(Localization.lang("Export sort order") + "  ------------------------");
+        exportSortOrder.setFont(FontSize.bigFont);
         // create GUI
-        builder.add(label,1,1);
-        builder.add(new Separator(),2,1);
-        builder.add(exportInOriginalOrder, 1,2);
-        builder.add(new Line(),2,3);
-        builder.add(exportInTableOrder, 1,4);
-        builder.add(new Line(),2,5);
-        builder.add(exportInSpecifiedOrder, 1,6);
-        builder.add(new Line(),2,7);
+        builder.add(exportSortOrder, 1, 1);
+        builder.add(new Separator(), 2, 1);
+        builder.add(exportInOriginalOrder,  1, 2);
+        builder.add(new Line(), 2, 3);
+        builder.add(exportInTableOrder,  1, 4);
+        builder.add(new Line(), 2, 5);
+        builder.add(exportInSpecifiedOrder, 1, 6);
+        builder.add(new Line(), 2, 7);
 
         exportOrderPanel = new SaveOrderConfigDisplay();
-        builder.add(exportOrderPanel.getJFXPanel(),1,8);
-        builder.add(new Line(),2,9);
+        builder.add(exportOrderPanel.getJFXPanel(), 1, 8);
+        builder.add(new Line(), 2, 9);
 
     }
 

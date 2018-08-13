@@ -13,7 +13,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.text.Font;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.help.HelpAction;
@@ -60,123 +59,111 @@ class FileTab extends Pane implements PrefsTab {
     public FileTab(DialogService dialogService, JabRefPreferences prefs) {
         this.dialogService = dialogService;
         this.prefs = prefs;
-        Font font = new Font(10);
-        Font font1 = new Font(14);
-
         fileDir = new TextField();
         bibLocAsPrimaryDir = new CheckBox(Localization.lang("Use the BIB file location as primary file directory"));
-        bibLocAsPrimaryDir.setFont(font);
+        bibLocAsPrimaryDir.setFont(FontSize.smallFont);
         bibLocAsPrimaryDir.setAccessibleText(Localization.lang("When downloading files, or moving linked files to the "
                 + "file directory, prefer the BIB file location rather than the file directory set above"));
         runAutoFileSearch = new CheckBox(
                 Localization.lang("When opening file link, search for matching file if no link is defined"));
-        runAutoFileSearch.setFont(font);
+        runAutoFileSearch.setFont(FontSize.smallFont);
         allowFileAutoOpenBrowse = new CheckBox(
                 Localization.lang("Automatically open browse dialog when creating new file link"));
-        allowFileAutoOpenBrowse.setFont(font);
+        allowFileAutoOpenBrowse.setFont(FontSize.smallFont);
         regExpTextField = new TextField();
         useRegExpComboBox = new RadioButton(Localization.lang("Use regular expression search"));
-        useRegExpComboBox.setFont(font);
+        useRegExpComboBox.setFont(FontSize.smallFont);
         useRegExpComboBox.setOnAction(e -> regExpTextField.setEditable(useRegExpComboBox.isSelected()));
 
-
         openLast = new CheckBox(Localization.lang("Open last edited libraries at startup"));
-        openLast.setFont(font);
+        openLast.setFont(FontSize.smallFont);
         backup = new CheckBox(Localization.lang("Backup old file when saving"));
-        backup.setFont(font);
+        backup.setFont(FontSize.smallFont);
         localAutoSave = new CheckBox(Localization.lang("Autosave local libraries"));
-        localAutoSave.setFont(font);
+        localAutoSave.setFont(FontSize.smallFont);
         resolveStringsAll = new RadioButton(Localization.lang("Resolve strings for all fields except") + ":");
-        resolveStringsAll.setFont(font);
+        resolveStringsAll.setFont(FontSize.smallFont);
         resolveStringsStandard = new RadioButton(Localization.lang("Resolve strings for standard BibTeX fields only"));
-        resolveStringsStandard.setFont(font);
+        resolveStringsStandard.setFont(FontSize.smallFont);
 
         // This is sort of a quick hack
         newlineSeparator = new ComboBox<>(FXCollections.observableArrayList("CR", "CR/LF", "LF"));
 
         reformatFileOnSaveAndExport = new CheckBox(Localization.lang("Always reformat BIB file on save and export"));
-        reformatFileOnSaveAndExport.setFont(font);
+        reformatFileOnSaveAndExport.setFont(FontSize.smallFont);
 
         nonWrappableFields = new TextField();
         doNotResolveStringsFor = new TextField();
-        nonWrappableFields.setPrefSize(80,25);
-        doNotResolveStringsFor.setPrefSize(80,25);
+        nonWrappableFields.setPrefSize(80, 25);
+        doNotResolveStringsFor.setPrefSize(80, 25);
+        builder.setPrefSize(800, 600);
 
-        builder.setPrefSize(800,600);
-        Label label = new Label(Localization.lang("General") + "  ----------------------------------------------");
-        label.setFont(font1);
-        builder.add(label,1,1);
-        builder.add(openLast, 1,2);
-        builder.add(backup,1, 3);
+        Label general = new Label(Localization.lang("General") + "  ----------------------------------------------");
+        general.setFont(FontSize.bigFont);
+        builder.add(general, 1, 1);
+        builder.add(openLast,  1, 2);
+        builder.add(backup, 1, 3);
+        Label label = new Label(Localization.lang("Do not wrap the following fields when saving") + ":");
+        label.setFont(FontSize.smallFont);
+        builder.add(label, 1, 4);
+        builder.add(nonWrappableFields, 2, 4);
+        builder.add(resolveStringsStandard,  1, 5);
+        builder.add(resolveStringsAll, 1, 6);
+        builder.add(doNotResolveStringsFor, 2, 6);
 
-
-        Label label1 = new Label(Localization.lang("Do not wrap the following fields when saving") + ":");
-        label1.setFont(font);
-        builder.add(label1,1,4);
-        builder.add(nonWrappableFields,2,4);
-
-        builder.add(resolveStringsStandard, 1,5);
-        builder.add(resolveStringsAll,1,6);
-        builder.add(doNotResolveStringsFor,2,6);
-
-
-        Label lab = new Label(Localization.lang("Newline separator") + ":");
-        lab.setFont(font);
-        builder.add(lab,1,7);
-        builder.add(newlineSeparator,2,7);
-
-        builder.add(reformatFileOnSaveAndExport, 1,8);
-
+        Label newlineSeparatorLabel = new Label(Localization.lang("Newline separator") + ":");
+        newlineSeparatorLabel.setFont(FontSize.smallFont);
+        builder.add(newlineSeparatorLabel, 1, 7);
+        builder.add(newlineSeparator, 2, 7);
+        builder.add(reformatFileOnSaveAndExport, 1, 8);
         Label invisible = new Label("");
-        builder.add(invisible,1,9);
+        builder.add(invisible, 1, 9);
 
-        Label label2 = new Label(Localization.lang("External file links") + "  ------------------------------------");
-        label2.setFont(font1);
-        builder.add(label2,1,11);
+        Label externalFileLinks = new Label(Localization.lang("External file links") + "  ------------------------------------");
+        externalFileLinks.setFont(FontSize.bigFont);
+        builder.add(externalFileLinks, 1, 11);
 
-        lab = new Label(Localization.lang("Main file directory") + ':');
-        lab.setFont(font);
-        builder.add(lab,1,12);
-        builder.add(fileDir,2,12);
+        label = new Label(Localization.lang("Main file directory") + ':');
+        label.setFont(FontSize.smallFont);
+        builder.add(label, 1, 12);
+        builder.add(fileDir, 2, 12);
 
         Button browse = new Button(Localization.lang("Browse"));
-        browse.setPrefSize(80,20);
-        browse.setFont(font);
+        browse.setPrefSize(80, 20);
+        browse.setFont(FontSize.smallFont);
         browse.setOnAction(e -> {
             DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                     .withInitialDirectory(Paths.get(fileDir.getText())).build();
             DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showDirectorySelectionDialog(dirDialogConfiguration))
                     .ifPresent(f -> fileDir.setText(f.toString()));
         });
-        builder.add(browse,3,12);
-        builder.add(bibLocAsPrimaryDir, 1,13);
-        builder.add(matchStartsWithKey, 1,14);
-        builder.add(matchExactKeyOnly, 1,15);
-        builder.add(useRegExpComboBox,1,16);
-        builder.add(regExpTextField,2,16);
+        builder.add(browse, 3, 12);
+        builder.add(bibLocAsPrimaryDir, 1, 13);
+        builder.add(matchStartsWithKey,  1, 14);
+        builder.add(matchExactKeyOnly,  1, 15);
+        builder.add(useRegExpComboBox, 1, 16);
+        builder.add(regExpTextField, 2, 16);
 
         Button help = new Button("?");
-        help.setFont(font);
+        help.setFont(FontSize.smallFont);
         help.setOnAction(event -> new HelpAction(Localization.lang("Help on regular expression search"),
                 HelpFile.REGEX_SEARCH).getHelpButton().doClick());
 
-        builder.add(help,3,16);
-
-        builder.add(runAutoFileSearch, 1,17);
-        builder.add(allowFileAutoOpenBrowse,1,18);
+        builder.add(help, 3, 16);
+        builder.add(runAutoFileSearch, 1, 17);
+        builder.add(allowFileAutoOpenBrowse, 1, 18);
 
         Label invisible1 = new Label("");
-        builder.add(invisible1,1,19);
+        builder.add(invisible1, 1, 19);
 
-        Label label3 = new Label(Localization.lang("Autosave") + "  ---------------------------------------------");
-        label3.setFont(font1);
-        builder.add(label3,1,20);
-        builder.add(localAutoSave, 1,21);
+        Label autosave = new Label(Localization.lang("Autosave") + "  ---------------------------------------------");
+        autosave.setFont(FontSize.bigFont);
+        builder.add(autosave, 1, 20);
+        builder.add(localAutoSave,  1, 21);
         Button help1 = new Button("?");
-        help1.setFont(font);
+        help1.setFont(FontSize.smallFont);
         help1.setOnAction(event -> new HelpAction(HelpFile.AUTOSAVE).getHelpButton().doClick());
-        builder.add(help1,2,21);
-
+        builder.add(help1, 2, 21);
     }
 
     @Override

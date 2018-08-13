@@ -30,7 +30,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
@@ -103,9 +102,6 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 new TableRow("journal",130),
                 new TableRow("bibtexkey",100));
 
-        Font font = new Font(10);
-        Font font1 = new Font(14);
-
         colSetup = new TableView<>();
         TableColumn<TableRow,String> field = new TableColumn<>(Localization.lang("Field name"));
         TableColumn<TableRow,Double> column = new TableColumn<>(Localization.lang("Column width"));
@@ -144,7 +140,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         HBox toolBar = new HBox();
         Button addRow = new Button("Add");
-        addRow.setPrefSize(80,20);
+        addRow.setPrefSize(80, 20);
         addRow.setOnAction( e -> {
             if (!addLast.getText().isEmpty()) {
                 TableRow tableRow = addLast.getText().matches("[1-9][0-9]") ? new TableRow(addName.getText(), Integer.valueOf(addLast.getText())) : new TableRow(addName.getText());
@@ -160,7 +156,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         });
 
         Button deleteRow = new Button("Delete");
-        deleteRow.setPrefSize(80,20);
+        deleteRow.setPrefSize(80, 20);
         deleteRow.setOnAction(e -> {
             if (colSetup.getFocusModel() != null && colSetup.getFocusModel().getFocusedIndex() != -1) {
             tableChanged = true;
@@ -173,7 +169,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
             colSetup.refresh();
         }});
         Button up = new Button("Up");
-        up.setPrefSize(80,20);
+        up.setPrefSize(80, 20);
         up.setOnAction(e-> {
             if (colSetup.getFocusModel() != null) {
                 int row = colSetup.getFocusModel().getFocusedIndex();
@@ -193,7 +189,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
             }
         });
         Button down = new Button("Down");
-        down.setPrefSize(80,20);
+        down.setPrefSize(80, 20);
         down.setOnAction(e-> {
             if (colSetup.getFocusModel() != null) {
                 int row = colSetup.getFocusModel().getFocusedIndex();
@@ -212,24 +208,24 @@ class TableColumnsTab extends Pane implements PrefsTab {
                 return;
             }
         });
-        toolBar.getChildren().addAll(addName,addLast,addRow,deleteRow,up,down);
+        toolBar.getChildren().addAll(addName, addLast, addRow, deleteRow, up, down);
         tabPanel.setBottom(toolBar);
 
         fileColumn = new CheckBox(Localization.lang("Show file column"));
-        fileColumn.setFont(font);
+        fileColumn.setFont(FontSize.smallFont);
         urlColumn = new CheckBox(Localization.lang("Show URL/DOI column"));
-        urlColumn.setFont(font);
+        urlColumn.setFont(FontSize.smallFont);
         preferUrl = new RadioButton(Localization.lang("Show URL first"));
-        preferUrl.setFont(font);
+        preferUrl.setFont(FontSize.smallFont);
         preferDoi = new RadioButton(Localization.lang("Show DOI first"));
-        preferDoi.setFont(font);
+        preferDoi.setFont(FontSize.smallFont);
 
         urlColumn.setOnAction(arg0 -> {
             preferUrl.setDisable(!urlColumn.isSelected());
             preferDoi.setDisable(!urlColumn.isSelected());
         });
         arxivColumn = new CheckBox(Localization.lang("Show ArXiv column"));
-        arxivColumn.setFont(font);
+        arxivColumn.setFont(FontSize.smallFont);
 
         Collection<ExternalFileType> fileTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         String[] fileTypeNames = new String[fileTypes.size()];
@@ -244,7 +240,7 @@ class TableColumnsTab extends Pane implements PrefsTab {
         listOfFileColumnsScrollPane.setMaxHeight(80);
         listOfFileColumnsScrollPane.setContent(listOfFileColumnsVBox);
         extraFileColumns = new CheckBox(Localization.lang("Show extra columns"));
-        extraFileColumns.setFont(font);
+        extraFileColumns.setFont(FontSize.smallFont);
         if (!extraFileColumns.isSelected()) {
             listOfFileColumnsVBox.setDisable(true);
         }
@@ -253,33 +249,33 @@ class TableColumnsTab extends Pane implements PrefsTab {
         /** begin: special table columns and special fields ***/
 
         Button helpButton = new Button("?");
-        helpButton.setPrefSize(20,20);
+        helpButton.setPrefSize(20, 20);
         helpButton.setOnAction(e->new HelpAction(Localization.lang("Help on special fields"),
                 HelpFile.SPECIAL_FIELDS).getHelpButton().doClick());
 
         rankingColumn = new CheckBox(Localization.lang("Show rank"));
-        rankingColumn.setFont(font);
+        rankingColumn.setFont(FontSize.smallFont);
         qualityColumn = new CheckBox(Localization.lang("Show quality"));
-        qualityColumn.setFont(font);
+        qualityColumn.setFont(FontSize.smallFont);
         priorityColumn = new CheckBox(Localization.lang("Show priority"));
-        priorityColumn.setFont(font);
+        priorityColumn.setFont(FontSize.smallFont);
         relevanceColumn = new CheckBox(Localization.lang("Show relevance"));
-        relevanceColumn.setFont(font);
+        relevanceColumn.setFont(FontSize.smallFont);
         printedColumn = new CheckBox(Localization.lang("Show printed status"));
-        printedColumn.setFont(font);
+        printedColumn.setFont(FontSize.smallFont);
         readStatusColumn = new CheckBox(Localization.lang("Show read status"));
-        readStatusColumn.setFont(font);
+        readStatusColumn.setFont(FontSize.smallFont);
 
         // "sync keywords" and "write special" fields may be configured mutually exclusive only
         // The implementation supports all combinations (TRUE+TRUE and FALSE+FALSE, even if the latter does not make sense)
         // To avoid confusion, we opted to make the setting mutually exclusive
         syncKeywords = new RadioButton(Localization.lang("Synchronize with keywords"));
-        syncKeywords.setFont(font);
+        syncKeywords.setFont(FontSize.smallFont);
         writeSpecialFields = new RadioButton(Localization.lang("Write values of special fields as separate fields to BibTeX"));
-        writeSpecialFields.setFont(font);
+        writeSpecialFields.setFont(FontSize.smallFont);
 
         specialFieldsEnabled = new CheckBox(Localization.lang("Enable special fields"));
-        specialFieldsEnabled.setFont(font);
+        specialFieldsEnabled.setFont(FontSize.smallFont);
         specialFieldsEnabled.setOnAction(event -> {
             boolean isEnabled = specialFieldsEnabled.isSelected();
             rankingColumn.setDisable(!isEnabled);
@@ -292,52 +288,50 @@ class TableColumnsTab extends Pane implements PrefsTab {
             writeSpecialFields.setDisable(!isEnabled);
         });
 
-        Label label = new Label(Localization.lang("Special table columns") + "  ------------------------------------");
-        label.setFont(font1);
-        builder.add(label,1,1);
+        Label specialTableColumns = new Label(Localization.lang("Special table columns") + "  ------------------------------------");
+        specialTableColumns.setFont(FontSize.bigFont);
+        builder.add(specialTableColumns, 1, 1);
 
         GridPane specialTableColumnsBuilder = new GridPane();
-        specialTableColumnsBuilder.add(specialFieldsEnabled,1,1);
-        specialTableColumnsBuilder.add(rankingColumn,1,2);
-        specialTableColumnsBuilder.add(relevanceColumn, 1,3);
-        specialTableColumnsBuilder.add(qualityColumn, 1,4);
-        specialTableColumnsBuilder.add(priorityColumn, 1,5);
-        specialTableColumnsBuilder.add(printedColumn, 1,6);
-        specialTableColumnsBuilder.add(readStatusColumn, 1,7);
-        specialTableColumnsBuilder.add(syncKeywords, 1,8);
-        specialTableColumnsBuilder.add(writeSpecialFields, 1,9);
-        specialTableColumnsBuilder.add(helpButton, 1,10);
+        specialTableColumnsBuilder.add(specialFieldsEnabled, 1, 1);
+        specialTableColumnsBuilder.add(rankingColumn, 1, 2);
+        specialTableColumnsBuilder.add(relevanceColumn,  1, 3);
+        specialTableColumnsBuilder.add(qualityColumn, 1, 4);
+        specialTableColumnsBuilder.add(priorityColumn, 1, 5);
+        specialTableColumnsBuilder.add(printedColumn, 1, 6);
+        specialTableColumnsBuilder.add(readStatusColumn, 1, 7);
+        specialTableColumnsBuilder.add(syncKeywords, 1, 8);
+        specialTableColumnsBuilder.add(writeSpecialFields, 1, 9);
+        specialTableColumnsBuilder.add(helpButton, 1, 10);
 
-        specialTableColumnsBuilder.add(fileColumn, 2,1);
-        specialTableColumnsBuilder.add(urlColumn, 2,2);
-        specialTableColumnsBuilder.add(preferUrl,2,3);
-        specialTableColumnsBuilder.add(preferDoi, 2,4);
-        specialTableColumnsBuilder.add(arxivColumn, 2,5);
+        specialTableColumnsBuilder.add(fileColumn, 2, 1);
+        specialTableColumnsBuilder.add(urlColumn, 2, 2);
+        specialTableColumnsBuilder.add(preferUrl, 2 ,3);
+        specialTableColumnsBuilder.add(preferDoi, 2, 4);
+        specialTableColumnsBuilder.add(arxivColumn, 2, 5);
 
-        specialTableColumnsBuilder.add(extraFileColumns,2,6);
-        specialTableColumnsBuilder.add(listOfFileColumnsScrollPane, 2,10);
+        specialTableColumnsBuilder.add(extraFileColumns,2, 6);
+        specialTableColumnsBuilder.add(listOfFileColumnsScrollPane, 2, 10);
 
-        builder.add(specialTableColumnsBuilder,1,2);
-
+        builder.add(specialTableColumnsBuilder, 1, 2);
 
         /*** end: special table columns and special fields ***/
-
-        builder.add(new Label(""),1,3);
-        Label label1 = new Label(Localization.lang("Entry table columns") + "  --------------------------------------");
-        label1.setFont(font1);
-        builder.add(label1,1,4);
-        builder.add(tabPanel,1,5);
+        builder.add(new Label(""), 1, 3);
+        Label entryTableColumns = new Label(Localization.lang("Entry table columns") + "  --------------------------------------");
+        entryTableColumns.setFont(FontSize.bigFont);
+        builder.add(entryTableColumns, 1, 4);
+        builder.add(tabPanel, 1, 5);
 
         Button buttonWidth = new Button("Update to current column widths");
-        buttonWidth.setPrefSize(200,30);
-        buttonWidth.setFont(font);
+        buttonWidth.setPrefSize(200, 30);
+        buttonWidth.setFont(FontSize.smallFont);
         buttonWidth.setOnAction(e->new UpdateWidthsAction());
         Button buttonOrder = new Button("Update to current column order");
-        buttonOrder.setPrefSize(200,30);
-        buttonOrder.setFont(font);
+        buttonOrder.setPrefSize(200, 30);
+        buttonOrder.setFont(FontSize.smallFont);
         buttonOrder.setOnAction(e->new UpdateOrderAction());
-        builder.add(buttonWidth,1,6);
-        builder.add(buttonOrder,1,7);
+        builder.add(buttonWidth, 1, 6);
+        builder.add(buttonOrder, 1, 7);
     }
 
     public GridPane getBuilder() {

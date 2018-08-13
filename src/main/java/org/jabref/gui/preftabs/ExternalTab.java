@@ -13,7 +13,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Font;
 
 import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
@@ -47,34 +46,30 @@ class ExternalTab extends JPanel implements PrefsTab {
 
     public ExternalTab(JabRefFrame frame, PreferencesDialog prefsDiag, JabRefPreferences prefs) {
         this.prefs = prefs;
-
-        Font font = new Font(10);
-        Font font1 = new Font(14);
         Button editFileTypes = new Button(Localization.lang("Manage external file types"));
-        editFileTypes.setFont(font);
+        editFileTypes.setFont(FontSize.smallFont);
         citeCommand = new TextField();
         editFileTypes.setOnAction(e->ExternalFileTypeEditor.getAction());
-
         defaultConsole = new RadioButton(Localization.lang("Use default terminal emulator"));
-        defaultConsole.setFont(font);
+        defaultConsole.setFont(FontSize.smallFont);
         executeConsole = new RadioButton(Localization.lang("Execute command") + ":");
-        executeConsole.setFont(font);
+        executeConsole.setFont(FontSize.smallFont);
         consoleCommand = new TextField();
         browseButton = new Button(Localization.lang("Browse"));
-        browseButton.setFont(font);
+        browseButton.setFont(FontSize.smallFont);
         adobeAcrobatReader = new RadioButton(Localization.lang("Adobe Acrobat Reader"));
-        adobeAcrobatReader.setFont(font);
+        adobeAcrobatReader.setFont(FontSize.smallFont);
         adobeAcrobatReaderPath = new TextField();
         Button browseAdobeAcrobatReader = new Button(Localization.lang("Browse"));
-        browseAdobeAcrobatReader.setFont(font);
+        browseAdobeAcrobatReader.setFont(FontSize.smallFont);
         sumatraReader = new RadioButton(Localization.lang("Sumatra Reader"));
-        sumatraReader.setFont(font);
+        sumatraReader.setFont(FontSize.smallFont);
         sumatraReaderPath = new TextField();
         Button browseSumatraReader = new Button(Localization.lang("Browse"));
-        browseSumatraReader.setFont(font);
+        browseSumatraReader.setFont(FontSize.smallFont);
 
         Label commandDescription = new Label(Localization.lang("Note: Use the placeholder %0 for the location of the opened library file.", "%DIR"));
-        commandDescription.setFont(font);
+        commandDescription.setFont(FontSize.smallFont);
         defaultConsole.setOnAction(e -> updateExecuteConsoleButtonAndFieldEnabledState());
         executeConsole.setOnAction(e -> updateExecuteConsoleButtonAndFieldEnabledState());
         browseButton.setOnAction(e -> showConsoleChooser());
@@ -82,41 +77,40 @@ class ExternalTab extends JPanel implements PrefsTab {
         browseAdobeAcrobatReader.setOnAction(e -> showAdobeChooser());
 
         GridPane consoleOptionPanel = new GridPane();
-        consoleOptionPanel.add(defaultConsole, 1,1);
-        consoleOptionPanel.add(executeConsole, 1,2);
-        consoleOptionPanel.add(consoleCommand, 2,2);
-        consoleOptionPanel.add(browseButton, 3,2);
-        consoleOptionPanel.add(commandDescription, 2,3);
+        consoleOptionPanel.add(defaultConsole,  1, 1);
+        consoleOptionPanel.add(executeConsole,  1, 2);
+        consoleOptionPanel.add(consoleCommand,  2, 2);
+        consoleOptionPanel.add(browseButton,  3, 2);
+        consoleOptionPanel.add(commandDescription,  2, 3);
 
         GridPane pdfOptionPanel = new GridPane();
-        pdfOptionPanel.add(adobeAcrobatReader, 1,1);
-        pdfOptionPanel.add(adobeAcrobatReaderPath, 2,1);
-        pdfOptionPanel.add(browseAdobeAcrobatReader, 3,1);
+        pdfOptionPanel.add(adobeAcrobatReader,  1, 1);
+        pdfOptionPanel.add(adobeAcrobatReaderPath,  2, 1);
+        pdfOptionPanel.add(browseAdobeAcrobatReader,  3, 1);
 
         if (OS.WINDOWS) {
             browseSumatraReader.setOnAction(e -> showSumatraChooser());
-            pdfOptionPanel.add(sumatraReader, 1,2);
-            pdfOptionPanel.add(sumatraReaderPath, 2,2);
-            pdfOptionPanel.add(browseSumatraReader, 3,2);
+            pdfOptionPanel.add(sumatraReader,  1, 2);
+            pdfOptionPanel.add(sumatraReaderPath,  2, 2);
+            pdfOptionPanel.add(browseSumatraReader,  3, 2);
         }
 
-        Label label = new Label(Localization.lang("Sending of emails") + "  ----------------------------");
-        label.setFont(font1);
-        builder.add(label,1,1);
-        Label lab = new Label(Localization.lang("Subject for sending an email with references").concat(":"));
-        lab.setFont(font);
-        builder.add(lab,1,2);
+        Label sendingOfEmails = new Label(Localization.lang("Sending of emails") + "  ----------------------------");
+        sendingOfEmails.setFont(FontSize.bigFont);
+        builder.add(sendingOfEmails, 1, 1);
+        Label subject = new Label(Localization.lang("Subject for sending an email with references").concat(":"));
+        subject.setFont(FontSize.smallFont);
+        builder.add(subject, 1, 2);
         emailSubject = new TextField();
-        builder.add(emailSubject,2,2);
+        builder.add(emailSubject, 2, 2);
         openFoldersOfAttachedFiles = new CheckBox(Localization.lang("Automatically open folders of attached files"));
-        openFoldersOfAttachedFiles.setFont(font);
-        builder.add(openFoldersOfAttachedFiles,1,3);
+        openFoldersOfAttachedFiles.setFont(FontSize.smallFont);
+        builder.add(openFoldersOfAttachedFiles, 1, 3);
 
-        builder.add(new Label(""),1,4);
-        Label label1 = new Label(Localization.lang("External programs") + "  ----------------------------");
-        label1.setFont(font1);
-        builder.add(label1,1,5);
-
+        builder.add(new Label(""), 1, 4);
+        Label externalPrograms = new Label(Localization.lang("External programs") + "  ----------------------------");
+        externalPrograms.setFont(FontSize.bigFont);
+        builder.add(externalPrograms, 1, 5);
 
         GridPane butpan = new GridPane();
         int index = 0;
@@ -125,28 +119,26 @@ class ExternalTab extends JPanel implements PrefsTab {
             index++;
         }
 
-        builder.add(butpan,1,6);
+        builder.add(butpan, 1, 6);
 
-        lab = new Label(Localization.lang("Cite command") + ':');
-        lab.setFont(font);
-        builder.add(lab,1,7);
-        builder.add(citeCommand,2,7);
+        Label citeCommandLabel = new Label(Localization.lang("Cite command") + ':');
+        citeCommandLabel.setFont(FontSize.smallFont);
+        builder.add(citeCommandLabel, 1, 7);
+        builder.add(citeCommand, 2, 7);
+        builder.add(editFileTypes, 1, 8);
+        builder.add(new Label(""), 1, 9);
+        Label openConsole = new Label(Localization.lang("Open console") + "  ---------------------------------");
+        openConsole.setFont(FontSize.bigFont);
+        builder.add(openConsole, 1, 10);
 
-        builder.add(editFileTypes,1,8);
+        builder.add(consoleOptionPanel, 1, 11);
+        builder.add(new Label(""), 1, 12);
 
-        builder.add(new Label(""),1,9);
-        Label label2 = new Label(Localization.lang("Open console") + "  ---------------------------------");
-        label2.setFont(font1);
-        builder.add(label2,1,10);
+        Label openPdf = new Label(Localization.lang("Open PDF") + "  -------------------------------------");
+        openPdf.setFont(FontSize.bigFont);
+        builder.add(openPdf,  1, 12);
 
-        builder.add(consoleOptionPanel,1,11);
-        builder.add(new Label(""),1,12);
-
-        Label label3 = new Label(Localization.lang("Open PDF") + "  -------------------------------------");
-        label3.setFont(font1);
-        builder.add(label3, 1,12);
-
-        builder.add(pdfOptionPanel,1,13);
+        builder.add(pdfOptionPanel, 1, 13);
         JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
         setLayout(new BorderLayout());
         add(panel, BorderLayout.CENTER);
@@ -159,13 +151,13 @@ class ExternalTab extends JPanel implements PrefsTab {
     private void addSettingsButton(final PushToApplication application, GridPane panel, int index) {
         PushToApplicationSettings settings = PushToApplications.getSettings(application);
         Button button = new Button(Localization.lang("Settings for %0", application.getApplicationName()));
-        button.setFont(new Font(10));
-        button.setPrefSize(150,20);
-        button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(null, settings,index));
+        button.setFont(FontSize.smallFont);
+        button.setPrefSize(150, 20);
+        button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(null, settings, index));
         if (index % 2 == 0) {
-            panel.add(button,1, index / 2 + 1);
+            panel.add(button, 1, index / 2 + 1);
         } else {
-            panel.add(button,2, index / 2 + 1);
+            panel.add(button, 2, index / 2 + 1);
         }
     }
 

@@ -1,5 +1,6 @@
 package org.jabref.gui.preftabs;
 
+import java.io.FileOutputStream;
 import java.util.Optional;
 
 import javafx.scene.control.Button;
@@ -11,7 +12,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
-import javafx.scene.text.Font;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
@@ -43,24 +43,21 @@ class AdvancedTab extends Pane implements PrefsTab {
         preferences = prefs;
         remotePreferences = prefs.getRemotePreferences();
 
-        Font font = new Font(10);
-        Font font1 = new Font(14);
-
         useRemoteServer = new CheckBox(Localization.lang("Listen for remote operation on port") + ':');
-        useRemoteServer.setFont(font);
+        useRemoteServer.setFont(FontSize.smallFont);
         useIEEEAbrv = new CheckBox(Localization.lang("Use IEEE LaTeX abbreviations"));
-        useIEEEAbrv.setFont(font);
+        useIEEEAbrv.setFont(FontSize.smallFont);
         remoteServerPort = new TextField();
         useCaseKeeperOnSearch = new CheckBox(Localization.lang("Add {} to specified title words on search to keep the correct case"));
-        useCaseKeeperOnSearch.setFont(font);
+        useCaseKeeperOnSearch.setFont(FontSize.smallFont);
         useUnitFormatterOnSearch = new CheckBox(Localization.lang("Format units by adding non-breaking separators and keeping the correct case on search"));
-        useUnitFormatterOnSearch.setFont(font);
+        useUnitFormatterOnSearch.setFont(FontSize.smallFont);
 
-        Label label = new Label(Localization.lang("Remote operation") + "  -----------------------------");
-        label.setFont(font1);
-        builder.add(label,2,1);
-        builder.add(new Separator(),2,1);
-        builder.add(new Pane(),1,2);
+        Label remoteOperation = new Label(Localization.lang("Remote operation") + "  -----------------------------");
+        remoteOperation.setFont(FontSize.bigFont);
+        builder.add(remoteOperation, 2, 1);
+        builder.add(new Separator(), 2, 1);
+        builder.add(new Pane(), 1, 2);
         Label label1 = new Label(Localization.lang("This feature lets new files be opened or imported into an "
 
                 + "already running instance of JabRef<BR>instead of opening a new instance. For instance, this "
@@ -69,48 +66,48 @@ class AdvancedTab extends Pane implements PrefsTab {
 
                 + "<BR>Note that this will prevent you from running more than one instance of JabRef at a time."));
         label1.setVisible(false);
-        builder.add(label1,2,22);
+        builder.add(label1, 2, 22);
 
-        Label label2 = new Label("    This feature lets new files be opened or imported into an already running instance of JabRef instead of opening a new instance. For");
-        label2.setFont(font);
-        builder.add(label2,2,3);
-        Label label3 = new Label("instance, this is useful when you open a file in JabRef from your web browser. ");
-        label3.setFont(font);
-        builder.add(label3,2,4);
-        Label label4 = new Label("    Note that this will prevent you from running more than one instance of JabRef at a time.");
-        label4.setFont(font);
-        builder.add(label4,2,5);
-        builder.add(new Line(),2,6);
-        builder.add(new Pane(),2,7);
+        Label textLabel1 = new Label("    This feature lets new files be opened or imported into an already running instance of JabRef instead of opening a new instance. For");
+        textLabel1.setFont(FontSize.smallFont);
+        builder.add(textLabel1, 2, 3);
+        Label textLabel2 = new Label("instance, this is useful when you open a file in JabRef from your web browser. ");
+        textLabel2.setFont(FontSize.smallFont);
+        builder.add(textLabel2, 2, 4);
+        Label textLabel3 = new Label("    Note that this will prevent you from running more than one instance of JabRef at a time.");
+        textLabel3.setFont(FontSize.smallFont);
+        builder.add(textLabel3, 2, 5);
+        builder.add(new Line(), 2, 6);
+        builder.add(new Pane(), 2, 7);
 
         HBox p = new HBox();
         p.getChildren().add(useRemoteServer);
         p.getChildren().add(remoteServerPort);
-        Button button = new Button("?");
-        button.setFont(font);
-        button.setOnAction(event -> new HelpAction(HelpFile.REMOTE).getHelpButton().doClick());
-        p.getChildren().add(button);
+        Button helpButton = new Button("?");
+        helpButton.setFont(FontSize.smallFont);
+        helpButton.setOnAction(event -> new HelpAction(HelpFile.REMOTE).getHelpButton().doClick());
+        p.getChildren().add(helpButton);
 
-        builder.add(p,2,9);
-        builder.add(new Label(""),1,10);
+        builder.add(p, 2, 9);
+        builder.add(new Label(""), 1, 10);
 
-        Label label5 = new Label(Localization.lang("Search %0", "IEEEXplore") + "  -----------------------------");
-        label5.setFont(font1);
-        builder.add(label5,2,11);
-        builder.add(new Separator(),2,11);
-        builder.add(new Pane(),2,12);
-        builder.add(useIEEEAbrv,2,13);
+        Label explore = new Label(Localization.lang("Search %0", "IEEEXplore") + "  -----------------------------");
+        explore.setFont(FontSize.bigFont);
+        builder.add(explore, 2, 11);
+        builder.add(new Separator(), 2, 11);
+        builder.add(new Pane(), 2, 12);
+        builder.add(useIEEEAbrv, 2, 13);
 
-        builder.add(new Line(),2,16);
-        builder.add(new Label(""),1,17);
+        builder.add(new Line(), 2, 16);
+        builder.add(new Label(""), 1, 17);
 
-        Label label6 = new Label(Localization.lang("Import conversions") + "  ----------------------------");
-        label6.setFont(font1);
-        builder.add(label6,2,18);
+        Label importConversions = new Label(Localization.lang("Import conversions") + "  ----------------------------");
+        importConversions.setFont(FontSize.bigFont);
+        builder.add(importConversions, 2, 18);
 
-        builder.add(useCaseKeeperOnSearch,2,19);
-        builder.add(new Pane(),2,20);
-        builder.add(useUnitFormatterOnSearch,2,21);
+        builder.add(useCaseKeeperOnSearch, 2, 19);
+        builder.add(new Pane(), 2, 20);
+        builder.add(useUnitFormatterOnSearch, 2, 21);
 
     }
 

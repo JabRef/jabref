@@ -5,7 +5,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Font;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -36,8 +35,8 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
 
     public BibtexKeyPatternPrefTab(JabRefPreferences prefs, BasePanel panel) {
         super(panel);
-        builder.add(super.getPanel(),1,1);
-        builder.add(new Label(""),1,2);
+        builder.add(super.getPanel(), 1, 1);
+        builder.add(new Label(""), 1, 2);
         this.prefs = prefs;
         appendKeyGeneratorSettings();
     }
@@ -52,7 +51,6 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
 
         // Set the default value:
         Globals.prefs.put(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, defaultPat.getText());
-
         Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, warnBeforeOverwriting.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY, dontOverwrite.isSelected());
 
@@ -80,34 +78,30 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
 
     private void appendKeyGeneratorSettings() {
         // Build a panel for checkbox settings:
+        autoGenerateOnImport.setFont(FontSize.smallFont);
+        letterStartA.setFont(FontSize.smallFont);
+        warnBeforeOverwriting.setFont(FontSize.smallFont);
+        letterStartB.setFont(FontSize.smallFont);
+        dontOverwrite.setFont(FontSize.smallFont);
+        alwaysAddLetter.setFont(FontSize.smallFont);
+        generateOnSave.setFont(FontSize.smallFont);
 
-        Font font = new Font(10);
-        Font font1 = new Font(14);
+        Label keyGeneratorSettings = new Label(Localization.lang("Key generator settings") + "  --------------------------");
+        keyGeneratorSettings.setFont(FontSize.bigFont);
+        builder.add(keyGeneratorSettings, 1, 10);
+        builder.add(autoGenerateOnImport, 1, 11);
+        builder.add(letterStartA, 2, 11);
+        builder.add(warnBeforeOverwriting, 1, 12);
+        builder.add(letterStartB, 2, 12);
+        builder.add(dontOverwrite, 1, 13);
+        builder.add(alwaysAddLetter, 2, 13);
+        builder.add(generateOnSave, 1, 14);
 
-        autoGenerateOnImport.setFont(font);
-        letterStartA.setFont(font);
-        warnBeforeOverwriting.setFont(font);
-        letterStartB.setFont(font);
-        dontOverwrite.setFont(font);
-        alwaysAddLetter.setFont(font);
-        generateOnSave.setFont(font);
+        builder.add((new Label(Localization.lang("Replace (regular expression)") + ':')), 1, 15);
+        builder.add(new Label(Localization.lang("by") + ':'), 2, 15);
 
-        Label label = new Label(Localization.lang("Key generator settings") + "  --------------------------");
-        label.setFont(font1);
-        builder.add(label,1,10);
-        builder.add(autoGenerateOnImport,1,11);
-        builder.add(letterStartA,2,11);
-        builder.add(warnBeforeOverwriting,1,12);
-        builder.add(letterStartB,2,12);
-        builder.add(dontOverwrite,1,13);
-        builder.add(alwaysAddLetter,2,13);
-        builder.add(generateOnSave,1,14);
-
-        builder.add((new Label(Localization.lang("Replace (regular expression)") + ':')),1,15);
-        builder.add(new Label(Localization.lang("by") + ':'),2,15);
-
-        builder.add(keyPatternRegex,1,16);
-        builder.add(keyPatternReplacement,2,16);
+        builder.add(keyPatternRegex, 1, 16);
+        builder.add(keyPatternReplacement, 2, 16);
 
         dontOverwrite.setOnAction(e ->
         // Warning before overwriting is only relevant if overwriting can happen:

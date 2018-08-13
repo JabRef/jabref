@@ -8,7 +8,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.Font;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -34,18 +33,15 @@ public class NetworkTab extends Pane implements PrefsTab {
         this.dialogService = dialogService;
         this.preferences = preferences;
 
-        Font font = new Font(10);
-        Font font1 = new Font(14);
-
         useProxyCheckBox = new CheckBox(Localization.lang("Use custom proxy configuration"));
-        useProxyCheckBox.setFont(font);
+        useProxyCheckBox.setFont(FontSize.smallFont);
         hostnameTextField = new TextField();
         hostnameTextField.setDisable(true);
         portTextField = new TextField();
         portTextField.setDisable(true);
 
         useAuthenticationCheckBox = new CheckBox(Localization.lang("Proxy requires authentication"));
-        useAuthenticationCheckBox.setFont(font);
+        useAuthenticationCheckBox.setFont(FontSize.smallFont);
         useAuthenticationCheckBox.setDisable(true);
 
         usernameTextField = new TextField();
@@ -53,7 +49,7 @@ public class NetworkTab extends Pane implements PrefsTab {
         passwordTextField = new PasswordField();
         passwordTextField.setDisable(true);
         Label passwordWarningLabel = new Label(Localization.lang("Attention: Password is stored in plain text!"));
-        passwordWarningLabel.setFont(font);
+        passwordWarningLabel.setFont(FontSize.smallFont);
         passwordWarningLabel.setDisable(true);
         passwordWarningLabel.setTextFill(Paint.valueOf("Red"));
 
@@ -70,30 +66,29 @@ public class NetworkTab extends Pane implements PrefsTab {
             passwordWarningLabel.setDisable(!useProxyCheckBox.isSelected() || !useAuthenticationCheckBox.isSelected());
         });
 
-        Label label = new Label(Localization.lang("Network") + "  ---------------------------------");
-        label.setFont(font1);
-        builder.add(label,1,1);
-        builder.add(new Separator(),2,1);
-        builder.add(useProxyCheckBox,2,2);
-        Label label1 = new Label(Localization.lang("Hostname") + ':');
-        label1.setFont(font);
-        builder.add(label1,1,3);
-        builder.add(hostnameTextField,2,3);
-        Label label2 = new Label(Localization.lang("Port") + ':');
-        label2.setFont(font);
-        builder.add(label2,1,4);
-        builder.add(portTextField,2,4);
-        builder.add(useAuthenticationCheckBox,2,5);
-        Label label3 = new Label(Localization.lang("Username") + ':');
-        label3.setFont(font);
-        builder.add(label3,2,6);
-        builder.add(usernameTextField,3,6);
-        Label label4 = new Label(Localization.lang("Password") + ':');
-        label4.setFont(font);
-        builder.add(label4,2,7);
-        builder.add(passwordTextField,3,7);
-        builder.add(passwordWarningLabel,3,8);
-
+        Label network = new Label(Localization.lang("Network") + "  ---------------------------------");
+        network.setFont(FontSize.bigFont);
+        builder.add(network, 1, 1);
+        builder.add(new Separator(), 2, 1);
+        builder.add(useProxyCheckBox, 2, 2);
+        Label hostname = new Label(Localization.lang("Hostname") + ':');
+        hostname.setFont(FontSize.smallFont);
+        builder.add(hostname, 1, 3);
+        builder.add(hostnameTextField, 2, 3);
+        Label port = new Label(Localization.lang("Port") + ':');
+        port.setFont(FontSize.smallFont);
+        builder.add(port, 1, 4);
+        builder.add(portTextField, 2, 4);
+        builder.add(useAuthenticationCheckBox, 2, 5);
+        Label username = new Label(Localization.lang("Username") + ':');
+        username.setFont(FontSize.smallFont);
+        builder.add(username, 2, 6);
+        builder.add(usernameTextField, 3, 6);
+        Label password = new Label(Localization.lang("Password") + ':');
+        password.setFont(FontSize.smallFont);
+        builder.add(password, 2, 7);
+        builder.add(passwordTextField, 3, 7);
+        builder.add(passwordWarningLabel, 3, 8);
     }
 
     public GridPane getBuilder() {

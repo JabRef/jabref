@@ -7,7 +7,6 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.text.Font;
 
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
@@ -44,41 +43,38 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
     public EntryEditorPrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
         autoCompletePreferences = prefs.getAutoCompletePreferences();
-        Font font = new Font(10);
-        Font font1 = new Font(14);
-
         autoOpenForm = new CheckBox(Localization.lang("Open editor when a new entry is created"));
-        autoOpenForm.setFont(font);
+        autoOpenForm.setFont(FontSize.smallFont);
         defSource = new CheckBox(Localization.lang("Show BibTeX source by default"));
-        defSource.setFont(font);
+        defSource.setFont(FontSize.smallFont);
         emacsMode = new CheckBox(Localization.lang("Use Emacs key bindings"));
-        emacsMode.setFont(font);
+        emacsMode.setFont(FontSize.smallFont);
         emacsRebindCtrlA = new CheckBox(Localization.lang("Rebind C-a, too"));
-        emacsRebindCtrlA.setFont(font);
+        emacsRebindCtrlA.setFont(FontSize.smallFont);
         emacsRebindCtrlF = new CheckBox(Localization.lang("Rebind C-f, too"));
-        emacsRebindCtrlF.setFont(font);
+        emacsRebindCtrlF.setFont(FontSize.smallFont);
         autoComplete = new CheckBox(Localization.lang("Enable word/name autocompletion"));
-        autoComplete.setFont(font);
+        autoComplete.setFont(FontSize.smallFont);
         recommendations = new CheckBox(Localization.lang("Show 'Related Articles' tab"));
-        recommendations.setFont(font);
+        recommendations.setFont(FontSize.smallFont);
         validation = new CheckBox(Localization.lang("Show validation messages"));
-        validation.setFont(font);
+        validation.setFont(FontSize.smallFont);
 
         // allowed name formats
         autoCompFF = new RadioButton(Localization.lang("Autocomplete names in 'Firstname Lastname' format only"));
-        autoCompFF.setFont(font);
+        autoCompFF.setFont(FontSize.smallFont);
         autoCompLF = new RadioButton(Localization.lang("Autocomplete names in 'Lastname, Firstname' format only"));
-        autoCompLF.setFont(font);
+        autoCompLF.setFont(FontSize.smallFont);
         autoCompBoth = new RadioButton(Localization.lang("Autocomplete names in both formats"));
-        autoCompBoth.setFont(font);
+        autoCompBoth.setFont(FontSize.smallFont);
 
         // treatment of first name
         firstNameModeFull = new RadioButton(Localization.lang("Use full firstname whenever possible"));
-        firstNameModeFull.setFont(font);
+        firstNameModeFull.setFont(FontSize.smallFont);
         firstNameModeAbbr = new RadioButton(Localization.lang("Use abbreviated firstname whenever possible"));
-        firstNameModeAbbr.setFont(font);
+        firstNameModeAbbr.setFont(FontSize.smallFont);
         firstNameModeBoth = new RadioButton(Localization.lang("Use abbreviated and full firstname"));
-        firstNameModeBoth.setFont(font);
+        firstNameModeBoth.setFont(FontSize.smallFont);
 
         // We need a listener on showSource to enable and disable the source panel-related choices:
         emacsMode.setOnAction(event -> emacsRebindCtrlA.setDisable(!emacsMode.isSelected()));
@@ -86,51 +82,49 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         // We need a listener on showSource to enable and disable the source panel-related choices:
         emacsMode.setOnAction(event -> emacsRebindCtrlF.setDisable(!emacsMode.isSelected()));
 
-
         autoCompFields = new TextField();
         // We need a listener on autoComplete to enable and disable the
         // autoCompFields text field:
         autoComplete.setOnAction(event -> setAutoCompleteElementsEnabled(autoComplete.isSelected()));
 
-        Label label = new Label(Localization.lang("Editor options") + "  -------------------------------------");
-        label.setFont(font1);
-        builder.add(label,1,1);
-        builder.add(new Separator(),2,1);
-        builder.add(autoOpenForm, 1,2);
-        builder.add(defSource, 1,3);
-        builder.add(emacsMode,1,4);
-        builder.add(emacsRebindCtrlA,1,5);
-        builder.add(emacsRebindCtrlF, 1,6);
-        builder.add(recommendations, 1,7);
-        builder.add(validation, 1,8);
-        builder.add(new Label(""),1,9);
+        Label editorOptions = new Label(Localization.lang("Editor options") + "  -------------------------------------");
+        editorOptions.setFont(FontSize.bigFont);
+        builder.add(editorOptions, 1, 1);
+        builder.add(new Separator(), 2, 1);
+        builder.add(autoOpenForm,  1, 2);
+        builder.add(defSource,  1, 3);
+        builder.add(emacsMode, 1, 4);
+        builder.add(emacsRebindCtrlA, 1, 5);
+        builder.add(emacsRebindCtrlF, 1, 6);
+        builder.add(recommendations, 1, 7);
+        builder.add(validation, 1, 8);
+        builder.add(new Label(""), 1, 9);
 
-        Label label1 = new Label(Localization.lang("Autocompletion options") + "  --------------------------");
-        label1.setFont(font1);
-        builder.add(label1,1,10);
-        builder.add(autoComplete, 1,11);
+        Label autocompletionOptions = new Label(Localization.lang("Autocompletion options") + "  --------------------------");
+        autocompletionOptions.setFont(FontSize.bigFont);
+        builder.add(autocompletionOptions, 1, 10);
+        builder.add(autoComplete,   1, 11);
 
-        Label label2 = new Label("       " + Localization.lang("Use autocompletion for the following fields") + ":");
-        label2.setFont(font);
-        builder.add(label2,1,12);
-        builder.add(autoCompFields,2,12);
-        builder.add(new Label(""),1,13);
+        Label useFields = new Label("       " + Localization.lang("Use autocompletion for the following fields") + ":");
+        useFields.setFont(FontSize.smallFont);
+        builder.add(useFields, 1, 12);
+        builder.add(autoCompFields, 2, 12);
+        builder.add(new Label(""), 1, 13);
 
-        Label label3 = new Label(Localization.lang("Name format used for autocompletion") + "  ----------");
-        label3.setFont(font1);
-        builder.add(label3,1,14);
-        builder.add(autoCompFF,1,15);
-        builder.add(autoCompLF, 1,16);
-        builder.add(autoCompBoth, 1,17);
-        builder.add(new Label(""),1,18);
+        Label nameFormat = new Label(Localization.lang("Name format used for autocompletion") + "  ----------");
+        nameFormat.setFont(FontSize.bigFont);
+        builder.add(nameFormat, 1, 14);
+        builder.add(autoCompFF, 1, 15);
+        builder.add(autoCompLF,  1, 16);
+        builder.add(autoCompBoth,  1, 17);
+        builder.add(new Label(""), 1, 18);
 
-        Label label4 = new Label(Localization.lang("Treatment of first names") + "  --------------------------");
-        label4.setFont(font1);
-        builder.add(label4,1,19);
-        builder.add(firstNameModeAbbr, 1,20);
-        builder.add(firstNameModeFull,1,21);
-        builder.add(firstNameModeBoth, 1,22);
-
+        Label treatment = new Label(Localization.lang("Treatment of first names") + "  --------------------------");
+        treatment.setFont(FontSize.bigFont);
+        builder.add(treatment, 1, 19);
+        builder.add(firstNameModeAbbr,  1, 20);
+        builder.add(firstNameModeFull, 1, 21);
+        builder.add(firstNameModeBoth,  1, 22);
     }
 
     public GridPane getBuilder() {

@@ -17,7 +17,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 
 import org.jabref.Globals;
 import org.jabref.JabRefException;
@@ -138,7 +137,6 @@ public class PreferencesDialog extends BaseDialog<Void> {
     private void construct() {
         VBox vBox = new VBox();
         vBox.setPrefSize(150,800);
-        Font font = new Font(9);
         Button []button = new Button[20];
 
         button[0] = new Button(Localization.lang("General"));
@@ -178,10 +176,10 @@ public class PreferencesDialog extends BaseDialog<Void> {
         button[18] = new Button(Localization.lang("Show preferences"));
         button[19] = new Button(Localization.lang("Reset preferences"));
         for (int i = 0; i < button.length; i++) {
-            button[i].setFont(font);
+            button[i].setFont(FontSize.smallFont);
             button[i].setEffect(null);
             button[i].setAlignment(Pos.BASELINE_LEFT);
-            button[i].setPrefSize(120,20);
+            button[i].setPrefSize(130,20);
         }
 
         for (int i = 0; i < 16; i++) {

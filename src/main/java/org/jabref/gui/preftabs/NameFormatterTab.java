@@ -19,7 +19,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.text.Font;
 
 import org.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
@@ -100,7 +99,7 @@ public class NameFormatterTab extends Pane implements PrefsTab {
         firstCol.setPrefWidth(140);
         lastCol.setPrefWidth(200);
         table.setItems(data);
-        table.getColumns().addAll(firstCol,lastCol);
+        table.getColumns().addAll(firstCol, lastCol);
         final TextField addName = new TextField();
         addName.setPromptText("name");
         addName.setMaxWidth(100);
@@ -115,10 +114,10 @@ public class NameFormatterTab extends Pane implements PrefsTab {
         scrollPane.setContent(table);
         tabPanel.setCenter(scrollPane);
 
-        Label label1 = new Label(Localization.lang("Insert rows"));
-        label1.setVisible(false);
+        Label insertRows = new Label(Localization.lang("Insert rows"));
+        insertRows.setVisible(false);
         Button add = new Button("Insert");
-        add.setFont(new Font(10));
+        add.setFont(FontSize.smallFont);
         add.setOnAction(e-> {
             if (!addName.getText().isEmpty() && !addLast.getText().isEmpty()) {
                 TableRow tableRow = new TableRow(addName.getText(), addLast.getText());
@@ -131,10 +130,10 @@ public class NameFormatterTab extends Pane implements PrefsTab {
                 table.refresh();
             }
         });
-        Label label2 = new Label(Localization.lang("Delete rows"));
-        label2.setVisible(false);
+        Label deleteRows = new Label(Localization.lang("Delete rows"));
+        deleteRows.setVisible(false);
         Button delete = new Button("Delete");
-        delete.setFont(new Font(10));
+        delete.setFont(FontSize.smallFont);
         delete.setOnAction(e-> {
             if (table.getFocusModel() != null && table.getFocusModel().getFocusedIndex() != -1) {
                 tableChanged = true;
@@ -146,18 +145,17 @@ public class NameFormatterTab extends Pane implements PrefsTab {
                 table.refresh();
             }});
         Button help = new Button("?");
-        help.setFont(new Font(10));
+        help.setFont(FontSize.smallFont);
         help.setOnAction(e-> new HelpAction(Localization.lang("Help on Name Formatting"),
                 HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER).getHelpButton().doClick());
         HBox toolbar = new HBox();
         toolbar.getChildren().addAll(addName, addLast,add,delete,help);
         tabPanel.setBottom(toolbar);
 
-        Label label = new Label(Localization.lang("Special name formatters") + "  ------------------------------------");
-        label.setFont(new Font(14));
-        builder.add(label,1,1);
-        builder.add(tabPanel,1,2);
-
+        Label specialNameFormatters = new Label(Localization.lang("Special name formatters") + "  ------------------------------------");
+        specialNameFormatters.setFont(FontSize.bigFont);
+        builder.add(specialNameFormatters, 1, 1);
+        builder.add(tabPanel, 1, 2);
     }
 
     public GridPane getBuilder() {

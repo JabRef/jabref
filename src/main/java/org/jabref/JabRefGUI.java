@@ -44,7 +44,7 @@ public class JabRefGUI {
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
     private final DialogService dialogService;
-    
+
     private final String focusedFile;
 
     public JabRefGUI(Stage mainStage, List<ParserResult> argsDatabases, boolean isBlank) {
@@ -58,6 +58,7 @@ public class JabRefGUI {
                 .flatMap(ParserResult::getFile)
                 .map(File::getAbsolutePath)
                 .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
+
         openWindow(mainStage);
         JabRefGUI.checkForNewVersion(false);
     }

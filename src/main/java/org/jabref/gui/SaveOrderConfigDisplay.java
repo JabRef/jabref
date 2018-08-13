@@ -45,12 +45,11 @@ public class SaveOrderConfigDisplay {
         List<String> fieldNames = InternalBibtexFields.getAllPublicFieldNames();
         fieldNames.add(BibEntry.KEY_FIELD);
         Collections.sort(fieldNames);
-        String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
-        savePriSort = new ComboBox<>(FXCollections.observableArrayList(allPlusKey));
+        savePriSort = new ComboBox<>(FXCollections.observableArrayList(fieldNames));
         savePriSort.setEditable(true);
-        saveSecSort = new ComboBox<>(FXCollections.observableArrayList(allPlusKey));
+        saveSecSort = new ComboBox<>(FXCollections.observableArrayList(fieldNames));
         saveSecSort.setEditable(true);
-        saveTerSort = new ComboBox<>(FXCollections.observableArrayList(allPlusKey));
+        saveTerSort = new ComboBox<>(FXCollections.observableArrayList(fieldNames));
         saveTerSort.setEditable(true);
 
         savePriDesc = new CheckBox(Localization.lang("Descending"));
@@ -59,25 +58,27 @@ public class SaveOrderConfigDisplay {
 
         Font font = new Font(10);
         GridPane builder = new GridPane();
-        Label label = new Label(Localization.lang("Primary sort criterion"));
-        label.setFont(font);
-        builder.add(label,1,1);
-        builder.add(savePriSort,2,1);
-        builder.add(savePriDesc,3,1);
+        Label primarySortCriterion = new Label(Localization.lang("Primary sort criterion"));
+        primarySortCriterion.setFont(font);
+        builder.add(primarySortCriterion, 1, 1);
+        builder.add(savePriSort, 2, 1);
+        builder.add(savePriDesc, 3, 1);
 
-        Label label1 = new Label(Localization.lang("Secondary sort criterion"));
-        label1.setFont(font);
-        builder.add(label1,1,2);
-        builder.add(saveSecSort,2,2);
-        builder.add(saveSecDesc,3,2);
+        Label secondarySortCriterion = new Label(Localization.lang("Secondary sort criterion"));
+        secondarySortCriterion.setFont(font);
+        builder.add(secondarySortCriterion, 1, 2);
+        builder.add(saveSecSort, 2, 2);
+        builder.add(saveSecDesc, 3, 2);
 
-        Label label2 = new Label(Localization.lang("Tertiary sort criterion"));
-        label2.setFont(font);
-        builder.add(label2,1, 3);
-        builder.add(saveTerSort,2,3);
-        builder.add(saveTerDesc,3,3);
+        Label tertiarySortCriterion = new Label(Localization.lang("Tertiary sort criterion"));
+        tertiarySortCriterion.setFont(font);
+        builder.add(tertiarySortCriterion, 1, 3);
+        builder.add(saveTerSort, 2, 3);
+        builder.add(saveTerDesc, 3, 3);
         panel = builder;
 
+        // initialization for the JPanel used in DatabasePropertiesDialog.java
+        String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
         JComboBox<String> savePriSort1 = new JComboBox<>(allPlusKey);
         savePriSort1.setEditable(true);
         JComboBox<String> saveSecSort1 = new JComboBox<>(allPlusKey);

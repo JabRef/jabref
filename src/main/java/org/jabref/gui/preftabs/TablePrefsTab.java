@@ -13,7 +13,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.text.Font;
 
 import org.jabref.Globals;
 import org.jabref.logic.l10n.Localization;
@@ -55,9 +54,6 @@ class TablePrefsTab extends Pane implements PrefsTab {
      */
     public TablePrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
-        Font font = new Font(10);
-        Font font1 = new Font(14);
-
         /**
          * Added Bibtexkey to combobox.
          *
@@ -74,21 +70,21 @@ class TablePrefsTab extends Pane implements PrefsTab {
         terSort = new ComboBox<>(FXCollections.observableArrayList(allPlusKey));
 
         autoResizeMode = new CheckBox(Localization.lang("Fit table horizontally on screen"));
-        autoResizeMode.setFont(font);
+        autoResizeMode.setFont(FontSize.smallFont);
         namesAsIs = new RadioButton(Localization.lang("Show names unchanged"));
-        namesAsIs.setFont(font);
+        namesAsIs.setFont(FontSize.smallFont);
         namesFf = new RadioButton(Localization.lang("Show 'Firstname Lastname'"));
-        namesFf.setFont(font);
+        namesFf.setFont(FontSize.smallFont);
         namesFl = new RadioButton(Localization.lang("Show 'Lastname, Firstname'"));
-        namesFl.setFont(font);
+        namesFl.setFont(FontSize.smallFont);
         namesNatbib = new RadioButton(Localization.lang("Natbib style"));
-        namesNatbib.setFont(font);
+        namesNatbib.setFont(FontSize.smallFont);
         noAbbrNames = new RadioButton(Localization.lang("Do not abbreviate names"));
-        noAbbrNames.setFont(font);
+        noAbbrNames.setFont(FontSize.smallFont);
         abbrNames = new RadioButton(Localization.lang("Abbreviate names"));
-        abbrNames.setFont(font);
+        abbrNames.setFont(FontSize.smallFont);
         lastNamesOnly = new RadioButton(Localization.lang("Show last names only"));
-        lastNamesOnly.setFont(font);
+        lastNamesOnly.setFont(FontSize.smallFont);
 
         priField = new TextField();
         secField = new TextField();
@@ -117,61 +113,62 @@ class TablePrefsTab extends Pane implements PrefsTab {
         });
 
         priDesc = new CheckBox(Localization.lang("Descending"));
-        priDesc.setFont(font);
+        priDesc.setFont(FontSize.smallFont);
         secDesc = new CheckBox(Localization.lang("Descending"));
-        secDesc.setFont(font);
+        secDesc.setFont(FontSize.smallFont);
         terDesc = new CheckBox(Localization.lang("Descending"));
-        terDesc.setFont(font);
+        terDesc.setFont(FontSize.smallFont);
 
-        Label label = new Label(Localization.lang("Format of author and editor names") + "  ----------------------");
-        label.setFont(font1);
-        builder.add(label,1,1);
-        builder.add(namesAsIs,1,2);
-        builder.add(noAbbrNames,2,2);
-        builder.add(namesFf,1,3);
-        builder.add(abbrNames,2,3);
-        builder.add(namesFl,1,4);
-        builder.add(lastNamesOnly,2,4);
-        builder.add(namesNatbib,1,5);
+        Label formatOfAuthor = new Label(Localization.lang("Format of author and editor names") + "  ----------------------");
+        formatOfAuthor.setFont(FontSize.bigFont);
+        builder.add(formatOfAuthor, 1, 1);
+        builder.add(namesAsIs, 1, 2);
+        builder.add(noAbbrNames, 2, 2);
+        builder.add(namesFf, 1, 3);
+        builder.add(abbrNames, 2, 3);
+        builder.add(namesFl, 1, 4);
+        builder.add(lastNamesOnly, 2, 4);
+        builder.add(namesNatbib, 1, 5);
 
         Label label1 = new Label("");
-        builder.add(label1,1,6);
+        builder.add(label1, 1, 6);
 
-        Label label2 = new Label(Localization.lang("Default sort criteria") + "  ----------------------------------------");
-        label2.setFont(font1);
-        builder.add(label2,1,7);
+        Label defaultSortCriteria = new Label(Localization.lang("Default sort criteria") + "  ----------------------------------------");
+        defaultSortCriteria.setFont(FontSize.bigFont);
+        builder.add(defaultSortCriteria, 1, 7);
         // Create a new panel with its own FormLayout for these items:
-        Label lab = new Label(Localization.lang("Primary sort criterion"));
-        lab.setFont(font);
-        builder.add(lab,1,8);
-        builder.add(priSort,2,8);
-        builder.add(priField,3,8);
-        builder.add(priDesc,4,8);
+        Label primarySortCriterion = new Label(Localization.lang("Primary sort criterion"));
+        primarySortCriterion.setFont(FontSize.smallFont);
+        builder.add(primarySortCriterion, 1, 8);
+        builder.add(priSort, 2, 8);
+        builder.add(priField, 3, 8);
+        builder.add(priDesc, 4, 8);
 
-        lab = new Label(Localization.lang("Secondary sort criterion"));
-        lab.setFont(font);
-        builder.add(lab,1,9);
-        builder.add(secSort,2,9);
-        builder.add(secField,3,9);
-        builder.add(secDesc,4,9);
+        Label secondarySortCriterion = new Label(Localization.lang("Secondary sort criterion"));
+        secondarySortCriterion.setFont(FontSize.smallFont);
+        builder.add(secondarySortCriterion, 1, 9);
+        builder.add(secSort, 2, 9);
+        builder.add(secField, 3, 9);
+        builder.add(secDesc, 4, 9);
 
-        lab = new Label(Localization.lang("Tertiary sort criterion"));
-        lab.setFont(font);
-        builder.add(lab,1,10);
-        builder.add(terSort,2,10);
-        builder.add(terField,3,10);
-        builder.add(terDesc,4,10);
+        Label tertiarySortCriterion = new Label(Localization.lang("Tertiary sort criterion"));
+        tertiarySortCriterion.setFont(FontSize.smallFont);
+        builder.add(tertiarySortCriterion, 1, 10);
+        builder.add(terSort, 2, 10);
+        builder.add(terField, 3, 10);
+        builder.add(terDesc, 4, 10);
 
-        Label label3 = new Label(Localization.lang("Sort the following fields as numeric fields") + ':');
-        builder.add(label3,1,11);
-        builder.add(numericFields,2,11);
+        Label sortFields = new Label(Localization.lang("Sort the following fields as numeric fields") + ':');
+        sortFields.setFont(FontSize.smallFont);
+        builder.add(sortFields, 1, 11);
+        builder.add(numericFields, 2, 11);
 
-        builder.add(new Label(""),1,12);
+        builder.add(new Label(""), 1, 12);
 
-        Label label4 = new Label(Localization.lang("General") + " ------------------------------------------------------");
-        label4.setFont(font1);
-        builder.add(label4,1,13);
-        builder.add(autoResizeMode,1,14);
+        Label general = new Label(Localization.lang("General") + " ------------------------------------------------------");
+        general.setFont(FontSize.bigFont);
+        builder.add(general, 1, 13);
+        builder.add(autoResizeMode, 1, 14);
         namesNatbib.setOnAction(e -> {
             abbrNames.setDisable(namesNatbib.isSelected());
             lastNamesOnly.setDisable(namesNatbib.isSelected());
