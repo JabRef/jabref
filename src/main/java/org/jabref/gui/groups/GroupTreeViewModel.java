@@ -7,8 +7,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javax.swing.SwingUtilities;
-
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
@@ -92,7 +90,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
 
         currentDatabase.ifPresent(database -> {
-            if (newValue == null || newValue.isEmpty()) {
+            if ((newValue == null) || newValue.isEmpty()) {
                 stateManager.clearSelectedGroups(database);
             } else {
                 stateManager.setSelectedGroups(database, newValue.stream().map(GroupNodeViewModel::getGroupNode).collect(Collectors.toList()));
@@ -135,8 +133,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Opens "New Group Dialog" and add the resulting group to the specified group
      */
     public void addNewSubgroup(GroupNodeViewModel parent) {
-        SwingUtilities.invokeLater(() -> {
-            Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialog());
+        Platform.runLater(() -> {
+            //        SwingUtilities.invokeLater(() -> {
+            //            Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialog());
+            Optional<AbstractGroup> newGroup = new GroupDialog().showAndWaitCustom();
             newGroup.ifPresent(group -> {
                 parent.addSubgroup(group);
 
@@ -161,9 +161,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Opens "Edit Group Dialog" and changes the given group to the edited one.
      */
     public void editGroup(GroupNodeViewModel oldGroup) {
-        SwingUtilities.invokeLater(() -> {
-            Optional<AbstractGroup> newGroup = dialogService
-                    .showCustomDialogAndWait(new GroupDialog(oldGroup.getGroupNode().getGroup()));
+        Platform.runLater(() -> {
+            //        SwingUtilities.invokeLater(() -> {
+            //            Optional<AbstractGroup> newGroup = dialogService
+            //                    .showCustomDialogAndWait(new GroupDialog(oldGroup.getGroupNode().getGroup()));
+            Optional<AbstractGroup> newGroup = new GroupDialog(oldGroup.getGroupNode().getGroup()).showAndWaitCustom();
             newGroup.ifPresent(group -> {
 
                 Platform.runLater(() -> {

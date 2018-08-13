@@ -1,48 +1,38 @@
 package org.jabref.gui;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
-import org.jabref.Globals;
-import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 /**
  * Asks for details about merge database operation.
  */
-public class MergeDialog extends JabRefDialog {
+public class MergeDialog extends FXDialog {
 
-    private final JPanel panel1 = new JPanel();
-    private final BorderLayout borderLayout1 = new BorderLayout();
-    private final JPanel jPanel1 = new JPanel();
-    private final JPanel jPanel2 = new JPanel();
-    private final JButton ok = new JButton();
-    private final JButton cancel = new JButton();
-    private final JCheckBox entries = new JCheckBox();
-    private final JCheckBox strings = new JCheckBox();
-    private final GridBagLayout gridBagLayout1 = new GridBagLayout();
-    private final JCheckBox groups = new JCheckBox();
-    private final JCheckBox selector = new JCheckBox();
+    private final Pane panel1 = new Pane();
+    private final Pane Panel1 = new Pane();
+    private final Pane Panel2 = new Pane();
+    private final Button ok = new Button();
+    private final Button cancel = new Button();
+    private final CheckBox entries = new CheckBox();
+    private final CheckBox strings = new CheckBox();
+    private final GridPane gridPane1 = new GridPane();
+    private final CheckBox groups = new CheckBox();
+    private final CheckBox selector = new CheckBox();
 
 
     private boolean okPressed;
 
     public MergeDialog(JabRefFrame frame, String title, boolean modal) {
-        super(title, modal, MergeDialog.class);
+      super(AlertType.NONE, Localization.lang("Append Library"));
         jbInit();
-        pack();
+
     }
 
     public boolean isOkPressed() {
@@ -50,16 +40,18 @@ public class MergeDialog extends JabRefDialog {
     }
 
     private void jbInit() {
-        panel1.setLayout(borderLayout1);
+
         ok.setText(Localization.lang("OK"));
-        ok.addActionListener(e -> {
-                okPressed = true;
-                dispose();
+        ok.setOnAction(oa->{
+          okPressed = true;
+          dispose();
         });
+        ok.setPrefWidth(100);
+        ok.setPrefHeight(30);
         cancel.setText(Localization.lang("Cancel"));
-        cancel.addActionListener(e -> dispose());
-        jPanel1.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        jPanel1.setLayout(gridBagLayout1);
+        cancel.setOnAction(oa-> dispose());
+        cancel.setPrefWidth(100);
+        cancel.setPrefHeight(30);
         entries.setSelected(true);
         entries.setText(Localization.lang("Import entries"));
         strings.setSelected(true);
@@ -67,33 +59,26 @@ public class MergeDialog extends JabRefDialog {
         groups.setText(Localization.lang("Import group definitions"));
         selector.setText(Localization.lang("Import word selector definitions"));
 
-        this.setModal(true);
-        this.setResizable(false);
-        getContentPane().add(panel1);
-        panel1.add(jPanel2, BorderLayout.SOUTH);
-        jPanel2.add(ok, null);
-        jPanel2.add(cancel, null);
-        panel1.add(jPanel1, BorderLayout.CENTER);
-        jPanel1.add(entries, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
-                , GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
-        jPanel1.add(strings, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0
-                , GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-        jPanel1.add(groups, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0
-                , GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-        jPanel1.add(selector, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
-                GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 
-        // Key bindings:
-        ActionMap am = jPanel1.getActionMap();
-        InputMap im = jPanel1.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
-        am.put("close", new AbstractAction() {
+        GridPane gp= new GridPane();
+        HBox optionButtons = new HBox();
+        getDialogPane().setContent(gp);
+        gp.setHgap(10);
+        gp.setVgap(10);
+        gp.setPadding(new Insets(15,5,0,0));
+        gp.add(entries, 0, 0);
+        gp.add(strings, 0, 1);
+        gp.add(groups, 0, 2);
+        gp.add(selector, 0, 3);
+        gp.add(optionButtons,0,4);
+        gp.setPadding(new Insets(15,5,0,0));
+        gp.setGridLinesVisible(false);
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
+        optionButtons.setAlignment(Pos.BOTTOM_CENTER);
+        optionButtons.setPadding(new Insets(15, 0, 0, 0));
+        optionButtons.setSpacing(35);
+        optionButtons.getChildren().add(ok);
+        optionButtons.getChildren().add(cancel);
 
     }
 
@@ -112,6 +97,15 @@ public class MergeDialog extends JabRefDialog {
     public boolean importSelectorWords() {
         return selector.isSelected();
     }
+
+    public void setVisible(boolean b) {
+      if (b) {
+          show();
+      } else {
+          hide();
+      }
+  }
+    private void dispose() {
+      ((Stage) (getDialogPane().getScene().getWindow())).close();
+  }
 }
-
-

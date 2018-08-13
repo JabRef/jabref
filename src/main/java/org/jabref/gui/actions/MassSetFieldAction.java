@@ -1,42 +1,35 @@
 package org.jabref.gui.actions;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
 import javax.swing.undo.UndoableEdit;
 
-import org.jabref.Globals;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.stage.Stage;
+
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.FXDialog;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-
 /**
  * An Action for launching mass field.
  *
@@ -47,22 +40,25 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class MassSetFieldAction extends SimpleCommand {
 
+    public javafx.scene.control.Dialog FXDialog = new javafx.scene.control.Dialog();
     private final JabRefFrame frame;
-    private JDialog diag;
-    private JRadioButton all;
-    private JRadioButton selected;
-    private JRadioButton clear;
-    private JRadioButton set;
-    private JRadioButton append;
-    private JRadioButton rename;
-    private JComboBox<String> field;
-    private JTextField textFieldSet;
-    private JTextField textFieldAppend;
-    private JTextField textFieldRename;
+    private FXDialog diag;
+    private RadioButton all;
+    private RadioButton selected;
+    private RadioButton clear;
+    private RadioButton set;
+    private RadioButton append;
+    private RadioButton rename;
+    private ComboBox<String> field;
+    private TextField textFieldSet;
+    private TextField textFieldAppend;
+    private TextField textFieldRename;
     private boolean canceled = true;
-    private JCheckBox overwrite;
+    private CheckBox overwrite;
+
 
     public MassSetFieldAction(JabRefFrame frame) {
+        //super(AlertType.NONE, Localization.lang("Set/clear/append/rename fields"), true);
         this.frame = frame;
     }
 
@@ -100,7 +96,8 @@ public class MassSetFieldAction extends SimpleCommand {
     }
 
     private void prepareDialog(boolean selection) {
-        selected.setEnabled(selection);
+
+        //selected.setEnabled(selection);
         if (selection) {
             selected.setSelected(true);
         } else {
@@ -112,8 +109,10 @@ public class MassSetFieldAction extends SimpleCommand {
         }
     }
 
+
     @Override
     public void execute() {
+
         BasePanel bp = frame.getCurrentBasePanel();
         if (bp == null) {
             return;
@@ -125,9 +124,7 @@ public class MassSetFieldAction extends SimpleCommand {
         }
         canceled = true;
         prepareDialog(!entries.isEmpty());
-        if (diag != null) {
-            diag.setVisible(true);
-        }
+
         if (canceled) {
             return;
         }
@@ -145,7 +142,11 @@ public class MassSetFieldAction extends SimpleCommand {
             toSet = null;
         }
 
-        String[] fields = getFieldNames(((String) field.getSelectedItem()).trim().toLowerCase(Locale.ROOT));
+        String[] fields = (String[]) field.getItems().toArray();
+        for (String s : fields) {
+            s = s.toLowerCase();
+        }
+
         NamedCompound compoundEdit = new NamedCompound(Localization.lang("Set field"));
         if (rename.isSelected()) {
             if (fields.length > 1) {
@@ -234,94 +235,29 @@ public class MassSetFieldAction extends SimpleCommand {
     }
 
     private void createDialog() {
-        diag = new JDialog((JFrame) null, Localization.lang("Set/clear/append/rename fields"), true);
+        diag = new FXDialog(AlertType.NONE, Localization.lang("Set/clear/append/rename fields"), true);
+        FXDialog.setTitle("Set/clear/append/rename fields");
 
-        field = new JComboBox<>();
+
+        field = new ComboBox<>();
         field.setEditable(true);
-        textFieldSet = new JTextField();
-        textFieldSet.setEnabled(false);
-        textFieldAppend = new JTextField();
-        textFieldAppend.setEnabled(false);
-        textFieldRename = new JTextField();
-        textFieldRename.setEnabled(false);
+        textFieldSet = new TextField();
 
-        JButton ok = new JButton(Localization.lang("OK"));
-        JButton cancel = new JButton(Localization.lang("Cancel"));
+        textFieldSet.setDisable(true);
+        textFieldAppend = new TextField();
 
-        all = new JRadioButton(Localization.lang("All entries"));
-        selected = new JRadioButton(Localization.lang("Selected entries"));
-        clear = new JRadioButton(Localization.lang("Clear fields"));
-        set = new JRadioButton(Localization.lang("Set fields"));
-        append = new JRadioButton(Localization.lang("Append to fields"));
-        rename = new JRadioButton(Localization.lang("Rename field to") + ":");
-        rename.setToolTipText(Localization.lang("Move contents of a field into a field with a different name"));
+        textFieldAppend.setDisable(true);
+        textFieldRename = new TextField();
 
-        Set<String> allFields = frame.getCurrentBasePanel().getDatabase().getAllVisibleFields();
+        textFieldRename.setDisable(true);
 
-        for (String f : allFields) {
-            field.addItem(f);
-        }
 
-        set.addChangeListener(e ->
-                // Entering a setText is only relevant if we are setting, not clearing:
-                textFieldSet.setEnabled(set.isSelected()));
-
-        append.addChangeListener(e -> {
-            // Text to append is only required if we are appending:
-            textFieldAppend.setEnabled(append.isSelected());
-            // Overwrite protection makes no sense if we are appending to a field:
-            overwrite.setEnabled(!clear.isSelected() && !append.isSelected());
-        });
-
-        clear.addChangeListener(e ->
-                // Overwrite protection makes no sense if we are clearing the field:
-                overwrite.setEnabled(!clear.isSelected() && !append.isSelected()));
-
-        rename.addChangeListener(e ->
-                // Entering a setText is only relevant if we are renaming
-                textFieldRename.setEnabled(rename.isSelected()));
-
-        overwrite = new JCheckBox(Localization.lang("Overwrite existing field values"), true);
-        ButtonGroup bg = new ButtonGroup();
-        bg.add(all);
-        bg.add(selected);
-        bg = new ButtonGroup();
-        bg.add(clear);
-        bg.add(set);
-        bg.add(append);
-        bg.add(rename);
-        FormBuilder builder = FormBuilder.create().layout(new FormLayout(
-                "left:pref, 4dlu, fill:100dlu:grow", "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref"));
-        builder.addSeparator(Localization.lang("Field name")).xyw(1, 1, 3);
-        builder.add(Localization.lang("Field name")).xy(1, 3);
-        builder.add(field).xy(3, 3);
-        builder.addSeparator(Localization.lang("Include entries")).xyw(1, 5, 3);
-        builder.add(all).xyw(1, 7, 3);
-        builder.add(selected).xyw(1, 9, 3);
-        builder.addSeparator(Localization.lang("New field value")).xyw(1, 11, 3);
-        builder.add(set).xy(1, 13);
-        builder.add(textFieldSet).xy(3, 13);
-        builder.add(clear).xyw(1, 15, 3);
-        builder.add(append).xy(1, 17);
-        builder.add(textFieldAppend).xy(3, 17);
-        builder.add(rename).xy(1, 19);
-        builder.add(textFieldRename).xy(3, 19);
-        builder.add(overwrite).xyw(1, 21, 3);
-
-        ButtonBarBuilder bb = new ButtonBarBuilder();
-        bb.addGlue();
-        bb.addButton(ok);
-        bb.addButton(cancel);
-        bb.addGlue();
-        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
-        diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
-        diag.pack();
-
-        ok.addActionListener(e -> {
+        Button ok = new Button(Localization.lang("OK"));
+        Button cancel = new Button(Localization.lang("Cancel"));
+        ok.setOnAction(e -> {
             // Check that any field name is set
-            String fieldText = (String) field.getSelectedItem();
+
+            String fieldText = field.getItems().toString();
             if ((fieldText == null) || fieldText.trim().isEmpty()) {
 
                 frame.getDialogService().showErrorDialogAndWait(Localization.lang("You must enter at least one field name"));
@@ -340,27 +276,147 @@ public class MassSetFieldAction extends SimpleCommand {
                 }
             }
             canceled = false;
-            diag.dispose();
+            dispose();
         });
 
-        Action cancelAction = new AbstractAction() {
+        cancel.setText(Localization.lang("Cancel"));
+        cancel.setOnAction(oa -> dispose());
+        cancel.setPrefWidth(100);
+        cancel.setPrefHeight(30);
 
+        all = new RadioButton(Localization.lang("All entries"));
+        selected = new RadioButton(Localization.lang("Selected entries"));
+        clear = new RadioButton(Localization.lang("Clear fields"));
+        set = new RadioButton(Localization.lang("Set fields"));
+        append = new RadioButton(Localization.lang("Append to fields"));
+        rename = new RadioButton(Localization.lang("Rename field to") + ":");
+        Tooltip aaa = new Tooltip(Localization.lang("Move contents of a field into a field with a different name"));
+        rename.setTooltip(aaa);
+
+        Set<String> allFields = frame.getCurrentBasePanel().getDatabase().getAllVisibleFields();
+
+        for (String f : allFields) {
+            //field.addItem(f);
+            field.getItems().add(f);
+
+        }
+        set.selectedProperty().addListener(new ChangeListener<Boolean>(){
             @Override
-            public void actionPerformed(ActionEvent e) {
-                canceled = true;
-                diag.dispose();
+            public void changed(ObservableValue<? extends Boolean> ov, Boolean a,Boolean b) {
+                textFieldSet.setDisable(!set.isSelected());
             }
-        };
-        cancel.addActionListener(cancelAction);
+        });
+        append.selectedProperty().addListener(new ChangeListener<Boolean>(){
+            @Override
+            public void changed(ObservableValue<? extends Boolean> ov, Boolean a,Boolean b) {
+                textFieldSet.setDisable(!(!clear.isSelected() && !append.isSelected()));
+            }
+        });
+        clear.selectedProperty().addListener(new ChangeListener<Boolean>(){
+            @Override
+            public void changed(ObservableValue<? extends Boolean> ov, Boolean a,Boolean b) {
+                textFieldSet.setDisable(!(!clear.isSelected() && !append.isSelected()));
+            }
+        });
+        rename.selectedProperty().addListener(new ChangeListener<Boolean>(){
+            @Override
+            public void changed(ObservableValue<? extends Boolean> ov, Boolean a,Boolean b) {
+                textFieldSet.setDisable(!rename.isSelected());
+            }
+        });
 
-        // Key bindings:
-        ActionMap am = builder.getPanel().getActionMap();
-        InputMap im = builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
-        am.put("close", cancelAction);
+        overwrite = new CheckBox("Overwrite existing field values");
+
+        GridPane main=new GridPane();
+        GridPane fn = new GridPane();
+        GridPane ie = new GridPane();
+        GridPane nfv = new GridPane();
+        HBox title1 = new HBox();
+        HBox title2 = new HBox();
+        HBox title3 = new HBox();
+        HBox optionButtons = new HBox();
+        FXDialog.getDialogPane().setContent(main);
+        main.setPrefSize(400, 400);
+
+        main.add(title1, 0, 0);
+        main.add(fn, 0, 1);
+        main.add(title2, 0, 2);
+        main.add(ie, 0, 3, 2, 1);
+        main.add(title3, 0, 5);
+        main.add(nfv, 0, 6, 4, 1);
+        main.add(optionButtons, 0, 10);
+        main.setPadding(new Insets(15, 5, 0, 0));
+        main.setGridLinesVisible(false);
+
+        Label str1 = new Label(Localization.lang("Field name"));
+        Label str2 = new Label(Localization.lang("Include entries"));
+        Label str3 = new Label(Localization.lang("New field value"));
+        title1.getChildren().add(str1);
+        title1.setPadding(new Insets(10, 0, 0, 0));
+        title1.setAlignment(Pos.CENTER_LEFT);
+        title2.getChildren().add(str2);
+        title2.setPadding(new Insets(10, 0, 0, 0));
+        title2.setAlignment(Pos.CENTER_LEFT);
+        title3.getChildren().add(str3);
+        title3.setPadding(new Insets(10, 0, 0, 0));
+        title3.setAlignment(Pos.CENTER_LEFT);
+
+        fn.setHgap(34);
+        fn.setVgap(5);
+        fn.setPadding(new Insets(5, 15, 5, 15));
+        fn.add(new Label(Localization.lang("Field name") + ":"), 0, 0);
+        fn.add(field, 1, 0);
+        fn.setStyle("-fx-content-display:top;"
+                    + "-fx-border-insets:0 0 0 0;"
+                    + "-fx-border-color:#D3D3D3");
+
+        ie.setHgap(10);
+        ie.setVgap(10);
+        ie.setPadding(new Insets(5, 15, 5, 15));
+        ie.add(all, 0, 0);
+        ie.add(selected, 0, 1);
+        ie.setStyle("-fx-content-display:top;"
+                    + "-fx-border-insets:0 0 0 0;"
+                    + "-fx-border-color:#D3D3D3");
+
+        nfv.setHgap(34);
+        nfv.setVgap(5);
+        nfv.setPadding(new Insets(5, 15, 5, 15));
+        nfv.add(set, 0, 0);
+        nfv.add(clear, 0, 1);
+        nfv.add(append, 0, 2);
+        nfv.add(rename, 0, 3);
+        nfv.add(overwrite, 0, 4);
+        nfv.setStyle("-fx-content-display:top;"
+                    + "-fx-border-insets:0 0 0 0;"
+                    + "-fx-border-color:#D3D3D3");
+
+        optionButtons.setAlignment(Pos.BOTTOM_CENTER);
+        optionButtons.setPadding(new Insets(15, 0, 0, 0));
+        optionButtons.setSpacing(35);
+        optionButtons.getChildren().add(ok);
+        optionButtons.getChildren().add(cancel);
+
+        FXDialog.showAndWait();
+
     }
+
+
 
     private static String[] getFieldNames(String s) {
         return s.split("[\\s;,]");
+    }
+
+    public void setVisible(boolean b) {
+        if (b) {
+            FXDialog.showAndWait();
+        } else {
+            FXDialog.hide();
+        }
+    }
+
+    private void dispose() {
+
+        ((Stage) (FXDialog.getDialogPane().getScene().getWindow())).close();
     }
 }
