@@ -59,7 +59,8 @@ after_failure:
 
 branches:
   only:
-    - fix-for-issue-3959
+    - master
+    - maintable-beta
 
 # cache gradle dependencies
 # https://docs.travis-ci.com/user/languages/java#Caching
