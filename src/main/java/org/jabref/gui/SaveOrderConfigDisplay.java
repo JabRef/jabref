@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import javax.swing.JPanel;
-
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
