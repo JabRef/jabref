@@ -1,6 +1,6 @@
 package org.jabref.gui.mergeentries;
 
-//import java.awt.Font;
+import java.awt.Font;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -14,28 +14,21 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-//import javax.swing.BorderFactory;
-//import javax.swing.ButtonGroup;
-//import javax.swing.JComboBox;
-//import javax.swing.JLabel;
-//import javax.swing.JPanel;
-//import javax.swing.JRadioButton;
-//import javax.swing.JScrollPane;
-//import javax.swing.JSeparator;
-//import javax.swing.JTextArea;
-//import javax.swing.JTextPane;
-//import javax.swing.ScrollPaneConstants;
-//import javax.swing.SwingUtilities;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.GridPane;
-
 import org.jabref.Globals;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.PreviewPanel;
@@ -52,10 +45,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
-//import com.jgoodies.forms.layout.CellConstraints;
-//import com.jgoodies.forms.layout.ColumnSpec;
-//import com.jgoodies.forms.layout.FormLayout;
-//import com.jgoodies.forms.layout.RowSpec;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +59,7 @@ public class MergeEntries {
 
     private static final String MARGIN = "10px";
 
-    private static final List<Label> HEADING_LABELS = new ArrayList<>(6);
+    private static final List<JLabel> HEADING_LABELS = new ArrayList<>(6);
 
     private static final CellConstraints CELL_CONSTRAINTS = new CellConstraints();
     private static final String[] DIFF_MODES = {Localization.lang("Plain text"),
@@ -88,20 +81,20 @@ public class MergeEntries {
     private final BibEntry leftEntry;
     private final BibEntry rightEntry;
     private final BibDatabaseMode databaseType;
-    private ScrollPane scrollPane;
-    private TextArea sourceView;
+    private JScrollPane scrollPane;
+    private JTextArea sourceView;
     private PreviewPanel entryPreview;
     private Boolean doneBuilding;
     private Boolean identicalTypes;
-    private List<RadioButton> typeRadioButtons;
+    private List<JRadioButton> typeRadioButtons;
     private final Set<String> allFields = new TreeSet<>();
-    private final ComboBox<String> diffMode = new ComboBox<>();
-    private final Map<String, TextArea> leftTextPanes = new HashMap<>();
-    private final Map<String, TextArea> rightTextPanes = new HashMap<>();
+    private final JComboBox<String> diffMode = new JComboBox<>();
+    private final Map<String, JTextPane> leftTextPanes = new HashMap<>();
+    private final Map<String, JTextPane> rightTextPanes = new HashMap<>();
 
-    private final Map<String, List<RadioButton>> radioButtons = new HashMap<>();
+    private final Map<String, List<JRadioButton>> radioButtons = new HashMap<>();
 
-    private final GridPane mainPanel = new GridPane();
+    private final JPanel mainPanel = new JPanel();
 
 
 
