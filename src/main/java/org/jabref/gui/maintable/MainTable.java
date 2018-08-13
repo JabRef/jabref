@@ -24,7 +24,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DragAndDropDataFormats;
@@ -235,6 +234,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private void handleOnDragOver(BibEntryTableViewModel originalItem, DragEvent event) {
         if ((event.getGestureSource() != originalItem) && GUIGlobals.localDragboard.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
             event.acceptTransferModes(TransferMode.MOVE);
+
         }
         if (event.getDragboard().hasFiles() && (event.getSource() instanceof TableRow)) {
             event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
@@ -269,14 +269,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         event.consume();
     }
 
-    private void handleOnDragDropped(BibEntryTableViewModel originalItem, DragEvent event) {
+    private void handleOnDragDropped(@SuppressWarnings("unused") BibEntryTableViewModel originalItem, DragEvent event) {
 
         boolean success = false;
 
         if (event.getDragboard().hasContent(DataFormat.FILES)) {
 
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
-            System.out.println("files in maintable " + files);
 
             List<Path> bibFiles = files.stream().filter(file -> FileUtil.getFileExtension(file).filter(ext -> "bib".equals(ext)).isPresent()).collect(Collectors.toList());
 

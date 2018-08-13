@@ -119,7 +119,6 @@ public class NewDroppedFileHandler {
     }
 
     public void importEntriesFromDroppedBibFiles(Path bibFile) {
-        System.out.println("importing db contents " + bibFile);
         ParserResult parserResult = OpenDatabase.loadDatabase(bibFile.toString(), importFormatPreferences, fileUpdateMonitor);
         List<BibEntry> entriesToImport = parserResult.getDatabaseContext().getEntries();
         bibDatabaseContext.getDatabase().insertEntries(entriesToImport);
@@ -175,7 +174,6 @@ public class NewDroppedFileHandler {
                 Path targetFile = firstExistingFileDir.get().resolve(file.getFileName());
                 if (FileUtil.copyFile(file, targetFile, false)) {
                     filesCopiedToFileDirectory.add(targetFile);
-                    System.out.println("copy to file dir " + filesCopiedToFileDirectory);
                 } else {
                     dialogService.showErrorDialogAndWait(Localization.lang("Could not copy file"), Localization.lang("The file %0 already exists", targetFile.toString()));
 
