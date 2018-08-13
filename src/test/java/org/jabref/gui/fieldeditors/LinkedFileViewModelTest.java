@@ -32,11 +32,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(TempDirectory.class)
-/**
- * Must be public because otherwise @TestArchitectureTests fails!
- *
-*/
-public class LinkedFileViewModelTest {
+class LinkedFileViewModelTest {
 
     private Path tempFile;
     private final JabRefPreferences preferences = mock(JabRefPreferences.class);

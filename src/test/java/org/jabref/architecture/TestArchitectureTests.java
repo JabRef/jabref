@@ -54,7 +54,7 @@ public class TestArchitectureTests {
     @MethodSource("data")
     public void testsAreIndependent(String forbiddenPackage) throws IOException {
         Predicate<String> isForbiddenPackage = (s) -> s.startsWith("import " + forbiddenPackage);
-        Predicate<String> isExceptionClass = (s) -> exceptions.stream().anyMatch(exception -> s.startsWith("public class " + exception));
+        Predicate<String> isExceptionClass = (s) -> exceptions.stream().anyMatch(exception -> s.startsWith("class " + exception));
 
         try (Stream<Path> pathStream = Files.walk(Paths.get("src/test/"))) {
             List<Path> files = pathStream
