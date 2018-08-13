@@ -2,6 +2,7 @@ package org.jabref.gui.preftabs;
 
 import java.util.Optional;
 
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -110,7 +111,7 @@ class AdvancedTab extends Pane implements PrefsTab {
 
     }
 
-    public GridPane getBuilder() {
+    public Node getBuilder() {
         return builder;
     }
 

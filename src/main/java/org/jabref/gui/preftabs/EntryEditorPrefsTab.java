@@ -1,5 +1,6 @@
 package org.jabref.gui.preftabs;
 
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -127,7 +128,7 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         builder.add(firstNameModeBoth,  1, 22);
     }
 
-    public GridPane getBuilder() {
+    public Node getBuilder() {
         return builder;
     }
 

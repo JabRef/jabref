@@ -3,6 +3,7 @@ package org.jabref.gui.preftabs;
 import java.util.Objects;
 
 import javafx.collections.FXCollections;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -87,7 +88,7 @@ public class ImportSettingsTab extends Pane implements PrefsTab {
         builder.add(fileDirPattern, 2, 10);
     }
 
-    public GridPane getBuilder() {
+    public Node getBuilder() {
         return builder;
     }
 

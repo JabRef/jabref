@@ -11,6 +11,7 @@ import javax.swing.SwingWorker;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
@@ -178,7 +179,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         gridPane.add(scrollPane, 1, 9);
     }
 
-    public GridPane getGridPane() {
+    public Node getGridPane() {
         return gridPane;
     }
 

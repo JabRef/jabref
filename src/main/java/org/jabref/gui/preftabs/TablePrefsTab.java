@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 import javafx.collections.FXCollections;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -176,7 +177,7 @@ class TablePrefsTab extends Pane implements PrefsTab {
         });
     }
 
-    public GridPane getBuilder() {
+    public Node getBuilder() {
         return builder;
     }
 

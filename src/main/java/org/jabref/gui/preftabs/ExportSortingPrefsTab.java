@@ -1,6 +1,7 @@
 package org.jabref.gui.preftabs;
 
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
@@ -67,7 +68,7 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
 
     }
 
-    public GridPane getBuilder() {
+    public Node getBuilder() {
         return builder;
     }
 

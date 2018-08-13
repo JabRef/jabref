@@ -6,6 +6,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 
 import javafx.embed.swing.JFXPanel;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -144,7 +145,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         add(panel, BorderLayout.CENTER);
     }
 
-    public GridPane getBuilder() {
+    public Node getBuilder() {
         return builder;
     }
 

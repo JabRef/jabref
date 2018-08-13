@@ -1,5 +1,6 @@
 package org.jabref.gui.preftabs;
 
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -108,7 +109,7 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
         warnBeforeOverwriting.setDisable(dontOverwrite.isSelected()));
     }
 
-    public GridPane getBuilder() {
+    public Node getBuilder() {
         return builder;
     }
 

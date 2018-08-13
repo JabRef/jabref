@@ -2,6 +2,7 @@ package org.jabref.gui.preftabs;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -65,7 +66,7 @@ class GroupsPrefsTab extends Pane implements PrefsTab {
         builder.add(keywordSeparator, 2, 10);
     }
 
-    public GridPane getBuilder() {
+    public Node getBuilder() {
         return builder;
     }
 

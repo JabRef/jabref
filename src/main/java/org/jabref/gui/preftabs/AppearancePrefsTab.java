@@ -1,6 +1,7 @@
 package org.jabref.gui.preftabs;
 
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -44,7 +45,7 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
 
     }
 
-    public VBox getContainer() {
+    public Node getContainer() {
         return container;
     }
 

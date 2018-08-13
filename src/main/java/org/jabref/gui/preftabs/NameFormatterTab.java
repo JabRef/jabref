@@ -7,6 +7,7 @@ import java.util.Objects;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -158,7 +159,7 @@ public class NameFormatterTab extends Pane implements PrefsTab {
         builder.add(tabPanel, 1, 2);
     }
 
-    public GridPane getBuilder() {
+    public Node getBuilder() {
         return builder;
     }
 
