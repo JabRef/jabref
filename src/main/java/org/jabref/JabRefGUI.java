@@ -59,7 +59,6 @@ public class JabRefGUI {
                 .map(File::getAbsolutePath)
                 .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
         openWindow(mainStage);
-        
         JabRefGUI.checkForNewVersion(false);
     }
 
