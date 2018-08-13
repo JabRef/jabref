@@ -37,7 +37,6 @@ public class PushToApplicationSettings {
      * @return a JPanel containing options, or null if options are not needed.
      */
     public JPanel getSettingsPanel(int n) {
-        
         switch (n) {
             case 0: application = new PushToEmacs(dialogService);
                     break;
@@ -128,7 +127,6 @@ public class PushToApplicationSettings {
      * state of the widgets in the settings panel to Globals.prefs.
      */
     public void storeSettings() {
-        System.out.println(application.commandPathPreferenceKey);
         Globals.prefs.put(application.commandPathPreferenceKey, path.getText());
     }
 }

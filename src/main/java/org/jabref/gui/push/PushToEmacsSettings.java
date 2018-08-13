@@ -16,11 +16,7 @@ public class PushToEmacsSettings extends PushToApplicationSettings {
     @Override
     public JPanel getSettingsPanel(int n) {
         additionalParams.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
-        if (super.settings == null) {
-            super.initSettingsPanel("Emacs",Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
-        }
-        super.path.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
-        return super.settings;
+        return super.getSettingsPanel(n);
     }
 
     @Override
