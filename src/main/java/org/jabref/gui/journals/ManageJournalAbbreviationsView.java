@@ -2,7 +2,6 @@ package org.jabref.gui.journals;
 
 import javax.inject.Inject;
 
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -186,15 +185,7 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
 
     @FXML
     private void saveAbbreviationsAndCloseDialog() {
-        Task<Void> task = new Task<Void>() {
-
-            @Override
-            protected Void call() {
-                viewModel.saveEverythingAndUpdateAutoCompleter();
-                return null;
-            }
-        };
-        new Thread(task).start();
+        viewModel.saveEverythingAndUpdateAutoCompleter();
         close();
     }
 
