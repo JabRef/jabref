@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
 import javafx.collections.FXCollections;
@@ -22,13 +20,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.SaveOrderConfig;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-
 public class SaveOrderConfigDisplay {
 
     private GridPane panel;
-    private JPanel jPanel;
     private ComboBox<String> savePriSort;
     private ComboBox<String> saveSecSort;
     private ComboBox<String> saveTerSort;
@@ -76,39 +70,10 @@ public class SaveOrderConfigDisplay {
         builder.add(saveTerSort, 2, 3);
         builder.add(saveTerDesc, 3, 3);
         panel = builder;
-
-        // initialization for the JPanel used in DatabasePropertiesDialog.java
-        String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
-        JComboBox<String> savePriSort1 = new JComboBox<>(allPlusKey);
-        savePriSort1.setEditable(true);
-        JComboBox<String> saveSecSort1 = new JComboBox<>(allPlusKey);
-        saveSecSort1.setEditable(true);
-        JComboBox<String> saveTerSort1 = new JComboBox<>(allPlusKey);
-        saveTerSort1.setEditable(true);
-        JCheckBox savePriDesc1 = new JCheckBox(Localization.lang("Descending"));
-        JCheckBox saveSecDesc1 = new JCheckBox(Localization.lang("Descending"));
-        JCheckBox saveTerDesc1 = new JCheckBox(Localization.lang("Descending"));
-        FormLayout layout = new FormLayout("right:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref",
-                "pref, 2dlu, pref, 2dlu, pref");
-        FormBuilder builder1 = FormBuilder.create().layout(layout);
-        builder1.add(Localization.lang("Primary sort criterion")).xy(1, 1);
-        builder1.add(savePriSort1).xy(3, 1);
-        builder1.add(savePriDesc1).xy(5, 1);
-        builder1.add(Localization.lang("Secondary sort criterion")).xy(1, 3);
-        builder1.add(saveSecSort1).xy(3, 3);
-        builder1.add(saveSecDesc1).xy(5, 3);
-        builder1.add(Localization.lang("Tertiary sort criterion")).xy(1, 5);
-        builder1.add(saveTerSort1).xy(3, 5);
-        builder1.add(saveTerDesc1).xy(5, 5);
-        jPanel = builder1.build();
     }
 
     public Node getJFXPanel() {
         return panel;
-    }
-
-    public JPanel getPanel() {
-        return jPanel;
     }
 
     public void setEnabled(boolean enabled) {
