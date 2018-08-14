@@ -42,12 +42,13 @@ public class BibTeXMLExporterTestFiles {
     public BibTeXMLExporter bibtexmlExportFormat;
     public BibtexImporter testImporter;
 
-    public Path resourceDir;
+    private static Path resourceDir;
 
     public static Stream<String> fileNames() throws IOException, URISyntaxException {
-        Path path = Paths.get(BibTeXMLExporterTestFiles.class.getResource("/").toURI());
+        resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("BibTeXMLExporterTestArticle.bib").toURI()).getParent();
+        System.out.println(resourceDir);
 
-        try (Stream<Path> stream = Files.list(path.getParent().resolve("resources/org/jabref/logic/exporter"))) {
+        try (Stream<Path> stream = Files.list(resourceDir)) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
                     .filter(n -> n.startsWith("BibTeXML")).collect(Collectors.toList()).stream();
         }
@@ -55,9 +56,6 @@ public class BibTeXMLExporterTestFiles {
 
     @BeforeEach
     public void setUp(@TempDirectory.TempDir Path testFolder) throws Exception {
-        Path path = Paths.get(BibTeXMLExporterTestFiles.class.getResource("/").toURI());
-
-        resourceDir = path.getParent().resolve("resources/org/jabref/logic/exporter");
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         bibtexmlExportFormat = new BibTeXMLExporter();

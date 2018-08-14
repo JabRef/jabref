@@ -44,10 +44,13 @@ public class ModsExportFormatTestFiles {
     private ModsImporter modsImporter;
     private Path importFile;
 
-    public static Stream<String> fileNames() throws Exception {
-        Path path = Paths.get(ModsExportFormatTestFiles.class.getResource("/").toURI());
+    private static Path resourceDir;
 
-        try (Stream<Path> stream = Files.list(path.getParent().resolve("resources/org/jabref/logic/exporter"))) {
+    public static Stream<String> fileNames() throws Exception {
+        resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("ModsExportFormatTestAllFields.bib").toURI()).getParent();
+        System.out.println(resourceDir);
+
+        try (Stream<Path> stream = Files.list(resourceDir)) {
             //            stream.forEach(n -> System.out.println(n));
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
                     .filter(n -> n.startsWith("Mods")).collect(Collectors.toList()).stream();

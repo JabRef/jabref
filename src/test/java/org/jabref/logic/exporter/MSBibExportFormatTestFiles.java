@@ -55,7 +55,6 @@ public class MSBibExportFormatTestFiles {
 
     @BeforeEach
     void setUp(@TempDirectory.TempDir Path testFolder) throws Exception {
-
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         msBibExportFormat = new MSBibExporter();
