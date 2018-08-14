@@ -99,7 +99,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
                 }
             }
         });
-        isLoading.bind(isLoadingBuiltIn.and(isLoadingBuiltIn));
+        isLoading.bind(isLoadingBuiltIn.or(isLoadingIeee));
     }
 
     public SimpleBooleanProperty isLoadingProperty() {
@@ -121,6 +121,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
                 .onSuccess(result -> {
                     isLoadingBuiltIn.setValue(false);
                     addList(Localization.lang("JabRef built in list"), result);
+                    selectLastJournalFile();
                 })
                 .onFailure(dialogService::showErrorDialogAndWait)
                 .executeWith(taskExecutor);
@@ -350,17 +351,19 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      * {@link JournalAbbreviationLoader#update(JournalAbbreviationPreferences)}.
      */
     public void saveEverythingAndUpdateAutoCompleter() {
-        saveExternalFilesList();
+        BackgroundTask.wrap(() -> {
+            saveExternalFilesList();
 
-        if (shouldWriteLists) {
-            saveJournalAbbreviationFiles();
-            shouldWriteLists = false;
-        }
+            if (shouldWriteLists) {
+                saveJournalAbbreviationFiles();
+                shouldWriteLists = false;
+            }
 
-        // Update journal abbreviation loader
-        journalAbbreviationLoader.update(abbreviationsPreferences);
+            // Update journal abbreviation loader
+            journalAbbreviationLoader.update(abbreviationsPreferences);
 
-        preferences.storeJournalAbbreviationPreferences(abbreviationsPreferences);
+            preferences.storeJournalAbbreviationPreferences(abbreviationsPreferences);
+        }).executeWith(taskExecutor);
     }
 
     public SimpleListProperty<AbbreviationsFileViewModel> journalFilesProperty() {
