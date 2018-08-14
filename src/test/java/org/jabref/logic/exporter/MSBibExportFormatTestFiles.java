@@ -41,20 +41,21 @@ public class MSBibExportFormatTestFiles {
     public MSBibExporter msBibExportFormat;
     public BibtexImporter testImporter;
 
-    public Path resourceDir;
+    private static Path resourceDir;
 
-    public static Stream<String> fileNames() throws IOException, URISyntaxException {
-        Path path = Paths.get(MSBibExportFormatTestFiles.class.getResource("/").toURI());
-        try (Stream<Path> stream = Files.list(path.getParent().resolve("resources/org/jabref/logic/exporter"))) {
+    static Stream<String> fileNames() throws IOException, URISyntaxException {
+        //we have to point it to one existing file, otherwise it will return the default class path
+        resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("MsBibExportFormatTest1.bib").toURI()).getParent();
+        System.out.println(resourceDir);
+        try (Stream<Path> stream = Files.list(resourceDir)) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
-                    .filter(n -> n.startsWith("MsBib")).collect(Collectors.toList()).stream();
+                         .filter(n -> n.startsWith("MsBib")).collect(Collectors.toList()).stream();
         }
     }
 
     @BeforeEach
-    public void setUp(@TempDirectory.TempDir Path testFolder) throws Exception {
-        Path tempPath = Paths.get(MSBibExportFormatTestFiles.class.getResource("/").toURI());
-        resourceDir = tempPath.getParent().resolve("resources/org/jabref/logic/exporter");
+    void setUp(@TempDirectory.TempDir Path testFolder) throws Exception {
+
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         msBibExportFormat = new MSBibExporter();
@@ -65,12 +66,12 @@ public class MSBibExportFormatTestFiles {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public final void testPerformExport(String filename) throws IOException, SaveException {
+    void testPerformExport(String filename) throws IOException, SaveException {
         String xmlFileName = filename.replace(".bib", ".xml");
         Path importFile = resourceDir.resolve(filename);
 
         List<BibEntry> entries = testImporter.importDatabase(importFile, StandardCharsets.UTF_8).getDatabase()
-                .getEntries();
+                                             .getEntries();
 
         msBibExportFormat.export(databaseContext, tempFile, charset, entries);
 
@@ -78,6 +79,6 @@ public class MSBibExportFormatTestFiles {
         Builder test = Input.from(Files.newInputStream(tempFile));
 
         assertThat(test, CompareMatcher.isSimilarTo(control)
-                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
 }
