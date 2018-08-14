@@ -31,8 +31,8 @@ public class AboutDialogView extends BaseDialog<Void> {
         this.setResizable(true);
 
         ViewLoader.view(this)
-                .load()
-                .setAsDialogPane(this);
+                  .load()
+                  .setAsDialogPane(this);
 
         ControlHelper.setAction(copyVersionButton, getDialogPane(), event -> copyVersionToClipboard());
     }
