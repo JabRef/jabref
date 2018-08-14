@@ -47,7 +47,7 @@ public class ModsExportFormatTestFiles {
     public static Stream<String> fileNames() throws Exception {
         Path path = Paths.get(ModsExportFormatTestFiles.class.getResource("/").toURI());
 
-        try (Stream<Path> stream = Files.list(path.getParent().resolve("resources\\org\\jabref\\logic\\exporter"))) {
+        try (Stream<Path> stream = Files.list(path.getParent().resolve("resources/org/jabref/logic/exporter"))) {
             //            stream.forEach(n -> System.out.println(n));
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
                     .filter(n -> n.startsWith("Mods")).collect(Collectors.toList()).stream();

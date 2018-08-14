@@ -45,7 +45,7 @@ public class MSBibExportFormatTestFiles {
 
     public static Stream<String> fileNames() throws IOException, URISyntaxException {
         Path path = Paths.get(MSBibExportFormatTestFiles.class.getResource("/").toURI());
-        try (Stream<Path> stream = Files.list(path.getParent().resolve("resources\\org\\jabref\\logic\\exporter"))) {
+        try (Stream<Path> stream = Files.list(path.getParent().resolve("resources/org/jabref/logic/exporter"))) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
                     .filter(n -> n.startsWith("MsBib")).collect(Collectors.toList()).stream();
         }
@@ -54,7 +54,7 @@ public class MSBibExportFormatTestFiles {
     @BeforeEach
     public void setUp(@TempDirectory.TempDir Path testFolder) throws Exception {
         Path tempPath = Paths.get(MSBibExportFormatTestFiles.class.getResource("/").toURI());
-        resourceDir = tempPath.getParent().resolve("resources\\org\\jabref\\logic\\exporter");
+        resourceDir = tempPath.getParent().resolve("resources/org/jabref/logic/exporter");
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         msBibExportFormat = new MSBibExporter();

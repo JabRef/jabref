@@ -47,7 +47,7 @@ public class BibTeXMLExporterTestFiles {
     public static Stream<String> fileNames() throws IOException, URISyntaxException {
         Path path = Paths.get(BibTeXMLExporterTestFiles.class.getResource("/").toURI());
 
-        try (Stream<Path> stream = Files.list(path.getParent().resolve("resources\\org\\jabref\\logic\\exporter"))) {
+        try (Stream<Path> stream = Files.list(path.getParent().resolve("resources/org/jabref/logic/exporter"))) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
                     .filter(n -> n.startsWith("BibTeXML")).collect(Collectors.toList()).stream();
         }
@@ -57,7 +57,7 @@ public class BibTeXMLExporterTestFiles {
     public void setUp(@TempDirectory.TempDir Path testFolder) throws Exception {
         Path path = Paths.get(BibTeXMLExporterTestFiles.class.getResource("/").toURI());
 
-        resourceDir = path.getParent().resolve("resources\\org\\jabref\\logic\\exporter");
+        resourceDir = path.getParent().resolve("resources/org/jabref/logic/exporter");
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         bibtexmlExportFormat = new BibTeXMLExporter();
