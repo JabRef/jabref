@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,14 +17,11 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junitpioneer.jupiter.TempDirectory;
 import org.mockito.Answers;
 import org.xmlunit.builder.Input;
 import org.xmlunit.builder.Input.Builder;
@@ -33,10 +29,10 @@ import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 import org.xmlunit.matchers.CompareMatcher;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 
-@RunWith(Parameterized.class)
+@ExtendWith(TempDirectory.class)
 public class MSBibExportFormatTestFiles {
 
     public BibDatabaseContext databaseContext;
@@ -45,38 +41,31 @@ public class MSBibExportFormatTestFiles {
     public MSBibExporter msBibExportFormat;
     public BibtexImporter testImporter;
 
-    @Parameter
-    public String filename;
     public Path resourceDir;
 
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
-
-
-    @Parameters(name = "{0}")
-    public static Collection<String> fileNames() throws IOException, URISyntaxException {
+    public static Stream<String> fileNames() throws IOException, URISyntaxException {
         Path path = Paths.get(MSBibExportFormatTestFiles.class.getResource("/").toURI());
-
         try (Stream<Path> stream = Files.list(path.getParent().resolve("resources\\org\\jabref\\logic\\exporter"))) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
-                    .filter(n -> n.startsWith("MsBib")).collect(Collectors.toList());
+                    .filter(n -> n.startsWith("MsBib")).collect(Collectors.toList()).stream();
         }
     }
 
-    @Before
-    public void setUp() throws Exception {
-        Path path = Paths.get(MSBibExportFormatTestFiles.class.getResource("/").toURI());
-
-        resourceDir = path.getParent().resolve("resources\\org\\jabref\\logic\\exporter");
+    @BeforeEach
+    public void setUp(@TempDirectory.TempDir Path testFolder) throws Exception {
+        Path tempPath = Paths.get(MSBibExportFormatTestFiles.class.getResource("/").toURI());
+        resourceDir = tempPath.getParent().resolve("resources\\org\\jabref\\logic\\exporter");
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         msBibExportFormat = new MSBibExporter();
-        tempFile = testFolder.newFile().toPath();
+        Path path = testFolder.resolve("ARandomlyNamedFile.tmp");
+        tempFile = Files.createFile(path);
         testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
     }
 
-    @Test
-    public final void testPerformExport() throws IOException, SaveException {
+    @ParameterizedTest
+    @MethodSource("fileNames")
+    public final void testPerformExport(String filename) throws IOException, SaveException {
         String xmlFileName = filename.replace(".bib", ".xml");
         Path importFile = resourceDir.resolve(filename);
 
