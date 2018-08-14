@@ -7,14 +7,14 @@ import org.jabref.testutils.category.GUITest;
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
 import org.assertj.swing.fixture.JTableFixture;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 
 import static org.assertj.swing.finder.WindowFinder.findDialog;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@Category(GUITest.class)
+@Tag("GUITest")
 public class UndoTest extends AbstractUITest {
 
     @Test

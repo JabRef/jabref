@@ -18,11 +18,11 @@ import org.assertj.swing.image.ScreenshotTaker;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.assertj.swing.timing.Pause;
 import org.junit.Assert;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
 
 import static org.assertj.swing.launcher.ApplicationLauncher.application;
 
-@Category(GUITest.class)
+@Tag("GUITest")
 public abstract class AbstractUITest extends AssertJSwingJUnitTestCase {
 
     protected final static int SPEED_NORMAL = 50;

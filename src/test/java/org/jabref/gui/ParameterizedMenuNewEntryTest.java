@@ -7,13 +7,13 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.testutils.category.GUITest;
 
 import org.assertj.swing.fixture.JTableFixture;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-@Category(GUITest.class)
+@Tag("GUITest")
 public class ParameterizedMenuNewEntryTest extends AbstractUITest {
 
     private final String databaseMode;

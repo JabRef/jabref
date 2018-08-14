@@ -28,13 +28,14 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mockito;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -43,24 +44,24 @@ public class ImporterTest {
 
     @Parameter public Importer format;
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void isRecognizedFormatWithNullForBufferedReaderThrowsException() throws IOException {
-        format.isRecognizedFormat((BufferedReader) null);
+    	assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((BufferedReader) null));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void isRecognizedFormatWithNullForStringThrowsException() throws IOException {
-        format.isRecognizedFormat((String) null);
+    	assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((String) null));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void importDatabaseWithNullForBufferedReaderThrowsException() throws IOException {
-        format.importDatabase((BufferedReader) null);
+    	assertThrows(NullPointerException.class, () -> format.importDatabase((BufferedReader) null));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void importDatabaseWithNullForStringThrowsException() throws IOException {
-        format.importDatabase((String) null);
+    	assertThrows(NullPointerException.class, () -> format.importDatabase((String) null));
     }
 
     @Test
