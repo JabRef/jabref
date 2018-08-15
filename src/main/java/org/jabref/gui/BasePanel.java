@@ -798,10 +798,13 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         EntryType actualType = type;
         if (actualType == null) {
             // Find out what type is wanted.
-            final EntryTypeDialog etd = new EntryTypeDialog(frame);
+            //final EntryTypeDialog etd = new EntryTypeDialog(frame);
+            final EntryTypeView etv = new EntryTypeView(frame.getCurrentBasePanel());
             // We want to center the dialog, to make it look nicer.
-            etd.setVisible(true);
-            actualType = etd.getChoice();
+            //etd.setVisible(true);
+            //actualType = etd.getChoice();
+            etv.showAndWait();
+            actualType = etv.getChoice();
         }
         if (actualType != null) { // Only if the dialog was not canceled.
             final BibEntry be = new BibEntry(actualType.getName());

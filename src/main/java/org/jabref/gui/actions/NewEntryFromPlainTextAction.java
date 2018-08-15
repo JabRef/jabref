@@ -1,6 +1,6 @@
 package org.jabref.gui.actions;
 
-import org.jabref.gui.EntryTypeDialog;
+import org.jabref.gui.EntryTypeView;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.plaintextimport.TextInputDialog;
 import org.jabref.logic.util.UpdateField;
@@ -31,8 +31,10 @@ public class NewEntryFromPlainTextAction extends SimpleCommand {
             return;
         }
 
-        EntryTypeDialog typeChoiceDialog = new EntryTypeDialog(jabRefFrame);
-        typeChoiceDialog.setVisible(true);
+        //EntryTypeDialog typeChoiceDialog = new EntryTypeDialog(jabRefFrame);
+        EntryTypeView typeChoiceDialog = new EntryTypeView(jabRefFrame.getCurrentBasePanel());
+        //typeChoiceDialog.setVisible(true);
+        typeChoiceDialog.showAndWait();
         EntryType selectedType = typeChoiceDialog.getChoice();
         if (selectedType == null) {
             return;
