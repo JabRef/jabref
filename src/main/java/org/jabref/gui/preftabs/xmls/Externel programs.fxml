@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.media.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="830.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ListView layoutY="2.0" prefHeight="830.0" prefWidth="253.0" />
+      <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="General" />
+      <Button layoutY="30.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="File" />
+      <Button layoutY="240.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Import" />
+      <Button layoutY="210.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="BibTeX key generator" />
+      <Button layoutY="60.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Entry table" />
+      <Button layoutY="90.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Entry table columns" />
+      <Button layoutY="120.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Entry preview" />
+      <Button layoutY="150.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Groups" />
+      <Button layoutY="180.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Entry editor" />
+      <Button layoutY="300.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Name formatter" />
+      <Button layoutY="270.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Export sorting" />
+      <Button layoutY="360.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Network" />
+      <Button layoutY="330.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="XMP -metadata" />
+      <Button layoutY="390.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Advanced" />
+      <Button layoutY="420.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Appearance" />
+      <Button layoutY="793.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Reset preferences" />
+      <Button layoutY="763.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Show preferences" />
+      <Button layoutY="733.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Export preferences" />
+      <Button layoutY="703.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Import preferences" />
+      <Button layoutX="1150.0" layoutY="780.0" mnemonicParsing="false" text="Cancle" />
+      <Button layoutX="1050.0" layoutY="780.0" mnemonicParsing="false" text="Save" />
+      <Label layoutX="260.0" layoutY="10.0" text="Sending of emails" />
+      <Label layoutX="301.0" layoutY="35.0" text="Subject for sending an email with references" />
+      <CheckBox layoutX="301.0" layoutY="65.0" mnemonicParsing="false" text="Automatically open folders of attached files" />
+      <TextField layoutX="875.0" layoutY="30.0" text="References" />
+      <Label layoutX="259.0" layoutY="110.0" text="External programs" />
+      <Separator layoutX="389.0" layoutY="22.0" prefHeight="0.0" prefWidth="892.0" />
+      <Separator layoutX="391.0" layoutY="119.0" prefHeight="3.0" prefWidth="884.0" />
+      <Button layoutX="301.0" layoutY="144.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="441.0" text="Setting for Emacs" />
+      <Button layoutX="301.0" layoutY="174.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="441.0" text="Setting for Texmaker" />
+      <Button layoutX="301.0" layoutY="204.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="441.0" text="Setting for Vim" />
+      <Button layoutX="742.0" layoutY="144.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="441.0" text="Setting for LyX/Kile" />
+      <Button layoutX="742.0" layoutY="174.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="441.0" text="Setting for TeXstudio" />
+      <Button layoutX="742.0" layoutY="204.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="441.0" text="Setting for WinEdit" />
+      <Label layoutX="305.0" layoutY="255.0" text="Cite command" />
+      <Button layoutX="305.0" layoutY="285.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="260.0" text="Manage external file types" />
+      <Label layoutX="260.0" layoutY="335.0" text="Open console" />
+      <Separator layoutX="361.0" layoutY="344.0" prefHeight="3.0" prefWidth="919.0" />
+      <RadioButton layoutX="310.0" layoutY="375.0" mnemonicParsing="true" text="Use default terminal emulator" />
+      <RadioButton layoutX="310.0" layoutY="417.0" mnemonicParsing="false" text="Execute command:" />
+      <TextField layoutX="652.0" layoutY="412.0" prefHeight="30.0" prefWidth="342.0" />
+      <Button layoutX="1016.0" layoutY="412.0" mnemonicParsing="false" text="Browse" />
+      <Label layoutX="652.0" layoutY="450.0" text="Note: Use the placeholder %DIR for the location of the opened library file" />
+      <Label layoutX="260.0" layoutY="470.0" text="Open PDF" />
+      <Separator layoutX="335.0" layoutY="479.0" prefHeight="3.0" prefWidth="944.0" />
+      <RadioButton layoutX="310.0" layoutY="502.0" mnemonicParsing="false" text="Adobe Acrobat Reader" />
+      <RadioButton layoutX="310.0" layoutY="539.0" mnemonicParsing="false" text="Sumatra Reader" />
+      <TextField layoutX="519.0" layoutY="497.0" prefHeight="30.0" prefWidth="441.0" />
+      <TextField layoutX="519.0" layoutY="534.0" prefHeight="30.0" prefWidth="441.0" />
+      <Button layoutX="976.0" layoutY="497.0" mnemonicParsing="false" text="Browse" />
+      <Button layoutX="976.0" layoutY="534.0" mnemonicParsing="false" text="Browse" />
+   </children>
+</AnchorPane>

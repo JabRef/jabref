@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity"
+	minHeight="-Infinity" minWidth="-Infinity" prefHeight="830.0"
+	prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+	<children>
+		<Label layoutX="260.0" layoutY="23.0" text="General" />
+		<Separator layoutX="314.0" layoutY="32.0" prefHeight="3.0"
+			prefWidth="961.0" />
+		<CheckBox layoutX="277.0" layoutY="55.0" mnemonicParsing="false"
+			prefHeight="21.0" prefWidth="371.0" text="Open last edited libraried at startup" />
+		<CheckBox layoutX="277.0" layoutY="87.0" mnemonicParsing="false"
+			text="Backup old file when saving" />
+		<Label layoutX="260.0" layoutY="120.0"
+			text="Do not wrap the following fields when saving:" />
+		<RadioButton layoutX="278.0" layoutY="146.0"
+			mnemonicParsing="false" text="Resolve strings for standard BibTeX fields only" />
+		<RadioButton layoutX="278.0" layoutY="181.0"
+			mnemonicParsing="false" text="Resolve strings for all filelds except:" />
+		<Label layoutX="260.0" layoutY="217.0" text="Newline separator" />
+		<CheckBox layoutX="287.0" layoutY="246.0" mnemonicParsing="false"
+			text="Always reformat BIB file on save and export" />
+		<Label layoutX="260.0" layoutY="281.0" text="External file links" />
+		<Label layoutX="260.0" layoutY="317.0" text="Main file directory:" />
+		<CheckBox layoutX="287.0" layoutY="346.0" mnemonicParsing="false"
+			text="Use the BIB file location as primary file directory" />
+		<RadioButton layoutX="288.0" layoutY="386.0"
+			mnemonicParsing="false"
+			text="Autolink files with names starting with the BibTeX key" />
+		<RadioButton layoutX="288.0" layoutY="424.0"
+			mnemonicParsing="false" text="Autolink only files that match the BibTeX key" />
+		<RadioButton layoutX="288.0" layoutY="466.0"
+			mnemonicParsing="false" text="Use regular expression search" />
+		<CheckBox layoutX="287.0" layoutY="504.0" mnemonicParsing="false"
+			text="When opening file link, search for matching file if no link is defined" />
+		<CheckBox layoutX="287.0" layoutY="551.0" mnemonicParsing="false"
+			text="Automatically open browse dialog when creating new  file link" />
+		<Label layoutX="259.0" layoutY="596.0" text="Autosave" />
+		<CheckBox layoutX="287.0" layoutY="630.0" mnemonicParsing="false"
+			text="Autosabe local libraries" />
+		<Separator layoutX="329.0" layoutY="605.0" prefHeight="3.0"
+			prefWidth="949.0" />
+		<Separator layoutX="374.0" layoutY="290.0" prefHeight="3.0"
+			prefWidth="906.0" />
+		<TextField layoutX="703.0" layoutY="141.0" prefHeight="30.0"
+			prefWidth="303.0" text="pdf;ps;url;doi;file;isbn;issn" />
+		<TextField layoutX="703.0" layoutY="176.0" prefHeight="30.0"
+			prefWidth="303.0" text="url" />
+		<MenuButton layoutX="703.0" layoutY="222.0"
+			mnemonicParsing="false" prefHeight="30.0" prefWidth="303.0" text="CR/LF">
+			<items>
+				<MenuItem mnemonicParsing="false" text="Action 1" />
+				<MenuItem mnemonicParsing="false" text="Action 2" />
+			</items>
+		</MenuButton>
+		<TextField layoutX="703.0" layoutY="302.0" prefHeight="30.0"
+			prefWidth="303.0" />
+		<TextField layoutX="703.0" layoutY="451.0" prefHeight="30.0"
+			prefWidth="303.0" text="**/.*[bibtexkey].*\\.[extension]" />
+		<Button layoutX="1019.0" layoutY="302.0" mnemonicParsing="false"
+			text="Button" />
+		<Button layoutX="1019.0" layoutY="451.0" mnemonicParsing="false"
+			text="?" />
+		<Button layoutX="992.0" layoutY="626.0" mnemonicParsing="false"
+			text="?" />
+		<ListView layoutY="2.0" prefHeight="830.0" prefWidth="253.0" />
+		<Button mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0"
+			text="General" />
+		<Button layoutY="30.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="File" />
+		<Button layoutY="240.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="Import" />
+		<Button layoutY="210.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="BibTeX key generator" />
+		<Button layoutY="60.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="Entry table" />
+		<Button layoutY="90.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="Entry table columns" />
+		<Button layoutY="120.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="Entry preview" />
+		<Button layoutY="150.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="Groups" />
+		<Button layoutY="180.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="Entry editor" />
+		<Button layoutY="300.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="Name formatter" />
+		<Button layoutY="270.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="Export sorting" />
+		<Button layoutY="360.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="Network" />
+		<Button layoutY="330.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="XMP -metadata" />
+		<Button layoutY="390.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="Advanced" />
+		<Button layoutY="420.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="Appearance" />
+		<Button layoutY="793.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="Reset preferences" />
+		<Button layoutY="763.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="Show preferences" />
+		<Button layoutY="733.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="Export preferences" />
+		<Button layoutY="703.0" mnemonicParsing="false" prefHeight="30.0"
+			prefWidth="253.0" text="Import preferences" />
+		<Button layoutX="1150.0" layoutY="780.0" mnemonicParsing="false"
+			text="Cancle" />
+		<Button layoutX="1050.0" layoutY="780.0" mnemonicParsing="false"
+			text="Save" />
+		<Separator layoutX="417.0" layoutY="420.0" prefHeight="0.0"
+			prefWidth="860.0" />
+		<Separator layoutX="417.0" layoutY="37.0" prefHeight="3.0"
+			prefWidth="860.0" />
+	</children>
+</AnchorPane>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.media.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="830.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="260.0" layoutY="11.0" text="Label" />
+      <Separator layoutX="292.0" layoutY="21.0" prefHeight="5.0" prefWidth="985.0" />
+      <CheckBox layoutX="260.0" layoutY="44.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="513.0" text="Warn about unresolved duplicates when closing inspection window" />
+      <CheckBox layoutX="260.0" layoutY="86.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="513.0" text="Show confirmation dialog when deleting entries" />
+      <CheckBox layoutX="260.0" layoutY="132.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="526.0" text="Enforce legal chracters in BibTeX keys" />
+      <CheckBox layoutX="260.0" layoutY="175.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="609.0" text="Load and Save preferences from/to jabref.xml on start-up (memory stick mode)" />
+      <CheckBox layoutX="260.0" layoutY="218.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="526.0" text="Mark new entries with owner name:" />
+      <CheckBox layoutX="260.0" layoutY="263.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="526.0" text="Mark new entries with addition date.Date format:" />
+      <CheckBox layoutX="301.0" layoutY="297.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="477.0" text="Update timestamp on modification" />
+      <CheckBox layoutX="260.0" layoutY="343.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="526.0" text="Collect and share telemetry data to help improve JabRef." />
+      <Label layoutX="260.0" layoutY="406.0" text="Language:" />
+      <Label layoutX="260.0" layoutY="461.0" text="Default encoding:" />
+      <Label layoutX="260.0" layoutY="520.0" text="Default bibliographt mode" />
+      <Separator layoutX="450.0" layoutY="529.0" prefHeight="5.0" prefWidth="824.0" />
+      <MenuButton layoutX="292.0" layoutY="555.0" mnemonicParsing="false" text="BibTeX">
+        <items>
+          <MenuItem mnemonicParsing="false" text="Action 1" />
+          <MenuItem mnemonicParsing="false" text="Action 2" />
+        </items>
+      </MenuButton>
+      <MenuButton layoutX="872.0" layoutY="391.0" mnemonicParsing="false" text="MenuButton">
+        <items>
+          <MenuItem mnemonicParsing="false" text="Action 1" />
+          <MenuItem mnemonicParsing="false" text="Action 2" />
+        </items>
+      </MenuButton>
+      <MenuButton layoutX="872.0" layoutY="446.0" mnemonicParsing="false" text="MenuButton">
+        <items>
+          <MenuItem mnemonicParsing="false" text="Action 1" />
+          <MenuItem mnemonicParsing="false" text="Action 2" />
+        </items>
+      </MenuButton>
+      <TextField layoutX="872.0" layoutY="214.0" prefHeight="30.0" prefWidth="119.0" text="lenovo" />
+      <TextField layoutX="872.0" layoutY="259.0" prefHeight="30.0" prefWidth="119.0" text="yyyy-MM-dd" />
+      <CheckBox layoutX="1011.0" layoutY="218.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="111.0" text="Overwrite" />
+      <CheckBox layoutX="1011.0" layoutY="264.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="119.0" text="Overwrite" />
+      <TextField layoutX="1113.0" layoutY="260.0" prefHeight="30.0" prefWidth="119.0" text="timestamp" />
+      <ListView layoutY="2.0" prefHeight="830.0" prefWidth="253.0" />
+      <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="General" />
+      <Button layoutY="30.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="File" />
+      <Button layoutY="240.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Import" />
+      <Button layoutY="210.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="BibTeX key generator" />
+      <Button layoutY="60.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Entry table" />
+      <Button layoutY="90.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Entry table columns" />
+      <Button layoutY="120.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Entry preview" />
+      <Button layoutY="150.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Groups" />
+      <Button layoutY="180.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Entry editor" />
+      <Button layoutY="300.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Name formatter" />
+      <Button layoutY="270.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Export sorting" />
+      <Button layoutY="360.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Network" />
+      <Button layoutY="330.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="XMP -metadata" />
+      <Button layoutY="390.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Advanced" />
+      <Button layoutY="420.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Appearance" />
+      <Button layoutY="793.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Reset preferences" />
+      <Button layoutY="763.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Show preferences" />
+      <Button layoutY="733.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Export preferences" />
+      <Button layoutY="703.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Import preferences" />
+      <Button layoutX="1150.0" layoutY="780.0" mnemonicParsing="false" text="Cancle" />
+      <Button layoutX="1050.0" layoutY="780.0" mnemonicParsing="false" text="Save" />
+      <Separator layoutX="417.0" layoutY="420.0" prefHeight="0.0" prefWidth="860.0" />
+      <Separator layoutX="417.0" layoutY="37.0" prefHeight="3.0" prefWidth="860.0" />
+   </children>
+</AnchorPane>

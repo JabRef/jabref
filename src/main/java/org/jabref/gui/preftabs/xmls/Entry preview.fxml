@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.media.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="830.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ListView layoutY="2.0" prefHeight="830.0" prefWidth="253.0" />
+      <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="General" />
+      <Button layoutY="30.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="File" />
+      <Button layoutY="240.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Import" />
+      <Button layoutY="210.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="BibTeX key generator" />
+      <Button layoutY="60.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Entry table" />
+      <Button layoutY="90.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Entry table columns" />
+      <Button layoutY="120.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Entry preview" />
+      <Button layoutY="150.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Groups" />
+      <Button layoutY="180.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Entry editor" />
+      <Button layoutY="300.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Name formatter" />
+      <Button layoutY="270.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Export sorting" />
+      <Button layoutY="360.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Network" />
+      <Button layoutY="330.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="XMP -metadata" />
+      <Button layoutY="390.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Advanced" />
+      <Button layoutY="420.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Appearance" />
+      <Button layoutY="793.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Reset preferences" />
+      <Button layoutY="763.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Show preferences" />
+      <Button layoutY="733.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Export preferences" />
+      <Button layoutY="703.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Import preferences" />
+      <Button layoutX="1150.0" layoutY="780.0" mnemonicParsing="false" text="Cancle" />
+      <Button layoutX="1050.0" layoutY="780.0" mnemonicParsing="false" text="Save" />
+      <Label layoutX="260.0" layoutY="10.0" text="Current Preview" />
+   </children>
+</AnchorPane>

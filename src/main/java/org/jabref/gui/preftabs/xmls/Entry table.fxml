@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="830.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="264.0" layoutY="25.0" text="Format of author and editor names" />
+      <RadioButton layoutX="303.0" layoutY="53.0" mnemonicParsing="false" text="Show names unchanged" />
+      <RadioButton layoutX="303.0" layoutY="91.0" mnemonicParsing="false" text="Show 'Firstname Lastname'" />
+      <RadioButton layoutX="303.0" layoutY="130.0" mnemonicParsing="false" text="Show 'Lastname, Firstname'" />
+      <RadioButton layoutX="303.0" layoutY="165.0" mnemonicParsing="false" text="Natbib style" />
+      <Label layoutX="264.0" layoutY="212.0" text="Default sort criteria" />
+      <Label layoutX="303.0" layoutY="258.0" text="Primary sort criterion" />
+      <Label layoutX="303.0" layoutY="289.0" text="Secondary sort criterion" />
+      <Label layoutX="303.0" layoutY="320.0" text="Tertiary sort criterion" />
+      <Label layoutX="303.0" layoutY="353.0" text="Sort the following fields as numeric fields:" />
+      <Label layoutX="264.0" layoutY="405.0" text="General" />
+      <CheckBox layoutX="303.0" layoutY="443.0" mnemonicParsing="false" text="Fit table horizontally on screen" />
+      <RadioButton layoutX="575.0" layoutY="53.0" mnemonicParsing="false" text="Do not abbreviate names" />
+      <RadioButton layoutX="575.0" layoutY="91.0" mnemonicParsing="false" text="Abbreviate names" />
+      <RadioButton layoutX="575.0" layoutY="130.0" mnemonicParsing="false" text="Show last names only" />
+      <MenuButton layoutX="517.0" layoutY="253.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="209.0" text="&lt;select&gt;">
+        <items>
+          <MenuItem mnemonicParsing="false" text="Action 1" />
+          <MenuItem mnemonicParsing="false" text="Action 2" />
+        </items>
+      </MenuButton>
+      <MenuButton layoutX="517.0" layoutY="284.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="209.0" text="&lt;select&gt;">
+        <items>
+          <MenuItem mnemonicParsing="false" text="Action 1" />
+          <MenuItem mnemonicParsing="false" text="Action 2" />
+        </items>
+      </MenuButton>
+      <MenuButton layoutX="517.0" layoutY="315.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="209.0" text="&lt;select&gt;">
+        <items>
+          <MenuItem mnemonicParsing="false" text="Action 1" />
+          <MenuItem mnemonicParsing="false" text="Action 2" />
+        </items>
+      </MenuButton>
+      <TextField layoutX="742.0" layoutY="253.0" prefHeight="30.0" prefWidth="120.0" />
+      <TextField layoutX="742.0" layoutY="284.0" prefHeight="30.0" prefWidth="120.0" />
+      <TextField layoutX="742.0" layoutY="315.0" prefHeight="30.0" prefWidth="120.0" />
+      <CheckBox layoutX="894.0" layoutY="258.0" mnemonicParsing="false" text="Descending" />
+      <CheckBox layoutX="894.0" layoutY="289.0" mnemonicParsing="false" text="Descending" />
+      <CheckBox layoutX="894.0" layoutY="320.0" mnemonicParsing="false" text="Descending" />
+      <Separator layoutX="522.0" layoutY="34.0" prefHeight="3.0" prefWidth="751.0" />
+      <Separator layoutX="406.0" layoutY="221.0" prefHeight="3.0" prefWidth="870.0" />
+      <Separator layoutX="328.0" layoutY="414.0" prefHeight="3.0" prefWidth="948.0" />
+      <TextField layoutX="622.0" layoutY="348.0" prefHeight="30.0" prefWidth="427.0" text="mittnum; author" />
+      <Button layoutX="1049.0" layoutY="768.0" mnemonicParsing="false" text="Save" />
+      <Button layoutX="1164.0" layoutY="768.0" mnemonicParsing="false" text="Cancel" />
+   </children>
+</AnchorPane>

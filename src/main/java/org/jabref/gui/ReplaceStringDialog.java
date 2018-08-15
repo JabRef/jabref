@@ -53,6 +53,7 @@ class ReplaceStringDialog extends JabRefDialog {
         ButtonGroup bg = new ButtonGroup();
         bg.add(allFi);
         bg.add(field);
+
         ActionListener okListener = e -> {
             fromString = fromField.getText();
             toString = toField.getText();
@@ -63,10 +64,12 @@ class ReplaceStringDialog extends JabRefDialog {
             fieldStrings = fieldsField.getText().toLowerCase(Locale.ROOT).split(";");
             dispose();
         };
+
         JButton ok = new JButton(Localization.lang("OK"));
         ok.addActionListener(okListener);
         toField.addActionListener(okListener);
         fieldsField.addActionListener(okListener);
+
         AbstractAction cancelAction = new AbstractAction() {
 
             @Override

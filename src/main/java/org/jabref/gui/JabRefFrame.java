@@ -1324,7 +1324,9 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             } catch (Throwable ex) {
                 return false;
             }
-        } else return !response.isPresent() || !response.get().equals(cancel);
+        } else {
+            return !response.isPresent() || !response.get().equals(cancel);
+        }
         return false;
     }
 

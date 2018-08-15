@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.media.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="830.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ListView layoutY="2.0" prefHeight="830.0" prefWidth="253.0" />
+      <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="General" />
+      <Button layoutY="30.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="File" />
+      <Button layoutY="240.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Import" />
+      <Button layoutY="210.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="BibTeX key generator" />
+      <Button layoutY="60.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Entry table" />
+      <Button layoutY="90.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Entry table columns" />
+      <Button layoutY="120.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Entry preview" />
+      <Button layoutY="150.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Groups" />
+      <Button layoutY="180.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Entry editor" />
+      <Button layoutY="300.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Name formatter" />
+      <Button layoutY="270.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Export sorting" />
+      <Button layoutY="360.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Network" />
+      <Button layoutY="330.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="XMP -metadata" />
+      <Button layoutY="390.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Advanced" />
+      <Button layoutY="420.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Appearance" />
+      <Button layoutY="793.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Reset preferences" />
+      <Button layoutY="763.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Show preferences" />
+      <Button layoutY="733.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Export preferences" />
+      <Button layoutY="703.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="253.0" text="Import preferences" />
+      <Button layoutX="1150.0" layoutY="780.0" mnemonicParsing="false" text="Cancle" />
+      <Button layoutX="1050.0" layoutY="780.0" mnemonicParsing="false" text="Save" />
+      <Label layoutX="269.0" layoutY="75.0" text="Entry type" />
+      <Label layoutX="385.0" layoutY="75.0" text="Key pattern" />
+      <Label layoutX="270.0" layoutY="110.0" text="Default pattern" />
+      <Label layoutX="269.0" layoutY="150.0" text="Article" />
+      <Label layoutX="269.0" layoutY="190.0" text="Book" />
+      <Label layoutX="269.0" layoutY="230.0" text="Bookiet" />
+      <Label layoutX="269.0" layoutY="270.0" text="Conference" />
+      <TextField layoutX="385.0" layoutY="105.0" prefHeight="30.0" prefWidth="768.0" />
+      <TextField layoutX="385.0" layoutY="145.0" prefHeight="30.0" prefWidth="768.0" />
+      <TextField layoutX="385.0" layoutY="185.0" prefHeight="30.0" prefWidth="768.0" />
+      <Label layoutX="270.0" layoutY="390.0" text="InBook" />
+      <Label layoutX="270.0" layoutY="350.0" text="IEEEtranBSTCTL" />
+      <Label layoutX="269.0" layoutY="310.0" text="Electronic" />
+      <Label layoutX="269.0" layoutY="470.0" text="Manual" />
+      <Label layoutX="270.0" layoutY="430.0" text="InCollection" />
+      <TextField layoutX="385.0" layoutY="225.0" prefHeight="30.0" prefWidth="768.0" />
+      <TextField layoutX="385.0" layoutY="425.0" prefHeight="30.0" prefWidth="768.0" />
+      <TextField layoutX="385.0" layoutY="385.0" prefHeight="30.0" prefWidth="768.0" />
+      <TextField layoutX="385.0" layoutY="345.0" prefHeight="30.0" prefWidth="768.0" />
+      <TextField layoutX="385.0" layoutY="265.0" prefHeight="30.0" prefWidth="768.0" />
+      <TextField layoutX="385.0" layoutY="305.0" prefHeight="30.0" prefWidth="768.0" />
+      <TextField layoutX="385.0" layoutY="465.0" prefHeight="30.0" prefWidth="768.0" />
+      <Button layoutX="1172.0" layoutY="105.0" mnemonicParsing="false" text="Default" />
+      <Button layoutX="1172.0" layoutY="145.0" mnemonicParsing="false" text="Default" />
+      <Button layoutX="1172.0" layoutY="185.0" mnemonicParsing="false" text="Default" />
+      <Button layoutX="1172.0" layoutY="225.0" mnemonicParsing="false" text="Default" />
+      <Button layoutX="1172.0" layoutY="265.0" mnemonicParsing="false" text="Default" />
+      <Button layoutX="1172.0" layoutY="305.0" mnemonicParsing="false" text="Default" />
+      <Button layoutX="1172.0" layoutY="345.0" mnemonicParsing="false" text="Default" />
+      <Button layoutX="1172.0" layoutY="385.0" mnemonicParsing="false" text="Default" />
+      <Button layoutX="1172.0" layoutY="425.0" mnemonicParsing="false" text="Default" />
+      <Button layoutX="1172.0" layoutY="465.0" mnemonicParsing="false" text="Default" />
+      <TextField layoutX="306.0" layoutY="780.0" prefHeight="30.0" prefWidth="253.0" />
+      <Label layoutX="306.0" layoutY="753.0" text="Label" />
+      <Label layoutX="761.0" layoutY="753.0" text="Label" />
+      <TextField layoutX="761.0" layoutY="778.0" prefHeight="30.0" prefWidth="235.0" />
+      <CheckBox layoutX="318.0" layoutY="723.0" mnemonicParsing="false" text="Generate keys before saving(for entries without a key)" />
+      <CheckBox layoutX="318.0" layoutY="693.0" mnemonicParsing="false" text="Do not overwrite existing keys" />
+      <CheckBox layoutX="318.0" layoutY="661.0" mnemonicParsing="false" text="Warn before overwriting existing keys" />
+      <CheckBox layoutX="318.0" layoutY="629.0" mnemonicParsing="false" text="Generate keys for imported entries" />
+      <Label layoutX="270.0" layoutY="591.0" text="Key generator setting" />
+      <Button layoutX="269.0" layoutY="551.0" mnemonicParsing="false" text="Button" />
+      <Button layoutX="383.0" layoutY="551.0" mnemonicParsing="false" text="Button" />
+      <RadioButton layoutX="761.0" layoutY="630.0" mnemonicParsing="false" text="Ensure unique keys using letters" />
+      <RadioButton layoutX="761.0" layoutY="662.0" mnemonicParsing="false" text="Ensure unique keys using letters" />
+      <RadioButton layoutX="761.0" layoutY="694.0" mnemonicParsing="false" text="Always add letter to generated keys" />
+   </children>
+</AnchorPane>
