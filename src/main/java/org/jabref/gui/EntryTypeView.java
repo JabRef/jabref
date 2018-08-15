@@ -13,7 +13,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -51,9 +50,11 @@ import org.slf4j.LoggerFactory;
  */
 public class EntryTypeView extends BaseDialog<Void> {
 
+    private static final int COLUMN = 3;
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntryTypeView.class);
+
     @FXML private Button generateButton;
     @FXML private Button cancelButton;
-    @FXML private ButtonType button;
     @FXML private TextField idTextField;
     @FXML private ComboBox<String> comboBox;
     @FXML private TitledPane biblatexPane;
@@ -62,12 +63,9 @@ public class EntryTypeView extends BaseDialog<Void> {
     @FXML private TitledPane customPane;
     @FXML private VBox vBox;
 
-    private EntryType type;
-    private static final int COLUMN = 3;
-    private static final Logger LOGGER = LoggerFactory.getLogger(EntryTypeView.class);
-
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
     private final BasePanel basePanel;
+    private EntryType type;
     private Task<Optional<BibEntry>> fetcherWorker = new FetcherWorker();
 
     public EntryTypeView(BasePanel basePanel) {
@@ -141,9 +139,10 @@ public class EntryTypeView extends BaseDialog<Void> {
                 col = 0;
                 row++;
                 //constraints.gridwidth = GridBagConstraints.REMAINDER;
-            } else {
-                //constraints.gridwidth = 1;
             }
+            //else {
+                //constraints.gridwidth = 1;
+            //}
             GridPane.setHalignment(entryButton, HPos.CENTER);
             gridpane.add(entryButton, col, row);
             col++;
@@ -280,7 +279,6 @@ public class EntryTypeView extends BaseDialog<Void> {
             return bibEntry;
         }
     }
-
 
     @FXML
     private void cancelHandle(Event event) {
