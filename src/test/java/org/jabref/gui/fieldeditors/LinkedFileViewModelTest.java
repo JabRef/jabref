@@ -15,7 +15,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.junit$pioneer.jupiter.TempDirectory;
+import org.junitpioneer.jupiter.TempDirectory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

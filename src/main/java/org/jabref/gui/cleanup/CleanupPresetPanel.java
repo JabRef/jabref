@@ -6,11 +6,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javafx.embed.swing.SwingNode;
+import javafx.scene.Group;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.GridPane;
 
 import org.jabref.Globals;
 import org.jabref.logic.cleanup.CleanupPreset;
@@ -20,25 +21,22 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-
 public class CleanupPresetPanel {
 
     private final BibDatabaseContext databaseContext;
-    private JCheckBox cleanUpDOI;
-    private JCheckBox cleanUpISSN;
-    private JCheckBox cleanUpMovePDF;
-    private JCheckBox cleanUpMakePathsRelative;
-    private JCheckBox cleanUpRenamePDF;
-    private JCheckBox cleanUpRenamePDFonlyRelativePaths;
-    private JCheckBox cleanUpUpgradeExternalLinks;
-    private JCheckBox cleanUpBiblatex;
-    private JCheckBox cleanUpBibtex;
+    private CheckBox cleanUpDOI;
+    private CheckBox cleanUpISSN;
+    private CheckBox cleanUpMovePDF;
+    private CheckBox cleanUpMakePathsRelative;
+    private CheckBox cleanUpRenamePDF;
+    private CheckBox cleanUpRenamePDFonlyRelativePaths;
+    private CheckBox cleanUpUpgradeExternalLinks;
+    private CheckBox cleanUpBiblatex;
+    private CheckBox cleanUpBibtex;
     private FieldFormatterCleanupsPanel cleanUpFormatters;
 
-    private JPanel panel;
-    private JScrollPane scrollPane;
+    private GridPane panel;
+    private ScrollPane scrollPane;
     private CleanupPreset cleanupPreset;
 
     public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset) {
@@ -48,76 +46,77 @@ public class CleanupPresetPanel {
     }
 
     private void init() {
-        cleanUpDOI = new JCheckBox(
+        cleanUpDOI = new CheckBox(
                 Localization.lang("Move DOIs from note and URL field to DOI field and remove http prefix"));
-        cleanUpISSN = new JCheckBox(Localization.lang("Reformat ISSN"));
-
+        cleanUpISSN = new CheckBox(Localization.lang("Reformat ISSN"));
         Optional<Path> firstExistingDir = databaseContext
                 .getFirstExistingFileDir(JabRefPreferences.getInstance().getFileDirectoryPreferences());
         if (firstExistingDir.isPresent()) {
-            cleanUpMovePDF = new JCheckBox(Localization.lang("Move linked files to default file directory %0",
+            cleanUpMovePDF = new CheckBox(Localization.lang("Move linked files to default file directory %0",
                     firstExistingDir.get().toString()));
         } else {
-            cleanUpMovePDF = new JCheckBox(Localization.lang("Move linked files to default file directory %0", "..."));
-            cleanUpMovePDF.setEnabled(false);
+            cleanUpMovePDF = new CheckBox(Localization.lang("Move linked files to default file directory %0", "..."));
+            cleanUpMovePDF.setDisable(true);
             // Since the directory does not exist, we cannot move it to there. So, this option is not checked - regardless of the presets stored in the preferences.
             cleanUpMovePDF.setSelected(false);
         }
-
-        cleanUpMakePathsRelative = new JCheckBox(
+        cleanUpMakePathsRelative = new CheckBox(
                 Localization.lang("Make paths of linked files relative (if possible)"));
-        cleanUpRenamePDF = new JCheckBox(Localization.lang("Rename PDFs to given filename format pattern"));
-        cleanUpRenamePDF.addChangeListener(
-                event -> cleanUpRenamePDFonlyRelativePaths.setEnabled(cleanUpRenamePDF.isSelected()));
-        cleanUpRenamePDFonlyRelativePaths = new JCheckBox(Localization.lang("Rename only PDFs having a relative path"));
-        cleanUpUpgradeExternalLinks = new JCheckBox(
+        cleanUpRenamePDF = new CheckBox(Localization.lang("Rename PDFs to given filename format pattern"));
+        cleanUpRenamePDF.selectedProperty().addListener(
+                                                        event -> cleanUpRenamePDFonlyRelativePaths.setDisable(!cleanUpRenamePDF.isSelected()));
+        cleanUpRenamePDFonlyRelativePaths = new CheckBox(Localization.lang("Rename only PDFs having a relative path"));
+        cleanUpUpgradeExternalLinks = new CheckBox(
                 Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", FieldName.FILE));
-        cleanUpBiblatex = new JCheckBox(Localization.lang(
+        cleanUpBiblatex = new CheckBox(Localization.lang(
                 "Convert to biblatex format (for example, move the value of the 'journal' field to 'journaltitle')"));
-        cleanUpBibtex = new JCheckBox(Localization.lang(
+        cleanUpBibtex = new CheckBox(Localization.lang(
                 "Convert to BibTeX format (for example, move the value of the 'journaltitle' field to 'journal')"));
-        ButtonGroup biblatexConversion = new ButtonGroup(); // Only make "to Biblatex" or "to BibTeX" selectable
-        biblatexConversion.add(cleanUpBiblatex);
-        biblatexConversion.add(cleanUpBibtex);
+        Group biblatexConversion = new Group(); // Only make "to Biblatex" or "to BibTeX" selectable
+        biblatexConversion.getChildren().add(cleanUpBiblatex);
+        biblatexConversion.getChildren().add(cleanUpBibtex);
 
         cleanUpFormatters = new FieldFormatterCleanupsPanel(Localization.lang("Run field formatter:"),
                 Cleanups.DEFAULT_SAVE_ACTIONS);
 
         updateDisplay(cleanupPreset);
 
-        FormLayout layout = new FormLayout("left:15dlu, fill:pref:grow",
-                "pref, pref, pref, pref, pref, fill:pref:grow, pref,pref, pref, pref,190dlu, fill:pref:grow,");
-
-        FormBuilder builder = FormBuilder.create().layout(layout);
-        builder.add(cleanUpDOI).xyw(1, 1, 2);
-        builder.add(cleanUpUpgradeExternalLinks).xyw(1, 2, 2);
-        builder.add(cleanUpMovePDF).xyw(1, 3, 2);
-        builder.add(cleanUpMakePathsRelative).xyw(1, 4, 2);
-        builder.add(cleanUpRenamePDF).xyw(1, 5, 2);
+        //                FormLayout layout = new FormLayout("left:15dlu, fill:pref:grow",
+        //                        "pref, pref, pref, pref, pref, fill:pref:grow, pref,pref, pref, pref,190dlu, fill:pref:grow,");
+        //
+        //                FormBuilder builder = FormBuilder.create().layout(layout);
+        panel = new GridPane();
+        panel.add(cleanUpDOI, 0, 0);
+        panel.add(cleanUpUpgradeExternalLinks, 0, 1);
+        panel.add(cleanUpMovePDF, 0, 2);
+        panel.add(cleanUpMakePathsRelative, 0, 3);
+        panel.add(cleanUpRenamePDF, 0, 4);
         String currentPattern = Localization.lang("Filename format pattern").concat(": ");
         currentPattern = currentPattern.concat(Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
-        builder.add(new JLabel(currentPattern)).xy(2, 6);
-        builder.add(cleanUpRenamePDFonlyRelativePaths).xy(2, 7);
-        builder.add(cleanUpBibtex).xyw(1, 8, 2);
-        builder.add(cleanUpBiblatex).xyw(1, 9, 2);
-        builder.add(cleanUpISSN).xyw(1, 10, 2);
-        builder.add(cleanUpFormatters).xyw(1, 11, 2);
-        panel = builder.build();
-        scrollPane = new JScrollPane(panel);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        panel.add(new Label(currentPattern), 0, 5);
+        panel.add(cleanUpRenamePDFonlyRelativePaths, 0, 6);
+        panel.add(cleanUpBibtex, 0, 7);
+        panel.add(cleanUpBiblatex, 0, 8);
+        panel.add(cleanUpISSN, 0, 9);
+        SwingNode cleanUpFormattersFX = new SwingNode();
+        cleanUpFormattersFX.setContent(cleanUpFormatters);
+        panel.add(cleanUpFormattersFX, 0, 10);
+        //        panel = builder.build();
+        scrollPane = new ScrollPane(panel);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         scrollPane.setVisible(true);
         scrollPane.setBorder(null);
     }
 
     private void updateDisplay(CleanupPreset preset) {
         cleanUpDOI.setSelected(preset.isCleanUpDOI());
-        if (cleanUpMovePDF.isEnabled()) {
+        if (!cleanUpMovePDF.isDisabled()) {
             cleanUpMovePDF.setSelected(preset.isMovePDF());
         }
         cleanUpMakePathsRelative.setSelected(preset.isMakePathsRelative());
         cleanUpRenamePDF.setSelected(preset.isRenamePDF());
         cleanUpRenamePDFonlyRelativePaths.setSelected(preset.isRenamePdfOnlyRelativePaths());
-        cleanUpRenamePDFonlyRelativePaths.setEnabled(cleanUpRenamePDF.isSelected());
+        cleanUpRenamePDFonlyRelativePaths.setDisable(!cleanUpRenamePDF.isSelected());
         cleanUpUpgradeExternalLinks.setSelected(preset.isCleanUpUpgradeExternalLinks());
         cleanUpBiblatex.setSelected(preset.isConvertToBiblatex());
         cleanUpBibtex.setSelected(preset.isConvertToBibtex());
@@ -125,7 +124,7 @@ public class CleanupPresetPanel {
         cleanUpFormatters.setValues(preset.getFormatterCleanups());
     }
 
-    public JScrollPane getScrollPane() {
+    public ScrollPane getScrollPane() {
         return scrollPane;
     }
 

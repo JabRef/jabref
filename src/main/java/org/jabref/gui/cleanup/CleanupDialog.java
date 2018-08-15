@@ -1,8 +1,9 @@
 package org.jabref.gui.cleanup;
 
-import javax.swing.JScrollPane;
-
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ScrollPane;
 
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
@@ -19,8 +20,9 @@ public class CleanupDialog extends BaseDialog<CleanupPreset> {
 
         CleanupPresetPanel presetPanel = new CleanupPresetPanel(databaseContext, initialPreset);
         presetPanel.getScrollPane().setVisible(true);
-        JScrollPane scrollPane = presetPanel.getScrollPane();
-
+        ScrollPane scrollPane = presetPanel.getScrollPane();
+        JFXPanel scrollPanes = new JFXPanel();
+        scrollPanes.setScene(new Scene(scrollPane));
         setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 return presetPanel.getCleanupPreset();
@@ -29,6 +31,6 @@ public class CleanupDialog extends BaseDialog<CleanupPreset> {
             }
         });
 
-        ControlHelper.setSwingContent(getDialogPane(), scrollPane);
+        ControlHelper.setSwingContent(getDialogPane(), scrollPanes);
     }
 }
