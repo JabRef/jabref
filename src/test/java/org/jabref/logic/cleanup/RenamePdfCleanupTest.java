@@ -28,7 +28,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(TempDirectory.class)
-public class RenamePdfCleanupTest {
+class RenamePdfCleanupTest {
 
     private BibDatabaseContext context;
     private BibEntry entry;
@@ -37,7 +37,7 @@ public class RenamePdfCleanupTest {
     private LayoutFormatterPreferences layoutFormatterPreferences;
 
     @BeforeEach
-    public void setUp(@TempDirectory.TempDir Path testFolder) throws Exception {
+    void setUp(@TempDirectory.TempDir Path testFolder) {
         Path path = testFolder.resolve("test.bib");
         MetaData metaData = new MetaData();
         context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
@@ -54,13 +54,12 @@ public class RenamePdfCleanupTest {
      * Test for #466
      */
     @Test
-    public void cleanupRenamePdfRenamesFileEvenIfOnlyDifferenceIsCase(@TempDirectory.TempDir Path testFolder) throws IOException {
+    void cleanupRenamePdfRenamesFileEvenIfOnlyDifferenceIsCase(@TempDirectory.TempDir Path testFolder) throws IOException {
         String fileNamePattern = "[bibtexkey]";
         Path path = testFolder.resolve("toot.tmp");
         Files.createFile(path);
-        File tempFile = path.toFile();
 
-        LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
+        LinkedFile fileField = new LinkedFile("", path.toAbsolutePath().toString(), "");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
@@ -72,7 +71,7 @@ public class RenamePdfCleanupTest {
     }
 
     @Test
-    public void cleanupRenamePdfRenamesWithMultipleFiles(@TempDirectory.TempDir Path testFolder) throws IOException {
+    void cleanupRenamePdfRenamesWithMultipleFiles(@TempDirectory.TempDir Path testFolder) throws IOException {
         String fileNamePattern = "[bibtexkey] - [fulltitle]";
         Path path = testFolder.resolve("Toot.tmp");
         Files.createFile(path);
@@ -92,13 +91,12 @@ public class RenamePdfCleanupTest {
     }
 
     @Test
-    public void cleanupRenamePdfRenamesFileStartingWithBibtexKey(@TempDirectory.TempDir Path testFolder) throws IOException {
+    void cleanupRenamePdfRenamesFileStartingWithBibtexKey(@TempDirectory.TempDir Path testFolder) throws IOException {
         String fileNamePattern = "[bibtexkey] - [fulltitle]";
         Path path = testFolder.resolve("Toot.tmp");
         Files.createFile(path);
 
-        File tempFile = path.toFile();
-        LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
+        LinkedFile fileField = new LinkedFile("", path.toAbsolutePath().toString(), "");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
@@ -111,7 +109,7 @@ public class RenamePdfCleanupTest {
     }
 
     @Test
-    public void cleanupRenamePdfRenamesFileInSameFolder(@TempDirectory.TempDir Path testFolder) throws IOException {
+    void cleanupRenamePdfRenamesFileInSameFolder(@TempDirectory.TempDir Path testFolder) throws IOException {
         String fileNamePattern = "[bibtexkey] - [fulltitle]";
         Path path = testFolder.resolve("Toot.pdf");
         Files.createFile(path);
@@ -127,7 +125,7 @@ public class RenamePdfCleanupTest {
     }
 
     @Test
-    public void cleanupSingleField(@TempDirectory.TempDir Path testFolder) throws IOException {
+    void cleanupSingleField(@TempDirectory.TempDir Path testFolder) throws IOException {
         String fileNamePattern = "[bibtexkey] - [fulltitle]";
         Path path = testFolder.resolve("Toot.pdf");
         Files.createFile(path);
@@ -145,7 +143,7 @@ public class RenamePdfCleanupTest {
     }
 
     @Test
-    public void cleanupGetTargetFilename(@TempDirectory.TempDir Path testFolder) throws IOException {
+    void cleanupGetTargetFilename(@TempDirectory.TempDir Path testFolder) throws IOException {
         String fileNamePattern = "[bibtexkey] - [fulltitle]";
         Path path = testFolder.resolve("Toot.pdf");
         Files.createFile(path);

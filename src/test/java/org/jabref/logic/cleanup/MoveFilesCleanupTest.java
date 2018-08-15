@@ -28,7 +28,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(TempDirectory.class)
-public class MoveFilesCleanupTest {
+class MoveFilesCleanupTest {
 
     private File pdfFolder;
     private BibDatabaseContext databaseContext;
@@ -37,7 +37,7 @@ public class MoveFilesCleanupTest {
     private FileDirectoryPreferences fileDirPrefs;
 
     @BeforeEach
-    public void setUp(@TempDirectory.TempDir Path bibFolder) throws IOException {
+    void setUp(@TempDirectory.TempDir Path bibFolder) throws IOException {
         MetaData metaData = new MetaData();
         Path path = bibFolder.resolve("ARandomlyNamedFolder");
         Files.createDirectory(path);
@@ -55,13 +55,12 @@ public class MoveFilesCleanupTest {
     }
 
     @Test
-    public void movesFileFromSubfolder(@TempDirectory.TempDir Path bibFolder) throws IOException {
+    void movesFileFromSubfolder(@TempDirectory.TempDir Path bibFolder) throws IOException {
         Path path = bibFolder.resolve("AnotherRandomlyNamedFolder");
         Files.createDirectory(path);
-        File subfolder = path.toFile();
-        File fileBefore = new File(subfolder, "test.pdf");
+        File fileBefore = path.resolve("test.pdf").toFile();
         assertTrue(fileBefore.createNewFile());
-        assertTrue(new File(subfolder, "test.pdf").exists());
+        assertTrue(fileBefore.exists());
 
         LinkedFile fileField = new LinkedFile("", fileBefore.getAbsolutePath(), "");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
@@ -70,7 +69,7 @@ public class MoveFilesCleanupTest {
         cleanup.cleanup(entry);
 
         assertFalse(fileBefore.exists());
-        File fileAfter = new File(pdfFolder, "test.pdf");
+        File fileAfter = pdfFolder.toPath().resolve("test.pdf").toFile();
         assertTrue(fileAfter.exists());
 
         assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(new LinkedFile("", fileAfter.getName(), ""))),
@@ -78,11 +77,10 @@ public class MoveFilesCleanupTest {
     }
 
     @Test
-    public void movesFileFromSubfolderMultiple(@TempDirectory.TempDir Path bibFolder) throws IOException {
+    void movesFileFromSubfolderMultiple(@TempDirectory.TempDir Path bibFolder) throws IOException {
         Path path = bibFolder.resolve("AnotherRandomlyNamedFolder");
         Files.createDirectory(path);
-        File subfolder = path.toFile();
-        File fileBefore = new File(subfolder, "test.pdf");
+        File fileBefore = path.resolve("test.pdf").toFile();
         assertTrue(fileBefore.createNewFile());
         assertTrue(fileBefore.exists());
 
@@ -94,7 +92,7 @@ public class MoveFilesCleanupTest {
         cleanup.cleanup(entry);
 
         assertFalse(fileBefore.exists());
-        File fileAfter = new File(pdfFolder, "test.pdf");
+        File fileAfter = pdfFolder.toPath().resolve("test.pdf").toFile();
         assertTrue(fileAfter.exists());
 
         assertEquals(
@@ -103,14 +101,13 @@ public class MoveFilesCleanupTest {
     }
 
     @Test
-    public void movesFileFromSubfolderWithFileDirPattern(@TempDirectory.TempDir Path bibFolder) throws IOException {
+    void movesFileFromSubfolderWithFileDirPattern(@TempDirectory.TempDir Path bibFolder) throws IOException {
         Path path = bibFolder.resolve("AnotherRandomlyNamedFolder");
         Files.createDirectory(path);
-        File subfolder = path.toFile();
-        File fileBefore = new File(subfolder, "test.pdf");
+        File fileBefore = path.resolve("test.pdf").toFile();
 
         assertTrue(fileBefore.createNewFile());
-        assertTrue(new File(subfolder, "test.pdf").exists());
+        assertTrue(fileBefore.exists());
 
         LinkedFile fileField = new LinkedFile("", fileBefore.getAbsolutePath(), "");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
@@ -130,16 +127,15 @@ public class MoveFilesCleanupTest {
     }
 
     @Test
-    public void movesFileFromSubfolderWithSubdirPattern(@TempDirectory.TempDir Path bibFolder) throws IOException {
+    void movesFileFromSubfolderWithSubdirPattern(@TempDirectory.TempDir Path bibFolder) throws IOException {
         BibEntry local_entry = (BibEntry) entry.clone();
         local_entry.setField("year", "1989");
         Path path = bibFolder.resolve("AnotherRandomlyNamedFolder");
         Files.createDirectory(path);
-        File subfolder = path.toFile();
-        File fileBefore = new File(subfolder, "test.pdf");
+        File fileBefore = path.resolve("test.pdf").toFile();
 
         assertTrue(fileBefore.createNewFile());
-        assertTrue(new File(subfolder, "test.pdf").exists());
+        assertTrue(fileBefore.exists());
 
         LinkedFile fileField = new LinkedFile("", fileBefore.getAbsolutePath(), "");
         local_entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
@@ -158,17 +154,16 @@ public class MoveFilesCleanupTest {
     }
 
     @Test
-    public void movesFileFromSubfolderWithDeepSubdirPattern(@TempDirectory.TempDir Path bibFolder) throws IOException {
+    void movesFileFromSubfolderWithDeepSubdirPattern(@TempDirectory.TempDir Path bibFolder) throws IOException {
         BibEntry local_entry = (BibEntry) entry.clone();
         local_entry.setField("year", "1989");
         local_entry.setField("author", "O. Kitsune");
         Path path = bibFolder.resolve("AnotherRandomlyNamedFolder");
         Files.createDirectory(path);
-        File subfolder = path.toFile();
-        File fileBefore = new File(subfolder, "test.pdf");
+        File fileBefore = path.resolve("test.pdf").toFile();
 
         assertTrue(fileBefore.createNewFile());
-        assertTrue(new File(subfolder, "test.pdf").exists());
+        assertTrue(fileBefore.exists());
 
         LinkedFile fileField = new LinkedFile("", fileBefore.getAbsolutePath(), "");
         local_entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));

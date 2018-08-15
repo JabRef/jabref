@@ -46,7 +46,7 @@ public class BibTeXMLExporterTestFiles {
 
     public static Stream<String> fileNames() throws IOException, URISyntaxException {
         resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("BibTeXMLExporterTestArticle.bib").toURI()).getParent();
-        System.out.println(resourceDir);
+//        System.out.println(resourceDir);
 
         try (Stream<Path> stream = Files.list(resourceDir)) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
@@ -69,7 +69,7 @@ public class BibTeXMLExporterTestFiles {
     public final void testPerformExport(String filename) throws IOException, SaveException {
         String xmlFileName = filename.replace(".bib", ".xml");
         Path importFile = resourceDir.resolve(filename);
-        String tempFilename = tempFile.getCanonicalPath();
+        String tempFilePath = tempFile.getCanonicalPath();
 
         List<BibEntry> entries = testImporter.importDatabase(importFile, StandardCharsets.UTF_8).getDatabase()
                 .getEntries();
@@ -77,7 +77,7 @@ public class BibTeXMLExporterTestFiles {
         bibtexmlExportFormat.export(databaseContext, tempFile.toPath(), charset, entries);
 
         Builder control = Input.from(Files.newInputStream(resourceDir.resolve(xmlFileName)));
-        Builder test = Input.from(Files.newInputStream(Paths.get(tempFilename)));
+        Builder test = Input.from(Files.newInputStream(Paths.get(tempFilePath)));
 
         assertThat(test, CompareMatcher.isSimilarTo(control)
                 .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
