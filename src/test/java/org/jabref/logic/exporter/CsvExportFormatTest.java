@@ -27,6 +27,7 @@ import static org.mockito.Mockito.mock;
 
 @ExtendWith(TempDirectory.class)
 public class CsvExportFormatTest {
+
     private Exporter exportFormat;
     public BibDatabaseContext databaseContext;
     public Charset charset;
@@ -53,35 +54,35 @@ public class CsvExportFormatTest {
     @Test
     public void testPerformExportForSingleAuthor(@TempDirectory.TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
-        File tmpFile = path.toFile();
+
         BibEntry entry = new BibEntry();
         entry.setField("author", "Someone, Van Something");
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, tmpFile.toPath(), charset, entries);
+        exportFormat.export(databaseContext, path, charset, entries);
 
-        List<String> lines = Files.readAllLines(tmpFile.toPath());
+        List<String> lines = Files.readAllLines(path);
         assertEquals(2, lines.size());
         assertEquals(
-                "10,\"\",\"\",\"Someone, Van Something\",\"\",\"\",,,\"\",\"\",,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
-                lines.get(1));
+                     "10,\"\",\"\",\"Someone, Van Something\",\"\",\"\",,,\"\",\"\",,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
+                     lines.get(1));
     }
 
     @Test
     public void testPerformExportForMultipleAuthors(@TempDirectory.TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
-        File tmpFile = path.toFile();
+
         BibEntry entry = new BibEntry();
         entry.setField("author", "von Neumann, John and Smith, John and Black Brown, Peter");
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, tmpFile.toPath(), charset, entries);
+        exportFormat.export(databaseContext, path, charset, entries);
 
-        List<String> lines = Files.readAllLines(tmpFile.toPath());
+        List<String> lines = Files.readAllLines(path);
         assertEquals(2, lines.size());
         assertEquals(
-                "10,\"\",\"\",\"von Neumann, John; Smith, John; Black Brown, Peter\",\"\",\"\",,,\"\",\"\",,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
-                lines.get(1));
+                     "10,\"\",\"\",\"von Neumann, John; Smith, John; Black Brown, Peter\",\"\",\"\",,,\"\",\"\",,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
+                     lines.get(1));
     }
 
     @Test
@@ -97,8 +98,8 @@ public class CsvExportFormatTest {
         List<String> lines = Files.readAllLines(tmpFile.toPath());
         assertEquals(2, lines.size());
         assertEquals(
-                "10,\"\",\"\",\"\",\"\",\"\",,,\"\",\"\",,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"Someone, Van Something\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
-                lines.get(1));
+                     "10,\"\",\"\",\"\",\"\",\"\",,,\"\",\"\",,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"Someone, Van Something\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
+                     lines.get(1));
     }
 
     @Test
@@ -114,8 +115,8 @@ public class CsvExportFormatTest {
         List<String> lines = Files.readAllLines(tmpFile.toPath());
         assertEquals(2, lines.size());
         assertEquals(
-                "10,\"\",\"\",\"\",\"\",\"\",,,\"\",\"\",,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"von Neumann, John; Smith, John; Black Brown, Peter\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
-                lines.get(1));
+                     "10,\"\",\"\",\"\",\"\",\"\",,,\"\",\"\",,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"von Neumann, John; Smith, John; Black Brown, Peter\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
+                     lines.get(1));
     }
 
 }

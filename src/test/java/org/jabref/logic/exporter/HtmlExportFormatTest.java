@@ -1,6 +1,5 @@
 package org.jabref.logic.exporter;
 
-import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -59,9 +58,8 @@ public class HtmlExportFormatTest {
     @Test
     public void emitWellFormedHtml(@TempDirectory.TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
-        File tmpFile = path.toFile();
-        exportFormat.export(databaseContext, tmpFile.toPath(), charset, entries);
-        List<String> lines = Files.readAllLines(tmpFile.toPath());
+        exportFormat.export(databaseContext, path, charset, entries);
+        List<String> lines = Files.readAllLines(path);
         assertEquals("</html>", lines.get(lines.size() - 1));
     }
 }

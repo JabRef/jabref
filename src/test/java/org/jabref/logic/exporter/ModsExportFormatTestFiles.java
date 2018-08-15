@@ -1,6 +1,5 @@
 package org.jabref.logic.exporter;
 
-import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -39,7 +38,7 @@ public class ModsExportFormatTestFiles {
 
     public Charset charset;
     private BibDatabaseContext databaseContext;
-    private File tempFile;
+    private Path tempFile;
     private ModsExporter modsExportFormat;
     private BibtexImporter bibtexImporter;
     private ModsImporter modsImporter;
@@ -65,7 +64,7 @@ public class ModsExportFormatTestFiles {
         modsExportFormat = new ModsExporter();
         Path path = testFolder.resolve("ARandomlyNamedFile.tmp");
         Files.createFile(path);
-        tempFile = path.toFile();
+        tempFile = path.toAbsolutePath();
         bibtexImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
         modsImporter = new ModsImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
@@ -76,14 +75,14 @@ public class ModsExportFormatTestFiles {
     public final void testPerformExport(String filename) throws Exception {
         importFile = Paths.get(ModsExportFormatTestFiles.class.getResource(filename).toURI());
         String xmlFileName = filename.replace(".bib", ".xml");
-        String tempFilename = tempFile.getCanonicalPath();
+        Path tempFilename = tempFile.toAbsolutePath();
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
         Path xmlFile = Paths.get(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
 
-        modsExportFormat.export(databaseContext, tempFile.toPath(), charset, entries);
+        modsExportFormat.export(databaseContext, tempFile, charset, entries);
 
         Builder control = Input.from(Files.newInputStream(xmlFile));
-        Builder test = Input.from(Files.newInputStream(Paths.get(tempFilename)));
+        Builder test = Input.from(Files.newInputStream(tempFilename));
 
         assertThat(test, CompareMatcher.isSimilarTo(control)
                 .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
@@ -96,8 +95,8 @@ public class ModsExportFormatTestFiles {
         importFile = Paths.get(ModsExportFormatTestFiles.class.getResource(filename).toURI());
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
 
-        modsExportFormat.export(databaseContext, tempFile.toPath(), charset, entries);
-        BibEntryAssert.assertEquals(entries, Paths.get(tempFile.getPath()), modsImporter);
+        modsExportFormat.export(databaseContext, tempFile, charset, entries);
+        BibEntryAssert.assertEquals(entries, tempFile, modsImporter);
     }
 
     @Disabled
@@ -106,15 +105,15 @@ public class ModsExportFormatTestFiles {
     public final void testImportAsModsAndExportAsMods(String filename) throws Exception {
         importFile = Paths.get(ModsExportFormatTestFiles.class.getResource(filename).toURI());
         String xmlFileName = filename.replace(".bib", ".xml");
-        String tempFilename = tempFile.getCanonicalPath();
+        Path tempFilename = tempFile.toAbsolutePath();
         Path xmlFile = Paths.get(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
 
         List<BibEntry> entries = modsImporter.importDatabase(xmlFile, charset).getDatabase().getEntries();
 
-        modsExportFormat.export(databaseContext, tempFile.toPath(), charset, entries);
+        modsExportFormat.export(databaseContext, tempFile, charset, entries);
 
         Builder control = Input.from(Files.newInputStream(xmlFile));
-        Builder test = Input.from(Files.newInputStream(Paths.get(tempFilename)));
+        Builder test = Input.from(Files.newInputStream(tempFilename));
 
         assertThat(test, CompareMatcher.isSimilarTo(control)
                 .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());

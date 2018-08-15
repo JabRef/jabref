@@ -1,6 +1,5 @@
 package org.jabref.logic.exporter;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -38,7 +37,7 @@ public class BibTeXMLExporterTestFiles {
 
     public BibDatabaseContext databaseContext;
     public Charset charset;
-    public File tempFile;
+    public Path tempFile;
     public BibTeXMLExporter bibtexmlExportFormat;
     public BibtexImporter testImporter;
 
@@ -60,7 +59,7 @@ public class BibTeXMLExporterTestFiles {
         charset = StandardCharsets.UTF_8;
         bibtexmlExportFormat = new BibTeXMLExporter();
         Files.createFile(testFolder.resolve("ARandomlyNamedFile.tmp"));
-        tempFile = testFolder.resolve("ARandomlyNamedFile.tmp").toFile();
+        tempFile = testFolder.resolve("ARandomlyNamedFile.tmp");
         testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
     }
 
@@ -69,12 +68,12 @@ public class BibTeXMLExporterTestFiles {
     public final void testPerformExport(String filename) throws IOException, SaveException {
         String xmlFileName = filename.replace(".bib", ".xml");
         Path importFile = resourceDir.resolve(filename);
-        String tempFilePath = tempFile.getCanonicalPath();
+        String tempFilePath = tempFile.toAbsolutePath().toString();
 
         List<BibEntry> entries = testImporter.importDatabase(importFile, StandardCharsets.UTF_8).getDatabase()
                 .getEntries();
 
-        bibtexmlExportFormat.export(databaseContext, tempFile.toPath(), charset, entries);
+        bibtexmlExportFormat.export(databaseContext, tempFile, charset, entries);
 
         Builder control = Input.from(Files.newInputStream(resourceDir.resolve(xmlFileName)));
         Builder test = Input.from(Files.newInputStream(Paths.get(tempFilePath)));
