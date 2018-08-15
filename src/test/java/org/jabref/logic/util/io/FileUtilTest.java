@@ -30,14 +30,19 @@ class FileUtilTest {
     private Path existingTestFile;
     private Path otherExistingTestFile;
     private LayoutFormatterPreferences layoutFormatterPreferences;
+    private Path rootDir;
 
     @BeforeEach
     void setUpViewModel(@TempDirectory.TempDir Path temporaryFolder) throws IOException {
-        existingTestFile = temporaryFolder.resolve("existingTestFile.txt");
+        rootDir = temporaryFolder;
+        Path subDir = rootDir.resolve("1");
+        Files.createDirectory(subDir);
+
+        existingTestFile = subDir.resolve("existingTestFile.txt");
         Files.createFile(existingTestFile);
         Files.write(existingTestFile, "existingTestFile.txt".getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
 
-        otherExistingTestFile = temporaryFolder.resolve("otherExistingTestFile.txt");
+        otherExistingTestFile = subDir.resolve("otherExistingTestFile.txt");
         Files.createFile(otherExistingTestFile);
         Files.write(otherExistingTestFile, "otherExistingTestFile.txt".getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
         layoutFormatterPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -252,18 +257,20 @@ class FileUtilTest {
     }
 
     @Test
-    void testCopyFileSuccessfulWithOverrideExistFile(@TempDirectory.TempDir Path otherTemporaryFolder) throws IOException {
-        Path temp = otherTemporaryFolder.getParent().resolve("junit11111111111/existingTestFile.txt");
-        Files.createDirectory(temp.getParent());
+    void testCopyFileSuccessfulWithOverrideExistFile() throws IOException {
+        Path subDir = rootDir.resolve("2");
+        Files.createDirectory(subDir);
+        Path temp = subDir.resolve("existingTestFile.txt");
         Files.createFile(temp);
         FileUtil.copyFile(existingTestFile, temp, true);
         assertEquals(Files.readAllLines(existingTestFile, StandardCharsets.UTF_8), Files.readAllLines(temp, StandardCharsets.UTF_8));
     }
 
     @Test
-    void testCopyFileSuccessfulWithoutOverrideExistFile(@TempDirectory.TempDir Path otherTemporaryFolder) throws IOException {
-        Path temp = otherTemporaryFolder.getParent().resolve("junit11111111111/existingTestFile.txt");
-        Files.createDirectory(temp.getParent());
+    void testCopyFileSuccessfulWithoutOverrideExistFile() throws IOException {
+        Path subDir = rootDir.resolve("2");
+        Files.createDirectory(subDir);
+        Path temp = subDir.resolve("existingTestFile.txt");
         Files.createFile(temp);
         FileUtil.copyFile(existingTestFile, temp, false);
         assertNotEquals(Files.readAllLines(existingTestFile, StandardCharsets.UTF_8), Files.readAllLines(temp, StandardCharsets.UTF_8));
@@ -311,6 +318,8 @@ class FileUtilTest {
 
     @Test
     void testRenameFileSuccessful(@TempDirectory.TempDir Path otherTemporaryFolder) {
+        // Be careful. This "otherTemporaryFolder" is the same as the "temporaryFolder"
+        // in the @BeforeEach method.
         Path temp = Paths.get(otherTemporaryFolder.resolve("123").toString());
 
         System.out.println(temp);
@@ -354,31 +363,5 @@ class FileUtilTest {
 
         assertEquals("PDF/1998/Åuthör/1234 - mytitle",
                 FileUtil.createDirNameFromPattern(null, entry, fileNamePattern));
-    }
-
-    @AfterEach void delete() throws IOException{
-        deleteIfExists(existingTestFile);
-        deleteIfExists(otherExistingTestFile);
-        deleteIfExists(existingTestFile.getParent().getParent().resolve("junit11111111111"));
-    }
-
-    private static void deleteIfExists(Path dir) throws IOException {
-        try {
-            Files.deleteIfExists(dir);
-        } catch (DirectoryNotEmptyException e) {
-            Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.delete(file);
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.delete(dir);
-                    return super.postVisitDirectory(dir, exc);
-                }
-            });
-        }
     }
 }

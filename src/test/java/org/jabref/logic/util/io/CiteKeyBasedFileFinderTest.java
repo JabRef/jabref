@@ -33,7 +33,7 @@ class CiteKeyBasedFileFinderTest {
         entry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
         entry.setCiteKey("HipKro03");
 
-        rootDir = temporaryFolder.getParent();
+        rootDir = temporaryFolder;
 
         Path subDir = Files.createDirectory(rootDir.resolve("Organization Science"));
         pdfsDir = Files.createDirectory(rootDir.resolve("pdfs"));
@@ -101,36 +101,5 @@ class CiteKeyBasedFileFinderTest {
         List<Path> results = fileFinder.findAssociatedFiles(entry, dirs, extensions);
 
         assertEquals(Collections.emptyList(), results);
-    }
-
-    @AfterEach
-    void deleteTempFiles() throws IOException{
-        deleteIfExists(rootDir.resolve("Organization Science"));
-        deleteIfExists(rootDir.resolve("pdfs"));
-        deleteIfExists(rootDir.resolve("HipKro03 - Hello.pdf"));
-        deleteIfExists(rootDir.resolve("2002"));
-        deleteIfExists(rootDir.resolve("2003"));
-        deleteIfExists(rootDir.resolve("test"));
-        deleteIfExists(rootDir.resolve("graphicsDir"));
-    }
-
-    private static void deleteIfExists(Path dir) throws IOException {
-        try {
-            Files.deleteIfExists(dir);
-        } catch (DirectoryNotEmptyException e) {
-            Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.delete(file);
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.delete(dir);
-                    return super.postVisitDirectory(dir, exc);
-                }
-            });
-        }
     }
 }
