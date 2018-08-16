@@ -9,12 +9,12 @@ import org.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
 import org.assertj.swing.fixture.DialogFixture;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.swing.finder.WindowFinder.findDialog;
 
-@Category(org.jabref.testutils.category.GUITest.class)
+@Tag("GUITest")
 public class GUITest extends AbstractUITest {
 
     @Test
