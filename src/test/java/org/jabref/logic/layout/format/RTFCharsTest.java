@@ -2,26 +2,27 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-import org.junit.After;
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class RTFCharsTest {
+class RTFCharsTest {
     private LayoutFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new RTFChars();
     }
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    void tearDown() {
         formatter = null;
     }
 
     @Test
-    public void testBasicFormat() {
+    void testBasicFormat() {
         assertEquals("", formatter.format(""));
 
         assertEquals("hallo", formatter.format("hallo"));
@@ -34,7 +35,7 @@ public class RTFCharsTest {
     }
 
     @Test
-    public void testLaTeXHighlighting() {
+    void testLaTeXHighlighting() {
         assertEquals("{\\i hallo}", formatter.format("\\emph{hallo}"));
         assertEquals("{\\i hallo}", formatter.format("{\\emph hallo}"));
         assertEquals("An article title with {\\i a book title} emphasized", formatter.format("An article title with \\emph{a book title} emphasized"));
@@ -47,18 +48,18 @@ public class RTFCharsTest {
     }
 
     @Test
-    public void testComplicated() {
+    void testComplicated() {
         assertEquals("R\\u233eflexions sur le timing de la quantit\\u233e {\\u230ae} should be \\u230ae",
                 formatter.format("Réflexions sur le timing de la quantité {\\ae} should be æ"));
     }
 
     @Test
-    public void  testComplicated2() {
+    void testComplicated2() {
         assertEquals("h\\'e1ll{\\u339oe}", formatter.format("h\\'all{\\oe}"));
     }
 
     @Test
-    public void testComplicated3() {
+    void testComplicated3() {
         assertEquals("Le c\\u339oeur d\\u233e\\u231cu mais l'\\u226ame plut\\u244ot na\\u239ive, Lou\\u255ys r" +
                 "\\u234eva de crapa\\u252?ter en cano\\u235e au del\\u224a des \\u238iles, pr\\u232es du m\\u228alstr" +
                 "\\u246om o\\u249u br\\u251ulent les nov\\u230ae.", formatter.format("Le cœur déçu mais l'âme plutôt " +
@@ -66,7 +67,7 @@ public class RTFCharsTest {
     }
 
     @Test
-    public void testComplicated4() {
+    void testComplicated4() {
         assertEquals("l'\\u238ile exigu\\u235e\n" +
                 "  O\\u249u l'ob\\u232ese jury m\\u251ur\n" +
                 "  F\\u234ete l'ha\\u239i volap\\u252?k,\n" +
@@ -79,19 +80,19 @@ public class RTFCharsTest {
     }
 
     @Test
-    public void testComplicated5() {
+    void testComplicated5() {
         assertEquals("\\u193Arv\\u237izt\\u369?r\\u337? t\\u252?k\\u246orf\\u250ur\\u243og\\u233ep",
                 formatter.format("Árvíztűrő tükörfúrógép"));
     }
 
     @Test
-    public void testComplicated6() {
+    void testComplicated6() {
         assertEquals("Pchn\\u261a\\u263c w t\\u281e \\u322l\\u243od\\u378z je\\u380za lub o\\u347sm skrzy\\u324n fig"
                 ,formatter.format("Pchnąć w tę łódź jeża lub ośm skrzyń fig"));
     }
 
     @Test
-    public void testSpecialCharacters() {
+    void testSpecialCharacters() {
         assertEquals("\\'f3", formatter.format("\\'{o}")); // ó
         assertEquals("\\'f2", formatter.format("\\`{o}")); // ò
         assertEquals("\\'f4", formatter.format("\\^{o}")); // ô
@@ -130,7 +131,7 @@ public class RTFCharsTest {
     }
 
     @Test
-    public void testRTFCharacters(){
+    void testRTFCharacters(){
         assertEquals("\\'e0",formatter.format("\\`{a}"));
         assertEquals("\\'e8",formatter.format("\\`{e}"));
         assertEquals("\\'ec",formatter.format("\\`{i}"));
@@ -159,7 +160,7 @@ public class RTFCharsTest {
     }
 
     @Test
-    public void testRTFCharactersCapital() {
+    void testRTFCharactersCapital() {
         assertEquals("\\'c0",formatter.format("\\`A"));
         assertEquals("\\'c8",formatter.format("\\`E"));
         assertEquals("\\'cc",formatter.format("\\`I"));

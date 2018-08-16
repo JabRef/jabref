@@ -12,7 +12,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class PreferencesMigrationsTest {
+class PreferencesMigrationsTest {
 
     private JabRefPreferences prefs;
     private Preferences mainPrefsNode;
@@ -23,14 +23,14 @@ public class PreferencesMigrationsTest {
                                                             "[bibtexkey] - [fulltitle]"};
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         prefs = mock(JabRefPreferences.class);
         mainPrefsNode = mock(Preferences.class);
 
     }
 
     @Test
-    public void testOldStyleBibtexkeyPattern0() {
+    void testOldStyleBibtexkeyPattern0() {
         when(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(oldStylePatterns[0]);
         when(mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null)).thenReturn(oldStylePatterns[0]);
         when(prefs.hasKey(JabRefPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(true);
@@ -43,7 +43,7 @@ public class PreferencesMigrationsTest {
     }
 
     @Test
-    public void testOldStyleBibtexkeyPattern1() {
+    void testOldStyleBibtexkeyPattern1() {
 
         when(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(oldStylePatterns[1]);
         when(mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null)).thenReturn(oldStylePatterns[1]);
@@ -57,7 +57,7 @@ public class PreferencesMigrationsTest {
     }
 
     @Test
-    public void testArbitraryBibtexkeyPattern() {
+    void testArbitraryBibtexkeyPattern() {
         String arbitraryPattern = "[anyUserPrividedString]";
 
         when(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(arbitraryPattern);
@@ -71,7 +71,7 @@ public class PreferencesMigrationsTest {
     }
 
     @Test
-    public void testPreviewStyle() {
+    void testPreviewStyle() {
         String oldPreviewStyle = "<font face=\"sans-serif\">"
                                  + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
                                  + "\\end{bibtexkey}</b><br>__NEWLINE__"
