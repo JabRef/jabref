@@ -15,10 +15,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
@@ -264,11 +262,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         List<BibEntry> entries = getSelectionModel().getSelectedItems().stream().map(BibEntryTableViewModel::getEntry).collect(Collectors.toList());
 
-        if (entries != null) {
-            ClipboardContent content = new ClipboardContent();
-            Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
-            content.put(DragAndDropDataFormats.ENTRIES, "");
-            dragboard.setContent(content);
+        if (!entries.isEmpty()) {
             GUIGlobals.localDragboard.putValue(DragAndDropDataFormats.BIBENTRY_LIST_CLASS, entries);
         }
 
@@ -297,22 +291,23 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 @SuppressWarnings("unchecked")
                 TableRow<BibEntryTableViewModel> targetRow = (TableRow<BibEntryTableViewModel>) event.getGestureTarget();
                 BibEntry entry = this.getItems().get(targetRow.getIndex()).getEntry();
+
                 if ((event.getTransferMode() == TransferMode.MOVE)) {
 
-                    System.out.println("Mode MOVE"); //shift on win or no modifier
+                    LOGGER.debug("Mode MOVE"); //shift on win or no modifier
 
                     fileHandler.addNewEntryFromXMPorPDFContent(entry, files);
                     success = true;
                 }
 
                 if (event.getTransferMode() == TransferMode.LINK) {
-                    System.out.println("LINK"); //alt on win
+                    LOGGER.debug("LINK"); //alt on win
                     fileHandler.addToEntryAndMoveToFileDir(entry, files);
                     success = true;
 
                 }
                 if (event.getTransferMode() == TransferMode.COPY) {
-                    System.out.println("Mode Copy"); //ctrl on win
+                    LOGGER.debug("Mode Copy"); //ctrl on win
                     fileHandler.copyFilesToFileDirAndAddToEntry(entry, files);
                     success = true;
                 }

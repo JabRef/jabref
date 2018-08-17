@@ -220,13 +220,12 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
         initKeyBindings();
 
         tabbedPane.setOnDragOver(event -> {
-            if (event.getDragboard().hasFiles() && (event.getSource() instanceof DndTabPane)) {
+            if (event.getDragboard().hasFiles()) {
                 event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
             }
         });
 
         tabbedPane.setOnDragDropped(event -> {
-            System.out.println("drag drop in tabbed pane" + event.getGestureTarget());
             boolean success = false;
 
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
@@ -613,7 +612,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
                                  newLibrary,
                                  factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this)),
                                  factory.createIconButton(StandardActions.SAVE_LIBRARY, new OldDatabaseCommandWrapper(Actions.SAVE, this, Globals.stateManager)),
-                                 leftSpacer);
+                                 leftSpacer
+        );
         leftSide.setMinWidth(100);
         leftSide.prefWidthProperty().bind(sidePane.widthProperty());
         leftSide.maxWidthProperty().bind(sidePane.widthProperty());
@@ -634,7 +634,8 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
 
                                   factory.createIconButton(StandardActions.FORK_ME, new OpenBrowserAction("https://github.com/JabRef/jabref")),
                                   factory.createIconButton(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
-                                  factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org")));
+                                  factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org"))
+        );
 
         HBox.setHgrow(globalSearchBar, Priority.ALWAYS);
 

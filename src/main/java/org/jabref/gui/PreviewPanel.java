@@ -127,24 +127,20 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
             boolean success = false;
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
                 List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
-                System.out.println(files);
 
                 if (event.getTransferMode() == TransferMode.MOVE) {
 
-                    System.out.println("Mode MOVE"); //shift on win or no modifier
+                    LOGGER.debug("Mode MOVE"); //shift on win or no modifier
                     fileHandler.addNewEntryFromXMPorPDFContent(entry, files);
-                    success = true;
                 }
                 if (event.getTransferMode() == TransferMode.LINK) {
-                    System.out.println("LINK"); //alt on win
+                    LOGGER.debug("Node LINK"); //alt on win
                     fileHandler.addToEntryAndMoveToFileDir(entry, files);
-                    success = true;
 
                 }
                 if (event.getTransferMode() == TransferMode.COPY) {
-                    System.out.println("Mode Copy"); //ctrl on win, no modifier on Xubuntu
+                    LOGGER.debug("Mode Copy"); //ctrl on win, no modifier on Xubuntu
                     fileHandler.copyFilesToFileDirAndAddToEntry(entry, files);
-                    success = true;
                 }
             }
 

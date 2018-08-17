@@ -1312,13 +1312,6 @@ public class BasePanel extends StackPane {
         }
     }
 
-    /*
-    // Method pertaining to the ClipboardOwner interface.
-    @Override
-    public void lostOwnership(Clipboard clipboard, Transferable contents) {
-        // Nothing
-    }
-    */
 
     /**
      * Perform necessary cleanup when this BasePanel is closed.
