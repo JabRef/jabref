@@ -30,20 +30,22 @@ public class ExternalFilesEntryLinker {
 
     }
 
-    public boolean copyFileToFileDir(Path file) {
+    public Optional<Path> copyFileToFileDir(Path file) {
         Optional<Path> firstExistingFileDir = bibDatabaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
         if (firstExistingFileDir.isPresent()) {
             Path targetFile = firstExistingFileDir.get().resolve(file.getFileName());
-            return FileUtil.copyFile(file, targetFile, false);
+            if (FileUtil.copyFile(file, targetFile, false)) {
+                return Optional.ofNullable(targetFile);
+            }
         }
-        return false;
+        return Optional.empty();
     }
 
     public void moveLinkedFilesToFileDir(BibEntry entry) {
         moveFilesCleanup.cleanup(entry);
     }
 
-    public void linkFileToEntry(BibEntry entry, Path file) {
+    public void addFileToEntry(BibEntry entry, Path file) {
         addFilesToEntry(entry, Arrays.asList(file));
     }
 

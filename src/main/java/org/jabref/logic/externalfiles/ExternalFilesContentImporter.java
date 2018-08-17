@@ -15,8 +15,8 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 public class ExternalFilesContentImporter {
 
-    PdfContentImporter pdfImporter;
-    ImportFormatPreferences importFormatPreferences;
+    private final PdfContentImporter pdfImporter;
+    private final ImportFormatPreferences importFormatPreferences;
 
     public ExternalFilesContentImporter(ImportFormatPreferences importFormatPreferences) {
         pdfImporter = new PdfContentImporter(importFormatPreferences);

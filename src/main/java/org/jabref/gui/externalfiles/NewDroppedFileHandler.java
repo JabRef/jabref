@@ -1,9 +1,7 @@
 package org.jabref.gui.externalfiles;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -17,22 +15,16 @@ import javafx.scene.text.Text;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.externalfiletype.UnknownExternalFileType;
-import org.jabref.logic.cleanup.MoveFilesCleanup;
+import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
+import org.jabref.logic.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.OpenDatabase;
-import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.PdfContentImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
@@ -45,13 +37,11 @@ public class NewDroppedFileHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(NewDroppedFileHandler.class);
 
     private final BibDatabaseContext bibDatabaseContext;
-    private final ExternalFileTypes externalFileTypes;
-    private final FileDirectoryPreferences fileDirectoryPreferences;
-    private final ImportFormatPreferences importFormatPreferences;
     private final UpdateFieldPreferences updateFieldPreferences;
-    private final MoveFilesCleanup moveFilesCleanup;
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final ExternalFilesEntryLinker linker;
+    private final ExternalFilesContentImporter contentImporter;
 
     public NewDroppedFileHandler(DialogService dialogService,
                                  BibDatabaseContext bibDatabaseContext,
@@ -63,46 +53,32 @@ public class NewDroppedFileHandler {
                                  FileUpdateMonitor fileupdateMonitor) {
 
         this.dialogService = dialogService;
-        this.externalFileTypes = externalFileTypes;
-        this.fileDirectoryPreferences = fileDirectoryPreferences;
         this.bibDatabaseContext = bibDatabaseContext;
-        this.importFormatPreferences = importFormatPreferences;
         this.updateFieldPreferences = updateFieldPreferences;
         this.fileUpdateMonitor = fileupdateMonitor;
-        this.moveFilesCleanup = new MoveFilesCleanup(bibDatabaseContext, fileDirPattern, fileDirectoryPreferences);
-    }
 
-    public void addFilesToEntry(BibEntry entry, List<Path> files) {
-
-        for (Path file : files) {
-            FileUtil.getFileExtension(file).ifPresent(ext -> {
-
-                ExternalFileType type = externalFileTypes.getExternalFileTypeByExt(ext)
-                                                         .orElse(new UnknownExternalFileType(ext));
-                Path relativePath = FileUtil.shortenFileName(file, bibDatabaseContext.getFileDirectoriesAsPaths(fileDirectoryPreferences));
-                LinkedFile linkedfile = new LinkedFile("", relativePath.toString(), type.getName());
-                entry.addFile(linkedfile);
-            });
-
-        }
-
+        this.linker = new ExternalFilesEntryLinker(externalFileTypes, fileDirectoryPreferences, fileDirPattern, bibDatabaseContext);
+        this.contentImporter = new ExternalFilesContentImporter(importFormatPreferences);
     }
 
     public void addNewEntryFromXMPorPDFContent(BibEntry entry, List<Path> files) {
-        PdfContentImporter pdfImporter = new PdfContentImporter(importFormatPreferences);
 
         for (Path file : files) {
 
             if (FileUtil.getFileExtension(file).filter(ext -> "pdf".equals(ext)).isPresent()) {
 
                 try {
+                    List<BibEntry> pdfResult = contentImporter.importPDFContent(file);
+                    //FIXME: Show merge dialog if working again properly
+                    List<BibEntry> xmpEntriesInFile = contentImporter.importXMPContent(file);
 
-                    List<BibEntry> result = pdfImporter.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
-                    //TODO: Show Merge Dialog
-                    List<BibEntry> xmpEntriesInFile = XmpUtilReader.readXmp(file, importFormatPreferences.getXmpPreferences());
-
+                    //First try xmp import, if empty try pdf import, otherwise show dialog
                     if (xmpEntriesInFile.isEmpty()) {
-                        addToEntryAndMoveToFileDir(entry, files);
+                        if (pdfResult.isEmpty()) {
+                            addToEntryAndMoveToFileDir(entry, files);
+                        } else {
+                            showImportOrLinkFileDialog(pdfResult, file, entry);
+                        }
                     } else {
                         showImportOrLinkFileDialog(xmpEntriesInFile, file, entry);
                     }
@@ -111,16 +87,15 @@ public class NewDroppedFileHandler {
                     LOGGER.warn("Problem reading XMP", e);
                 }
 
-            }
-            else {
+            } else {
                 addToEntryAndMoveToFileDir(entry, files);
             }
         }
     }
 
     public void importEntriesFromDroppedBibFiles(Path bibFile) {
-        ParserResult parserResult = OpenDatabase.loadDatabase(bibFile.toString(), importFormatPreferences, fileUpdateMonitor);
-        List<BibEntry> entriesToImport = parserResult.getDatabaseContext().getEntries();
+
+        List<BibEntry> entriesToImport = contentImporter.importFromBibFile(bibFile, fileUpdateMonitor);
         bibDatabaseContext.getDatabase().insertEntries(entriesToImport);
 
         if (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)) {
@@ -160,27 +135,15 @@ public class NewDroppedFileHandler {
     }
 
     public void addToEntryAndMoveToFileDir(BibEntry entry, List<Path> files) {
-        addFilesToEntry(entry, files);
-        moveFilesCleanup.cleanup(entry);
-
+        linker.addFilesToEntry(entry, files);
+        linker.moveLinkedFilesToFileDir(entry);
     }
 
-    public void copyFileToFileDirAndAddToEntry(BibEntry entry, List<Path> files) {
-        Optional<Path> firstExistingFileDir = bibDatabaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
-        if (firstExistingFileDir.isPresent()) {
-
-            List<Path> filesCopiedToFileDirectory = new ArrayList<>();
-            for (Path file : files) {
-                Path targetFile = firstExistingFileDir.get().resolve(file.getFileName());
-                if (FileUtil.copyFile(file, targetFile, false)) {
-                    filesCopiedToFileDirectory.add(targetFile);
-                } else {
-                    dialogService.showErrorDialogAndWait(Localization.lang("Could not copy file"), Localization.lang("The file %0 already exists", targetFile.toString()));
-
-                }
-                addFilesToEntry(entry, filesCopiedToFileDirectory);
-            }
-
+    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files) {
+        for (Path file : files) {
+            linker.copyFileToFileDir(file).ifPresent(copiedFile -> {
+                linker.addFilesToEntry(entry, files);
+            });
         }
     }
 }

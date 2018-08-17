@@ -37,6 +37,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.logic.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
@@ -59,6 +60,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private final MainTableDataModel model;
     private final NewDroppedFileHandler fileHandler;
+    private final ExternalFilesEntryLinker linker;
 
     public MainTable(MainTableDataModel model, JabRefFrame frame,
                      BasePanel panel, BibDatabaseContext database,
@@ -75,6 +77,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                                 Globals.prefs.getImportFormatPreferences(),
                                                 Globals.prefs.getUpdateFieldPreferences(),
                                                 Globals.getFileUpdateMonitor());
+
+        linker = new ExternalFilesEntryLinker(externalFileTypes, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern(), database);
+
 
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
@@ -308,7 +313,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 }
                 if (event.getTransferMode() == TransferMode.COPY) {
                     System.out.println("Mode Copy"); //ctrl on win
-                    fileHandler.copyFileToFileDirAndAddToEntry(entry, files);
+                    fileHandler.copyFilesToFileDirAndAddToEntry(entry, files);
                     success = true;
                 }
             }
