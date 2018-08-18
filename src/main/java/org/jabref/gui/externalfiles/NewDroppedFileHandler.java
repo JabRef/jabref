@@ -17,7 +17,6 @@ import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
-import org.jabref.logic.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
@@ -50,14 +49,15 @@ public class NewDroppedFileHandler {
                                  String fileDirPattern,
                                  ImportFormatPreferences importFormatPreferences,
                                  UpdateFieldPreferences updateFieldPreferences,
-                                 FileUpdateMonitor fileupdateMonitor) {
+                                 FileUpdateMonitor fileupdateMonitor,
+                                 String fileNamePattern) {
 
         this.dialogService = dialogService;
         this.bibDatabaseContext = bibDatabaseContext;
         this.updateFieldPreferences = updateFieldPreferences;
         this.fileUpdateMonitor = fileupdateMonitor;
 
-        this.linker = new ExternalFilesEntryLinker(externalFileTypes, fileDirectoryPreferences, fileDirPattern, bibDatabaseContext);
+        this.linker = new ExternalFilesEntryLinker(externalFileTypes, fileDirectoryPreferences, fileDirPattern, bibDatabaseContext, fileNamePattern);
         this.contentImporter = new ExternalFilesContentImporter(importFormatPreferences);
     }
 
@@ -75,7 +75,7 @@ public class NewDroppedFileHandler {
                     //First try xmp import, if empty try pdf import, otherwise show dialog
                     if (xmpEntriesInFile.isEmpty()) {
                         if (pdfResult.isEmpty()) {
-                            addToEntryAndMoveToFileDir(entry, files);
+                            addToEntryRenameAndMoveToFileDir(entry, files);
                         } else {
                             showImportOrLinkFileDialog(pdfResult, file, entry);
                         }
@@ -88,7 +88,7 @@ public class NewDroppedFileHandler {
                 }
 
             } else {
-                addToEntryAndMoveToFileDir(entry, files);
+                addToEntryRenameAndMoveToFileDir(entry, files);
             }
         }
     }
@@ -102,7 +102,6 @@ public class NewDroppedFileHandler {
             // Set owner field to default value
             UpdateField.setAutomaticFields(entriesToImport, true, true, updateFieldPreferences);
         }
-
     }
 
     private void showImportOrLinkFileDialog(List<BibEntry> entriesToImport, Path fileName, BibEntry entryToLink) {
@@ -130,13 +129,14 @@ public class NewDroppedFileHandler {
             bibDatabaseContext.getDatabase().insertEntries(entriesToImport);
         }
         if (buttonPressed.equals(Optional.of(linkToEntry))) {
-            addToEntryAndMoveToFileDir(entryToLink, Arrays.asList(fileName));
+            addToEntryRenameAndMoveToFileDir(entryToLink, Arrays.asList(fileName));
         }
     }
 
-    public void addToEntryAndMoveToFileDir(BibEntry entry, List<Path> files) {
+    public void addToEntryRenameAndMoveToFileDir(BibEntry entry, List<Path> files) {
         linker.addFilesToEntry(entry, files);
         linker.moveLinkedFilesToFileDir(entry);
+        linker.renameLinkedFilesToPattern(entry);
     }
 
     public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files) {
@@ -146,4 +146,9 @@ public class NewDroppedFileHandler {
             });
         }
     }
+
+    public void addToEntry(BibEntry entry, List<Path> files) {
+        linker.addFilesToEntry(entry, files);
+    }
+
 }

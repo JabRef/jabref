@@ -35,7 +35,6 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.util.ViewModelTableRowFactory;
-import org.jabref.logic.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
@@ -58,7 +57,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private final MainTableDataModel model;
     private final NewDroppedFileHandler fileHandler;
-    private final ExternalFilesEntryLinker linker;
+
 
     public MainTable(MainTableDataModel model, JabRefFrame frame,
                      BasePanel panel, BibDatabaseContext database,
@@ -74,10 +73,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                                 Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern(),
                                                 Globals.prefs.getImportFormatPreferences(),
                                                 Globals.prefs.getUpdateFieldPreferences(),
-                                                Globals.getFileUpdateMonitor());
+                                                Globals.getFileUpdateMonitor(),
+                                                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN)
 
-        linker = new ExternalFilesEntryLinker(externalFileTypes, Globals.prefs.getFileDirectoryPreferences(), Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern(), database);
-
+        );
 
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
@@ -269,7 +268,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         event.consume();
     }
 
-    private void handleOnDragDropped(@SuppressWarnings("unused") BibEntryTableViewModel originalItem, DragEvent event) {
+    private void handleOnDragDropped(BibEntryTableViewModel originalItem, DragEvent event) {
 
         boolean success = false;
 
@@ -277,7 +276,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
 
-            List<Path> bibFiles = files.stream().filter(file -> FileUtil.getFileExtension(file).filter(ext -> "bib".equals(ext)).isPresent()).collect(Collectors.toList());
+            List<Path> bibFiles = files.stream().filter(FileUtil::isBibFile).collect(Collectors.toList());
 
             if (!bibFiles.isEmpty()) {
                 for (Path file : bibFiles) {
@@ -288,21 +287,18 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             }
             if (event.getGestureTarget() instanceof TableRow) {
 
-                @SuppressWarnings("unchecked")
-                TableRow<BibEntryTableViewModel> targetRow = (TableRow<BibEntryTableViewModel>) event.getGestureTarget();
-                BibEntry entry = this.getItems().get(targetRow.getIndex()).getEntry();
+                BibEntry entry = originalItem.getEntry();
 
                 if ((event.getTransferMode() == TransferMode.MOVE)) {
 
                     LOGGER.debug("Mode MOVE"); //shift on win or no modifier
-
                     fileHandler.addNewEntryFromXMPorPDFContent(entry, files);
                     success = true;
                 }
 
                 if (event.getTransferMode() == TransferMode.LINK) {
                     LOGGER.debug("LINK"); //alt on win
-                    fileHandler.addToEntryAndMoveToFileDir(entry, files);
+                    fileHandler.addToEntryRenameAndMoveToFileDir(entry, files);
                     success = true;
 
                 }

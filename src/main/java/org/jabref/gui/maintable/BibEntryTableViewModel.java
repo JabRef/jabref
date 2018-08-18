@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
+
 import org.jabref.gui.externalfiles.NewDroppedFileHandler;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.model.database.BibDatabase;

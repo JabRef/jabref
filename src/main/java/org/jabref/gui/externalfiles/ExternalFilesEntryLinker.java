@@ -1,4 +1,4 @@
-package org.jabref.logic.externalfiles;
+package org.jabref.gui.externalfiles;
 
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -9,6 +9,7 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
+import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -21,13 +22,14 @@ public class ExternalFilesEntryLinker {
     private final FileDirectoryPreferences fileDirectoryPreferences;
     private final BibDatabaseContext bibDatabaseContext;
     private final MoveFilesCleanup moveFilesCleanup;
+    private final RenamePdfCleanup renameFilesCleanup;
 
-    public ExternalFilesEntryLinker(ExternalFileTypes externalFileTypes, FileDirectoryPreferences fileDirectoryPreferences, String fileDirPattern, BibDatabaseContext bibDatabaseContext) {
+    public ExternalFilesEntryLinker(ExternalFileTypes externalFileTypes, FileDirectoryPreferences fileDirectoryPreferences, String fileDirPattern, BibDatabaseContext bibDatabaseContext, String fileNamePattern) {
         this.externalFileTypes = externalFileTypes;
         this.fileDirectoryPreferences = fileDirectoryPreferences;
         this.bibDatabaseContext = bibDatabaseContext;
         this.moveFilesCleanup = new MoveFilesCleanup(bibDatabaseContext, fileDirPattern, fileDirectoryPreferences);
-
+        this.renameFilesCleanup = new RenamePdfCleanup(false, bibDatabaseContext, fileNamePattern, fileDirectoryPreferences);
     }
 
     public Optional<Path> copyFileToFileDir(Path file) {
@@ -39,6 +41,10 @@ public class ExternalFilesEntryLinker {
             }
         }
         return Optional.empty();
+    }
+
+    public void renameLinkedFilesToPattern(BibEntry entry) {
+        renameFilesCleanup.cleanup(entry);
     }
 
     public void moveLinkedFilesToFileDir(BibEntry entry) {

@@ -229,7 +229,7 @@ public class JabRefFrame extends BorderPane implements OutputPrinter {
             boolean success = false;
 
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
-                List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
+                List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).filter(FileUtil::isBibFile).collect(Collectors.toList());
                 success = true;
 
                 for (Path file : files) {

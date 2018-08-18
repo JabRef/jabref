@@ -26,6 +26,8 @@ public class XmpUtilReader {
     private static final String END_TAG = "</rdf:Description>";
 
     private XmpUtilReader() {
+        //See: https://pdfbox.apache.org/2.0/getting-started.html
+        System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider"); //To get higher rendering speed on java 8 oder 9 for images
     }
 
     /**

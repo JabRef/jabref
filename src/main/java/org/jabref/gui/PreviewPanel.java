@@ -40,6 +40,7 @@ import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -91,7 +92,8 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
                                                 Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern(),
                                                 Globals.prefs.getImportFormatPreferences(),
                                                 Globals.prefs.getUpdateFieldPreferences(),
-                                                Globals.getFileUpdateMonitor());
+                                                Globals.getFileUpdateMonitor(),
+                                                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
 
         // Set up scroll pane for preview pane
         setFitToHeight(true);
@@ -131,11 +133,11 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
                 if (event.getTransferMode() == TransferMode.MOVE) {
 
                     LOGGER.debug("Mode MOVE"); //shift on win or no modifier
-                    fileHandler.addNewEntryFromXMPorPDFContent(entry, files);
+                    fileHandler.addToEntryRenameAndMoveToFileDir(entry, files);
                 }
                 if (event.getTransferMode() == TransferMode.LINK) {
                     LOGGER.debug("Node LINK"); //alt on win
-                    fileHandler.addToEntryAndMoveToFileDir(entry, files);
+                    fileHandler.addToEntry(entry, files);
 
                 }
                 if (event.getTransferMode() == TransferMode.COPY) {
