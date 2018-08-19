@@ -1,38 +1,26 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-
-import javafx.embed.swing.JFXPanel;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-class AppearancePrefsTab extends JPanel implements PrefsTab {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(AppearancePrefsTab.class);
+class AppearancePrefsTab extends Pane implements PrefsTab {
 
     private final JabRefPreferences prefs;
-
     private final CheckBox fontTweaksLAF;
     private final TextField fontSize;
     private final CheckBox overrideFonts;
-
+    private final VBox container = new VBox();
     private final DialogService dialogService;
 
     /**
@@ -43,7 +31,6 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     public AppearancePrefsTab(DialogService dialogService, JabRefPreferences prefs) {
         this.dialogService = dialogService;
         this.prefs = prefs;
-        setLayout(new BorderLayout());
 
         overrideFonts = new CheckBox(Localization.lang("Override default font settings"));
         fontSize = new TextField();
@@ -54,12 +41,12 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         fontSizeContainer.disableProperty().bind(overrideFonts.selectedProperty().not());
         fontTweaksLAF = new CheckBox(Localization.lang("Tweak font rendering for entry editor on Linux"));
 
-        VBox container = new VBox();
         container.getChildren().addAll(overrideFonts, fontSizeContainer, fontTweaksLAF);
 
-        JFXPanel panel = CustomJFXPanel.wrap(new Scene(container));
-        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        add(panel, BorderLayout.CENTER);
+    }
+
+    public Node getContainer() {
+        return container;
     }
 
     @Override

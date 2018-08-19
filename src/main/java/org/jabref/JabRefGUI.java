@@ -54,10 +54,10 @@ public class JabRefGUI {
 
         // passed file (we take the first one) should be focused
         focusedFile = argsDatabases.stream()
-                                   .findFirst()
-                                   .flatMap(ParserResult::getFile)
-                                   .map(File::getAbsolutePath)
-                                   .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
+                                    .findFirst()
+                                    .flatMap(ParserResult::getFile)
+                                    .map(File::getAbsolutePath)
+                                    .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
 
         openWindow(mainStage);
         JabRefGUI.checkForNewVersion(false);
@@ -109,15 +109,15 @@ public class JabRefGUI {
                     try {
                         new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
                     } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
-                             NotASharedDatabaseException e) {
+                            NotASharedDatabaseException e) {
                         pr.getDatabaseContext().clearDatabaseFile(); // do not open the original file
                         pr.getDatabase().clearSharedDatabaseID();
 
                         LOGGER.error("Connection error", e);
                         dialogService.showErrorDialogAndWait(
-                                                             Localization.lang("Connection error"),
-                                                             Localization.lang("A local copy will be opened."),
-                                                             e);
+                                Localization.lang("Connection error"),
+                                Localization.lang("A local copy will be opened."),
+                                e);
                     }
                     toOpenTab.add(pr);
                 } else if (pr.toOpenTab()) {
@@ -166,7 +166,7 @@ public class JabRefGUI {
 
         for (ParserResult pr : failed) {
             String message = Localization.lang("Error opening file '%0'.", pr.getFile().get().getName()) + "\n"
-                             + pr.getErrorMessage();
+                    + pr.getErrorMessage();
 
             dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
 
@@ -223,7 +223,7 @@ public class JabRefGUI {
             }
 
             ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,
-                                                                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
 
             if (parsedDatabase.isEmpty()) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");

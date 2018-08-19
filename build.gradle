@@ -86,6 +86,7 @@ repositories {
 configurations {
     antlr3
     antlr4
+    errorprone
 }
 
 dependencies {
@@ -157,6 +158,8 @@ dependencies {
 
     compile 'com.github.tomtung:latex2unicode_2.12:0.2.2'
 
+    errorprone 'com.google.errorprone:error_prone_core:2.3.1'
+
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.1.2'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.1.2'
 
@@ -202,12 +205,12 @@ dependencyUpdates.resolutionStrategy = {
         }
         rules.withModule("org.controlsfx:controlsfx") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /9.*/) { // Reject version 9 or higher
-                 selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
+                selection.reject("Cannot be updated to 9.*.* until Jabref works with Java 9")
             }
         }
         rules.withModule("com.github.tomtung:latex2unicode_2.12") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /0.2.2/) { // Reject version higher than 2.0.2
-                 selection.reject("Cannot be updated to 0.2.4 until JabRef is prepared for it")
+                selection.reject("Cannot be updated to 0.2.4 until JabRef is prepared for it")
             }
         }
         rules.withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
@@ -220,7 +223,7 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject("http://dev.mysql.com/downloads/connector/j/ lists the version 5.* as last stable version.")
             }
         }
-        
+
     }
 }
 
@@ -502,16 +505,16 @@ jmh {
 
 // Source: https://stackoverflow.com/a/44168582/873282
 task downloadDependencies {
-  description "Pre-downloads *most* dependencies"
-  doLast {
-    configurations.getAsMap().each { name, config ->
-      println "Retrieving dependencies for $name"
-      try {
-        config.files
-      } catch (e) {
-        // some cannot be resolved, just log them
-        project.logger.info e.message
-      }
+    description "Pre-downloads *most* dependencies"
+    doLast {
+        configurations.getAsMap().each { name, config ->
+            println "Retrieving dependencies for $name"
+            try {
+                config.files
+            } catch (e) {
+                // some cannot be resolved, just log them
+                project.logger.info e.message
+            }
+        }
     }
-  }
 }
