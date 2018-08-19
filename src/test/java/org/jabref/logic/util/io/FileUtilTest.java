@@ -3,7 +3,6 @@ package org.jabref.logic.util.io;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +13,6 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileHelper;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -363,5 +361,18 @@ class FileUtilTest {
 
         assertEquals("PDF/1998/Åuthör/1234 - mytitle",
                 FileUtil.createDirNameFromPattern(null, entry, fileNamePattern));
+    }
+    @Test
+    public void testIsBibFile() throws IOException
+    {
+        Path bibFile = Files.createFile(rootDir.resolve("test.bib"));
+
+        assertTrue(FileUtil.isBibFile(bibFile));
+    }
+
+    @Test
+    public void testIsNotBibFile() throws IOException {
+        Path bibFile = Files.createFile(rootDir.resolve("test.pdf"));
+        assertFalse(FileUtil.isBibFile(bibFile));
     }
 }

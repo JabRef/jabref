@@ -23,6 +23,7 @@ import org.jabref.JabRefException;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -104,7 +105,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         importSettingsTab = new ImportSettingsTab(prefs);
         nameFormatterTab = new NameFormatterTab(prefs);
         networkTab = new NetworkTab(dialogService,prefs);
-        previewPrefsTab = new PreviewPrefsTab(dialogService);
+        previewPrefsTab = new PreviewPrefsTab(dialogService, ExternalFileTypes.getInstance());
         tableColumnsTab = new TableColumnsTab(prefs,frame);
         tablePrefsTab = new TablePrefsTab(prefs);
         xmpPrefsTab = new XmpPrefsTab(prefs);

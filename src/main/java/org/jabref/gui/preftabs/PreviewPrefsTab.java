@@ -27,6 +27,7 @@ import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.PreviewPanel;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
@@ -59,9 +60,11 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     private final Button btnDefault = new Button(Localization.lang("Default"));
     private final ScrollPane scrollPane = new ScrollPane(layout);
     private final DialogService dialogService;
+    private final ExternalFileTypes externalFileTypes;
 
-    public PreviewPrefsTab(DialogService dialogService) {
+    public PreviewPrefsTab(DialogService dialogService, ExternalFileTypes externalFileTypes) {
         this.dialogService = dialogService;
+        this.externalFileTypes = externalFileTypes;
         setupLogic();
         setupGui();
     }
@@ -125,7 +128,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         btnTest.setOnAction(event -> {
             try {
                 DefaultTaskExecutor.runInJavaFXThread(() -> {
-                    PreviewPanel testPane = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService);
+                    PreviewPanel testPane = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService, externalFileTypes);
                     if (chosen.getSelectionModel().getSelectedItems().isEmpty()) {
                         testPane.setFixedLayout(layout.getText());
                         testPane.setEntry(TestEntry.getTestEntry());
@@ -135,7 +138,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                         PreviewPreferences preferences = Globals.prefs.getPreviewPreferences();
                         preferences = new PreviewPreferences(preferences.getPreviewCycle(),indexStyle,preferences.getPreviewPanelDividerPosition(),preferences.isPreviewPanelEnabled(), preferences.getPreviewStyle(),preferences.getPreviewStyleDefault());
 
-                        testPane = new PreviewPanel(JabRefGUI.getMainFrame().getCurrentBasePanel(), new BibDatabaseContext(), Globals.getKeyPrefs(), preferences, dialogService);
+                        testPane = new PreviewPanel(JabRefGUI.getMainFrame().getCurrentBasePanel(), new BibDatabaseContext(), Globals.getKeyPrefs(), preferences, dialogService, externalFileTypes);
                         testPane.setEntry(TestEntry.getTestEntry());
                         testPane.updateLayout(preferences);
                     }

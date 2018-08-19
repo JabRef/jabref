@@ -1,8 +1,5 @@
 package org.jabref.gui;
 
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -134,7 +131,8 @@ import org.fxmisc.easybind.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BasePanel extends StackPane implements ClipboardOwner {
+public class BasePanel extends StackPane {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BasePanel.class);
 
     private final BibDatabaseContext bibDatabaseContext;
@@ -227,8 +225,10 @@ public class BasePanel extends StackPane implements ClipboardOwner {
 
         this.entryEditor = new EntryEditor(this, preferences.getEntryEditorPreferences(), Globals.getFileUpdateMonitor(), dialogService);
 
-        this.preview = new PreviewPanel(this, getBibDatabaseContext(), preferences.getKeyBindings(), preferences.getPreviewPreferences(), dialogService);
+        this.preview = new PreviewPanel(this, getBibDatabaseContext(), preferences.getKeyBindings(), preferences.getPreviewPreferences(), dialogService, externalFileTypes);
         frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview);
+
+
     }
 
     @Subscribe
@@ -680,15 +680,16 @@ public class BasePanel extends StackPane implements ClipboardOwner {
      */
     private boolean saveDatabase(File file, boolean selectedOnly, Charset encoding,
                                  SavePreferences.DatabaseSaveType saveType)
-            throws SaveException {
+        throws SaveException {
         SaveSession session;
         final String SAVE_DATABASE = Localization.lang("Save library");
         try {
             SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences()
-                    .withEncoding(encoding)
-                    .withSaveType(saveType);
+                                                 .withEncoding(encoding)
+                                                 .withSaveType(saveType);
+
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
-                    FileSaveSession::new);
+                                                                                          FileSaveSession::new);
             if (selectedOnly) {
                 session = databaseWriter.savePartOfDatabase(bibDatabaseContext, mainTable.getSelectedEntries(), prefs);
             } else {
@@ -700,7 +701,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         // FIXME: not sure if this is really thrown anywhere
         catch (UnsupportedCharsetException ex) {
             frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file.")
-                    + Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()));
+                                                                                               + Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()));
             throw new SaveException("rt");
         } catch (SaveException ex) {
             if (ex.specificEntry()) {
@@ -1145,7 +1146,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
      */
     public void ensureNotShowingBottomPanel(BibEntry entry) {
         if (((mode == BasePanelMode.SHOWING_EDITOR) && (entryEditor.getEntry() == entry))
-                || ((mode == BasePanelMode.SHOWING_PREVIEW) && (preview.getEntry() == entry))) {
+            || ((mode == BasePanelMode.SHOWING_PREVIEW) && (preview.getEntry() == entry))) {
             closeBottomPane();
         }
     }
@@ -1312,11 +1313,6 @@ public class BasePanel extends StackPane implements ClipboardOwner {
         }
     }
 
-    // Method pertaining to the ClipboardOwner interface.
-    @Override
-    public void lostOwnership(Clipboard clipboard, Transferable contents) {
-        // Nothing
-    }
 
     /**
      * Perform necessary cleanup when this BasePanel is closed.
@@ -1500,7 +1496,7 @@ public class BasePanel extends StackPane implements ClipboardOwner {
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)) {
                 final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
                 Globals.stateManager.getSelectedGroup(bibDatabaseContext).forEach(
-                        selectedGroup -> selectedGroup.addEntriesToGroup(entries));
+                                                                                  selectedGroup -> selectedGroup.addEntriesToGroup(entries));
             }
         }
     }
@@ -1600,10 +1596,10 @@ public class BasePanel extends StackPane implements ClipboardOwner {
                     List<LinkedFile> files = bes.get(0).getFiles();
 
                     Optional<LinkedFile> linkedFile = files.stream()
-                            .filter(file -> (FieldName.URL.equalsIgnoreCase(file.getFileType())
-                                    || FieldName.PS.equalsIgnoreCase(file.getFileType())
-                                    || FieldName.PDF.equalsIgnoreCase(file.getFileType())))
-                            .findFirst();
+                                                           .filter(file -> (FieldName.URL.equalsIgnoreCase(file.getFileType())
+                                                                            || FieldName.PS.equalsIgnoreCase(file.getFileType())
+                                                                            || FieldName.PDF.equalsIgnoreCase(file.getFileType())))
+                                                           .findFirst();
 
                     if (linkedFile.isPresent()) {
 
