@@ -57,7 +57,7 @@ public class BibEntry implements Cloneable {
      * Cache that stores latex free versions of fields.
      */
     private final Map<String, String> latexFreeFields = new ConcurrentHashMap<>();
-    private final transient EventBus eventBus = new EventBus();
+    private final EventBus eventBus = new EventBus();
     private String id;
     private final StringProperty type = new SimpleStringProperty();
 

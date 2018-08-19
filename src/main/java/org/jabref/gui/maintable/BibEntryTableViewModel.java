@@ -9,7 +9,6 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 
-import org.jabref.gui.externalfiles.NewDroppedFileHandler;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -25,7 +24,6 @@ import org.fxmisc.easybind.EasyBind;
 
 public class BibEntryTableViewModel {
     private final BibEntry entry;
-    private NewDroppedFileHandler fileHandler;
 
     public BibEntryTableViewModel(BibEntry entry) {
         this.entry = entry;
