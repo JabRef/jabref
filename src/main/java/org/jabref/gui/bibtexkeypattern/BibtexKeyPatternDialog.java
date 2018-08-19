@@ -15,6 +15,7 @@ import javax.swing.WindowConstants;
 
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefDialog;
