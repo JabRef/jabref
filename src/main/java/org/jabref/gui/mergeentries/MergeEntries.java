@@ -184,6 +184,7 @@ public class MergeEntries {
             entryPreview.setEntry(mergedEntry);
             JFXPanel container = CustomJFXPanel.wrap(new Scene(entryPreview));
             mainPanel.add(container, CELL_CONSTRAINTS.xyw(1, 8, 6));
+            updateAll();
         });
 
         mainPanel.add(boldFontLabel(Localization.lang("Merged BibTeX source code")), CELL_CONSTRAINTS.xyw(8, 6, 4));
@@ -203,7 +204,7 @@ public class MergeEntries {
         // Everything done, allow any action to actually update the merged entry
         doneBuilding = true;
 
-        updateAll();
+        //updateAll();
 
         // Show what we've got
         mainPanel.setVisible(true);
