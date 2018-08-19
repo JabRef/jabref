@@ -132,3 +132,4 @@ The changelog of JabRef 2.11 and all previous versions is available as [text fil
 [4.0-beta]: https://github.com/JabRef/jabref/compare/v3.8.2...v4.0-beta
 [2.11.1]: https://github.com/JabRef/jabref/compare/v2.11...v2.11.1
 [JavaFX]: https://en.wikipedia.org/wiki/JavaFX
+

@@ -121,9 +121,9 @@ public class SaveDatabaseAction implements BaseAction {
                 // Save the database
                 success = saveDatabase(panel.getBibDatabaseContext().getDatabaseFile().get(), false,
                         panel.getBibDatabaseContext()
-                             .getMetaData()
-                             .getEncoding()
-                             .orElse(Globals.prefs.getDefaultEncoding()));
+                                .getMetaData()
+                                .getEncoding()
+                                .orElse(Globals.prefs.getDefaultEncoding()));
 
                 panel.updateTimeStamp();
             } else {
@@ -393,10 +393,10 @@ public class SaveDatabaseAction implements BaseAction {
             ButtonType reviewChanges = new ButtonType(Localization.lang("Review changes"));
 
             Optional<ButtonType> buttonPressed = DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showCustomButtonDialogAndWait(AlertType.CONFIRMATION, Localization.lang("File updated externally"),
-                                                                                                                                                    Localization.lang("File has been updated externally. " + "What do you want to do?"),
-                                                                                                                                                    reviewChanges,
-                                                                                                                                                    save,
-                                                                                                                                                    ButtonType.CANCEL));
+                    Localization.lang("File has been updated externally. " + "What do you want to do?"),
+                    reviewChanges,
+                    save,
+                    ButtonType.CANCEL));
 
             if (buttonPressed.isPresent()) {
                 if (buttonPressed.get() == ButtonType.CANCEL) {

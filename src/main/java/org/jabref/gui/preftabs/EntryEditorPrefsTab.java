@@ -1,15 +1,13 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.awt.Insets;
-
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
+import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
@@ -17,31 +15,28 @@ import org.jabref.gui.keyboard.EmacsKeyBindings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
-
 import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_ABBREVIATED;
 import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_FULL;
 
-class EntryEditorPrefsTab extends JPanel implements PrefsTab {
+class EntryEditorPrefsTab extends Pane implements PrefsTab {
 
-    private final JCheckBox autoOpenForm;
-    private final JCheckBox defSource;
-    private final JCheckBox emacsMode;
-    private final JCheckBox emacsRebindCtrlA;
-    private final JCheckBox emacsRebindCtrlF;
-    private final JCheckBox autoComplete;
-    private final JCheckBox recommendations;
-    private final JCheckBox validation;
-    private final JRadioButton autoCompBoth;
-    private final JRadioButton autoCompFF;
-    private final JRadioButton autoCompLF;
-    private final JRadioButton firstNameModeFull;
-    private final JRadioButton firstNameModeAbbr;
-    private final JRadioButton firstNameModeBoth;
+    private final CheckBox autoOpenForm;
+    private final CheckBox defSource;
+    private final CheckBox emacsMode;
+    private final CheckBox emacsRebindCtrlA;
+    private final CheckBox emacsRebindCtrlF;
+    private final CheckBox autoComplete;
+    private final CheckBox recommendations;
+    private final CheckBox validation;
+    private final RadioButton autoCompBoth;
+    private final RadioButton autoCompFF;
+    private final RadioButton autoCompLF;
+    private final RadioButton firstNameModeFull;
+    private final RadioButton firstNameModeAbbr;
+    private final RadioButton firstNameModeBoth;
+    private final GridPane builder = new GridPane();
 
-    private final JTextField autoCompFields;
+    private final TextField autoCompFields;
     private final JabRefPreferences prefs;
     private final AutoCompletePreferences autoCompletePreferences;
 
@@ -49,104 +44,102 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
     public EntryEditorPrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
         autoCompletePreferences = prefs.getAutoCompletePreferences();
-        setLayout(new BorderLayout());
-
-        autoOpenForm = new JCheckBox(Localization.lang("Open editor when a new entry is created"));
-        defSource = new JCheckBox(Localization.lang("Show BibTeX source by default"));
-        emacsMode = new JCheckBox(Localization.lang("Use Emacs key bindings"));
-        emacsRebindCtrlA = new JCheckBox(Localization.lang("Rebind C-a, too"));
-        emacsRebindCtrlF = new JCheckBox(Localization.lang("Rebind C-f, too"));
-        autoComplete = new JCheckBox(Localization.lang("Enable word/name autocompletion"));
-        recommendations = new JCheckBox(Localization.lang("Show 'Related Articles' tab"));
-        validation = new JCheckBox(Localization.lang("Show validation messages"));
+        autoOpenForm = new CheckBox(Localization.lang("Open editor when a new entry is created"));
+        autoOpenForm.setFont(FontSize.smallFont);
+        defSource = new CheckBox(Localization.lang("Show BibTeX source by default"));
+        defSource.setFont(FontSize.smallFont);
+        emacsMode = new CheckBox(Localization.lang("Use Emacs key bindings"));
+        emacsMode.setFont(FontSize.smallFont);
+        emacsRebindCtrlA = new CheckBox(Localization.lang("Rebind C-a, too"));
+        emacsRebindCtrlA.setFont(FontSize.smallFont);
+        emacsRebindCtrlF = new CheckBox(Localization.lang("Rebind C-f, too"));
+        emacsRebindCtrlF.setFont(FontSize.smallFont);
+        autoComplete = new CheckBox(Localization.lang("Enable word/name autocompletion"));
+        autoComplete.setFont(FontSize.smallFont);
+        recommendations = new CheckBox(Localization.lang("Show 'Related Articles' tab"));
+        recommendations.setFont(FontSize.smallFont);
+        validation = new CheckBox(Localization.lang("Show validation messages"));
+        validation.setFont(FontSize.smallFont);
 
         // allowed name formats
-        autoCompFF = new JRadioButton(Localization.lang("Autocomplete names in 'Firstname Lastname' format only"));
-        autoCompLF = new JRadioButton(Localization.lang("Autocomplete names in 'Lastname, Firstname' format only"));
-        autoCompBoth = new JRadioButton(Localization.lang("Autocomplete names in both formats"));
-        ButtonGroup buttonGroup = new ButtonGroup();
-        buttonGroup.add(autoCompLF);
-        buttonGroup.add(autoCompFF);
-        buttonGroup.add(autoCompBoth);
+        autoCompFF = new RadioButton(Localization.lang("Autocomplete names in 'Firstname Lastname' format only"));
+        autoCompFF.setFont(FontSize.smallFont);
+        autoCompLF = new RadioButton(Localization.lang("Autocomplete names in 'Lastname, Firstname' format only"));
+        autoCompLF.setFont(FontSize.smallFont);
+        autoCompBoth = new RadioButton(Localization.lang("Autocomplete names in both formats"));
+        autoCompBoth.setFont(FontSize.smallFont);
 
         // treatment of first name
-        firstNameModeFull = new JRadioButton(Localization.lang("Use full firstname whenever possible"));
-        firstNameModeAbbr = new JRadioButton(Localization.lang("Use abbreviated firstname whenever possible"));
-        firstNameModeBoth = new JRadioButton(Localization.lang("Use abbreviated and full firstname"));
-        ButtonGroup firstNameModeButtonGroup = new ButtonGroup();
-        firstNameModeButtonGroup.add(firstNameModeFull);
-        firstNameModeButtonGroup.add(firstNameModeAbbr);
-        firstNameModeButtonGroup.add(firstNameModeBoth);
+        firstNameModeFull = new RadioButton(Localization.lang("Use full firstname whenever possible"));
+        firstNameModeFull.setFont(FontSize.smallFont);
+        firstNameModeAbbr = new RadioButton(Localization.lang("Use abbreviated firstname whenever possible"));
+        firstNameModeAbbr.setFont(FontSize.smallFont);
+        firstNameModeBoth = new RadioButton(Localization.lang("Use abbreviated and full firstname"));
+        firstNameModeBoth.setFont(FontSize.smallFont);
 
-        Insets marg = new Insets(0, 20, 3, 0);
-
-        emacsRebindCtrlA.setMargin(marg);
         // We need a listener on showSource to enable and disable the source panel-related choices:
-        emacsMode.addChangeListener(event -> emacsRebindCtrlA.setEnabled(emacsMode.isSelected()));
+        emacsMode.setOnAction(event -> emacsRebindCtrlA.setDisable(!emacsMode.isSelected()));
 
-        emacsRebindCtrlF.setMargin(marg);
         // We need a listener on showSource to enable and disable the source panel-related choices:
-        emacsMode.addChangeListener(event -> emacsRebindCtrlF.setEnabled(emacsMode.isSelected()));
+        emacsMode.setOnAction(event -> emacsRebindCtrlF.setDisable(!emacsMode.isSelected()));
 
-
-        autoCompFields = new JTextField(40);
+        autoCompFields = new TextField();
         // We need a listener on autoComplete to enable and disable the
         // autoCompFields text field:
-        autoComplete.addChangeListener(event -> setAutoCompleteElementsEnabled(autoComplete.isSelected()));
+        autoComplete.setOnAction(event -> setAutoCompleteElementsEnabled(autoComplete.isSelected()));
 
-        FormLayout layout = new FormLayout
-                (// columns
-                 "8dlu, left:pref, 8dlu, fill:150dlu, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
-                 // rows  1 to 10
-                 "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu," +
-                // rows 11 to 16
-                        "pref, 6dlu, pref, 6dlu, pref, 6dlu, " +
-                        // rows 17 to 27
-                 "pref, 6dlu, pref, pref, pref, pref, 6dlu, pref, pref, pref, pref, pref");
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        CellConstraints cc = new CellConstraints();
-        builder.addSeparator(Localization.lang("Editor options"), cc.xyw(1, 1, 5));
-        builder.add(autoOpenForm, cc.xy(2, 3));
-        builder.add(defSource, cc.xy(2, 5));
-        builder.add(emacsMode, cc.xy(2, 7));
-        builder.add(emacsRebindCtrlA, cc.xy(2, 9));
-        builder.add(emacsRebindCtrlF, cc.xy(2, 11));
-        builder.add(recommendations, cc.xy(2,13));
-        builder.add(validation, cc.xy(2,15));
+        Label editorOptions = new Label(Localization.lang("Editor options") + "  -------------------------------------");
+        editorOptions.setFont(FontSize.bigFont);
+        builder.add(editorOptions, 1, 1);
+        builder.add(new Separator(), 2, 1);
+        builder.add(autoOpenForm,  1, 2);
+        builder.add(defSource,  1, 3);
+        builder.add(emacsMode, 1, 4);
+        builder.add(emacsRebindCtrlA, 1, 5);
+        builder.add(emacsRebindCtrlF, 1, 6);
+        builder.add(recommendations, 1, 7);
+        builder.add(validation, 1, 8);
+        builder.add(new Label(""), 1, 9);
 
-        builder.addSeparator(Localization.lang("Autocompletion options"), cc.xyw(1, 17, 5));
-        builder.add(autoComplete, cc.xy(2, 19));
+        Label autocompletionOptions = new Label(Localization.lang("Autocompletion options") + "  --------------------------");
+        autocompletionOptions.setFont(FontSize.bigFont);
+        builder.add(autocompletionOptions, 1, 10);
+        builder.add(autoComplete,   1, 11);
 
-        DefaultFormBuilder builder3 = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:150dlu",""));
-        JLabel label = new JLabel(Localization.lang("Use autocompletion for the following fields") + ":");
+        Label useFields = new Label("       " + Localization.lang("Use autocompletion for the following fields") + ":");
+        useFields.setFont(FontSize.smallFont);
+        builder.add(useFields, 1, 12);
+        builder.add(autoCompFields, 2, 12);
+        builder.add(new Label(""), 1, 13);
 
-        builder3.append(label);
-        builder3.append(autoCompFields);
-        builder.add(builder3.getPanel(), cc.xyw(2, 21, 3));
+        Label nameFormat = new Label(Localization.lang("Name format used for autocompletion") + "  ----------");
+        nameFormat.setFont(FontSize.bigFont);
+        builder.add(nameFormat, 1, 14);
+        builder.add(autoCompFF, 1, 15);
+        builder.add(autoCompLF,  1, 16);
+        builder.add(autoCompBoth,  1, 17);
+        builder.add(new Label(""), 1, 18);
 
-        builder.addSeparator(Localization.lang("Name format used for autocompletion"), cc.xyw(2, 23, 4));
-        builder.add(autoCompFF, cc.xy(2, 24));
-        builder.add(autoCompLF, cc.xy(2, 25));
-        builder.add(autoCompBoth, cc.xy(2, 26));
+        Label treatment = new Label(Localization.lang("Treatment of first names") + "  --------------------------");
+        treatment.setFont(FontSize.bigFont);
+        builder.add(treatment, 1, 19);
+        builder.add(firstNameModeAbbr,  1, 20);
+        builder.add(firstNameModeFull, 1, 21);
+        builder.add(firstNameModeBoth,  1, 22);
+    }
 
-        builder.addSeparator(Localization.lang("Treatment of first names"), cc.xyw(2, 29, 4));
-        builder.add(firstNameModeAbbr, cc.xy(2, 30));
-        builder.add(firstNameModeFull, cc.xy(2, 31));
-        builder.add(firstNameModeBoth, cc.xy(2, 32));
-
-        JPanel pan = builder.getPanel();
-        pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        add(pan, BorderLayout.CENTER);
+    public Node getBuilder() {
+        return builder;
     }
 
     private void setAutoCompleteElementsEnabled(boolean enabled) {
-        autoCompFields.setEnabled(enabled);
-        autoCompLF.setEnabled(enabled);
-        autoCompFF.setEnabled(enabled);
-        autoCompBoth.setEnabled(enabled);
-        firstNameModeAbbr.setEnabled(enabled);
-        firstNameModeFull.setEnabled(enabled);
-        firstNameModeBoth.setEnabled(enabled);
+        autoCompFields.setDisable(!enabled);
+        autoCompLF.setDisable(!enabled);
+        autoCompFF.setDisable(!enabled);
+        autoCompBoth.setDisable(!enabled);
+        firstNameModeAbbr.setDisable(!enabled);
+        firstNameModeFull.setDisable(!enabled);
+        firstNameModeBoth.setDisable(!enabled);
     }
 
     @Override
@@ -181,7 +174,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         }
 
         // similar for emacs CTRL-a and emacs mode
-        emacsRebindCtrlA.setEnabled(emacsMode.isSelected());
+        emacsRebindCtrlA.setDisable(!emacsMode.isSelected());
         // Autocomplete fields is only enabled when autocompletion is selected
         setAutoCompleteElementsEnabled(autoComplete.isSelected());
 
