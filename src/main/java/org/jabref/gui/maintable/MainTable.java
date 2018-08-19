@@ -15,8 +15,10 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
@@ -34,6 +36,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
@@ -57,6 +60,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private final MainTableDataModel model;
     private final NewDroppedFileHandler fileHandler;
+    private final CustomLocalDragboard localDragboard = GUIGlobals.localDragboard;
 
 
     public MainTable(MainTableDataModel model, JabRefFrame frame,
@@ -235,7 +239,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void handleOnDragOver(BibEntryTableViewModel originalItem, DragEvent event) {
-        if ((event.getGestureSource() != originalItem) && GUIGlobals.localDragboard.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
+        if ((event.getGestureSource() != originalItem) && localDragboard.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
             event.acceptTransferModes(TransferMode.MOVE);
 
         }
@@ -261,8 +265,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         List<BibEntry> entries = getSelectionModel().getSelectedItems().stream().map(BibEntryTableViewModel::getEntry).collect(Collectors.toList());
 
+        //The following is necesary to initiate the drag and drop in javafx, although we don't need the contents
+        //It doesn't work without
+        ClipboardContent content = new ClipboardContent();
+        Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
+        content.put(DragAndDropDataFormats.ENTRIES, "");
+        dragboard.setContent(content);
+
         if (!entries.isEmpty()) {
-            GUIGlobals.localDragboard.putValue(DragAndDropDataFormats.BIBENTRY_LIST_CLASS, entries);
+            localDragboard.putBibEntries(entries);
         }
 
         event.consume();

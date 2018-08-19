@@ -251,7 +251,7 @@ public class GroupTreeView {
                 }
 
                 if (localDragboard.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
-                    List<BibEntry> entries = localDragboard.getValue(DragAndDropDataFormats.BIBENTRY_LIST_CLASS);
+                    List<BibEntry> entries = localDragboard.getBibEntries();
                     row.getItem().addEntriesToGroup(entries);
                     success = true;
                 }
