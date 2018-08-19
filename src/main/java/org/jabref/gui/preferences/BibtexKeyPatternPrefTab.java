@@ -1,4 +1,4 @@
-package org.jabref.gui.preftabs;
+package org.jabref.gui.preferences;
 
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;

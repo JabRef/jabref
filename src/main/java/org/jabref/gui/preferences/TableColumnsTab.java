@@ -1,4 +1,4 @@
-package org.jabref.gui.preftabs;
+package org.jabref.gui.preferences;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;

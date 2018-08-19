@@ -1,4 +1,4 @@
-package org.jabref.gui.preftabs;
+package org.jabref.gui.preferences;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

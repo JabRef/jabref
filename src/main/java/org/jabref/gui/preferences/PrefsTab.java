@@ -1,4 +1,4 @@
-package org.jabref.gui.preftabs;
+package org.jabref.gui.preferences;
 
 /**
  * A prefsTab is a component displayed in the PreferenceDialog.
