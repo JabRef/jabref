@@ -13,9 +13,12 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefDialog;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.keyboard.KeyBinder;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
@@ -41,7 +44,8 @@ public class BibtexKeyPatternDialog extends JabRefDialog {
 
     private void init() {
         getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(bibtexKeyPatternPanel, BorderLayout.CENTER);
+        JFXPanel bibPanel = CustomJFXPanel.wrap(new Scene(bibtexKeyPatternPanel));
+        getContentPane().add(bibPanel, BorderLayout.CENTER);
 
         JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(); // label of "cancel" is set later as the label is overwritten by assigning an action to the button

@@ -136,7 +136,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
 
     private void construct() {
         VBox vBox = new VBox();
-        vBox.setPrefSize(150,800);
+        vBox.setPrefSize(160,800);
         Button []button = new Button[20];
 
         button[0] = new Button(Localization.lang("General"));
