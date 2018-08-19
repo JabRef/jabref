@@ -129,7 +129,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
             try {
                 DefaultTaskExecutor.runInJavaFXThread(() -> {
                     PreviewPanel testPane = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService, externalFileTypes);
-                    if (chosen.isSelectionEmpty()) {
+                    if (chosen.getSelectionModel().getSelectedItems().isEmpty()) {
                         testPane.setFixedLayout(layout.getText());
                         testPane.setEntry(TestEntry.getTestEntry());
                     }
