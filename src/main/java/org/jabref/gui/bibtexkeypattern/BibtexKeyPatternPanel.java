@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -174,7 +175,7 @@ public class BibtexKeyPatternPanel extends Pane {
         }
     }
 
-    public GridPane getPanel() {
+    public Node getPanel() {
         return gridPane;
     }
 }

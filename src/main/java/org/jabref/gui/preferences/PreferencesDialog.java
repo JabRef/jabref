@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
@@ -102,7 +103,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         tabsList.itemsProperty().setValue(preferenceTabs);
         EasyBind.subscribe(tabsList.getSelectionModel().selectedItemProperty(), tab -> {
             if (tab != null) {
-                container.setCenter(tab.getBuilder());
+                container.setCenter(new ScrollPane(tab.getBuilder()));
             }
         });
         tabsList.getSelectionModel().selectFirst();
