@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
@@ -70,7 +71,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     /**
      * If a database is set, the preview will attempt to resolve strings in the previewed entry using that database.
      */
-    private Optional<BibDatabaseContext> databaseContext = Optional.empty();
+    private BibDatabaseContext databaseContext;
     private final WebView previewView;
     private Optional<Future<?>> citationStyleFuture = Optional.empty();
 
@@ -78,10 +79,10 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
 
     /**
      * @param panel           (may be null) Only set this if the preview is associated to the main window.
-     * @param databaseContext (may be null) Used for resolving pdf directories for links.
+     * @param databaseContext Used for resolving pdf directories for links. Must not be null.
      */
     public PreviewPanel(BasePanel panel, BibDatabaseContext databaseContext, KeyBindingRepository keyBindingRepository, PreviewPreferences preferences, DialogService dialogService, ExternalFileTypes externalFileTypes) {
-        this.databaseContext = Optional.ofNullable(databaseContext);
+        this.databaseContext = Objects.requireNonNull(databaseContext);
         this.basePanel = Optional.ofNullable(panel);
         this.dialogService = dialogService;
         this.clipBoardManager = Globals.clipboardManager;
@@ -198,7 +199,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
     }
 
     public void setDatabaseContext(BibDatabaseContext databaseContext) {
-        this.databaseContext = Optional.ofNullable(databaseContext);
+        this.databaseContext = databaseContext;
     }
 
     public Optional<BasePanel> getBasePanel() {
@@ -281,7 +282,7 @@ public class PreviewPanel extends ScrollPane implements SearchQueryHighlightList
         if (layout.isPresent()) {
             StringBuilder sb = new StringBuilder();
             bibEntry.ifPresent(entry -> sb.append(layout.get()
-                                                        .doLayout(entry, databaseContext.map(BibDatabaseContext::getDatabase).orElse(null))));
+                                                        .doLayout(entry, databaseContext.getDatabase())));
             setPreviewLabel(sb.toString());
         } else if (basePanel.isPresent() && bibEntry.isPresent()) {
             Future<?> citationStyleWorker = BackgroundTask
