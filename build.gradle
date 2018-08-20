@@ -15,7 +15,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '1.15.1'
+    id 'com.gradle.build-scan' version '1.15.2'
     id 'com.install4j.gradle' version '7.0.6'
     id 'com.github.johnrengelman.shadow' version '2.0.4'
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
@@ -119,8 +119,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.7.1'
     compile 'org.antlr:antlr4-runtime:4.7.1'
 
-    // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
-    compile 'mysql:mysql-connector-java:5.1.46'
+    compile 'mysql:mysql-connector-java:8.0.12'
 
     compile 'org.postgresql:postgresql:42.2.4'
 
@@ -169,8 +168,8 @@ dependencies {
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.3.0-RC1'
     testCompile 'org.junit.platform:junit-platform-launcher:1.3.0-RC1'
     testCompile 'org.junit-pioneer:junit-pioneer:0.1.2'
-    testRuntime 'org.apache.logging.log4j:log4j-core:2.11.0'
-    testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.0'
+    testRuntime 'org.apache.logging.log4j:log4j-core:2.11.1'
+    testRuntime 'org.apache.logging.log4j:log4j-jul:2.11.1'
     testCompile 'org.mockito:mockito-core:2.21.0'
     testCompile 'com.github.tomakehurst:wiremock:2.18.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
@@ -181,7 +180,7 @@ dependencies {
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.11'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.12'
 }
 
 jacoco {
