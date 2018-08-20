@@ -119,8 +119,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.7.1'
     compile 'org.antlr:antlr4-runtime:4.7.1'
 
-    // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
-    compile 'mysql:mysql-connector-java:5.1.46'
+    compile 'mysql:mysql-connector-java:8.0.12'
 
     compile 'org.postgresql:postgresql:42.2.4'
 
