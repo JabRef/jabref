@@ -111,6 +111,7 @@ class AdvancedTab extends Pane implements PrefsTab {
 
     }
 
+    @Override
     public Node getBuilder() {
         return builder;
     }

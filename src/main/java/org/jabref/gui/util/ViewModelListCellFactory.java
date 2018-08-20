@@ -113,6 +113,10 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
         comboBox.setCellFactory(this);
     }
 
+    public void install(ListView<T> listView) {
+        listView.setCellFactory(this);
+    }
+
     @Override
     public ListCell<T> call(ListView<T> param) {
 

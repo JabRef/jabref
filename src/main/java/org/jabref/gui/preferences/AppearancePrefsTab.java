@@ -45,7 +45,7 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
 
     }
 
-    public Node getContainer() {
+    public Node getBuilder() {
         return container;
     }
 

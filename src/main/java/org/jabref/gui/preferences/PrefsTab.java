@@ -1,11 +1,15 @@
 package org.jabref.gui.preferences;
 
+import javafx.scene.Node;
+
 /**
  * A prefsTab is a component displayed in the PreferenceDialog.
  *
  * It needs to extend from Component.
  */
 interface PrefsTab {
+
+    Node getBuilder();
 
     /**
      * This method is called when the dialog is opened, or if it is made

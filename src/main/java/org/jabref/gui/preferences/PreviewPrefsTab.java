@@ -182,7 +182,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         gridPane.add(scrollPane, 1, 9);
     }
 
-    public Node getGridPane() {
+    public Node getBuilder() {
         return gridPane;
     }
 

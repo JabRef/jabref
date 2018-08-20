@@ -38,7 +38,6 @@ public class BibtexKeyPatternPanel extends Pane {
 
     // one field for each type
     private final Map<String, TextField> textFields = new HashMap<>();
-    private final TextField[] textFieldArray = new TextField[19];
     private final BasePanel panel;
     private final GridPane gridPane = new GridPane();
 
@@ -78,11 +77,6 @@ public class BibtexKeyPatternPanel extends Pane {
         }
 
         addExtraText(mode);
-        int y = 0;
-        for (EntryType type : EntryTypes.getAllValues(mode)) {
-            textFields.put(type.getName().toLowerCase(Locale.ROOT), textFieldArray[y]);
-            y++;
-        }
 
         Button help1 = new Button("?");
         help1.setOnAction(e->new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN).getHelpButton().doClick());
@@ -92,7 +86,7 @@ public class BibtexKeyPatternPanel extends Pane {
         btnDefaultAll1.setFont(FontSize.smallFont);
         btnDefaultAll1.setOnAction(e-> {
             // reset all fields
-            for (TextField field : textFieldArray) {
+            for (TextField field : textFields.values()) {
                 field.setText("");
             }
             defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
@@ -101,25 +95,24 @@ public class BibtexKeyPatternPanel extends Pane {
     }
 
     private void addExtraText(BibDatabaseMode mode) {
-        Label []label = new Label[19];
-        Button []button = new Button[19];
-        int i = 0;
-        for (i = 0; i <= 18; i++) {
-            textFieldArray[i] = new TextField();
-            button[i] = new Button("Default");
-            button[i].setFont(new javafx.scene.text.Font(10));
-            button[i].setOnAction(e-> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
-        }
-        i = 0;
+        int rowIndex = 0;
         for (EntryType type : EntryTypes.getAllValues(mode)) {
-            label[i] = new Label(type.getName());
-            i ++;
-        }
-        for (i = 0; i <= 18; i++) {
-            label[i].setFont(FontSize.smallFont);
-            gridPane.add(label[i], 1, i + 3);
-            gridPane.add(textFieldArray[i], 3, i + 3);
-            gridPane.add(button[i], 4, i + 3);
+            Label label = new Label(type.getName());
+            label.setFont(FontSize.smallFont);
+
+            TextField textField = new TextField();
+
+            Button button = new Button("Default");
+            button.setFont(new javafx.scene.text.Font(10));
+            button.setOnAction(e -> textField.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
+
+            gridPane.add(label, 1, rowIndex + 3);
+            gridPane.add(textField, 3, rowIndex + 3);
+            gridPane.add(button, 4, rowIndex + 3);
+
+            textFields.put(type.getName().toLowerCase(Locale.ROOT), textField);
+
+            rowIndex++;
         }
     }
 

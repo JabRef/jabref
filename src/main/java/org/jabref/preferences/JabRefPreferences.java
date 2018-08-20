@@ -74,6 +74,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
+import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.Version;
@@ -1144,6 +1145,7 @@ public class JabRefPreferences implements PreferencesService {
         clearAllCustomEntryTypes();
         clearKeyPatterns();
         prefs.clear();
+        new SharedDatabasePreferences().clear();
     }
 
     public void clear(String key) {
@@ -1322,8 +1324,11 @@ public class JabRefPreferences implements PreferencesService {
      * @param filename String File to export to
      */
     public void exportPreferences(String filename) throws JabRefException {
-        File f = new File(filename);
-        try (OutputStream os = new FileOutputStream(f)) {
+        exportPreferences(Paths.get(filename));
+    }
+
+    public void exportPreferences(Path file) throws JabRefException {
+        try (OutputStream os = new FileOutputStream(file.toFile())) {
             prefs.exportSubtree(os);
         } catch (BackingStoreException | IOException ex) {
             throw new JabRefException("Could not export preferences", Localization.lang("Could not export preferences"),
@@ -1339,12 +1344,15 @@ public class JabRefPreferences implements PreferencesService {
      *                         or an IOException
      */
     public void importPreferences(String filename) throws JabRefException {
-        File f = new File(filename);
-        try (InputStream is = new FileInputStream(f)) {
+        importPreferences(Paths.get(filename));
+    }
+
+    public void importPreferences(Path file) throws JabRefException {
+        try (InputStream is = new FileInputStream(file.toFile())) {
             Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException | IOException ex) {
             throw new JabRefException("Could not import preferences", Localization.lang("Could not import preferences"),
-                                      ex);
+                    ex);
         }
     }
 
@@ -1911,5 +1919,9 @@ public class JabRefPreferences implements PreferencesService {
         } else {
             return Optional.empty();
         }
+    }
+
+    public String getPrefsExportPath() {
+        return get(PREFS_EXPORT_PATH);
     }
 }
