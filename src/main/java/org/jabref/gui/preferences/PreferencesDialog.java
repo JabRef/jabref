@@ -5,6 +5,7 @@ import java.util.prefs.BackingStoreException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -12,6 +13,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
@@ -60,6 +62,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         setTitle(Localization.lang("JabRef preferences"));
         getDialogPane().setPrefSize(1250, 800);
         getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        getDialogPane().getScene().getStylesheets().add(this.getClass().getResource("PreferencesDialog.css").toExternalForm());
         setResizable(true);
         ButtonType save = new ButtonType(Localization.lang("Save"), ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(save, ButtonType.CANCEL);
@@ -100,6 +103,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         vBox.setPrefWidth(160);
 
         ListView<PrefsTab> tabsList = new ListView<>();
+        tabsList.setId("sideMenu");
         tabsList.itemsProperty().setValue(preferenceTabs);
         EasyBind.subscribe(tabsList.getSelectionModel().selectedItemProperty(), tab -> {
             if (tab != null) {
@@ -111,23 +115,36 @@ public class PreferencesDialog extends BaseDialog<Void> {
                 .withText(PrefsTab::getTabName)
                 .install(tabsList);
 
+        VBox buttonContainer = new VBox();
+        buttonContainer.setAlignment(Pos.BOTTOM_LEFT);
         Button importPreferences = new Button(Localization.lang("Import preferences"));
         importPreferences.setTooltip(new Tooltip(Localization.lang("Import preferences from file")));
         importPreferences.setOnAction(e -> importPreferences());
+        importPreferences.getStyleClass().add("text-button");
         Button exportPreferences = new Button(Localization.lang("Export preferences"));
         exportPreferences.setTooltip(new Tooltip(Localization.lang("Export preferences to file")));
         exportPreferences.setOnAction(e -> exportPreferences());
+        exportPreferences.getStyleClass().add("text-button");
         Button showPreferences = new Button(Localization.lang("Show preferences"));
         showPreferences.setOnAction(e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs)).setVisible(true));
+        showPreferences.getStyleClass().add("text-button");
         Button resetPreferences = new Button(Localization.lang("Reset preferences"));
         resetPreferences.setOnAction(e -> resetPreferences());
-
-        vBox.getChildren().addAll(
-                tabsList,
+        resetPreferences.getStyleClass().add("text-button");
+        buttonContainer.getChildren().addAll(
                 importPreferences,
                 exportPreferences,
                 showPreferences,
                 resetPreferences
+        );
+
+        VBox spacer = new VBox();
+        VBox.setVgrow(tabsList, Priority.ALWAYS);
+        VBox.setVgrow(spacer, Priority.SOMETIMES);
+        vBox.getChildren().addAll(
+                tabsList,
+                spacer,
+                buttonContainer
         );
 
         container.setLeft(vBox);
