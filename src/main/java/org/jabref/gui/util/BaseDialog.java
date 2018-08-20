@@ -20,7 +20,7 @@ public class BaseDialog<T> extends Dialog<T> {
         });
 
         setDialogIcon(IconTheme.getJabRefImageFX());
-
+        setResizable(true);
         Globals.getThemeLoader().installBaseCss(getDialogPane().getScene(), Globals.prefs);
     }
 
