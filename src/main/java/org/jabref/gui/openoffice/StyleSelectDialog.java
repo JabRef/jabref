@@ -53,6 +53,7 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TestEntry;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -134,7 +135,7 @@ class StyleSelectDialog {
         // Create a preview panel for previewing styles
         // Must be done before creating the table to avoid NPEs
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-            preview = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService, ExternalFileTypes.getInstance());
+            preview = new PreviewPanel(null, new BibDatabaseContext(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService, ExternalFileTypes.getInstance());
             // Use the test entry from the Preview settings tab in Preferences:
             preview.setEntry(prevEntry);
         });
