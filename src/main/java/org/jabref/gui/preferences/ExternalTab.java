@@ -48,29 +48,20 @@ class ExternalTab extends JPanel implements PrefsTab {
     public ExternalTab(JabRefFrame frame, PreferencesDialog prefsDiag, JabRefPreferences prefs) {
         this.prefs = prefs;
         Button editFileTypes = new Button(Localization.lang("Manage external file types"));
-        editFileTypes.setFont(FontSize.smallFont);
         citeCommand = new TextField();
         editFileTypes.setOnAction(e->ExternalFileTypeEditor.getAction());
         defaultConsole = new RadioButton(Localization.lang("Use default terminal emulator"));
-        defaultConsole.setFont(FontSize.smallFont);
         executeConsole = new RadioButton(Localization.lang("Execute command") + ":");
-        executeConsole.setFont(FontSize.smallFont);
         consoleCommand = new TextField();
         browseButton = new Button(Localization.lang("Browse"));
-        browseButton.setFont(FontSize.smallFont);
         adobeAcrobatReader = new RadioButton(Localization.lang("Adobe Acrobat Reader"));
-        adobeAcrobatReader.setFont(FontSize.smallFont);
         adobeAcrobatReaderPath = new TextField();
         Button browseAdobeAcrobatReader = new Button(Localization.lang("Browse"));
-        browseAdobeAcrobatReader.setFont(FontSize.smallFont);
         sumatraReader = new RadioButton(Localization.lang("Sumatra Reader"));
-        sumatraReader.setFont(FontSize.smallFont);
         sumatraReaderPath = new TextField();
         Button browseSumatraReader = new Button(Localization.lang("Browse"));
-        browseSumatraReader.setFont(FontSize.smallFont);
 
         Label commandDescription = new Label(Localization.lang("Note: Use the placeholder %0 for the location of the opened library file.", "%DIR"));
-        commandDescription.setFont(FontSize.smallFont);
         defaultConsole.setOnAction(e -> updateExecuteConsoleButtonAndFieldEnabledState());
         executeConsole.setOnAction(e -> updateExecuteConsoleButtonAndFieldEnabledState());
         browseButton.setOnAction(e -> showConsoleChooser());
@@ -100,12 +91,10 @@ class ExternalTab extends JPanel implements PrefsTab {
         sendingOfEmails.setFont(FontSize.bigFont);
         builder.add(sendingOfEmails, 1, 1);
         Label subject = new Label(Localization.lang("Subject for sending an email with references").concat(":"));
-        subject.setFont(FontSize.smallFont);
         builder.add(subject, 1, 2);
         emailSubject = new TextField();
         builder.add(emailSubject, 2, 2);
         openFoldersOfAttachedFiles = new CheckBox(Localization.lang("Automatically open folders of attached files"));
-        openFoldersOfAttachedFiles.setFont(FontSize.smallFont);
         builder.add(openFoldersOfAttachedFiles, 1, 3);
 
         builder.add(new Label(""), 1, 4);
@@ -123,7 +112,6 @@ class ExternalTab extends JPanel implements PrefsTab {
         builder.add(butpan, 1, 6);
 
         Label citeCommandLabel = new Label(Localization.lang("Cite command") + ':');
-        citeCommandLabel.setFont(FontSize.smallFont);
         builder.add(citeCommandLabel, 1, 7);
         builder.add(citeCommand, 2, 7);
         builder.add(editFileTypes, 1, 8);
@@ -152,7 +140,6 @@ class ExternalTab extends JPanel implements PrefsTab {
     private void addSettingsButton(final PushToApplication application, GridPane panel, int index) {
         PushToApplicationSettings settings = PushToApplications.getSettings(application);
         Button button = new Button(Localization.lang("Settings for %0", application.getApplicationName()));
-        button.setFont(FontSize.smallFont);
         button.setPrefSize(150, 20);
         button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(null, settings, index));
         if (index % 2 == 0) {

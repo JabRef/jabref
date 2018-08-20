@@ -62,36 +62,26 @@ class FileTab extends Pane implements PrefsTab {
         this.prefs = prefs;
         fileDir = new TextField();
         bibLocAsPrimaryDir = new CheckBox(Localization.lang("Use the BIB file location as primary file directory"));
-        bibLocAsPrimaryDir.setFont(FontSize.smallFont);
         bibLocAsPrimaryDir.setAccessibleText(Localization.lang("When downloading files, or moving linked files to the "
                 + "file directory, prefer the BIB file location rather than the file directory set above"));
         runAutoFileSearch = new CheckBox(
                 Localization.lang("When opening file link, search for matching file if no link is defined"));
-        runAutoFileSearch.setFont(FontSize.smallFont);
         allowFileAutoOpenBrowse = new CheckBox(
                 Localization.lang("Automatically open browse dialog when creating new file link"));
-        allowFileAutoOpenBrowse.setFont(FontSize.smallFont);
         regExpTextField = new TextField();
         useRegExpComboBox = new RadioButton(Localization.lang("Use regular expression search"));
-        useRegExpComboBox.setFont(FontSize.smallFont);
         useRegExpComboBox.setOnAction(e -> regExpTextField.setEditable(useRegExpComboBox.isSelected()));
 
         openLast = new CheckBox(Localization.lang("Open last edited libraries at startup"));
-        openLast.setFont(FontSize.smallFont);
         backup = new CheckBox(Localization.lang("Backup old file when saving"));
-        backup.setFont(FontSize.smallFont);
         localAutoSave = new CheckBox(Localization.lang("Autosave local libraries"));
-        localAutoSave.setFont(FontSize.smallFont);
         resolveStringsAll = new RadioButton(Localization.lang("Resolve strings for all fields except") + ":");
-        resolveStringsAll.setFont(FontSize.smallFont);
         resolveStringsStandard = new RadioButton(Localization.lang("Resolve strings for standard BibTeX fields only"));
-        resolveStringsStandard.setFont(FontSize.smallFont);
 
         // This is sort of a quick hack
         newlineSeparator = new ComboBox<>(FXCollections.observableArrayList("CR", "CR/LF", "LF"));
 
         reformatFileOnSaveAndExport = new CheckBox(Localization.lang("Always reformat BIB file on save and export"));
-        reformatFileOnSaveAndExport.setFont(FontSize.smallFont);
 
         nonWrappableFields = new TextField();
         doNotResolveStringsFor = new TextField();
@@ -105,7 +95,6 @@ class FileTab extends Pane implements PrefsTab {
         builder.add(openLast,  1, 2);
         builder.add(backup, 1, 3);
         Label label = new Label(Localization.lang("Do not wrap the following fields when saving") + ":");
-        label.setFont(FontSize.smallFont);
         builder.add(label, 1, 4);
         builder.add(nonWrappableFields, 2, 4);
         builder.add(resolveStringsStandard,  1, 5);
@@ -113,7 +102,6 @@ class FileTab extends Pane implements PrefsTab {
         builder.add(doNotResolveStringsFor, 2, 6);
 
         Label newlineSeparatorLabel = new Label(Localization.lang("Newline separator") + ":");
-        newlineSeparatorLabel.setFont(FontSize.smallFont);
         builder.add(newlineSeparatorLabel, 1, 7);
         builder.add(newlineSeparator, 2, 7);
         builder.add(reformatFileOnSaveAndExport, 1, 8);
@@ -125,13 +113,11 @@ class FileTab extends Pane implements PrefsTab {
         builder.add(externalFileLinks, 1, 11);
 
         label = new Label(Localization.lang("Main file directory") + ':');
-        label.setFont(FontSize.smallFont);
         builder.add(label, 1, 12);
         builder.add(fileDir, 2, 12);
 
         Button browse = new Button(Localization.lang("Browse"));
         browse.setPrefSize(80, 20);
-        browse.setFont(FontSize.smallFont);
         browse.setOnAction(e -> {
             DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                     .withInitialDirectory(Paths.get(fileDir.getText())).build();
@@ -146,7 +132,6 @@ class FileTab extends Pane implements PrefsTab {
         builder.add(regExpTextField, 2, 16);
 
         Button help = new Button("?");
-        help.setFont(FontSize.smallFont);
         help.setOnAction(event -> new HelpAction(Localization.lang("Help on regular expression search"),
                 HelpFile.REGEX_SEARCH).getHelpButton().doClick());
 
@@ -162,7 +147,6 @@ class FileTab extends Pane implements PrefsTab {
         builder.add(autosave, 1, 20);
         builder.add(localAutoSave,  1, 21);
         Button help1 = new Button("?");
-        help1.setFont(FontSize.smallFont);
         help1.setOnAction(event -> new HelpAction(HelpFile.AUTOSAVE).getHelpButton().doClick());
         builder.add(help1, 2, 21);
     }

@@ -59,26 +59,18 @@ class GeneralTab extends Pane implements PrefsTab {
         biblatexMode = new ComboBox<>(FXCollections.observableArrayList(BibDatabaseMode.values()));
 
         memoryStick = new CheckBox(Localization.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
-        memoryStick.setFont(FontSize.smallFont);
         useOwner = new CheckBox(Localization.lang("Mark new entries with owner name") + ':');
-        useOwner.setFont(FontSize.smallFont);
         updateTimeStamp = new CheckBox(Localization.lang("Update timestamp on modification"));
-        updateTimeStamp.setFont(FontSize.smallFont);
         useTimeStamp = new CheckBox(Localization.lang("Mark new entries with addition date") + ". "
                 + Localization.lang("Date format") + ':');
-        useTimeStamp.setFont(FontSize.smallFont);
         if (!useTimeStamp.isSelected()) {
             updateTimeStamp.setDisable(true);
         }
         useTimeStamp.setOnAction(e->updateTimeStamp.setDisable(!useTimeStamp.isSelected()));
         overwriteOwner = new CheckBox(Localization.lang("Overwrite"));
-        overwriteOwner.setFont(FontSize.smallFont);
         overwriteTimeStamp = new CheckBox(Localization.lang("If a pasted or imported entry already has the field set, overwrite."));
-        overwriteTimeStamp.setFont(FontSize.smallFont);
         enforceLegalKeys = new CheckBox(Localization.lang("Enforce legal characters in BibTeX keys"));
-        enforceLegalKeys.setFont(FontSize.smallFont);
         confirmDelete = new CheckBox(Localization.lang("Show confirmation dialog when deleting entries"));
-        confirmDelete.setFont(FontSize.smallFont);
         defOwnerField = new TextField();
         defOwnerField.setPrefSize(80, 20);
         timeStampFormat = new TextField();
@@ -86,9 +78,7 @@ class GeneralTab extends Pane implements PrefsTab {
         timeStampField = new TextField();
         timeStampField.setPrefSize(80, 20);
         inspectionWarnDupli = new CheckBox(Localization.lang("Warn about unresolved duplicates when closing inspection window"));
-        inspectionWarnDupli.setFont(FontSize.smallFont);
         shouldCollectTelemetry = new CheckBox(Localization.lang("Collect and share telemetry data to help improve JabRef."));
-        shouldCollectTelemetry.setFont(FontSize.smallFont);
         encodings = new ComboBox<>(FXCollections.observableArrayList(Encodings.ENCODINGS));
 
         Label general = new Label(Localization.lang("General") + "  -----------------------------------------------");
@@ -109,7 +99,6 @@ class GeneralTab extends Pane implements PrefsTab {
         builder.add(overwriteOwner, 3, 10);
 
         Button help = new Button("?");
-        help.setFont(FontSize.smallFont);
         help.setPrefSize(10, 10);
         help.setOnAction(event -> new HelpAction(HelpFile.OWNER).getHelpButton().doClick());
         builder.add(help, 4, 10);
@@ -118,12 +107,10 @@ class GeneralTab extends Pane implements PrefsTab {
         builder.add(timeStampFormat, 2, 13);
         builder.add(overwriteTimeStamp, 3, 13);
         Label fieldName = new Label(Localization.lang("Field name") + ':');
-        fieldName.setFont(FontSize.smallFont);
         builder.add(fieldName, 4, 13);
         builder.add(timeStampField, 5, 13);
 
         Button help1 = new Button("?");
-        help1.setFont(FontSize.smallFont);
         help1.setOnAction(event -> new HelpAction(HelpFile.TIMESTAMP).getHelpButton().doClick());
         builder.add(help1, 6, 13);
 
@@ -133,16 +120,13 @@ class GeneralTab extends Pane implements PrefsTab {
         builder.add(shouldCollectTelemetry, 1, 15);
         builder.add(new Line(), 1, 16);
         Label languageLabel = new Label(Localization.lang("Language") + ':');
-        languageLabel.setFont(FontSize.smallFont);
         builder.add(languageLabel, 1, 17);
         builder.add(language, 2, 17);
         builder.add(new Line(), 2, 18);
         Label defaultEncoding = new Label(Localization.lang("Default encoding") + ':');
-        defaultEncoding.setFont(FontSize.smallFont);
         builder.add(defaultEncoding, 1, 19);
         builder.add(encodings, 2, 19);
         Label defaultBibliographyMode = new Label(Localization.lang("Default bibliography mode"));
-        defaultBibliographyMode.setFont(FontSize.smallFont);
         builder.add(defaultBibliographyMode, 1, 20);
         builder.add(biblatexMode, 2, 20);
     }

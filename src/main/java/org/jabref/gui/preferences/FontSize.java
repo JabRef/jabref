@@ -7,5 +7,4 @@ import javafx.scene.text.Font;
  */
 public class FontSize {
     public static Font bigFont = new Font(14);
-    public static Font smallFont = new Font(10);
 }

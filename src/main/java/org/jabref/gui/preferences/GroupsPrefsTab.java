@@ -38,9 +38,7 @@ class GroupsPrefsTab extends Pane implements PrefsTab {
         });
 
         multiSelectionModeIntersection.setText(Localization.lang("Display only entries belonging to all selected groups."));
-        multiSelectionModeIntersection.setFont(FontSize.smallFont);
         multiSelectionModeUnion.setText(Localization.lang("Display all entries belonging to one or more of the selected groups."));
-        multiSelectionModeUnion.setFont(FontSize.smallFont);
 
         Label view = new Label(Localization.lang("View") + "  ---------------------------------------");
         view.setFont(FontSize.bigFont);
@@ -57,11 +55,9 @@ class GroupsPrefsTab extends Pane implements PrefsTab {
         builder.add(dynamicGroups, 1, 8);
 
         Label defaultGrouping = new Label(Localization.lang("Default grouping field") + ":");
-        defaultGrouping.setFont(FontSize.smallFont);
         builder.add(defaultGrouping, 1, 9);
         builder.add(groupingField, 2, 9);
         Label label = new Label(Localization.lang("When adding/removing keywords, separate them by") + ":");
-        label.setFont(FontSize.smallFont);
         builder.add(label, 1, 10);
         builder.add(keywordSeparator, 2, 10);
     }

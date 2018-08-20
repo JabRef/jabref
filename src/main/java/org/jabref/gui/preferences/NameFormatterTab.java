@@ -118,7 +118,6 @@ public class NameFormatterTab extends Pane implements PrefsTab {
         Label insertRows = new Label(Localization.lang("Insert rows"));
         insertRows.setVisible(false);
         Button add = new Button("Insert");
-        add.setFont(FontSize.smallFont);
         add.setOnAction(e-> {
             if (!addName.getText().isEmpty() && !addLast.getText().isEmpty()) {
                 TableRow tableRow = new TableRow(addName.getText(), addLast.getText());
@@ -134,7 +133,6 @@ public class NameFormatterTab extends Pane implements PrefsTab {
         Label deleteRows = new Label(Localization.lang("Delete rows"));
         deleteRows.setVisible(false);
         Button delete = new Button("Delete");
-        delete.setFont(FontSize.smallFont);
         delete.setOnAction(e-> {
             if (table.getFocusModel() != null && table.getFocusModel().getFocusedIndex() != -1) {
                 tableChanged = true;
@@ -146,7 +144,6 @@ public class NameFormatterTab extends Pane implements PrefsTab {
                 table.refresh();
             }});
         Button help = new Button("?");
-        help.setFont(FontSize.smallFont);
         help.setOnAction(e-> new HelpAction(Localization.lang("Help on Name Formatting"),
                 HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER).getHelpButton().doClick());
         HBox toolbar = new HBox();

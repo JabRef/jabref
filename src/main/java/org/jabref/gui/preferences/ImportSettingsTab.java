@@ -41,17 +41,12 @@ public class ImportSettingsTab extends Pane implements PrefsTab {
     public ImportSettingsTab(JabRefPreferences prefs) {
         this.prefs = Objects.requireNonNull(prefs);
         radioButtonNoMeta = new RadioButton(Localization.lang("Create blank entry linking the PDF"));
-        radioButtonNoMeta.setFont(FontSize.smallFont);
         radioButtonXmp = new RadioButton(Localization.lang("Create entry based on XMP-metadata"));
-        radioButtonXmp.setFont(FontSize.smallFont);
         radioButtonPDFcontent = new RadioButton(Localization.lang("Create entry based on content"));
-        radioButtonPDFcontent.setFont(FontSize.smallFont);
         radioButtononlyAttachPDF = new RadioButton(Localization.lang("Only attach PDF"));
-        radioButtononlyAttachPDF.setFont(FontSize.smallFont);
 
         useDefaultPDFImportStyle = new CheckBox(
                 Localization.lang("Always use this PDF import style (and do not ask for each import)"));
-        useDefaultPDFImportStyle.setFont(FontSize.smallFont);
 
         fileNamePattern = new TextField();
         fileDirPattern = new TextField();
@@ -77,13 +72,11 @@ public class ImportSettingsTab extends Pane implements PrefsTab {
         defaultPdfFileLinkAction.setFont(FontSize.bigFont);
         builder.add(defaultPdfFileLinkAction, 1, 8);
         Label filenameFormatPattern = new Label(Localization.lang("Filename format pattern").concat(":"));
-        filenameFormatPattern.setFont(FontSize.smallFont);
         builder.add(filenameFormatPattern, 1, 9);
         builder.add(fileNamePattern, 2, 9);
         builder.add(selectFileNamePattern, 3, 9);
 
         Label lbfileDirPattern = new Label(Localization.lang("File directory pattern").concat(":"));
-        lbfileDirPattern.setFont(FontSize.smallFont);
         builder.add(lbfileDirPattern, 1, 10);
         builder.add(fileDirPattern, 2, 10);
     }

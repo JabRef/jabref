@@ -79,14 +79,6 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
 
     private void appendKeyGeneratorSettings() {
         // Build a panel for checkbox settings:
-        autoGenerateOnImport.setFont(FontSize.smallFont);
-        letterStartA.setFont(FontSize.smallFont);
-        warnBeforeOverwriting.setFont(FontSize.smallFont);
-        letterStartB.setFont(FontSize.smallFont);
-        dontOverwrite.setFont(FontSize.smallFont);
-        alwaysAddLetter.setFont(FontSize.smallFont);
-        generateOnSave.setFont(FontSize.smallFont);
-
         Label keyGeneratorSettings = new Label(Localization.lang("Key generator settings") + "  --------------------------");
         keyGeneratorSettings.setFont(FontSize.bigFont);
         builder.add(keyGeneratorSettings, 1, 10);

@@ -103,7 +103,6 @@ class XmpPrefsTab extends Pane implements PrefsTab {
         Label xmpExportPrivacySettings = new Label(Localization.lang("XMP export privacy settings") + "  -------------------------");
         xmpExportPrivacySettings.setFont(FontSize.bigFont);
         builder.add(xmpExportPrivacySettings, 1, 1);
-        privacyFilterCheckBox.setFont(FontSize.smallFont);
         builder.add(privacyFilterCheckBox, 1, 2);
         builder.add(tablePanel, 1, 3);
 

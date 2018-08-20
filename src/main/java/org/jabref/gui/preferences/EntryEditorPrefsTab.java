@@ -45,37 +45,23 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         this.prefs = prefs;
         autoCompletePreferences = prefs.getAutoCompletePreferences();
         autoOpenForm = new CheckBox(Localization.lang("Open editor when a new entry is created"));
-        autoOpenForm.setFont(FontSize.smallFont);
         defSource = new CheckBox(Localization.lang("Show BibTeX source by default"));
-        defSource.setFont(FontSize.smallFont);
         emacsMode = new CheckBox(Localization.lang("Use Emacs key bindings"));
-        emacsMode.setFont(FontSize.smallFont);
         emacsRebindCtrlA = new CheckBox(Localization.lang("Rebind C-a, too"));
-        emacsRebindCtrlA.setFont(FontSize.smallFont);
         emacsRebindCtrlF = new CheckBox(Localization.lang("Rebind C-f, too"));
-        emacsRebindCtrlF.setFont(FontSize.smallFont);
         autoComplete = new CheckBox(Localization.lang("Enable word/name autocompletion"));
-        autoComplete.setFont(FontSize.smallFont);
         recommendations = new CheckBox(Localization.lang("Show 'Related Articles' tab"));
-        recommendations.setFont(FontSize.smallFont);
         validation = new CheckBox(Localization.lang("Show validation messages"));
-        validation.setFont(FontSize.smallFont);
 
         // allowed name formats
         autoCompFF = new RadioButton(Localization.lang("Autocomplete names in 'Firstname Lastname' format only"));
-        autoCompFF.setFont(FontSize.smallFont);
         autoCompLF = new RadioButton(Localization.lang("Autocomplete names in 'Lastname, Firstname' format only"));
-        autoCompLF.setFont(FontSize.smallFont);
         autoCompBoth = new RadioButton(Localization.lang("Autocomplete names in both formats"));
-        autoCompBoth.setFont(FontSize.smallFont);
 
         // treatment of first name
         firstNameModeFull = new RadioButton(Localization.lang("Use full firstname whenever possible"));
-        firstNameModeFull.setFont(FontSize.smallFont);
         firstNameModeAbbr = new RadioButton(Localization.lang("Use abbreviated firstname whenever possible"));
-        firstNameModeAbbr.setFont(FontSize.smallFont);
         firstNameModeBoth = new RadioButton(Localization.lang("Use abbreviated and full firstname"));
-        firstNameModeBoth.setFont(FontSize.smallFont);
 
         // We need a listener on showSource to enable and disable the source panel-related choices:
         emacsMode.setOnAction(event -> emacsRebindCtrlA.setDisable(!emacsMode.isSelected()));
@@ -107,7 +93,6 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         builder.add(autoComplete,   1, 11);
 
         Label useFields = new Label("       " + Localization.lang("Use autocompletion for the following fields") + ":");
-        useFields.setFont(FontSize.smallFont);
         builder.add(useFields, 1, 12);
         builder.add(autoCompFields, 2, 12);
         builder.add(new Label(""), 1, 13);

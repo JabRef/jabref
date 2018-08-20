@@ -16,7 +16,6 @@ import javafx.scene.layout.Pane;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.preferences.FontSize;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
@@ -51,20 +50,16 @@ public class BibtexKeyPatternPanel extends Pane {
     private void buildGUI() {
         // The header - can be removed
         Label label = new Label(Localization.lang("Entry type"));
-        label.setFont(FontSize.smallFont);
         gridPane.add(label, 1, 1);
 
         Label keyPattern = new Label(Localization.lang("Key pattern"));
-        keyPattern.setFont(FontSize.smallFont);
         gridPane.add(keyPattern, 3, 1);
 
         Label defaultPattern = new Label(Localization.lang("Default pattern"));
-        defaultPattern.setFont(FontSize.smallFont);
         gridPane.add(defaultPattern, 1, 2);
         gridPane.add(defaultPat, 3, 2);
 
         Button button = new Button("Default");
-        button.setFont(FontSize.smallFont);
         button.setOnAction(e-> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
         gridPane.add(button, 4, 2);
 
@@ -84,7 +79,6 @@ public class BibtexKeyPatternPanel extends Pane {
         gridPane.add(help1, 1, 24);
 
         Button btnDefaultAll1 = new Button(Localization.lang("Reset all"));
-        btnDefaultAll1.setFont(FontSize.smallFont);
         btnDefaultAll1.setOnAction(e-> {
             // reset all fields
             for (TextField field : textFields.values()) {
@@ -99,12 +93,10 @@ public class BibtexKeyPatternPanel extends Pane {
         int rowIndex = 0;
         for (EntryType type : EntryTypes.getAllValues(mode)) {
             Label label = new Label(type.getName());
-            label.setFont(FontSize.smallFont);
 
             TextField textField = new TextField();
 
             Button button = new Button("Default");
-            button.setFont(new javafx.scene.text.Font(10));
             button.setOnAction(e -> textField.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
 
             gridPane.add(label, 1, rowIndex + 3);

@@ -33,11 +33,8 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
         // EXPORT SORT ORDER
         // create Components
         exportInOriginalOrder = new RadioButton(Localization.lang("Export entries in their original order"));
-        exportInOriginalOrder.setFont(FontSize.smallFont);
         exportInTableOrder = new RadioButton(Localization.lang("Export in current table sort order"));
-        exportInTableOrder.setFont(FontSize.smallFont);
         exportInSpecifiedOrder = new RadioButton(Localization.lang("Export entries ordered as specified"));
-        exportInSpecifiedOrder.setFont(FontSize.smallFont);
 
         exportOrderPanel = new SaveOrderConfigDisplay();
 
