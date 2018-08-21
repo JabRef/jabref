@@ -6,3 +6,7 @@
     -fx-padding: 8 8 8 8;
     -fx-background: -jr-white;
 }
+
+.preferencePaneContainer {
+    -fx-padding: 0em 1em 0em 2em;
+}

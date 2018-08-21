@@ -107,7 +107,9 @@ public class PreferencesDialog extends BaseDialog<Void> {
         tabsList.itemsProperty().setValue(preferenceTabs);
         EasyBind.subscribe(tabsList.getSelectionModel().selectedItemProperty(), tab -> {
             if (tab != null) {
-                container.setCenter(new ScrollPane(tab.getBuilder()));
+                ScrollPane preferencePaneContainer = new ScrollPane(tab.getBuilder());
+                preferencePaneContainer.getStyleClass().add("preferencePaneContainer");
+                container.setCenter(preferencePaneContainer);
             }
         });
         tabsList.getSelectionModel().selectFirst();

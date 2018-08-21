@@ -524,9 +524,9 @@
 .table-view:focused,
 .tree-table-view:focused,
 .html-editor:contains-focus {
-    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
-    -fx-background-insets: 0, 1;
-    -fx-background-radius: 0, 0;
+    -fx-background-color: -fx-control-inner-background;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
 }
 
 /* Selected rows */
@@ -551,8 +551,7 @@
     -fx-background: -jr-selected;
     -fx-background-color: -jr-selected;
     -fx-table-cell-border-color: transparent;
-    -fx-fill: white;
-    -fx-text-fill: green;
+    -fx-text-fill: -jr-black;
 }
 
 .combo-box-base {
@@ -594,8 +593,11 @@
     -fx-text-fill: -fx-text-base-color;
 }
 
+.stack-pane,
 .scroll-pane,
+.scroll-pane > .viewport,
 .split-pane {
+    -fx-background-color: transparent;
     -fx-background-insets: 0, 0;
     -fx-padding: 0;
 }
@@ -896,4 +898,12 @@ We want to have a look that matches our icons in the tool-bar */
 /* This is awful, but I don't know a better way*/
 .mainToolbar .context-menu * {
     -fx-background-color: -fx-control-inner-background;
+}
+
+#sidePane {
+    -fx-background-color: -jr-sidepane-background;
+}
+
+.sidePaneComponent {
+    -fx-background-color: -jr-sidepane-background;
 }
