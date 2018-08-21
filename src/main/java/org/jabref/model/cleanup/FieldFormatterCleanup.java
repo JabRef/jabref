@@ -71,7 +71,9 @@ public class FieldFormatterCleanup implements CleanupJob {
         List<FieldChange> fieldChanges = new ArrayList<>();
 
         for (String fieldKey : entry.getFieldNames()) {
-            fieldChanges.addAll(cleanupSingleField(fieldKey, entry));
+            if (!fieldKey.equals(BibEntry.KEY_FIELD)) {
+                fieldChanges.addAll(cleanupSingleField(fieldKey, entry));
+            }
         }
 
         return fieldChanges;
@@ -82,7 +84,9 @@ public class FieldFormatterCleanup implements CleanupJob {
         Set<String> fields = entry.getFieldNames();
         fields.removeAll(FieldName.getNotTextFieldNames());
         for (String fieldKey : fields) {
-            fieldChanges.addAll(cleanupSingleField(fieldKey, entry));
+            if (!fieldKey.equals(BibEntry.KEY_FIELD)) {
+                fieldChanges.addAll(cleanupSingleField(fieldKey, entry));
+            }
         }
 
         return fieldChanges;

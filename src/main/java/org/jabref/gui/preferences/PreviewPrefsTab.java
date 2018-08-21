@@ -128,7 +128,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         btnTest.setOnAction(event -> {
             try {
                 DefaultTaskExecutor.runInJavaFXThread(() -> {
-                    PreviewPanel testPane = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService, externalFileTypes);
+                    PreviewPanel testPane = new PreviewPanel(null, new BibDatabaseContext(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService, externalFileTypes);
                     if (chosen.getSelectionModel().getSelectedItems().isEmpty()) {
                         testPane.setFixedLayout(layout.getText());
                         testPane.setEntry(TestEntry.getTestEntry());
