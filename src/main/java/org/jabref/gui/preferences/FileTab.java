@@ -89,8 +89,8 @@ class FileTab extends Pane implements PrefsTab {
         doNotResolveStringsFor.setPrefSize(80, 25);
         builder.setPrefSize(800, 600);
 
-        Label general = new Label(Localization.lang("General") + "  ----------------------------------------------");
-        general.setFont(FontSize.bigFont);
+        Label general = new Label(Localization.lang("General"));
+        general.getStyleClass().add("sectionHeader");
         builder.add(general, 1, 1);
         builder.add(openLast,  1, 2);
         builder.add(backup, 1, 3);
@@ -108,8 +108,8 @@ class FileTab extends Pane implements PrefsTab {
         Label invisible = new Label("");
         builder.add(invisible, 1, 9);
 
-        Label externalFileLinks = new Label(Localization.lang("External file links") + "  ------------------------------------");
-        externalFileLinks.setFont(FontSize.bigFont);
+        Label externalFileLinks = new Label(Localization.lang("External file links"));
+        externalFileLinks.getStyleClass().add("sectionHeader");
         builder.add(externalFileLinks, 1, 11);
 
         label = new Label(Localization.lang("Main file directory") + ':');
@@ -142,8 +142,8 @@ class FileTab extends Pane implements PrefsTab {
         Label invisible1 = new Label("");
         builder.add(invisible1, 1, 19);
 
-        Label autosave = new Label(Localization.lang("Autosave") + "  ---------------------------------------------");
-        autosave.setFont(FontSize.bigFont);
+        Label autosave = new Label(Localization.lang("Autosave"));
+        autosave.getStyleClass().add("sectionHeader");
         builder.add(autosave, 1, 20);
         builder.add(localAutoSave,  1, 21);
         Button help1 = new Button("?");

@@ -58,7 +58,7 @@ public class ImportSettingsTab extends Pane implements PrefsTab {
         });
 
         Label defaultImportStyle = new Label(Localization.lang("Default import style for drag and drop of PDFs"));
-        defaultImportStyle.setFont(FontSize.bigFont);
+        defaultImportStyle.getStyleClass().add("sectionHeader");
         builder.add(defaultImportStyle, 1, 1);
         builder.add(new Separator(), 2, 1);
         builder.add(radioButtonNoMeta, 2, 2);
@@ -68,8 +68,8 @@ public class ImportSettingsTab extends Pane implements PrefsTab {
         builder.add(useDefaultPDFImportStyle, 2, 6);
         builder.add(new Label(""), 1, 7);
 
-        Label defaultPdfFileLinkAction = new Label(Localization.lang("Default PDF file link action") + "  ------------------------");
-        defaultPdfFileLinkAction.setFont(FontSize.bigFont);
+        Label defaultPdfFileLinkAction = new Label(Localization.lang("Default PDF file link action"));
+        defaultPdfFileLinkAction.getStyleClass().add("sectionHeader");
         builder.add(defaultPdfFileLinkAction, 1, 8);
         Label filenameFormatPattern = new Label(Localization.lang("Filename format pattern").concat(":"));
         builder.add(filenameFormatPattern, 1, 9);

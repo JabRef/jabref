@@ -81,8 +81,8 @@ class GeneralTab extends Pane implements PrefsTab {
         shouldCollectTelemetry = new CheckBox(Localization.lang("Collect and share telemetry data to help improve JabRef."));
         encodings = new ComboBox<>(FXCollections.observableArrayList(Encodings.ENCODINGS));
 
-        Label general = new Label(Localization.lang("General") + "  -----------------------------------------------");
-        general.setFont(FontSize.bigFont);
+        Label general = new Label(Localization.lang("General"));
+        general.getStyleClass().add("sectionHeader");
         builder.add(general, 1, 1);
         builder.add(new Line(), 1, 2);
         builder.add(inspectionWarnDupli, 1, 3);

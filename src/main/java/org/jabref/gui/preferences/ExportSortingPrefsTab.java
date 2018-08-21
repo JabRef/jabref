@@ -47,8 +47,8 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
         exportInTableOrder.setOnAction(listener);
         exportInSpecifiedOrder.setOnAction(listener);
 
-        Label exportSortOrder = new Label(Localization.lang("Export sort order") + "  ------------------------");
-        exportSortOrder.setFont(FontSize.bigFont);
+        Label exportSortOrder = new Label(Localization.lang("Export sort order"));
+        exportSortOrder.getStyleClass().add("sectionHeader");
         // create GUI
         builder.add(exportSortOrder, 1, 1);
         builder.add(new Separator(), 2, 1);

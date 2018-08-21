@@ -87,8 +87,8 @@ class ExternalTab extends JPanel implements PrefsTab {
             pdfOptionPanel.add(browseSumatraReader,  3, 2);
         }
 
-        Label sendingOfEmails = new Label(Localization.lang("Sending of emails") + "  ----------------------------");
-        sendingOfEmails.setFont(FontSize.bigFont);
+        Label sendingOfEmails = new Label(Localization.lang("Sending of emails"));
+        sendingOfEmails.getStyleClass().add("sectionHeader");
         builder.add(sendingOfEmails, 1, 1);
         Label subject = new Label(Localization.lang("Subject for sending an email with references").concat(":"));
         builder.add(subject, 1, 2);
@@ -98,8 +98,8 @@ class ExternalTab extends JPanel implements PrefsTab {
         builder.add(openFoldersOfAttachedFiles, 1, 3);
 
         builder.add(new Label(""), 1, 4);
-        Label externalPrograms = new Label(Localization.lang("External programs") + "  ----------------------------");
-        externalPrograms.setFont(FontSize.bigFont);
+        Label externalPrograms = new Label(Localization.lang("External programs"));
+        externalPrograms.getStyleClass().add("sectionHeader");
         builder.add(externalPrograms, 1, 5);
 
         GridPane butpan = new GridPane();
@@ -116,15 +116,15 @@ class ExternalTab extends JPanel implements PrefsTab {
         builder.add(citeCommand, 2, 7);
         builder.add(editFileTypes, 1, 8);
         builder.add(new Label(""), 1, 9);
-        Label openConsole = new Label(Localization.lang("Open console") + "  ---------------------------------");
-        openConsole.setFont(FontSize.bigFont);
+        Label openConsole = new Label(Localization.lang("Open console"));
+        openConsole.getStyleClass().add("sectionHeader");
         builder.add(openConsole, 1, 10);
 
         builder.add(consoleOptionPanel, 1, 11);
         builder.add(new Label(""), 1, 12);
 
-        Label openPdf = new Label(Localization.lang("Open PDF") + "  -------------------------------------");
-        openPdf.setFont(FontSize.bigFont);
+        Label openPdf = new Label(Localization.lang("Open PDF"));
+        openPdf.getStyleClass().add("sectionHeader");
         builder.add(openPdf,  1, 12);
 
         builder.add(pdfOptionPanel, 1, 13);

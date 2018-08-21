@@ -49,8 +49,8 @@ class AdvancedTab extends Pane implements PrefsTab {
         useCaseKeeperOnSearch = new CheckBox(Localization.lang("Add {} to specified title words on search to keep the correct case"));
         useUnitFormatterOnSearch = new CheckBox(Localization.lang("Format units by adding non-breaking separators and keeping the correct case on search"));
 
-        Label remoteOperation = new Label(Localization.lang("Remote operation") + "  -----------------------------");
-        remoteOperation.setFont(FontSize.bigFont);
+        Label remoteOperation = new Label(Localization.lang("Remote operation"));
+        remoteOperation.getStyleClass().add("sectionHeader");
         builder.add(remoteOperation, 2, 1);
         builder.add(new Separator(), 2, 1);
         builder.add(new Pane(), 1, 2);
@@ -83,8 +83,8 @@ class AdvancedTab extends Pane implements PrefsTab {
         builder.add(p, 2, 9);
         builder.add(new Label(""), 1, 10);
 
-        Label explore = new Label(Localization.lang("Search %0", "IEEEXplore") + "  -----------------------------");
-        explore.setFont(FontSize.bigFont);
+        Label explore = new Label(Localization.lang("Search %0", "IEEEXplore"));
+        explore.getStyleClass().add("sectionHeader");
         builder.add(explore, 2, 11);
         builder.add(new Separator(), 2, 11);
         builder.add(new Pane(), 2, 12);
@@ -93,8 +93,8 @@ class AdvancedTab extends Pane implements PrefsTab {
         builder.add(new Line(), 2, 16);
         builder.add(new Label(""), 1, 17);
 
-        Label importConversions = new Label(Localization.lang("Import conversions") + "  ----------------------------");
-        importConversions.setFont(FontSize.bigFont);
+        Label importConversions = new Label(Localization.lang("Import conversions"));
+        importConversions.getStyleClass().add("sectionHeader");
         builder.add(importConversions, 2, 18);
 
         builder.add(useCaseKeeperOnSearch, 2, 19);

@@ -48,12 +48,11 @@ class XmpPrefsTab extends Pane implements PrefsTab {
         TableView tableView = new TableView();
         TableColumn<TableRow,String> column = new TableColumn<>(Localization.lang("Field to filter"));
         column.setCellValueFactory(new PropertyValueFactory<>("name"));
-        column.setCellFactory(TextFieldTableCell.<TableRow>forTableColumn());
+        column.setCellFactory(TextFieldTableCell.forTableColumn());
         column.setOnEditCommit(
                 (TableColumn.CellEditEvent<TableRow, String> t) -> {
-                    ((TableRow) t.getTableView().getItems().get(
-                            t.getTablePosition().getRow())
-                    ).setName(t.getNewValue());
+                    t.getTableView().getItems().get(
+                            t.getTablePosition().getRow()).setName(t.getNewValue());
                 });
         column.setPrefWidth(350);
         tableView.setItems(data);
@@ -100,8 +99,8 @@ class XmpPrefsTab extends Pane implements PrefsTab {
         tablePanel.setBottom(toolbar);
 
         // Build Prefs Tabs
-        Label xmpExportPrivacySettings = new Label(Localization.lang("XMP export privacy settings") + "  -------------------------");
-        xmpExportPrivacySettings.setFont(FontSize.bigFont);
+        Label xmpExportPrivacySettings = new Label(Localization.lang("XMP export privacy settings"));
+        xmpExportPrivacySettings.getStyleClass().add("sectionHeader");
         builder.add(xmpExportPrivacySettings, 1, 1);
         builder.add(privacyFilterCheckBox, 1, 2);
         builder.add(tablePanel, 1, 3);

@@ -8,5 +8,10 @@
 }
 
 .preferencePaneContainer {
-    -fx-padding: 0em 1em 0em 2em;
+    -fx-padding: 0em 1em 0em 3em;
+}
+
+.sectionHeader {
+    -fx-font-size: 1.5em;
+    -fx-padding: 1em 0em 1em 0em;
 }

@@ -82,20 +82,18 @@ public class NameFormatterTab extends Pane implements PrefsTab {
         table = new TableView();
         table.setEditable(true);
         firstCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        firstCol.setCellFactory(TextFieldTableCell.<TableRow>forTableColumn());
+        firstCol.setCellFactory(TextFieldTableCell.forTableColumn());
         firstCol.setOnEditCommit(
                 (TableColumn.CellEditEvent<TableRow, String> t) -> {
-                    ((TableRow) t.getTableView().getItems().get(
-                            t.getTablePosition().getRow())
-                    ).setName(t.getNewValue());
+                    t.getTableView().getItems().get(
+                            t.getTablePosition().getRow()).setName(t.getNewValue());
                 });
         lastCol.setCellValueFactory(new PropertyValueFactory<>("format"));
-        lastCol.setCellFactory(TextFieldTableCell.<TableRow>forTableColumn());
+        lastCol.setCellFactory(TextFieldTableCell.forTableColumn());
         lastCol.setOnEditCommit(
                 (TableColumn.CellEditEvent<TableRow, String> t) -> {
-                    ((TableRow) t.getTableView().getItems().get(
-                            t.getTablePosition().getRow())
-                    ).setFormat(t.getNewValue());
+                    t.getTableView().getItems().get(
+                            t.getTablePosition().getRow()).setFormat(t.getNewValue());
                 });
         firstCol.setPrefWidth(140);
         lastCol.setPrefWidth(200);
@@ -150,8 +148,8 @@ public class NameFormatterTab extends Pane implements PrefsTab {
         toolbar.getChildren().addAll(addName, addLast,add,delete,help);
         tabPanel.setBottom(toolbar);
 
-        Label specialNameFormatters = new Label(Localization.lang("Special name formatters") + "  ------------------------------------");
-        specialNameFormatters.setFont(FontSize.bigFont);
+        Label specialNameFormatters = new Label(Localization.lang("Special name formatters"));
+        specialNameFormatters.getStyleClass().add("sectionHeader");
         builder.add(specialNameFormatters, 1, 1);
         builder.add(tabPanel, 1, 2);
     }

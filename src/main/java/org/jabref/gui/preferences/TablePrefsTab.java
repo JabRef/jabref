@@ -109,8 +109,8 @@ class TablePrefsTab extends Pane implements PrefsTab {
         secDesc = new CheckBox(Localization.lang("Descending"));
         terDesc = new CheckBox(Localization.lang("Descending"));
 
-        Label formatOfAuthor = new Label(Localization.lang("Format of author and editor names") + "  ----------------------");
-        formatOfAuthor.setFont(FontSize.bigFont);
+        Label formatOfAuthor = new Label(Localization.lang("Format of author and editor names"));
+        formatOfAuthor.getStyleClass().add("sectionHeader");
         builder.add(formatOfAuthor, 1, 1);
         builder.add(namesAsIs, 1, 2);
         builder.add(noAbbrNames, 2, 2);
@@ -123,8 +123,8 @@ class TablePrefsTab extends Pane implements PrefsTab {
         Label label1 = new Label("");
         builder.add(label1, 1, 6);
 
-        Label defaultSortCriteria = new Label(Localization.lang("Default sort criteria") + "  ----------------------------------------");
-        defaultSortCriteria.setFont(FontSize.bigFont);
+        Label defaultSortCriteria = new Label(Localization.lang("Default sort criteria"));
+        defaultSortCriteria.getStyleClass().add("sectionHeader");
         builder.add(defaultSortCriteria, 1, 7);
         // Create a new panel with its own FormLayout for these items:
         Label primarySortCriterion = new Label(Localization.lang("Primary sort criterion"));
@@ -151,8 +151,8 @@ class TablePrefsTab extends Pane implements PrefsTab {
 
         builder.add(new Label(""), 1, 12);
 
-        Label general = new Label(Localization.lang("General") + " ------------------------------------------------------");
-        general.setFont(FontSize.bigFont);
+        Label general = new Label(Localization.lang("General"));
+        general.getStyleClass().add("sectionHeader");
         builder.add(general, 1, 13);
         builder.add(autoResizeMode, 1, 14);
         namesNatbib.setOnAction(e -> {

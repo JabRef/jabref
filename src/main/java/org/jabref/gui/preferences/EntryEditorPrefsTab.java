@@ -74,8 +74,8 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         // autoCompFields text field:
         autoComplete.setOnAction(event -> setAutoCompleteElementsEnabled(autoComplete.isSelected()));
 
-        Label editorOptions = new Label(Localization.lang("Editor options") + "  -------------------------------------");
-        editorOptions.setFont(FontSize.bigFont);
+        Label editorOptions = new Label(Localization.lang("Editor options"));
+        editorOptions.getStyleClass().add("sectionHeader");
         builder.add(editorOptions, 1, 1);
         builder.add(new Separator(), 2, 1);
         builder.add(autoOpenForm,  1, 2);
@@ -87,8 +87,8 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         builder.add(validation, 1, 8);
         builder.add(new Label(""), 1, 9);
 
-        Label autocompletionOptions = new Label(Localization.lang("Autocompletion options") + "  --------------------------");
-        autocompletionOptions.setFont(FontSize.bigFont);
+        Label autocompletionOptions = new Label(Localization.lang("Autocompletion options"));
+        autocompletionOptions.getStyleClass().add("sectionHeader");
         builder.add(autocompletionOptions, 1, 10);
         builder.add(autoComplete,   1, 11);
 
@@ -97,16 +97,16 @@ class EntryEditorPrefsTab extends Pane implements PrefsTab {
         builder.add(autoCompFields, 2, 12);
         builder.add(new Label(""), 1, 13);
 
-        Label nameFormat = new Label(Localization.lang("Name format used for autocompletion") + "  ----------");
-        nameFormat.setFont(FontSize.bigFont);
+        Label nameFormat = new Label(Localization.lang("Name format used for autocompletion"));
+        nameFormat.getStyleClass().add("sectionHeader");
         builder.add(nameFormat, 1, 14);
         builder.add(autoCompFF, 1, 15);
         builder.add(autoCompLF,  1, 16);
         builder.add(autoCompBoth,  1, 17);
         builder.add(new Label(""), 1, 18);
 
-        Label treatment = new Label(Localization.lang("Treatment of first names") + "  --------------------------");
-        treatment.setFont(FontSize.bigFont);
+        Label treatment = new Label(Localization.lang("Treatment of first names"));
+        treatment.getStyleClass().add("sectionHeader");
         builder.add(treatment, 1, 19);
         builder.add(firstNameModeAbbr,  1, 20);
         builder.add(firstNameModeFull, 1, 21);

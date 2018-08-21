@@ -109,19 +109,17 @@ class TableColumnsTab extends Pane implements PrefsTab {
         field.setPrefWidth(400);
         column.setPrefWidth(240);
         field.setCellValueFactory(new PropertyValueFactory<>("name"));
-        field.setCellFactory(TextFieldTableCell.<TableRow>forTableColumn());
+        field.setCellFactory(TextFieldTableCell.forTableColumn());
         field.setOnEditCommit(
                 (TableColumn.CellEditEvent<TableRow, String> t) -> {
-                    ((TableRow) t.getTableView().getItems().get(
-                            t.getTablePosition().getRow())
-                    ).setName(t.getNewValue());
+                    t.getTableView().getItems().get(
+                            t.getTablePosition().getRow()).setName(t.getNewValue());
                 });
         column.setCellValueFactory(new PropertyValueFactory<>("length"));
         column.setOnEditCommit(
                 (TableColumn.CellEditEvent<TableRow, Double> t) -> {
-                    ((TableRow) t.getTableView().getItems().get(
-                            t.getTablePosition().getRow())
-                    ).setLength(t.getNewValue());
+                    t.getTableView().getItems().get(
+                            t.getTablePosition().getRow()).setLength(t.getNewValue());
                 });
 
         colSetup.setItems(data);
@@ -274,8 +272,8 @@ class TableColumnsTab extends Pane implements PrefsTab {
             writeSpecialFields.setDisable(!isEnabled);
         });
 
-        Label specialTableColumns = new Label(Localization.lang("Special table columns") + "  ------------------------------------");
-        specialTableColumns.setFont(FontSize.bigFont);
+        Label specialTableColumns = new Label(Localization.lang("Special table columns"));
+        specialTableColumns.getStyleClass().add("sectionHeader");
         builder.add(specialTableColumns, 1, 1);
 
         GridPane specialTableColumnsBuilder = new GridPane();
@@ -303,8 +301,8 @@ class TableColumnsTab extends Pane implements PrefsTab {
 
         /*** end: special table columns and special fields ***/
         builder.add(new Label(""), 1, 3);
-        Label entryTableColumns = new Label(Localization.lang("Entry table columns") + "  --------------------------------------");
-        entryTableColumns.setFont(FontSize.bigFont);
+        Label entryTableColumns = new Label(Localization.lang("Entry table columns"));
+        entryTableColumns.getStyleClass().add("sectionHeader");
         builder.add(entryTableColumns, 1, 4);
         builder.add(tabPanel, 1, 5);
 

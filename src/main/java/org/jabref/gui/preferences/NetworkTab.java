@@ -64,8 +64,8 @@ public class NetworkTab extends Pane implements PrefsTab {
             passwordWarningLabel.setDisable(!useProxyCheckBox.isSelected() || !useAuthenticationCheckBox.isSelected());
         });
 
-        Label network = new Label(Localization.lang("Network") + "  ---------------------------------");
-        network.setFont(FontSize.bigFont);
+        Label network = new Label(Localization.lang("Network"));
+        network.getStyleClass().add("sectionHeader");
         builder.add(network, 1, 1);
         builder.add(new Separator(), 2, 1);
         builder.add(useProxyCheckBox, 2, 2);
