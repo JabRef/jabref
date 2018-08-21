@@ -38,7 +38,8 @@ public class CleanupURLFormatter extends Formatter {
 
         Matcher matcher = PATTERN_URL.matcher(value);
         if (matcher.find()) {
-          toDecode = matcher.group(1);
+        toDecode = matcher.group(1);
+
         }
         try {
             decodedLink = URLDecoder.decode(toDecode, StandardCharsets.UTF_8.name());

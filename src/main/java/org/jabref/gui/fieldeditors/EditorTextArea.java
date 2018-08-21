@@ -82,7 +82,7 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
         Objects.requireNonNull(handler);
         this.pasteActionHandler = handler;
     }
-  
+
     /**
      *  Override javafx TextArea method applying TextArea.paste() and pasteActionHandler after
      */
@@ -91,7 +91,7 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
         super.paste();
         pasteActionHandler.handle();
     }
-  
+
     /**
      *  Interface presents user-described paste behaviour applying to paste method
      */

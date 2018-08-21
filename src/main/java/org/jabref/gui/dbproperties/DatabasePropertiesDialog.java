@@ -19,6 +19,10 @@ import javax.swing.JComponent;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
@@ -26,6 +30,7 @@ import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.SaveOrderConfigDisplay;
 import org.jabref.gui.cleanup.FieldFormatterCleanupsPanel;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -127,7 +132,8 @@ public class DatabasePropertiesDialog extends JabRefDialog {
         builder.add(saveInSpecifiedOrder).xyw(1, 17, 5);
 
         saveOrderPanel = new SaveOrderConfigDisplay();
-        builder.add(saveOrderPanel.getPanel()).xyw(1, 21, 5);
+        JFXPanel panel = CustomJFXPanel.wrap(new Scene((Parent) saveOrderPanel.getJFXPanel()));
+        builder.add(panel).xyw(1, 21, 5);
 
         builder.addSeparator(Localization.lang("Library protection")).xyw(1, 23, 5);
         builder.add(protect).xyw(1, 25, 5);

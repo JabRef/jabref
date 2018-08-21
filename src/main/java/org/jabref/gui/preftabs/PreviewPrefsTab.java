@@ -1,31 +1,33 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.PreviewPanel;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
@@ -33,9 +35,6 @@ import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreviewPreferences;
 
-import com.google.common.primitives.Ints;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.factories.Paddings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,102 +44,101 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     private SwingWorker<List<CitationStyle>, Void> discoverCitationStyleWorker;
 
-    private final DefaultListModel<Object> availableModel = new DefaultListModel<>();
-    private final DefaultListModel<Object> chosenModel = new DefaultListModel<>();
+    private final ObservableList<Object> availableModel = FXCollections.observableArrayList();
+    private final ObservableList<Object> chosenModel = FXCollections.observableArrayList();
 
-    private final JList<Object> available = new JList<>(availableModel);
-    private final JList<Object> chosen = new JList<>(chosenModel);
+    private final ListView<Object> available = new ListView<>(availableModel);
+    private final ListView<Object> chosen = new ListView<>(chosenModel);
 
-    private final JButton btnRight = new JButton("»");
-    private final JButton btnLeft = new JButton("«");
-    private final JButton btnUp = new JButton(Localization.lang("Up"));
-    private final JButton btnDown = new JButton(Localization.lang("Down"));
-
-    private final JTextArea layout = new JTextArea("", 1, 1);
-    private final JButton btnTest = new JButton(Localization.lang("Test"));
-    private final JButton btnDefault = new JButton(Localization.lang("Default"));
-    private final JScrollPane scrollPane = new JScrollPane(layout);
-
+    private final Button btnRight = new Button("»");
+    private final Button btnLeft = new Button("«");
+    private final Button btnUp = new Button(Localization.lang("Up"));
+    private final Button btnDown = new Button(Localization.lang("Down"));
+    private final GridPane gridPane = new GridPane();
+    private final TextArea layout = new TextArea();
+    private final Button btnTest = new Button(Localization.lang("Test"));
+    private final Button btnDefault = new Button(Localization.lang("Default"));
+    private final ScrollPane scrollPane = new ScrollPane(layout);
     private final DialogService dialogService;
+    private final ExternalFileTypes externalFileTypes;
 
-    public PreviewPrefsTab(DialogService dialogService) {
+    public PreviewPrefsTab(DialogService dialogService, ExternalFileTypes externalFileTypes) {
         this.dialogService = dialogService;
+        this.externalFileTypes = externalFileTypes;
         setupLogic();
         setupGui();
     }
 
     private void setupLogic() {
-        chosen.getSelectionModel().addListSelectionListener(event -> {
-            boolean selectionEmpty = ((ListSelectionModel) event.getSource()).isSelectionEmpty();
-            btnLeft.setEnabled(!selectionEmpty);
-            btnDown.setEnabled(!selectionEmpty);
-            btnUp.setEnabled(!selectionEmpty);
+        chosen.getSelectionModel().selectedItemProperty().addListener(event -> {
+            if (chosen.getSelectionModel().getSelectedIndices().isEmpty()) {
+                btnLeft.setDisable(true);
+                btnDown.setDisable(true);
+                btnUp.setDisable(true);
+            }
         });
 
-        available.getSelectionModel()
-                .addListSelectionListener(e -> btnRight.setEnabled(!((ListSelectionModel) e.getSource()).isSelectionEmpty()));
+        available.getSelectionModel().selectedItemProperty().addListener(
+                e -> btnRight.setDisable(available.getSelectionModel().getSelectedIndices().isEmpty()));
 
-        btnRight.addActionListener(event -> {
-            for (Object object : available.getSelectedValuesList()) {
-                availableModel.removeElement(object);
-                chosenModel.addElement(object);
+        btnRight.setOnAction(event -> {
+            for (Object object : available.getSelectionModel().getSelectedItems()) {
+                availableModel.remove(object);
+                chosenModel.add(object);
             }
             storeSettings();
         });
 
-        btnLeft.addActionListener(event -> {
-            for (Object object : chosen.getSelectedValuesList()) {
-                availableModel.addElement(object);
-                chosenModel.removeElement(object);
+        btnLeft.setOnAction(event -> {
+            for (Object object : chosen.getSelectionModel().getSelectedItems()) {
+                availableModel.add(object);
+                chosenModel.remove(object);
             }
             storeSettings();
         });
 
-        btnUp.addActionListener(event -> {
+        btnUp.setOnAction(event -> {
             List<Integer> newSelectedIndices = new ArrayList<>();
-            for (int oldIndex : chosen.getSelectedIndices()) {
+            for (int oldIndex : chosen.getSelectionModel().getSelectedIndices()) {
                 boolean alreadyTaken = newSelectedIndices.contains(oldIndex - 1);
                 int newIndex = ((oldIndex > 0) && !alreadyTaken) ? oldIndex - 1 : oldIndex;
                 chosenModel.add(newIndex, chosenModel.remove(oldIndex));
-                newSelectedIndices.add(newIndex);
+                chosen.getSelectionModel().select(newIndex);
             }
-            chosen.setSelectedIndices(Ints.toArray(newSelectedIndices));
             storeSettings();
         });
 
-        btnDown.addActionListener(event -> {
+        btnDown.setOnAction(event -> {
             List<Integer> newSelectedIndices = new ArrayList<>();
-            int[] selectedIndices = chosen.getSelectedIndices();
-            for (int i = selectedIndices.length - 1; i >= 0; i--) {
-                int oldIndex = selectedIndices[i];
+            ObservableList selectedIndices = chosen.getSelectionModel().getSelectedIndices();
+            for (int i = selectedIndices.size() - 1; i >= 0; i--) {
+                int oldIndex = (int)selectedIndices.get(i);
                 boolean alreadyTaken = newSelectedIndices.contains(oldIndex + 1);
-                int newIndex = ((oldIndex < (chosenModel.getSize() - 1)) && !alreadyTaken) ? oldIndex + 1 : oldIndex;
+                int newIndex = ((oldIndex < (chosenModel.size() - 1)) && !alreadyTaken) ? oldIndex + 1 : oldIndex;
                 chosenModel.add(newIndex, chosenModel.remove(oldIndex));
-                newSelectedIndices.add(newIndex);
+                chosen.getSelectionModel().select(newIndex);
             }
-            chosen.setSelectedIndices(Ints.toArray(newSelectedIndices));
             storeSettings();
         });
 
-        btnDefault.addActionListener(event -> layout.setText(Globals.prefs.getPreviewPreferences()
+        btnDefault.setOnAction(event -> layout.setText(Globals.prefs.getPreviewPreferences()
                 .getPreviewStyleDefault()
                 .replace("__NEWLINE__", "\n")));
 
-        btnTest.addActionListener(event -> {
+        btnTest.setOnAction(event -> {
             try {
                 DefaultTaskExecutor.runInJavaFXThread(() -> {
-
-                    PreviewPanel testPane = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService);
-                    if (chosen.isSelectionEmpty()) {
+                    PreviewPanel testPane = new PreviewPanel(null, new BibDatabaseContext(), Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), dialogService, externalFileTypes);
+                    if (chosen.getSelectionModel().getSelectedItems().isEmpty()) {
                         testPane.setFixedLayout(layout.getText());
                         testPane.setEntry(TestEntry.getTestEntry());
                     }
                     else {
-                        int indexStyle = chosen.getSelectedIndex();
+                        int indexStyle = chosen.getSelectionModel().getSelectedIndex();
                         PreviewPreferences preferences = Globals.prefs.getPreviewPreferences();
                         preferences = new PreviewPreferences(preferences.getPreviewCycle(),indexStyle,preferences.getPreviewPanelDividerPosition(),preferences.isPreviewPanelEnabled(), preferences.getPreviewStyle(),preferences.getPreviewStyleDefault());
 
-                        testPane = new PreviewPanel(JabRefGUI.getMainFrame().getCurrentBasePanel(), new BibDatabaseContext(), Globals.getKeyPrefs(), preferences, dialogService);
+                        testPane = new PreviewPanel(JabRefGUI.getMainFrame().getCurrentBasePanel(), new BibDatabaseContext(), Globals.getKeyPrefs(), preferences, dialogService, externalFileTypes);
                         testPane.setEntry(TestEntry.getTestEntry());
                         testPane.updateLayout(preferences);
                     }
@@ -164,46 +162,28 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     }
 
     private void setupGui() {
-        JPanel chooseStyle = FormBuilder.create()
-                .columns("0:grow, $lcgap, pref, $lcgap, 0:grow")
-                .rows("pref, $lg, fill:pref:grow, $lg, pref:grow, $lg, pref:grow, $lg, pref:grow")
-                .padding(Paddings.DIALOG)
+        VBox vBox = new VBox();
+        btnRight.setPrefSize(80, 20);
+        btnLeft.setPrefSize(80, 20);
+        btnUp.setPrefSize(80, 20);
+        btnDown.setPrefSize(80, 20);
+        vBox.getChildren().addAll(new Label(""),  new Label(""), new Label(""), new Label(""), new Label(""),
+                new Label(""), new Label(""), btnRight, btnLeft, new Label(""), new Label(""), new Label(""),
+                btnUp, btnDown);
+        Label currentPreview = new Label(Localization.lang("Current Preview") + "  ------------------------------------------");
+        currentPreview.setFont(FontSize.bigFont);
+        gridPane.add(currentPreview, 1, 1);
+        gridPane.add(available, 1, 2);
+        gridPane.add(vBox, 2, 2);
+        gridPane.add(chosen, 3, 2);
+        gridPane.add(btnTest, 2, 6);
+        gridPane.add(btnDefault, 3, 6);
+        layout.setPrefSize(600, 300);
+        gridPane.add(scrollPane, 1, 9);
+    }
 
-                .addSeparator(Localization.lang("Current Preview"))
-                .xyw(1, 1, 5)
-                .add(available)
-                .xywh(1, 3, 1, 7)
-                .add(chosen)
-                .xywh(5, 3, 1, 7)
-
-                .add(btnRight)
-                .xy(3, 3, "fill, bottom")
-                .add(btnLeft)
-                .xy(3, 5, "fill, top")
-                .add(btnUp)
-                .xy(3, 7, "fill, bottom")
-                .add(btnDown)
-                .xy(3, 9, "fill, top")
-                .build();
-
-        JPanel preview = FormBuilder.create()
-                .columns("pref:grow, $lcgap, pref, $lcgap, pref")
-                .rows("pref, $lg, fill:pref:grow")
-                .padding(Paddings.DIALOG)
-
-                .addSeparator(Localization.lang("Preview"))
-                .xy(1, 1)
-                .add(btnTest)
-                .xy(3, 1)
-                .add(btnDefault)
-                .xy(5, 1)
-                .add(scrollPane)
-                .xyw(1, 3, 5)
-                .build();
-
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        add(chooseStyle, BorderLayout.CENTER);
-        add(preview, BorderLayout.PAGE_END);
+    public Node getGridPane() {
+        return gridPane;
     }
 
     @Override
@@ -216,33 +196,32 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
             // in case the style is not a valid citation style file, an empty Optional is returned
             Optional<CitationStyle> citationStyle = CitationStyle.createCitationStyleFromFile(style);
             if (citationStyle.isPresent()) {
-                chosenModel.addElement(citationStyle.get());
+                chosenModel.add(citationStyle.get());
             } else {
                 if (isPreviewChosen) {
                     LOGGER.error("Preview is already in the list, something went wrong");
                     continue;
                 }
                 isPreviewChosen = true;
-                chosenModel.addElement(Localization.lang("Preview"));
+                chosenModel.add(Localization.lang("Preview"));
             }
         }
 
         availableModel.clear();
         if (!isPreviewChosen) {
-            availableModel.addElement(Localization.lang("Preview"));
+            availableModel.add(Localization.lang("Preview"));
         }
 
-        btnLeft.setEnabled(!chosen.isSelectionEmpty());
-        btnRight.setEnabled(!available.isSelectionEmpty());
-        btnUp.setEnabled(!chosen.isSelectionEmpty());
-        btnDown.setEnabled(!chosen.isSelectionEmpty());
+        btnLeft.setDisable(!chosen.getSelectionModel().getSelectedItems().isEmpty());
+        btnRight.setDisable(available.getSelectionModel().getSelectedIndices().isEmpty());
+        btnUp.setDisable(!chosen.getSelectionModel().getSelectedIndices().isEmpty());
+        btnDown.setDisable(!chosen.getSelectionModel().getSelectedIndices().isEmpty());
 
         if (discoverCitationStyleWorker != null) {
             discoverCitationStyleWorker.cancel(true);
         }
 
         discoverCitationStyleWorker = new SwingWorker<List<CitationStyle>, Void>() {
-
             @Override
             protected List<CitationStyle> doInBackground() throws Exception {
                 return CitationStyle.discoverCitationStyles();
@@ -257,9 +236,9 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                     get().stream()
                             .filter(style -> !previewPreferences.getPreviewCycle().contains(style.getFilePath()))
                             .sorted(Comparator.comparing(CitationStyle::getTitle))
-                            .forEach(availableModel::addElement);
+                            .forEach(availableModel::add);
 
-                    btnRight.setEnabled(!availableModel.isEmpty());
+                    btnRight.setDisable(availableModel.isEmpty());
                 } catch (InterruptedException | ExecutionException e) {
                     LOGGER.error("something went wrong while adding the discovered CitationStyles to the list ");
                 }
@@ -273,9 +252,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     @Override
     public void storeSettings() {
         List<String> styles = new ArrayList<>();
-        Enumeration<Object> elements = chosenModel.elements();
-        while (elements.hasMoreElements()) {
-            Object obj = elements.nextElement();
+        for (Object obj : chosenModel) {
             if (obj instanceof CitationStyle) {
                 styles.add(((CitationStyle) obj).getFilePath());
             } else if (obj instanceof String) {

@@ -1,23 +1,23 @@
 package org.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
 
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
+
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.externalfiletype.ExternalFileTypeEditor;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplicationSettings;
@@ -27,182 +27,139 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-
 class ExternalTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
+    private final TextField emailSubject;
+    private final TextField citeCommand;
+    private final CheckBox openFoldersOfAttachedFiles;
 
-    private final JTextField emailSubject;
-    private final JTextField citeCommand;
-    private final JCheckBox openFoldersOfAttachedFiles;
+    private final RadioButton defaultConsole;
+    private final RadioButton executeConsole;
+    private final TextField consoleCommand;
+    private final Button browseButton;
 
-    private final JRadioButton defaultConsole;
-    private final JRadioButton executeConsole;
-    private final JTextField consoleCommand;
-    private final JButton browseButton;
-
-    private final JRadioButton adobeAcrobatReader;
-    private final JRadioButton sumatraReader;
-    private final JTextField adobeAcrobatReaderPath;
-    private final JTextField sumatraReaderPath;
-    private final JButton browseAdobeAcrobatReader;
-    private final JButton browseSumatraReader;
+    private final RadioButton adobeAcrobatReader;
+    private final RadioButton sumatraReader;
+    private final TextField adobeAcrobatReaderPath;
+    private final TextField sumatraReaderPath;
+    private final GridPane builder = new GridPane();
 
     public ExternalTab(JabRefFrame frame, PreferencesDialog prefsDiag, JabRefPreferences prefs) {
         this.prefs = prefs;
+        Button editFileTypes = new Button(Localization.lang("Manage external file types"));
+        editFileTypes.setFont(FontSize.smallFont);
+        citeCommand = new TextField();
+        editFileTypes.setOnAction(e->ExternalFileTypeEditor.getAction());
+        defaultConsole = new RadioButton(Localization.lang("Use default terminal emulator"));
+        defaultConsole.setFont(FontSize.smallFont);
+        executeConsole = new RadioButton(Localization.lang("Execute command") + ":");
+        executeConsole.setFont(FontSize.smallFont);
+        consoleCommand = new TextField();
+        browseButton = new Button(Localization.lang("Browse"));
+        browseButton.setFont(FontSize.smallFont);
+        adobeAcrobatReader = new RadioButton(Localization.lang("Adobe Acrobat Reader"));
+        adobeAcrobatReader.setFont(FontSize.smallFont);
+        adobeAcrobatReaderPath = new TextField();
+        Button browseAdobeAcrobatReader = new Button(Localization.lang("Browse"));
+        browseAdobeAcrobatReader.setFont(FontSize.smallFont);
+        sumatraReader = new RadioButton(Localization.lang("Sumatra Reader"));
+        sumatraReader.setFont(FontSize.smallFont);
+        sumatraReaderPath = new TextField();
+        Button browseSumatraReader = new Button(Localization.lang("Browse"));
+        browseSumatraReader.setFont(FontSize.smallFont);
 
-        setLayout(new BorderLayout());
+        Label commandDescription = new Label(Localization.lang("Note: Use the placeholder %0 for the location of the opened library file.", "%DIR"));
+        commandDescription.setFont(FontSize.smallFont);
+        defaultConsole.setOnAction(e -> updateExecuteConsoleButtonAndFieldEnabledState());
+        executeConsole.setOnAction(e -> updateExecuteConsoleButtonAndFieldEnabledState());
+        browseButton.setOnAction(e -> showConsoleChooser());
 
-        JButton editFileTypes = new JButton(Localization.lang("Manage external file types"));
-        citeCommand = new JTextField(25);
-        editFileTypes.addActionListener(ExternalFileTypeEditor.getAction());
+        browseAdobeAcrobatReader.setOnAction(e -> showAdobeChooser());
 
-        defaultConsole = new JRadioButton(Localization.lang("Use default terminal emulator"));
-        executeConsole = new JRadioButton(Localization.lang("Execute command") + ":");
-        consoleCommand = new JTextField();
-        browseButton = new JButton(Localization.lang("Browse"));
+        GridPane consoleOptionPanel = new GridPane();
+        consoleOptionPanel.add(defaultConsole,  1, 1);
+        consoleOptionPanel.add(executeConsole,  1, 2);
+        consoleOptionPanel.add(consoleCommand,  2, 2);
+        consoleOptionPanel.add(browseButton,  3, 2);
+        consoleOptionPanel.add(commandDescription,  2, 3);
 
-        adobeAcrobatReader = new JRadioButton(Localization.lang("Adobe Acrobat Reader"));
-        adobeAcrobatReaderPath = new JTextField();
-        browseAdobeAcrobatReader = new JButton(Localization.lang("Browse"));
-
-        sumatraReader = new JRadioButton(Localization.lang("Sumatra Reader"));
-        sumatraReaderPath = new JTextField();
-        browseSumatraReader = new JButton(Localization.lang("Browse"));
-
-        JLabel commandDescription = new JLabel(Localization.lang("Note: Use the placeholder %0 for the location of the opened library file.", "%DIR"));
-
-        ButtonGroup consoleOptions = new ButtonGroup();
-        consoleOptions.add(defaultConsole);
-        consoleOptions.add(executeConsole);
-
-        ButtonGroup readerOptions = new ButtonGroup();
-        readerOptions.add(adobeAcrobatReader);
-
-        JPanel pdfOptionPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints pdfLayoutConstrains = new GridBagConstraints();
-
-        JPanel consoleOptionPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints layoutConstraints = new GridBagConstraints();
-
-        defaultConsole.addActionListener(e -> updateExecuteConsoleButtonAndFieldEnabledState());
-        executeConsole.addActionListener(e -> updateExecuteConsoleButtonAndFieldEnabledState());
-        browseButton.addActionListener(e -> showConsoleChooser());
-
-        browseAdobeAcrobatReader.addActionListener(e -> showAdobeChooser());
-
-        layoutConstraints.fill = GridBagConstraints.HORIZONTAL;
-
-        pdfLayoutConstrains.fill = GridBagConstraints.HORIZONTAL;
-
-        layoutConstraints.gridx = 0;
-        layoutConstraints.gridy = 0;
-        layoutConstraints.insets = new Insets(0, 0, 6, 0);
-        consoleOptionPanel.add(defaultConsole, layoutConstraints);
-
-        layoutConstraints.gridy = 1;
-        consoleOptionPanel.add(executeConsole, layoutConstraints);
-
-        layoutConstraints.gridx = 1;
-        consoleOptionPanel.add(consoleCommand, layoutConstraints);
-
-        layoutConstraints.gridx = 2;
-        layoutConstraints.insets = new Insets(0, 4, 6, 0);
-        consoleOptionPanel.add(browseButton, layoutConstraints);
-
-        layoutConstraints.gridx = 1;
-        layoutConstraints.gridy = 2;
-        consoleOptionPanel.add(commandDescription, layoutConstraints);
-
-        pdfLayoutConstrains.gridx = 0;
-        pdfLayoutConstrains.gridy = 0;
-        pdfLayoutConstrains.insets = new Insets(0, 0, 6, 0);
-        pdfOptionPanel.add(adobeAcrobatReader, pdfLayoutConstrains);
-
-        pdfLayoutConstrains.gridx = 1;
-        pdfOptionPanel.add(adobeAcrobatReaderPath, pdfLayoutConstrains);
-
-        pdfLayoutConstrains.gridx = 2;
-        pdfOptionPanel.add(browseAdobeAcrobatReader, pdfLayoutConstrains);
+        GridPane pdfOptionPanel = new GridPane();
+        pdfOptionPanel.add(adobeAcrobatReader,  1, 1);
+        pdfOptionPanel.add(adobeAcrobatReaderPath,  2, 1);
+        pdfOptionPanel.add(browseAdobeAcrobatReader,  3, 1);
 
         if (OS.WINDOWS) {
-            readerOptions.add(sumatraReader);
-            browseSumatraReader.addActionListener(e -> showSumatraChooser());
-            pdfLayoutConstrains.gridy = 1;
-            pdfLayoutConstrains.gridx = 0;
-            pdfOptionPanel.add(sumatraReader, pdfLayoutConstrains);
-
-            pdfLayoutConstrains.gridx = 1;
-            pdfOptionPanel.add(sumatraReaderPath, pdfLayoutConstrains);
-
-            pdfLayoutConstrains.gridx = 2;
-            pdfOptionPanel.add(browseSumatraReader, pdfLayoutConstrains);
+            browseSumatraReader.setOnAction(e -> showSumatraChooser());
+            pdfOptionPanel.add(sumatraReader,  1, 2);
+            pdfOptionPanel.add(sumatraReaderPath,  2, 2);
+            pdfOptionPanel.add(browseSumatraReader,  3, 2);
         }
 
-        FormLayout layout = new FormLayout(
-                "1dlu, 8dlu, left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", "");
+        Label sendingOfEmails = new Label(Localization.lang("Sending of emails") + "  ----------------------------");
+        sendingOfEmails.setFont(FontSize.bigFont);
+        builder.add(sendingOfEmails, 1, 1);
+        Label subject = new Label(Localization.lang("Subject for sending an email with references").concat(":"));
+        subject.setFont(FontSize.smallFont);
+        builder.add(subject, 1, 2);
+        emailSubject = new TextField();
+        builder.add(emailSubject, 2, 2);
+        openFoldersOfAttachedFiles = new CheckBox(Localization.lang("Automatically open folders of attached files"));
+        openFoldersOfAttachedFiles.setFont(FontSize.smallFont);
+        builder.add(openFoldersOfAttachedFiles, 1, 3);
 
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+        builder.add(new Label(""), 1, 4);
+        Label externalPrograms = new Label(Localization.lang("External programs") + "  ----------------------------");
+        externalPrograms.setFont(FontSize.bigFont);
+        builder.add(externalPrograms, 1, 5);
 
-        builder.appendSeparator(Localization.lang("Sending of emails"));
-        builder.append(new JPanel());
-        JLabel lab = new JLabel(Localization.lang("Subject for sending an email with references").concat(":"));
-        builder.append(lab);
-        emailSubject = new JTextField(25);
-        builder.append(emailSubject);
-        builder.nextLine();
-        builder.append(new JPanel());
-        openFoldersOfAttachedFiles = new JCheckBox(Localization.lang("Automatically open folders of attached files"));
-        builder.append(openFoldersOfAttachedFiles);
-        builder.nextLine();
-
-        builder.appendSeparator(Localization.lang("External programs"));
-        builder.nextLine();
-
-        JPanel butpan = new JPanel();
-        butpan.setLayout(new GridLayout(3, 3));
+        GridPane butpan = new GridPane();
+        int index = 0;
         for (PushToApplication pushToApplication : frame.getPushApplications().getApplications()) {
-            addSettingsButton(pushToApplication, butpan);
+            addSettingsButton(pushToApplication, butpan, index);
+            index++;
         }
-        builder.append(new JPanel());
-        builder.append(butpan, 3);
 
-        builder.nextLine();
-        lab = new JLabel(Localization.lang("Cite command") + ':');
-        JPanel pan = new JPanel();
-        builder.append(pan);
-        builder.append(lab);
-        builder.append(citeCommand);
+        builder.add(butpan, 1, 6);
 
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(editFileTypes);
-        builder.nextLine();
+        Label citeCommandLabel = new Label(Localization.lang("Cite command") + ':');
+        citeCommandLabel.setFont(FontSize.smallFont);
+        builder.add(citeCommandLabel, 1, 7);
+        builder.add(citeCommand, 2, 7);
+        builder.add(editFileTypes, 1, 8);
+        builder.add(new Label(""), 1, 9);
+        Label openConsole = new Label(Localization.lang("Open console") + "  ---------------------------------");
+        openConsole.setFont(FontSize.bigFont);
+        builder.add(openConsole, 1, 10);
 
-        builder.appendSeparator(Localization.lang("Open console"));
-        builder.nextLine();
-        builder.append(new JPanel());
-        builder.append(consoleOptionPanel);
-        builder.nextLine();
+        builder.add(consoleOptionPanel, 1, 11);
+        builder.add(new Label(""), 1, 12);
 
-        builder.appendSeparator(Localization.lang("Open PDF"));
-        builder.nextLine();
-        builder.append(new JPanel());
-        builder.append(pdfOptionPanel);
+        Label openPdf = new Label(Localization.lang("Open PDF") + "  -------------------------------------");
+        openPdf.setFont(FontSize.bigFont);
+        builder.add(openPdf,  1, 12);
 
-        pan = builder.getPanel();
-        pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        add(pan, BorderLayout.CENTER);
-
+        builder.add(pdfOptionPanel, 1, 13);
+        JFXPanel panel = CustomJFXPanel.wrap(new Scene(builder));
+        setLayout(new BorderLayout());
+        add(panel, BorderLayout.CENTER);
     }
 
-    private void addSettingsButton(final PushToApplication application, JPanel panel) {
+    public Node getBuilder() {
+        return builder;
+    }
+
+    private void addSettingsButton(final PushToApplication application, GridPane panel, int index) {
         PushToApplicationSettings settings = PushToApplications.getSettings(application);
-        JButton button = new JButton(Localization.lang("Settings for %0", application.getApplicationName()), application.getIcon().getIcon());
-        button.addActionListener(e -> PushToApplicationSettingsDialog.showSettingsDialog(null, settings));
-        panel.add(button);
+        Button button = new Button(Localization.lang("Settings for %0", application.getApplicationName()));
+        button.setFont(FontSize.smallFont);
+        button.setPrefSize(150, 20);
+        button.setOnAction(e -> PushToApplicationSettingsDialog.showSettingsDialog(null, settings, index));
+        if (index % 2 == 0) {
+            panel.add(button, 1, index / 2 + 1);
+        } else {
+            panel.add(button, 2, index / 2 + 1);
+        }
     }
 
     @Override
@@ -257,8 +214,8 @@ class ExternalTab extends JPanel implements PrefsTab {
     }
 
     private void updateExecuteConsoleButtonAndFieldEnabledState() {
-        browseButton.setEnabled(executeConsole.isSelected());
-        consoleCommand.setEnabled(executeConsole.isSelected());
+        browseButton.setDisable(!executeConsole.isSelected());
+        consoleCommand.setDisable(!executeConsole.isSelected());
     }
 
     private void showConsoleChooser() {

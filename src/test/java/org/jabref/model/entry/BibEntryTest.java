@@ -132,4 +132,5 @@ public class BibEntryTest {
         assertEquals(new KeywordList(new Keyword("kw"), new Keyword("kw2"), new Keyword("kw3")), actual);
     }
 
+
 }

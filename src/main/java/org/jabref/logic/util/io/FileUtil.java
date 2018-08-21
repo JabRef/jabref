@@ -52,13 +52,14 @@ public class FileUtil {
         }
     }
 
+
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
      * @return The extension, trimmed and in lowercase.
      */
-    public static Optional<String> getFileExtension(File file) {
-        return getFileExtension(file.getName());
+    public static Optional<String> getFileExtension(Path file) {
+        return getFileExtension(file.getFileName().toString());
     }
 
     /**
@@ -155,7 +156,7 @@ public class FileUtil {
             return false;
         }
         if (Files.exists(pathToDestinationFile) && !replaceExisting) {
-            LOGGER.error("Path to the destination file is not exists and the file shouldn't be replace.");
+            LOGGER.error("Path to the destination file exists but the file shouldn't be replaced.");
             return false;
         }
         try {
@@ -328,5 +329,15 @@ public class FileUtil {
     public static String toPortableString(Path path) {
         return path.toString()
                    .replace('\\', '/');
+    }
+
+    /**
+     * Test if the file is a bib file by simply checking the extension to be ".bib"
+     * @param file The file to check
+     * @return True if file extension is ".bib", false otherwise
+     */
+    public static boolean isBibFile(Path file)
+    {
+        return getFileExtension(file).filter(type -> "bib".equals(type)).isPresent();
     }
 }

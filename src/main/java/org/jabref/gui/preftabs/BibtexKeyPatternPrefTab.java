@@ -1,13 +1,11 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.GridBagConstraints;
-
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
+import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -16,34 +14,34 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-
 /**
  * The Preferences panel for key generation.
  */
 class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
+    private final GridPane builder = new GridPane();
+    private final CheckBox dontOverwrite = new CheckBox(Localization.lang("Do not overwrite existing keys"));
+    private final CheckBox warnBeforeOverwriting = new CheckBox(Localization.lang("Warn before overwriting existing keys"));
+    private final CheckBox generateOnSave = new CheckBox(Localization.lang("Generate keys before saving (for entries without a key)"));
+    private final CheckBox autoGenerateOnImport = new CheckBox(Localization.lang("Generate keys for imported entries"));
 
-    private final JCheckBox dontOverwrite = new JCheckBox(Localization.lang("Do not overwrite existing keys"));
-    private final JCheckBox warnBeforeOverwriting = new JCheckBox(Localization.lang("Warn before overwriting existing keys"));
-    private final JCheckBox generateOnSave = new JCheckBox(Localization.lang("Generate keys before saving (for entries without a key)"));
-    private final JCheckBox autoGenerateOnImport = new JCheckBox(Localization.lang("Generate keys for imported entries"));
+    private final RadioButton letterStartA = new RadioButton(Localization.lang("Ensure unique keys using letters (a, b, ...)"));
+    private final RadioButton letterStartB = new RadioButton(Localization.lang("Ensure unique keys using letters (b, c, ...)"));
+    private final RadioButton alwaysAddLetter = new RadioButton(Localization.lang("Always add letter (a, b, ...) to generated keys"));
 
-    private final JRadioButton letterStartA = new JRadioButton(Localization.lang("Ensure unique keys using letters (a, b, ...)"));
-    private final JRadioButton letterStartB = new JRadioButton(Localization.lang("Ensure unique keys using letters (b, c, ...)"));
-    private final JRadioButton alwaysAddLetter = new JRadioButton(Localization.lang("Always add letter (a, b, ...) to generated keys"));
-
-    private final JTextField keyPatternRegex = new JTextField(20);
-    private final JTextField keyPatternReplacement = new JTextField(20);
+    private final TextField keyPatternRegex = new TextField();
+    private final TextField keyPatternReplacement = new TextField();
 
 
     public BibtexKeyPatternPrefTab(JabRefPreferences prefs, BasePanel panel) {
         super(panel);
+        builder.add(super.getPanel(), 1, 1);
+        builder.add(new Label(""), 1, 2);
         this.prefs = prefs;
         appendKeyGeneratorSettings();
     }
+
 
     /**
      * Store changes to table preferences. This method is called when the user clicks Ok.
@@ -54,7 +52,6 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
 
         // Set the default value:
         Globals.prefs.put(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, defaultPat.getText());
-
         Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, warnBeforeOverwriting.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY, dontOverwrite.isSelected());
 
@@ -81,55 +78,39 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
     }
 
     private void appendKeyGeneratorSettings() {
-        ButtonGroup bg = new ButtonGroup();
-        bg.add(letterStartA);
-        bg.add(letterStartB);
-        bg.add(alwaysAddLetter);
-
         // Build a panel for checkbox settings:
-        FormLayout layout = new FormLayout
-                ("1dlu, 8dlu, left:pref, 8dlu, left:pref", "");
-        JPanel pan = new JPanel();
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        builder.appendSeparator(Localization.lang("Key generator settings"));
+        autoGenerateOnImport.setFont(FontSize.smallFont);
+        letterStartA.setFont(FontSize.smallFont);
+        warnBeforeOverwriting.setFont(FontSize.smallFont);
+        letterStartB.setFont(FontSize.smallFont);
+        dontOverwrite.setFont(FontSize.smallFont);
+        alwaysAddLetter.setFont(FontSize.smallFont);
+        generateOnSave.setFont(FontSize.smallFont);
 
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(autoGenerateOnImport);
-        builder.append(letterStartA);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(warnBeforeOverwriting);
-        builder.append(letterStartB);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(dontOverwrite);
-        builder.append(alwaysAddLetter);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(generateOnSave);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(Localization.lang("Replace (regular expression)") + ':');
-        builder.append(Localization.lang("by") + ':');
+        Label keyGeneratorSettings = new Label(Localization.lang("Key generator settings") + "  --------------------------");
+        keyGeneratorSettings.setFont(FontSize.bigFont);
+        builder.add(keyGeneratorSettings, 1, 10);
+        builder.add(autoGenerateOnImport, 1, 11);
+        builder.add(letterStartA, 2, 11);
+        builder.add(warnBeforeOverwriting, 1, 12);
+        builder.add(letterStartB, 2, 12);
+        builder.add(dontOverwrite, 1, 13);
+        builder.add(alwaysAddLetter, 2, 13);
+        builder.add(generateOnSave, 1, 14);
 
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(keyPatternRegex);
-        builder.append(keyPatternReplacement);
+        builder.add((new Label(Localization.lang("Replace (regular expression)") + ':')), 1, 15);
+        builder.add(new Label(Localization.lang("by") + ':'), 2, 15);
 
-        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        con.gridx = 1;
-        con.gridy = 3;
-        con.gridwidth = GridBagConstraints.REMAINDER;
-        con.weightx = 1;
-        con.fill = GridBagConstraints.BOTH;
-        gbl.setConstraints(builder.getPanel(), con);
-        add(builder.getPanel());
+        builder.add(keyPatternRegex, 1, 16);
+        builder.add(keyPatternReplacement, 2, 16);
 
-        dontOverwrite.addChangeListener(e ->
+        dontOverwrite.setOnAction(e ->
         // Warning before overwriting is only relevant if overwriting can happen:
-        warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected()));
+        warnBeforeOverwriting.setDisable(dontOverwrite.isSelected()));
+    }
+
+    public Node getBuilder() {
+        return builder;
     }
 
     @Override
@@ -157,7 +138,7 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
         }
 
         // Warning before overwriting is only relevant if overwriting can happen:
-        warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());
+        warnBeforeOverwriting.setDisable(dontOverwrite.isSelected());
 
         keyPatternRegex.setText(Globals.prefs.get(JabRefPreferences.KEY_PATTERN_REGEX));
         keyPatternReplacement.setText(Globals.prefs.get(JabRefPreferences.KEY_PATTERN_REPLACEMENT));

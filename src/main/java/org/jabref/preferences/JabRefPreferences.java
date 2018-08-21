@@ -1413,8 +1413,8 @@ public class JabRefPreferences implements PreferencesService {
 
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(customImports, getDefaultEncoding(), getKeywordDelimiter(),
-                                           getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(),
-                                           isKeywordSyncEnabled());
+                                           getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(), getXMPPreferences(),
+               				   isKeywordSyncEnabled());
     }
 
     public SavePreferences loadForExportFromPreferences() {

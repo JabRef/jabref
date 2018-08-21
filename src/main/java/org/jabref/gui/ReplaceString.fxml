@@ -36,7 +36,7 @@
                             <TextField fx:id="replaceField" GridPane.columnIndex="1" GridPane.rowIndex="2"
                                        GridPane.columnSpan="4"/>
                             <CheckBox fx:id="selectFieldOnly" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2"
-                                     text="%Limit to Selected Entries"/>
+                                      text="%Limit to Selected Entries"/>
                             <RadioButton fx:id="allReplace" GridPane.columnIndex="0" GridPane.rowIndex="5" GridPane.columnSpan="2"
                                          selected="true" text="%All Field Replace">
                                 <toggleGroup>

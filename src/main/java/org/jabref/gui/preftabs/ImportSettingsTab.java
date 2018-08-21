@@ -1,27 +1,23 @@
 package org.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
 import java.util.Objects;
 
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
+import javafx.collections.FXCollections;
+import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.pdfimport.ImportDialog;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-
-public class ImportSettingsTab extends JPanel implements PrefsTab {
+public class ImportSettingsTab extends Pane implements PrefsTab {
 
     public static final String[] DEFAULT_FILENAMEPATTERNS = new String[] {"[bibtexkey]",
             "[bibtexkey] - [title]"};
@@ -30,84 +26,70 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
     private static final String[] DEFAULT_FILENAMEPATTERNS_DISPLAY = new String[] {"bibtexkey", "bibtexkey - title",};
 
     private final JabRefPreferences prefs;
-    private final JRadioButton radioButtonXmp;
-    private final JRadioButton radioButtonPDFcontent;
-    private final JRadioButton radioButtonNoMeta;
-    private final JRadioButton radioButtononlyAttachPDF;
-    private final JCheckBox useDefaultPDFImportStyle;
+    private final RadioButton radioButtonXmp;
+    private final RadioButton radioButtonPDFcontent;
+    private final RadioButton radioButtonNoMeta;
+    private final RadioButton radioButtononlyAttachPDF;
+    private final CheckBox useDefaultPDFImportStyle;
+    private final GridPane builder = new GridPane();
+    private final TextField fileNamePattern;
+    private final ComboBox<String> selectFileNamePattern;
 
-    private final JTextField fileNamePattern;
-    private final JButton selectFileNamePattern;
 
-    private final JTextField fileDirPattern;
+    private final TextField fileDirPattern;
 
     public ImportSettingsTab(JabRefPreferences prefs) {
         this.prefs = Objects.requireNonNull(prefs);
+        radioButtonNoMeta = new RadioButton(Localization.lang("Create blank entry linking the PDF"));
+        radioButtonNoMeta.setFont(FontSize.smallFont);
+        radioButtonXmp = new RadioButton(Localization.lang("Create entry based on XMP-metadata"));
+        radioButtonXmp.setFont(FontSize.smallFont);
+        radioButtonPDFcontent = new RadioButton(Localization.lang("Create entry based on content"));
+        radioButtonPDFcontent.setFont(FontSize.smallFont);
+        radioButtononlyAttachPDF = new RadioButton(Localization.lang("Only attach PDF"));
+        radioButtononlyAttachPDF.setFont(FontSize.smallFont);
 
-        setLayout(new BorderLayout());
-        FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu");
-        radioButtonNoMeta = new JRadioButton(Localization.lang("Create blank entry linking the PDF"));
-        radioButtonXmp = new JRadioButton(Localization.lang("Create entry based on XMP-metadata"));
-        radioButtonPDFcontent = new JRadioButton(Localization.lang("Create entry based on content"));
-        radioButtononlyAttachPDF = new JRadioButton(Localization.lang("Only attach PDF"));
-        ButtonGroup bg = new ButtonGroup();
-        bg.add(radioButtonNoMeta);
-        bg.add(radioButtonXmp);
-        bg.add(radioButtonPDFcontent);
-        bg.add(radioButtononlyAttachPDF);
-
-        useDefaultPDFImportStyle = new JCheckBox(
+        useDefaultPDFImportStyle = new CheckBox(
                 Localization.lang("Always use this PDF import style (and do not ask for each import)"));
+        useDefaultPDFImportStyle.setFont(FontSize.smallFont);
 
-        fileNamePattern = new JTextField(50);
-        fileDirPattern = new JTextField(50);
-        selectFileNamePattern = new JButton(Localization.lang("Choose pattern"));
-        selectFileNamePattern.addActionListener(e -> openFilePatternMenu());
+        fileNamePattern = new TextField();
+        fileDirPattern = new TextField();
+        selectFileNamePattern = new ComboBox<>();
+        selectFileNamePattern.getItems().addAll(FXCollections.observableArrayList(DEFAULT_FILENAMEPATTERNS_DISPLAY));
+        selectFileNamePattern.setValue(Localization.lang("Choose pattern"));
+        selectFileNamePattern.setOnAction(e -> {
+            fileNamePattern.setText(selectFileNamePattern.getValue());
+        });
 
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        JPanel pan = new JPanel();
+        Label defaultImportStyle = new Label(Localization.lang("Default import style for drag and drop of PDFs"));
+        defaultImportStyle.setFont(FontSize.bigFont);
+        builder.add(defaultImportStyle, 1, 1);
+        builder.add(new Separator(), 2, 1);
+        builder.add(radioButtonNoMeta, 2, 2);
+        builder.add(radioButtonXmp, 2, 3);
+        builder.add(radioButtonPDFcontent, 2, 4);
+        builder.add(radioButtononlyAttachPDF, 2, 5);
+        builder.add(useDefaultPDFImportStyle, 2, 6);
+        builder.add(new Label(""), 1, 7);
 
-        builder.appendSeparator(Localization.lang("Default import style for drag and drop of PDFs"));
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(radioButtonNoMeta);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(radioButtonXmp);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(radioButtonPDFcontent);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(radioButtononlyAttachPDF);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(useDefaultPDFImportStyle);
-        builder.nextLine();
+        Label defaultPdfFileLinkAction = new Label(Localization.lang("Default PDF file link action") + "  ------------------------");
+        defaultPdfFileLinkAction.setFont(FontSize.bigFont);
+        builder.add(defaultPdfFileLinkAction, 1, 8);
+        Label filenameFormatPattern = new Label(Localization.lang("Filename format pattern").concat(":"));
+        filenameFormatPattern.setFont(FontSize.smallFont);
+        builder.add(filenameFormatPattern, 1, 9);
+        builder.add(fileNamePattern, 2, 9);
+        builder.add(selectFileNamePattern, 3, 9);
 
-        builder.appendSeparator(Localization.lang("Default PDF file link action"));
-        builder.nextLine();
-        builder.append(pan);
+        Label lbfileDirPattern = new Label(Localization.lang("File directory pattern").concat(":"));
+        lbfileDirPattern.setFont(FontSize.smallFont);
+        builder.add(lbfileDirPattern, 1, 10);
+        builder.add(fileDirPattern, 2, 10);
+    }
 
-        JPanel pan2 = new JPanel();
-        JLabel lab = new JLabel(Localization.lang("Filename format pattern").concat(":"));
-        pan2.add(lab);
-        pan2.add(fileNamePattern);
-        pan2.add(selectFileNamePattern);
-        builder.append(pan2);
-
-        JPanel pan3 = new JPanel();
-        JLabel lbfileDirPattern = new JLabel(Localization.lang("File directory pattern").concat(":"));
-        pan3.add(lbfileDirPattern);
-        pan3.add(fileDirPattern);
-
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(pan3);
-
-        pan = builder.getPanel();
-        pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        add(pan, BorderLayout.CENTER);
+    public Node getBuilder() {
+        return builder;
     }
 
     @Override
@@ -116,22 +98,22 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         useDefaultPDFImportStyle.setSelected(prefs.getBoolean(JabRefPreferences.IMPORT_ALWAYSUSE));
         int style = prefs.getInt(JabRefPreferences.IMPORT_DEFAULT_PDF_IMPORT_STYLE);
         switch (style) {
-        case ImportDialog.NOMETA:
-            radioButtonNoMeta.setSelected(true);
-            break;
-        case ImportDialog.XMP:
-            radioButtonXmp.setSelected(true);
-            break;
-        case ImportDialog.CONTENT:
-            radioButtonPDFcontent.setSelected(true);
-            break;
-        case ImportDialog.ONLYATTACH:
-            radioButtononlyAttachPDF.setSelected(true);
-            break;
-        default:
-            // fallback
-            radioButtonPDFcontent.setSelected(true);
-            break;
+            case ImportDialog.NOMETA:
+                radioButtonNoMeta.setSelected(true);
+                break;
+            case ImportDialog.XMP:
+                radioButtonXmp.setSelected(true);
+                break;
+            case ImportDialog.CONTENT:
+                radioButtonPDFcontent.setSelected(true);
+                break;
+            case ImportDialog.ONLYATTACH:
+                radioButtononlyAttachPDF.setSelected(true);
+                break;
+            default:
+                // fallback
+                radioButtonPDFcontent.setSelected(true);
+                break;
         }
         fileNamePattern.setText(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
         fileDirPattern.setText(prefs.get(JabRefPreferences.IMPORT_FILEDIRPATTERN));
@@ -165,14 +147,4 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         return Localization.lang("Import");
     }
 
-    private void openFilePatternMenu() {
-        JPopupMenu popup = new JPopupMenu();
-        for (int i = 0; i < ImportSettingsTab.DEFAULT_FILENAMEPATTERNS.length; i++) {
-            final JMenuItem item = new JMenuItem(ImportSettingsTab.DEFAULT_FILENAMEPATTERNS_DISPLAY[i]);
-            final String toSet = ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[i];
-            item.addActionListener(e -> fileNamePattern.setText(toSet));
-            popup.add(item);
-        }
-        popup.show(selectFileNamePattern, 0, selectFileNamePattern.getHeight());
-    }
 }
