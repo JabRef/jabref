@@ -168,7 +168,7 @@ public class ParserResult {
     }
 
     public BibDatabaseContext getDatabaseContext() {
-        return new BibDatabaseContext(database, metaData, file.toFile());
+        return new BibDatabaseContext(database, metaData, file);
     }
 
     public void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
