@@ -47,7 +47,6 @@ public class ErrorConsoleView extends BaseDialog<Void> {
 
     public ErrorConsoleView() {
         this.setTitle(Localization.lang("Event log"));
-        this.setResizable(true);
         this.initModality(Modality.NONE);
 
         ViewLoader.view(this)
@@ -97,7 +96,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
             public void updateItem(LogEventViewModel event, boolean empty) {
                 super.updateItem(event, empty);
 
-                if (event == null || empty) {
+                if ((event == null) || empty) {
                     setGraphic(null);
                 } else {
                     icon = event.getIcon().getGraphicNode();
