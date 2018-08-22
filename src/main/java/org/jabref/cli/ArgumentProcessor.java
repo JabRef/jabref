@@ -220,12 +220,11 @@ public class ArgumentProcessor {
         if (cli.isFileExport()) {
             if (!loaded.isEmpty()) {
                 exportFile(loaded, cli.getFileExport().split(","));
+                LOGGER.debug("Finished export");
             } else {
                 System.err.println(Localization.lang("The output option depends on a valid import option."));
             }
         }
-
-        LOGGER.debug("Finished export");
 
         if (cli.isPreferencesExport()) {
             try {
