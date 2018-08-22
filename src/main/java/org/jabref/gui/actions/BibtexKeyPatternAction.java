@@ -13,7 +13,6 @@ public class BibtexKeyPatternAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        BibtexKeyPatternDialog dlg = new BibtexKeyPatternDialog(frame.getCurrentBasePanel());
-        dlg.showAndWait();
+       new BibtexKeyPatternDialog(frame.getCurrentBasePanel()).showAndWait();
     }
 }

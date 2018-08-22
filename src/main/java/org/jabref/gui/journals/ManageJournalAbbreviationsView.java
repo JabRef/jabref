@@ -52,7 +52,6 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
 
     public ManageJournalAbbreviationsView() {
         this.setTitle(Localization.lang("Journal abbreviations"));
-        this.setResizable(true);
 
         ViewLoader.view(this)
                   .load()

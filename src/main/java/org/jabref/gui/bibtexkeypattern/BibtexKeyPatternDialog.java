@@ -32,9 +32,8 @@ public class BibtexKeyPatternDialog extends BaseDialog<Void> {
             if (button == ButtonType.APPLY) {
                 metaData.setCiteKeyPattern(bibtexKeyPatternPanel.getKeyPatternAsDatabaseBibtexKeyPattern());
                 panel.markNonUndoableBaseChanged();
-            } else {
-                return null;
             }
+
             return null;
         });
 
