@@ -63,7 +63,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         getDialogPane().setPrefSize(1250, 800);
         getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         getDialogPane().getScene().getStylesheets().add(this.getClass().getResource("PreferencesDialog.css").toExternalForm());
-        setResizable(true);
+
         ButtonType save = new ButtonType(Localization.lang("Save"), ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(save, ButtonType.CANCEL);
         ControlHelper.setAction(save, getDialogPane(), event -> {
@@ -178,7 +178,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.XML)
                 .withDefaultExtension(StandardFileType.XML)
-                .withInitialDirectory(prefs.getPrefsExportPath()).build();
+                .withInitialDirectory(prefs.setLastPreferencesExportPath()).build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> {
             try {
@@ -233,7 +233,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.XML)
                 .withDefaultExtension(StandardFileType.XML)
-                .withInitialDirectory(prefs.getPrefsExportPath())
+                .withInitialDirectory(prefs.setLastPreferencesExportPath())
                 .build();
 
         dialogService.showFileSaveDialog(fileDialogConfiguration)
@@ -241,7 +241,7 @@ public class PreferencesDialog extends BaseDialog<Void> {
                          try {
                              storeAllSettings();
                              prefs.exportPreferences(exportFile);
-                             prefs.put(JabRefPreferences.PREFS_EXPORT_PATH, exportFile.toString());
+                             prefs.setLastPreferencesExportPath(exportFile);
                          } catch (JabRefException ex) {
                              LOGGER.warn(ex.getMessage(), ex);
                              dialogService.showErrorDialogAndWait(Localization.lang("Export preferences"), ex);

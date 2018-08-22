@@ -72,11 +72,27 @@ public class BibtexKeyPatternPanel extends Pane {
             mode = Globals.prefs.getDefaultBibDatabaseMode();
         }
 
-        addExtraText(mode);
+        int rowIndex = 3;
+        for (EntryType type : EntryTypes.getAllValues(mode)) {
+            Label label1 = new Label(type.getName());
+
+            TextField textField = new TextField();
+
+            Button button1 = new Button("Default");
+            button1.setOnAction(e1 -> textField.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
+
+            gridPane.add(label1, 1, rowIndex);
+            gridPane.add(textField, 3, rowIndex);
+            gridPane.add(button1, 4, rowIndex);
+
+            textFields.put(type.getName().toLowerCase(Locale.ROOT), textField);
+
+            rowIndex++;
+        }
 
         Button help1 = new Button("?");
         help1.setOnAction(e->new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN).getHelpButton().doClick());
-        gridPane.add(help1, 1, 24);
+        gridPane.add(help1, 1, rowIndex);
 
         Button btnDefaultAll1 = new Button(Localization.lang("Reset all"));
         btnDefaultAll1.setOnAction(e-> {
@@ -86,27 +102,7 @@ public class BibtexKeyPatternPanel extends Pane {
             }
             defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         });
-        gridPane.add(btnDefaultAll1, 3, 24);
-    }
-
-    private void addExtraText(BibDatabaseMode mode) {
-        int rowIndex = 0;
-        for (EntryType type : EntryTypes.getAllValues(mode)) {
-            Label label = new Label(type.getName());
-
-            TextField textField = new TextField();
-
-            Button button = new Button("Default");
-            button.setOnAction(e -> textField.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
-
-            gridPane.add(label, 1, rowIndex + 3);
-            gridPane.add(textField, 3, rowIndex + 3);
-            gridPane.add(button, 4, rowIndex + 3);
-
-            textFields.put(type.getName().toLowerCase(Locale.ROOT), textField);
-
-            rowIndex++;
-        }
+        gridPane.add(btnDefaultAll1, 3, rowIndex);
     }
 
     /**
