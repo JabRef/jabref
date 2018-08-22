@@ -1,4 +1,4 @@
-package org.jabref.gui.preftabs;
+package org.jabref.gui.preferences;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -170,8 +170,8 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         vBox.getChildren().addAll(new Label(""),  new Label(""), new Label(""), new Label(""), new Label(""),
                 new Label(""), new Label(""), btnRight, btnLeft, new Label(""), new Label(""), new Label(""),
                 btnUp, btnDown);
-        Label currentPreview = new Label(Localization.lang("Current Preview") + "  ------------------------------------------");
-        currentPreview.setFont(FontSize.bigFont);
+        Label currentPreview = new Label(Localization.lang("Current Preview"));
+        currentPreview.getStyleClass().add("sectionHeader");
         gridPane.add(currentPreview, 1, 1);
         gridPane.add(available, 1, 2);
         gridPane.add(vBox, 2, 2);
@@ -182,7 +182,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         gridPane.add(scrollPane, 1, 9);
     }
 
-    public Node getGridPane() {
+    public Node getBuilder() {
         return gridPane;
     }
 

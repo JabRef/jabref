@@ -3,8 +3,6 @@ package org.jabref.preferences;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,6 +12,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -47,7 +46,7 @@ import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
-import org.jabref.gui.preftabs.ImportSettingsTab;
+import org.jabref.gui.preferences.ImportSettingsTab;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
@@ -74,6 +73,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
+import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.Version;
@@ -191,7 +191,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String AUTO_OPEN_FORM = "autoOpenForm";
     public static final String IMPORT_WORKING_DIRECTORY = "importWorkingDirectory";
     public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
-    public static final String PREFS_EXPORT_PATH = "prefsExportPath";
     public static final String WORKING_DIRECTORY = "workingDirectory";
     public static final String EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA";
@@ -246,7 +245,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SUMATRA_PDF_COMMAND = "sumatraCommand";
     public static final String USE_PDF_READER = "usePDFReader";
     // Currently, it is not possible to specify defaults for specific entry types
-    // When this should be made possible, the code to inspect is org.jabref.gui.preftabs.BibtexKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
+    // When this should be made possible, the code to inspect is org.jabref.gui.preferences.BibtexKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
     public static final String DEFAULT_BIBTEX_KEY_PATTERN = "defaultBibtexKeyPattern";
     public static final String GRAY_OUT_NON_HITS = "grayOutNonHits";
     public static final String CONFIRM_DELETE = "confirmDelete";
@@ -365,7 +364,6 @@ public class JabRefPreferences implements PreferencesService {
 
     // Preview
     private static final String PREVIEW_STYLE = "previewStyle";
-
     private static final String CYCLE_PREVIEW_POS = "cyclePreviewPos";
     private static final String CYCLE_PREVIEW = "cyclePreview";
     private static final String PREVIEW_PANEL_HEIGHT = "previewPanelHeightFX";
@@ -400,6 +398,9 @@ public class JabRefPreferences implements PreferencesService {
 
     //GroupViewMode
     private static final String GROUP_INTERSECT_UNION_VIEW_MODE = "groupIntersectUnionViewModes";
+
+    // Dialog states
+    private static final String PREFS_EXPORT_PATH = "prefsExportPath";
 
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
@@ -1144,6 +1145,7 @@ public class JabRefPreferences implements PreferencesService {
         clearAllCustomEntryTypes();
         clearKeyPatterns();
         prefs.clear();
+        new SharedDatabasePreferences().clear();
     }
 
     public void clear(String key) {
@@ -1322,8 +1324,11 @@ public class JabRefPreferences implements PreferencesService {
      * @param filename String File to export to
      */
     public void exportPreferences(String filename) throws JabRefException {
-        File f = new File(filename);
-        try (OutputStream os = new FileOutputStream(f)) {
+        exportPreferences(Paths.get(filename));
+    }
+
+    public void exportPreferences(Path file) throws JabRefException {
+        try (OutputStream os = Files.newOutputStream(file)) {
             prefs.exportSubtree(os);
         } catch (BackingStoreException | IOException ex) {
             throw new JabRefException("Could not export preferences", Localization.lang("Could not export preferences"),
@@ -1339,12 +1344,15 @@ public class JabRefPreferences implements PreferencesService {
      *                         or an IOException
      */
     public void importPreferences(String filename) throws JabRefException {
-        File f = new File(filename);
-        try (InputStream is = new FileInputStream(f)) {
+        importPreferences(Paths.get(filename));
+    }
+
+    public void importPreferences(Path file) throws JabRefException {
+        try (InputStream is = Files.newInputStream(file)) {
             Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException | IOException ex) {
             throw new JabRefException("Could not import preferences", Localization.lang("Could not import preferences"),
-                                      ex);
+                    ex);
         }
     }
 
@@ -1911,5 +1919,13 @@ public class JabRefPreferences implements PreferencesService {
         } else {
             return Optional.empty();
         }
+    }
+
+    public String setLastPreferencesExportPath() {
+        return get(PREFS_EXPORT_PATH);
+    }
+
+    public void setLastPreferencesExportPath(Path exportFile) {
+        put(PREFS_EXPORT_PATH, exportFile.toString());
     }
 }

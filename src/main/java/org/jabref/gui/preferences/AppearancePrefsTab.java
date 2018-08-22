@@ -1,4 +1,4 @@
-package org.jabref.gui.preftabs;
+package org.jabref.gui.preferences;
 
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -45,7 +45,7 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
 
     }
 
-    public Node getContainer() {
+    public Node getBuilder() {
         return container;
     }
 

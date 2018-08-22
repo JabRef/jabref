@@ -1,4 +1,4 @@
-package org.jabref.gui.preftabs;
+package org.jabref.gui.preferences;
 
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -79,16 +79,8 @@ class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab 
 
     private void appendKeyGeneratorSettings() {
         // Build a panel for checkbox settings:
-        autoGenerateOnImport.setFont(FontSize.smallFont);
-        letterStartA.setFont(FontSize.smallFont);
-        warnBeforeOverwriting.setFont(FontSize.smallFont);
-        letterStartB.setFont(FontSize.smallFont);
-        dontOverwrite.setFont(FontSize.smallFont);
-        alwaysAddLetter.setFont(FontSize.smallFont);
-        generateOnSave.setFont(FontSize.smallFont);
-
-        Label keyGeneratorSettings = new Label(Localization.lang("Key generator settings") + "  --------------------------");
-        keyGeneratorSettings.setFont(FontSize.bigFont);
+        Label keyGeneratorSettings = new Label(Localization.lang("Key generator settings"));
+        keyGeneratorSettings.getStyleClass().add("sectionHeader");
         builder.add(keyGeneratorSettings, 1, 10);
         builder.add(autoGenerateOnImport, 1, 11);
         builder.add(letterStartA, 2, 11);

@@ -1,4 +1,4 @@
-package org.jabref.gui.preftabs;
+package org.jabref.gui.preferences;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -33,11 +33,8 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
         // EXPORT SORT ORDER
         // create Components
         exportInOriginalOrder = new RadioButton(Localization.lang("Export entries in their original order"));
-        exportInOriginalOrder.setFont(FontSize.smallFont);
         exportInTableOrder = new RadioButton(Localization.lang("Export in current table sort order"));
-        exportInTableOrder.setFont(FontSize.smallFont);
         exportInSpecifiedOrder = new RadioButton(Localization.lang("Export entries ordered as specified"));
-        exportInSpecifiedOrder.setFont(FontSize.smallFont);
 
         exportOrderPanel = new SaveOrderConfigDisplay();
 
@@ -50,8 +47,8 @@ class ExportSortingPrefsTab extends Pane implements PrefsTab {
         exportInTableOrder.setOnAction(listener);
         exportInSpecifiedOrder.setOnAction(listener);
 
-        Label exportSortOrder = new Label(Localization.lang("Export sort order") + "  ------------------------");
-        exportSortOrder.setFont(FontSize.bigFont);
+        Label exportSortOrder = new Label(Localization.lang("Export sort order"));
+        exportSortOrder.getStyleClass().add("sectionHeader");
         // create GUI
         builder.add(exportSortOrder, 1, 1);
         builder.add(new Separator(), 2, 1);

@@ -380,7 +380,7 @@
     -fx-border-color: rgba(0, 0, 0, 0.54);
     -fx-border-width: 2px;
     -fx-border-radius: 1px;
-    -fx-padding: 0.166667em 0.166667em 0.25em 0.25em;
+    -fx-padding: 0.1em 0.1em 0.2em 0.2em;
 }
 
 .check-box:selected > .box {
@@ -391,8 +391,9 @@
 
 .check-box > .box > .mark {
     -fx-background-color: white;
-    -fx-padding: 0.166667em 0.166667em 0.166667em 0.166667 m;
+    -fx-padding: 0.2em 0.2em 0.2em 0.2em;
     -fx-shape: "M6.61 11.89L3.5 8.78 2.44 9.84 6.61 14l8.95-8.95L14.5 4z";
+    -fx-stroke-width: 5;
 }
 
 .menu-bar {
@@ -523,9 +524,9 @@
 .table-view:focused,
 .tree-table-view:focused,
 .html-editor:contains-focus {
-    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
-    -fx-background-insets: 0, 1;
-    -fx-background-radius: 0, 0;
+    -fx-background-color: -fx-control-inner-background;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
 }
 
 /* Selected rows */
@@ -550,8 +551,7 @@
     -fx-background: -jr-selected;
     -fx-background-color: -jr-selected;
     -fx-table-cell-border-color: transparent;
-    -fx-fill: white;
-    -fx-text-fill: green;
+    -fx-text-fill: -jr-black;
 }
 
 .combo-box-base {
@@ -593,8 +593,11 @@
     -fx-text-fill: -fx-text-base-color;
 }
 
+.stack-pane,
 .scroll-pane,
+.scroll-pane > .viewport,
 .split-pane {
+    -fx-background-color: transparent;
     -fx-background-insets: 0, 0;
     -fx-padding: 0;
 }
@@ -895,4 +898,12 @@ We want to have a look that matches our icons in the tool-bar */
 /* This is awful, but I don't know a better way*/
 .mainToolbar .context-menu * {
     -fx-background-color: -fx-control-inner-background;
+}
+
+#sidePane {
+    -fx-background-color: -jr-sidepane-background;
+}
+
+.sidePaneComponent {
+    -fx-background-color: -jr-sidepane-background;
 }

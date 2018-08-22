@@ -1,4 +1,4 @@
-package org.jabref.gui.preftabs;
+package org.jabref.gui.preferences;
 
 import java.util.Optional;
 
@@ -44,17 +44,13 @@ class AdvancedTab extends Pane implements PrefsTab {
         remotePreferences = prefs.getRemotePreferences();
 
         useRemoteServer = new CheckBox(Localization.lang("Listen for remote operation on port") + ':');
-        useRemoteServer.setFont(FontSize.smallFont);
         useIEEEAbrv = new CheckBox(Localization.lang("Use IEEE LaTeX abbreviations"));
-        useIEEEAbrv.setFont(FontSize.smallFont);
         remoteServerPort = new TextField();
         useCaseKeeperOnSearch = new CheckBox(Localization.lang("Add {} to specified title words on search to keep the correct case"));
-        useCaseKeeperOnSearch.setFont(FontSize.smallFont);
         useUnitFormatterOnSearch = new CheckBox(Localization.lang("Format units by adding non-breaking separators and keeping the correct case on search"));
-        useUnitFormatterOnSearch.setFont(FontSize.smallFont);
 
-        Label remoteOperation = new Label(Localization.lang("Remote operation") + "  -----------------------------");
-        remoteOperation.setFont(FontSize.bigFont);
+        Label remoteOperation = new Label(Localization.lang("Remote operation"));
+        remoteOperation.getStyleClass().add("sectionHeader");
         builder.add(remoteOperation, 2, 1);
         builder.add(new Separator(), 2, 1);
         builder.add(new Pane(), 1, 2);
@@ -69,13 +65,10 @@ class AdvancedTab extends Pane implements PrefsTab {
         builder.add(label1, 2, 22);
 
         Label textLabel1 = new Label("    This feature lets new files be opened or imported into an already running instance of JabRef instead of opening a new instance. For");
-        textLabel1.setFont(FontSize.smallFont);
         builder.add(textLabel1, 2, 3);
         Label textLabel2 = new Label("instance, this is useful when you open a file in JabRef from your web browser. ");
-        textLabel2.setFont(FontSize.smallFont);
         builder.add(textLabel2, 2, 4);
         Label textLabel3 = new Label("    Note that this will prevent you from running more than one instance of JabRef at a time.");
-        textLabel3.setFont(FontSize.smallFont);
         builder.add(textLabel3, 2, 5);
         builder.add(new Line(), 2, 6);
         builder.add(new Pane(), 2, 7);
@@ -84,15 +77,14 @@ class AdvancedTab extends Pane implements PrefsTab {
         p.getChildren().add(useRemoteServer);
         p.getChildren().add(remoteServerPort);
         Button helpButton = new Button("?");
-        helpButton.setFont(FontSize.smallFont);
         helpButton.setOnAction(event -> new HelpAction(HelpFile.REMOTE).getHelpButton().doClick());
         p.getChildren().add(helpButton);
 
         builder.add(p, 2, 9);
         builder.add(new Label(""), 1, 10);
 
-        Label explore = new Label(Localization.lang("Search %0", "IEEEXplore") + "  -----------------------------");
-        explore.setFont(FontSize.bigFont);
+        Label explore = new Label(Localization.lang("Search %0", "IEEEXplore"));
+        explore.getStyleClass().add("sectionHeader");
         builder.add(explore, 2, 11);
         builder.add(new Separator(), 2, 11);
         builder.add(new Pane(), 2, 12);
@@ -101,8 +93,8 @@ class AdvancedTab extends Pane implements PrefsTab {
         builder.add(new Line(), 2, 16);
         builder.add(new Label(""), 1, 17);
 
-        Label importConversions = new Label(Localization.lang("Import conversions") + "  ----------------------------");
-        importConversions.setFont(FontSize.bigFont);
+        Label importConversions = new Label(Localization.lang("Import conversions"));
+        importConversions.getStyleClass().add("sectionHeader");
         builder.add(importConversions, 2, 18);
 
         builder.add(useCaseKeeperOnSearch, 2, 19);
@@ -111,6 +103,7 @@ class AdvancedTab extends Pane implements PrefsTab {
 
     }
 
+    @Override
     public Node getBuilder() {
         return builder;
     }
