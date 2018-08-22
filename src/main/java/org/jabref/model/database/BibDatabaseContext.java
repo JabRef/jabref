@@ -57,6 +57,7 @@ public class BibDatabaseContext {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
         this.location = DatabaseLocation.LOCAL;
+        this.file = Optional.empty();
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData) {
