@@ -52,7 +52,7 @@ public class MergeEntriesDialog extends JabRefDialog {
         if (selected.size() != 2) { // None selected. Inform the user to select entries first.
 
             dialogService.showInformationDialogAndWait(Localization.lang("Merge entries"),
-                    Localization.lang("You have to choose exactly two entries to merge."));
+                                                       Localization.lang("You have to choose exactly two entries to merge."));
 
             this.dispose();
             return;
@@ -89,7 +89,7 @@ public class MergeEntriesDialog extends JabRefDialog {
             // Create a new entry and add it to the undo stack
             // Remove the other two entries and add them to the undo stack (which is not working...)
             BibEntry mergedEntry = mergeEntries.getMergeEntry();
-            DefaultTaskExecutor.runInJavaFXThread(()->{
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
                 panel.insertEntry(mergedEntry);
                 ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), mergedEntry));
                 ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), one, panel));
@@ -114,8 +114,8 @@ public class MergeEntriesDialog extends JabRefDialog {
         layout.insertColumn(1, ColumnSpec.decode(MARGIN));
 
         WindowLocation pw = new WindowLocation(this, JabRefPreferences.MERGEENTRIES_POS_X,
-                JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
-                JabRefPreferences.MERGEENTRIES_SIZE_Y);
+                                               JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
+                                               JabRefPreferences.MERGEENTRIES_SIZE_Y);
         pw.displayWindowAtStoredLocation();
 
         // Show what we've got
