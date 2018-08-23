@@ -1,6 +1,5 @@
 package org.jabref.gui.collab;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -39,7 +38,7 @@ public class ChangeScanner implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeScanner.class);
 
-    private final File file;
+    private final Path file;
     private final Path tempFile;
     private final BibDatabaseContext databaseInMemory;
 
@@ -56,7 +55,7 @@ public class ChangeScanner implements Runnable {
 
     //  NamedCompound edit = new NamedCompound("Merged external changes")
 
-    public ChangeScanner(JabRefFrame frame, BasePanel bp, File file, Path tempFile) {
+    public ChangeScanner(JabRefFrame frame, BasePanel bp, Path file, Path tempFile) {
         this.panel = bp;
         this.frame = frame;
         this.databaseInMemory = bp.getBibDatabaseContext();
@@ -126,7 +125,7 @@ public class ChangeScanner implements Runnable {
             databaseInTemp = result.getDatabaseContext();
 
             // Parse the modified file.
-            result = OpenDatabase.loadDatabase(file, importFormatPreferences, Globals.getFileUpdateMonitor());
+            result = OpenDatabase.loadDatabase(file.toAbsolutePath().toString(), importFormatPreferences, Globals.getFileUpdateMonitor());
             BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
 
             // Start looking at changes.
