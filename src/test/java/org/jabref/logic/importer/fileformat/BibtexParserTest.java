@@ -47,8 +47,8 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -1172,7 +1172,7 @@ class BibtexParserTest {
     @Test
     void parseFileHeaderAndPreambleWithoutNewLine() throws IOException {
         ParserResult result = parser
-                .parse(new StringReader("% Encoding: US-ASCII@preamble{some text and \\latex}"));
+                .parse(new StringReader("\\% Encoding: US-ASCII@preamble{some text and \\latex}"));
 
         assertFalse(result.hasWarnings());
         assertEquals(Optional.of("some text and \\latex"), result.getDatabase().getPreamble());
