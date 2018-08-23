@@ -17,7 +17,6 @@ import javafx.scene.layout.Pane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -38,7 +37,7 @@ class FileTab extends Pane implements PrefsTab {
     private final CheckBox backup;
     private final CheckBox localAutoSave;
     private final CheckBox openLast;
-    private final ComboBox newlineSeparator;
+    private final ComboBox<String> newlineSeparator;
     private final CheckBox reformatFileOnSaveAndExport;
     private final RadioButton resolveStringsStandard;
     private final RadioButton resolveStringsAll;
@@ -121,8 +120,8 @@ class FileTab extends Pane implements PrefsTab {
         browse.setOnAction(e -> {
             DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                     .withInitialDirectory(Paths.get(fileDir.getText())).build();
-            DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showDirectorySelectionDialog(dirDialogConfiguration))
-                    .ifPresent(f -> fileDir.setText(f.toString()));
+            dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
+                         .ifPresent(f -> fileDir.setText(f.toString()));
         });
         builder.add(browse, 3, 12);
         builder.add(bibLocAsPrimaryDir, 1, 13);
@@ -153,7 +152,7 @@ class FileTab extends Pane implements PrefsTab {
 
     @Override
     public void setValues() {
-        fileDir.setText(prefs.get(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX));
+        fileDir.setText(prefs.getAsOptional(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX).orElse(""));
         bibLocAsPrimaryDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
         runAutoFileSearch.setSelected(prefs.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH));
         allowFileAutoOpenBrowse.setSelected(prefs.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE));

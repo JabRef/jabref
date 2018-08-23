@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.time.format.DateTimeFormatter;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -15,18 +14,17 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Encodings;
+import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
-
-import static org.jabref.logic.l10n.Languages.LANGUAGES;
 
 class GeneralTab extends Pane implements PrefsTab {
 
@@ -47,8 +45,7 @@ class GeneralTab extends Pane implements PrefsTab {
     private final TextField timeStampField;
     private final JabRefPreferences prefs;
 
-    private final ObservableList<String> options = FXCollections.observableArrayList(LANGUAGES.keySet().toArray(new String[LANGUAGES.keySet().size()]));
-    private final ComboBox<String> language = new ComboBox<>(options);
+    private final ComboBox<Language> languageSelection = new ComboBox<>();
     private final ComboBox<Charset> encodings;
     private final ComboBox<BibDatabaseMode> biblatexMode;
     private final DialogService dialogService;
@@ -121,7 +118,11 @@ class GeneralTab extends Pane implements PrefsTab {
         builder.add(new Line(), 1, 16);
         Label languageLabel = new Label(Localization.lang("Language") + ':');
         builder.add(languageLabel, 1, 17);
-        builder.add(language, 2, 17);
+        languageSelection.setItems(FXCollections.observableArrayList(Language.values()));
+        new ViewModelListCellFactory<Language>()
+                .withText(Language::getDisplayName)
+                .install(languageSelection);
+        builder.add(languageSelection, 2, 17);
         builder.add(new Line(), 2, 18);
         Label defaultEncoding = new Label(Localization.lang("Default encoding") + ':');
         builder.add(defaultEncoding, 1, 19);
@@ -151,26 +152,13 @@ class GeneralTab extends Pane implements PrefsTab {
         timeStampFormat.setText(prefs.get(JabRefPreferences.TIME_STAMP_FORMAT));
         timeStampField.setText(prefs.get(JabRefPreferences.TIME_STAMP_FIELD));
         inspectionWarnDupli.setSelected(prefs.getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION));
-        if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
+        if (prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
             biblatexMode.setValue(BibDatabaseMode.BIBLATEX);
         } else {
             biblatexMode.setValue(BibDatabaseMode.BIBTEX);
         }
-
-        Charset enc = Globals.prefs.getDefaultEncoding();
-        encodings.setValue(enc);
-
-        String oldLan = prefs.get(JabRefPreferences.LANGUAGE);
-
-        // Language choice
-        int ilk = 0;
-        for (String lan : LANGUAGES.values()) {
-            if (lan.equals(oldLan)) {
-                language.setVisibleRowCount(ilk);
-            }
-            ilk++;
-        }
-
+        encodings.setValue(prefs.getDefaultEncoding());
+        languageSelection.setValue(prefs.getLanguage());
     }
 
     @Override
@@ -183,10 +171,9 @@ class GeneralTab extends Pane implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY, enforceLegalKeys.isSelected());
         prefs.setShouldCollectTelemetry(shouldCollectTelemetry.isSelected());
         if (prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE) && !memoryStick.isSelected()) {
-
-            DefaultTaskExecutor.runInJavaFXThread(()->dialogService.showInformationDialogAndWait(Localization.lang("Memory stick mode"),
+            dialogService.showInformationDialogAndWait(Localization.lang("Memory stick mode"),
                     Localization.lang("To disable the memory stick mode"
-                            + " rename or remove the jabref.xml file in the same folder as JabRef.")));
+                            + " rename or remove the jabref.xml file in the same folder as JabRef."));
         }
         prefs.putBoolean(JabRefPreferences.MEMORY_STICK_MODE, memoryStick.isSelected());
         prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, confirmDelete.isSelected());
@@ -196,21 +183,19 @@ class GeneralTab extends Pane implements PrefsTab {
         prefs.put(JabRefPreferences.TIME_STAMP_FORMAT, timeStampFormat.getText().trim());
         prefs.put(JabRefPreferences.TIME_STAMP_FIELD, timeStampField.getText().trim());
         // Update name of the time stamp field based on preferences
-        InternalBibtexFields.updateTimeStampField(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD));
+        InternalBibtexFields.updateTimeStampField(prefs.get(JabRefPreferences.TIME_STAMP_FIELD));
         prefs.setDefaultEncoding(encodings.getValue());
         prefs.putBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE, biblatexMode.getValue().equals(BibDatabaseMode.BIBLATEX));
 
-        if (!LANGUAGES.get(language.getValue()).equals(prefs.get(JabRefPreferences.LANGUAGE))) {
-            prefs.put(JabRefPreferences.LANGUAGE, LANGUAGES.get(language.getValue()));
-            Localization.setLanguage(LANGUAGES.get(language.getValue()));
-            // Update any defaults that might be language dependent:
-            Globals.prefs.setLanguageDependentDefaultValues();
-            // Warn about restart needed:
+        if (!languageSelection.getValue().equals(prefs.getLanguage())) {
+            prefs.setLanguage(languageSelection.getValue());
+            Localization.setLanguage(languageSelection.getValue());
 
-            DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showWarningDialogAndWait(Localization.lang("Changed language settings"),
+            // Warn about restart needed:
+            dialogService.showWarningDialogAndWait(Localization.lang("Changed language settings"),
                     Localization.lang("You have changed the language setting.")
-                            .concat(" ")
-                            .concat(Localization.lang("You must restart JabRef for this to come into effect."))));
+                                .concat(" ")
+                                .concat(Localization.lang("You must restart JabRef for this to come into effect.")));
         }
     }
 

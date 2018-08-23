@@ -1,8 +1,5 @@
 package org.jabref.logic.l10n;
 
-import com.google.common.collect.Sets;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -11,9 +8,18 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,14 +40,18 @@ class LocalizationConsistencyTest {
                 }
             }
         }
-        assertEquals(Collections.emptySet(), Sets.symmetricDifference(new HashSet<>(Languages.LANGUAGES.values()), localizationFiles), "There are some localization files that are not present in org.jabref.logic.l10n.Languages or vice versa!");
+
+        Set<String> knownLanguages = Stream.of(Language.values())
+                                           .map(Language::getId)
+                                           .collect(Collectors.toSet());
+        assertEquals(knownLanguages, localizationFiles, "There are some localization files that are not present in org.jabref.logic.l10n.Language or vice versa!");
     }
 
     @Test
     void ensureNoDuplicates() {
         String bundle = "JabRef";
-        for (String lang : Languages.LANGUAGES.values()) {
-            String propertyFilePath = String.format("/l10n/%s_%s.properties", bundle, lang);
+        for (Language lang : Language.values()) {
+            String propertyFilePath = String.format("/l10n/%s_%s.properties", bundle, lang.getId());
 
             // read in
             DuplicationDetectionProperties properties = new DuplicationDetectionProperties();
@@ -54,7 +64,7 @@ class LocalizationConsistencyTest {
 
             List<String> duplicates = properties.getDuplicates();
 
-            assertEquals(Collections.emptyList(), duplicates, "Duplicate keys inside bundle " + bundle + "_" + lang);
+            assertEquals(Collections.emptyList(), duplicates, "Duplicate keys inside bundle " + bundle + "_" + lang.getId());
         }
     }
 

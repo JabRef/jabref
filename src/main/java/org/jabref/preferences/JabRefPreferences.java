@@ -32,6 +32,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.Globals;
 import org.jabref.JabRefException;
@@ -61,6 +62,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.FileLinkPreferences;
@@ -444,7 +446,7 @@ public class JabRefPreferences implements PreferencesService {
         // the initialization of the preferences in main
         // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
         // like the SearchDisplayMode will never be translated.
-        Localization.setLanguage(prefs.get(LANGUAGE, "en"));
+        Localization.setLanguage(getLanguage());
 
         SearchPreferences.putDefaults(defaults);
 
@@ -1927,5 +1929,22 @@ public class JabRefPreferences implements PreferencesService {
 
     public void setLastPreferencesExportPath(Path exportFile) {
         put(PREFS_EXPORT_PATH, exportFile.toString());
+    }
+
+    public Language getLanguage() {
+        String languageId = get(LANGUAGE);
+        return Stream.of(Language.values())
+                     .filter(language -> language.getId().equalsIgnoreCase(languageId))
+                     .findFirst()
+                     .orElse(Language.English);
+    }
+
+    public void setLanguage(Language language) {
+        Language oldLanguage = getLanguage();
+        put(LANGUAGE, language.getId());
+        if (language != oldLanguage) {
+            // Update any defaults that might be language dependent:
+            setLanguageDependentDefaultValues();
+        }
     }
 }

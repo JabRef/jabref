@@ -1,8 +1,5 @@
 package org.jabref.logic.l10n;
 
-import com.google.common.base.Splitter;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -13,6 +10,9 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.google.common.base.Splitter;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -49,8 +49,8 @@ class PropertiesLocaleCompletenessTest {
 
     @Test
     void testCompletenessOfBundles() {
-        for (String lang : Languages.LANGUAGES.values()) {
-            Path messagesPropertyFile = Paths.get("src/main/resources").resolve(Localization.RESOURCE_PREFIX + "_" + lang + ".properties");
+        for (Language language : Language.values()) {
+            Path messagesPropertyFile = Paths.get("src/main/resources").resolve(Localization.RESOURCE_PREFIX + "_" + language.getId() + ".properties");
             assertTrue(Files.exists(messagesPropertyFile));
         }
     }
