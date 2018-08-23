@@ -51,7 +51,7 @@ class XmpPrefsTab extends Pane implements PrefsTab {
         tableView.itemsProperty().bindBidirectional(fields);
         TableColumn<XMPPrivacyFilter, String> column = new TableColumn<>();
 
-        column.setCellValueFactory(cellData -> cellData.getValue().filterName());
+        column.setCellValueFactory(cellData -> cellData.getValue().fieldName());
         new ValueTableCellFactory<XMPPrivacyFilter, String>().withText(item -> item).install(column);
 
         column.setOnEditCommit((CellEditEvent<XMPPrivacyFilter, String> cell) -> {
@@ -161,7 +161,7 @@ class XmpPrefsTab extends Pane implements PrefsTab {
             return field.get();
         }
 
-        public StringProperty filterName() {
+        public StringProperty fieldName() {
             return field;
         }
 
