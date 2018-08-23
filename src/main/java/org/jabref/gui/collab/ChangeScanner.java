@@ -1,6 +1,5 @@
 package org.jabref.gui.collab;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
@@ -38,7 +37,7 @@ public class ChangeScanner implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeScanner.class);
 
-    private final Path file;
+    private final Optional<Path> file;
     private final Path tempFile;
     private final BibDatabaseContext databaseInMemory;
 
@@ -59,7 +58,7 @@ public class ChangeScanner implements Runnable {
         this.panel = bp;
         this.frame = frame;
         this.databaseInMemory = bp.getBibDatabaseContext();
-        this.file = file;
+        this.file = Optional.ofNullable(file);
         this.tempFile = tempFile;
     }
 
@@ -73,8 +72,8 @@ public class ChangeScanner implements Runnable {
      */
     private static BibEntry bestFit(BibEntry targetEntry, List<BibEntry> entries) {
         return entries.stream()
-                .max(Comparator.comparingDouble(candidate -> DuplicateCheck.compareEntriesStrictly(targetEntry, candidate)))
-                .orElse(null);
+                      .max(Comparator.comparingDouble(candidate -> DuplicateCheck.compareEntriesStrictly(targetEntry, candidate)))
+                      .orElse(null);
     }
 
     public void displayResult(final DisplayResultCallback fup) {
@@ -90,7 +89,7 @@ public class ChangeScanner implements Runnable {
             });
         } else {
             frame.getDialogService().showInformationDialogAndWait(Localization.lang("External changes"),
-                    Localization.lang("No actual changes found."));
+                                                                  Localization.lang("No actual changes found."));
 
             fup.scanResultsResolved(true);
         }
@@ -100,11 +99,11 @@ public class ChangeScanner implements Runnable {
         JabRefExecutorService.INSTANCE.execute(() -> {
             try {
                 SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences()
-                        .withMakeBackup(false)
-                        .withEncoding(panel.getBibDatabaseContext()
-                                .getMetaData()
-                                .getEncoding()
-                                .orElse(Globals.prefs.getDefaultEncoding()));
+                                                     .withMakeBackup(false)
+                                                     .withEncoding(panel.getBibDatabaseContext()
+                                                                        .getMetaData()
+                                                                        .getEncoding()
+                                                                        .orElse(Globals.prefs.getDefaultEncoding()));
 
                 BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
                 SaveSession ss = databaseWriter.saveDatabase(databaseInTemp, prefs);
@@ -117,15 +116,14 @@ public class ChangeScanner implements Runnable {
 
     @Override
     public void run() {
-        try {
-
+        file.ifPresent(diskdb -> {
             // Parse the temporary file.
             ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
-            ParserResult result = OpenDatabase.loadDatabase(tempFile.toFile(), importFormatPreferences, Globals.getFileUpdateMonitor());
+            ParserResult result = OpenDatabase.loadDatabase(tempFile.toAbsolutePath().toString(), importFormatPreferences, Globals.getFileUpdateMonitor());
             databaseInTemp = result.getDatabaseContext();
 
             // Parse the modified file.
-            result = OpenDatabase.loadDatabase(file.toAbsolutePath().toString(), importFormatPreferences, Globals.getFileUpdateMonitor());
+            result = OpenDatabase.loadDatabase(diskdb.toAbsolutePath().toString(), importFormatPreferences, Globals.getFileUpdateMonitor());
             BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
 
             // Start looking at changes.
@@ -137,9 +135,7 @@ public class ChangeScanner implements Runnable {
             differences.getPreambleDifferences().ifPresent(diff -> changes.add(new PreambleChangeViewModel(databaseInMemory.getDatabase().getPreamble().orElse(""), diff)));
             differences.getBibStringDifferences().forEach(diff -> changes.add(createBibStringDiff(diff)));
             differences.getEntryDifferences().forEach(diff -> changes.add(createBibEntryDiff(diff)));
-        } catch (IOException ex) {
-            LOGGER.warn("Problem running", ex);
-        }
+        });
     }
 
     private ChangeViewModel createBibStringDiff(BibStringDiff diff) {
