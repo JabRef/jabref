@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
@@ -33,6 +33,7 @@ public class ExportToClipboardAction extends SimpleCommand {
     private JabRefFrame frame;
     private final DialogService dialogService;
     private BasePanel panel;
+    private final List<BibEntry> entries = new ArrayList<>();
 
     public ExportToClipboardAction(JabRefFrame frame, DialogService dialogService) {
         this.frame = frame;
@@ -63,7 +64,7 @@ public class ExportToClipboardAction extends SimpleCommand {
                                                                                     Localization.lang("Export"), exporters);
 
         selectedExporter.ifPresent(exporter -> BackgroundTask.wrap(() -> exportToClipboard(exporter))
-                                                             .onSuccess(panel::output)
+                                                             .onSuccess(this::setContentToClipboard)
                                                              .executeWith(Globals.TASK_EXECUTOR));
 
     }
@@ -80,7 +81,7 @@ public class ExportToClipboardAction extends SimpleCommand {
             // file, and read the contents afterwards:
             tmp = Files.createTempFile("jabrefCb", ".tmp");
 
-            List<BibEntry> entries = panel.getSelectedEntries();
+            entries.addAll(panel.getSelectedEntries());
 
             // Write to file:
             exporter.export(panel.getBibDatabaseContext(), tmp,
@@ -91,19 +92,9 @@ public class ExportToClipboardAction extends SimpleCommand {
                             entries);
             // Read the file and put the contents on the clipboard:
 
-            String content = readFileToString(tmp);
-
-            DefaultTaskExecutor.runInJavaFXThread(() -> {
-                ClipboardContent clipboardContent = new ClipboardContent();
-                clipboardContent.putRtf(content);
-                Globals.clipboardManager.setContent(clipboardContent);
-            });
-
-            return Localization.lang("Entries exported to clipboard") + ": " + entries.size();
-
+            return readFileToString(tmp);
         } catch (Exception e) {
             LOGGER.error("Error exporting to clipboard", e);
-            return Localization.lang("Error exporting to clipboard");
         } finally {
             // Clean up:
             if ((tmp != null) && Files.exists(tmp)) {
@@ -114,6 +105,16 @@ public class ExportToClipboardAction extends SimpleCommand {
                 }
             }
         }
+        return "";
+    }
+
+    private void setContentToClipboard(String content) {
+        ClipboardContent clipboardContent = new ClipboardContent();
+        clipboardContent.putRtf(content);
+        Globals.clipboardManager.setContent(clipboardContent);
+
+        panel.output(Localization.lang("Entries exported to clipboard") + ": " + entries.size());
+
     }
 
     private String readFileToString(Path tmp) throws IOException {
