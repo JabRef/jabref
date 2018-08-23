@@ -29,8 +29,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Files without a defined external file type are now directly opened with the default application of the operating system
 - We streamlined the process to rename and move files by removing the confirmation dialogs.
 - We removed the redundant new lines of markings and wrapped the summary in the File annotation tab. [#3823](https://github.com/JabRef/jabref/issues/3823)
-- We add auto url formatting when user paste link to URL field in Entry editor  [#254](https://github.com/koppor/jabref/issues/254)
-
+- We add auto url formatting when user paste link to URL field in entry editor. [#254](https://github.com/koppor/jabref/issues/254)
+- We added a minimal height for the entry editor so that it can no longer be hidden by accident. [#4279](https://github.com/JabRef/jabref/issues/4279)
 
 
 
