@@ -12,12 +12,12 @@ import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -25,6 +25,7 @@ import javafx.scene.layout.Pane;
 
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -60,10 +61,8 @@ class XmpPrefsTab extends Pane implements PrefsTab {
 
         column.setPrefWidth(350);
         tableView.getColumns().add(column);
+        ComboBox<String> bibtexFields = new ComboBox<>(FXCollections.observableArrayList(InternalBibtexFields.getAllPublicAndInternalFieldNames()));
 
-        TextField addName = new TextField();
-        addName.setPromptText("name");
-        addName.setPrefSize(200, 30);
         BorderPane tablePanel = new BorderPane();
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setMaxHeight(400);
@@ -74,9 +73,8 @@ class XmpPrefsTab extends Pane implements PrefsTab {
         Button add = new Button("Add");
         add.setPrefSize(80, 20);
         add.setOnAction(e -> {
-            if (!addName.getText().isEmpty()) {
-                XMPPrivacyFilter tableRow = new XMPPrivacyFilter(addName.getText());
-                addName.clear();
+            if (!StringUtil.isNullOrEmpty(bibtexFields.getSelectionModel().getSelectedItem())) {
+                XMPPrivacyFilter tableRow = new XMPPrivacyFilter(bibtexFields.getSelectionModel().getSelectedItem());
                 fields.add(tableRow);
             }
         });
@@ -90,7 +88,7 @@ class XmpPrefsTab extends Pane implements PrefsTab {
 
             }
         });
-        HBox toolbar = new HBox(addName, add, delete);
+        HBox toolbar = new HBox(bibtexFields, add, delete);
         tablePanel.setBottom(toolbar);
 
         // Build Prefs Tabs
@@ -125,13 +123,10 @@ class XmpPrefsTab extends Pane implements PrefsTab {
      */
     @Override
     public void storeSettings() {
-        if (privacyFilterCheckBox.isSelected()) {
 
-            fields.stream().filter(s -> StringUtil.isNullOrEmpty(s.getField())).forEach(fields::remove);
-            prefs.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS,
-                                fields.stream().map(XMPPrivacyFilter::getField).collect(Collectors.toList()));
-        }
-
+        fields.stream().filter(s -> StringUtil.isNullOrEmpty(s.getField())).forEach(fields::remove);
+        prefs.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS,
+                            fields.stream().map(XMPPrivacyFilter::getField).collect(Collectors.toList()));
         prefs.putBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER, privacyFilterCheckBox.isSelected());
     }
 
