@@ -40,11 +40,6 @@ Project: AppleJavaExtensions
 URL:     https://developer.apple.com/legacy/library/samplecode/AppleJavaExtensions/Introduction/Intro.html
 License: Apple License
 
-Id:      com.github.bkromhout:java-diff-utils
-Project: java-diff-utils
-URL:     https://github.com/bkromhout/java-diff-utils
-License: Apache-2.0
-
 Id:      com.github.tomtung
 Project: latex2unicode
 URL:     https://github.com/tomtung/latex2unicode
@@ -119,6 +114,11 @@ Id:      info.debatty:java-string-similarity
 Project: Java String Similarity
 URL:     https://github.com/tdebatty/java-string-similarity
 License: MIT
+
+Id:      io.github.java-diff-utils:java-diff-utils
+Project: java-diff-utils
+URL:     https://github.com/java-diff-utils/java-diff-utils
+License: Apache-1.1
 
 Id:      mysql:mysql-connector-java
 Project: MySQL Connector/J
@@ -234,11 +234,5 @@ Id:      org.xmlunit:xmlunit-matchers
 Project: XMLUnit
 URL:     http://www.xmlunit.org/
 License: Apache-2.0
-
-Id:      spin
-Path:    lib/spin.jar
-Project: Spin
-URL:     http://spin.sourceforge.net/
-License: LGPL-2.1+
 
 The last entry has to end with an empty line. Otherwise the entry is not present in About.html.

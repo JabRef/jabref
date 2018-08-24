@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
  * If committing fails, the temporary file will not be deleted.
  */
 public class FileSaveSession extends SaveSession {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(FileSaveSession.class);
 
     // Filenames.

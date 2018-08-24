@@ -50,7 +50,7 @@ public class IconTheme {
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(
             IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
 
-    static {
+    public static void loadFonts() {
         try (InputStream stream = getMaterialDesignIconsStream()) {
             FONT = Font.createFont(Font.TRUETYPE_FONT, stream);
         } catch (FontFormatException | IOException e) {
@@ -362,14 +362,14 @@ public class IconTheme {
         public Button asButton() {
             Button button = new Button();
             button.setGraphic(getGraphicNode());
-            button.getStyleClass().add("flatButton");
+            button.getStyleClass().add("icon-button");
             return button;
         }
 
         public ToggleButton asToggleButton() {
             ToggleButton button = new ToggleButton();
             button.setGraphic(getGraphicNode());
-            button.getStyleClass().add("flatButton");
+            button.getStyleClass().add("icon-button");
             return button;
         }
     }
@@ -383,7 +383,7 @@ public class IconTheme {
         public FontBasedIcon(String code, Color iconColor) {
             this.iconCode = code;
             this.iconColor = iconColor;
-            this.size = JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_LARGE);
+            this.size = 24;
         }
 
         public FontBasedIcon(String code, Color iconColor, int size) {
@@ -426,7 +426,7 @@ public class IconTheme {
         }
 
         public FontBasedIcon createSmallIcon() {
-            return new FontBasedIcon(this.iconCode, this.iconColor, JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL));
+            return new FontBasedIcon(this.iconCode, this.iconColor, 16);
         }
 
         public FontBasedIcon createWithNewColor(Color newColor) {

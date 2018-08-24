@@ -7,13 +7,13 @@ import org.jabref.Globals;
 import org.jabref.gui.util.DefaultTaskExecutor;
 
 /**
- * Remove as soon as possible
+ * TODO: Remove as soon as possible
  */
 public class CustomJFXPanel {
 
     public static JFXPanel wrap(Scene scene) {
         JFXPanel container = new JFXPanel();
-        Globals.getThemeLoader().installBaseCss(scene);
+        Globals.getThemeLoader().installBaseCss(scene, Globals.prefs);
         DefaultTaskExecutor.runInJavaFXThread(() -> container.setScene(scene));
         return container;
     }

@@ -9,6 +9,7 @@ import java.net.URLConnection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
@@ -115,8 +116,8 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
     }
 
     @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_ADS;
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_ADS);
     }
 
     @Override

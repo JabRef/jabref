@@ -71,7 +71,7 @@ public class MoveFilesCleanup implements CleanupJob {
             fileList = Arrays.asList(singleFileFieldCleanup);
             //Add all other except the current selected file
             newFileList = entry.getFiles().stream().filter(name -> !name.equals(singleFileFieldCleanup))
-                    .collect(Collectors.toList());
+                               .collect(Collectors.toList());
         } else {
             newFileList = new ArrayList<>();
             fileList = entry.getFiles();
@@ -113,7 +113,7 @@ public class MoveFilesCleanup implements CleanupJob {
                 LinkedFile newFileEntry = fileEntry;
                 if (!oldFileName.equals(newTargetFile.toString())) {
                     newFileEntry = new LinkedFile(fileEntry.getDescription(), newEntryFilePath,
-                            fileEntry.getFileType());
+                                                  fileEntry.getFileType());
                     changed = true;
                 }
                 newFileList.add(newFileEntry);

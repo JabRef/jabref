@@ -2,7 +2,9 @@ package org.jabref.gui.actions;
 
 import java.util.Objects;
 
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
@@ -57,11 +59,32 @@ public class ActionFactory {
 
     public Button createIconButton(Action action, Command command) {
         Button button = ActionUtils.createButton(new JabRefAction(action, command, keyBindingRepository), ActionUtils.ActionTextBehavior.HIDE);
-        button.getStyleClass().setAll("flatButton");
+
+        button.getStyleClass().setAll("icon-button");
 
         // For some reason the graphic is not set correctly, so let's fix this
         button.graphicProperty().unbind();
         action.getIcon().ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
+
+        return button;
+    }
+
+    public ButtonBase configureIconButton(Action action, Command command, ButtonBase button) {
+        ActionUtils.configureButton(
+                new JabRefAction(action, command, keyBindingRepository),
+                button,
+                ActionUtils.ActionTextBehavior.HIDE);
+
+        button.getStyleClass().add("icon-button");
+
+        // For some reason the graphic is not set correctly, so let's fix this
+        button.graphicProperty().unbind();
+        action.getIcon().ifPresent(icon -> {
+            // ToDO: Find a way to reuse JabRefIconView
+            Node graphicNode = icon.getGraphicNode();
+            graphicNode.setStyle(String.format("-fx-font-family: %s; -fx-font-size: %s;", icon.fontFamily(), "1em"));
+            button.setGraphic(graphicNode);
+        });
 
         return button;
     }

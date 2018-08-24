@@ -31,7 +31,7 @@ public class BibDatabaseContext {
     /**
      * The file where this database was last saved to.
      */
-    private File file;
+    private Optional<Path> file;
     private DatabaseSynchronizer dbmsSynchronizer;
     private CoarseChangeFilter dbmsListener;
     private DatabaseLocation location;
@@ -57,28 +57,29 @@ public class BibDatabaseContext {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
         this.location = DatabaseLocation.LOCAL;
+        this.file = Optional.empty();
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData) {
         this(database, metaData, new Defaults());
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, File file, Defaults defaults,
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path file, Defaults defaults,
                               DatabaseLocation location) {
         this(database, metaData, defaults);
         Objects.requireNonNull(location);
-        this.setDatabaseFile(file);
+        this.file = Optional.ofNullable(file);
 
         if (location == DatabaseLocation.LOCAL) {
             convertToLocalDatabase();
         }
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, File file, Defaults defaults) {
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path file, Defaults defaults) {
         this(database, metaData, file, defaults, DatabaseLocation.LOCAL);
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, File file) {
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path file) {
         this(database, metaData, file, new Defaults());
     }
 
@@ -109,19 +110,19 @@ public class BibDatabaseContext {
      */
     @Deprecated
     public Optional<File> getDatabaseFile() {
-        return Optional.ofNullable(file);
+        return file.map(Path::toFile);
     }
 
     public void setDatabaseFile(File file) {
-        this.file = file;
+        this.file = Optional.ofNullable(file).map(File::toPath);
     }
 
     public Optional<Path> getDatabasePath() {
-        return Optional.ofNullable(file).map(File::toPath);
+        return file;
     }
 
     public void clearDatabaseFile() {
-        this.file = null;
+        this.file = Optional.empty();
     }
 
     public BibDatabase getDatabase() {
@@ -188,16 +189,12 @@ public class BibDatabaseContext {
         List<String> fileDirs = new ArrayList<>();
 
         // 1. metadata user-specific directory
-        Optional<String> userFileDirectory = metaData.getUserFileDirectory(preferences.getUser());
-        if (userFileDirectory.isPresent()) {
-            fileDirs.add(getFileDirectoryPath(userFileDirectory.get()));
-        }
+        metaData.getUserFileDirectory(preferences.getUser())
+                .ifPresent(userFileDirectory -> fileDirs.add(getFileDirectoryPath(userFileDirectory)));
 
         // 2. metadata general directory
-        Optional<String> metaDataDirectory = metaData.getDefaultFileDirectory();
-        if (metaDataDirectory.isPresent()) {
-            fileDirs.add(getFileDirectoryPath(metaDataDirectory.get()));
-        }
+        metaData.getDefaultFileDirectory()
+                .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
 
         // 3. preferences directory
         preferences.getFileDirectory(fieldName).ifPresent(path -> fileDirs.add(path.toAbsolutePath().toString()));

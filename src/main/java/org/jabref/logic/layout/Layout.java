@@ -22,7 +22,6 @@ public class Layout {
 
     private final List<String> missingFormatters = new ArrayList<>();
 
-
     public Layout(List<StringInt> parsedEntries, LayoutFormatterPreferences prefs) {
         List<LayoutEntry> tmpEntries = new ArrayList<>(parsedEntries.size());
 
@@ -32,35 +31,35 @@ public class Layout {
 
         for (StringInt parsedEntry : parsedEntries) {
             switch (parsedEntry.i) {
-            case LayoutHelper.IS_LAYOUT_TEXT:
-            case LayoutHelper.IS_SIMPLE_FIELD:
-            case LayoutHelper.IS_OPTION_FIELD:
-                // Do nothing
-                break;
-            case LayoutHelper.IS_FIELD_START:
-            case LayoutHelper.IS_GROUP_START:
-                blockEntries = new ArrayList<>();
-                blockStart = parsedEntry.s;
-                break;
-            case LayoutHelper.IS_FIELD_END:
-            case LayoutHelper.IS_GROUP_END:
-                if ((blockStart != null) && (blockEntries != null)) {
-                    if (blockStart.equals(parsedEntry.s)) {
-                        blockEntries.add(parsedEntry);
-                        le = new LayoutEntry(blockEntries,
-                                parsedEntry.i == LayoutHelper.IS_FIELD_END ? LayoutHelper.IS_FIELD_START : LayoutHelper.IS_GROUP_START,
-                                prefs);
-                        tmpEntries.add(le);
-                        blockEntries = null;
-                    } else {
-                        LOGGER.debug(blockStart + '\n' + parsedEntry.s);
-                        LOGGER.warn("Nested field/group entries are not implemented!");
-                        Thread.dumpStack();
+                case LayoutHelper.IS_LAYOUT_TEXT:
+                case LayoutHelper.IS_SIMPLE_COMMAND:
+                case LayoutHelper.IS_OPTION_FIELD:
+                    // Do nothing
+                    break;
+                case LayoutHelper.IS_FIELD_START:
+                case LayoutHelper.IS_GROUP_START:
+                    blockEntries = new ArrayList<>();
+                    blockStart = parsedEntry.s;
+                    break;
+                case LayoutHelper.IS_FIELD_END:
+                case LayoutHelper.IS_GROUP_END:
+                    if ((blockStart != null) && (blockEntries != null)) {
+                        if (blockStart.equals(parsedEntry.s)) {
+                            blockEntries.add(parsedEntry);
+                            le = new LayoutEntry(blockEntries,
+                                    parsedEntry.i == LayoutHelper.IS_FIELD_END ? LayoutHelper.IS_FIELD_START : LayoutHelper.IS_GROUP_START,
+                                    prefs);
+                            tmpEntries.add(le);
+                            blockEntries = null;
+                        } else {
+                            LOGGER.debug(blockStart + '\n' + parsedEntry.s);
+                            LOGGER.warn("Nested field/group entries are not implemented!");
+                            Thread.dumpStack();
+                        }
                     }
-                }
-                break;
-            default:
-                break;
+                    break;
+                default:
+                    break;
             }
 
             if (blockEntries == null) {
@@ -129,8 +128,6 @@ public class Layout {
 
         return sb.toString();
     }
-
-    // added section - end (arudert)
 
     public List<String> getMissingFormatters() {
         return new ArrayList<>(missingFormatters);

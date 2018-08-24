@@ -49,8 +49,6 @@ public enum Actions {
     SAVE,
     SAVE_AS,
     SAVE_SELECTED_AS_PLAIN,
-    SEARCH,
-    GLOBAL_SEARCH,
     SELECT_ALL,
     SEND_AS_EMAIL,
     TOGGLE_GROUPS,
