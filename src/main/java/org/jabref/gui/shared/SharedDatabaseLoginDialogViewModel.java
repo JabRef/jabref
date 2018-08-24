@@ -65,6 +65,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final BooleanProperty autosave = new SimpleBooleanProperty();
     private final BooleanProperty rememberPassword = new SimpleBooleanProperty();
     private final BooleanProperty loading = new SimpleBooleanProperty();
+    private final StringProperty keystore = new SimpleStringProperty("");
+    private final BooleanProperty useSSL = new SimpleBooleanProperty();
 
     private final JabRefFrame frame;
     private final DialogService dialogService;
@@ -250,6 +252,18 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         });
     }
 
+    public void openKeyStoreFileDialog() {
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                                                                                               .addExtensionFilter(StandardFileType.JAVA_KEYSTORE)
+                                                                                               .withDefaultExtension(StandardFileType.JAVA_KEYSTORE)
+                                                                                               .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                                                                                               .build();
+        Optional<Path> keystorePath = dialogService.showFileSaveDialog(fileDialogConfiguration);
+        keystorePath.ifPresent(path -> {
+            folder.setValue(path.toString());
+        });
+    }
+
     public StringProperty databaseproperty() {
         return database;
     }
@@ -280,6 +294,14 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public StringProperty folderProperty() {
         return folder;
+    }
+
+    public StringProperty keyStoreProperty() {
+        return keystore;
+    }
+
+    public BooleanProperty useSSLProperty() {
+        return useSSL;
     }
 
     public ObjectProperty<DBMSType> selectedDbmstypeProperty() {

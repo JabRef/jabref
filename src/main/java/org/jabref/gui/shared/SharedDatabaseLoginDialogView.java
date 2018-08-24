@@ -39,6 +39,10 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private Button browseButton;
     @FXML private CheckBox autosave;
     @FXML private ButtonType connectButton;
+    @FXML private CheckBox useSSLpostgres;
+    @FXML private TextField fileKeystore;
+    @FXML private PasswordField passwordKeystore;
+    @FXML private Button browseKeystore;
 
     @Inject private DialogService dialogService;
 
@@ -106,6 +110,11 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML
     void openFileDialog(ActionEvent event) {
         viewModel.openFileDialog();
+    }
+
+    @FXML
+    void openKeyStoreFileDialog(ActionEvent event) {
+        viewModel.openKeyStoreFileDialog();
     }
 
 }

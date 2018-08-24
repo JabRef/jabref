@@ -14,44 +14,13 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<DialogPane xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.shared.SharedDatabaseLoginDialogView">
+<DialogPane  prefHeight="371.0" prefWidth="340.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.shared.SharedDatabaseLoginDialogView">
    <content>
-      <BorderPane>
+      <BorderPane prefHeight="382.0" prefWidth="400.0">
          <center>
-            <BorderPane BorderPane.alignment="CENTER">
-               <center>
-                  <GridPane>
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <Label text="%Database Type:" />
-                        <ComboBox fx:id="databaseType" prefHeight="25.0" prefWidth="606.0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
-                        <Label text="%Host/Port:" GridPane.rowIndex="1" />
-                        <TextField fx:id="host" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <TextField fx:id="database" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                        <TextField fx:id="port" prefHeight="25.0" prefWidth="66.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                        <Label text="%Database:" GridPane.rowIndex="2" />
-                        <Label text="%User:" GridPane.rowIndex="3" />
-                        <TextField fx:id="user" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3" />
-                        <Label text="%Password:" GridPane.rowIndex="4" />
-                        <PasswordField fx:id="password" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4" />
-                        <CheckBox fx:id="rememberPassword" mnemonicParsing="false" text="%Remember Password" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="5" />
-                     </children>
-                  </GridPane>
-               </center>
+            <BorderPane BorderPane.alignment="TOP_LEFT">
                <bottom>
-                  <GridPane BorderPane.alignment="CENTER">
+                  <GridPane BorderPane.alignment="TOP_LEFT">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -68,6 +37,56 @@
                      </children>
                   </GridPane>
                </bottom>
+               <right>
+                  <GridPane BorderPane.alignment="TOP_LEFT">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="20.0" prefWidth="120.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                    </rowConstraints>
+                     <children>
+                        <Label text="%Database Type:" />
+                        <ComboBox fx:id="databaseType" prefHeight="25.0" prefWidth="606.0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+                        <Label text="%Host/Port:" GridPane.rowIndex="1" />
+                        <TextField fx:id="host" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField fx:id="database" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                        <TextField fx:id="port" prefHeight="25.0" prefWidth="66.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <Label text="%Database:" GridPane.rowIndex="2" />
+                        <Label text="%User:" GridPane.rowIndex="3" />
+                        <TextField fx:id="user" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                        <Label text="%Password:" GridPane.rowIndex="4" />
+                        <PasswordField fx:id="password" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                        <CheckBox fx:id="rememberPassword" mnemonicParsing="false" text="%Remember Password" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="5" />
+                        <CheckBox fx:id="useSSLpostgres" mnemonicParsing="false" text="%Use SSL" GridPane.rowIndex="5" />
+                        <TextField fx:id="fileKeystore" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <Button fx:id="browseKeystore" mnemonicParsing="false" text="%Browse" onAction="#openKeyStoreFileDialog" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                        <GridPane>
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                        </GridPane>
+                        <PasswordField fx:id="passwordKeystore" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                        <Label text="%Keystore:" GridPane.rowIndex="6" />
+                        <Label text="%Keystore password:" GridPane.rowIndex="7" />
+                     </children>
+                  </GridPane>
+               </right>
             </BorderPane>
          </center>
       </BorderPane>
@@ -76,6 +95,6 @@
    </header>
    <buttonTypes>
       <ButtonType fx:constant="CLOSE" />
-      <ButtonType fx:id="connectButton" text="%Connect" buttonData="OK_DONE"/>
+      <ButtonType fx:id="connectButton" buttonData="OK_DONE" text="%Connect" />
    </buttonTypes>
 </DialogPane>
