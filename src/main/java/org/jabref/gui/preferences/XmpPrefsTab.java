@@ -62,6 +62,7 @@ class XmpPrefsTab extends Pane implements PrefsTab {
         column.setPrefWidth(350);
         tableView.getColumns().add(column);
         ComboBox<String> bibtexFields = new ComboBox<>(FXCollections.observableArrayList(InternalBibtexFields.getAllPublicAndInternalFieldNames()));
+        bibtexFields.setEditable(true);
 
         BorderPane tablePanel = new BorderPane();
         ScrollPane scrollPane = new ScrollPane();
@@ -71,7 +72,6 @@ class XmpPrefsTab extends Pane implements PrefsTab {
         tablePanel.setCenter(scrollPane);
 
         Button add = new Button("Add");
-        add.setPrefSize(80, 20);
         add.setOnAction(e -> {
             if (!StringUtil.isNullOrEmpty(bibtexFields.getSelectionModel().getSelectedItem())) {
                 XMPPrivacyFilter tableRow = new XMPPrivacyFilter(bibtexFields.getSelectionModel().getSelectedItem());
@@ -79,7 +79,6 @@ class XmpPrefsTab extends Pane implements PrefsTab {
             }
         });
         Button delete = new Button("Delete");
-        delete.setPrefSize(80, 20);
         delete.setOnAction(e -> {
             if ((tableView.getFocusModel() != null) && (tableView.getFocusModel().getFocusedIndex() != -1)) {
                 int row = tableView.getFocusModel().getFocusedIndex();
