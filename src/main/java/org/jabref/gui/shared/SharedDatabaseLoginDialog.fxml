@@ -30,7 +30,7 @@
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <CheckBox fx:id="autosave" mnemonicParsing="false" text="%Automatically save library to" GridPane.columnSpan="2" />
+                        <CheckBox fx:id="autosave" mnemonicParsing="false" text="%Automatically save the library to" GridPane.columnSpan="2" />
                         <TextField fx:id="folder" GridPane.rowIndex="1" />
                         <Button fx:id="browseButton" mnemonicParsing="false" onAction="#openFileDialog" text="%Browse" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <Group />

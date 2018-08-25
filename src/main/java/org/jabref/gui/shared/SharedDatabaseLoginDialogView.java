@@ -108,12 +108,12 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     }
 
     @FXML
-    void openFileDialog(ActionEvent event) {
+    private void openFileDialog(ActionEvent event) {
         viewModel.openFileDialog();
     }
 
     @FXML
-    void openKeyStoreFileDialog(ActionEvent event) {
+    private void openKeyStoreFileDialog(ActionEvent event) {
         viewModel.openKeyStoreFileDialog();
     }
 
