@@ -23,6 +23,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.IconTheme.JabRefIcons;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.InternalBibtexFields;
@@ -51,16 +53,25 @@ class XmpPrefsTab extends Pane implements PrefsTab {
 
         tableView.itemsProperty().bindBidirectional(fields);
         TableColumn<XMPPrivacyFilter, String> column = new TableColumn<>();
+        column.setCellValueFactory(cellData -> cellData.getValue().field());
 
-        column.setCellValueFactory(cellData -> cellData.getValue().fieldName());
-        new ValueTableCellFactory<XMPPrivacyFilter, String>().withText(item -> item).install(column);
+        TableColumn<XMPPrivacyFilter, String> deleteIconColumn = new TableColumn<>();
+        deleteIconColumn.setPrefWidth(60);
+        deleteIconColumn.setCellValueFactory(cellData -> cellData.getValue().field());
+        new ValueTableCellFactory<XMPPrivacyFilter, String>()
+        .withGraphic(item -> {
+            return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
+        }).withOnMouseClickedEvent(item -> {
+            return evt -> delete();
+        }).install(deleteIconColumn);
 
         column.setOnEditCommit((CellEditEvent<XMPPrivacyFilter, String> cell) -> {
             cell.getRowValue().setField(cell.getNewValue());
         });
 
-        column.setPrefWidth(350);
-        tableView.getColumns().add(column);
+        tableView.getColumns().setAll(column, deleteIconColumn);
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
         ComboBox<String> bibtexFields = new ComboBox<>(FXCollections.observableArrayList(InternalBibtexFields.getAllPublicAndInternalFieldNames()));
         bibtexFields.setEditable(true);
 
@@ -72,22 +83,15 @@ class XmpPrefsTab extends Pane implements PrefsTab {
         tablePanel.setCenter(scrollPane);
 
         Button add = new Button("Add");
+        add.setGraphic(JabRefIcons.ADD.getGraphicNode());
         add.setOnAction(e -> {
             if (!StringUtil.isNullOrEmpty(bibtexFields.getSelectionModel().getSelectedItem())) {
                 XMPPrivacyFilter tableRow = new XMPPrivacyFilter(bibtexFields.getSelectionModel().getSelectedItem());
                 fields.add(tableRow);
             }
         });
-        Button delete = new Button("Delete");
-        delete.setOnAction(e -> {
-            if ((tableView.getFocusModel() != null) && (tableView.getFocusModel().getFocusedIndex() != -1)) {
-                int row = tableView.getFocusModel().getFocusedIndex();
-                XMPPrivacyFilter tableRow = fields.get(row);
-                fields.remove(tableRow);
 
-            }
-        });
-        HBox toolbar = new HBox(bibtexFields, add, delete);
+        HBox toolbar = new HBox(bibtexFields, add);
         tablePanel.setBottom(toolbar);
 
         // Build Prefs Tabs
@@ -97,6 +101,15 @@ class XmpPrefsTab extends Pane implements PrefsTab {
         builder.add(privacyFilterCheckBox, 1, 2);
         builder.add(tablePanel, 1, 3);
 
+        tableView.disableProperty().bind(privacyFilterCheckBox.selectedProperty().not());
+        add.disableProperty().bind(privacyFilterCheckBox.selectedProperty().not());
+    }
+
+    private void delete() {
+        if (tableView.getSelectionModel().getSelectedItem() != null) {
+            XMPPrivacyFilter tableRow = tableView.getSelectionModel().getSelectedItem();
+            fields.remove(tableRow);
+        }
     }
 
     @Override
@@ -110,8 +123,7 @@ class XmpPrefsTab extends Pane implements PrefsTab {
     @Override
     public void setValues() {
         List<XMPPrivacyFilter> xmpExclusions = prefs.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS).stream().map(XMPPrivacyFilter::new).collect(Collectors.toList());
-        fields.clear();
-        fields.addAll(xmpExclusions);
+        fields.setAll(xmpExclusions);
         privacyFilterCheckBox.setSelected(JabRefPreferences.getInstance().getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER));
     }
 
@@ -155,7 +167,7 @@ class XmpPrefsTab extends Pane implements PrefsTab {
             return field.get();
         }
 
-        public StringProperty fieldName() {
+        public StringProperty field() {
             return field;
         }
 
