@@ -120,7 +120,7 @@ class StringUtilTest {
 
     @Test
     void testJoin() {
-        String[] s = "ab/cd/ed".split("/");
+        String[] s = {"ab", "cd", "ed"};
         assertEquals("ab\\cd\\ed", StringUtil.join(s, "\\", 0, s.length));
 
         assertEquals("cd\\ed", StringUtil.join(s, "\\", 1, s.length));
