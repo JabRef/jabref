@@ -215,8 +215,9 @@ Example: (PageNumbersFormatter)[https://github.com/JabRef/jabref/blob/master/src
 ## Get the JabRef frame panel
 
 ```java
-org.jabref.JabRefFrame jrf = JabRef.jrf;
-org.jabref.BasePanel basePanel = JabRef.jrf.basepanel();
+`JabRefFrame` and `BasePanel` are the two main classes. 
+You should never directly call them, instead pass them as parameters to the class. 
+
 ```
 
 ## Get Absolute Filename or Path
@@ -225,6 +226,7 @@ org.jabref.BasePanel basePanel = JabRef.jrf.basepanel();
 File f = FileUtil.expandFilename(basePanel.getDatabaseContext(), path, JabRefPreferences.getInstance().getFileDirectoryPreferences()).get(); 
 ```
 `String path` Can be the files name or a relative path to it.
+The Preferences should only be directly accessed in the GUI. For the usage in logic pass them as parameter
 
 
 ## Setting a Database Directory for a .bib File
@@ -278,69 +280,47 @@ we would have five tests containing a single `assert` statement and named accord
 - Do *not just test happy paths*, but also wrong/weird input.
 - It is recommend to write tests *before* you actually implement the functionality (test driven development). 
 - *Bug fixing:* write a test case covering the bug and then fix it, leaving the test as a security that the bug will never reappear.
-- Do not catch exceptions in tests, instead add `@Test(expected=ExpectedException.class)` to the test method.
+- Do not catch exceptions in tests, instead use the `assertThrows(Exception.class, ()->doSomethingThrowsEx())` feature of [junit-jupiter](https://junit.org/junit5/docs/current/user-guide/)  to the test method.
 
 ### Lists in tests
-* Use `Assert.assertEquals(Collections.emptyList(), actualList);` instead of `Assert.assertEquals(0, actualList.size());` to test whether a list is empty.
-* Similarly, use `Assert.assertEquals(Arrays.asList("a", "b"), actualList);` to compare lists instead of 
+* Use `assertEquals(Collections.emptyList(), actualList);` instead of `assertEquals(0, actualList.size());` to test whether a list is empty.
+* Similarly, use `assertEquals(Arrays.asList("a", "b"), actualList);` to compare lists instead of 
 ```` java
-         Assert.assertEquals(2, actualList.size());
-         Assert.assertEquals("a", actualList.get(0));
-         Assert.assertEquals("b", actualList.get(1));
+         assertEquals(2, actualList.size());
+         assertEquals("a", actualList.get(0));
+         assertEquals("b", actualList.get(1));
 ````
 
 ### BibEntries in tests
 * Use the `assertEquals` methods in `BibtexEntryAssert` to check that the correct BibEntry is returned.
 
 ### Files and folders in tests
-* If you need a temporary file in tests, then add 
+* If you need a temporary file in tests, then add the following Annotation before the class:
 ```` java
-         @Rule
-         public TemporaryFolder testFolder = new TemporaryFolder();
+@ExtendWith(TempDirectory.class)
+class TestClass{
+
+    @BeforeEach
+    void setUp(@TempDirectory.TempDir Path temporaryFolder){
+    }
+}
 ````
-to the test class. A temporary file is now created by `File tempFile = testFolder.newFile("file.txt");`. Using this pattern automatically ensures that the test folder is deleted after the tests are run. See the [blog of Gary Gregory](https://garygregory.wordpress.com/2010/01/20/junit-tip-use-rules-to-manage-temporary-files-and-folders/) for more details.
+to the test class. A temporary file is now created by `Files.createFile(path)`. Using this pattern automatically ensures that the test folder is deleted after the tests are run. See the [junit-pioneer doc](https://junit-pioneer.org/docs/temp-directory/)for more details.
 
 ### Loading Files from Resources:
-Sometimes it is necessary to load a specific resource as a File:
+Sometimes it is necessary to load a specific resource or to access the resource directory 
 ```` java
-AuxCommandLineTest.class.getResource("paper.aux");
+Path resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("MsBibExportFormatTest1.bib").toURI()).getParent();
 ````
-This returns an java.net.URL object. To avoid problems with whitespaces or any other special characters, the File creation should always be done with the Paths-Class.
-```` java
-File f = Paths.get(url.toUri()).toFile(); 
-//concrete example
-File auxFile = Paths.get(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toFile(); 
-````
-For more information see discussions at 
-http://stackoverflow.com/questions/6164448/convert-url-to-normal-windows-filename-java
+When the directory is needed, it is important to first point to an actual existing file. Otherwise the wrong directory will be returned.
+
 
 ### Preferences in tests
-If `Globals.prefs` are not initialized in a test case, try to add
 
-```java
-@BeforeClass
-public static void setUp() {
-    Globals.prefs = JabRefPreferences.getInstance();
-}
-```
 
 If you modify preference, use following pattern to ensure that the stored preferences of a developer are not affected:
 
-```java
-private JabRefPreferences backup;
 
-@Before
-public void setUp() {
-    prefs = JabRefPreferences.getInstance();
-    backup = prefs;
-}
-
-@After
-public void tearDown() {
-    //clean up preferences to default state
-    prefs.overwritePreferences(backup);
-}
-```
 
 Or even better, try to mock the preferences and insert them via dependency injection.
 ````java
@@ -356,25 +336,11 @@ public void getTypeReturnsBibLatexArticleInBibLatexMode() {
      assertEquals(BibLatexEntryTypes.ARTICLE, biblatexentrytypes.getType("article"));
 }
 ````
+To test that a preferences migration works succesfully, use the mockito method `verify`. See `PreferencesMigrationsTest` for an example.
 
 ## UI
 
-Global variables are OK here. Global variables are NOT OK everywhere else, especially model and logic.
-
-### Find out issues with the EDT
-
-If someone wants to find out more, add the following first in `main` or `start` in `JabRefMain`:
-``` Java
-RepaintManager.setCurrentManager(new CheckingRepaintManager());
-```
-then it is just to work with JabRef until an exception happens.
-
-Source: <https://github.com/JabRef/jabref/pull/1725>
-
-## UI for Preferences
-
-  * `JabRefFrame.preferences()` shows the preferences 
-  * class: PrefsDialog3 
+Global variables should be avoided. Try to pass them as dependency.
 
 ## Designing GUI Confirmation dialogs
 
