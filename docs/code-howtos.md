@@ -145,8 +145,8 @@ If you want to catch the event you'll have to register your listener class with 
 
 ## Logging
 
-JabRef uses the logging facade [Apache Commons Logging](http://commons.apache.org/proper/commons-logging/).
-All log messages are passed internally to Java's [java.util.logging](http://docs.oracle.com/javase/8/docs/technotes/guides/logging/overview.html) which handles any filterting, formatting and writing of log messages. 
+JabRef uses the logging facade [SLF4j](https://www.slf4j.org/).
+All log messages are passed internally to the [log4j2] [https://logging.apache.org/log4j/2.x/] which handles any filterting, formatting and writing of log messages. 
 - Obtaining a Logger for a Class: 
 
   ```java
@@ -161,6 +161,8 @@ All log messages are passed internally to Java's [java.util.logging](http://docs
        ...
     }
   ```
+- SLF4J also support parameterized logging, e.g. if you want to print out multiple arguments in a log statement use a pair of curly braces. [Examples](https://www.slf4j.org/faq.html#logging_performance)
+
 
 ## Using Localization correctly
 *(More information about this topic from the translator side is provided [here] (https://github.com/JabRef/jabref/wiki/Translating-JabRef-Interface) about the JabRef interface and 
