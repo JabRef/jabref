@@ -60,7 +60,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
 
         updatedExternally = true;
 
-        final ChangeScanner scanner = new ChangeScanner(panel.frame(), panel, database.getDatabaseFile().orElse(null), tmpFile);
+        final ChangeScanner scanner = new ChangeScanner(panel.frame(), panel, database.getDatabasePath().orElse(null), tmpFile);
 
         // Test: running scan automatically in background
         if (database.getDatabasePath().isPresent() && !FileBasedLock.waitForFileLock(database.getDatabasePath().get())) {
@@ -76,7 +76,6 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             fileUpdated();
             return;
         }
-
         JabRefExecutorService.INSTANCE.executeInterruptableTaskAndWait(scanner);
 
         // Adding the sidepane component is Swing work, so we must do this in the Swing

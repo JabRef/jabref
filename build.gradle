@@ -15,7 +15,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '1.15.2'
+    id 'com.gradle.build-scan' version '1.16'
     id 'com.install4j.gradle' version '7.0.6'
     id 'com.github.johnrengelman.shadow' version '2.0.4'
     id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
@@ -174,8 +174,8 @@ dependencies {
     testCompile 'com.github.tomakehurst:wiremock:2.18.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
-    testCompile 'org.xmlunit:xmlunit-core:2.6.0'
-    testCompile 'org.xmlunit:xmlunit-matchers:2.6.0'
+    testCompile 'org.xmlunit:xmlunit-core:2.6.1'
+    testCompile 'org.xmlunit:xmlunit-matchers:2.6.1'
     testCompile 'com.tngtech.archunit:archunit-junit:0.8.3'
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
