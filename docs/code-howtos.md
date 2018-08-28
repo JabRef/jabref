@@ -210,14 +210,15 @@ Example: (PageNumbersFormatter)[https://github.com/JabRef/jabref/blob/master/src
 
 ## Drag and Drop
 
-`org.jabref.external.DroppedFileHandler.handleDroppedfile(String, ExternalFileType, boolean, BibtexEntry) FileListEditor` sets a `TransferHandler` inherited from `FileListEditorTransferHandler`. There, at `importData`, a `DroppedFileHandler` is instantiated and `handleDroppedfile` called. 
+Drag and Drop makes usage of the Dragboard. For JavaFX the following [tutorial](https://docs.oracle.com/javafx/2/drag_drop/jfxpub-drag_drop.htm) is helpful. Note that the data has to be serializable which is put on the dragboard. For drag and drop of Bib-entries between the maintable and the groups panel, a custom Dragboard is used, `CustomLocalDragboard` which is a generic alternative to the system one.
+
+For accessing or putting data into the Clipboard use the `ClipboardManager`. 
 
 ## Get the JabRef frame panel
 
 ```java
 `JabRefFrame` and `BasePanel` are the two main classes. 
 You should never directly call them, instead pass them as parameters to the class. 
-
 ```
 
 ## Get Absolute Filename or Path
