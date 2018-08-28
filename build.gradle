@@ -121,7 +121,7 @@ dependencies {
 
     compile 'mysql:mysql-connector-java:8.0.12'
 
-    compile 'org.postgresql:postgresql:42.2.4'
+    compile 'org.postgresql:postgresql:42.2.5'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
@@ -174,8 +174,8 @@ dependencies {
     testCompile 'com.github.tomakehurst:wiremock:2.18.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
-    testCompile 'org.xmlunit:xmlunit-core:2.6.1'
-    testCompile 'org.xmlunit:xmlunit-matchers:2.6.1'
+    testCompile 'org.xmlunit:xmlunit-core:2.6.2'
+    testCompile 'org.xmlunit:xmlunit-matchers:2.6.2'
     testCompile 'com.tngtech.archunit:archunit-junit:0.8.3'
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit5:4.0.+"
@@ -217,12 +217,6 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject("Cannot be upgraded to version 2")
             }
         }
-        rules.withModule("mysql:mysql-connector-java") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /[6-9].*/) {
-                selection.reject("http://dev.mysql.com/downloads/connector/j/ lists the version 5.* as last stable version.")
-            }
-        }
-
     }
 }
 
