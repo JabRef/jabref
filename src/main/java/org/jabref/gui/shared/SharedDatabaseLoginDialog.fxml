@@ -14,31 +14,13 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<DialogPane  prefHeight="371.0" prefWidth="340.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.shared.SharedDatabaseLoginDialogView">
+<DialogPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="383.0" prefWidth="401.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.shared.SharedDatabaseLoginDialogView">
    <content>
-      <BorderPane prefHeight="382.0" prefWidth="400.0">
+      <BorderPane>
          <center>
             <BorderPane BorderPane.alignment="TOP_LEFT">
-               <bottom>
-                  <GridPane BorderPane.alignment="TOP_LEFT">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <CheckBox fx:id="autosave" mnemonicParsing="false" text="%Automatically save the library to" GridPane.columnSpan="2" />
-                        <TextField fx:id="folder" GridPane.rowIndex="1" />
-                        <Button fx:id="browseButton" mnemonicParsing="false" onAction="#openFileDialog" text="%Browse" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <Group />
-                     </children>
-                  </GridPane>
-               </bottom>
-               <right>
-                  <GridPane BorderPane.alignment="TOP_LEFT">
+               <center>
+                  <GridPane BorderPane.alignment="CENTER">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="20.0" prefWidth="120.0" />
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -69,7 +51,7 @@
                         <CheckBox fx:id="rememberPassword" mnemonicParsing="false" text="%Remember Password" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="5" />
                         <CheckBox fx:id="useSSLpostgres" mnemonicParsing="false" text="%Use SSL" GridPane.rowIndex="5" />
                         <TextField fx:id="fileKeystore" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                        <Button fx:id="browseKeystore" mnemonicParsing="false" text="%Browse" onAction="#openKeyStoreFileDialog" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                        <Button fx:id="browseKeystore" mnemonicParsing="false" onAction="#openKeyStoreFileDialog" text="%Browse" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                         <GridPane>
                           <columnConstraints>
                             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -86,9 +68,27 @@
                         <Label text="%Keystore password:" GridPane.rowIndex="7" />
                      </children>
                   </GridPane>
-               </right>
+               </center>
             </BorderPane>
          </center>
+         <bottom>
+            <GridPane BorderPane.alignment="CENTER">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <CheckBox fx:id="autosave" mnemonicParsing="false" text="%Automatically save the library to" GridPane.columnSpan="2" />
+                  <TextField fx:id="folder" GridPane.rowIndex="1" />
+                  <Button fx:id="browseButton" mnemonicParsing="false" onAction="#openFileDialog" text="%Browse" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Group />
+               </children>
+            </GridPane>
+         </bottom>
       </BorderPane>
    </content>
    <header>

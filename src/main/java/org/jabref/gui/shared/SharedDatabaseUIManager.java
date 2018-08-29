@@ -66,8 +66,7 @@ public class SharedDatabaseUIManager {
                 jabRefFrame.closeCurrentTab();
                 new SharedDatabaseLoginDialogView(jabRefFrame).showAndWait();
 
-            }
-            if (answer.get().equals(workOffline)) {
+            } else if (answer.get().equals(workOffline)) {
                 connectionLostEvent.getBibDatabaseContext().convertToLocalDatabase();
                 jabRefFrame.refreshTitleAndTabs();
                 jabRefFrame.output(Localization.lang("Working offline."));
@@ -97,7 +96,7 @@ public class SharedDatabaseUIManager {
         if (Objects.nonNull(entryEditor) && (entryEditor.getEntry() == event.getBibEntry())) {
 
             dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
-                                                       Localization.lang("The BibEntry you currently work on has been deleted on the shared side.")
+                                                       Localization.lang("The entry you currently work on has been deleted on the shared side.")
                                                                                                                + "\n"
                                                                                                                + Localization.lang("You can restore the entry using the \"Undo\" operation."));
             panel.closeBottomPane();
@@ -145,7 +144,7 @@ public class SharedDatabaseUIManager {
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
 
         bibDatabaseContext.getDatabase().setSharedDatabaseID(sharedDatabaseID);
-        bibDatabaseContext.setDatabaseFile(parserResult.getDatabaseContext().getDatabaseFile().orElse(null));
+        bibDatabaseContext.setDatabaseFile(parserResult.getDatabaseContext().getDatabasePath().orElse(null));
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
         dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));

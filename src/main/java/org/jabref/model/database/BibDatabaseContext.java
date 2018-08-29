@@ -113,8 +113,18 @@ public class BibDatabaseContext {
         return file.map(Path::toFile);
     }
 
+    /**
+     *
+     * @param Set the database file
+     * @deprecated use {@link #setDatabaseFile(Path)}
+     */
+    @Deprecated
     public void setDatabaseFile(File file) {
         this.file = Optional.ofNullable(file).map(File::toPath);
+    }
+
+    public void setDatabaseFile(Path file) {
+        this.file = Optional.ofNullable(file);
     }
 
     public Optional<Path> getDatabasePath() {
@@ -282,4 +292,5 @@ public class BibDatabaseContext {
     public List<BibEntry> getEntries() {
         return database.getEntries();
     }
+
 }

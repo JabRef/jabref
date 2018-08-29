@@ -26,7 +26,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     private String database;
     private String user;
     private String password;
-
+    private boolean useSSL;
 
     public DBMSConnectionProperties() {
         // no data

@@ -28,6 +28,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnectionProperties;
@@ -67,6 +68,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final BooleanProperty loading = new SimpleBooleanProperty();
     private final StringProperty keystore = new SimpleStringProperty("");
     private final BooleanProperty useSSL = new SimpleBooleanProperty();
+    private final StringProperty keyStorePasswordProperty = new SimpleStringProperty("");
+
 
     private final JabRefFrame frame;
     private final DialogService dialogService;
@@ -80,6 +83,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final CompositeValidator formValidator;
 
     private DBMSConnectionProperties connectionProperties;
+
 
     public SharedDatabaseLoginDialogViewModel(JabRefFrame frame, DialogService dialogService) {
         this.frame = frame;
@@ -254,6 +258,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public void openKeyStoreFileDialog() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                                                                                               .addExtensionFilter(FileFilterConverter.ANY_FILE)
                                                                                                .addExtensionFilter(StandardFileType.JAVA_KEYSTORE)
                                                                                                .withDefaultExtension(StandardFileType.JAVA_KEYSTORE)
                                                                                                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
@@ -298,6 +303,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public StringProperty keyStoreProperty() {
         return keystore;
+    }
+
+    public StringProperty keyStorePasswordProperty() {
+        return keyStorePasswordProperty;
     }
 
     public BooleanProperty useSSLProperty() {
