@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import org.jabref.logic.l10n.Localization;
@@ -13,7 +14,6 @@ import org.jabref.model.database.shared.DatabaseConnection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Properties;
 
 public class DBMSConnection implements DatabaseConnection {
 
@@ -21,7 +21,6 @@ public class DBMSConnection implements DatabaseConnection {
 
     private final Connection connection;
     private final DBMSConnectionProperties properties;
-
 
     public DBMSConnection(DBMSConnectionProperties connectionProperties) throws SQLException, InvalidDBMSConnectionPropertiesException {
 
@@ -40,13 +39,12 @@ public class DBMSConnection implements DatabaseConnection {
             props.setProperty("user", connectionProperties.getUser());
             props.setProperty("password", connectionProperties.getPassword());
 
-            if(connectionProperties.isUseSSL()) {
-                props.setProperty("ssl",  Boolean.toString(connectionProperties.isUseSSL()));
+            if (connectionProperties.isUseSSL()) {
+                props.setProperty("ssl", Boolean.toString(connectionProperties.isUseSSL()));
             }
             String url = connectionProperties.getType().getUrl(connectionProperties.getHost(), connectionProperties.getPort(), connectionProperties.getDatabase());
 
             this.connection = DriverManager.getConnection(url, props);
-
 
         } catch (SQLException e) {
             // Some systems like PostgreSQL retrieves 0 to every exception.
