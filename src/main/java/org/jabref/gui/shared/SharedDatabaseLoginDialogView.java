@@ -1,6 +1,7 @@
 package org.jabref.gui.shared;
 
 import java.util.concurrent.Callable;
+
 import javax.inject.Inject;
 
 import javafx.application.Platform;
