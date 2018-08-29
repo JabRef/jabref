@@ -70,7 +70,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final BooleanProperty useSSL = new SimpleBooleanProperty();
     private final StringProperty keyStorePasswordProperty = new SimpleStringProperty("");
 
-
     private final JabRefFrame frame;
     private final DialogService dialogService;
     private final SharedDatabasePreferences prefs = new SharedDatabasePreferences();
@@ -83,7 +82,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final CompositeValidator formValidator;
 
     private DBMSConnectionProperties connectionProperties;
-
 
     public SharedDatabaseLoginDialogViewModel(JabRefFrame frame, DialogService dialogService) {
         this.frame = frame;
@@ -114,8 +112,16 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         connectionProperties.setDatabase(database.getValue());
         connectionProperties.setUser(user.getValue());
         connectionProperties.setPassword(password.getValue());
+        connectionProperties.setUseSSL(useSSL.getValue());
 
+        setupKeyStore();
         openSharedDatabase();
+    }
+
+    private void setupKeyStore() {
+        System.setProperty("javax.net.ssl.trustStore", keystore.getValue());
+        System.setProperty("javax.net.ssl.trustStorePassword", keyStorePasswordProperty.getValue());
+        System.setProperty("javax.net.debug", "ssl");
     }
 
     private void openSharedDatabase() {
@@ -244,7 +250,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         });
     }
 
-    public void openFileDialog() {
+    public void openSaveDbFileDialog() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                                                                                                .addExtensionFilter(StandardFileType.BIBTEX_DB)
                                                                                                .withDefaultExtension(StandardFileType.BIBTEX_DB)
@@ -263,7 +269,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                                                                                .withDefaultExtension(StandardFileType.JAVA_KEYSTORE)
                                                                                                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                                                                                                .build();
-        Optional<Path> keystorePath = dialogService.showFileSaveDialog(fileDialogConfiguration);
+        Optional<Path> keystorePath = dialogService.showFileOpenDialog(fileDialogConfiguration);
         keystorePath.ifPresent(path -> {
             folder.setValue(path.toString());
         });

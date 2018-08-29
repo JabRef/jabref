@@ -13,6 +13,7 @@ import org.jabref.model.database.shared.DatabaseConnection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Properties;
 
 public class DBMSConnection implements DatabaseConnection {
 
@@ -22,12 +23,12 @@ public class DBMSConnection implements DatabaseConnection {
     private final DBMSConnectionProperties properties;
 
 
-    public DBMSConnection(DBMSConnectionProperties properties) throws SQLException, InvalidDBMSConnectionPropertiesException {
+    public DBMSConnection(DBMSConnectionProperties connectionProperties) throws SQLException, InvalidDBMSConnectionPropertiesException {
 
-        if (!properties.isValid()) {
+        if (!connectionProperties.isValid()) {
             throw new InvalidDBMSConnectionPropertiesException();
         }
-        this.properties = properties;
+        this.properties = connectionProperties;
 
         try {
             DriverManager.setLoginTimeout(3);
@@ -35,9 +36,18 @@ public class DBMSConnection implements DatabaseConnection {
             // we use the side effect of getAvailableDBMSTypes() - it loads all available drivers
             DBMSConnection.getAvailableDBMSTypes();
 
-            this.connection = DriverManager.getConnection(
-                    properties.getType().getUrl(properties.getHost(), properties.getPort(), properties.getDatabase()),
-                    properties.getUser(), properties.getPassword());
+            Properties props = new Properties();
+            props.setProperty("user", connectionProperties.getUser());
+            props.setProperty("password", connectionProperties.getPassword());
+
+            if(connectionProperties.isUseSSL()) {
+                props.setProperty("ssl",  Boolean.toString(connectionProperties.isUseSSL()));
+            }
+            String url = connectionProperties.getType().getUrl(connectionProperties.getHost(), connectionProperties.getPort(), connectionProperties.getDatabase());
+
+            this.connection = DriverManager.getConnection(url, props);
+
+
         } catch (SQLException e) {
             // Some systems like PostgreSQL retrieves 0 to every exception.
             // Therefore a stable error determination is not possible.

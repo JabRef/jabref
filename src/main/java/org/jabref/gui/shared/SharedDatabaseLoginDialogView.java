@@ -118,6 +118,10 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
             EasyBind.subscribe(autosave.selectedProperty(), selected -> {
                 visualizer.initVisualization(viewModel.folderValidation(), folder, true);
             });
+
+            EasyBind.subscribe(useSSLpostgres.selectedProperty(), selected -> {
+                visualizer.initVisualization(viewModel.folderValidation(), fileKeystore, true);
+            });
         });
 
         viewModel.applyPreferences();
@@ -126,7 +130,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
     @FXML
     private void openFileDialog(ActionEvent event) {
-        viewModel.openFileDialog();
+        viewModel.openSaveDbFileDialog();
     }
 
     @FXML

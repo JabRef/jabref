@@ -37,13 +37,14 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     }
 
     public DBMSConnectionProperties(DBMSType type, String host, int port, String database, String user,
-            String password) {
+                                    String password, boolean useSSL) {
         this.type = type;
         this.host = host;
         this.port = port;
         this.database = database;
         this.user = user;
         this.password = password;
+        this.useSSL = useSSL;
     }
 
     @Override
@@ -100,15 +101,23 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         this.password = password;
     }
 
+    public boolean isUseSSL() {
+        return useSSL;
+    }
+
+    public void setUseSSL(boolean useSSL) {
+        this.useSSL = useSSL;
+    }
+
     /**
      * Compares all properties except the password.
      */
     public boolean equals(DBMSConnectionProperties properties) {
         return this.type.equals(properties.getType())
-                && this.host.equalsIgnoreCase(properties.getHost())
-                && (this.port == properties.getPort())
-                && this.database.equals(properties.getDatabase())
-                && this.user.equals(properties.getUser());
+               && this.host.equalsIgnoreCase(properties.getHost())
+               && (this.port == properties.getPort())
+               && this.database.equals(properties.getDatabase())
+               && this.user.equals(properties.getUser());
     }
 
     /**
@@ -146,10 +155,11 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     @Override
     public boolean isValid() {
         return Objects.nonNull(type)
-                && Objects.nonNull(host)
-                && Objects.nonNull(port)
-                && Objects.nonNull(database)
-                && Objects.nonNull(user)
-                && Objects.nonNull(password);
+               && Objects.nonNull(host)
+               && Objects.nonNull(port)
+               && Objects.nonNull(database)
+               && Objects.nonNull(user)
+               && Objects.nonNull(password);
     }
+
 }
