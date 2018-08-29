@@ -12,16 +12,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LocalizationConsistencyTest {
@@ -137,6 +142,31 @@ class LocalizationConsistencyTest {
         keys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.MENU);
         for (LocalizationEntry e : keys) {
             assertTrue(e.getKey().startsWith("\"") || e.getKey().endsWith("\""), "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
+        }
+    }
+
+    private static Language[] installedLanguages() {
+        return Language.values();
+    }
+
+    @ParameterizedTest
+    @MethodSource("installedLanguages")
+    void resourceBundleExists(Language language) {
+        Path messagesPropertyFile = Paths.get("src/main/resources").resolve(Localization.RESOURCE_PREFIX + "_" + language.getId() + ".properties");
+        assertTrue(Files.exists(messagesPropertyFile));
+    }
+
+    @ParameterizedTest
+    @MethodSource("installedLanguages")
+    void languageCanBeLoaded(Language language) {
+        Locale oldLocale = Locale.getDefault();
+        try {
+            Locale locale = Language.convertToSupportedLocale(language).get();
+            Locale.setDefault(locale);
+            ResourceBundle messages = ResourceBundle.getBundle(Localization.RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
+            assertNotNull(messages);
+        } finally {
+            Locale.setDefault(oldLocale);
         }
     }
 

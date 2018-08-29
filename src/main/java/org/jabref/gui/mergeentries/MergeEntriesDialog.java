@@ -11,6 +11,7 @@ import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.WindowLocation;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -51,7 +52,7 @@ public class MergeEntriesDialog extends JabRefDialog {
         if (selected.size() != 2) { // None selected. Inform the user to select entries first.
 
             dialogService.showInformationDialogAndWait(Localization.lang("Merge entries"),
-                    Localization.lang("You have to choose exactly two entries to merge."));
+                                                       Localization.lang("You have to choose exactly two entries to merge."));
 
             this.dispose();
             return;
@@ -88,15 +89,18 @@ public class MergeEntriesDialog extends JabRefDialog {
             // Create a new entry and add it to the undo stack
             // Remove the other two entries and add them to the undo stack (which is not working...)
             BibEntry mergedEntry = mergeEntries.getMergeEntry();
-            panel.insertEntry(mergedEntry);
-            ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), mergedEntry));
-            ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), one, panel));
-            panel.getDatabase().removeEntry(one);
-            ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), two, panel));
-            panel.getDatabase().removeEntry(two);
-            ce.end();
-            panel.getUndoManager().addEdit(ce);
-            panel.output(Localization.lang("Merged entries"));
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                panel.insertEntry(mergedEntry);
+                ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), mergedEntry));
+                ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), one, panel));
+                panel.getDatabase().removeEntry(one);
+                ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), two, panel));
+                panel.getDatabase().removeEntry(two);
+                ce.end();
+                panel.getUndoManager().addEdit(ce);
+                panel.output(Localization.lang("Merged entries"));
+            });
+
             dispose();
         });
 
@@ -110,8 +114,8 @@ public class MergeEntriesDialog extends JabRefDialog {
         layout.insertColumn(1, ColumnSpec.decode(MARGIN));
 
         WindowLocation pw = new WindowLocation(this, JabRefPreferences.MERGEENTRIES_POS_X,
-                JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
-                JabRefPreferences.MERGEENTRIES_SIZE_Y);
+                                               JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
+                                               JabRefPreferences.MERGEENTRIES_SIZE_Y);
         pw.displayWindowAtStoredLocation();
 
         // Show what we've got

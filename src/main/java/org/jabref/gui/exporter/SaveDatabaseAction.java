@@ -409,13 +409,13 @@ public class SaveDatabaseAction implements BaseAction {
                     JabRefExecutorService.INSTANCE.execute(() -> {
 
                         if (!FileBasedLock
-                                .waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile().get().toPath())) {
+                                          .waitForFileLock(panel.getBibDatabaseContext().getDatabasePath().get())) {
                             // TODO: GUI handling of the situation when the externally modified file keeps being locked.
                             LOGGER.error("File locked, this will be trouble.");
                         }
 
                         ChangeScanner scanner = new ChangeScanner(panel.frame(), panel,
-                                panel.getBibDatabaseContext().getDatabaseFile().get(), panel.getTempFile());
+                                                                  panel.getBibDatabaseContext().getDatabasePath().orElse(null), panel.getTempFile());
                         JabRefExecutorService.INSTANCE.executeInterruptableTaskAndWait(scanner);
                         if (scanner.changesFound()) {
                             scanner.displayResult(resolved -> {
