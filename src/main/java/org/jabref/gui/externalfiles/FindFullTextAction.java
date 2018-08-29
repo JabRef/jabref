@@ -6,17 +6,18 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
@@ -29,71 +30,78 @@ import org.slf4j.LoggerFactory;
 /**
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
  */
-public class FindFullTextAction extends AbstractWorker {
+public class FindFullTextAction implements BaseAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FindFullTextAction.class);
     // The minimum number of selected entries to ask the user for confirmation
     private static final int WARNING_LIMIT = 5;
 
     private final BasePanel basePanel;
-    private final Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
+    private final DialogService dialogService;
 
-    public FindFullTextAction(BasePanel basePanel) {
+    public FindFullTextAction(DialogService dialogService, BasePanel basePanel) {
         this.basePanel = basePanel;
+        this.dialogService = dialogService;
     }
 
     @Override
-    public void init() throws Exception {
+    public void action() {
+        BackgroundTask.wrap(this::findFullTexts)
+                      .onSuccess(downloads -> SwingUtilities.invokeLater(() -> downloadFullTexts(downloads)))
+                      .executeWith(Globals.TASK_EXECUTOR);
+    }
+
+    private Map<Optional<URL>, BibEntry> findFullTexts() {
         if (!basePanel.getSelectedEntries().isEmpty()) {
             basePanel.output(Localization.lang("Looking for full text document..."));
         } else {
             LOGGER.debug("No entry selected for fulltext download.");
         }
-    }
 
-    @Override
-    public void run() {
         if (basePanel.getSelectedEntries().size() >= WARNING_LIMIT) {
-            String[] options = new String[] {Localization.lang("Look up full text documents"),
-                    Localization.lang("Cancel")};
-            int answer = JOptionPane.showOptionDialog(basePanel.frame(),
+            boolean confirmDownload = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Look up full text documents"),
                     Localization.lang(
                             "You are about to look up full text documents for %0 entries.",
                             String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
                             + Localization.lang("JabRef will send at least one request per entry to a publisher.")
                             + "\n"
                             + Localization.lang("Do you still want to continue?"),
-                    Localization.lang("Look up full text documents"), JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-            if (answer != JOptionPane.OK_OPTION) {
+                    Localization.lang("Look up full text documents"),
+                    Localization.lang("Cancel"));
+
+            if (!confirmDownload) {
                 basePanel.output(Localization.lang("Operation canceled."));
-                return;
+                return null;
             }
         }
 
+        Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
         for (BibEntry entry : basePanel.getSelectedEntries()) {
             FulltextFetchers fetchers = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
             downloads.put(fetchers.findFullTextPDF(entry), entry);
         }
+
+        return downloads;
     }
 
-    @Override
-    public void update() {
+    private void downloadFullTexts(Map<Optional<URL>, BibEntry> downloads) {
         List<Optional<URL>> finishedTasks = new ArrayList<>();
-        for (Entry<Optional<URL>, BibEntry> download : downloads.entrySet()) {
+        for (Map.Entry<Optional<URL>, BibEntry> download : downloads.entrySet()) {
             BibEntry entry = download.getValue();
             Optional<URL> result = download.getKey();
             if (result.isPresent()) {
                 Optional<Path> dir = basePanel.getBibDatabaseContext().getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences());
 
                 if (!dir.isPresent()) {
-                    JOptionPane.showMessageDialog(basePanel.frame(),
+
+                    dialogService.showErrorDialogAndWait(Localization.lang("Directory not found"),
                             Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
-                                    + " -> " + Localization.lang("File"),
-                            Localization.lang("Directory not found"), JOptionPane.ERROR_MESSAGE);
+                                    + " -> " + Localization.lang("File"));
+
                     return;
                 }
-                DownloadExternalFile fileDownload = new DownloadExternalFile(basePanel.frame(),
+                DownloadExternalFile fileDownload = new DownloadExternalFile(dialogService,
                         basePanel.getBibDatabaseContext(), entry);
                 try {
                     fileDownload.download(result.get(), "application/pdf", file -> {
@@ -121,7 +129,7 @@ public class FindFullTextAction extends AbstractWorker {
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined")));
 
                 basePanel.output(message);
-                JOptionPane.showMessageDialog(basePanel.frame(), message, title, JOptionPane.ERROR_MESSAGE);
+                DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showErrorDialogAndWait(title, message));
             }
             finishedTasks.add(result);
         }

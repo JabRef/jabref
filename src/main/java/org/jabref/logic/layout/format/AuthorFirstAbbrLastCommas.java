@@ -10,8 +10,6 @@ import org.jabref.model.entry.AuthorList;
  * <li>Individual authors separated by comma.</li>
  * <li>There is no command in front the and of a list of three or more authors.</li>
  * </ul>
- *
- * @author Christopher Oezbek <oezi@oezi.de>
  */
 public class AuthorFirstAbbrLastCommas implements LayoutFormatter {
 

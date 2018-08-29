@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.VBox?>
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" minHeight="450.0" minWidth="375.0" prefHeight="450.0" prefWidth="407.0"
+            xmlns="http://javafx.com/javafx/8.0.65" fx:controller="org.jabref.gui.keyboard.KeyBindingsDialogView">
+    <content>
+        <VBox>
+            <TreeTableView fx:id="keyBindingsTable" showRoot="false" styleClass="keybinding-table">
+                <columns>
+                    <TreeTableColumn fx:id="actionColumn" prefWidth="75.0" text="%Action"/>
+                    <TreeTableColumn fx:id="shortcutColumn" prefWidth="75.0" text="%Shortcut"/>
+                    <TreeTableColumn fx:id="resetColumn" maxWidth="600.0" prefWidth="75.0"/>
+                </columns>
+                <columnResizePolicy>
+                    <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+            </TreeTableView>
+        </VBox>
+    </content>
+    <ButtonType fx:id="resetButton" text="%Reset Bindings" buttonData="LEFT"/>
+    <ButtonType fx:id="saveButton" text="%Save" buttonData="OK_DONE"/>
+    <ButtonType fx:constant="CANCEL"/>
+</DialogPane>

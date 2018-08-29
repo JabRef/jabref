@@ -26,7 +26,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.OptionalUtil;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,20 +52,21 @@ public class FileUtil {
         }
     }
 
+
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
      * @return The extension, trimmed and in lowercase.
      */
-    public static Optional<String> getFileExtension(File file) {
-        return getFileExtension(file.getName());
+    public static Optional<String> getFileExtension(Path file) {
+        return getFileExtension(file.getFileName().toString());
     }
 
     /**
      * Returns the name part of a file name (i.e., everything in front of last ".").
      */
     public static String getBaseName(String fileNameWithExtension) {
-        return FilenameUtils.getBaseName(fileNameWithExtension);
+        return com.google.common.io.Files.getNameWithoutExtension(fileNameWithExtension);
     }
 
     /**
@@ -156,7 +156,7 @@ public class FileUtil {
             return false;
         }
         if (Files.exists(pathToDestinationFile) && !replaceExisting) {
-            LOGGER.error("Path to the destination file is not exists and the file shouldn't be replace.");
+            LOGGER.error("Path to the destination file exists but the file shouldn't be replaced.");
             return false;
         }
         try {
@@ -188,7 +188,9 @@ public class FileUtil {
      * @param toFile          The target fileName
      * @param replaceExisting Wether to replace existing files or not
      * @return True if the rename was successful, false if an exception occurred
+     * @deprecated Use {@link #renameFileWithException(Path, Path, boolean)} instead and handle exception properly
      */
+    @Deprecated
     public static boolean renameFile(Path fromFile, Path toFile, boolean replaceExisting) {
         try {
             return renameFileWithException(fromFile, toFile, replaceExisting);
@@ -327,5 +329,15 @@ public class FileUtil {
     public static String toPortableString(Path path) {
         return path.toString()
                    .replace('\\', '/');
+    }
+
+    /**
+     * Test if the file is a bib file by simply checking the extension to be ".bib"
+     * @param file The file to check
+     * @return True if file extension is ".bib", false otherwise
+     */
+    public static boolean isBibFile(Path file)
+    {
+        return getFileExtension(file).filter(type -> "bib".equals(type)).isPresent();
     }
 }

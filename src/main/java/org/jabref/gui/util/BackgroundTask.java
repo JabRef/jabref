@@ -3,6 +3,7 @@ package org.jabref.gui.util;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -37,6 +38,16 @@ public abstract class BackgroundTask<V> {
             @Override
             protected V call() throws Exception {
                 return callable.call();
+            }
+        };
+    }
+
+    public static BackgroundTask<Void> wrap(Runnable runnable) {
+        return new BackgroundTask<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                runnable.run();
+                return null;
             }
         };
     }
@@ -82,6 +93,7 @@ public abstract class BackgroundTask<V> {
 
     /**
      * Sets the {@link Consumer} that is invoked after the task is successfully finished.
+     * The consumer always runs on the JavaFX thread.
      */
     public BackgroundTask<V> onSuccess(Consumer<V> onSuccess) {
         this.onSuccess = onSuccess;
@@ -102,6 +114,10 @@ public abstract class BackgroundTask<V> {
         return chain(onFinished, onException);
     }
 
+    /**
+     * Sets the {@link Consumer} that is invoked after the task has failed with an exception.
+     * The consumer always runs on the JavaFX thread.
+     */
     public BackgroundTask<V> onFailure(Consumer<Exception> onException) {
         this.onException = onException;
         return this;
@@ -120,11 +136,68 @@ public abstract class BackgroundTask<V> {
         return this;
     }
 
-    protected void updateProgress(double workDone, double max) {
-        progress.setValue(new BackgroundProgress(workDone, max));
+    /**
+     * Creates a {@link BackgroundTask} that first runs this task and based on the result runs a second task.
+     *
+     * @param nextTaskFactory the function that creates the new task
+     * @param <T>             type of the return value of the second task
+     */
+    public <T> BackgroundTask<T> then(Function<V, BackgroundTask<T>> nextTaskFactory) {
+        return new BackgroundTask<T>() {
+            @Override
+            protected T call() throws Exception {
+                V result = BackgroundTask.this.call();
+                BackgroundTask<T> nextTask = nextTaskFactory.apply(result);
+                EasyBind.subscribe(nextTask.progressProperty(), this::updateProgress);
+                return nextTask.call();
+            }
+        };
     }
 
-    public class BackgroundProgress {
+    /**
+     * Creates a {@link BackgroundTask} that first runs this task and based on the result runs a second task.
+     *
+     * @param nextOperation the function that performs the next operation
+     * @param <T>           type of the return value of the second task
+     */
+    public <T> BackgroundTask<T> thenRun(Function<V, T> nextOperation) {
+        return new BackgroundTask<T>() {
+            @Override
+            protected T call() throws Exception {
+                V result = BackgroundTask.this.call();
+                BackgroundTask<T> nextTask = BackgroundTask.wrap(() -> nextOperation.apply(result));
+                EasyBind.subscribe(nextTask.progressProperty(), this::updateProgress);
+                return nextTask.call();
+            }
+        };
+    }
+
+    /**
+     * Creates a {@link BackgroundTask} that first runs this task and based on the result runs a second task.
+     *
+     * @param nextOperation the function that performs the next operation
+     */
+    public BackgroundTask<Void> thenRun(Consumer<V> nextOperation) {
+        return new BackgroundTask<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                V result = BackgroundTask.this.call();
+                BackgroundTask<Void> nextTask = BackgroundTask.wrap(() -> nextOperation.accept(result));
+                EasyBind.subscribe(nextTask.progressProperty(), this::updateProgress);
+                return nextTask.call();
+            }
+        };
+    }
+
+    protected void updateProgress(BackgroundProgress newProgress) {
+        progress.setValue(newProgress);
+    }
+
+    protected void updateProgress(double workDone, double max) {
+        updateProgress(new BackgroundProgress(workDone, max));
+    }
+
+    class BackgroundProgress {
 
         private final double workDone;
         private final double max;

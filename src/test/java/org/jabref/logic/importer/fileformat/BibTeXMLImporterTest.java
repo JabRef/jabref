@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.fileformat;
 
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ public class BibTeXMLImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(FileType.BIBTEXML, importer.getFileType());
+        assertEquals(StandardFileType.BIBTEXML, importer.getFileType());
     }
 
     @Test

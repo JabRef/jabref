@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import javafx.embed.swing.JFXPanel;
@@ -21,8 +22,10 @@ import javafx.scene.Scene;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.customjfx.CustomJFXPanel;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -43,7 +46,7 @@ class ResolveDuplicateLabelDialog {
 
 
     public ResolveDuplicateLabelDialog(BasePanel panel, String key, List<BibEntry> entries) {
-        diag = new JDialog(panel.frame(), Localization.lang("Duplicate BibTeX key"), true);
+        diag = new JDialog((JFrame) null, Localization.lang("Duplicate BibTeX key"), true);
 
         FormBuilder b = FormBuilder.create().layout(new FormLayout(
                 "left:pref, 4dlu, fill:pref", "p"));
@@ -56,7 +59,7 @@ class ResolveDuplicateLabelDialog {
             JCheckBox cb = new JCheckBox(Localization.lang("Generate BibTeX key"), !first);
             b.appendRows("1dlu, p");
             b.add(cb).xy(1, row);
-            PreviewPanel previewPanel = new PreviewPanel(null, null);
+            PreviewPanel previewPanel = new PreviewPanel(null, null, Globals.getKeyPrefs(), Globals.prefs.getPreviewPreferences(), new FXDialogService(), ExternalFileTypes.getInstance());
             previewPanel.setEntry(entry);
             JFXPanel container = CustomJFXPanel.wrap(new Scene(previewPanel));
             container.setPreferredSize(new Dimension(800, 90));
@@ -102,7 +105,7 @@ class ResolveDuplicateLabelDialog {
 
         ActionMap am = b.getPanel().getActionMap();
         InputMap im = b.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         am.put("close", closeAction);
     }
 

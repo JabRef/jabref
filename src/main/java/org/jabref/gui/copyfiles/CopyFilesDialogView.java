@@ -1,36 +1,65 @@
 package org.jabref.gui.copyfiles;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
+import javafx.fxml.FXML;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.DialogPane;
-
-import org.jabref.gui.AbstractDialogView;
-import org.jabref.gui.FXDialog;
+import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
-public class CopyFilesDialogView extends AbstractDialogView {
+import com.airhacks.afterburner.views.ViewLoader;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
+
+public class CopyFilesDialogView extends BaseDialog<Void> {
+
+    @FXML private TableView<CopyFilesResultItemViewModel> tvResult;
+    @FXML private TableColumn<CopyFilesResultItemViewModel, MaterialDesignIcon> colStatus;
+    @FXML private TableColumn<CopyFilesResultItemViewModel, String> colMessage;
+    @FXML private TableColumn<CopyFilesResultItemViewModel, String> colFile;
+    private final CopyFilesDialogViewModel viewModel;
 
     public CopyFilesDialogView(BibDatabaseContext bibDatabaseContext, CopyFilesResultListDependency results) {
-        super(createContext(bibDatabaseContext, results));
+        this.setTitle(Localization.lang("Result"));
+
+        this.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+
+        viewModel = new CopyFilesDialogViewModel(results);
+
+        ViewLoader.view(this)
+                  .load()
+                  .setAsContent(this.getDialogPane());
     }
 
-    @Override
-    public void show() {
-        FXDialog copyFilesResultDlg = new FXDialog(AlertType.INFORMATION, Localization.lang("Result"));
-        copyFilesResultDlg.setResizable(true);
-        copyFilesResultDlg.setDialogPane((DialogPane) this.getView());
-        copyFilesResultDlg.show();
+    @FXML
+    private void initialize() {
+        setupTable();
     }
 
-    private static Function<String, Object> createContext(BibDatabaseContext bibDatabaseContext, CopyFilesResultListDependency copyfilesresultlistDependency) {
-        Map<String, Object> context = new HashMap<>();
-        //The "keys" of the HashMap must have the same name as the with @inject annotated field in the controller
-        context.put("bibdatabasecontext", bibDatabaseContext);
-        context.put("copyfilesresultlistDependency", copyfilesresultlistDependency);
-        return context::get;
+    private void setupTable() {
+        colFile.setCellValueFactory(cellData -> cellData.getValue().getFile());
+        colMessage.setCellValueFactory(cellData -> cellData.getValue().getMessage());
+        colStatus.setCellValueFactory(cellData -> cellData.getValue().getIcon());
+
+        colFile.setCellFactory(new ValueTableCellFactory<CopyFilesResultItemViewModel, String>().withText(item -> item).withTooltip(item -> item));
+        colStatus.setCellFactory(new ValueTableCellFactory<CopyFilesResultItemViewModel, MaterialDesignIcon>().withGraphic(item -> {
+
+            Text icon = MaterialDesignIconFactory.get().createIcon(item);
+            if (item == MaterialDesignIcon.CHECK) {
+                icon.setFill(Color.GREEN);
+            }
+            if (item == MaterialDesignIcon.ALERT) {
+                icon.setFill(Color.RED);
+            }
+            return icon;
+        }));
+
+        tvResult.setItems(viewModel.copyFilesResultListProperty());
+        tvResult.setColumnResizePolicy((param) -> true);
     }
 }

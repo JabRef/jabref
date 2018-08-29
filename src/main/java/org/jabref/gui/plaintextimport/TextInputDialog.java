@@ -59,16 +59,12 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import org.jabref.Globals;
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.EntryMarker;
-import org.jabref.gui.FXDialogService;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.OSXCompatibleToolbar;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.component.OverlayPanel;
@@ -77,8 +73,8 @@ import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.FreeCiteImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.entry.BibEntry;
@@ -138,7 +134,7 @@ public class TextInputDialog extends JabRefDialog {
 
 
     public TextInputDialog(JabRefFrame frame, BibEntry bibEntry) {
-        super(frame, true, TextInputDialog.class);
+        super(true, TextInputDialog.class);
 
         this.frame = Objects.requireNonNull(frame);
 
@@ -177,7 +173,7 @@ public class TextInputDialog extends JabRefDialog {
         // Key bindings:
         ActionMap am = buttons.getActionMap();
         InputMap im = buttons.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         am.put("close", new AbstractAction() {
 
             @Override
@@ -479,15 +475,8 @@ public class TextInputDialog extends JabRefDialog {
             return false;
         } else {
             UpdateField.setAutomaticFields(importedEntries, false, false, Globals.prefs.getUpdateFieldPreferences());
-            boolean markEntries = EntryMarker.shouldMarkEntries();
 
-            for (BibEntry e : importedEntries) {
-                if (markEntries) {
-                    EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
-                }
-
-                frame.getCurrentBasePanel().insertEntry(e);
-            }
+            importedEntries.forEach(entry -> frame.getCurrentBasePanel().insertEntry(entry));
             return true;
         }
     }
@@ -526,12 +515,12 @@ public class TextInputDialog extends JabRefDialog {
 
         public PasteAction() {
             super(Localization.lang("Paste"), Localization.lang("Paste from clipboard"),
-                    IconTheme.JabRefIcon.PASTE.getIcon());
+                    IconTheme.JabRefIcons.PASTE.getIcon());
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String data = new ClipBoardManager().getClipboardContents();
+            String data = Globals.clipboardManager.getContents();
             int selStart = textPane.getSelectionStart();
             int selEnd = textPane.getSelectionEnd();
             if ((selEnd - selStart) > 0) {
@@ -549,17 +538,17 @@ public class TextInputDialog extends JabRefDialog {
     private class LoadAction extends BasicAction {
 
         public LoadAction() {
-            super(Localization.lang("Open"), Localization.lang("Open file"), IconTheme.JabRefIcon.OPEN.getIcon());
+            super(Localization.lang("Open"), Localization.lang("Open file"), IconTheme.JabRefIcons.OPEN.getIcon());
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                        .addExtensionFilter(FileType.TXT)
-                        .withDefaultExtension(FileType.TXT)
+                        .addExtensionFilter(Localization.lang("Plain text"), StandardFileType.TXT)
+                        .withDefaultExtension(Localization.lang("Plain text"), StandardFileType.TXT)
                         .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-                DialogService ds = new FXDialogService();
+                DialogService ds = frame.getDialogService();
 
                 Optional<Path> path = DefaultTaskExecutor
                         .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
@@ -584,7 +573,7 @@ public class TextInputDialog extends JabRefDialog {
     private class ClearAction extends BasicAction {
 
         public ClearAction() {
-            super(Localization.lang("Clear"), Localization.lang("Clear inputarea"), IconTheme.JabRefIcon.NEW.getIcon());
+            super(Localization.lang("Clear"), Localization.lang("Clear inputarea"), IconTheme.JabRefIcons.NEW.getIcon());
         }
 
         @Override
@@ -626,10 +615,10 @@ public class TextInputDialog extends JabRefDialog {
 
         private final Font baseFont;
         private final Font usedFont;
-        private final Icon okIcon = IconTheme.JabRefIcon.PLAIN_TEXT_IMPORT_DONE.getSmallIcon();
-        private final Icon needIcon = IconTheme.JabRefIcon.PLAIN_TEXT_IMPORT_TODO.getSmallIcon();
-        private final Color requiredColor = Globals.prefs.getColor(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND);
-        private final Color optionalColor = Globals.prefs.getColor(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND);
+        private final Icon okIcon = IconTheme.JabRefIcons.PLAIN_TEXT_IMPORT_DONE.getSmallIcon();
+        private final Icon needIcon = IconTheme.JabRefIcons.PLAIN_TEXT_IMPORT_TODO.getSmallIcon();
+        private final Color requiredColor = new Color(230, 235, 255);
+        private final Color optionalColor = new Color(230, 255, 230);
 
 
         public SimpleCellRenderer(Font normFont) {

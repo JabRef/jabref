@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.SwingUtilities;
 import javax.xml.transform.TransformerException;
 
 import javafx.beans.Observable;
@@ -20,26 +19,24 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 
-import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.filelist.FileListEntryEditor;
+import org.jabref.gui.filelist.LinkedFileEditDialogView;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -48,14 +45,11 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
-import de.jensd.fx.glyphs.GlyphIcons;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static javafx.scene.control.ButtonBar.ButtonData;
 
 public class LinkedFileViewModel extends AbstractViewModel {
 
@@ -71,33 +65,27 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final BibEntry entry;
     private final TaskExecutor taskExecutor;
     private final FileDirectoryPreferences fileDirectoryPreferences;
-    private final CleanupPreferences cleanupPreferences;
-    private final LayoutFormatterPreferences layoutFormatterPreferences;
+    private final String fileDirPattern;
     private final XmpPreferences xmpPreferences;
     private final String fileNamePattern;
 
-    /**
-     * @deprecated use {@link #LinkedFileViewModel(LinkedFile, BibEntry, BibDatabaseContext, TaskExecutor, DialogService, JabRefPreferences, JournalAbbreviationLoader)} instead
-     */
-    @Deprecated
-    public LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
-        this(linkedFile, entry, databaseContext, taskExecutor, new FXDialogService(), Globals.prefs, Globals.journalAbbreviationLoader);
-    }
+    public LinkedFileViewModel(LinkedFile linkedFile,
+                               BibEntry entry,
+                               BibDatabaseContext databaseContext,
+                               TaskExecutor taskExecutor,
+                               DialogService dialogService,
+                               JabRefPreferences preferences) {
 
-    public LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext,
-                               TaskExecutor taskExecutor, DialogService dialogService, JabRefPreferences preferences, JournalAbbreviationLoader abbreviationLoader) {
         this.linkedFile = linkedFile;
         this.databaseContext = databaseContext;
         this.entry = entry;
-        this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
 
-        cleanupPreferences = preferences.getCleanupPreferences(abbreviationLoader);
-        layoutFormatterPreferences = preferences.getLayoutFormatterPreferences(abbreviationLoader);
         xmpPreferences = preferences.getXMPPreferences();
         fileNamePattern = preferences.get(JabRefPreferences.IMPORT_FILENAMEPATTERN);
         fileDirectoryPreferences = preferences.getFileDirectoryPreferences();
-
+        fileDirPattern = preferences.get(JabRefPreferences.IMPORT_FILEDIRPATTERN);
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
         canWriteXMPMetadata.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
     }
@@ -134,6 +122,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
         return linkedFile.getDescription();
     }
 
+    public String getDescriptionAndLink() {
+        if (StringUtil.isBlank(linkedFile.getDescription())) {
+            return linkedFile.getLink();
+        } else {
+            return linkedFile.getDescription() + " (" + linkedFile.getLink() + ")";
+        }
+    }
+
     public Optional<Path> findIn(List<Path> directories) {
         return linkedFile.findIn(directories);
     }
@@ -142,8 +138,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
      * TODO: Be a bit smarter and try to infer correct icon, for example using {@link
      * org.jabref.gui.externalfiletype.ExternalFileTypes#getExternalFileTypeByName(String)}
      */
-    public GlyphIcons getTypeIcon() {
-        return MaterialDesignIcon.FILE_PDF;
+    public JabRefIcon getTypeIcon() {
+        return IconTheme.JabRefIcons.PDF_FILE;
     }
 
     public void markAsAutomaticallyFound() {
@@ -165,9 +161,12 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void open() {
         try {
             Optional<ExternalFileType> type = ExternalFileTypes.getInstance().fromLinkedFile(linkedFile, true);
-            JabRefDesktop.openExternalFileAnyFormat(databaseContext, linkedFile.getLink(), type);
+            boolean successful = JabRefDesktop.openExternalFileAnyFormat(databaseContext, linkedFile.getLink(), type);
+            if (!successful) {
+                dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+            }
         } catch (IOException e) {
-            LOGGER.warn("Cannot open selected file.", e);
+            dialogService.showErrorDialogAndWait(Localization.lang("Error opening file '%0'.", linkedFile.getLink()), e);
         }
     }
 
@@ -202,66 +201,39 @@ public class LinkedFileViewModel extends AbstractViewModel {
             // Cannot rename remote links
             return;
         }
-        Optional<Path> fileDir = databaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
-        if (!fileDir.isPresent()) {
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("Rename file"),
-                    Localization.lang("File directory is not set or does not exist!"));
-            return;
-        }
 
         Optional<Path> file = linkedFile.findIn(databaseContext, fileDirectoryPreferences);
         if ((file.isPresent()) && Files.exists(file.get())) {
-            RenamePdfCleanup pdfCleanup = new RenamePdfCleanup(false,
-                    databaseContext,
-                    cleanupPreferences.getFileNamePattern(),
-                    layoutFormatterPreferences,
-                    fileDirectoryPreferences, linkedFile);
-
-            String targetFileName = pdfCleanup.getTargetFileName(linkedFile, entry);
-
-            boolean confirm = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("Rename file"),
-                    Localization.lang("Rename file to") + " " + targetFileName,
-                    Localization.lang("Rename file"),
-                    Localization.lang("Cancel"));
-
-            if (confirm) {
-                Optional<Path> fileConflictCheck = pdfCleanup.findExistingFile(linkedFile, entry);
-
-                performRenameWithConflictCheck(file, pdfCleanup, targetFileName, fileConflictCheck);
-            }
+            RenamePdfCleanup pdfCleanup = new RenamePdfCleanup(false, databaseContext, fileDirPattern, fileDirectoryPreferences, linkedFile);
+            performRenameWithConflictCheck(file.get(), pdfCleanup);
         } else {
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("File not found"),
-                    Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+            dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
         }
     }
 
-    private void performRenameWithConflictCheck(Optional<Path> file, RenamePdfCleanup pdfCleanup, String targetFileName, Optional<Path> fileConflictCheck) {
+    private void performRenameWithConflictCheck(Path file, RenamePdfCleanup pdfCleanup) {
         boolean confirm;
+        Optional<Path> fileConflictCheck = pdfCleanup.findExistingFile(linkedFile, entry);
         if (!fileConflictCheck.isPresent()) {
             try {
                 pdfCleanup.cleanupWithException(entry);
             } catch (IOException e) {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("Rename failed"),
-                        Localization.lang("JabRef cannot access the file because it is being used by another process."));
+                dialogService.showErrorDialogAndWait(Localization.lang("Rename failed"), Localization.lang("JabRef cannot access the file because it is being used by another process."));
             }
         } else {
-            confirm = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("File exists"),
-                    Localization.lang("'%0' exists. Overwrite file?", targetFileName),
-                    Localization.lang("Overwrite"),
-                    Localization.lang("Cancel"));
+            String targetFileName = pdfCleanup.getTargetFileName(linkedFile, entry);
+            confirm = dialogService.showConfirmationDialogAndWait(Localization.lang("File exists"),
+                                                                  Localization.lang("'%0' exists. Overwrite file?", targetFileName),
+                                                                  Localization.lang("Overwrite"),
+                                                                  Localization.lang("Cancel"));
+
             if (confirm) {
                 try {
-                    FileUtil.renameFileWithException(fileConflictCheck.get(), file.get(), true);
+                    FileUtil.renameFileWithException(fileConflictCheck.get(), file, true);
                     pdfCleanup.cleanupWithException(entry);
                 } catch (IOException e) {
-                    dialogService.showErrorDialogAndWait(
-                            Localization.lang("Rename failed"),
-                            Localization.lang("JabRef cannot access the file because it is being used by another process."));
+                    dialogService.showErrorDialogAndWait(Localization.lang("Rename failed"),
+                                                         Localization.lang("JabRef cannot access the file because it is being used by another process."));
                 }
             }
         }
@@ -276,34 +248,24 @@ public class LinkedFileViewModel extends AbstractViewModel {
         // Get target folder
         Optional<Path> fileDir = databaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
         if (!fileDir.isPresent()) {
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("Move file"),
-                    Localization.lang("File directory is not set or does not exist!"));
+            dialogService.showErrorDialogAndWait(Localization.lang("Move file"), Localization.lang("File directory is not set or does not exist!"));
             return;
         }
 
         Optional<Path> file = linkedFile.findIn(databaseContext, fileDirectoryPreferences);
         if ((file.isPresent()) && Files.exists(file.get())) {
-            // Linked file exists, so move it
-            MoveFilesCleanup moveFiles = new MoveFilesCleanup(databaseContext,
-                    cleanupPreferences.getFileDirPattern(),
-                    fileDirectoryPreferences,
-                    layoutFormatterPreferences, linkedFile);
-
-            boolean confirm = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("Move file"),
-                    Localization.lang("Move file to file directory?") + " " + fileDir.get(),
-                    Localization.lang("Move file"),
-                    Localization.lang("Cancel"));
-            if (confirm) {
-                moveFiles.cleanup(entry);
-            }
+            // Found the linked file, so move it
+            MoveFilesCleanup moveFiles = new MoveFilesCleanup(databaseContext, fileDirPattern, fileDirectoryPreferences, linkedFile);
+            moveFiles.cleanup(entry);
         } else {
             // File doesn't exist, so we can't move it.
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("File not found"),
-                    Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+            dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
         }
+    }
+
+    public void moveToDefaultDirectoryAndRename() {
+        moveToDefaultDirectory();
+        rename();
     }
 
     public boolean delete(FileDirectoryPreferences prefs) {
@@ -317,9 +279,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
         ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"), ButtonData.YES);
         ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
         Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
-                Localization.lang("Delete '%0'", file.get().toString()),
-                Localization.lang("Delete the selected file permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk."),
-                removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
+                                                                                      Localization.lang("Delete '%0'", file.get().toString()),
+                                                                                      Localization.lang("Delete the selected file permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk."),
+                                                                                      removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
 
         if (buttonType.isPresent()) {
             if (buttonType.get().equals(removeFromEntry)) {
@@ -327,14 +289,11 @@ public class LinkedFileViewModel extends AbstractViewModel {
             }
 
             if (buttonType.get().equals(deleteFromEntry)) {
-
                 try {
                     Files.delete(file.get());
                     return true;
                 } catch (IOException ex) {
-                    dialogService.showErrorDialogAndWait(
-                            Localization.lang("Cannot delete file"),
-                            Localization.lang("File permission error"));
+                    dialogService.showErrorDialogAndWait(Localization.lang("Cannot delete file"), Localization.lang("File permission error"));
                     LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
                 }
             }
@@ -343,8 +302,15 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void edit() {
-        FileListEntryEditor editor = new FileListEntryEditor(linkedFile, false, true, databaseContext);
-        SwingUtilities.invokeLater(() -> editor.setVisible(true, false));
+
+        LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(this.linkedFile);
+
+        Optional<LinkedFile> editedFile = dialog.showAndWait();
+        editedFile.ifPresent(file -> {
+            this.linkedFile.setLink(file.getLink());
+            this.linkedFile.setDescription(file.getDescription());
+            this.linkedFile.setFileType(file.getFileType());
+        });
     }
 
     public void writeXMPMetadata() {
@@ -377,36 +343,35 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
 
         try {
-            URLDownload urlDownload = new URLDownload(linkedFile.getLink());
-            Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
-            String suggestedTypeName = suggestedType.map(ExternalFileType::getName).orElse("");
-            linkedFile.setFileType(suggestedTypeName);
-
             Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
             if (!targetDirectory.isPresent()) {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("Download file"),
-                        Localization.lang("File directory is not set or does not exist!"));
+                dialogService.showErrorDialogAndWait(Localization.lang("Download file"), Localization.lang("File directory is not set or does not exist!"));
                 return;
             }
-            String suffix = suggestedType.map(ExternalFileType::getExtension).orElse("");
-            String suggestedName = getSuggestedFileName(suffix);
-            Path destination = targetDirectory.get().resolve(suggestedName);
 
-            BackgroundTask<Void> downloadTask = new FileDownloadTask(urlDownload.getSource(), destination)
-                    .onSuccess(event -> {
+            URLDownload urlDownload = new URLDownload(linkedFile.getLink());
+            BackgroundTask<Path> downloadTask = BackgroundTask
+                    .wrap(() -> {
+                        Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
+                        String suggestedTypeName = suggestedType.map(ExternalFileType::getName).orElse("");
+                        linkedFile.setFileType(suggestedTypeName);
+
+                        String suffix = suggestedType.map(ExternalFileType::getExtension).orElse("");
+                        String suggestedName = getSuggestedFileName(suffix);
+                        return targetDirectory.get().resolve(suggestedName);
+                    })
+                    .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
+                    .onSuccess(destination -> {
                         LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectoriesAsPaths(fileDirectoryPreferences));
                         linkedFile.setLink(newLinkedFile.getLink());
                         linkedFile.setFileType(newLinkedFile.getFileType());
                     })
-                    .onFailure(ex -> dialogService.showErrorDialogAndWait("Download failed", ex));
+                    .onFailure(exception -> dialogService.showErrorDialogAndWait("Download failed", exception));
 
             downloadProgress.bind(downloadTask.workDonePercentageProperty());
             taskExecutor.execute(downloadTask);
         } catch (MalformedURLException exception) {
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("Invalid URL"),
-                    exception);
+            dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
         }
     }
 
@@ -421,7 +386,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     private Optional<ExternalFileType> inferFileTypeFromMimeType(URLDownload urlDownload) {
-        // TODO: what if this takes long time?
         String mimeType = urlDownload.getMimeType();
 
         if (mimeType != null) {

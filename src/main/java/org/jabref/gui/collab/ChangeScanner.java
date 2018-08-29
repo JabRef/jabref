@@ -1,13 +1,10 @@
 package org.jabref.gui.collab;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -32,18 +29,17 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.metadata.MetaData;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ChangeScanner implements Runnable {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeScanner.class);
 
-    private final File file;
+    private final Optional<Path> file;
     private final Path tempFile;
     private final BibDatabaseContext databaseInMemory;
-    private final MetaData metadataInMemory;
 
     private final BasePanel panel;
     private final JabRefFrame frame;
@@ -58,12 +54,11 @@ public class ChangeScanner implements Runnable {
 
     //  NamedCompound edit = new NamedCompound("Merged external changes")
 
-    public ChangeScanner(JabRefFrame frame, BasePanel bp, File file, Path tempFile) {
+    public ChangeScanner(JabRefFrame frame, BasePanel bp, Path file, Path tempFile) {
         this.panel = bp;
         this.frame = frame;
         this.databaseInMemory = bp.getBibDatabaseContext();
-        this.metadataInMemory = bp.getBibDatabaseContext().getMetaData();
-        this.file = file;
+        this.file = Optional.ofNullable(file);
         this.tempFile = tempFile;
     }
 
@@ -77,15 +72,14 @@ public class ChangeScanner implements Runnable {
      */
     private static BibEntry bestFit(BibEntry targetEntry, List<BibEntry> entries) {
         return entries.stream()
-                .max(Comparator.comparingDouble(candidate -> DuplicateCheck.compareEntriesStrictly(targetEntry, candidate)))
-                .orElse(null);
+                      .max(Comparator.comparingDouble(candidate -> DuplicateCheck.compareEntriesStrictly(targetEntry, candidate)))
+                      .orElse(null);
     }
 
     public void displayResult(final DisplayResultCallback fup) {
         if (changes.getChildCount() > 0) {
             SwingUtilities.invokeLater(() -> {
-                ChangeDisplayDialog changeDialog = new ChangeDisplayDialog(frame, panel, databaseInTemp.getDatabase(), changes);
-                changeDialog.setLocationRelativeTo(frame);
+                ChangeDisplayDialog changeDialog = new ChangeDisplayDialog(panel, databaseInTemp.getDatabase(), changes);
                 changeDialog.setVisible(true);
                 fup.scanResultsResolved(changeDialog.isOkPressed());
                 if (changeDialog.isOkPressed()) {
@@ -94,8 +88,9 @@ public class ChangeScanner implements Runnable {
                 }
             });
         } else {
-            JOptionPane.showMessageDialog(frame, Localization.lang("No actual changes found."),
-                    Localization.lang("External changes"), JOptionPane.INFORMATION_MESSAGE);
+            frame.getDialogService().showInformationDialogAndWait(Localization.lang("External changes"),
+                                                                  Localization.lang("No actual changes found."));
+
             fup.scanResultsResolved(true);
         }
     }
@@ -103,9 +98,12 @@ public class ChangeScanner implements Runnable {
     private void storeTempDatabase() {
         JabRefExecutorService.INSTANCE.execute(() -> {
             try {
-                SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences().withMakeBackup(false)
-                        .withEncoding(panel.getBibDatabaseContext().getMetaData().getEncoding()
-                                .orElse(Globals.prefs.getDefaultEncoding()));
+                SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences()
+                                                     .withMakeBackup(false)
+                                                     .withEncoding(panel.getBibDatabaseContext()
+                                                                        .getMetaData()
+                                                                        .getEncoding()
+                                                                        .orElse(Globals.prefs.getDefaultEncoding()));
 
                 BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
                 SaveSession ss = databaseWriter.saveDatabase(databaseInTemp, prefs);
@@ -118,29 +116,26 @@ public class ChangeScanner implements Runnable {
 
     @Override
     public void run() {
-        try {
-
+        file.ifPresent(diskdb -> {
             // Parse the temporary file.
             ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
-            ParserResult result = OpenDatabase.loadDatabase(tempFile.toFile(), importFormatPreferences, Globals.getFileUpdateMonitor());
+            ParserResult result = OpenDatabase.loadDatabase(tempFile.toAbsolutePath().toString(), importFormatPreferences, Globals.getFileUpdateMonitor());
             databaseInTemp = result.getDatabaseContext();
 
             // Parse the modified file.
-            result = OpenDatabase.loadDatabase(file, importFormatPreferences, Globals.getFileUpdateMonitor());
+            result = OpenDatabase.loadDatabase(diskdb.toAbsolutePath().toString(), importFormatPreferences, Globals.getFileUpdateMonitor());
             BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
 
             // Start looking at changes.
             BibDatabaseDiff differences = BibDatabaseDiff.compare(databaseInTemp, databaseOnDisk);
             differences.getMetaDataDifferences().ifPresent(diff -> {
-                changes.add(new MetaDataChangeViewModel(metadataInMemory, diff));
+                changes.add(new MetaDataChangeViewModel(diff));
                 diff.getGroupDifferences().ifPresent(groupDiff -> changes.add(new GroupChangeViewModel(groupDiff)));
             });
             differences.getPreambleDifferences().ifPresent(diff -> changes.add(new PreambleChangeViewModel(databaseInMemory.getDatabase().getPreamble().orElse(""), diff)));
             differences.getBibStringDifferences().forEach(diff -> changes.add(createBibStringDiff(diff)));
             differences.getEntryDifferences().forEach(diff -> changes.add(createBibEntryDiff(diff)));
-        } catch (IOException ex) {
-            LOGGER.warn("Problem running", ex);
-        }
+        });
     }
 
     private ChangeViewModel createBibStringDiff(BibStringDiff diff) {
@@ -176,6 +171,7 @@ public class ChangeScanner implements Runnable {
 
     @FunctionalInterface
     public interface DisplayResultCallback {
+
         void scanResultsResolved(boolean resolved);
     }
 }

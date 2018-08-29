@@ -5,11 +5,13 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.application.Platform;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -22,8 +24,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 
 import org.jabref.Globals;
-import org.jabref.gui.FXDialogService;
-import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
@@ -50,12 +51,14 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private final BibDatabaseContext databaseContext;
     private UndoManager undoManager;
     private Collection<String> fields;
+    private final DialogService dialogService;
 
-    public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager) {
+    public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService) {
         this.isCompressed = compressed;
         this.databaseContext = databaseContext;
         this.suggestionProviders = suggestionProviders;
         this.undoManager = undoManager;
+        this.dialogService = dialogService;
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -66,31 +69,31 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         gridPane.addColumn(columnIndex, nodes.toArray(Node[]::new));
     }
 
-    private String convertToHex(java.awt.Color color) {
-        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
-    }
-
     private Region setupPanel(BibEntry entry, boolean compressed, SuggestionProviders suggestionProviders, UndoManager undoManager) {
+        // The preferences might be not initialized in tests -> return empty node
+        // TODO: Replace this ugly workaround by proper injection propagation
+        if (Globals.prefs == null) {
+            return new Region();
+        }
+
         editors.clear();
 
         EntryType entryType = EntryTypes.getTypeOrDefault(entry.getType(), databaseContext.getMode());
         fields = determineFieldsToShow(entry, entryType);
 
         List<Label> labels = new ArrayList<>();
+        boolean isFirstField = true;
         for (String fieldName : fields) {
-            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.TASK_EXECUTOR, new FXDialogService(),
-                    Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs,
-                    databaseContext, entry.getType(),
-                    suggestionProviders, undoManager);
+            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.TASK_EXECUTOR, dialogService,
+                    Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
+                    Globals.prefs, databaseContext, entry.getType(), suggestionProviders, undoManager);
             fieldEditor.bindToEntry(entry);
 
             editors.put(fieldName, fieldEditor);
-            /*
-            // TODO: Reenable this
-            if (i == 0) {
+            if (isFirstField) {
                 activeField = fieldEditor;
+                isFirstField = false;
             }
-            */
 
             labels.add(new FieldNameLabel(fieldName));
         }
@@ -125,13 +128,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);
 
             setRegularRowLayout(gridPane, rows);
-        }
-
-        if (GUIGlobals.currentFont != null) {
-            gridPane.setStyle(
-                    "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"
-                            + "text-area-foreground: " + convertToHex(GUIGlobals.editorTextColor) + ";"
-                            + "text-area-highlight: " + convertToHex(GUIGlobals.activeBackgroundColor) + ";");
         }
 
         // Warp everything in a scroll-pane
@@ -203,7 +199,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     public void requestFocus(String fieldName) {
         if (editors.containsKey(fieldName)) {
             activeField = editors.get(fieldName);
-            activeField.requestFocus();
+            activeField.focus();
         }
     }
 
@@ -216,14 +212,25 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     @Override
     public void handleFocus() {
         if (activeField != null) {
-            activeField.requestFocus();
+            activeField.focus();
         }
     }
 
     @Override
     protected void bindToEntry(BibEntry entry) {
+        Optional<String> selectedFieldName = editors.entrySet()
+                                                    .stream()
+                                                    .filter(editor -> editor.getValue().childIsFocused())
+                                                    .map(Map.Entry::getKey)
+                                                    .findFirst();
+
         Region panel = setupPanel(entry, isCompressed, suggestionProviders, undoManager);
         setContent(panel);
+
+        Platform.runLater(() -> {
+            // Restore focus to field (run this async so that editor is already initialized correctly)
+            selectedFieldName.ifPresent(this::requestFocus);
+        });
     }
 
     protected abstract Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType);

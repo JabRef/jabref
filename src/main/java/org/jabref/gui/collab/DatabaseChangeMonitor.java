@@ -10,6 +10,7 @@ import javax.swing.SwingUtilities;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.SidePaneManager;
+import org.jabref.gui.SidePaneType;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -59,7 +60,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
 
         updatedExternally = true;
 
-        final ChangeScanner scanner = new ChangeScanner(panel.frame(), panel, database.getDatabaseFile().orElse(null), tmpFile);
+        final ChangeScanner scanner = new ChangeScanner(panel.frame(), panel, database.getDatabasePath().orElse(null), tmpFile);
 
         // Test: running scan automatically in background
         if (database.getDatabasePath().isPresent() && !FileBasedLock.waitForFileLock(database.getDatabasePath().get())) {
@@ -75,25 +76,21 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             fileUpdated();
             return;
         }
-
         JabRefExecutorService.INSTANCE.executeInterruptableTaskAndWait(scanner);
 
         // Adding the sidepane component is Swing work, so we must do this in the Swing
         // thread:
         Runnable t = () -> {
 
-            // Check if there is already a notification about external
-            // changes:
+            // Check if there is already a notification about external changes:
             SidePaneManager sidePaneManager = panel.getSidePaneManager();
-            boolean hasAlready = sidePaneManager.hasComponent(FileUpdatePanel.class);
+            boolean hasAlready = sidePaneManager.isComponentVisible(SidePaneType.FILE_UPDATE_NOTIFICATION);
             if (hasAlready) {
-                sidePaneManager.hideComponent(FileUpdatePanel.class);
-                sidePaneManager.unregisterComponent(FileUpdatePanel.class);
+                sidePaneManager.hide(SidePaneType.FILE_UPDATE_NOTIFICATION);
             }
-            FileUpdatePanel pan = new FileUpdatePanel(panel, sidePaneManager,
-                    database.getDatabaseFile().orElse(null), scanner);
-            sidePaneManager.register(pan);
-            sidePaneManager.show(FileUpdatePanel.class);
+
+            FileUpdatePanel component = (FileUpdatePanel) sidePaneManager.getComponent(SidePaneType.FILE_UPDATE_NOTIFICATION);
+            component.showForFile(panel, database.getDatabaseFile().orElse(null), scanner);
         };
 
         if (scanner.changesFound()) {

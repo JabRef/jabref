@@ -28,20 +28,16 @@ import org.slf4j.LoggerFactory;
  * them in unescaped form inside a {@link LocalizationBundle} which provides fast access because it caches the key-value
  * pairs.
  * <p>
- * The access to this is given by the functions {@link Localization#lang(String, String...)} and {@link
- * Localization#menuTitle(String, String...)} that developers should use whenever they use strings for the e.g. GUI that
- * need to be translatable.
+ * The access to this is given by the functions {@link Localization#lang(String, String...)} and
+ * that developers should use whenever they use strings for the e.g. GUI that need to be translatable.
  */
 public class Localization {
-    public static final String BIBTEX = "BibTeX";
     static final String RESOURCE_PREFIX = "l10n/JabRef";
-    static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Localization.class);
 
     private static Locale locale;
     private static LocalizationBundle localizedMessages;
-    private static LocalizationBundle localizedMenuTitles;
 
     private Localization() {
     }
@@ -56,37 +52,10 @@ public class Localization {
     public static String lang(String key, String... params) {
         if (localizedMessages == null) {
             // I'm logging this because it should never happen
-            LOGGER.error("Messages are not initialized before accessing " + key);
-            setLanguage("en");
+            LOGGER.error("Messages are not initialized before accessing key: " + key);
+            setLanguage(Language.English);
         }
-        return lookup(localizedMessages, "message", key, params);
-    }
-
-    /**
-     * Public access to menu entry messages
-     *
-     * @param key    The key of the message in unescaped form like "Save all"
-     * @param params Replacement strings for parameters %0, %1, etc.
-     * @return The message with replaced parameters
-     */
-    public static String menuTitle(String key, String... params) {
-        if (localizedMenuTitles == null) {
-            // I'm logging this because it should never happen
-            LOGGER.error("Menu entries are not initialized");
-            setLanguage("en");
-        }
-        return lookup(localizedMenuTitles, "menu item", key, params);
-    }
-
-    /**
-     * Return the translated string for usage in JavaFX menus.
-     *
-     * @implNote This is only a temporary workaround. In the long term, the & sign should be removed from the language
-     * files.
-     */
-    public static String menuTitleFX(String key, String... params) {
-        // Remove & sign, which is not used by JavaFX to signify the shortcut
-        return menuTitle(key, params).replace("&", "");
+        return lookup(localizedMessages, key, params);
     }
 
     /**
@@ -95,12 +64,12 @@ public class Localization {
      *
      * @param language Language identifier like "en", "de", etc.
      */
-    public static void setLanguage(String language) {
-        Optional<Locale> knownLanguage = Languages.convertToSupportedLocale(language);
+    public static void setLanguage(Language language) {
+        Optional<Locale> knownLanguage = Language.convertToSupportedLocale(language);
         final Locale defaultLocale = Locale.getDefault();
         if (!knownLanguage.isPresent()) {
             LOGGER.warn("Language " + language + " is not supported by JabRef (Default:" + defaultLocale + ")");
-            setLanguage("en");
+            setLanguage(Language.English);
             return;
         }
         // avoid reinitialization of the language bundles
@@ -117,19 +86,19 @@ public class Localization {
         } catch (MissingResourceException ex) {
             // should not happen as we have scripts to enforce this
             LOGGER.warn("Could not find bundles for language " + locale + ", switching to full english language", ex);
-            setLanguage("en");
+            setLanguage(Language.English);
         }
     }
 
     /**
-     * Public access to the messages bundle for classes like AbstractView.
+     * Returns the messages bundle, e.g. to load FXML files correctly translated.
      *
      * @return The internally cashed bundle.
      */
     public static LocalizationBundle getMessages() {
         // avoid situations where this function is called before any language was set
         if (locale == null) {
-            setLanguage("en");
+            setLanguage(Language.English);
         }
         return localizedMessages;
     }
@@ -143,11 +112,8 @@ public class Localization {
      */
     private static void createResourceBundles(Locale locale) {
         ResourceBundle messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
-        ResourceBundle menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
         Objects.requireNonNull(messages, "Could not load " + RESOURCE_PREFIX + " resource.");
-        Objects.requireNonNull(menuTitles, "Could not load " + MENU_RESOURCE_PREFIX + " resource.");
-        localizedMenuTitles = new LocalizationBundle(createLookupMap(menuTitles));
-        localizedMessages = new LocalizationBundle(createLookupMap(messages, localizedMenuTitles));
+        localizedMessages = new LocalizationBundle(createLookupMap(messages));
     }
 
     /**
@@ -166,48 +132,20 @@ public class Localization {
     }
 
     /**
-     * Helper function to create a HashMap from the key/value pairs of a bundle and existing localized menu titles.
-     * Currently, JabRef has two translations for the same string: One for the menu and one for other parts of the
-     * application. The menu might contain an ampersand (&), which causes issues when used outside the menu.
-     * With this fix, the ampersand is removed
-     */
-    private static HashMap<String,String> createLookupMap(ResourceBundle baseBundle, LocalizationBundle localizedMenuTitles) {
-        final ArrayList<String> baseKeys = Collections.list(baseBundle.getKeys());
-        return new HashMap<>(baseKeys.stream().collect(
-                Collectors.toMap(
-                        key -> new LocalizationKey(key).getTranslationValue(),
-                        key -> {
-                            String menuTranslationValue = localizedMenuTitles.lookup.get(key);
-                            String plainTranslationValue = new LocalizationKey(baseBundle.getString(key)).getTranslationValue();
-                            String translationValue;
-                            if (plainTranslationValue.contains("&") && plainTranslationValue.equals(menuTranslationValue)) {
-                                translationValue = plainTranslationValue.replace("&", "");
-                            } else {
-                                translationValue = plainTranslationValue;
-                            }
-                            return translationValue;
-                        })
-        ));
-    }
-
-    /**
      * This looks up a key in the bundle and replaces parameters %0, ..., %9 with the respective params given. Note that
      * the keys are the "unescaped" strings from the bundle property files.
      *
-     * @param bundle            The {@link LocalizationBundle} which means either {@link Localization#localizedMenuTitles}
-     *                          or {@link Localization#localizedMessages}.
-     * @param idForErrorMessage Identifier-string when the translation is not found.
+     * @param bundle            The {@link LocalizationBundle} which is usually {@link Localization#localizedMessages}.
      * @param key               The lookup key.
      * @param params            The parameters that should be inserted into the message
      * @return The final message with replaced parameters.
      */
-    private static String lookup(LocalizationBundle bundle, String idForErrorMessage, String key, String... params) {
+    private static String lookup(LocalizationBundle bundle, String key, String... params) {
         Objects.requireNonNull(key);
 
         String translation = bundle.containsKey(key) ? bundle.getString(key) : "";
         if (translation.isEmpty()) {
-            LOGGER.warn("Warning: could not get " + idForErrorMessage + " translation for \"" + key + "\" for locale "
-                    + Locale.getDefault());
+            LOGGER.warn("Warning: could not get translation for \"" + key + "\" for locale " + Locale.getDefault());
             translation = key;
         }
         return new LocalizationKeyParams(translation, params).replacePlaceholders();

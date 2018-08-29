@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
  * Implementation based on https://stackoverflow.com/questions/16251273/can-i-watch-for-single-file-change-with-watchservice-not-the-whole-directory
  */
 public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFileUpdateMonitor.class);
 
     private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
@@ -68,10 +69,13 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
     @Override
     public void addListenerForFile(Path file, FileUpdateListener listener) throws IOException {
+        if (watcher == null) {
+            throw new IllegalStateException("You need to start the file monitor before watching files");
+        }
+
         // We can't watch files directly, so monitor their parent directory for updates
         Path directory = file.toAbsolutePath().getParent();
         directory.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
-
         listeners.put(file, listener);
     }
 

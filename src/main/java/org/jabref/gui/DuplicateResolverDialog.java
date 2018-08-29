@@ -45,7 +45,7 @@ public class DuplicateResolverDialog extends JabRefDialog {
     private MergeEntries me;
 
     public DuplicateResolverDialog(JabRefFrame frame, BibEntry one, BibEntry two, DuplicateResolverType type) {
-        super(frame, Localization.lang("Possible duplicate entries"), true, DuplicateResolverDialog.class);
+        super(Localization.lang("Possible duplicate entries"), true, DuplicateResolverDialog.class);
         this.frame = frame;
         init(one, two, type);
     }

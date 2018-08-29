@@ -54,7 +54,7 @@ import org.jabref.logic.importer.fileformat.mods.StringPlusLanguagePlusSupplied;
 import org.jabref.logic.importer.fileformat.mods.SubjectDefinition;
 import org.jabref.logic.importer.fileformat.mods.TitleInfoDefinition;
 import org.jabref.logic.importer.fileformat.mods.UrlDefinition;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
@@ -416,7 +416,7 @@ public class ModsImporter extends Importer implements Parser {
 
     private void putIfListIsNotEmpty(Map<String, String> fields, List<String> list, String key, String separator) {
         if (!list.isEmpty()) {
-            fields.put(key, Joiner.on(separator).join(list));
+            fields.put(key, list.stream().collect(Collectors.joining(separator)));
         }
     }
 
@@ -477,8 +477,8 @@ public class ModsImporter extends Importer implements Parser {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.MODS;
+    public StandardFileType getFileType() {
+        return StandardFileType.XML;
     }
 
     @Override

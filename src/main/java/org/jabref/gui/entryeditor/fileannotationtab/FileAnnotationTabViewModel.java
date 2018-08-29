@@ -16,8 +16,8 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
+import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
@@ -49,6 +49,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         this.cache = cache;
         this.entry = entry;
         this.fileMonitor = fileMonitor;
+
         fileAnnotations = this.cache.getFromCache(this.entry);
         files.setAll(fileAnnotations.keySet());
     }
@@ -121,7 +122,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         sj.add(Localization.lang("Content") + ": " + getCurrentAnnotation().getContent());
         sj.add(Localization.lang("Marking") + ": " + getCurrentAnnotation().markingProperty().get());
 
-        new ClipBoardManager().setClipboardContents(sj.toString());
+        Globals.clipboardManager.setContent(sj.toString());
     }
 
     private FileAnnotationViewModel getCurrentAnnotation() {

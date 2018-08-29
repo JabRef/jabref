@@ -7,11 +7,11 @@ import java.util.Locale;
 import java.util.Optional;
 
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.jabref.Globals;
+import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
@@ -22,18 +22,21 @@ import org.jabref.preferences.JabRefPreferences;
 
 /**
  * This class extends FieldSetComponent to provide some required functionality for the
- * list of entry types in EntryCustomizationDialog.
- * @author alver
+ * list of entry types in EntryTypeCustomizationDialog.
  */
 public class EntryTypeList extends FieldSetComponent implements ListSelectionListener {
 
     private final JButton def = new JButton(Localization.lang("Default"));
     private final BibDatabaseMode mode;
+    private final DialogService dialogService;
 
-    /** Creates a new instance of EntryTypeList */
-    public EntryTypeList(List<String> fields, BibDatabaseMode mode) {
-        super(Localization.lang("Entry types"), fields, false, true);
+    /**
+     * Creates a new instance of EntryTypeList
+     */
+    public EntryTypeList(DialogService dialogService, List<String> fields, BibDatabaseMode mode) {
+        super(Localization.lang("Entry types"), fields, fields, false, true);
         this.mode = mode;
+        this.dialogService = dialogService;
 
         con.gridx = 0;
         con.gridy = 2;
@@ -61,15 +64,17 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
                 Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
         if (!testString.equals(s) || (s.indexOf('&') >= 0)) {
             // Report error and exit.
-            JOptionPane.showMessageDialog(this, Localization.lang("Entry type names are not allowed to contain white space or the following "
-                            + "characters") + ": # { } ~ , ^ &",
-                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+
+            dialogService.showErrorDialogAndWait(Localization.lang("Error"),
+                    Localization.lang("Entry type names are not allowed to contain white space or the following "
+                            + "characters") + ": # { } ~ , ^ &");
+
             return;
-        }
-        else if ("comment".equalsIgnoreCase(s)) {
+        } else if ("comment".equalsIgnoreCase(s)) {
             // Report error and exit.
-            JOptionPane.showMessageDialog(this, Localization.lang("The name 'comment' cannot be used as an entry type name."),
-                    Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+            dialogService.showErrorDialogAndWait(Localization.lang("Error"),
+                    Localization.lang("The name 'comment' cannot be used as an entry type name."));
+
             return;
         }
         addFieldUncritically(s);
@@ -93,8 +98,8 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
                 listModel.removeElementAt(selected[selected.length - 1 - i]);
             } else {
                 // This shouldn't happen, since the Remove button should be disabled.
-                JOptionPane.showMessageDialog(null, Localization.lang("This entry type cannot be removed."),
-                        Localization.lang("Remove entry type"), JOptionPane.ERROR_MESSAGE);
+                dialogService.showErrorDialogAndWait(Localization.lang("Remove entry type"),
+                        Localization.lang("This entry type cannot be removed."));
             }
         }
     }

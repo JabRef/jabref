@@ -93,6 +93,10 @@ public class InternalBibtexFields {
             SpecialField.RELEVANCE.getFieldName()
     );
 
+    private static final Set<String> SINGLE_LINE_FIELDS = Collections.unmodifiableSet(new HashSet<>(
+            Arrays.asList(FieldName.TITLE, FieldName.AUTHOR, FieldName.YEAR, FieldName.INSTITUTION)
+    ));
+
     // singleton instance
     private static InternalBibtexFields RUNTIME = new InternalBibtexFields();
 
@@ -175,12 +179,6 @@ public class InternalBibtexFields {
         add(new BibtexSingleField(FieldName.PUBSTATE).withProperties(FieldProperty.PUBLICATION_STATE));
 
         // some internal fields
-        tempField = new BibtexSingleField(FieldName.NUMBER_COL, false, 32);
-        tempField.setPrivate();
-        tempField.setWriteable(false);
-        tempField.setDisplayable(false);
-        add(tempField);
-
         tempField = new BibtexSingleField(FieldName.OWNER, false).withProperties(FieldProperty.OWNER);
         tempField.setPrivate();
         add(tempField);
@@ -382,7 +380,7 @@ public class InternalBibtexFields {
         return Optional.empty();
     }
 
-    public static int getFieldLength(String name) {
+    public static Double getFieldLength(String name) {
         return InternalBibtexFields.getField(name)
                 .map(BibtexSingleField::getLength)
                 .orElse(BibtexSingleField.DEFAULT_FIELD_LENGTH);
@@ -480,5 +478,9 @@ public class InternalBibtexFields {
      */
     private void add(BibtexSingleField field) {
         fieldSet.put(field.getName(), field);
+    }
+
+    public static boolean isSingleLineField(final String fieldName) {
+        return SINGLE_LINE_FIELDS.contains(fieldName.toLowerCase());
     }
 }

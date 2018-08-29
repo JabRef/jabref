@@ -6,14 +6,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import javax.swing.Icon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -27,14 +25,18 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToLyx.class);
 
+    public PushToLyx(DialogService dialogService) {
+        super(dialogService);
+    }
+
     @Override
     public String getApplicationName() {
         return "LyX/Kile";
     }
 
     @Override
-    public Icon getIcon() {
-        return IconTheme.getImage("lyx");
+    public JabRefIcon getIcon() {
+        return IconTheme.JabRefIcons.APPLICATION_LYX;
     }
 
     @Override
@@ -46,28 +48,19 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
     public void operationCompleted(BasePanel panel) {
         if (couldNotConnect) {
             panel.output(Localization.lang("Error") + ": " +
-                    Localization.lang("verify that LyX is running and that the lyxpipe is valid")
-                    + ". [" + commandPath + "]");
+                         Localization.lang("verify that LyX is running and that the lyxpipe is valid")
+                         + ". [" + commandPath + "]");
         } else if (couldNotCall) {
             panel.output(Localization.lang("Error") + ": " +
-                    Localization.lang("unable to write to") + " " + commandPath +
-                    ".in");
+                         Localization.lang("unable to write to") + " " + commandPath +
+                         ".in");
         } else {
             super.operationCompleted(panel);
         }
     }
 
     @Override
-    protected void initSettingsPanel() {
-        super.initSettingsPanel();
-        settings = new JPanel();
-        settings.add(new JLabel(Localization.lang("Path to LyX pipe") + ":"));
-        settings.add(path);
-    }
-
-    @Override
-    public void pushEntries(BibDatabase database, final List<BibEntry> entries, final String keyString,
-            MetaData metaData) {
+    public void pushEntries(BibDatabase database, final List<BibEntry> entries, final String keyString, MetaData metaData) {
 
         couldNotConnect = false;
         couldNotCall = false;

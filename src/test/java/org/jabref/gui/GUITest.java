@@ -5,17 +5,16 @@ import java.io.IOException;
 import javax.swing.JButton;
 
 import org.jabref.gui.dbproperties.DatabasePropertiesDialog;
-import org.jabref.gui.preftabs.PreferencesDialog;
 
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
 import org.assertj.swing.fixture.DialogFixture;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.swing.finder.WindowFinder.findDialog;
 
-@Category(org.jabref.testutils.category.GUITest.class)
+@Tag("GUITest")
 public class GUITest extends AbstractUITest {
 
     @Test
@@ -43,24 +42,6 @@ public class GUITest extends AbstractUITest {
                     }
                 }).click();
         takeScreenshot(mainFrame, "MainWindowWithOneDatabase");
-    }
-
-    @Test
-    public void testOpenAndSavePreferences() throws IOException {
-        mainFrame.menuItemWithPath("Options", "Preferences").click();
-
-        robot().waitForIdle();
-
-        DialogFixture preferencesDialog = findDialog(PreferencesDialog.class).withTimeout(10_000).using(robot());
-        takeScreenshot(preferencesDialog, "PreferencesDialog");
-        preferencesDialog.button(new GenericTypeMatcher<JButton>(JButton.class) {
-                    @Override
-                    protected boolean isMatching(@Nonnull JButton jButton) {
-                        return "OK".equals(jButton.getText());
-                    }
-                }).click();
-
-        exitJabRef();
     }
 
     /**

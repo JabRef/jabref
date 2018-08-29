@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.jabref.JabRefExecutorService;
@@ -19,11 +18,11 @@ import org.jabref.model.entry.BibEntry;
  * An Action class representing the process of invoking a PushToApplication operation.
  */
 class PushToApplicationAction extends AbstractAction implements Runnable {
+
     private final PushToApplication operation;
     private final JabRefFrame frame;
     private BasePanel panel;
     private List<BibEntry> entries;
-
 
     public PushToApplicationAction(JabRefFrame frame, PushToApplication operation) {
         this.frame = frame;
@@ -45,7 +44,9 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         // Check if any entries are selected:
         entries = panel.getSelectedEntries();
         if (entries.isEmpty()) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("This operation requires one or more entries to be selected."), (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
+            frame.getDialogService().showErrorDialogAndWait((String) getValue(Action.NAME),
+                    Localization.lang("This operation requires one or more entries to be selected."));
+
             return;
         }
 
@@ -53,10 +54,9 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         if (operation.requiresBibtexKeys()) {
             for (BibEntry entry : entries) {
                 if (!(entry.getCiteKeyOptional().isPresent()) || entry.getCiteKeyOptional().get().trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(frame,
-                            Localization
-                                    .lang("This operation requires all selected entries to have BibTeX keys defined."),
-                            (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
+                    frame.getDialogService().showErrorDialogAndWait((String) getValue(Action.NAME),
+                            Localization.lang("This operation requires all selected entries to have BibTeX keys defined."));
+
                     return;
                 }
             }

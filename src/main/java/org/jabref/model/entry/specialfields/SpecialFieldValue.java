@@ -34,6 +34,23 @@ public enum SpecialFieldValue {
         this.keyword = Optional.ofNullable(keyword).map(Keyword::new);
     }
 
+    public static SpecialFieldValue getRating(int ranking) {
+        switch (ranking) {
+            case 1:
+                return RANK_1;
+            case 2:
+                return RANK_2;
+            case 3:
+                return RANK_3;
+            case 4:
+                return RANK_4;
+            case 5:
+                return RANK_5;
+            default:
+                throw new UnsupportedOperationException(ranking + "is not a valid ranking");
+        }
+    }
+
     public Optional<Keyword> getKeyword() {
         return keyword;
     }
@@ -42,4 +59,20 @@ public enum SpecialFieldValue {
         return keyword.map(Keyword::toString);
     }
 
+    public int toRating() {
+        switch (this) {
+            case RANK_1:
+                return 1;
+            case RANK_2:
+                return 2;
+            case RANK_3:
+                return 3;
+            case RANK_4:
+                return 4;
+            case RANK_5:
+                return 5;
+            default:
+                throw new UnsupportedOperationException(this + "is not a valid ranking");
+        }
+    }
 }

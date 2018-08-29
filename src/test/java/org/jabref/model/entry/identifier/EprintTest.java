@@ -55,6 +55,6 @@ public class EprintTest {
 
     @Test
     public void constructCorrectURLForEprint() {
-        assertEquals("http://arxiv.org/abs/0706.0001v1", new Eprint("0706.0001v1").getURIAsASCIIString());
+        assertEquals("https://arxiv.org/abs/0706.0001v1", new Eprint("0706.0001v1").getURIAsASCIIString());
     }
 }

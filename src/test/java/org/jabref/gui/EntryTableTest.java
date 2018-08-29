@@ -3,13 +3,12 @@ package org.jabref.gui;
 import java.awt.event.KeyEvent;
 import java.util.regex.Pattern;
 
-import org.jabref.testutils.category.GUITest;
-
 import org.assertj.swing.fixture.JTableCellFixture;
 import org.assertj.swing.fixture.JTableFixture;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Specific Use-Case:
@@ -17,7 +16,7 @@ import org.junit.experimental.categories.Category;
  * Then I click on the first entry again, and scroll through all of the lists entries, without having to click
  * on the table again.
  */
-@Category(GUITest.class)
+@Tag("GUITest")
 public class EntryTableTest extends AbstractUITest{
 
     private final static int SCROLL_ACTION_EXECUTION = 5;
@@ -51,13 +50,13 @@ public class EntryTableTest extends AbstractUITest{
         //go throught the table and check if the entry with the correct index is selected
         for (int i=0; i < SCROLL_ACTION_EXECUTION; i++) {
             robot().pressAndReleaseKey(DOWN);
-            Assert.assertTrue(entryTable.selectionValue() != null);
+            assertNotNull(entryTable.selectionValue());
             assertColumnValue(entryTable, i+1, TITLE_COLUMN_INDEX, entryTable.selectionValue());
         }
         //do the same going up again
         for (int i = SCROLL_ACTION_EXECUTION; i > 0; i--) {
             robot().pressAndReleaseKey(UP);
-            Assert.assertTrue(entryTable.selectionValue() != null);
+            assertNotNull(entryTable.selectionValue());
             assertColumnValue(entryTable, i-1, TITLE_COLUMN_INDEX, entryTable.selectionValue());
         }
 

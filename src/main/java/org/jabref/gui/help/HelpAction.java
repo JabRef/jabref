@@ -18,9 +18,10 @@ import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 
 import org.jabref.Globals;
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.actions.MnemonicAwareAction;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
@@ -41,7 +42,7 @@ public class HelpAction extends MnemonicAwareAction {
 
 
     public HelpAction(String title, String tooltip, HelpFile helpPage, KeyStroke key) {
-        this(title, tooltip, helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
+        this(title, tooltip, helpPage, IconTheme.JabRefIcons.HELP.getSmallIcon());
         putValue(Action.ACCELERATOR_KEY, key);
     }
 
@@ -53,7 +54,7 @@ public class HelpAction extends MnemonicAwareAction {
     }
 
     public HelpAction(String tooltip, HelpFile helpPage) {
-        this(Localization.lang("Help"), tooltip, helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
+        this(Localization.lang("Help"), tooltip, helpPage, IconTheme.JabRefIcons.HELP.getSmallIcon());
     }
 
     public HelpAction(HelpFile helpPage, Icon icon) {
@@ -61,7 +62,7 @@ public class HelpAction extends MnemonicAwareAction {
     }
 
     public HelpAction(HelpFile helpPage) {
-        this(Localization.lang("Help"), Localization.lang("Help"), helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
+        this(Localization.lang("Help"), Localization.lang("Help"), helpPage, IconTheme.JabRefIcons.HELP.getSmallIcon());
     }
 
     public JButton getHelpButton() {
@@ -107,5 +108,23 @@ public class HelpAction extends MnemonicAwareAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         openHelpPage(helpPage);
+    }
+
+    public static SimpleCommand getMainHelpPageCommand() {
+        return new SimpleCommand() {
+            @Override
+            public void execute() {
+                openHelpPage(HelpFile.CONTENTS);
+            }
+        };
+    }
+
+    public SimpleCommand getCommand() {
+        return new SimpleCommand() {
+            @Override
+            public void execute() {
+                openHelpPage(helpPage);
+            }
+        };
     }
 }

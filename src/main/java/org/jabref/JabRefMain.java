@@ -4,7 +4,6 @@ import java.net.Authenticator;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -38,14 +37,55 @@ import org.slf4j.LoggerFactory;
 public class JabRefMain extends Application {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefMain.class);
+
     private static String[] arguments;
 
     public static void main(String[] args) {
         arguments = args;
-
         launch(arguments);
     }
 
+    @Override
+    public void start(Stage mainStage) throws Exception {
+        try {
+            // Fail on unsupported Java versions
+            ensureCorrectJavaVersion();
+            FallbackExceptionHandler.installExceptionHandler();
+
+            // Init preferences
+            final JabRefPreferences preferences = JabRefPreferences.getInstance();
+            Globals.prefs = preferences;
+            // Perform migrations
+            PreferencesMigrations.runMigrations();
+
+            configureProxy(preferences.getProxyPreferences());
+
+            Globals.startBackgroundTasks();
+
+            applyPreferences(preferences);
+
+            // Process arguments
+            ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START);
+
+            // Check for running JabRef
+            if (!handleMultipleAppInstances(arguments) || argumentProcessor.shouldShutDown()) {
+                Platform.exit();
+                return;
+            }
+
+            // If not, start GUI
+            new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank());
+        } catch (Exception ex) {
+            LOGGER.error("Unexpected exception", ex);
+        }
+    }
+  
+    @Override
+    public void stop() {
+        Globals.stopBackgroundTasks();
+        Globals.shutdownThreadPools();
+    }
+  
     /**
      * Tests if we are running an acceptable Java and terminates JabRef when we are sure the version is not supported.
      * This test uses the requirements for the Java version as specified in <code>gradle.build</code>. It is possible to
@@ -68,11 +108,9 @@ public class JabRefMain extends Application {
 
         if (java9Fail || versionFail) {
             StringBuilder versionError = new StringBuilder(
-                    Localization.lang("Your current Java version (%0) is not supported. Please install version %1 or higher.",
-                            checker.getJavaVersion(),
-                            buildInfo.getMinRequiredJavaVersion()
-                    )
-            );
+                                                           Localization.lang("Your current Java version (%0) is not supported. Please install version %1 or higher.",
+                                                                             checker.getJavaVersion(),
+                                                                             buildInfo.getMinRequiredJavaVersion()));
 
             versionError.append("\n");
             versionError.append(Localization.lang("Your Java Runtime Environment is located at %0.", checker.getJavaInstallationDirectory()));
@@ -82,7 +120,7 @@ public class JabRefMain extends Application {
                 versionError.append(Localization.lang("Note that currently, JabRef does not run with Java 9."));
             }
             final JFrame frame = new JFrame();
-            JOptionPane.showMessageDialog(frame, versionError, Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, versionError, Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
             frame.dispose();
 
             // We exit on Java 9 error since this will definitely not work
@@ -92,40 +130,29 @@ public class JabRefMain extends Application {
         }
     }
 
-    private static void start(String[] args) {
-        // Init preferences
-        JabRefPreferences preferences = JabRefPreferences.getInstance();
-        Globals.prefs = preferences;
-        // Perform Migrations
-        // Perform checks and changes for users with a preference set from an older JabRef version.
-        PreferencesMigrations.upgradePrefsToOrgJabRef();
-        PreferencesMigrations.upgradeSortOrder();
-        PreferencesMigrations.upgradeFaultyEncodingStrings();
-        PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
-        PreferencesMigrations.upgradeImportFileAndDirePatterns();
-        PreferencesMigrations.upgradeStoredCustomEntryTypes();
-        PreferencesMigrations.upgradeKeyBindingsToJavaFX();
-        PreferencesMigrations.addCrossRefRelatedFieldsForAutoComplete();
-        PreferencesMigrations.upgradeObsoleteLookAndFeels();
-
-        // Process arguments
-        ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);
-
-        FallbackExceptionHandler.installExceptionHandler();
-
-        ensureCorrectJavaVersion();
-
-        ProxyPreferences proxyPreferences = preferences.getProxyPreferences();
-        ProxyRegisterer.register(proxyPreferences);
-        if (proxyPreferences.isUseProxy() && proxyPreferences.isUseAuthentication()) {
-            Authenticator.setDefault(new ProxyAuthenticator());
+    private static boolean handleMultipleAppInstances(String[] args) {
+        RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();
+        if (remotePreferences.useRemoteServer()) {
+            // Try to contact already running JabRef
+            RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
+            if (remoteClient.ping()) {
+                // We are not alone, there is already a server out there, send command line arguments to other instance
+                if (remoteClient.sendCommandLineArguments(args)) {
+                    // So we assume it's all taken care of, and quit.
+                    LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
+                    return false;
+                }
+            } else {
+                // We are alone, so we start the server
+                Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort());
+            }
         }
+        return true;
+    }
 
-        Globals.startBackgroundTasks();
-
+    private static void applyPreferences(JabRefPreferences preferences) {
         // Update handling of special fields based on preferences
-        InternalBibtexFields
-                .updateSpecialFields(Globals.prefs.getBoolean(JabRefPreferences.SERIALIZESPECIALFIELDS));
+        InternalBibtexFields.updateSpecialFields(Globals.prefs.getBoolean(JabRefPreferences.SERIALIZESPECIALFIELDS));
         // Update name of the time stamp field based on preferences
         InternalBibtexFields.updateTimeStampField(Globals.prefs.getTimestampPreferences().getTimestampField());
         // Update which fields should be treated as numeric, based on preferences:
@@ -136,56 +163,23 @@ public class JabRefMain extends Application {
 
         /* Build list of Import and Export formats */
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
-                Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
+                                                        Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
         EntryTypes.loadCustomEntryTypes(preferences.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
-                preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
+                                        preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
         Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());
 
-        // Check for running JabRef
-        RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();
-        if (remotePreferences.useRemoteServer()) {
-            Globals.REMOTE_LISTENER.open(new JabRefMessageHandler(), remotePreferences.getPort());
-
-            if (!Globals.REMOTE_LISTENER.isOpen()) {
-                // we are not alone, there is already a server out there, try to contact already running JabRef:
-                if (new RemoteClient(remotePreferences.getPort()).sendCommandLineArguments(args)) {
-                    // We have successfully sent our command line options through the socket to another JabRef instance.
-                    // So we assume it's all taken care of, and quit.
-                    LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
-                    Globals.shutdownThreadPools();
-                    // needed to tell JavaFx to stop
-                    Platform.exit();
-                    return;
-                }
-            }
-            // we are alone, we start the server
-            Globals.REMOTE_LISTENER.start();
-        }
-
         // override used newline character with the one stored in the preferences
         // The preferences return the system newline character sequence as default
         OS.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
-
-        // See if we should shut down now
-        if (argumentProcessor.shouldShutDown()) {
-            Globals.shutdownThreadPools();
-            Platform.exit();
-            return;
-        }
-
-        // If not, start GUI
-        SwingUtilities
-                .invokeLater(() -> new JabRefGUI(argumentProcessor.getParserResults(),
-                        argumentProcessor.isBlank()));
     }
 
-    @Override
-    public void start(Stage mainStage) throws Exception {
-        Platform.setImplicitExit(false);
-        SwingUtilities.invokeLater(() -> start(arguments)
-        );
+    private static void configureProxy(ProxyPreferences proxyPreferences) {
+        ProxyRegisterer.register(proxyPreferences);
+        if (proxyPreferences.isUseProxy() && proxyPreferences.isUseAuthentication()) {
+            Authenticator.setDefault(new ProxyAuthenticator());
+        }
     }
 }

@@ -38,14 +38,13 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     }
 
     @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_DOI;
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_DOI);
     }
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         Optional<DOI> doi = DOI.parse(identifier);
-
         try {
             if (doi.isPresent()) {
                 URL doiURL = new URL(doi.get().getURIAsASCIIString());

@@ -43,7 +43,7 @@ public class MergeFetchedEntryDialog extends JabRefDialog {
 
 
     public MergeFetchedEntryDialog(BasePanel panel, BibEntry originalEntry, BibEntry fetchedEntry, String type) {
-        super(panel.frame(), Localization.lang("Merge entry with %0 information", type), true, MergeFetchedEntryDialog.class);
+        super(Localization.lang("Merge entry with %0 information", type), true, MergeFetchedEntryDialog.class);
 
         this.panel = panel;
         this.originalEntry = originalEntry;

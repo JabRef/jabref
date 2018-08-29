@@ -34,15 +34,6 @@ import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
-/**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2003</p>
- * <p>Company: </p>
- * @author not attributable
- * @version 1.0
- */
-
 public class ExportCustomizationDialog extends JabRefDialog {
 
     // Column widths for export customization dialog table:
@@ -52,7 +43,7 @@ public class ExportCustomizationDialog extends JabRefDialog {
 
     public ExportCustomizationDialog(final JabRefFrame frame) {
 
-        super(frame, Localization.lang("Manage custom exports"), false, ExportCustomizationDialog.class);
+        super(Localization.lang("Manage custom exports"), false, ExportCustomizationDialog.class);
         DefaultEventTableModel<List<String>> tableModel = new DefaultEventTableModel<>(
                 Globals.prefs.customExports.getSortedList(), new ExportTableFormat());
         JTable table = new JTable(tableModel);
@@ -135,7 +126,7 @@ public class ExportCustomizationDialog extends JabRefDialog {
         JPanel main = new JPanel();
         ActionMap am = main.getActionMap();
         InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         am.put("close", closeAction);
         main.setLayout(new BorderLayout());
         main.add(sp, BorderLayout.CENTER);
@@ -154,7 +145,6 @@ public class ExportCustomizationDialog extends JabRefDialog {
         getContentPane().add(main, BorderLayout.CENTER);
         getContentPane().add(buttons, BorderLayout.SOUTH);
         pack();
-        setLocationRelativeTo(frame);
         table.requestFocus();
     }
 

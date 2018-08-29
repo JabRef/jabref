@@ -155,8 +155,8 @@ public class LocalizationParser {
             for (String key : keys) {
                 result.add(new LocalizationEntry(path, key, type));
             }
-        } catch (IOException ignore) {
-            ignore.printStackTrace();
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
         }
 
         return result;
@@ -174,8 +174,8 @@ public class LocalizationParser {
             for (String key : keys) {
                 result.add(new LocalizationEntry(path, key, type));
             }
-        } catch (IOException ignore) {
-            ignore.printStackTrace();
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
         }
 
         return result;
@@ -209,6 +209,7 @@ public class LocalizationParser {
 
         PlatformImpl.startup(() -> {
         });
+
         try {
             FXMLLoader loader = new FXMLLoader(path.toUri().toURL(), registerUsageResourceBundle);
             // We don't want to initialize controller
@@ -216,8 +217,8 @@ public class LocalizationParser {
             // Don't check if root is null (needed for custom controls, where the root value is normally set in the FXMLLoader)
             loader.impl_setStaticLoad(true);
             loader.load();
-        } catch (IOException ignore) {
-            ignore.printStackTrace();
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
         }
 
         return result.stream()

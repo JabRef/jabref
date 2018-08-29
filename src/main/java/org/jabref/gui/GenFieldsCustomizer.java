@@ -6,7 +6,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -21,7 +23,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import org.jabref.Globals;
-import org.jabref.gui.entryeditor.EntryEditorTabList;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
@@ -49,7 +50,7 @@ public class GenFieldsCustomizer extends JabRefDialog {
     private final JButton revert = new JButton();
 
     public GenFieldsCustomizer(JabRefFrame frame) {
-        super(frame, Localization.lang("Set general fields"), false, GenFieldsCustomizer.class);
+        super(Localization.lang("Set general fields"), false, GenFieldsCustomizer.class);
         helpBut = new HelpAction(HelpFile.GENERAL_FIELDS).getHelpButton();
         jbInit();
         setSize(new Dimension(650, 300));
@@ -95,7 +96,7 @@ public class GenFieldsCustomizer extends JabRefDialog {
         // Key bindings:
         ActionMap am = buttons.getActionMap();
         InputMap im = buttons.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
         am.put("close", new AbstractAction() {
 
             @Override
@@ -143,11 +144,10 @@ public class GenFieldsCustomizer extends JabRefDialog {
     private void setFieldsText() {
         StringBuilder sb = new StringBuilder();
 
-        EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
-        for (int i = 0; i < tabList.getTabCount(); i++) {
-            sb.append(tabList.getTabName(i));
+        for (Map.Entry<String, List<String>> tab : Globals.prefs.getEntryEditorTabList().entrySet()) {
+            sb.append(tab.getKey());
             sb.append(':');
-            sb.append(String.join(";", tabList.getTabFields(i)));
+            sb.append(String.join(";", tab.getValue()));
             sb.append('\n');
         }
 

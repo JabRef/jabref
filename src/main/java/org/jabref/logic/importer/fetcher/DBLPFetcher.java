@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
@@ -23,11 +24,11 @@ import org.apache.http.client.utils.URIBuilder;
 /**
  * Fetches BibTeX data from DBLP (dblp.org)
  *
- * @see <a href="http://dblp.dagstuhl.de/faq/13501473">Basic API documentation</a>
+ * @see <a href="https://dblp.dagstuhl.de/faq/13501473">Basic API documentation</a>
  */
 public class DBLPFetcher implements SearchBasedParserFetcher {
 
-    private static final String BASIC_SEARCH_URL = "http://dblp.org/search/publ/api";
+    private static final String BASIC_SEARCH_URL = "https://dblp.org/search/publ/api";
 
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -71,8 +72,8 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_DBLP;
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_DBLP);
     }
 
 }

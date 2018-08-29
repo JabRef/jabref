@@ -26,7 +26,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 
 import de.undercouch.citeproc.helper.CSLUtils;
 import org.slf4j.Logger;
@@ -176,7 +176,7 @@ public class CitationStyle {
      * Checks if the given style file is a CitationStyle
      */
     public static boolean isCitationStyleFile(String styleFile) {
-        return FileType.CITATION_STYLE.getExtensions().stream().anyMatch(styleFile::endsWith);
+        return StandardFileType.CITATION_STYLE.getExtensions().stream().anyMatch(styleFile::endsWith);
     }
 
     public String getTitle() {

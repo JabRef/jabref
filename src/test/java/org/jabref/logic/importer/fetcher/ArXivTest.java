@@ -169,6 +169,11 @@ public class ArXivTest {
     }
 
     @Test
+    public void searchEntryByIdWith4DigitsAndPrefixAndNotTrimmed() throws Exception {
+        assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("arXiv : 1405. 2249"));
+    }
+
+    @Test
     public void searchEntryByIdWith5Digits() throws Exception {
         assertEquals(Optional.of(
                 "An Optimal Convergence Theorem for Mean Curvature Flow of Arbitrary Codimension in Hyperbolic Spaces"),
@@ -185,5 +190,9 @@ public class ArXivTest {
         sliceTheoremPaper.clearField(FieldName.EPRINT);
 
         assertEquals(ArXivIdentifier.parse("1405.2249v1"), finder.findIdentifier(sliceTheoremPaper));
+    }
+    @Test
+    public void searchEmptyId() throws Exception {
+        assertEquals(Optional.empty(), finder.performSearchById(""));
     }
 }

@@ -1,8 +1,8 @@
 package org.jabref.gui.push;
 
-import javax.swing.Icon;
-
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.preferences.JabRefPreferences;
 
 /**
@@ -10,14 +10,18 @@ import org.jabref.preferences.JabRefPreferences;
  */
 public class PushToTexmaker extends AbstractPushToApplication implements PushToApplication {
 
+    public PushToTexmaker(DialogService dialogService) {
+        super(dialogService);
+    }
+
     @Override
     public String getApplicationName() {
         return "Texmaker";
     }
 
     @Override
-    public Icon getIcon() {
-        return IconTheme.getImage("texmaker");
+    public JabRefIcon getIcon() {
+        return IconTheme.JabRefIcons.APPLICATION_TEXMAKER;
     }
 
     @Override

@@ -27,7 +27,7 @@ public class MergeReviewIntoCommentConfirmationDialog {
 
         String[] options = {Localization.lang("Merge fields")};
         int answer = JOptionPane.showOptionDialog(
-                panel,
+                null,
                 bibKeys + " " +
                         Localization.lang("has/have both a 'Comment' and a 'Review' field.") + "\n" +
                         Localization.lang("Since the 'Review' field was deprecated in JabRef 4.2, these two fields are about to be merged into the 'Comment' field.") + "\n" +

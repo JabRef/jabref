@@ -8,24 +8,14 @@ import java.util.Optional;
  */
 public enum DBMSType {
 
-    MYSQL(
-            "MySQL",
-            "com.mysql.jdbc.Driver",
-            "jdbc:mysql://%s:%d/%s", 3306),
-    ORACLE(
-            "Oracle",
-            "oracle.jdbc.driver.OracleDriver",
-            "jdbc:oracle:thin:@%s:%d:%s", 1521),
-    POSTGRESQL(
-            "PostgreSQL",
-            "com.impossibl.postgres.jdbc.PGDriver",
-            "jdbc:pgsql://%s:%d/%s", 5432);
+    MYSQL("MySQL", "com.mysql.cj.jdbc.Driver", "jdbc:mysql://%s:%d/%s", 3306),
+    ORACLE("Oracle", "oracle.jdbc.driver.OracleDriver", "jdbc:oracle:thin:@%s:%d:%s", 1521),
+    POSTGRESQL("PostgreSQL", "org.postgresql.Driver", "jdbc:postgresql://%s:%d/%s", 5432);
 
     private final String type;
     private final String driverPath;
     private final String urlPattern;
     private final int defaultPort;
-
 
     private DBMSType(String type, String driverPath, String urlPattern, int defaultPort) {
         this.type = type;
