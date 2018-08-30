@@ -1,6 +1,7 @@
 package org.jabref.logic.shared.listener;
 
 import java.sql.SQLException;
+
 import org.jabref.logic.shared.DBMSProcessor;
 import org.jabref.logic.shared.DBMSSynchronizer;
 
