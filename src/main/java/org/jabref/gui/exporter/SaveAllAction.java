@@ -6,8 +6,6 @@ import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
 
-import spin.Spin;
-
 public class SaveAllAction extends SimpleCommand implements Runnable {
 
     private final JabRefFrame frame;
@@ -23,7 +21,6 @@ public class SaveAllAction extends SimpleCommand implements Runnable {
     public void execute() {
         databases = frame.getBasePanelCount();
         frame.output(Localization.lang("Saving all libraries..."));
-        Spin.off(this);
         run();
         frame.output(Localization.lang("Save all finished."));
     }

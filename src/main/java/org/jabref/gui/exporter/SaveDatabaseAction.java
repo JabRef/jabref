@@ -20,11 +20,12 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.SidePaneType;
+import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.collab.ChangeScanner;
 import org.jabref.gui.dialogs.AutosaveUIManager;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -50,10 +51,10 @@ import org.slf4j.LoggerFactory;
  * Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for
  * save operations when closing a database or quitting the applications.
  *
- * The operations run synchronously, but offload the save operation from the event thread using Spin.
+ * The save operation is loaded off of the GUI thread using {@link BackgroundTask}.
  * Callers can query whether the operation was canceled, or whether it was successful.
  */
-public class SaveDatabaseAction extends AbstractWorker {
+public class SaveDatabaseAction implements BaseAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);
 
@@ -80,7 +81,6 @@ public class SaveDatabaseAction extends AbstractWorker {
         this.filePath = Optional.ofNullable(filePath);
     }
 
-    @Override
     public void init() throws Exception {
         success = false;
         canceled = false;
@@ -101,30 +101,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         }
     }
 
-    @Override
-    public void update() {
-        if (success) {
-            DefaultTaskExecutor.runInJavaFXThread(() -> {
-                // Reset title of tab
-                frame.setTabTitle(panel, panel.getTabTitle(),
-                        panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
-                frame.output(Localization.lang("Saved library") + " '"
-                        + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
-                frame.setWindowTitle();
-                frame.updateAllTabTitles();
-            });
-        } else if (!canceled) {
-            if (fileLockedError) {
-                // TODO: user should have the option to override the lock file.
-                frame.output(Localization.lang("Could not save, file locked by another JabRef instance."));
-            } else {
-                frame.output(Localization.lang("Save failed"));
-            }
-        }
-    }
-
-    @Override
-    public void run() {
+    private void doSave() {
         if (canceled || !panel.getBibDatabaseContext().getDatabaseFile().isPresent()) {
             return;
         }
@@ -173,6 +150,25 @@ public class SaveDatabaseAction extends AbstractWorker {
                 return;
             }
             LOGGER.error("Problem saving file", ex);
+        }
+
+        if (success) {
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                // Reset title of tab
+                frame.setTabTitle(panel, panel.getTabTitle(),
+                        panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
+                frame.output(Localization.lang("Saved library") + " '"
+                        + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
+                frame.setWindowTitle();
+                frame.updateAllTabTitles();
+            });
+        } else if (!canceled) {
+            if (fileLockedError) {
+                // TODO: user should have the option to override the lock file.
+                frame.output(Localization.lang("Could not save, file locked by another JabRef instance."));
+            } else {
+                frame.output(Localization.lang("Save failed"));
+            }
         }
     }
 
@@ -275,11 +271,10 @@ public class SaveDatabaseAction extends AbstractWorker {
     }
 
     /**
-     * Run the "Save" operation. This method offloads the actual save operation to a background thread, but
-     * still runs synchronously using Spin (the method returns only after completing the operation).
+     * Run the "Save" operation. This method offloads the actual save operation to a background thread.
      */
     public void runCommand() throws Exception {
-        BasePanel.runWorker(this);
+        action();
     }
 
     public void save() throws Exception {
@@ -305,8 +300,7 @@ public class SaveDatabaseAction extends AbstractWorker {
     }
 
     /**
-     * Run the "Save as" operation. This method offloads the actual save operation to a background thread, but
-     * still runs synchronously using Spin (the method returns only after completing the operation).
+     * Run the "Save as" operation. This method offloads the actual save operation to a background thread.
      */
     public void saveAs(File file) throws Exception {
         BibDatabaseContext context = panel.getBibDatabaseContext();
@@ -399,10 +393,10 @@ public class SaveDatabaseAction extends AbstractWorker {
             ButtonType reviewChanges = new ButtonType(Localization.lang("Review changes"));
 
             Optional<ButtonType> buttonPressed = DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().showCustomButtonDialogAndWait(AlertType.CONFIRMATION, Localization.lang("File updated externally"),
-                                                                                                                                                    Localization.lang("File has been updated externally. " + "What do you want to do?"),
-                                                                                                                                                    reviewChanges,
-                                                                                                                                                    save,
-                                                                                                                                                    ButtonType.CANCEL));
+                    Localization.lang("File has been updated externally. " + "What do you want to do?"),
+                    reviewChanges,
+                    save,
+                    ButtonType.CANCEL));
 
             if (buttonPressed.isPresent()) {
                 if (buttonPressed.get() == ButtonType.CANCEL) {
@@ -415,13 +409,13 @@ public class SaveDatabaseAction extends AbstractWorker {
                     JabRefExecutorService.INSTANCE.execute(() -> {
 
                         if (!FileBasedLock
-                                .waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile().get().toPath())) {
+                                          .waitForFileLock(panel.getBibDatabaseContext().getDatabasePath().get())) {
                             // TODO: GUI handling of the situation when the externally modified file keeps being locked.
                             LOGGER.error("File locked, this will be trouble.");
                         }
 
                         ChangeScanner scanner = new ChangeScanner(panel.frame(), panel,
-                                panel.getBibDatabaseContext().getDatabaseFile().get(), panel.getTempFile());
+                                                                  panel.getBibDatabaseContext().getDatabasePath().orElse(null), panel.getTempFile());
                         JabRefExecutorService.INSTANCE.executeInterruptableTaskAndWait(scanner);
                         if (scanner.changesFound()) {
                             scanner.displayResult(resolved -> {
@@ -453,5 +447,13 @@ public class SaveDatabaseAction extends AbstractWorker {
 
         // Return false as either no external database file modifications have been found or overwrite is requested any way
         return false;
+    }
+
+    @Override
+    public void action() throws Exception {
+        init();
+        BackgroundTask
+                .wrap(this::doSave)
+                .executeWith(Globals.TASK_EXECUTOR);
     }
 }

@@ -53,7 +53,6 @@ public class ExternalFileTypeEditor extends BaseDialog<Void> {
     public ExternalFileTypeEditor() {
         this.setTitle(Localization.lang("Manage external file types"));
         this.initModality(Modality.APPLICATION_MODAL);
-        this.setResizable(true);
         this.getDialogPane().setPrefSize(600, 500);
 
         init();

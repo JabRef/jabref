@@ -1,18 +1,10 @@
 package org.jabref;
 
-import java.awt.Font;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.plaf.FontUIResource;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -34,7 +26,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
@@ -43,10 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JabRefGUI {
-
-    private static final String NIMBUS_LOOK_AND_FEEL = "javax.swing.plaf.nimbus.NimbusLookAndFeel";
-    private static final String WINDOWS_LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-    private static final String OSX_AQUA_LOOk_AND_FEEL = "apple.laf.AquaLookAndFeel";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
 
@@ -67,10 +54,10 @@ public class JabRefGUI {
 
         // passed file (we take the first one) should be focused
         focusedFile = argsDatabases.stream()
-                                   .findFirst()
-                                   .flatMap(ParserResult::getFile)
-                                   .map(File::getAbsolutePath)
-                                   .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
+                                    .findFirst()
+                                    .flatMap(ParserResult::getFile)
+                                    .map(File::getAbsolutePath)
+                                    .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
 
         openWindow(mainStage);
         JabRefGUI.checkForNewVersion(false);
@@ -122,15 +109,15 @@ public class JabRefGUI {
                     try {
                         new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
                     } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
-                             NotASharedDatabaseException e) {
+                            NotASharedDatabaseException e) {
                         pr.getDatabaseContext().clearDatabaseFile(); // do not open the original file
                         pr.getDatabase().clearSharedDatabaseID();
 
                         LOGGER.error("Connection error", e);
                         dialogService.showErrorDialogAndWait(
-                                                             Localization.lang("Connection error"),
-                                                             Localization.lang("A local copy will be opened."),
-                                                             e);
+                                Localization.lang("Connection error"),
+                                Localization.lang("A local copy will be opened."),
+                                e);
                     }
                     toOpenTab.add(pr);
                 } else if (pr.toOpenTab()) {
@@ -155,16 +142,22 @@ public class JabRefGUI {
         // do it here:
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
             mainStage.setMaximized(true);
+        } else {
+            mainStage.setX(Globals.prefs.getDouble(JabRefPreferences.POS_X));
+            mainStage.setY(Globals.prefs.getDouble(JabRefPreferences.POS_Y));
+            mainStage.setWidth(Globals.prefs.getDouble(JabRefPreferences.SIZE_X));
+            mainStage.setHeight(Globals.prefs.getDouble(JabRefPreferences.SIZE_Y));
         }
 
         Scene scene = new Scene(JabRefGUI.mainFrame, 800, 800);
-        Globals.getThemeLoader().installBaseCss(scene);
+        Globals.getThemeLoader().installBaseCss(scene, Globals.prefs);
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
         mainStage.setScene(scene);
         mainStage.show();
 
         mainStage.setOnCloseRequest(event -> {
+            saveWindowState(mainStage);
             boolean reallyQuit = mainFrame.quit();
             if (!reallyQuit) {
                 event.consume();
@@ -173,7 +166,7 @@ public class JabRefGUI {
 
         for (ParserResult pr : failed) {
             String message = Localization.lang("Error opening file '%0'.", pr.getFile().get().getName()) + "\n"
-                             + pr.getErrorMessage();
+                    + pr.getErrorMessage();
 
             dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
 
@@ -203,6 +196,14 @@ public class JabRefGUI {
         LOGGER.debug("Finished adding panels");
     }
 
+    private void saveWindowState(Stage mainStage) {
+        Globals.prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, mainStage.isMaximized());
+        Globals.prefs.putDouble(JabRefPreferences.POS_X, mainStage.getX());
+        Globals.prefs.putDouble(JabRefPreferences.POS_Y, mainStage.getY());
+        Globals.prefs.putDouble(JabRefPreferences.SIZE_X, mainStage.getWidth());
+        Globals.prefs.putDouble(JabRefPreferences.SIZE_Y, mainStage.getHeight());
+    }
+
     private void openLastEditedDatabases() {
         if (Globals.prefs.get(JabRefPreferences.LAST_EDITED) == null) {
             return;
@@ -222,7 +223,7 @@ public class JabRefGUI {
             }
 
             ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,
-                                                                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
 
             if (parsedDatabase.isEmpty()) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
@@ -242,46 +243,11 @@ public class JabRefGUI {
     }
 
     private void setLookAndFeel() {
-        try {
-
-            if (OS.WINDOWS) {
-                UIManager.setLookAndFeel(WINDOWS_LOOK_AND_FEEL);
-            }
-            if (OS.OS_X) {
-                UIManager.setLookAndFeel(OSX_AQUA_LOOk_AND_FEEL);
-            } else {
-                UIManager.setLookAndFeel(NIMBUS_LOOK_AND_FEEL);
-            }
-            // On Linux, Java FX fonts look blurry per default. This can be improved by using a non-default rendering
-            // setting. See https://github.com/woky/javafx-hates-linux
-            if (Globals.prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK)) {
-                System.setProperty("prism.text", "t2k");
-                System.setProperty("prism.lcdtext", "true");
-            }
-        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            try {
-                LOGGER.warn("Setting Look and Feel to Nimbus", e);
-
-                UIManager.setLookAndFeel(NIMBUS_LOOK_AND_FEEL);
-            } catch (Exception ex) {
-                LOGGER.warn("Look and feel could not be set", e);
-            }
-
-        }
-
-        // In JabRef v2.8, we did it only on NON-Mac. Now, we try on all platforms
-        boolean overrideDefaultFonts = Globals.prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS);
-        if (overrideDefaultFonts) {
-            int fontSize = Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
-            UIDefaults defaults = UIManager.getDefaults();
-            Enumeration<Object> keys = defaults.keys();
-            for (Object key : Collections.list(keys)) {
-                if ((key instanceof String) && ((String) key).endsWith(".font")) {
-                    Font font = (Font) UIManager.get(key);
-                    font = new FontUIResource(font.getName(), font.getStyle(), fontSize);
-                    defaults.put(key, font);
-                }
-            }
+        // On Linux, Java FX fonts look blurry per default. This can be improved by using a non-default rendering
+        // setting. See https://github.com/woky/javafx-hates-linux
+        if (Globals.prefs.getBoolean(JabRefPreferences.FX_FONT_RENDERING_TWEAK)) {
+            System.setProperty("prism.text", "t2k");
+            System.setProperty("prism.lcdtext", "true");
         }
     }
 

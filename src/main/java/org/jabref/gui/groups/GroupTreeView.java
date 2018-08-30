@@ -28,19 +28,23 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AllEntriesGroup;
 
 import org.controlsfx.control.textfield.CustomTextField;
@@ -65,6 +69,7 @@ public class GroupTreeView {
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
     private GroupTreeViewModel viewModel;
+    private CustomLocalDragboard localDragboard;
 
     private static void removePseudoClasses(TreeTableRow<GroupNodeViewModel> row, PseudoClass... pseudoClasses) {
         for (PseudoClass pseudoClass : pseudoClasses) {
@@ -74,10 +79,10 @@ public class GroupTreeView {
 
     @FXML
     public void initialize() {
-        viewModel = new GroupTreeViewModel(stateManager, dialogService, taskExecutor);
+        this.localDragboard = GUIGlobals.localDragboard;
+        viewModel = new GroupTreeViewModel(stateManager, dialogService, taskExecutor, localDragboard);
 
         // Set-up groups tree
-        groupTree.setStyle("-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         // Set-up bindings
@@ -148,7 +153,10 @@ public class GroupTreeView {
                     disclosureNode.getChildren().add(disclosureNodeArrow);
                     return disclosureNode;
                 })
-                .withOnMouseClickedEvent(group -> event -> group.toggleExpansion()));
+                .withOnMouseClickedEvent(group -> event -> {
+                    group.toggleExpansion();
+                    event.consume();
+                }));
 
         // Set pseudo-classes to indicate if row is root or sub-item ( > 1 deep)
         PseudoClass rootPseudoClass = PseudoClass.getPseudoClass("root");
@@ -178,6 +186,12 @@ public class GroupTreeView {
                     EasyBind.monadic(row.itemProperty())
                             .map(this::createContextMenuForGroup)
                             .orElse((ContextMenu) null));
+            row.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+                if (event.getButton() == MouseButton.SECONDARY) {
+                    // Prevent right-click to select group
+                    event.consume();
+                }
+            });
 
             // Drag and drop support
             row.setOnDragDetected(event -> {
@@ -198,8 +212,11 @@ public class GroupTreeView {
             });
             row.setOnDragOver(event -> {
                 Dragboard dragboard = event.getDragboard();
-                if ((event.getGestureSource() != row) && row.getItem().acceptableDrop(dragboard)) {
+                if ((event.getGestureSource() != row) && (row.getItem() != null) && row.getItem().acceptableDrop(dragboard)) {
                     event.acceptTransferModes(TransferMode.MOVE, TransferMode.LINK);
+
+                    //expand node and all children on drag over
+                    row.getTreeItem().setExpanded(true);
 
                     removePseudoClasses(row, dragOverBottom, dragOverCenter, dragOverTop);
                     switch (getDroppingMouseLocation(row, event)) {
@@ -232,11 +249,10 @@ public class GroupTreeView {
                         success = true;
                     }
                 }
-                if (dragboard.hasContent(DragAndDropDataFormats.ENTRIES)) {
-                    TransferableEntrySelection entrySelection = (TransferableEntrySelection) dragboard
-                            .getContent(DragAndDropDataFormats.ENTRIES);
 
-                    row.getItem().addEntriesToGroup(entrySelection.getSelection());
+                if (localDragboard.hasType(DragAndDropDataFormats.BIBENTRY_LIST_CLASS)) {
+                    List<BibEntry> entries = localDragboard.getBibEntries();
+                    row.getItem().addEntriesToGroup(entries);
                     success = true;
                 }
                 event.setDropCompleted(success);
@@ -251,12 +267,12 @@ public class GroupTreeView {
     }
 
     private void updateSelection(List<TreeItem<GroupNodeViewModel>> newSelectedGroups) {
-        if (newSelectedGroups == null || newSelectedGroups.isEmpty()) {
+        if ((newSelectedGroups == null) || newSelectedGroups.isEmpty()) {
             viewModel.selectedGroupsProperty().clear();
         } else {
             List<GroupNodeViewModel> list = new ArrayList<>();
             for (TreeItem<GroupNodeViewModel> model : newSelectedGroups) {
-                if (model != null && model.getValue() != null && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)) {
+                if ((model != null) && (model.getValue() != null) && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)) {
                     list.add(model.getValue());
                 }
             }

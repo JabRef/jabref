@@ -68,7 +68,7 @@ public class MainTableDataModel {
         return Optional.of(searchRules);
     }
 
-    public ObservableList<BibEntryTableViewModel> getEntriesFiltered() {
+    public ObservableList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {
         return entriesSorted;
     }
 

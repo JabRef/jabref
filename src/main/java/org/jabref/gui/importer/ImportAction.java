@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.swing.SwingUtilities;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
@@ -33,7 +35,7 @@ public class ImportAction {
     private final Optional<Importer> importer;
     private final DialogService dialogService;
     private Exception importError;
-    private TaskExecutor taskExecutor = Globals.TASK_EXECUTOR;
+    private final TaskExecutor taskExecutor = Globals.TASK_EXECUTOR;
 
     public ImportAction(JabRefFrame frame, boolean openInNew) {
         this(frame, openInNew, null);
@@ -78,9 +80,8 @@ public class ImportAction {
             } else {
                 // Import in a specific format was specified. Check if we have stored error information:
                 if (importError == null) {
-                    dialogService.showErrorDialogAndWait(
-                            Localization.lang("Import failed"),
-                            Localization.lang("No entries found. Please make sure you are using the correct import filter."));
+                    dialogService.showErrorDialogAndWait(Localization.lang("Import failed"),
+                                                         Localization.lang("No entries found. Please make sure you are using the correct import filter."));
                 } else {
                     dialogService.showErrorDialogAndWait(Localization.lang("Import failed"), importError);
                 }
@@ -88,16 +89,17 @@ public class ImportAction {
         } else {
             if (openInNew) {
                 frame.addTab(bibtexResult.getDatabaseContext(), true);
-                frame.output(
-                        Localization.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
+                frame.output(Localization.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
             } else {
                 final BasePanel panel = frame.getCurrentBasePanel();
 
-                ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"), false);
-                diag.addEntries(bibtexResult.getDatabase().getEntries());
-                diag.entryListComplete();
-                diag.setVisible(true);
-                diag.toFront();
+                SwingUtilities.invokeLater(() -> {
+                    ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"), false);
+                    diag.addEntries(bibtexResult.getDatabase().getEntries());
+                    diag.entryListComplete();
+                    diag.setVisible(true);
+                    diag.toFront();
+                });
             }
         }
     }
@@ -147,7 +149,6 @@ public class ImportAction {
                 if (directParserResult == null) {
                     directParserResult = pr;
                 }
-
                 // Merge entries:
                 for (BibEntry entry : pr.getDatabase().getEntries()) {
                     database.insertEntry(entry);

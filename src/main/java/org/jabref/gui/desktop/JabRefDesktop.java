@@ -14,7 +14,6 @@ import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.desktop.os.DefaultDesktop;
 import org.jabref.gui.desktop.os.Linux;
 import org.jabref.gui.desktop.os.NativeDesktop;
@@ -130,20 +129,15 @@ public class JabRefDesktop {
         }
 
         Optional<Path> file = FileHelper.expandFilename(databaseContext, link, Globals.prefs.getFileDirectoryPreferences());
-        if (file.isPresent() && Files.exists(file.get()) && (type.isPresent())) {
+        if (file.isPresent() && Files.exists(file.get())) {
             // Open the file:
             String filePath = file.get().toString();
             openExternalFilePlatformIndependent(type, filePath);
             return true;
         } else {
             // No file matched the name, try to open it directly using the given app
-            if (type.isPresent()) {
-                openExternalFilePlatformIndependent(type, link);
-                return true;
-            }
-
-            // Run out of ideas what to do...
-            return false;
+            openExternalFilePlatformIndependent(type, link);
+            return true;
         }
     }
 
@@ -161,6 +155,10 @@ public class JabRefDesktop {
             } else {
                 NATIVE_DESKTOP.openFileWithApplication(filePath, application);
             }
+        } else {
+            //File type is not given and therefore no application specified
+            //Let the OS handle the opening of the file
+            NATIVE_DESKTOP.openFile(filePath, "");
         }
     }
 
@@ -198,7 +196,7 @@ public class JabRefDesktop {
         try {
             openBrowser(url);
         } catch (IOException exception) {
-            new ClipBoardManager().setClipboardContents(url);
+            Globals.clipboardManager.setContent(url);
             LOGGER.error("Could not open browser", exception);
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);

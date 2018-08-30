@@ -13,7 +13,7 @@ public class DatabasePropertiesAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        DatabasePropertiesDialog propertiesDialog = new DatabasePropertiesDialog(null, frame.getCurrentBasePanel());
+        DatabasePropertiesDialog propertiesDialog = new DatabasePropertiesDialog(frame.getCurrentBasePanel());
         propertiesDialog.updateEnableStatus();
         propertiesDialog.setVisible(true);
     }

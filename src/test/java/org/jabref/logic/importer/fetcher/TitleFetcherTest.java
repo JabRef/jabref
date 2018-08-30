@@ -43,7 +43,7 @@ public class TitleFetcherTest {
 
     @Test
     public void testGetHelpPage() {
-        assertEquals("TitleToBibTeX", fetcher.getHelpPage().getPageName());
+        assertEquals("TitleToBibTeX", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test

@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
@@ -16,18 +17,26 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
 
     @FXML private final PersonsEditorViewModel viewModel;
 
-    public PersonsEditor(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, JabRefPreferences preferences, FieldCheckers fieldCheckers) {
+    private TextInputControl textInput;
+
+    public PersonsEditor(final String fieldName,
+                         final AutoCompleteSuggestionProvider<?> suggestionProvider,
+                         final JabRefPreferences preferences,
+                         final FieldCheckers fieldCheckers,
+                         final boolean isSingleLine) {
         this.viewModel = new PersonsEditorViewModel(fieldName, suggestionProvider, preferences.getAutoCompletePreferences(), fieldCheckers);
 
-        EditorTextArea textArea = new EditorTextArea();
-        HBox.setHgrow(textArea, Priority.ALWAYS);
-        textArea.textProperty().bindBidirectional(viewModel.textProperty());
-        textArea.addToContextMenu(EditorMenus.getNameMenu(textArea));
-        this.getChildren().add(textArea);
+        textInput = isSingleLine
+                ? new EditorTextField()
+                : new EditorTextArea();
+        HBox.setHgrow(textInput, Priority.ALWAYS);
+        textInput.textProperty().bindBidirectional(viewModel.textProperty());
+        ((ContextMenuAddable) textInput).addToContextMenu(EditorMenus.getNameMenu(textInput));
+        this.getChildren().add(textInput);
 
-        AutoCompletionTextInputBinding.autoComplete(textArea, viewModel::complete, viewModel.getAutoCompletionConverter(), viewModel.getAutoCompletionStrategy());
+        AutoCompletionTextInputBinding.autoComplete(textInput, viewModel::complete, viewModel.getAutoCompletionConverter(), viewModel.getAutoCompletionStrategy());
 
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textInput);
     }
 
     @Override
@@ -39,4 +48,10 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
     public Parent getNode() {
         return this;
     }
+
+    @Override
+    public void requestFocus() {
+        textInput.requestFocus();
+    }
+
 }
