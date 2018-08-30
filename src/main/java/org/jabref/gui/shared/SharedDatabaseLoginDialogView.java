@@ -120,7 +120,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
             });
 
             EasyBind.subscribe(useSSLpostgres.selectedProperty(), selected -> {
-                visualizer.initVisualization(viewModel.folderValidation(), fileKeystore, true);
+                visualizer.initVisualization(viewModel.keystoreValidation(), fileKeystore, true);
             });
         });
 

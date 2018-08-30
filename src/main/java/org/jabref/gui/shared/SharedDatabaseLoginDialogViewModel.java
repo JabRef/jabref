@@ -79,6 +79,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final Validator portValidator;
     private final Validator userValidator;
     private final Validator folderValidator;
+    private final Validator keystoreValidator;
     private final CompositeValidator formValidator;
 
     private DBMSConnectionProperties connectionProperties;
@@ -98,6 +99,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         portValidator = new FunctionBasedValidator<>(port, predicate, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Host"))));
         userValidator = new FunctionBasedValidator<>(user, predicate, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("User"))));
         folderValidator = new FunctionBasedValidator<>(folder, predicate, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
+        keystoreValidator = new FunctionBasedValidator<>(keystore, predicate, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
 
         formValidator = new CompositeValidator();
         formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator);
@@ -271,7 +273,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                                                                                .build();
         Optional<Path> keystorePath = dialogService.showFileOpenDialog(fileDialogConfiguration);
         keystorePath.ifPresent(path -> {
-            folder.setValue(path.toString());
+            keystore.setValue(path.toString());
         });
     }
 
@@ -345,6 +347,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public ValidationStatus folderValidation() {
         return folderValidator.getValidationStatus();
+    }
+
+    public ValidationStatus keystoreValidation() {
+        return keystoreValidator.getValidationStatus();
     }
 
     public ValidationStatus formValidation() {
