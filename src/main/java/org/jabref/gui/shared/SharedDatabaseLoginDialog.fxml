@@ -49,7 +49,7 @@
                         <Label text="%Password:" GridPane.rowIndex="4" />
                         <PasswordField fx:id="password" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4" />
                         <CheckBox fx:id="rememberPassword" mnemonicParsing="false" text="%Remember Password" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="5" />
-                        <CheckBox fx:id="useSSLpostgres" mnemonicParsing="false" text="%Use SSL" GridPane.rowIndex="5" />
+                        <CheckBox fx:id="useSSL" mnemonicParsing="false" text="%Use SSL" GridPane.rowIndex="5" />
                         <TextField fx:id="fileKeystore" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                         <Button fx:id="browseKeystore" mnemonicParsing="false" onAction="#showOpenKeystoreFileDialog" text="%Browse" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                         <GridPane>

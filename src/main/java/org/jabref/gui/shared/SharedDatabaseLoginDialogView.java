@@ -1,11 +1,8 @@
 package org.jabref.gui.shared;
 
-import java.util.concurrent.Callable;
-
 import javax.inject.Inject;
 
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -42,7 +39,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private Button browseButton;
     @FXML private CheckBox autosave;
     @FXML private ButtonType connectButton;
-    @FXML private CheckBox useSSLpostgres;
+    @FXML private CheckBox useSSL;
     @FXML private TextField fileKeystore;
     @FXML private PasswordField passwordKeystore;
     @FXML private Button browseKeystore;
@@ -94,18 +91,12 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         folder.disableProperty().bind(autosave.selectedProperty().not());
         autosave.selectedProperty().bindBidirectional(viewModel.autosaveProperty());
 
-        Callable<Boolean> notPostgresSelected = () -> {
-            return databaseType.valueProperty().get() != DBMSType.POSTGRESQL;
-        };
-
-        useSSLpostgres.selectedProperty().bindBidirectional(viewModel.useSSLProperty());
-        useSSLpostgres.disableProperty().bind(Bindings.createBooleanBinding(notPostgresSelected, databaseType.valueProperty()));
+        useSSL.selectedProperty().bindBidirectional(viewModel.useSSLProperty());
 
         fileKeystore.textProperty().bindBidirectional(viewModel.keyStoreProperty());
-        fileKeystore.disableProperty().bind(Bindings.createBooleanBinding(notPostgresSelected, databaseType.valueProperty()));
 
-        browseKeystore.disableProperty().bind(Bindings.createBooleanBinding(notPostgresSelected, databaseType.valueProperty()));
-        passwordKeystore.disableProperty().bind(Bindings.createBooleanBinding(notPostgresSelected, databaseType.valueProperty()));
+        browseKeystore.disableProperty().bind(useSSL.selectedProperty().not());
+        passwordKeystore.disableProperty().bind(useSSL.selectedProperty().not());
         passwordKeystore.textProperty().bindBidirectional(viewModel.keyStorePasswordProperty());
 
         //Must be executed after the initialization of the view, otherwise it doesn't work
@@ -119,7 +110,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 visualizer.initVisualization(viewModel.folderValidation(), folder, true);
             });
 
-            EasyBind.subscribe(useSSLpostgres.selectedProperty(), selected -> {
+            EasyBind.subscribe(useSSL.selectedProperty(), selected -> {
                 visualizer.initVisualization(viewModel.keystoreValidation(), fileKeystore, true);
             });
         });
