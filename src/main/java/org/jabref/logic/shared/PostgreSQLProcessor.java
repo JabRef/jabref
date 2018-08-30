@@ -89,7 +89,8 @@ public class PostgreSQLProcessor extends DBMSProcessor {
             // Otherwise the listener is going to be deleted by GC.
             PGConnection pgConnection = connection.unwrap(PGConnection.class);
             listener = new PostgresSQLNotificationListener(dbmsSynchronizer, pgConnection);
-            listener.start();
+            new Thread(listener, "PostgresSQLNotificationListener").start();
+
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
         }
@@ -98,6 +99,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
     @Override
     public void stopNotificationListener() {
         try {
+            listener.stop();
             connection.close();
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);

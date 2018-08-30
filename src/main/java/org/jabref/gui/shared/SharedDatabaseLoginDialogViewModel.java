@@ -252,7 +252,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         });
     }
 
-    public void openSaveDbFileDialog() {
+    public void showSaveDbToFileDialog() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                                                                                                .addExtensionFilter(StandardFileType.BIBTEX_DB)
                                                                                                .withDefaultExtension(StandardFileType.BIBTEX_DB)
@@ -264,7 +264,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         });
     }
 
-    public void openKeyStoreFileDialog() {
+    public void showOpenKeystoreFileDialog() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                                                                                                .addExtensionFilter(FileFilterConverter.ANY_FILE)
                                                                                                .addExtensionFilter(StandardFileType.JAVA_KEYSTORE)

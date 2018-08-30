@@ -1,7 +1,6 @@
 package org.jabref.logic.shared.listener;
 
 import java.sql.SQLException;
-
 import org.jabref.logic.shared.DBMSProcessor;
 import org.jabref.logic.shared.DBMSSynchronizer;
 
@@ -13,23 +12,29 @@ import org.slf4j.LoggerFactory;
 /**
  * A listener for PostgreSQL database notifications.
  */
-public class PostgresSQLNotificationListener extends Thread {
+public class PostgresSQLNotificationListener implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgresSQLNotificationListener.class);
 
     private final DBMSSynchronizer dbmsSynchronizer;
     private final PGConnection pgConnection;
+    private volatile boolean stop;
 
     public PostgresSQLNotificationListener(DBMSSynchronizer dbmsSynchronizer, PGConnection pgConnection) {
         this.dbmsSynchronizer = dbmsSynchronizer;
         this.pgConnection = pgConnection;
     }
 
+    public void start() {
+        stop = false;
+        new Thread(this).start();
+    }
+
     @Override
     public void run() {
         try {
             //noinspection InfiniteLoopStatement
-            while (true) {
+            while (!stop) {
                 PGNotification notifications[] = pgConnection.getNotifications();
 
                 if (notifications != null) {
@@ -46,5 +51,9 @@ public class PostgresSQLNotificationListener extends Thread {
         } catch (SQLException | InterruptedException exception) {
             LOGGER.error("Error while listening for updates to PostgresSQL", exception);
         }
+    }
+
+    public void stop() {
+        stop = true;
     }
 }
