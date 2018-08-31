@@ -7,6 +7,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import org.jabref.JabRefMain;
+import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.model.database.shared.DatabaseConnectionProperties;
 
@@ -140,6 +141,8 @@ public class SharedDatabasePreferences {
         setPort(String.valueOf(properties.getPort()));
         setName(properties.getDatabase());
         setUser(properties.getUser());
+        setUseSSL(properties.isUseSSL());
+        setKeystoreFile(properties.getKeyStore());
 
         try {
             setPassword(new Password(properties.getPassword().toCharArray(), properties.getUser()).encrypt());

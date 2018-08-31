@@ -92,20 +92,21 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
             port.setValue(Integer.toString(selected.getDefaultPort()));
         });
 
-        Predicate<String> predicate = input -> (input != null) && !input.trim().isEmpty();
+        Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
+        Predicate<String> fileExists = input -> Files.exists(Paths.get(input));
+        Predicate<String> notEmptyAndfilesExist = notEmpty.and(fileExists);
 
-        databaseValidator = new FunctionBasedValidator<>(database, predicate, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Library"))));
-        hostValidator = new FunctionBasedValidator<>(host, predicate, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Port"))));
-        portValidator = new FunctionBasedValidator<>(port, predicate, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Host"))));
-        userValidator = new FunctionBasedValidator<>(user, predicate, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("User"))));
-        folderValidator = new FunctionBasedValidator<>(folder, predicate, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
-        keystoreValidator = new FunctionBasedValidator<>(keystore, predicate, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
+        databaseValidator = new FunctionBasedValidator<>(database, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Library"))));
+        hostValidator = new FunctionBasedValidator<>(host, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Port"))));
+        portValidator = new FunctionBasedValidator<>(port, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Host"))));
+        userValidator = new FunctionBasedValidator<>(user, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("User"))));
+        folderValidator = new FunctionBasedValidator<>(folder, notEmptyAndfilesExist, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
+        keystoreValidator = new FunctionBasedValidator<>(keystore, notEmptyAndfilesExist, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
 
         formValidator = new CompositeValidator();
         formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator);
 
         applyPreferences();
-
     }
 
     public void openDatabase() {
@@ -118,6 +119,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         connectionProperties.setUser(user.getValue());
         connectionProperties.setPassword(password.getValue());
         connectionProperties.setUseSSL(useSSL.getValue());
+        connectionProperties.setKeyStore(keystore.getValue());
 
         setupKeyStore();
         openSharedDatabase();
@@ -190,6 +192,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
         }
         loading.set(false);
+
     }
 
     private void setPreferences() {

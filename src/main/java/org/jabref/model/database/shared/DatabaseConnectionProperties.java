@@ -15,4 +15,9 @@ public interface DatabaseConnectionProperties {
     String getPassword();
 
     boolean isValid();
+
+    String getKeyStore();
+
+    boolean isUseSSL();
+
 }

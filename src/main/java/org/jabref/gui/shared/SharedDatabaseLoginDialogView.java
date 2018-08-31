@@ -69,6 +69,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML
     private void openDatabase() {
         viewModel.openDatabase();
+        this.close();
     }
 
     @FXML
@@ -114,6 +115,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 visualizer.initVisualization(viewModel.keystoreValidation(), fileKeystore, true);
             });
         });
+
     }
 
     @FXML

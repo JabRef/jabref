@@ -29,6 +29,9 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     private String password;
     private boolean useSSL;
 
+    //Not needed for connection, but stored for future login
+    private String keyStore;
+
     public DBMSConnectionProperties() {
         // no data
     }
@@ -102,6 +105,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         this.password = password;
     }
 
+    @Override
     public boolean isUseSSL() {
         return useSSL;
     }
@@ -128,6 +132,15 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         }
 
         return props;
+    }
+
+    @Override
+    public String getKeyStore() {
+        return keyStore;
+    }
+
+    public void setKeyStore(String keyStore) {
+        this.keyStore = keyStore;
     }
 
     /**
@@ -170,6 +183,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         prefs.getHost().ifPresent(theHost -> this.host = theHost);
         prefs.getPort().ifPresent(thePort -> this.port = Integer.parseInt(thePort));
         prefs.getName().ifPresent(theDatabase -> this.database = theDatabase);
+        prefs.getKeyStoreFile().ifPresent(theKeystore -> this.keyStore = theKeystore);
 
         if (prefs.getUser().isPresent()) {
             this.user = prefs.getUser().get();
