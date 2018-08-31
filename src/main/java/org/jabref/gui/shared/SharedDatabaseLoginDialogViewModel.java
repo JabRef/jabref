@@ -82,8 +82,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final Validator keystoreValidator;
     private final CompositeValidator formValidator;
 
-    private DBMSConnectionProperties connectionProperties;
-
     public SharedDatabaseLoginDialogViewModel(JabRefFrame frame, DialogService dialogService) {
         this.frame = frame;
         this.dialogService = dialogService;
@@ -111,7 +109,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public void openDatabase() {
 
-        connectionProperties = new DBMSConnectionProperties();
+        DBMSConnectionProperties connectionProperties = new DBMSConnectionProperties();
         connectionProperties.setType(selectedDBMSType.getValue());
         connectionProperties.setHost(host.getValue());
         connectionProperties.setPort(Integer.parseInt(port.getValue()));
@@ -122,7 +120,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         connectionProperties.setKeyStore(keystore.getValue());
 
         setupKeyStore();
-        openSharedDatabase();
+        openSharedDatabase(connectionProperties);
     }
 
     private void setupKeyStore() {
@@ -131,8 +129,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         System.setProperty("javax.net.debug", "ssl");
     }
 
-    private void openSharedDatabase() {
-        if (isSharedDatabaseAlreadyPresent()) {
+    private void openSharedDatabase(DBMSConnectionProperties connectionProperties) {
+        if (isSharedDatabaseAlreadyPresent(connectionProperties)) {
 
             dialogService.showWarningDialogAndWait(Localization.lang("Shared database connection"),
                                                    Localization.lang("You are already connected to a database using entered connection details."));
@@ -149,7 +147,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                                                                            Localization.lang("Overwrite file"),
                                                                                            Localization.lang("Cancel"));
                 if (!overwriteFilePressed) {
-                    // tbFolder.requestFocus();
                     return;
                 }
             }
@@ -188,7 +185,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                                                                       ButtonType.OK, openHelp);
 
             result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> HelpAction.openHelpPage(HelpFile.SQL_DATABASE_MIGRATION));
-            result.filter(btn -> btn.equals(ButtonType.OK)).ifPresent(btn -> openSharedDatabase());
+            result.filter(btn -> btn.equals(ButtonType.OK)).ifPresent(btn -> openSharedDatabase(connectionProperties));
 
         }
         loading.set(false);
@@ -220,7 +217,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     /**
      * Fetches possibly saved data and configures the control elements respectively.
      */
-    public void applyPreferences() {
+    private void applyPreferences() {
         Optional<String> sharedDatabaseType = prefs.getType();
         Optional<String> sharedDatabaseHost = prefs.getHost();
         Optional<String> sharedDatabasePort = prefs.getPort();
@@ -253,13 +250,13 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         rememberPassword.set(sharedDatabaseRememberPassword);
     }
 
-    private boolean isSharedDatabaseAlreadyPresent() {
+    private boolean isSharedDatabaseAlreadyPresent(DBMSConnectionProperties connectionProperties) {
         List<BasePanel> panels = frame.getBasePanelList();
         return panels.parallelStream().anyMatch(panel -> {
             BibDatabaseContext context = panel.getBibDatabaseContext();
 
             return ((context.getLocation() == DatabaseLocation.SHARED) &&
-                    this.connectionProperties.equals(context.getDBMSSynchronizer().getConnectionProperties()));
+                    connectionProperties.equals(context.getDBMSSynchronizer().getConnectionProperties()));
         });
     }
 
