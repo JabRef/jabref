@@ -24,6 +24,7 @@ public enum StandardFileType implements FileType {
     CSV("csv"),
     HTML("html"),
     JAR("jar"),
+    JAVA_KEYSTORE("jks"),
     JSTYLE("jstyle"),
     LAYOUT("layout"),
     ODS("ods"),

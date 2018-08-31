@@ -55,7 +55,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private Connection currentConnection;
     private final Character keywordSeparator;
     private final GlobalBibtexKeyPattern globalCiteKeyPattern;
-    private FileUpdateMonitor fileMonitor;
+    private final FileUpdateMonitor fileMonitor;
 
     public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
                             GlobalBibtexKeyPattern globalCiteKeyPattern, FileUpdateMonitor fileMonitor) {
@@ -132,13 +132,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
     }
 
-    @Subscribe
-    public void listen(EntryEvent event) {
-        if (isEventSourceAccepted(event)) {
-            dbmsProcessor.notifyClients();
-        }
-    }
-
     /**
      * Sets the table structure of shared database if needed and pulls all shared entries
      * to the new local database.
@@ -195,7 +188,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             // update fields
                             localEntry.setType(sharedEntry.get().getType(), EntryEventSource.SHARED);
                             localEntry.getSharedBibEntryData()
-                                    .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
+                                      .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
                             for (String field : sharedEntry.get().getFieldNames()) {
                                 localEntry.setField(field, sharedEntry.get().getField(field), EntryEventSource.SHARED);
                             }
@@ -399,6 +392,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.metaData = metaData;
     }
 
+    @Override
     public void registerListener(Object listener) {
         eventBus.register(listener);
     }
