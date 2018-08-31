@@ -46,8 +46,6 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
     @Inject private DialogService dialogService;
 
-    private final Button btnConnect;
-
     private SharedDatabaseLoginDialogViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
@@ -60,7 +58,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                   .setAsDialogPane(this);
 
         ControlHelper.setAction(connectButton, this.getDialogPane(), event -> openDatabase());
-        btnConnect = (Button) this.getDialogPane().lookupButton(connectButton);
+        Button btnConnect = (Button) this.getDialogPane().lookupButton(connectButton);
         //must be set here, because in initialize the button is still null
         btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not());
         btnConnect.textProperty().bind(EasyBind.map(viewModel.loadingProperty(), loading -> (loading) ? Localization.lang("Connecting...") : Localization.lang("Connect")));
