@@ -188,7 +188,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             // update fields
                             localEntry.setType(sharedEntry.get().getType(), EntryEventSource.SHARED);
                             localEntry.getSharedBibEntryData()
-                                    .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
+                                      .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
                             for (String field : sharedEntry.get().getFieldNames()) {
                                 localEntry.setField(field, sharedEntry.get().getField(field), EntryEventSource.SHARED);
                             }

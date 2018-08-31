@@ -31,10 +31,10 @@ public class SharedDatabasePreferences {
     private static final String SHARED_DATABASE_PASSWORD = "sharedDatabasePassword";
     private static final String SHARED_DATABASE_REMEMBER_PASSWORD = "sharedDatabaseRememberPassword";
     private static final String SHARED_DATABASE_USE_SSL = "sharedDatabaseUseSSL";
+    private static final String SHARED_DATABASE_KEYSTORE_FILE = "sharedDatabaseKeyStoreFile";
 
     // This {@link Preferences} is used only for things which should not appear in real JabRefPreferences due to security reasons.
     private final Preferences internalPrefs;
-
 
     public SharedDatabasePreferences() {
         this(DEFAULT_NODE);
@@ -68,12 +68,15 @@ public class SharedDatabasePreferences {
         return getOptionalValue(SHARED_DATABASE_PASSWORD);
     }
 
+    public Optional<String> getKeyStoreFile() {
+        return getOptionalValue(SHARED_DATABASE_KEYSTORE_FILE);
+    }
+
     public boolean getRememberPassword() {
         return internalPrefs.getBoolean(SHARED_DATABASE_REMEMBER_PASSWORD, false);
     }
 
-    public boolean isUseSSL()
-    {
+    public boolean isUseSSL() {
         return internalPrefs.getBoolean(SHARED_DATABASE_USE_SSL, false);
     }
 
@@ -107,6 +110,10 @@ public class SharedDatabasePreferences {
 
     public void setUseSSL(boolean useSSL) {
         internalPrefs.putBoolean(SHARED_DATABASE_USE_SSL, useSSL);
+    }
+
+    public void setKeystoreFile(String keystoreFile) {
+        internalPrefs.put(SHARED_DATABASE_KEYSTORE_FILE, keystoreFile);
     }
 
     public void clearPassword() {

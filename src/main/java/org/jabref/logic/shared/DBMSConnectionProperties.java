@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Properties;
 
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
@@ -109,15 +110,50 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         this.useSSL = useSSL;
     }
 
+    public String getUrl() {
+        return type.getUrl(host, port, database);
+    }
+
+    /**
+     * Returns username, password and ssl as Properties Object
+     * @return Properties with values for user, password and ssl
+     */
+    public Properties asProperties() {
+        Properties props = new Properties();
+        props.setProperty("user", user);
+        props.setProperty("password", password);
+
+        if (useSSL) {
+            props.setProperty("ssl", Boolean.toString(useSSL));
+        }
+
+        return props;
+    }
+
     /**
      * Compares all properties except the password.
      */
-    public boolean equals(DBMSConnectionProperties properties) {
-        return this.type.equals(properties.getType())
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (!(obj instanceof DBMSConnectionProperties)) {
+            return false;
+        }
+        DBMSConnectionProperties properties = (DBMSConnectionProperties) obj;
+        return Objects.equals(type, properties.getType())
                && this.host.equalsIgnoreCase(properties.getHost())
-               && (this.port == properties.getPort())
-               && this.database.equals(properties.getDatabase())
-               && this.user.equals(properties.getUser());
+               && Objects.equals(port, properties.getPort())
+               && Objects.equals(database, properties.getDatabase())
+               && Objects.equals(user, properties.getUser())
+               && Objects.equals(useSSL, properties.isUseSSL());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, host, port, database, user, useSSL);
     }
 
     /**

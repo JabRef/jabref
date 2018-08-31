@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 import org.jabref.logic.l10n.Localization;
@@ -34,17 +33,7 @@ public class DBMSConnection implements DatabaseConnection {
             // ensure that all SQL drivers are loaded - source: http://stackoverflow.com/a/22384826/873282
             // we use the side effect of getAvailableDBMSTypes() - it loads all available drivers
             DBMSConnection.getAvailableDBMSTypes();
-
-            Properties props = new Properties();
-            props.setProperty("user", connectionProperties.getUser());
-            props.setProperty("password", connectionProperties.getPassword());
-
-            if (connectionProperties.isUseSSL()) {
-                props.setProperty("ssl", Boolean.toString(connectionProperties.isUseSSL()));
-            }
-            String url = connectionProperties.getType().getUrl(connectionProperties.getHost(), connectionProperties.getPort(), connectionProperties.getDatabase());
-
-            this.connection = DriverManager.getConnection(url, props);
+            this.connection = DriverManager.getConnection(connectionProperties.getUrl(), connectionProperties.asProperties());
 
         } catch (SQLException e) {
             // Some systems like PostgreSQL retrieves 0 to every exception.

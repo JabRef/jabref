@@ -103,6 +103,9 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
         formValidator = new CompositeValidator();
         formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator);
+
+        applyPreferences();
+
     }
 
     public void openDatabase() {
@@ -183,7 +186,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                                                                       ButtonType.OK, openHelp);
 
             result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> HelpAction.openHelpPage(HelpFile.SQL_DATABASE_MIGRATION));
-            result.filter(btn -> btn == ButtonType.OK).ifPresent(btn -> openSharedDatabase());
+            result.filter(btn -> btn.equals(ButtonType.OK)).ifPresent(btn -> openSharedDatabase());
 
         }
         loading.set(false);
@@ -220,6 +223,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         Optional<String> sharedDatabaseUser = prefs.getUser();
         Optional<String> sharedDatabasePassword = prefs.getPassword();
         boolean sharedDatabaseRememberPassword = prefs.getRememberPassword();
+        Optional<String> sharedDatabaseKeystoreFile = prefs.getKeyStoreFile();
 
         if (sharedDatabaseType.isPresent()) {
             Optional<DBMSType> dbmsType = DBMSType.fromString(sharedDatabaseType.get());
@@ -230,6 +234,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         sharedDatabasePort.ifPresent(port::set);
         sharedDatabaseName.ifPresent(database::set);
         sharedDatabaseUser.ifPresent(user::set);
+        sharedDatabaseKeystoreFile.ifPresent(keystore::set);
 
         if (sharedDatabasePassword.isPresent() && sharedDatabaseUser.isPresent()) {
             try {

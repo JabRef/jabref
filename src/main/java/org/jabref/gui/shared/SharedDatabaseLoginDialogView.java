@@ -88,15 +88,15 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
         folder.textProperty().bindBidirectional(viewModel.folderProperty());
         browseButton.disableProperty().bind(autosave.selectedProperty().not());
-        folder.disableProperty().bind(autosave.selectedProperty().not());
+        folder.disableProperty().bind(viewModel.autosaveProperty().not());
         autosave.selectedProperty().bindBidirectional(viewModel.autosaveProperty());
 
         useSSL.selectedProperty().bindBidirectional(viewModel.useSSLProperty());
 
         fileKeystore.textProperty().bindBidirectional(viewModel.keyStoreProperty());
 
-        browseKeystore.disableProperty().bind(useSSL.selectedProperty().not());
-        passwordKeystore.disableProperty().bind(useSSL.selectedProperty().not());
+        browseKeystore.disableProperty().bind(viewModel.useSSLProperty().not());
+        passwordKeystore.disableProperty().bind(viewModel.useSSLProperty().not());
         passwordKeystore.textProperty().bindBidirectional(viewModel.keyStorePasswordProperty());
 
         //Must be executed after the initialization of the view, otherwise it doesn't work
@@ -114,9 +114,6 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 visualizer.initVisualization(viewModel.keystoreValidation(), fileKeystore, true);
             });
         });
-
-        viewModel.applyPreferences();
-
     }
 
     @FXML

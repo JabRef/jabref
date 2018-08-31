@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.jabref.JabRefExecutorService;
 import org.jabref.logic.shared.listener.PostgresSQLNotificationListener;
 import org.jabref.model.database.shared.DatabaseConnection;
 import org.jabref.model.entry.BibEntry;
@@ -89,7 +90,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
             // Otherwise the listener is going to be deleted by GC.
             PGConnection pgConnection = connection.unwrap(PGConnection.class);
             listener = new PostgresSQLNotificationListener(dbmsSynchronizer, pgConnection);
-            new Thread(listener, "PostgresSQLNotificationListener").start();
+            JabRefExecutorService.INSTANCE.execute(listener);
 
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
