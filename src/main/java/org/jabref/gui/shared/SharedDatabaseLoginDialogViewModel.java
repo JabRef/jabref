@@ -201,6 +201,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         prefs.setPort(port.getValue());
         prefs.setName(database.getValue());
         prefs.setUser(user.getValue());
+        prefs.setUseSSL(useSSL.getValue());
+        prefs.setKeystoreFile(keystore.getValue());
 
         if (rememberPassword.get()) {
             try {
@@ -238,6 +240,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         sharedDatabaseName.ifPresent(database::set);
         sharedDatabaseUser.ifPresent(user::set);
         sharedDatabaseKeystoreFile.ifPresent(keystore::set);
+        useSSL.setValue(prefs.isUseSSL());
 
         if (sharedDatabasePassword.isPresent() && sharedDatabaseUser.isPresent()) {
             try {

@@ -184,6 +184,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         prefs.getPort().ifPresent(thePort -> this.port = Integer.parseInt(thePort));
         prefs.getName().ifPresent(theDatabase -> this.database = theDatabase);
         prefs.getKeyStoreFile().ifPresent(theKeystore -> this.keyStore = theKeystore);
+        this.setUseSSL(prefs.isUseSSL());
 
         if (prefs.getUser().isPresent()) {
             this.user = prefs.getUser().get();

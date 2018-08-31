@@ -115,7 +115,6 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 visualizer.initVisualization(viewModel.keystoreValidation(), fileKeystore, true);
             });
         });
-
     }
 
     @FXML
