@@ -88,7 +88,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         databaseType.valueProperty().bindBidirectional(viewModel.selectedDbmstypeProperty());
 
         folder.textProperty().bindBidirectional(viewModel.folderProperty());
-        browseButton.disableProperty().bind(autosave.selectedProperty().not());
+        browseButton.disableProperty().bind(viewModel.autosaveProperty().not());
         folder.disableProperty().bind(viewModel.autosaveProperty().not());
         autosave.selectedProperty().bindBidirectional(viewModel.autosaveProperty());
 
