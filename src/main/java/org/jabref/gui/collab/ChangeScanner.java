@@ -104,8 +104,8 @@ public class ChangeScanner implements Runnable {
                                                                         .getEncoding()
                                                                         .orElse(Globals.prefs.getDefaultEncoding()));
 
-                BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(new AtomicFileWriter(tempFile, prefs.getEncoding()));
-                databaseWriter.saveDatabase(databaseInTemp, prefs);
+                BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(new AtomicFileWriter(tempFile, prefs.getEncoding()), prefs);
+                databaseWriter.saveDatabase(databaseInTemp);
             } catch (IOException ex) {
                 LOGGER.warn("Problem updating tmp file after accepting external changes", ex);
             }

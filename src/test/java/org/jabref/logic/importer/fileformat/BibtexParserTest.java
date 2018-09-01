@@ -52,9 +52,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Test the BibtexParser
- */
 class BibtexParserTest {
 
     private ImportFormatPreferences importFormatPreferences;
@@ -1450,7 +1447,7 @@ class BibtexParserTest {
     void parseRecognizesDatabaseID() throws Exception {
         String expectedDatabaseID = "q1w2e3r4t5z6";
         StringBuilder sharedDatabaseFileContent = new StringBuilder()
-                .append("% DBID: ").append(expectedDatabaseID)
+                .append("\\% DBID: ").append(expectedDatabaseID)
                 .append(OS.NEWLINE)
                 .append("@Article{a}");
 
@@ -1463,8 +1460,8 @@ class BibtexParserTest {
     @Test
     void parseDoesNotRecognizeDatabaseIDasUserComment() throws Exception {
         StringBuilder sharedDatabaseFileContent = new StringBuilder()
-                .append("% Encoding: UTF-8").append(OS.NEWLINE)
-                .append("% DBID: q1w2e3r4t5z6").append(OS.NEWLINE)
+                .append("\\% Encoding: UTF-8").append(OS.NEWLINE)
+                .append("\\% DBID: q1w2e3r4t5z6").append(OS.NEWLINE)
                 .append("@Article{a}");
 
         ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent.toString()));

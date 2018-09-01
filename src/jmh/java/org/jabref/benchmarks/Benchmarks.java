@@ -36,6 +36,8 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
+import static org.mockito.Mockito.mock;
+
 @State(Scope.Thread)
 public class Benchmarks {
 
@@ -61,10 +63,9 @@ public class Benchmarks {
             database.insertEntry(entry);
         }
         StringWriter outputWriter = new StringWriter();
-        BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(outputWriter);
+        BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(outputWriter, mock(SavePreferences.class));
         databaseWriter.savePartOfDatabase(
-                new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries(),
-                new SavePreferences());
+                new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries());
         bibtexString = outputWriter.toString();
 
         latexConversionString = "{A} \\textbf{bold} approach {\\it to} ${{\\Sigma}}{\\Delta}$ modulator \\textsuperscript{2} \\$";
@@ -81,10 +82,8 @@ public class Benchmarks {
     @Benchmark
     public String write() throws Exception {
         StringWriter outputWriter = new StringWriter();
-        BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(outputWriter);
-        databaseWriter.savePartOfDatabase(
-                new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries(),
-                new SavePreferences());
+        BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(outputWriter, mock(SavePreferences.class));
+        databaseWriter.savePartOfDatabase(new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries());
         return outputWriter.toString();
     }
 

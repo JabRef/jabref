@@ -128,7 +128,9 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             try {
                 // Make sure we have written everything to the temporary file
                 flush();
-                ((FileOutputStream) out).getFD().sync();
+                if (out instanceof FileOutputStream) {
+                    ((FileOutputStream) out).getFD().sync();
+                }
             } catch (IOException exception) {
                 // Try to close nonetheless
                 super.close();

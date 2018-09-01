@@ -390,9 +390,9 @@ public class ArgumentProcessor {
             System.out.println(Localization.lang("Saving") + ": " + subName);
             SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences();
             AtomicFileWriter fileWriter = new AtomicFileWriter(Paths.get(subName), prefs.getEncoding());
-            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter);
+            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, prefs);
             Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
-            databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults), prefs);
+            databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults));
 
             // Show just a warning message if encoding did not work for all characters:
             if (fileWriter.hasEncodingProblems()) {

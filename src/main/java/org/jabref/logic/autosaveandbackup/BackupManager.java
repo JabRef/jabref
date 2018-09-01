@@ -120,8 +120,8 @@ public class BackupManager {
             Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(preferences.getDefaultEncoding());
             SavePreferences savePreferences = preferences.loadForSaveFromPreferences().withEncoding
                     (charset).withMakeBackup(false);
-            new BibtexDatabaseWriter(new AtomicFileWriter(backupPath, savePreferences.getEncoding()))
-                    .saveDatabase(bibDatabaseContext, savePreferences);
+            new BibtexDatabaseWriter(new AtomicFileWriter(backupPath, savePreferences.getEncoding()), savePreferences)
+                    .saveDatabase(bibDatabaseContext);
         } catch (IOException e) {
             logIfCritical(e);
         }

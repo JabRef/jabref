@@ -1447,7 +1447,8 @@ public class JabRefPreferences implements PreferencesService {
                 this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 this.getLatexFieldFormatterPreferences(),
                 this.getKeyPattern(),
-                getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING));
+                getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING),
+                getBibtexKeyPatternPreferences());
     }
 
     public SavePreferences loadForSaveFromPreferences() {
@@ -1461,7 +1462,8 @@ public class JabRefPreferences implements PreferencesService {
                 this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 this.getLatexFieldFormatterPreferences(),
                 this.getKeyPattern(),
-                getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING));
+                getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING),
+                getBibtexKeyPatternPreferences());
     }
 
     public ExporterFactory getExporterFactory(JournalAbbreviationLoader abbreviationLoader) {
@@ -1692,37 +1694,29 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void storeExportSaveOrder(SaveOrderConfig config) {
-        putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, config.sortCriteria[0].descending);
-        putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, config.sortCriteria[1].descending);
-        putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, config.sortCriteria[2].descending);
+        putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, config.getSortCriteria().get(0).descending);
+        putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, config.getSortCriteria().get(1).descending);
+        putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, config.getSortCriteria().get(2).descending);
 
-        put(EXPORT_PRIMARY_SORT_FIELD, config.sortCriteria[0].field);
-        put(EXPORT_SECONDARY_SORT_FIELD, config.sortCriteria[1].field);
-        put(EXPORT_TERTIARY_SORT_FIELD, config.sortCriteria[2].field);
+        put(EXPORT_PRIMARY_SORT_FIELD, config.getSortCriteria().get(0).field);
+        put(EXPORT_SECONDARY_SORT_FIELD, config.getSortCriteria().get(1).field);
+        put(EXPORT_TERTIARY_SORT_FIELD, config.getSortCriteria().get(2).field);
     }
 
     public SaveOrderConfig loadTableSaveOrder() {
-        SaveOrderConfig config = new SaveOrderConfig();
-        config.sortCriteria[0].field = get(TABLE_PRIMARY_SORT_FIELD);
-        config.sortCriteria[0].descending = getBoolean(TABLE_PRIMARY_SORT_DESCENDING);
-        config.sortCriteria[1].field = get(TABLE_SECONDARY_SORT_FIELD);
-        config.sortCriteria[1].descending = getBoolean(TABLE_SECONDARY_SORT_DESCENDING);
-        config.sortCriteria[2].field = get(TABLE_TERTIARY_SORT_FIELD);
-        config.sortCriteria[2].descending = getBoolean(TABLE_TERTIARY_SORT_DESCENDING);
-
-        return config;
+        return new SaveOrderConfig(true,
+                new SaveOrderConfig.SortCriterion(get(TABLE_PRIMARY_SORT_FIELD), getBoolean(TABLE_PRIMARY_SORT_DESCENDING)),
+                new SaveOrderConfig.SortCriterion(get(TABLE_SECONDARY_SORT_FIELD), getBoolean(TABLE_SECONDARY_SORT_DESCENDING)),
+                new SaveOrderConfig.SortCriterion(get(TABLE_TERTIARY_SORT_FIELD), getBoolean(TABLE_TERTIARY_SORT_DESCENDING))
+        );
     }
 
     public SaveOrderConfig loadExportSaveOrder() {
-        SaveOrderConfig config = new SaveOrderConfig();
-        config.sortCriteria[0].field = get(EXPORT_PRIMARY_SORT_FIELD);
-        config.sortCriteria[0].descending = getBoolean(EXPORT_PRIMARY_SORT_DESCENDING);
-        config.sortCriteria[1].field = get(EXPORT_SECONDARY_SORT_FIELD);
-        config.sortCriteria[1].descending = getBoolean(EXPORT_SECONDARY_SORT_DESCENDING);
-        config.sortCriteria[2].field = get(EXPORT_TERTIARY_SORT_FIELD);
-        config.sortCriteria[2].descending = getBoolean(EXPORT_TERTIARY_SORT_DESCENDING);
-
-        return config;
+        return new SaveOrderConfig(true,
+                new SaveOrderConfig.SortCriterion(get(EXPORT_PRIMARY_SORT_FIELD), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
+                new SaveOrderConfig.SortCriterion(get(EXPORT_SECONDARY_SORT_FIELD), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
+                new SaveOrderConfig.SortCriterion(get(EXPORT_TERTIARY_SORT_FIELD), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING))
+        );
     }
 
     public Character getKeywordDelimiter() {

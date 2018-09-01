@@ -84,12 +84,12 @@ public class SaveDatabaseAction {
             }
 
             AtomicFileWriter fileWriter = new AtomicFileWriter(file, preferences.getEncoding());
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter);
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, preferences);
 
             if (selectedOnly) {
-                databaseWriter.savePartOfDatabase(panel.getBibDatabaseContext(), panel.getSelectedEntries(), preferences);
+                databaseWriter.savePartOfDatabase(panel.getBibDatabaseContext(), panel.getSelectedEntries());
             } else {
-                databaseWriter.saveDatabase(panel.getBibDatabaseContext(), preferences);
+                databaseWriter.saveDatabase(panel.getBibDatabaseContext());
             }
 
             panel.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());

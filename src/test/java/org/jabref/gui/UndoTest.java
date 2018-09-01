@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class UndoTest extends AbstractUITest {
 
     @Test
-    public void undoCutOfMultipleEntries() {
+    public void undoCutOfMultipleEntries() throws Exception {
         importBibIntoNewDatabase(getAbsolutePath("testbib/testjabref.bib"));
 
         JTableFixture entryTable = mainFrame.table();

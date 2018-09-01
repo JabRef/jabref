@@ -8,7 +8,6 @@ import java.util.Map;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
-import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -25,85 +24,84 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     private static final String COMMENT_PREFIX = "@Comment";
     private static final String PREAMBLE_PREFIX = "@Preamble";
 
-    public BibtexDatabaseWriter(Writer writer) {
-        super(writer);
+    public BibtexDatabaseWriter(Writer writer, SavePreferences preferences) {
+        super(writer, preferences);
     }
 
     @Override
     protected void writeEpilogue(String epilogue) throws IOException {
         if (!StringUtil.isNullOrEmpty(epilogue)) {
-            getWriter().write(OS.NEWLINE);
-            getWriter().write(epilogue);
-            getWriter().write(OS.NEWLINE);
+            writer.write(OS.NEWLINE);
+            writer.write(epilogue);
+            writer.write(OS.NEWLINE);
         }
     }
 
     @Override
     protected void writeMetaDataItem(Map.Entry<String, String> metaItem) throws IOException {
-        getWriter().write(OS.NEWLINE);
-        getWriter().write(COMMENT_PREFIX + "{");
-        getWriter().write(MetaData.META_FLAG);
-        getWriter().write(metaItem.getKey());
-        getWriter().write(":");
-        getWriter().write(metaItem.getValue());
-        getWriter().write("}");
-        getWriter().write(OS.NEWLINE);
+        writer.write(OS.NEWLINE);
+        writer.write(COMMENT_PREFIX + "{");
+        writer.write(MetaData.META_FLAG);
+        writer.write(metaItem.getKey());
+        writer.write(":");
+        writer.write(metaItem.getValue());
+        writer.write("}");
+        writer.write(OS.NEWLINE);
     }
 
     @Override
     protected void writePreamble(String preamble) throws IOException {
         if (!StringUtil.isNullOrEmpty(preamble)) {
-            getWriter().write(OS.NEWLINE);
-            getWriter().write(PREAMBLE_PREFIX + "{");
-            getWriter().write(preamble);
-            getWriter().write('}' + OS.NEWLINE);
+            writer.write(OS.NEWLINE);
+            writer.write(PREAMBLE_PREFIX + "{");
+            writer.write(preamble);
+            writer.write('}' + OS.NEWLINE);
         }
     }
 
     @Override
-    protected void writeString(BibtexString bibtexString, boolean isFirstString, int maxKeyLength, Boolean reformatFile,
-                               LatexFieldFormatterPreferences latexFieldFormatterPreferences) throws IOException {
+    protected void writeString(BibtexString bibtexString, boolean isFirstString, int maxKeyLength) throws IOException {
         // If the string has not been modified, write it back as it was
-        if (!reformatFile && !bibtexString.hasChanged()) {
-            getWriter().write(bibtexString.getParsedSerialization());
+        if (!preferences.isReformatFile() && !bibtexString.hasChanged()) {
+            writer.write(bibtexString.getParsedSerialization());
             return;
         }
 
         // Write user comments
         String userComments = bibtexString.getUserComments();
         if (!userComments.isEmpty()) {
-            getWriter().write(userComments + OS.NEWLINE);
+            writer.write(userComments + OS.NEWLINE);
         }
 
         if (isFirstString) {
-            getWriter().write(OS.NEWLINE);
+            writer.write(OS.NEWLINE);
         }
 
-        getWriter().write(STRING_PREFIX + "{" + bibtexString.getName() + StringUtil
+        writer.write(STRING_PREFIX + "{" + bibtexString.getName() + StringUtil
                 .repeatSpaces(maxKeyLength - bibtexString.getName().length()) + " = ");
         if (bibtexString.getContent().isEmpty()) {
-            getWriter().write("{}");
+            writer.write("{}");
         } else {
             try {
-                String formatted = new LatexFieldFormatter(latexFieldFormatterPreferences)
+                String formatted = new LatexFieldFormatter(preferences.getLatexFieldFormatterPreferences())
                         .format(bibtexString.getContent(),
                                 LatexFieldFormatter.BIBTEX_STRING);
-                getWriter().write(formatted);
+                writer.write(formatted);
             } catch (InvalidFieldValueException ex) {
                 throw new IOException(ex);
             }
         }
 
-        getWriter().write("}" + OS.NEWLINE);
+        writer.write("}" + OS.NEWLINE);
     }
 
     @Override
     protected void writeEntryTypeDefinition(CustomEntryType customType) throws IOException {
-        getWriter().write(OS.NEWLINE);
-        getWriter().write(COMMENT_PREFIX + "{");
-        getWriter().write(customType.getAsString());
-        getWriter().write("}");
-        getWriter().write(OS.NEWLINE);
+        writer.write(OS.NEWLINE);
+        writer.write(COMMENT_PREFIX + "{");
+        writer.write(customType.getAsString());
+        writer.write("}");
+        writer.write(OS.NEWLINE);
     }
 
     @Override
@@ -113,14 +111,14 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
         }
 
         // Writes the file encoding information.
-        getWriter().write("% ");
-        getWriter().write(SavePreferences.ENCODING_PREFIX + encoding);
-        getWriter().write(OS.NEWLINE);
+        writer.write("% ");
+        writer.write(SavePreferences.ENCODING_PREFIX + encoding);
+        writer.write(OS.NEWLINE);
     }
 
     @Override
     protected void writeDatabaseID(String sharedDatabaseID) throws IOException {
-        getWriter().write("% " +
+        writer.write("% " +
                 DATABASE_ID_PREFIX +
                 " " +
                 sharedDatabaseID +
@@ -128,10 +126,9 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     }
 
     @Override
-    protected void writeEntry(BibEntry entry, BibDatabaseMode mode, Boolean isReformatFile,
-                              LatexFieldFormatterPreferences latexFieldFormatterPreferences) throws IOException {
+    protected void writeEntry(BibEntry entry, BibDatabaseMode mode) throws IOException {
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
-                new LatexFieldFormatter(latexFieldFormatterPreferences), true);
-        bibtexEntryWriter.write(entry, getWriter(), mode, isReformatFile);
+                new LatexFieldFormatter(preferences.getLatexFieldFormatterPreferences()), true);
+        bibtexEntryWriter.write(entry, writer, mode, preferences.isReformatFile());
     }
 }
