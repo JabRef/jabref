@@ -175,7 +175,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 }
             });
             for (Path theFile : theFiles) {
-                frame.getFileHistory().newFile(theFile.toString());
+                frame.getFileHistory().newFile(theFile);
             }
         }
         // If no files are remaining to open, this could mean that a file was

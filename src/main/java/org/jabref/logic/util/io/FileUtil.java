@@ -96,8 +96,7 @@ public class FileUtil {
      * @return the with the modified file name
      */
     public static Path addExtension(Path path, String extension) {
-        Path fileName = path.getFileName();
-        return path.resolveSibling(fileName + extension);
+        return path.resolveSibling(path.getFileName() + extension);
     }
 
     /**

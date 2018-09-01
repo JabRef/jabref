@@ -1382,12 +1382,12 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public FileHistory getFileHistory() {
-        return new FileHistory(getStringList(RECENT_DATABASES));
+        return new FileHistory(getStringList(RECENT_DATABASES).stream().map(Paths::get).collect(Collectors.toList()));
     }
 
     public void storeFileHistory(FileHistory history) {
         if (!history.isEmpty()) {
-            putStringList(RECENT_DATABASES, history.getHistory());
+            putStringList(RECENT_DATABASES, history.getHistory().stream().map(Path::toAbsolutePath).map(Path::toString).collect(Collectors.toList()));
         }
     }
 
@@ -1437,29 +1437,31 @@ public class JabRefPreferences implements PreferencesService {
                 saveOrder = this.loadTableSaveOrder();
             }
         }
-        Charset encoding = this.getDefaultEncoding();
-        Boolean makeBackup = this.getBoolean(JabRefPreferences.BACKUP);
-        SavePreferences.DatabaseSaveType saveType = SavePreferences.DatabaseSaveType.ALL;
-        Boolean takeMetadataSaveOrderInAccount = false;
-        Boolean reformatFile = this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
-        LatexFieldFormatterPreferences latexFieldFormatterPreferences = this.getLatexFieldFormatterPreferences();
-        GlobalBibtexKeyPattern globalCiteKeyPattern = this.getKeyPattern();
-        return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
-                                   takeMetadataSaveOrderInAccount, reformatFile, latexFieldFormatterPreferences, globalCiteKeyPattern);
+        return new SavePreferences(
+                saveInOriginalOrder,
+                saveOrder,
+                this.getDefaultEncoding(),
+                this.getBoolean(JabRefPreferences.BACKUP),
+                SavePreferences.DatabaseSaveType.ALL,
+                false,
+                this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
+                this.getLatexFieldFormatterPreferences(),
+                this.getKeyPattern(),
+                getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING));
     }
 
     public SavePreferences loadForSaveFromPreferences() {
-        Boolean saveInOriginalOrder = false;
-        SaveOrderConfig saveOrder = null;
-        Charset encoding = this.getDefaultEncoding();
-        Boolean makeBackup = this.getBoolean(JabRefPreferences.BACKUP);
-        SavePreferences.DatabaseSaveType saveType = SavePreferences.DatabaseSaveType.ALL;
-        Boolean takeMetadataSaveOrderInAccount = true;
-        Boolean reformatFile = this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
-        LatexFieldFormatterPreferences latexFieldFormatterPreferences = this.getLatexFieldFormatterPreferences();
-        GlobalBibtexKeyPattern globalCiteKeyPattern = this.getKeyPattern();
-        return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
-                                   takeMetadataSaveOrderInAccount, reformatFile, latexFieldFormatterPreferences, globalCiteKeyPattern);
+        return new SavePreferences(
+                false,
+                null,
+                this.getDefaultEncoding(),
+                this.getBoolean(JabRefPreferences.BACKUP),
+                SavePreferences.DatabaseSaveType.ALL,
+                true,
+                this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
+                this.getLatexFieldFormatterPreferences(),
+                this.getKeyPattern(),
+                getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING));
     }
 
     public ExporterFactory getExporterFactory(JournalAbbreviationLoader abbreviationLoader) {

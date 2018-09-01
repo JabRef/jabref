@@ -12,6 +12,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -82,6 +83,25 @@ public class BibEntryWriterTest {
         String actual = stringWriter.toString();
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void writeEntryWithFile() throws Exception {
+        BibEntry entry = new BibEntry();
+        LinkedFile file = new LinkedFile("test", "/home/uers/test.pdf", "PDF");
+        entry.addFile(file);
+
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+
+        assertEquals(OS.NEWLINE +
+                "@Article{,"
+                + OS.NEWLINE
+                + "  file = {test:/home/uers/test.pdf:PDF},"
+                + OS.NEWLINE
+                + "}" + OS.NEWLINE
+                + OS.NEWLINE
+                + "@Comment{jabref-meta: databaseType:bibtex;}" + OS.NEWLINE, stringWriter.toString());
     }
 
     @Test

@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,8 +16,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -74,27 +70,17 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntry;
-import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.worker.CitationStyleToClipboardWorker;
 import org.jabref.gui.worker.SendAsEMailAction;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.FileSaveSession;
-import org.jabref.logic.exporter.SaveException;
-import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.exporter.SaveSession;
-import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
@@ -118,13 +104,10 @@ import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.Subscription;
 import org.slf4j.Logger;
@@ -300,11 +283,11 @@ public class BasePanel extends StackPane {
         actions.put(Actions.EDIT, this::showAndEdit);
 
         // The action for saving a database.
-        actions.put(Actions.SAVE, saveAction);
+        actions.put(Actions.SAVE, saveAction::save);
 
         actions.put(Actions.SAVE_AS, saveAction::saveAs);
 
-        actions.put(Actions.SAVE_SELECTED_AS_PLAIN, new SaveSelectedAction(SavePreferences.DatabaseSaveType.PLAIN_BIBTEX));
+        actions.put(Actions.SAVE_SELECTED_AS_PLAIN, saveAction::saveSelectedAsPlain);
 
         // The action for copying selected entries.
         actions.put(Actions.COPY, mainTable::copy);
@@ -672,87 +655,9 @@ public class BasePanel extends StackPane {
         }
     }
 
-    /**
-     * FIXME: high code duplication with {@link SaveDatabaseAction#saveDatabase(File, boolean, Charset)}
-     */
-    private boolean saveDatabase(File file, boolean selectedOnly, Charset encoding,
-                                 SavePreferences.DatabaseSaveType saveType)
-        throws SaveException {
-        SaveSession session;
-        final String SAVE_DATABASE = Localization.lang("Save library");
-        try {
-            SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences()
-                                                 .withEncoding(encoding)
-                                                 .withSaveType(saveType);
-
-            BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
-                                                                                          FileSaveSession::new);
-            if (selectedOnly) {
-                session = databaseWriter.savePartOfDatabase(bibDatabaseContext, mainTable.getSelectedEntries(), prefs);
-            } else {
-                session = databaseWriter.saveDatabase(bibDatabaseContext, prefs);
-            }
-
-            registerUndoableChanges(session);
-        }
-        // FIXME: not sure if this is really thrown anywhere
-        catch (UnsupportedCharsetException ex) {
-            frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file.")
-                                                                                               + Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()));
-            throw new SaveException("rt");
-        } catch (SaveException ex) {
-            if (ex.specificEntry()) {
-                // Error occurred during processing of the entry. Highlight it:
-                clearAndSelect(ex.getEntry());
-                showAndEdit(ex.getEntry());
-            } else {
-                LOGGER.warn("Could not save", ex);
-            }
-
-            dialogService.showErrorDialogAndWait(SAVE_DATABASE, Localization.lang("Could not save file."), ex);
-            throw new SaveException("rt");
-        }
-
-        boolean commit = true;
-        if (!session.getWriter().couldEncodeAll()) {
-            FormBuilder builder = FormBuilder.create()
-                    .layout(new FormLayout("left:pref, 4dlu, fill:pref", "pref, 4dlu, pref"));
-            JTextArea ta = new JTextArea(session.getWriter().getProblemCharacters());
-            ta.setEditable(false);
-            builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters:", session.getEncoding().displayName())).xy(1, 1);
-            builder.add(ta).xy(3, 1);
-            builder.add(Localization.lang("What do you want to do?")).xy(1, 3);
-            String tryDiff = Localization.lang("Try different encoding");
-            int answer = JOptionPane.showOptionDialog(null, builder.getPanel(), SAVE_DATABASE, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, new String[] {Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
-
-            if (answer == JOptionPane.NO_OPTION) {
-
-                // The user wants to use another encoding.
-                Object choice = JOptionPane.showInputDialog(null, Localization.lang("Select encoding"), SAVE_DATABASE, JOptionPane.QUESTION_MESSAGE, null, Encodings.ENCODINGS_DISPLAYNAMES, encoding);
-                if (choice == null) {
-                    commit = false;
-                } else {
-                    Charset newEncoding = Charset.forName((String) choice);
-                    return saveDatabase(file, selectedOnly, newEncoding, saveType);
-                }
-            } else if (answer == JOptionPane.CANCEL_OPTION) {
-                commit = false;
-            }
-        }
-
-        if (commit) {
-            session.commit(file.toPath());
-            this.bibDatabaseContext.getMetaData().setEncoding(encoding); // Make sure to remember which encoding we used.
-        } else {
-            session.cancel();
-        }
-
-        return commit;
-    }
-
-    public void registerUndoableChanges(SaveSession session) {
+    public void registerUndoableChanges(List<FieldChange> changes) {
         NamedCompound ce = new NamedCompound(Localization.lang("Save actions"));
-        for (FieldChange change : session.getFieldChanges()) {
+        for (FieldChange change : changes) {
             ce.addEdit(new UndoableFieldChange(change));
         }
         ce.end();
@@ -1268,30 +1173,6 @@ public class BasePanel extends StackPane {
     }
 
     /**
-     * If the relevant option is set, autogenerate keys for all entries that are lacking keys.
-     */
-    public void autoGenerateKeysBeforeSaving() {
-        if (Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING)) {
-            NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
-
-            BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(bibDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences());
-            for (BibEntry bes : bibDatabaseContext.getDatabase().getEntries()) {
-                Optional<String> oldKey = bes.getCiteKeyOptional();
-                if (StringUtil.isBlank(oldKey)) {
-                    Optional<FieldChange> change = keyGenerator.generateAndSetKey(bes);
-                    change.ifPresent(fieldChange -> ce.addEdit(new UndoableKeyChange(fieldChange)));
-                }
-            }
-
-            // Store undo information, if any:
-            if (ce.hasEdits()) {
-                ce.end();
-                getUndoManager().addEdit(ce);
-            }
-        }
-    }
-
-    /**
      * Depending on whether a preview or an entry editor is showing, save the current divider location in the correct preference setting.
      */
     private void saveDividerLocation(Number position) {
@@ -1643,32 +1524,6 @@ public class BasePanel extends StackPane {
         public void action() {
             showPreview();
             preview.print();
-        }
-    }
-
-    private class SaveSelectedAction implements BaseAction {
-
-        private final SavePreferences.DatabaseSaveType saveType;
-
-        public SaveSelectedAction(SavePreferences.DatabaseSaveType saveType) {
-            this.saveType = saveType;
-        }
-
-        @Override
-        public void action() throws SaveException {
-            FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                    .addExtensionFilter(String.format("%1s %2s", "BibTex", Localization.lang("Library")), StandardFileType.BIBTEX_DB)
-                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
-                    .build();
-
-            Optional<Path> chosenFile = dialogService.showFileSaveDialog(fileDialogConfiguration);
-            if (chosenFile.isPresent()) {
-                Path path = chosenFile.get();
-                saveDatabase(path.toFile(), true, Globals.prefs.getDefaultEncoding(), saveType);
-                frame.getFileHistory().newFile(path.toString());
-                frame.output(Localization.lang("Saved selected to '%0'.", path.toString()));
-            }
         }
     }
 }

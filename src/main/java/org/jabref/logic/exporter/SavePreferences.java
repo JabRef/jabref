@@ -21,15 +21,16 @@ public class SavePreferences {
     private final boolean takeMetadataSaveOrderInAccount;
     private final LatexFieldFormatterPreferences latexFieldFormatterPreferences;
     private final GlobalBibtexKeyPattern globalCiteKeyPattern;
+    private final Boolean generateBibtexKeysBeforeSaving;
 
     public SavePreferences() {
         this(true, null, null, false, DatabaseSaveType.ALL, true, false, new LatexFieldFormatterPreferences(),
-                new GlobalBibtexKeyPattern(Collections.emptyList()));
+                new GlobalBibtexKeyPattern(Collections.emptyList()), false);
     }
 
     public SavePreferences(Boolean saveInOriginalOrder, SaveOrderConfig saveOrder, Charset encoding, Boolean makeBackup,
-            DatabaseSaveType saveType, Boolean takeMetadataSaveOrderInAccount, Boolean reformatFile,
-            LatexFieldFormatterPreferences latexFieldFormatterPreferences, GlobalBibtexKeyPattern globalCiteKeyPattern) {
+                           DatabaseSaveType saveType, Boolean takeMetadataSaveOrderInAccount, Boolean reformatFile,
+                           LatexFieldFormatterPreferences latexFieldFormatterPreferences, GlobalBibtexKeyPattern globalCiteKeyPattern, Boolean generateBibtexKeysBeforeSaving) {
         this.saveInOriginalOrder = saveInOriginalOrder;
         this.saveOrder = saveOrder;
         this.encoding = encoding;
@@ -39,6 +40,7 @@ public class SavePreferences {
         this.reformatFile = reformatFile;
         this.latexFieldFormatterPreferences = latexFieldFormatterPreferences;
         this.globalCiteKeyPattern = globalCiteKeyPattern;
+        this.generateBibtexKeysBeforeSaving = generateBibtexKeysBeforeSaving;
     }
 
     public Boolean getTakeMetadataSaveOrderInAccount() {
@@ -56,17 +58,17 @@ public class SavePreferences {
     public SavePreferences withSaveInOriginalOrder(Boolean newSaveInOriginalOrder) {
         return new SavePreferences(newSaveInOriginalOrder, this.saveOrder, this.encoding, this.makeBackup, this.saveType,
                 this.takeMetadataSaveOrderInAccount, this.reformatFile, this.latexFieldFormatterPreferences,
-                globalCiteKeyPattern);
+                this.globalCiteKeyPattern, this.generateBibtexKeysBeforeSaving);
     }
 
-    public boolean getMakeBackup() {
+    public boolean makeBackup() {
         return makeBackup;
     }
 
     public SavePreferences withMakeBackup(Boolean newMakeBackup) {
         return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, this.encoding, newMakeBackup, this.saveType,
                 this.takeMetadataSaveOrderInAccount, this.reformatFile, this.latexFieldFormatterPreferences,
-                globalCiteKeyPattern);
+                this.globalCiteKeyPattern, this.generateBibtexKeysBeforeSaving);
     }
 
     public Charset getEncoding() {
@@ -76,7 +78,7 @@ public class SavePreferences {
     public SavePreferences withEncoding(Charset newEncoding) {
         return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, newEncoding, this.makeBackup, this.saveType,
                 this.takeMetadataSaveOrderInAccount, this.reformatFile, this.latexFieldFormatterPreferences,
-                globalCiteKeyPattern);
+                this.globalCiteKeyPattern, this.generateBibtexKeysBeforeSaving);
     }
 
     public DatabaseSaveType getSaveType() {
@@ -86,7 +88,7 @@ public class SavePreferences {
     public SavePreferences withSaveType(DatabaseSaveType newSaveType) {
         return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, this.encoding, this.makeBackup, newSaveType,
                 this.takeMetadataSaveOrderInAccount, this.reformatFile, this.latexFieldFormatterPreferences,
-                globalCiteKeyPattern);
+                this.globalCiteKeyPattern, this.generateBibtexKeysBeforeSaving);
     }
 
     public Boolean isReformatFile() {
@@ -96,7 +98,7 @@ public class SavePreferences {
     public SavePreferences withReformatFile(boolean newReformatFile) {
         return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, this.encoding, this.makeBackup,
                 this.saveType, this.takeMetadataSaveOrderInAccount, newReformatFile, this.latexFieldFormatterPreferences,
-                globalCiteKeyPattern);
+                this.globalCiteKeyPattern, this.generateBibtexKeysBeforeSaving);
     }
 
     public Charset getEncodingOrDefault() {
@@ -109,6 +111,10 @@ public class SavePreferences {
 
     public GlobalBibtexKeyPattern getGlobalCiteKeyPattern() {
         return globalCiteKeyPattern;
+    }
+
+    public Boolean generateBibtexKeysBeforeSaving() {
+        return generateBibtexKeysBeforeSaving;
     }
 
     public enum DatabaseSaveType {

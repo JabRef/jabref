@@ -146,7 +146,7 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
             dispose();
             if (!fileLocationField.getText().isEmpty()) {
                 try {
-                    new SaveDatabaseAction(panel, Paths.get(fileLocationField.getText())).runCommand();
+                    new SaveDatabaseAction(panel).saveAs(Paths.get(fileLocationField.getText()));
                 } catch (Throwable e) {
                     LOGGER.error("Error while saving the database", e);
                 }

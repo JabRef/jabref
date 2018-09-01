@@ -117,6 +117,10 @@ public class BibDatabaseContext {
         this.file = Optional.ofNullable(file).map(File::toPath);
     }
 
+    public void setDatabaseFile(Path file) {
+        this.file = Optional.ofNullable(file);
+    }
+
     public Optional<Path> getDatabasePath() {
         return file;
     }
