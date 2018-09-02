@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * In detail, the strategy is to:
  * <ol>
  * <li>Write to a temporary file (with .tmp suffix) in the same directory as the destination file.</li>
- * <li>Create a backup of the original file (if it exists) in the same directory.</li>
+ * <li>Create a backup (with .sav suffix) of the original file (if it exists) in the same directory.</li>
  * <li>Move the temporary file to the correct place, overwriting any file that already exists at that location.</li>
  * <li>Delete the backup file.</li>
  * </ol>
