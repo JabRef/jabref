@@ -54,7 +54,6 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
         fontSizeContainer.disableProperty().bind(overrideFonts.selectedProperty().not());
         fontSizeContainer.disableProperty().bind(accessDarkThemes.selectedProperty().not());
         fontTweaksLAF = new CheckBox(Localization.lang("Tweak font rendering for entry editor on Linux"));
-
         container.getChildren().addAll(overrideFonts,fontSizeContainer, fontTweaksLAF,accessDarkThemes);
 
     }
@@ -67,6 +66,7 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
     //Ultimately you have to read the contents of the file and replace it
     private void addLogic(CheckBox accessDarkTheme) throws URISyntaxException {
 
+        //Swaps files
         if(accessDarkTheme.isSelected()==true){
 
             File basecaseFile= new File(DEFAULT_PATH_MAIN_CSS);
@@ -148,7 +148,6 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
     @Override
     public void storeSettings() {
         // Java FX font rendering tweak
-
         try {
             addLogic(accessDarkThemes);
         } catch (URISyntaxException e) {
