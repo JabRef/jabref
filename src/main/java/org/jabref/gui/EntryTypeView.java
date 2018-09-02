@@ -1,28 +1,29 @@
 package org.jabref.gui;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.geometry.HPos;
-import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
 import org.jabref.Globals;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
@@ -41,6 +42,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,108 +52,90 @@ import org.slf4j.LoggerFactory;
  */
 public class EntryTypeView extends BaseDialog<Void> {
 
-    private static final int COLUMN = 3;
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryTypeView.class);
 
-    @FXML private Button generateButton;
-    @FXML private Button cancelButton;
+    @FXML private ButtonType generateButton;
     @FXML private TextField idTextField;
     @FXML private ComboBox<String> comboBox;
-    @FXML private TitledPane biblatexPane;
-    @FXML private TitledPane bibTexPane;
-    @FXML private TitledPane ieeetranPane;
-    @FXML private TitledPane customPane;
+    @FXML private FlowPane biblatexPane;
+    @FXML private FlowPane bibTexPane;
+    @FXML private FlowPane ieeetranPane;
+    @FXML private FlowPane customPane;
+    @FXML private TitledPane biblatexTitlePane;
+    @FXML private TitledPane bibTexTitlePane;
+    @FXML private TitledPane ieeeTranTitlePane;
+    @FXML private TitledPane customTitlePane;
     @FXML private VBox vBox;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
     private final BasePanel basePanel;
     private EntryType type;
     private Task<Optional<BibEntry>> fetcherWorker = new FetcherWorker();
+    private EntryTypeViewModel viewModel;
 
     public EntryTypeView(BasePanel basePanel) {
         this.basePanel = basePanel;
         this.setTitle(Localization.lang("Select entry type"));
-        //viewModel = new EntryTypeViewModel(basePanel);
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
 
-        //ControlHelper.setAction(cancelButton, getDialogPane(), event -> cancelHandle(event));
-        cancelButton.setOnAction(event -> cancelHandle(event));
+        ControlHelper.setAction(generateButton, this.getDialogPane(), event -> fetcherWorker.run());
 
-        //cancelButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE), "close");
-        //cancelButton.getActionMap().put("close", cancelAction);
-        //ControlHelper.setAction(generateButton, getDialogPane(), action -> {
-        //    fetcherWorker.run();
-        //});
-        generateButton.setOnAction(action -> {
-            fetcherWorker.run();
-        });
-        comboBox.onActionProperty().addListener(e -> {
+        comboBox.setOnAction(evt -> {
             idTextField.requestFocus();
             idTextField.selectAll();
         });
 
-        idTextField.onActionProperty().addListener(event -> fetcherWorker.run());
+        idTextField.setOnAction(evt -> {
+            fetcherWorker.run();
+        });
 
         if (basePanel.getBibDatabaseContext().isBiblatexMode()) {
-            biblatexPane.setContent(createPane(BiblatexEntryTypes.ALL));
-            vBox.getChildren().remove(bibTexPane);
-            vBox.getChildren().remove(ieeetranPane);
+            addEntriesToPane(biblatexPane, BiblatexEntryTypes.ALL);
+
+            vBox.getChildren().remove(bibTexTitlePane);
+            vBox.getChildren().remove(ieeeTranTitlePane);
             List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
-            if (EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBLATEX).isEmpty()) {
-                vBox.getChildren().remove(customPane);
+            if (customTypes.isEmpty()) {
+                vBox.getChildren().remove(customTitlePane);
             } else {
-                customPane.setContent(createPane(customTypes));
+                addEntriesToPane(customPane, customTypes);
             }
-            //vBox.getChildren().remove(customPane);
-            //bibTexPane.setVisible(false);
-            //ieeetranPane.setVisible(false);
+
         } else {
-            bibTexPane.setContent(createPane(BibtexEntryTypes.ALL));
-            ieeetranPane.setContent(createPane(IEEETranEntryTypes.ALL));
-            vBox.getChildren().remove(biblatexPane);
+            addEntriesToPane(bibTexPane, BibtexEntryTypes.ALL);
+            addEntriesToPane(ieeetranPane, IEEETranEntryTypes.ALL);
 
             List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBTEX);
-            if (EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBTEX).isEmpty()) {
-                vBox.getChildren().remove(customPane);
+            if (customTypes.isEmpty()) {
+                vBox.getChildren().remove(customTitlePane);
             } else {
-                customPane.setContent(createPane(customTypes));
+                addEntriesToPane(customPane, customTypes);
             }
-            //vBox.getChildren().remove(customPane);
-            //biblatexPane.setVisible(false);
         }
+
+        Button btnGenerate = (Button) this.getDialogPane().lookupButton(generateButton);
+
+        btnGenerate.textProperty().bind(EasyBind.map(viewModel.searchingProperty(), searching -> (searching) ? Localization.lang("Searching...") : Localization.lang("Generate")));
+        btnGenerate.disableProperty().bind(viewModel.searchingProperty());
 
     }
 
-    private GridPane createPane(Collection<? extends EntryType> entries) {
-        GridPane gridpane = new GridPane();
-        gridpane.setPadding(new Insets(4));
-        gridpane.setVgap(4);
-        // row count
-        int row = 0;
-        // col count
-        int col = 0;
+    private void addEntriesToPane(FlowPane pane, Collection<? extends EntryType> entries) {
+
         for (EntryType entryType : entries) {
-            TypeButton entryButton = new TypeButton(entryType.getName(), entryType);
+            Button entryButton = new Button(entryType.getName());
+            entryButton.setUserData(entryType);
             entryButton.setOnAction(event -> cancelHandle(event));
-            if (col == EntryTypeView.COLUMN) {
-                col = 0;
-                row++;
-                //constraints.gridwidth = GridBagConstraints.REMAINDER;
-            }
-            //else {
-                //constraints.gridwidth = 1;
-            //}
-            GridPane.setHalignment(entryButton, HPos.CENTER);
-            gridpane.add(entryButton, col, row);
-            col++;
+            pane.getChildren().add(entryButton);
         }
-        return gridpane;
     }
 
     @FXML
     public void initialize() {
+        viewModel = new EntryTypeViewModel();
+
         visualizer.setDecoration(new IconValidationDecorator());
 
         WebFetchers.getIdBasedFetchers(Globals.prefs.getImportFormatPreferences()).forEach(fetcher -> comboBox.getItems().add(fetcher.getName()));
@@ -179,25 +163,6 @@ public class EntryTypeView extends BaseDialog<Void> {
         }
     }
 
-    static class TypeButton extends Button implements Comparable<TypeButton> {
-
-        private final EntryType type;
-
-        TypeButton(String label, EntryType type) {
-            super(label);
-            this.type = type;
-        }
-
-        @Override
-        public int compareTo(TypeButton o) {
-            return type.getName().compareTo(o.type.getName());
-        }
-
-        public EntryType getType() {
-            return type;
-        }
-    }
-
     private class FetcherWorker extends Task<Optional<BibEntry>> {
 
         private boolean fetcherException = false;
@@ -216,7 +181,7 @@ public class EntryTypeView extends BaseDialog<Void> {
                         final BasePanel panel = basePanel;
 
                         ImportInspectionDialog diag = new ImportInspectionDialog(basePanel.frame(), panel, Localization.lang("Import"), false);
-                        diag.addEntry(bibEntry);
+                        diag.addEntries(Arrays.asList(bibEntry));
                         diag.entryListComplete();
                         diag.setVisible(true);
                         diag.toFront();
@@ -233,22 +198,18 @@ public class EntryTypeView extends BaseDialog<Void> {
                     close();
                 } else if (searchID.trim().isEmpty()) {
                     basePanel.frame().getDialogService().showWarningDialogAndWait(Localization.lang("Empty search ID"),
-                                                                      Localization.lang("The given search ID was empty."));
+                                                                                  Localization.lang("The given search ID was empty."));
                 } else if (!fetcherException) {
                     basePanel.frame().getDialogService().showErrorDialogAndWait(Localization.lang("No files found.",
-                                                                                      Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage));
+                                                                                                  Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage));
                 } else {
                     basePanel.frame().getDialogService().showErrorDialogAndWait(Localization.lang("Error"), Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage);
                 }
                 fetcherWorker = new FetcherWorker();
-                Platform.runLater(() -> {
-                    idTextField.requestFocus();
-                    idTextField.selectAll();
-                    //((Button) (getDialogPane().lookupButton(generateButton))).setText(Localization.lang("Generate"));
-                    //((Button) (getDialogPane().lookupButton(generateButton))).setDisable(true);
-                    generateButton.setText(Localization.lang("Generate"));
-                    generateButton.setDisable(true);
-                });
+
+                idTextField.requestFocus();
+                idTextField.selectAll();
+
             } catch (ExecutionException | InterruptedException e) {
                 LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchID, fetcher.getName()), e);
             }
@@ -257,12 +218,6 @@ public class EntryTypeView extends BaseDialog<Void> {
         @Override
         protected Optional<BibEntry> call() throws Exception {
             Optional<BibEntry> bibEntry = Optional.empty();
-            Platform.runLater(() -> {
-                //((Button) (getDialogPane().lookupButton(generateButton))).setText(Localization.lang("Searching..."));
-                //((Button) (getDialogPane().lookupButton(generateButton))).setDisable(true);
-                generateButton.setDisable(true);
-                generateButton.setText(Localization.lang("Searching..."));
-            });
 
             Globals.prefs.put(JabRefPreferences.ID_ENTRY_GENERATOR, String.valueOf(comboBox.getSelectionModel().getSelectedItem()));
             fetcher = WebFetchers.getIdBasedFetchers(Globals.prefs.getImportFormatPreferences()).get(comboBox.getSelectionModel().getSelectedIndex());
@@ -282,10 +237,8 @@ public class EntryTypeView extends BaseDialog<Void> {
 
     @FXML
     private void cancelHandle(Event event) {
-        if (event.getSource() instanceof TypeButton) {
-            type = ((TypeButton) event.getSource()).getType();
-        }
+        type = (EntryType) ((Node) event.getSource()).getUserData();
         stopFetching();
-        this.getDialogPane().getScene().getWindow().hide();
+        this.close();
     }
 }

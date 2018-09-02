@@ -1,29 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import java.lang.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
-<DialogPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.EntryTypeView">
+<DialogPane xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.EntryTypeView">
    <content>
-       
       <BorderPane>             
-         <bottom>
-            <Button fx:id="cancelButton" text="Cancel" BorderPane.alignment="CENTER" />
-         </bottom>
          <center>
             <GridPane alignment="CENTER" BorderPane.alignment="CENTER">
                <children>
-                  <Label text="ID type" />
+                  <Label text="%ID type" />
                   <ComboBox fx:id="comboBox" prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1" />                  	
-                  <Label text="ID" GridPane.rowIndex="1" />
+                  <Label text="%ID" GridPane.rowIndex="1" />
                   <TextField fx:id="idTextField" prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Button fx:id="generateButton" alignment="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="110.0" text="Generate" textAlignment="CENTER" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="2">
-                     <GridPane.margin>
-                        <Insets />
-                     </GridPane.margin>
-                  </Button>
                </children>
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="122.0" minWidth="10.0" prefWidth="100.0" />
@@ -45,20 +46,24 @@
          <top>
             <VBox fx:id="vBox" prefHeight="200.0" prefWidth="400.0" BorderPane.alignment="CENTER">
                <children>
-                  <TitledPane fx:id="biblatexPane" animated="false" collapsible="false" text="biblatex">
-                     <content>                        
+                  <TitledPane fx:id="biblatexTitlePane" animated="false" collapsible="false" text="Biblatex">
+                     <content>
+                        <FlowPane fx:id="biblatexPane" prefHeight="200.0" prefWidth="200.0" />
                      </content>
                   </TitledPane>
-                  <TitledPane fx:id="bibTexPane" animated="false" collapsible="false" text="BibTex">
-                     <content>                        
+                  <TitledPane fx:id="bibTexTitlePane" animated="false" collapsible="false" text="BibTeX">
+                     <content>
+                        <FlowPane fx:id="bibTexPane" prefHeight="200.0" prefWidth="200.0" />
                      </content>
                   </TitledPane>
-                  <TitledPane fx:id="ieeetranPane" animated="false" collapsible="false" text="IEEETran">
-                     <content>                        
+                  <TitledPane fx:id="ieeeTranTitlePane"  animated="false" collapsible="false" text="IEEETran">
+                     <content>
+                        <FlowPane fx:id="ieeetranPane" prefHeight="200.0" prefWidth="200.0" />
                      </content>
                   </TitledPane>
-                  <TitledPane fx:id="customPane" animated="false" collapsible="false" text="Custom">
-                     <content>                        
+                  <TitledPane fx:id="customTitlePane"  animated="false"  collapsible="false" text="%Custom">
+                     <content>
+                        <FlowPane fx:id="customPane" prefHeight="200.0" prefWidth="200.0" />
                      </content>
                   </TitledPane>
                </children>
@@ -66,5 +71,8 @@
          </top>
       </BorderPane>
    </content>
-    
+      <buttonTypes>
+        <ButtonType fx:constant="CANCEL"/>
+        <ButtonType fx:id="generateButton" buttonData="OK_DONE" text="%Generate" />
+      </buttonTypes>
 </DialogPane>
