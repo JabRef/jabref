@@ -64,6 +64,7 @@ public class FXDialogService implements DialogService {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        alert.showAndWait();
         return alert;
     }
 

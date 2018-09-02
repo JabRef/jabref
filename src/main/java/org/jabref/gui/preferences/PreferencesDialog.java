@@ -93,18 +93,22 @@ public class PreferencesDialog extends BaseDialog<Void> {
         preferenceTabs.add(new AdvancedTab(dialogService, prefs));
         preferenceTabs.add(new AppearancePrefsTab(dialogService, prefs));
 
+
         container = new BorderPane();
         getDialogPane().setContent(container);
+        getDialogPane().setId("dialogPane");
         construct();
     }
 
     private void construct() {
         VBox vBox = new VBox();
         vBox.setPrefWidth(160);
+        vBox.setId("vBoxPAne");
 
         ListView<PrefsTab> tabsList = new ListView<>();
         tabsList.setId("sideMenu");
         tabsList.itemsProperty().setValue(preferenceTabs);
+
         EasyBind.subscribe(tabsList.getSelectionModel().selectedItemProperty(), tab -> {
             if (tab != null) {
                 ScrollPane preferencePaneContainer = new ScrollPane(tab.getBuilder());
