@@ -14,7 +14,7 @@ import javax.swing.SwingUtilities;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelMode;
-import org.jabref.gui.EntryTypeDialog;
+import org.jabref.gui.EntryTypeView;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiles.DroppedFileHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -224,8 +224,10 @@ public class PdfImporter {
 
     private Optional<BibEntry> createNewEntry() {
         // Find out what type is desired
-        EntryTypeDialog etd = new EntryTypeDialog(frame);
-        etd.setVisible(true);
+        //EntryTypeDialog etd = new EntryTypeDialog(frame);
+        EntryTypeView etd = new EntryTypeView(frame.getCurrentBasePanel());
+        //etd.setVisible(true);
+        etd.showAndWait();
         EntryType type = etd.getChoice();
 
         if (type != null) { // Only if the dialog was not canceled.
