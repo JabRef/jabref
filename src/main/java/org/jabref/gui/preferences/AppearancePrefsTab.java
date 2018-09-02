@@ -65,8 +65,7 @@ class AppearancePrefsTab extends Pane implements PrefsTab {
     //Basically replace each of the files with each other
     //Ultimately you have to read the contents of the file and replace it
     private void addLogic(CheckBox accessDarkTheme) throws URISyntaxException {
-
-        //Swaps files
+        
         if(accessDarkTheme.isSelected()==true){
 
             File basecaseFile= new File(DEFAULT_PATH_MAIN_CSS);
