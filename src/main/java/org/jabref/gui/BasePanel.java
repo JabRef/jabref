@@ -773,7 +773,7 @@ public class BasePanel extends StackPane {
         if (actualType == null) {
             // Find out what type is wanted.
             //final EntryTypeDialog etd = new EntryTypeDialog(frame);
-            final EntryTypeView etv = new EntryTypeView(frame.getCurrentBasePanel());
+            final EntryTypeView etv = new EntryTypeView(frame.getCurrentBasePanel(), dialogService);
             // We want to center the dialog, to make it look nicer.
             //etd.setVisible(true);
             //actualType = etd.getChoice();

@@ -18,7 +18,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Window;
 
 import org.jabref.Globals;
 import org.jabref.gui.importer.ImportInspectionDialog;
@@ -69,12 +68,16 @@ public class EntryTypeView extends BaseDialog<Void> {
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
     private final BasePanel basePanel;
+    private final DialogService dialogService;
+
     private EntryType type;
     private Task<Optional<BibEntry>> fetcherWorker = new FetcherWorker();
     private EntryTypeViewModel viewModel;
 
-    public EntryTypeView(BasePanel basePanel) {
+    public EntryTypeView(BasePanel basePanel, DialogService dialogService) {
         this.basePanel = basePanel;
+        this.dialogService = dialogService;
+
         this.setTitle(Localization.lang("Select entry type"));
         ViewLoader.view(this)
                   .load()
@@ -94,22 +97,24 @@ public class EntryTypeView extends BaseDialog<Void> {
         if (basePanel.getBibDatabaseContext().isBiblatexMode()) {
             addEntriesToPane(biblatexPane, BiblatexEntryTypes.ALL);
 
-            vBox.getChildren().remove(bibTexTitlePane);
-            vBox.getChildren().remove(ieeeTranTitlePane);
+            bibTexTitlePane.setVisible(false);
+            ieeeTranTitlePane.setVisible(false);
+
             List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
             if (customTypes.isEmpty()) {
-                vBox.getChildren().remove(customTitlePane);
+                customTitlePane.setVisible(false);
             } else {
                 addEntriesToPane(customPane, customTypes);
             }
 
         } else {
+            biblatexTitlePane.setVisible(false);
             addEntriesToPane(bibTexPane, BibtexEntryTypes.ALL);
             addEntriesToPane(ieeetranPane, IEEETranEntryTypes.ALL);
 
             List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBTEX);
             if (customTypes.isEmpty()) {
-                vBox.getChildren().remove(customTitlePane);
+                customTitlePane.setVisible(false);
             } else {
                 addEntriesToPane(customPane, customTypes);
             }
@@ -141,16 +146,12 @@ public class EntryTypeView extends BaseDialog<Void> {
         WebFetchers.getIdBasedFetchers(Globals.prefs.getImportFormatPreferences()).forEach(fetcher -> comboBox.getItems().add(fetcher.getName()));
         comboBox.setValue(Globals.prefs.get(JabRefPreferences.ID_ENTRY_GENERATOR));
 
-        Window window = this.getDialogPane().getScene().getWindow();
-        window.setOnCloseRequest(event -> window.hide());
-        //        this.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
-        //        Node closeButton = this.getDialogPane().lookupButton(ButtonType.CLOSE);
-        //
-        //        closeButton.managedProperty().bind(closeButton.visibleProperty());
-        //        closeButton.setVisible(false);
-        //bibTexPane.managedProperty().bind(biblatexPane.visibleProperty());
-        //ieeetranPane.managedProperty().bind(ieeetranPane.visibleProperty());
-        //biblatexPane.managedProperty().bind(biblatexPane.visibleProperty());
+        //we set the managed property so that they will only be rendered when they are visble so that the Nodes only take the space when visible
+        //avoids removing and adding from the scence graph
+        bibTexTitlePane.managedProperty().bind(bibTexTitlePane.visibleProperty());
+        ieeeTranTitlePane.managedProperty().bind(ieeeTranTitlePane.visibleProperty());
+        biblatexTitlePane.managedProperty().bind(biblatexTitlePane.visibleProperty());
+        customTitlePane.managedProperty().bind(customTitlePane.visibleProperty());
     }
 
     public EntryType getChoice() {
@@ -197,18 +198,17 @@ public class EntryTypeView extends BaseDialog<Void> {
 
                     close();
                 } else if (searchID.trim().isEmpty()) {
-                    basePanel.frame().getDialogService().showWarningDialogAndWait(Localization.lang("Empty search ID"),
-                                                                                  Localization.lang("The given search ID was empty."));
+                    dialogService.showWarningDialogAndWait(Localization.lang("Empty search ID"), Localization.lang("The given search ID was empty."));
                 } else if (!fetcherException) {
-                    basePanel.frame().getDialogService().showErrorDialogAndWait(Localization.lang("No files found.",
-                                                                                                  Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage));
+                    dialogService.showErrorDialogAndWait(Localization.lang("No files found.", Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage));
                 } else {
-                    basePanel.frame().getDialogService().showErrorDialogAndWait(Localization.lang("Error"), Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage);
+                    dialogService.showErrorDialogAndWait(Localization.lang("Error"), Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage);
                 }
                 fetcherWorker = new FetcherWorker();
 
                 idTextField.requestFocus();
                 idTextField.selectAll();
+                viewModel.searchingProperty().setValue(false);
 
             } catch (ExecutionException | InterruptedException e) {
                 LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchID, fetcher.getName()), e);
@@ -219,6 +219,7 @@ public class EntryTypeView extends BaseDialog<Void> {
         protected Optional<BibEntry> call() throws Exception {
             Optional<BibEntry> bibEntry = Optional.empty();
 
+            viewModel.searchingProperty().setValue(true);
             Globals.prefs.put(JabRefPreferences.ID_ENTRY_GENERATOR, String.valueOf(comboBox.getSelectionModel().getSelectedItem()));
             fetcher = WebFetchers.getIdBasedFetchers(Globals.prefs.getImportFormatPreferences()).get(comboBox.getSelectionModel().getSelectedIndex());
             searchID = idTextField.getText();

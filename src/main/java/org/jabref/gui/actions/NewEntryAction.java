@@ -4,9 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.swing.SwingUtilities;
-
 import org.jabref.Globals;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.EntryTypeView;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.model.entry.EntryType;
@@ -15,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NewEntryAction extends SimpleCommand {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryAction.class);
 
     private final JabRefFrame jabRefFrame;
@@ -22,16 +22,18 @@ public class NewEntryAction extends SimpleCommand {
      * The type of the entry to create.
      */
     private final Optional<EntryType> type;
+    private final DialogService dialogService;
 
-
-    public NewEntryAction(JabRefFrame jabRefFrame) {
+    public NewEntryAction(JabRefFrame jabRefFrame, DialogService dialogService) {
         this.jabRefFrame = jabRefFrame;
         this.type = Optional.empty();
+        this.dialogService = dialogService;
     }
 
-    public NewEntryAction(JabRefFrame jabRefFrame, EntryType type) {
+    public NewEntryAction(JabRefFrame jabRefFrame, EntryType type, DialogService dialogService) {
         this.jabRefFrame = jabRefFrame;
         this.type = Optional.of(type);
+        this.dialogService = dialogService;
     }
 
     @Override
@@ -46,7 +48,7 @@ public class NewEntryAction extends SimpleCommand {
         } else {
             //EntryTypeDialog typeChoiceDialog = new EntryTypeDialog(jabRefFrame);
             //typeChoiceDialog.setVisible(true);
-            EntryTypeView typeChoiceDialog = new EntryTypeView(jabRefFrame.getCurrentBasePanel());
+            EntryTypeView typeChoiceDialog = new EntryTypeView(jabRefFrame.getCurrentBasePanel(), dialogService);
             typeChoiceDialog.showAndWait();
             EntryType selectedType = typeChoiceDialog.getChoice();
             if (selectedType == null) {

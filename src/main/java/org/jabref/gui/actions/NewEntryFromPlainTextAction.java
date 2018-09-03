@@ -1,5 +1,6 @@
 package org.jabref.gui.actions;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.EntryTypeView;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.plaintextimport.TextInputDialog;
@@ -17,10 +18,12 @@ public class NewEntryFromPlainTextAction extends SimpleCommand {
 
     private final UpdateFieldPreferences prefs;
     private final JabRefFrame jabRefFrame;
+    private final DialogService dialogService;
 
-    public NewEntryFromPlainTextAction(JabRefFrame jabRefFrame, UpdateFieldPreferences prefs) {
+    public NewEntryFromPlainTextAction(JabRefFrame jabRefFrame, UpdateFieldPreferences prefs, DialogService dialogService) {
         this.jabRefFrame = jabRefFrame;
         this.prefs = prefs;
+        this.dialogService = dialogService;
 
     }
 
@@ -32,7 +35,7 @@ public class NewEntryFromPlainTextAction extends SimpleCommand {
         }
 
         //EntryTypeDialog typeChoiceDialog = new EntryTypeDialog(jabRefFrame);
-        EntryTypeView typeChoiceDialog = new EntryTypeView(jabRefFrame.getCurrentBasePanel());
+        EntryTypeView typeChoiceDialog = new EntryTypeView(jabRefFrame.getCurrentBasePanel(), dialogService);
         //typeChoiceDialog.setVisible(true);
         typeChoiceDialog.showAndWait();
         EntryType selectedType = typeChoiceDialog.getChoice();
