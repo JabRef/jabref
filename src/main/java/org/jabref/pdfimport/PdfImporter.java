@@ -117,26 +117,26 @@ public class PdfImporter {
             if (neverShow || (importDialog.getResult() == JOptionPane.OK_OPTION)) {
                 int choice = neverShow ? globalChoice : importDialog.getChoice();
                 switch (choice) {
-                case ImportDialog.XMP:
-                    doXMPImport(fileName, res);
-                    break;
+                    case ImportDialog.XMP:
+                        doXMPImport(fileName, res);
+                        break;
 
-                case ImportDialog.CONTENT:
-                    doContentImport(fileName, res);
-                    break;
-                case ImportDialog.NOMETA:
-                    createNewBlankEntry(fileName).ifPresent(res::add);
-                    break;
-                case ImportDialog.ONLYATTACH:
-                    DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
-                    if (dropRow >= 0) {
-                        dfh.linkPdfToEntry(fileName, entryTable, dropRow);
-                    } else {
-                        entryTable.getSelectedEntries().forEach(entry -> dfh.linkPdfToEntry(fileName, entry));
-                    }
-                    break;
-                default:
-                    break;
+                    case ImportDialog.CONTENT:
+                        doContentImport(fileName, res);
+                        break;
+                    case ImportDialog.NOMETA:
+                        createNewBlankEntry(fileName).ifPresent(res::add);
+                        break;
+                    case ImportDialog.ONLYATTACH:
+                        DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
+                        if (dropRow >= 0) {
+                            dfh.linkPdfToEntry(fileName, entryTable, dropRow);
+                        } else {
+                            entryTable.getSelectedEntries().forEach(entry -> dfh.linkPdfToEntry(fileName, entry));
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -169,10 +169,10 @@ public class PdfImporter {
             Path toLink = Paths.get(fileName);
             // Get a list of file directories:
             List<Path> dirsS = panel.getBibDatabaseContext()
-                    .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+                                    .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
 
             tm.addEntry(0, new FileListEntry("", FileUtil.shortenFileName(toLink, dirsS).toString(),
-                    ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
+                                             ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
             entry.setField(FieldName.FILE, tm.getStringRepresentation());
             res.add(entry);
         }
@@ -190,7 +190,7 @@ public class PdfImporter {
     private void doContentImport(String fileName, List<BibEntry> res) {
 
         PdfContentImporter contentImporter = new PdfContentImporter(
-                Globals.prefs.getImportFormatPreferences());
+                                                                    Globals.prefs.getImportFormatPreferences());
         Path filePath = Paths.get(fileName);
         ParserResult result = contentImporter.importDatabase(filePath, Globals.prefs.getDefaultEncoding());
         if (result.hasWarnings()) {
@@ -210,7 +210,7 @@ public class PdfImporter {
         panel.getDatabase().insertEntry(entry);
         panel.markBaseChanged();
         new BibtexKeyGenerator(panel.getBibDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences())
-                .generateAndSetKey(entry);
+                                                                                                             .generateAndSetKey(entry);
         DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
         dfh.linkPdfToEntry(fileName, entry);
 
@@ -224,14 +224,11 @@ public class PdfImporter {
 
     private Optional<BibEntry> createNewEntry() {
         // Find out what type is desired
-        //EntryTypeDialog etd = new EntryTypeDialog(frame);
-        EntryTypeView etd = new EntryTypeView(frame.getCurrentBasePanel(), frame.getDialogService(), Globals.prefs);
-        //etd.setVisible(true);
-        etd.showAndWait();
-        EntryType type = etd.getChoice();
+        EntryTypeView entryTypeDialog = new EntryTypeView(frame.getCurrentBasePanel(), frame.getDialogService(), Globals.prefs);
+        EntryType type = entryTypeDialog.showAndWait().orElse(null);
 
         if (type != null) { // Only if the dialog was not canceled.
-            final BibEntry bibEntry = new BibEntry(type.getName());
+            final BibEntry bibEntry = new BibEntry(type);
             try {
                 panel.getDatabase().insertEntry(bibEntry);
 

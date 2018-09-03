@@ -18,7 +18,7 @@
    <content>
       <BorderPane>
          <top>
-            <VBox fx:id="vBox" prefHeight="200.0" prefWidth="400.0" BorderPane.alignment="CENTER">
+            <VBox prefHeight="200.0" prefWidth="400.0" BorderPane.alignment="CENTER">
                <children>
                   <TitledPane fx:id="biblatexTitlePane" animated="false" collapsible="false" text="Biblatex">
                      <content>
@@ -47,9 +47,9 @@
             <GridPane alignment="CENTER" BorderPane.alignment="CENTER">
                <children>
                   <Label text="%ID type" />
-                  <ComboBox fx:id="comboBox" prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1" />                  	
+                  <ComboBox fx:id="idBasedFetchers" prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1" onAction="#focusTextField" />                  	
                   <Label text="%ID" GridPane.rowIndex="1" />
-                  <TextField fx:id="idTextField" prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="idTextField" prefHeight="30.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" onAction="#runFetcherWorker"/>
                </children>
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="122.0" minWidth="10.0" prefWidth="100.0" />

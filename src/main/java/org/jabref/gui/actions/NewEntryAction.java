@@ -51,8 +51,7 @@ public class NewEntryAction extends SimpleCommand {
             jabRefFrame.getCurrentBasePanel().newEntry(type.get());
         } else {
             EntryTypeView typeChoiceDialog = new EntryTypeView(jabRefFrame.getCurrentBasePanel(), dialogService, preferences);
-            typeChoiceDialog.showAndWait();
-            EntryType selectedType = typeChoiceDialog.getChoice();
+            EntryType selectedType = typeChoiceDialog.showAndWait().orElse(null);
             if (selectedType == null) {
                 return;
             }

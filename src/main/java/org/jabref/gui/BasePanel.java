@@ -762,26 +762,17 @@ public class BasePanel extends StackPane {
     }
 
     /**
-     * This method is called from JabRefFrame when the user wants to create a new entry. If the argument is null, the
-     * user is prompted for an entry type.
-     *
-     * @param type The type of the entry to create.
-     * @return The newly created BibEntry or null the operation was canceled by the user.
+     * TODO: Merge with insertEntry
      */
     public BibEntry newEntry(EntryType type) {
         EntryType actualType = type;
         if (actualType == null) {
             // Find out what type is wanted.
-            //final EntryTypeDialog etd = new EntryTypeDialog(frame);
-            final EntryTypeView etv = new EntryTypeView(frame.getCurrentBasePanel(), dialogService, Globals.prefs);
-            // We want to center the dialog, to make it look nicer.
-            //etd.setVisible(true);
-            //actualType = etd.getChoice();
-            etv.showAndWait();
-            actualType = etv.getChoice();
+            final EntryTypeView entryTypeDialog = new EntryTypeView(frame.getCurrentBasePanel(), dialogService, Globals.prefs);
+            actualType = entryTypeDialog.showAndWait().orElse(null);
         }
         if (actualType != null) { // Only if the dialog was not canceled.
-            final BibEntry be = new BibEntry(actualType.getName());
+            final BibEntry be = new BibEntry(actualType);
             try {
                 bibDatabaseContext.getDatabase().insertEntry(be);
                 // Set owner/timestamp if options are enabled:
