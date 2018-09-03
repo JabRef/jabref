@@ -225,7 +225,7 @@ public class PdfImporter {
     private Optional<BibEntry> createNewEntry() {
         // Find out what type is desired
         //EntryTypeDialog etd = new EntryTypeDialog(frame);
-        EntryTypeView etd = new EntryTypeView(frame.getCurrentBasePanel(), frame.getDialogService());
+        EntryTypeView etd = new EntryTypeView(frame.getCurrentBasePanel(), frame.getDialogService(), Globals.prefs);
         //etd.setVisible(true);
         etd.showAndWait();
         EntryType type = etd.getChoice();

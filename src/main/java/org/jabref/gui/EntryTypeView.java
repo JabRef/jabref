@@ -18,8 +18,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 
-import org.jabref.Globals;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
@@ -28,7 +28,6 @@ import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
-import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
@@ -55,7 +54,7 @@ public class EntryTypeView extends BaseDialog<Void> {
 
     @FXML private ButtonType generateButton;
     @FXML private TextField idTextField;
-    @FXML private ComboBox<String> comboBox;
+    @FXML private ComboBox<IdBasedFetcher> comboBox;
     @FXML private FlowPane biblatexPane;
     @FXML private FlowPane bibTexPane;
     @FXML private FlowPane ieeetranPane;
@@ -69,14 +68,16 @@ public class EntryTypeView extends BaseDialog<Void> {
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
     private final BasePanel basePanel;
     private final DialogService dialogService;
+    private final JabRefPreferences prefs;
 
     private EntryType type;
     private Task<Optional<BibEntry>> fetcherWorker = new FetcherWorker();
     private EntryTypeViewModel viewModel;
 
-    public EntryTypeView(BasePanel basePanel, DialogService dialogService) {
+    public EntryTypeView(BasePanel basePanel, DialogService dialogService, JabRefPreferences preferences) {
         this.basePanel = basePanel;
         this.dialogService = dialogService;
+        this.prefs = preferences;
 
         this.setTitle(Localization.lang("Select entry type"));
         ViewLoader.view(this)
@@ -139,12 +140,22 @@ public class EntryTypeView extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new EntryTypeViewModel();
+        viewModel = new EntryTypeViewModel(prefs);
 
         visualizer.setDecoration(new IconValidationDecorator());
+        comboBox.itemsProperty().bind(viewModel.fetcherItemsProperty());
+        comboBox.setConverter(new StringConverter<IdBasedFetcher>() {
 
-        WebFetchers.getIdBasedFetchers(Globals.prefs.getImportFormatPreferences()).forEach(fetcher -> comboBox.getItems().add(fetcher.getName()));
-        comboBox.setValue(Globals.prefs.get(JabRefPreferences.ID_ENTRY_GENERATOR));
+            @Override
+            public String toString(IdBasedFetcher object) {
+                return object.getName();
+            }
+
+            @Override
+            public IdBasedFetcher fromString(String string) {
+                return null;
+            }
+        });
 
         //we set the managed property so that they will only be rendered when they are visble so that the Nodes only take the space when visible
         //avoids removing and adding from the scence graph
@@ -188,10 +199,10 @@ public class EntryTypeView extends BaseDialog<Void> {
                         diag.toFront();
                     } else {
                         // Regenerate CiteKey of imported BibEntry
-                        new BibtexKeyGenerator(basePanel.getBibDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(bibEntry);
+                        new BibtexKeyGenerator(basePanel.getBibDatabaseContext(), prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(bibEntry);
                         // Update Timestamps
-                        if (Globals.prefs.getTimestampPreferences().includeCreatedTimestamp()) {
-                            bibEntry.setField(Globals.prefs.getTimestampPreferences().getTimestampField(), Globals.prefs.getTimestampPreferences().now());
+                        if (prefs.getTimestampPreferences().includeCreatedTimestamp()) {
+                            bibEntry.setField(prefs.getTimestampPreferences().getTimestampField(), prefs.getTimestampPreferences().now());
                         }
                         basePanel.insertEntry(bibEntry);
                     }
@@ -220,8 +231,8 @@ public class EntryTypeView extends BaseDialog<Void> {
             Optional<BibEntry> bibEntry = Optional.empty();
 
             viewModel.searchingProperty().setValue(true);
-            Globals.prefs.put(JabRefPreferences.ID_ENTRY_GENERATOR, String.valueOf(comboBox.getSelectionModel().getSelectedItem()));
-            fetcher = WebFetchers.getIdBasedFetchers(Globals.prefs.getImportFormatPreferences()).get(comboBox.getSelectionModel().getSelectedIndex());
+            viewModel.storeSelectedFetcher();
+            fetcher = viewModel.selectedItemProperty().getValue();
             searchID = idTextField.getText();
             if (!searchID.isEmpty()) {
                 try {

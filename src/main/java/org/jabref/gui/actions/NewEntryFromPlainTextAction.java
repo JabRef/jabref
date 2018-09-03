@@ -8,6 +8,7 @@ import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +20,13 @@ public class NewEntryFromPlainTextAction extends SimpleCommand {
     private final UpdateFieldPreferences prefs;
     private final JabRefFrame jabRefFrame;
     private final DialogService dialogService;
+    private final JabRefPreferences preferences;
 
-    public NewEntryFromPlainTextAction(JabRefFrame jabRefFrame, UpdateFieldPreferences prefs, DialogService dialogService) {
+    public NewEntryFromPlainTextAction(JabRefFrame jabRefFrame, UpdateFieldPreferences prefs, DialogService dialogService, JabRefPreferences preferences) {
         this.jabRefFrame = jabRefFrame;
         this.prefs = prefs;
         this.dialogService = dialogService;
+        this.preferences = preferences;
 
     }
 
@@ -35,14 +38,14 @@ public class NewEntryFromPlainTextAction extends SimpleCommand {
         }
 
         //EntryTypeDialog typeChoiceDialog = new EntryTypeDialog(jabRefFrame);
-        EntryTypeView typeChoiceDialog = new EntryTypeView(jabRefFrame.getCurrentBasePanel(), dialogService);
+        EntryTypeView typeChoiceDialog = new EntryTypeView(jabRefFrame.getCurrentBasePanel(), dialogService, preferences);
         //typeChoiceDialog.setVisible(true);
         typeChoiceDialog.showAndWait();
         EntryType selectedType = typeChoiceDialog.getChoice();
         if (selectedType == null) {
             return;
         }
-        BibEntry bibEntry = new BibEntry(selectedType.getName());
+        BibEntry bibEntry = new BibEntry(selectedType);
 
         TextInputDialog tidialog = new TextInputDialog(jabRefFrame, bibEntry);
         tidialog.setVisible(true);
