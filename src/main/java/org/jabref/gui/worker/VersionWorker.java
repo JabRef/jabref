@@ -108,8 +108,6 @@ public class VersionWorker extends SwingWorker<List<Version>, Void> {
             if (manualExecution) {
                 DefaultTaskExecutor.runInJavaFXThread(() -> mainFrame.getDialogService().showInformationDialogAndWait(upToDate, upToDate));
             }
-            this.mainFrame.output(upToDate);
-
         } else {
             // notify the user about a newer version
             new NewVersionDialog(installedVersion, newerVersion.get());
