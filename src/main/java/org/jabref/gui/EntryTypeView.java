@@ -2,6 +2,7 @@ package org.jabref.gui;
 
 import java.util.Collection;
 import java.util.List;
+
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -11,6 +12,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.FlowPane;
+
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -26,16 +28,12 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.fxmisc.easybind.EasyBind;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Dialog that prompts the user to choose a type for an entry.
  * Returns null if canceled.
  */
 public class EntryTypeView extends BaseDialog<EntryType> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(EntryTypeView.class);
 
     @FXML private ButtonType generateButton;
     @FXML private TextField idTextField;
