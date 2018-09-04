@@ -81,7 +81,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         for (EntryType entryType : entries) {
             Button entryButton = new Button(entryType.getName());
             entryButton.setUserData(entryType);
-            entryButton.setOnAction(event -> setEntryTypeForReturnAndClose(type));
+            entryButton.setOnAction(event -> setEntryTypeForReturnAndClose(entryType));
             pane.getChildren().add(entryButton);
         }
     }
@@ -144,8 +144,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         idTextField.selectAll();
     }
 
-    private void setEntryTypeForReturnAndClose(EntryType type) {
-        this.type = type;
+    private void setEntryTypeForReturnAndClose(EntryType entryType) {
+        type = entryType;
         viewModel.stopFetching();
         this.close();
     }

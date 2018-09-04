@@ -8,6 +8,7 @@ import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.EntryTypeView;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -48,7 +49,7 @@ public class NewEntryAction extends SimpleCommand {
         }
 
         if (type.isPresent()) {
-            jabRefFrame.getCurrentBasePanel().newEntry(type.get());
+            jabRefFrame.getCurrentBasePanel().insertEntry(new BibEntry(type.get()));
         } else {
             EntryTypeView typeChoiceDialog = new EntryTypeView(jabRefFrame.getCurrentBasePanel(), dialogService, preferences);
             EntryType selectedType = typeChoiceDialog.showAndWait().orElse(null);
@@ -57,15 +58,14 @@ public class NewEntryAction extends SimpleCommand {
             }
 
             trackNewEntry(selectedType);
-            jabRefFrame.getCurrentBasePanel().newEntry(selectedType);
+            jabRefFrame.getCurrentBasePanel().insertEntry(new BibEntry(selectedType));
         }
     }
 
     private void trackNewEntry(EntryType type) {
         Map<String, String> properties = new HashMap<>();
         properties.put("EntryType", type.getName());
-        Map<String, Double> measurements = new HashMap<>();
 
-        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("NewEntry", properties, measurements));
+        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("NewEntry", properties, new HashMap<>()));
     }
 }

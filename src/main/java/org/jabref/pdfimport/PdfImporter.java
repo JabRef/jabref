@@ -5,7 +5,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 import javax.swing.JOptionPane;
@@ -13,7 +12,6 @@ import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.BasePanelMode;
 import org.jabref.gui.EntryTypeView;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiles.DroppedFileHandler;
@@ -21,13 +19,10 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.maintable.MainTable;
-import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.PdfContentImporter;
 import org.jabref.logic.importer.fileformat.PdfXmpImporter;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpUtilShared;
 import org.jabref.model.database.KeyCollisionException;
@@ -230,30 +225,7 @@ public class PdfImporter {
         if (type != null) { // Only if the dialog was not canceled.
             final BibEntry bibEntry = new BibEntry(type);
             try {
-                panel.getDatabase().insertEntry(bibEntry);
-
-                // Set owner/timestamp if options are enabled:
-                List<BibEntry> list = new ArrayList<>();
-                list.add(bibEntry);
-                UpdateField.setAutomaticFields(list, true, true, Globals.prefs.getUpdateFieldPreferences());
-
-                // Create an UndoableInsertEntry object.
-                panel.getUndoManager().addEdit(new UndoableInsertEntry(panel.getDatabase(), bibEntry));
-                panel.output(Localization.lang("Added new") + " '" + type.getName().toLowerCase(Locale.ROOT) + "' "
-                        + Localization.lang("entry") + ".");
-
-                // We are going to select the new entry. Before that, make sure that we are in
-                // show-entry mode. If we aren't already in that mode, enter the WILL_SHOW_EDITOR
-                // mode which makes sure the selection will trigger display of the entry editor
-                // and adjustment of the splitter.
-                if (panel.getMode() != BasePanelMode.SHOWING_EDITOR) {
-                    panel.setMode(BasePanelMode.WILL_SHOW_EDITOR);
-                }
-
-                SwingUtilities.invokeLater(() -> panel.showAndEdit(bibEntry));
-
-                // The database just changed.
-                panel.markBaseChanged();
+                panel.insertEntry(bibEntry);
 
                 return Optional.of(bibEntry);
             } catch (KeyCollisionException ex) {
