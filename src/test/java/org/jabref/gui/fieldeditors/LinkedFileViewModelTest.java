@@ -12,13 +12,14 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.TempDirectory;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,13 +36,12 @@ import static org.mockito.Mockito.when;
 class LinkedFileViewModelTest {
 
     private Path tempFile;
-    private final JabRefPreferences preferences = mock(JabRefPreferences.class);
+    private final JabRefPreferences preferences = mock(JabRefPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private LinkedFile linkedFile;
     private BibEntry entry;
     private BibDatabaseContext databaseContext;
     private TaskExecutor taskExecutor;
     private DialogService dialogService;
-    private final FileDirectoryPreferences fileDirectoryPreferences = mock(FileDirectoryPreferences.class);
 
     @BeforeEach
     void setUp(@TempDirectory.TempDir Path tempFolder) throws Exception {
@@ -58,10 +58,10 @@ class LinkedFileViewModelTest {
     void deleteWhenFilePathNotPresentReturnsTrue() {
         // Making this a spy, so we can inject an empty optional without digging into the implementation
         linkedFile = spy(new LinkedFile("", "nonexistent file", ""));
-        doReturn(Optional.empty()).when(linkedFile).findIn(any(BibDatabaseContext.class), any(FileDirectoryPreferences.class));
+        doReturn(Optional.empty()).when(linkedFile).findIn(any(BibDatabaseContext.class), any(FilePreferences.class));
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
-        boolean removed = viewModel.delete(fileDirectoryPreferences);
+        boolean removed = viewModel.delete();
 
         assertTrue(removed);
         verifyZeroInteractions(dialogService); // dialog was never shown
@@ -79,7 +79,7 @@ class LinkedFileViewModelTest {
                 any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(3))); // first vararg - remove button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
-        boolean removed = viewModel.delete(fileDirectoryPreferences);
+        boolean removed = viewModel.delete();
 
         assertTrue(removed);
         assertTrue(Files.exists(tempFile));
@@ -97,7 +97,7 @@ class LinkedFileViewModelTest {
                 any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
-        boolean removed = viewModel.delete(fileDirectoryPreferences);
+        boolean removed = viewModel.delete();
 
         assertTrue(removed);
         assertFalse(Files.exists(tempFile));
@@ -115,7 +115,7 @@ class LinkedFileViewModelTest {
                 any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
-        boolean removed = viewModel.delete(fileDirectoryPreferences);
+        boolean removed = viewModel.delete();
 
         verify(dialogService).showErrorDialogAndWait(anyString(), anyString());
         assertFalse(removed);
@@ -133,7 +133,7 @@ class LinkedFileViewModelTest {
                 any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(5))); // third vararg - cancel button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
-        boolean removed = viewModel.delete(fileDirectoryPreferences);
+        boolean removed = viewModel.delete();
 
         assertFalse(removed);
         assertTrue(Files.exists(tempFile));

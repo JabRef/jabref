@@ -16,7 +16,7 @@ import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
 
 /**
@@ -151,7 +151,7 @@ public class BibDatabaseContext {
         return getMode() == BibDatabaseMode.BIBLATEX;
     }
 
-    public List<Path> getFileDirectoriesAsPaths(FileDirectoryPreferences preferences) {
+    public List<Path> getFileDirectoriesAsPaths(FilePreferences preferences) {
         // Filter for empty string, as this would be expanded to the jar-directory with Paths.get()
         return getFileDirectories(preferences).stream()
                 .filter(s -> !s.isEmpty())
@@ -162,20 +162,20 @@ public class BibDatabaseContext {
     }
 
     /**
-     * @deprecated use {@link #getFileDirectoriesAsPaths(FileDirectoryPreferences)} instead
+     * @deprecated use {@link #getFileDirectoriesAsPaths(FilePreferences)} instead
      */
     @Deprecated
-    public List<String> getFileDirectories(FileDirectoryPreferences preferences) {
+    public List<String> getFileDirectories(FilePreferences preferences) {
         return getFileDirectories(FieldName.FILE, preferences);
     }
 
     /**
-     * Returns the first existing file directory from  {@link #getFileDirectories(FileDirectoryPreferences)}
+     * Returns the first existing file directory from  {@link #getFileDirectories(FilePreferences)}
      *
-     * @param preferences The FileDirectoryPreferences
+     * @param preferences The FilePreferences
      * @return Optional of Path
      */
-    public Optional<Path> getFirstExistingFileDir(FileDirectoryPreferences preferences) {
+    public Optional<Path> getFirstExistingFileDir(FilePreferences preferences) {
         return getFileDirectoriesAsPaths(preferences).stream().filter(Files::exists).findFirst();
     }
 
@@ -195,7 +195,7 @@ public class BibDatabaseContext {
      * @param preferences The fileDirectory preferences
      * @return The default directory for this field type.
      */
-    public List<String> getFileDirectories(String fieldName, FileDirectoryPreferences preferences) {
+    public List<String> getFileDirectories(String fieldName, FilePreferences preferences) {
         List<String> fileDirs = new ArrayList<>();
 
         // 1. metadata user-specific directory

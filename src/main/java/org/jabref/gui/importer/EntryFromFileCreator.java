@@ -136,8 +136,8 @@ public abstract class EntryFromFileCreator implements FileFilter {
                 .getExternalFileTypeByExt(externalFileType.getFieldName());
 
         List<Path> possibleFilePaths = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext()
-                .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
-        Path shortenedFileName = FileUtil.shortenFileName(file.toPath(), possibleFilePaths);
+                                                .getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences());
+        Path shortenedFileName = FileUtil.relativize(file.toPath(), possibleFilePaths);
         FileListEntry fileListEntry = new FileListEntry("", shortenedFileName.toString(), fileType);
 
         FileListTableModel model = new FileListTableModel();
