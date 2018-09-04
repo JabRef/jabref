@@ -5,7 +5,6 @@ import java.util.List;
 
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -67,11 +66,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         ControlHelper.setAction(generateButton, this.getDialogPane(), event -> viewModel.runFetcherWorker());
 
         setResultConverter(button -> {
-            if (button.equals(generateButton)) {
-                return type;
-            } else {
-                return null;
-            }
+            //The buttonType will always be cancel, even if we pressed one of the entry type buttons
+            return type;
         });
 
         Button btnGenerate = (Button) this.getDialogPane().lookupButton(generateButton);
@@ -85,7 +81,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         for (EntryType entryType : entries) {
             Button entryButton = new Button(entryType.getName());
             entryButton.setUserData(entryType);
-            entryButton.setOnAction(event -> cancelHandle(event));
+            entryButton.setOnAction(event -> setEntryTypeForReturnAndClose(type));
             pane.getChildren().add(entryButton);
         }
     }
@@ -148,9 +144,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         idTextField.selectAll();
     }
 
-    @FXML
-    private void cancelHandle(Event event) {
-        type = (EntryType) ((Node) event.getSource()).getUserData();
+    private void setEntryTypeForReturnAndClose(EntryType type) {
+        this.type = type;
         viewModel.stopFetching();
         this.close();
     }
