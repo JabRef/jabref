@@ -118,7 +118,6 @@ public class EntryTypeViewModel {
             String searchId = idText.getValue();
             if (exception instanceof FetcherException) {
                 dialogService.showErrorDialogAndWait(Localization.lang("Error"), Localization.lang("Error while fetching from %0", fetcher + "." + "\n" + fetcherExceptionMessage));
-
             } else {
                 dialogService.showErrorDialogAndWait(Localization.lang("No files found.", Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher, searchId) + "\n" + fetcherExceptionMessage));
             }
@@ -134,9 +133,7 @@ public class EntryTypeViewModel {
                 final BibEntry bibEntry = result.get();
                 if ((DuplicateCheck.containsDuplicate(basePanel.getDatabase(), bibEntry, basePanel.getBibDatabaseContext().getMode()).isPresent())) {
                     //If there are duplicates starts ImportInspectionDialog
-                    final BasePanel panel = basePanel;
-
-                    ImportInspectionDialog diag = new ImportInspectionDialog(basePanel.frame(), panel, Localization.lang("Import"), false);
+                    ImportInspectionDialog diag = new ImportInspectionDialog(basePanel.frame(), basePanel, Localization.lang("Import"), false);
                     diag.addEntries(Arrays.asList(bibEntry));
                     diag.entryListComplete();
                     diag.setVisible(true);
@@ -144,10 +141,6 @@ public class EntryTypeViewModel {
                 } else {
                     // Regenerate CiteKey of imported BibEntry
                     new BibtexKeyGenerator(basePanel.getBibDatabaseContext(), prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(bibEntry);
-                    // Update Timestamps
-                    if (prefs.getTimestampPreferences().includeCreatedTimestamp()) {
-                        bibEntry.setField(prefs.getTimestampPreferences().getTimestampField(), prefs.getTimestampPreferences().now());
-                    }
                     basePanel.insertEntry(bibEntry);
                 }
 

@@ -768,10 +768,10 @@ public class BasePanel extends StackPane {
         if (bibEntry != null) {
             try {
                 bibDatabaseContext.getDatabase().insertEntry(bibEntry);
-                if (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)) {
-                    // Set owner field to default value
-                    UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs.getUpdateFieldPreferences());
-                }
+
+                // Set owner and timestamp
+                UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs.getUpdateFieldPreferences());
+
                 // Create an UndoableInsertEntry object.
                 getUndoManager().addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), bibEntry));
                 output(Localization.lang("Added new '%0' entry.", bibEntry.getType()));
