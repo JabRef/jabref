@@ -104,7 +104,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.setItems(model.getEntriesFilteredAndSorted());
 
         // Enable sorting
-        model.bindComparator(this.comparatorProperty());
+        model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
 
         this.panel = panel;
 
